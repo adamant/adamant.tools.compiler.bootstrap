@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Forge</RootNamespace>
+    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Framework</AssemblyName>
+    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Framework</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

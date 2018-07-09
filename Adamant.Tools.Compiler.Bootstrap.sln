@@ -9,7 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "forge", "forge\forge.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Language.Tests", "Language.Tests\Language.Tests.csproj", "{E33B6D8B-51F0-4578-9898-7423B122BC04}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Syntax", "Syntax\Syntax.csproj", "{34857CAF-DA85-44C1-A97E-8E7B53013671}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Syntax", "Syntax\Syntax.csproj", "{34857CAF-DA85-44C1-A97E-8E7B53013671}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{28A30670-D9C8-4ACF-9EA6-B3A73254AC6B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Framework", "Framework\Framework.csproj", "{8C18643D-60EE-4BBD-91E3-08122ADD3C59}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +37,14 @@ Global
 		{34857CAF-DA85-44C1-A97E-8E7B53013671}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34857CAF-DA85-44C1-A97E-8E7B53013671}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34857CAF-DA85-44C1-A97E-8E7B53013671}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28A30670-D9C8-4ACF-9EA6-B3A73254AC6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28A30670-D9C8-4ACF-9EA6-B3A73254AC6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28A30670-D9C8-4ACF-9EA6-B3A73254AC6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28A30670-D9C8-4ACF-9EA6-B3A73254AC6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C18643D-60EE-4BBD-91E3-08122ADD3C59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C18643D-60EE-4BBD-91E3-08122ADD3C59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C18643D-60EE-4BBD-91E3-08122ADD3C59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C18643D-60EE-4BBD-91E3-08122ADD3C59}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
