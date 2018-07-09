@@ -2,6 +2,8 @@
 .vs/
 bin/
 obj/
+*.user
+launchSettings.json
 
 # OSX Files
 .DS_Store
