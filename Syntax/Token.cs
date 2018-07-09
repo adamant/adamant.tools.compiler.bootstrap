@@ -15,10 +15,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         public readonly TokenKind Kind;
         public string Text => Source.Content.Substring(Start, Length);
         public readonly bool IsMissing;
-        public IEnumerable<Diagnostic> Diagnostics => diagnostics;
-        private readonly List<Diagnostic> diagnostics;
+        public IEnumerable<DiagnosticInfo> DiagnosticInfos => diagnosticInfos;
+        private readonly List<DiagnosticInfo> diagnosticInfos;
 
-        private Token(SourceText source, int start, int length, TokenKind kind, bool isMissing, IEnumerable<Diagnostic> diagnostics)
+        private Token(SourceText source, int start, int length, TokenKind kind, bool isMissing, IEnumerable<DiagnosticInfo> diagnosticInfos)
         {
             Requires.InString(source.Content, nameof(start), start, nameof(length), length);
             Requires.ValidEnum(nameof(kind), kind);
@@ -27,17 +27,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             Length = length;
             Kind = kind;
             IsMissing = isMissing;
-            this.diagnostics = (diagnostics ?? throw new ArgumentNullException(nameof(diagnostics))).ToList();
+            this.diagnosticInfos = (diagnosticInfos ?? throw new ArgumentNullException(nameof(diagnosticInfos))).ToList();
         }
 
-        public static Token New(SourceText source, int start, int length, TokenKind kind, IEnumerable<Diagnostic> diagnostics)
+        public static Token New(SourceText source, int start, int length, TokenKind kind, IEnumerable<DiagnosticInfo> diagnosticInfos)
         {
-            return new Token(source, start, length, kind, false, diagnostics);
+            return new Token(source, start, length, kind, false, diagnosticInfos);
         }
 
         public static Token NewMissing(SourceText source, int start, TokenKind kind)
         {
-            var diagnostic = new Diagnostic();
+            var diagnostic = new DiagnosticInfo(DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, $"Missing token of kind {kind}");
             return new Token(source, start, 0, kind, true, diagnostic.Yield());
         }
     }
