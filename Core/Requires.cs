@@ -5,15 +5,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
     public static class Requires
     {
-        public static void InString(string value, string startName, int start, string lengthName, int length)
+        internal static void Positive(string name, int value)
         {
-            if (start < 0 || start >= value.Length)
-                throw new ArgumentOutOfRangeException(startName, start, $"Position not in string of length {value.Length}");
-            if (length < 0)
-                throw new ArgumentOutOfRangeException(lengthName, length, "Must be greater that zero");
-            var end = start + length;
-            if (end > value.Length)
-                throw new ArgumentOutOfRangeException(lengthName, length, $"End not in string of length {value.Length} with start {start}");
+            if (value < 0)
+                throw new ArgumentOutOfRangeException(name, value, "Must not be greater than or equal to zero");
+        }
+
+        public static void InString(string inString, string name, TextSpan value)
+        {
+            if (value.Start >= value.Length)
+                throw new ArgumentOutOfRangeException(name, value, $"Start not in string of length {value.Length}");
+            if (value.End > value.Length)
+                throw new ArgumentOutOfRangeException(name, value, $"End not in string of length {value.Length}");
         }
 
         public static void ValidEnum<E>(string name, E value)
