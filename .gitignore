@@ -1,5 +1,7 @@
 # VS Files
 .vs/
+bin/
+obj/
 
 # OSX Files
 .DS_Store

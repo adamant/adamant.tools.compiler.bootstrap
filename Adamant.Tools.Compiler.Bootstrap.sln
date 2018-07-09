@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2026
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "adamantc", "adamantc\adamantc.csproj", "{E51046BD-E182-43CB-81C5-261064D784BD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "forge", "forge\forge.csproj", "{3EC50ACC-86FF-4975-A50C-C5F43F5C2D18}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Language.Tests", "Language.Tests\Language.Tests.csproj", "{E33B6D8B-51F0-4578-9898-7423B122BC04}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E51046BD-E182-43CB-81C5-261064D784BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E51046BD-E182-43CB-81C5-261064D784BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E51046BD-E182-43CB-81C5-261064D784BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E51046BD-E182-43CB-81C5-261064D784BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EC50ACC-86FF-4975-A50C-C5F43F5C2D18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EC50ACC-86FF-4975-A50C-C5F43F5C2D18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EC50ACC-86FF-4975-A50C-C5F43F5C2D18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EC50ACC-86FF-4975-A50C-C5F43F5C2D18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E33B6D8B-51F0-4578-9898-7423B122BC04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E33B6D8B-51F0-4578-9898-7423B122BC04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E33B6D8B-51F0-4578-9898-7423B122BC04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E33B6D8B-51F0-4578-9898-7423B122BC04}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {64B1198F-39D1-48BD-B689-D9949391AEE6}
+	EndGlobalSection
+EndGlobal
