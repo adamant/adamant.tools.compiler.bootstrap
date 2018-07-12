@@ -3,7 +3,6 @@ using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
@@ -21,7 +20,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             var tokenStart = 0;
             var tokenEnd = -1; // One past the end position to allow for zero length spans
             var tokenDiagnosticInfos = new List<DiagnosticInfo>();
-
             while (tokenStart < source.Length)
             {
                 var currentChar = source[tokenStart];
@@ -34,15 +32,63 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         tokenStart += 1;
                         continue;
                     case '{':
-                        yield return NewOperatorToken(TokenKind.LeftBrace);
+                        yield return NewOperatorToken(TokenKind.LeftCurlyBracket);
+                        break;
+                    case '}':
+                        yield return NewOperatorToken(TokenKind.RightCurlyBracket);
+                        break;
+                    case '=':
+                        if (NextCharIs('='))
+                            // it is `==`
+                            yield return NewOperatorToken(TokenKind.EqualsEquals, 2);
+                        else if (NextCharIs('/') && CharIs(2, '='))
+                            // it is `=/=`
+                            yield return NewOperatorToken(TokenKind.NotEqual, 3);
+                        else
+                            // it is `=`
+                            yield return NewOperatorToken(TokenKind.Equals);
+                        break;
+                    case '≠':
+                        yield return NewOperatorToken(TokenKind.NotEqual);
                         break;
                     case '+':
-                        if (tokenStart + 1 < source.Length && source[tokenStart] == '=')
+                        if (NextCharIs('='))
                             // it is `+=`
                             yield return NewOperatorToken(TokenKind.PlusEquals, 2);
                         else
                             // it is `+`
                             yield return NewOperatorToken(TokenKind.Plus);
+                        break;
+                    case '/':
+                        if (NextCharIs('/'))
+                        {
+                            // it is a line comment `//`
+                            tokenStart += 2;
+                            while (tokenStart < source.Length && source[tokenStart] != '\r' && source[tokenStart] != '\n')
+                            {
+                                tokenStart += 1;
+                            }
+                            continue;
+                        }
+                        else if (NextCharIs('*'))
+                        {
+                            // it is a block comment `/*`
+                            tokenStart += 2;
+                            var lastCharWasStar = false;
+                            while (tokenStart < source.Length && !(lastCharWasStar && source[tokenStart] == '/'))
+                            {
+                                lastCharWasStar = source[tokenStart] == '*';
+                                tokenStart += 1;
+                            }
+                            tokenStart += 1; // move past the final '/'
+                            continue;
+                        }
+                        else if (NextCharIs('='))
+                            // it is `/=`
+                            yield return NewOperatorToken(TokenKind.SolidusEquals, 2);
+                        else
+                            // it is `/`
+                            yield return NewOperatorToken(TokenKind.Solidus);
                         break;
                     default:
                         if (IsIdentiferStartCharacter(currentChar))
@@ -54,7 +100,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 
                             yield return NewIdentifierOrKeywordToken();
                         }
-                        throw new NotImplementedException();
+                        else if (currentChar == '!' && NextCharIs('='))
+                        {
+                            NewError(DiagnosticLevel.CompilationError, "Use `≠` or `=/=` for not equal instead of `!=`.");
+                            yield return NewOperatorToken(TokenKind.NotEqual, 2);
+                        }
+                        else
+                            throw new NotImplementedException($"Current char=`{currentChar}`");
+                        break;
                 }
                 tokenStart = tokenEnd;
             }
@@ -81,7 +134,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             {
                 // TODO check for keywords
                 var kind = TokenKind.Identifier;
-                return NewToken(kind); // TODO Identifiers should have a string value because of escaped identifiers?
+                return NewToken(kind); // TODO create IdentifierToken with value, IsEscaped etc.
+            }
+
+            bool NextCharIs(char c)
+            {
+                var index = tokenStart + 1;
+                return index < source.Length && source[index] == c;
+            }
+
+            bool CharIs(int i, char c)
+            {
+                var index = tokenStart + i;
+                return index < source.Length && source[index] == c;
+            }
+
+            void NewError(DiagnosticLevel level, string message)
+            {
+                tokenDiagnosticInfos.Add(new DiagnosticInfo(level, DiagnosticPhase.Lexing, message));
             }
         }
 

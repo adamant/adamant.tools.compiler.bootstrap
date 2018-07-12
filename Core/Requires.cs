@@ -13,10 +13,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
 
         public static void InString(string inString, string name, TextSpan value)
         {
-            if (value.Start >= value.Length)
-                throw new ArgumentOutOfRangeException(name, value, $"Start not in string of length {value.Length}");
-            if (value.End > value.Length)
-                throw new ArgumentOutOfRangeException(name, value, $"End not in string of length {value.Length}");
+            // Start is allowed to be equal to length to allow for a zero length span after the last character
+            if (value.Start > inString.Length)
+                throw new ArgumentOutOfRangeException(name, value, $"Start not in string of length {inString.Length}");
+            if (value.End > inString.Length)
+                throw new ArgumentOutOfRangeException(name, value, $"End not in string of length {inString.Length}");
         }
 
         public static void ValidEnum<E>(string name, E value)

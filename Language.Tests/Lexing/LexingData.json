@@ -1,0 +1,93 @@
+{
+    "tokens": [
+        {
+            "token": "plus",
+            "valid": "+"
+        },
+        {
+            "token": "solidus",
+            "valid": "/"
+        },
+        {
+            "token": "left_curly_bracket",
+            "valid": "{"
+        },
+        {
+            "token": "right_curly_bracket",
+            "valid": "}"
+        },
+        {
+            "token": "equals",
+            "valid": "="
+        },
+        {
+            "token": "equals_equals",
+            "valid": "=="
+        },
+        {
+            "token": "not_equal",
+            "valid": [ "≠", "=/=" ],
+            "invalid": [ "!=" ]
+        },
+        {
+            "token": "plus_equals",
+            "valid": "+="
+        },
+        {
+            "token": "solidus_equals",
+            "valid": "/="
+        },
+        {
+            "token": "identifier",
+            "valid": [ "a", "n", "z", "A", "N", "Z", "i", "j", "k", "user", "T1" ]
+        }
+    ],
+    "future_tokens": [
+        {
+            "token": "escaped_identifier",
+            "valid": [
+                {
+                    "text": "\\var",
+                    "value": "var"
+                }
+            ]
+        },
+        {
+            "token": "escaped_string_identifier",
+            "valid": [
+                {
+                    "text": "\\\"Hello and Goodbye!\"",
+                    "value": "Hello and Goodbye!"
+                }
+            ]
+        }
+    ],
+    "whitespace": [ " ", "\t", "\n", "\r\n", "\t\t", "    " ],
+    "comments": [ "/**/", "/***/", "/*/**/", "// foo\n" ],
+    "separate": [
+        [ "plus", "equals" ],
+        [ "plus", "equals_equals" ],
+        [
+            "plus",
+            { "not_equal": "=/=" }
+        ],
+        [ "solidus", "equals" ],
+        [ "solidus", "equals_equals" ],
+        [
+            "solidus",
+            { "not_equal": "=/=" }
+        ],
+        [ "solidus", "solidus" ],
+        [ "solidus", "comment" ],
+        [ "solidus", "solidus_equals" ],
+        [ "equals", "equals" ],
+        [ "equals", "equals_equals" ],
+        [ "equals", "solidus_equals" ],
+        [
+            "equals",
+            { "not_equal": "=/=" }
+        ],
+        [ "identifier", "identifier" ],
+        [ "escaped_identifier", "identifier" ]
+    ]
+}

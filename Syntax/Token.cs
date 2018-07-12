@@ -38,5 +38,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             var diagnostic = new DiagnosticInfo(DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, $"Missing token of kind {kind}");
             return new Token(source, new TextSpan(start, 0), kind, true, diagnostic.Yield());
         }
+
+        public override string ToString()
+        {
+            var validMarker = IsMissing || DiagnosticInfos.Any(d => d.Level > DiagnosticLevel.Warning) ? "*" : "";
+            return $"{Kind}{validMarker}=`{Text}`";
+        }
     }
 }

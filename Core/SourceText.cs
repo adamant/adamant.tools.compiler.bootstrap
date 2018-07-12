@@ -8,5 +8,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
 
         public string this[TextSpan span] => Content.Substring(span.Start, span.Length);
         public char this[int index] => Content[index];
+
+        public SourceText(string content)
+        {
+            Content = content;
+        }
     }
 }
