@@ -1,10 +1,10 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Syntax;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Syntax;
+using Newtonsoft.Json.Linq;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
 {

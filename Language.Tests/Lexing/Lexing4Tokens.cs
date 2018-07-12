@@ -1,11 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Syntax;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
@@ -14,16 +6,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
 {
     public class Lexing4Tokens
     {
-        [Theory]
-        [MemberData(nameof(GetFourTokenSequenceData))]
-        internal void LexesAllValidTokenCombinations(string text, TestToken[] expectedTokens)
+        private readonly ITestOutputHelper output;
+
+        public Lexing4Tokens(ITestOutputHelper output)
         {
-            LexAssert.LexesTo(text, expectedTokens);
+            this.output = output;
         }
 
-        public static IEnumerable<object[]> GetFourTokenSequenceData()
+        [Fact]
+        internal void LexesAllValidTokenCombinations()
         {
-            return LexingData.Instance.FourTokenSequences.Select(TestToken.GetSequenceData);
+            var sequences = LexingData.Instance.FourTokenSequences;
+            output.WriteLine($"Sequence Count={sequences.Count}");
+            foreach (var sequence in sequences)
+                LexAssert.LexesTo(string.Concat(sequence.Select(s => s.Text)), sequence.Where(s => s.Kind.Category == TestTokenCategory.Token));
         }
     }
 }

@@ -1,15 +1,16 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
-using System;
-using System.Linq;
 using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
 {
     public static class LexAssert
     {
-        internal static void LexesTo(string text, TestToken[] expectedTokens)
+        internal static void LexesTo(string text, IEnumerable<TestToken> expectedTokens)
         {
             var source = new SourceText(text);
             var lexer = new Lexer(source);

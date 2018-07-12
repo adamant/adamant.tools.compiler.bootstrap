@@ -1,5 +1,5 @@
-using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Syntax;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
 {

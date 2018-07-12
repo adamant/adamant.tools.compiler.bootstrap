@@ -1,5 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Syntax;
-
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
 {
     public struct TestTokenMatcher
