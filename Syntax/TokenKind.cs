@@ -16,8 +16,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     /// be synonynms then perhaps it makes sense to use the single symbol name?
     ///
     /// I really like the idea of supporting Unicode correct operators like not
-    /// equal. I'm going to name each symbol token after the desired Unicode
-    /// code point, dropping filler words.
+    /// equal. However, some of the Unicode character names are so weird that
+    /// it doesn't really make sense to me to use them.  I'm going to name
+    /// things after their single character version, but not follow Unicode
+    /// naming when it doesn't make sense
     public enum TokenKind
     {
         EndOfFile = 0,
@@ -34,6 +36,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         Question, // `?` U+003F
         VerticalLine, // `|` U+007C
         RightwardsArrow, // `→` U+2192
+        AtSign, // `@` U+0040 (named at sign to distinguish it from the word "at")
+        Caret, // `^` U+005E
         Plus, // `+` U+002B
         HyphenMinus, // `-` U+002D
         Asterisk, // `*` U+002A

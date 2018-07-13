@@ -70,6 +70,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     case '→':
                         yield return NewOperatorToken(TokenKind.RightwardsArrow);
                         break;
+                    case '@':
+                        yield return NewOperatorToken(TokenKind.AtSign);
+                        break;
+                    case '^':
+                        yield return NewOperatorToken(TokenKind.Caret);
+                        break;
                     case '+':
                         if (NextCharIs('='))
                             // it is `+=`

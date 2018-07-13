@@ -53,6 +53,14 @@
             "valid": [ "→", "->" ]
         },
         {
+            "token": "at_sign",
+            "valid": "@"
+        },
+        {
+            "token": "caret",
+            "valid": "^"
+        },
+        {
             "token": "plus",
             "valid": "+"
         },
