@@ -258,6 +258,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         {
                             content.Append(currentChar);
                             NewError(DiagnosticLevel.CompilationError, "Invalid string escape sequence `\\EOF`.");
+                            break; // we hit the end of file and need to not add to tokenEnd any more
                         }
                         else
                         {
@@ -280,6 +281,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                                 case 't':
                                     content.Append('\t');
                                     break;
+                                case 'u':
+                                    tokenEnd += 1; // consume the 'u'
+                                    if (tokenEnd < source.Length && source[tokenEnd] == '(')
+                                        tokenEnd += 1;
+                                    else
+                                        NewError(DiagnosticLevel.CompilationError, $"Unicode escape sequence must begin `\\u(` rather than `\\{source[tokenEnd]}`.");
+
+                                    var codepoint = new StringBuilder(6);
+                                    while (tokenEnd < source.Length && IsHexDigit(currentChar = source[tokenEnd]))
+                                    {
+                                        codepoint.Append(currentChar);
+                                        tokenEnd += 1;
+                                    }
+
+                                    content.Append(char.ConvertFromUtf32(Convert.ToInt32(codepoint.ToString(), 16)));
+
+                                    if (tokenEnd >= source.Length)
+                                    {
+                                        NewError(DiagnosticLevel.CompilationError, $"Unclosed Unicode escape sequence.");
+                                        break;
+                                    }
+                                    else if (tokenEnd < source.Length && source[tokenEnd] == ')')
+                                        tokenEnd += 1;
+                                    else
+                                        NewError(DiagnosticLevel.CompilationError, $"Unicode escape sequence must be terminated with `)`.");
+
+                                    // We have already consumed all the characters of the escape sequence and now want to continue the loop
+                                    continue;
                                 default:
                                     NewError(DiagnosticLevel.CompilationError, $"Invalid string escape sequence `\\{currentChar}`.");
                                     content.Append('\\');
@@ -290,6 +319,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     }
                     else
                         content.Append(currentChar);
+
                     tokenEnd += 1;
                 }
 
@@ -316,6 +346,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         {
 
             return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || char.IsNumber(c);
+        }
+
+        private static bool IsHexDigit(char c)
+        {
+            return (c >= '0' && c <= '9')
+                || (c >= 'a' && c <= 'f')
+                || (c >= 'A' && c <= 'F');
         }
     }
 }
