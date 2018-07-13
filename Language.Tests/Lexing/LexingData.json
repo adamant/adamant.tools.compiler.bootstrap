@@ -49,6 +49,10 @@
             "valid": "|"
         },
         {
+            "token": "rightwards_arrow",
+            "valid": [ "→", "->" ]
+        },
+        {
             "token": "plus",
             "valid": "+"
         },
@@ -149,6 +153,8 @@
             "hyphen_minus",
             { "not_equal": "=/=" }
         ],
+        [ "hyphen_minus", "greater_than" ],
+        [ "hyphen_minus", "greater_than_or_equal" ],
         [ "asterisk", "equals" ],
         [ "asterisk", "equals_equals" ],
         [

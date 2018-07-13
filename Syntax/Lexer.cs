@@ -67,6 +67,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     case '|':
                         yield return NewOperatorToken(TokenKind.VerticalLine);
                         break;
+                    case '→':
+                        yield return NewOperatorToken(TokenKind.RightwardsArrow);
+                        break;
                     case '+':
                         if (NextCharIs('='))
                             // it is `+=`
@@ -79,6 +82,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         if (NextCharIs('='))
                             // it is `-=`
                             yield return NewOperatorToken(TokenKind.HyphenMinusEquals, 2);
+                        else if (NextCharIs('>'))
+                            // it is `->`
+                            yield return NewOperatorToken(TokenKind.RightwardsArrow, 2);
                         else
                             // it is `-`
                             yield return NewOperatorToken(TokenKind.HyphenMinus);

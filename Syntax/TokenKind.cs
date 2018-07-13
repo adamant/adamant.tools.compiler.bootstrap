@@ -33,6 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         Colon, // `:` U+003A
         Question, // `?` U+003F
         VerticalLine, // `|` U+007C
+        RightwardsArrow, // `→` U+2192
         Plus, // `+` U+002B
         HyphenMinus, // `-` U+002D
         Asterisk, // `*` U+002A
@@ -51,5 +52,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         Identifier,
         EscapedIdentifier, // TODO this should just be a kind of indentifier
         EscapedStringIdentifier, // TODO this should just be a kind of indentifier
+
     }
 }
