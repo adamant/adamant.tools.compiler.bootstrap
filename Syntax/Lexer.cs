@@ -1,8 +1,8 @@
-using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
@@ -37,19 +37,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     case '}':
                         yield return NewOperatorToken(TokenKind.RightCurlyBracket);
                         break;
-                    case '=':
-                        if (NextCharIs('='))
-                            // it is `==`
-                            yield return NewOperatorToken(TokenKind.EqualsEquals, 2);
-                        else if (NextCharIs('/') && CharIs(2, '='))
-                            // it is `=/=`
-                            yield return NewOperatorToken(TokenKind.NotEqual, 3);
-                        else
-                            // it is `=`
-                            yield return NewOperatorToken(TokenKind.Equals);
+                    case '(':
+                        yield return NewOperatorToken(TokenKind.LeftParenthesis);
                         break;
-                    case '≠':
-                        yield return NewOperatorToken(TokenKind.NotEqual);
+                    case ')':
+                        yield return NewOperatorToken(TokenKind.RightParenthesis);
+                        break;
+                    case '[':
+                        yield return NewOperatorToken(TokenKind.LeftSquareBracket);
+                        break;
+                    case ']':
+                        yield return NewOperatorToken(TokenKind.RightSquareBracket);
+                        break;
+                    case ';':
+                        yield return NewOperatorToken(TokenKind.Semicolon);
+                        break;
+                    case ',':
+                        yield return NewOperatorToken(TokenKind.Comma);
+                        break;
+                    case '.':
+                        yield return NewOperatorToken(TokenKind.FullStop);
+                        break;
+                    case ':':
+                        yield return NewOperatorToken(TokenKind.Colon);
+                        break;
+                    case '?':
+                        yield return NewOperatorToken(TokenKind.Question);
+                        break;
+                    case '|':
+                        yield return NewOperatorToken(TokenKind.VerticalLine);
                         break;
                     case '+':
                         if (NextCharIs('='))
@@ -58,6 +74,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         else
                             // it is `+`
                             yield return NewOperatorToken(TokenKind.Plus);
+                        break;
+                    case '-':
+                        if (NextCharIs('='))
+                            // it is `-=`
+                            yield return NewOperatorToken(TokenKind.HyphenMinusEquals, 2);
+                        else
+                            // it is `-`
+                            yield return NewOperatorToken(TokenKind.HyphenMinus);
+                        break;
+                    case '*':
+                        if (NextCharIs('='))
+                            // it is `*=`
+                            yield return NewOperatorToken(TokenKind.AsteriskEquals, 2);
+                        else
+                            // it is `*`
+                            yield return NewOperatorToken(TokenKind.Asterisk);
                         break;
                     case '/':
                         if (NextCharIs('/'))
@@ -89,6 +121,44 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         else
                             // it is `/`
                             yield return NewOperatorToken(TokenKind.Solidus);
+                        break;
+                    case '=':
+                        if (NextCharIs('='))
+                            // it is `==`
+                            yield return NewOperatorToken(TokenKind.EqualsEquals, 2);
+                        else if (NextCharIs('/') && CharIs(2, '='))
+                            // it is `=/=`
+                            yield return NewOperatorToken(TokenKind.NotEqual, 3);
+                        else
+                            // it is `=`
+                            yield return NewOperatorToken(TokenKind.Equals);
+                        break;
+                    case '≠':
+                        yield return NewOperatorToken(TokenKind.NotEqual);
+                        break;
+                    case '>':
+                        if (NextCharIs('='))
+                            // it is `>=`
+                            yield return NewOperatorToken(TokenKind.GreaterThanOrEqual, 2);
+                        else
+                            // it is `>`
+                            yield return NewOperatorToken(TokenKind.GreaterThan);
+                        break;
+                    case '≥':
+                    case '⩾':
+                        yield return NewOperatorToken(TokenKind.GreaterThanOrEqual);
+                        break;
+                    case '<':
+                        if (NextCharIs('='))
+                            // it is `<=`
+                            yield return NewOperatorToken(TokenKind.LessThanOrEqual, 2);
+                        else
+                            // it is `<`
+                            yield return NewOperatorToken(TokenKind.LessThan);
+                        break;
+                    case '≤':
+                    case '⩽':
+                        yield return NewOperatorToken(TokenKind.LessThanOrEqual);
                         break;
                     default:
                         if (IsIdentiferStartCharacter(currentChar))

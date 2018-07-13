@@ -1,20 +1,68 @@
 {
     "tokens": [
         {
-            "token": "plus",
-            "valid": "+"
-        },
-        {
-            "token": "solidus",
-            "valid": "/"
-        },
-        {
             "token": "left_curly_bracket",
             "valid": "{"
         },
         {
             "token": "right_curly_bracket",
             "valid": "}"
+        },
+        {
+            "token": "left_parenthesis",
+            "valid": "("
+        },
+        {
+            "token": "right_parenthesis",
+            "valid": ")"
+        },
+        {
+            "token": "left_square_bracket",
+            "valid": "["
+        },
+        {
+            "token": "right_square_bracket",
+            "valid": "]"
+        },
+        {
+            "token": "semicolon",
+            "valid": ";"
+        },
+        {
+            "token": "comma",
+            "valid": ","
+        },
+        {
+            "token": "full_stop",
+            "valid": "."
+        },
+        {
+            "token": "colon",
+            "valid": ":"
+        },
+        {
+            "token": "question",
+            "valid": "?"
+        },
+        {
+            "token": "vertical_line",
+            "valid": "|"
+        },
+        {
+            "token": "plus",
+            "valid": "+"
+        },
+        {
+            "token": "hyphen_minus",
+            "valid": "-"
+        },
+        {
+            "token": "asterisk",
+            "valid": "*"
+        },
+        {
+            "token": "solidus",
+            "valid": "/"
         },
         {
             "token": "equals",
@@ -30,8 +78,32 @@
             "invalid": [ "!=" ]
         },
         {
+            "token": "greater_than",
+            "valid": ">"
+        },
+        {
+            "token": "greater_than_or_equal",
+            "valid": [ "≥", "⩾", ">=" ]
+        },
+        {
+            "token": "less_than",
+            "valid": "<"
+        },
+        {
+            "token": "less_than_or_equal",
+            "valid": [ "≤", "⩽", "<=" ]
+        },
+        {
             "token": "plus_equals",
             "valid": "+="
+        },
+        {
+            "token": "hyphen_minus_equals",
+            "valid": "-="
+        },
+        {
+            "token": "asterisk_equals",
+            "valid": "*="
         },
         {
             "token": "solidus_equals",
@@ -71,12 +143,26 @@
             "plus",
             { "not_equal": "=/=" }
         ],
+        [ "hyphen_minus", "equals" ],
+        [ "hyphen_minus", "equals_equals" ],
+        [
+            "hyphen_minus",
+            { "not_equal": "=/=" }
+        ],
+        [ "asterisk", "equals" ],
+        [ "asterisk", "equals_equals" ],
+        [
+            "asterisk",
+            { "not_equal": "=/=" }
+        ],
         [ "solidus", "equals" ],
         [ "solidus", "equals_equals" ],
         [
             "solidus",
             { "not_equal": "=/=" }
         ],
+        [ "solidus", "asterisk" ],
+        [ "solidus", "asterisk_equals" ],
         [ "solidus", "solidus" ],
         [ "solidus", "comment" ],
         [ "solidus", "solidus_equals" ],
@@ -85,6 +171,18 @@
         [ "equals", "solidus_equals" ],
         [
             "equals",
+            { "not_equal": "=/=" }
+        ],
+        [ "greater_than", "equals" ],
+        [ "greater_than", "equals_equals" ],
+        [
+            "greater_than",
+            { "not_equal": "=/=" }
+        ],
+        [ "less_than", "equals" ],
+        [ "less_than", "equals_equals" ],
+        [
+            "less_than",
             { "not_equal": "=/=" }
         ],
         [ "identifier", "identifier" ],

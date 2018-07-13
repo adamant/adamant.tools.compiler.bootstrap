@@ -23,12 +23,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         EndOfFile = 0,
         LeftCurlyBracket, // `{` U+007B
         RightCurlyBracket, // `}` U+007D
+        LeftParenthesis, // `(` U+0028
+        RightParenthesis, // `)` U+0029
+        LeftSquareBracket, // `[` U+005B
+        RightSquareBracket, // `]` U+005D
+        Semicolon, // `;` U+003B
+        Comma, // `,` U+002C
+        FullStop, // `.` U+002E
+        Colon, // `:` U+003A
+        Question, // `?` U+003F
+        VerticalLine, // `|` U+007C
         Plus, // `+` U+002B
+        HyphenMinus, // `-` U+002D
+        Asterisk, // `*` U+002A
+        Solidus, // `/` U+002F
         Equals, // `=` U+003D
         EqualsEquals, // `==` U+003D, U+003D
-        PlusEquals, // `+=` U+002B, U+003D
         NotEqual, // `≠` U+2260 or `=/=` U+003D, , U+003D
-        Solidus, // `/` U+002F
+        GreaterThan, // `>` U+003E
+        GreaterThanOrEqual, // `≥` U+2265
+        LessThan, // `<` U+003C
+        LessThanOrEqual, // `≤` U+2264
+        PlusEquals, // `+=` U+002B, U+003D
+        HyphenMinusEquals, // `-=` U+002D, U+003D
+        AsteriskEquals, // `*=` U+002A, U+003D
         SolidusEquals, // `/=` U+002F, U+003D
         Identifier,
         EscapedIdentifier, // TODO this should just be a kind of indentifier
