@@ -32,22 +32,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         tokenStart += 1;
                         continue;
                     case '{':
-                        yield return NewOperatorToken(TokenKind.LeftCurlyBracket);
+                        yield return NewOperatorToken(TokenKind.LeftBrace);
                         break;
                     case '}':
-                        yield return NewOperatorToken(TokenKind.RightCurlyBracket);
+                        yield return NewOperatorToken(TokenKind.RightBrace);
                         break;
                     case '(':
-                        yield return NewOperatorToken(TokenKind.LeftParenthesis);
+                        yield return NewOperatorToken(TokenKind.LeftParen);
                         break;
                     case ')':
-                        yield return NewOperatorToken(TokenKind.RightParenthesis);
+                        yield return NewOperatorToken(TokenKind.RightParen);
                         break;
                     case '[':
-                        yield return NewOperatorToken(TokenKind.LeftSquareBracket);
+                        yield return NewOperatorToken(TokenKind.LeftBracket);
                         break;
                     case ']':
-                        yield return NewOperatorToken(TokenKind.RightSquareBracket);
+                        yield return NewOperatorToken(TokenKind.RightBracket);
                         break;
                     case ';':
                         yield return NewOperatorToken(TokenKind.Semicolon);
@@ -56,7 +56,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         yield return NewOperatorToken(TokenKind.Comma);
                         break;
                     case '.':
-                        yield return NewOperatorToken(TokenKind.FullStop);
+                        yield return NewOperatorToken(TokenKind.Dot);
                         break;
                     case ':':
                         yield return NewOperatorToken(TokenKind.Colon);
@@ -65,10 +65,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         yield return NewOperatorToken(TokenKind.Question);
                         break;
                     case '|':
-                        yield return NewOperatorToken(TokenKind.VerticalLine);
+                        yield return NewOperatorToken(TokenKind.Pipe);
                         break;
                     case '→':
-                        yield return NewOperatorToken(TokenKind.RightwardsArrow);
+                        yield return NewOperatorToken(TokenKind.RightArrow);
                         break;
                     case '@':
                         yield return NewOperatorToken(TokenKind.AtSign);
@@ -87,13 +87,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     case '-':
                         if (NextCharIs('='))
                             // it is `-=`
-                            yield return NewOperatorToken(TokenKind.HyphenMinusEquals, 2);
+                            yield return NewOperatorToken(TokenKind.MinusEquals, 2);
                         else if (NextCharIs('>'))
                             // it is `->`
-                            yield return NewOperatorToken(TokenKind.RightwardsArrow, 2);
+                            yield return NewOperatorToken(TokenKind.RightArrow, 2);
                         else
                             // it is `-`
-                            yield return NewOperatorToken(TokenKind.HyphenMinus);
+                            yield return NewOperatorToken(TokenKind.Minus);
                         break;
                     case '*':
                         if (NextCharIs('='))
@@ -129,10 +129,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         }
                         else if (NextCharIs('='))
                             // it is `/=`
-                            yield return NewOperatorToken(TokenKind.SolidusEquals, 2);
+                            yield return NewOperatorToken(TokenKind.SlashEquals, 2);
                         else
                             // it is `/`
-                            yield return NewOperatorToken(TokenKind.Solidus);
+                            yield return NewOperatorToken(TokenKind.Slash);
                         break;
                     case '=':
                         if (NextCharIs('='))

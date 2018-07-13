@@ -1,27 +1,27 @@
 {
     "tokens": [
         {
-            "token": "left_curly_bracket",
+            "token": "left_brace",
             "valid": "{"
         },
         {
-            "token": "right_curly_bracket",
+            "token": "right_brace",
             "valid": "}"
         },
         {
-            "token": "left_parenthesis",
+            "token": "left_paren",
             "valid": "("
         },
         {
-            "token": "right_parenthesis",
+            "token": "right_paren",
             "valid": ")"
         },
         {
-            "token": "left_square_bracket",
+            "token": "left_bracket",
             "valid": "["
         },
         {
-            "token": "right_square_bracket",
+            "token": "right_bracket",
             "valid": "]"
         },
         {
@@ -33,7 +33,7 @@
             "valid": ","
         },
         {
-            "token": "full_stop",
+            "token": "dot",
             "valid": "."
         },
         {
@@ -45,11 +45,11 @@
             "valid": "?"
         },
         {
-            "token": "vertical_line",
+            "token": "pipe",
             "valid": "|"
         },
         {
-            "token": "rightwards_arrow",
+            "token": "right_arrow",
             "valid": [ "→", "->" ]
         },
         {
@@ -65,7 +65,7 @@
             "valid": "+"
         },
         {
-            "token": "hyphen_minus",
+            "token": "minus",
             "valid": "-"
         },
         {
@@ -73,7 +73,7 @@
             "valid": "*"
         },
         {
-            "token": "solidus",
+            "token": "slash",
             "valid": "/"
         },
         {
@@ -110,7 +110,7 @@
             "valid": "+="
         },
         {
-            "token": "hyphen_minus_equals",
+            "token": "minus_equals",
             "valid": "-="
         },
         {
@@ -118,7 +118,7 @@
             "valid": "*="
         },
         {
-            "token": "solidus_equals",
+            "token": "slash_equals",
             "valid": "/="
         },
         {
@@ -155,34 +155,34 @@
             "plus",
             { "not_equal": "=/=" }
         ],
-        [ "hyphen_minus", "equals" ],
-        [ "hyphen_minus", "equals_equals" ],
+        [ "minus", "equals" ],
+        [ "minus", "equals_equals" ],
         [
-            "hyphen_minus",
+            "minus",
             { "not_equal": "=/=" }
         ],
-        [ "hyphen_minus", "greater_than" ],
-        [ "hyphen_minus", "greater_than_or_equal" ],
+        [ "minus", "greater_than" ],
+        [ "minus", "greater_than_or_equal" ],
         [ "asterisk", "equals" ],
         [ "asterisk", "equals_equals" ],
         [
             "asterisk",
             { "not_equal": "=/=" }
         ],
-        [ "solidus", "equals" ],
-        [ "solidus", "equals_equals" ],
+        [ "slash", "equals" ],
+        [ "slash", "equals_equals" ],
         [
-            "solidus",
+            "slash",
             { "not_equal": "=/=" }
         ],
-        [ "solidus", "asterisk" ],
-        [ "solidus", "asterisk_equals" ],
-        [ "solidus", "solidus" ],
-        [ "solidus", "comment" ],
-        [ "solidus", "solidus_equals" ],
+        [ "slash", "asterisk" ],
+        [ "slash", "asterisk_equals" ],
+        [ "slash", "slash" ],
+        [ "slash", "comment" ],
+        [ "slash", "slash_equals" ],
         [ "equals", "equals" ],
         [ "equals", "equals_equals" ],
-        [ "equals", "solidus_equals" ],
+        [ "equals", "slash_equals" ],
         [
             "equals",
             { "not_equal": "=/=" }

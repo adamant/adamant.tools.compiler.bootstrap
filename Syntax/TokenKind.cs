@@ -23,25 +23,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     public enum TokenKind
     {
         EndOfFile = 0,
-        LeftCurlyBracket, // `{` U+007B
-        RightCurlyBracket, // `}` U+007D
-        LeftParenthesis, // `(` U+0028
-        RightParenthesis, // `)` U+0029
-        LeftSquareBracket, // `[` U+005B
-        RightSquareBracket, // `]` U+005D
+        LeftBrace, // `{` U+007B
+        RightBrace, // `}` U+007D
+        LeftParen, // `(` U+0028
+        RightParen, // `)` U+0029
+        LeftBracket, // `[` U+005B
+        RightBracket, // `]` U+005D
         Semicolon, // `;` U+003B
         Comma, // `,` U+002C
-        FullStop, // `.` U+002E
+        Dot, // `.` U+002E
         Colon, // `:` U+003A
         Question, // `?` U+003F
-        VerticalLine, // `|` U+007C
-        RightwardsArrow, // `→` U+2192
+        Pipe, // `|` U+007C
+        RightArrow, // `→` U+2192
         AtSign, // `@` U+0040 (named at sign to distinguish it from the word "at")
         Caret, // `^` U+005E
         Plus, // `+` U+002B
-        HyphenMinus, // `-` U+002D
+        Minus, // `-` U+002D
         Asterisk, // `*` U+002A
-        Solidus, // `/` U+002F
+        Slash, // `/` U+002F
         Equals, // `=` U+003D
         EqualsEquals, // `==` U+003D, U+003D
         NotEqual, // `≠` U+2260 or `=/=` U+003D, , U+003D
@@ -50,12 +50,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         LessThan, // `<` U+003C
         LessThanOrEqual, // `≤` U+2264
         PlusEquals, // `+=` U+002B, U+003D
-        HyphenMinusEquals, // `-=` U+002D, U+003D
+        MinusEquals, // `-=` U+002D, U+003D
         AsteriskEquals, // `*=` U+002A, U+003D
-        SolidusEquals, // `/=` U+002F, U+003D
+        SlashEquals, // `/=` U+002F, U+003D
         Identifier,
         EscapedIdentifier, // TODO this should just be a kind of indentifier
         EscapedStringIdentifier, // TODO this should just be a kind of indentifier
-
     }
 }
