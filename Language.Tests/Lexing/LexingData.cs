@@ -69,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
 
         private static IEnumerable<TestToken> ParseToken(JObject token)
         {
-            var kind = ParseKind(token["token"].ToObject<string>()).ToTokenKind();
+            var kind = ParseKind(token["kind"].ToObject<string>()).ToTokenKind();
 
             var valid = token["valid"];
             IEnumerable<TestToken> testTokens;

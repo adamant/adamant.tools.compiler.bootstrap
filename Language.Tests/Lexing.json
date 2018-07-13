@@ -1,135 +1,143 @@
 {
-    "tests": [],
+    "tests": [
+        [
+            {
+                "kind": "string_literal",
+                "text": "\"♠\"",
+                "value": "♠"
+            }
+        ]
+    ],
     "tokens": [
         {
-            "token": "left_brace",
+            "kind": "left_brace",
             "valid": "{"
         },
         {
-            "token": "right_brace",
+            "kind": "right_brace",
             "valid": "}"
         },
         {
-            "token": "left_paren",
+            "kind": "left_paren",
             "valid": "("
         },
         {
-            "token": "right_paren",
+            "kind": "right_paren",
             "valid": ")"
         },
         {
-            "token": "left_bracket",
+            "kind": "left_bracket",
             "valid": "["
         },
         {
-            "token": "right_bracket",
+            "kind": "right_bracket",
             "valid": "]"
         },
         {
-            "token": "semicolon",
+            "kind": "semicolon",
             "valid": ";"
         },
         {
-            "token": "comma",
+            "kind": "comma",
             "valid": ","
         },
         {
-            "token": "dot",
+            "kind": "dot",
             "valid": "."
         },
         {
-            "token": "colon",
+            "kind": "colon",
             "valid": ":"
         },
         {
-            "token": "question",
+            "kind": "question",
             "valid": "?"
         },
         {
-            "token": "pipe",
+            "kind": "pipe",
             "valid": "|"
         },
         {
-            "token": "right_arrow",
+            "kind": "right_arrow",
             "valid": [ "→", "->" ]
         },
         {
-            "token": "at_sign",
+            "kind": "at_sign",
             "valid": "@"
         },
         {
-            "token": "caret",
+            "kind": "caret",
             "valid": "^"
         },
         {
-            "token": "plus",
+            "kind": "plus",
             "valid": "+"
         },
         {
-            "token": "minus",
+            "kind": "minus",
             "valid": "-"
         },
         {
-            "token": "asterisk",
+            "kind": "asterisk",
             "valid": "*"
         },
         {
-            "token": "slash",
+            "kind": "slash",
             "valid": "/"
         },
         {
-            "token": "equals",
+            "kind": "equals",
             "valid": "="
         },
         {
-            "token": "equals_equals",
+            "kind": "equals_equals",
             "valid": "=="
         },
         {
-            "token": "not_equal",
+            "kind": "not_equal",
             "valid": [ "≠", "=/=" ],
             "invalid": [ "!=" ]
         },
         {
-            "token": "greater_than",
+            "kind": "greater_than",
             "valid": ">"
         },
         {
-            "token": "greater_than_or_equal",
+            "kind": "greater_than_or_equal",
             "valid": [ "≥", "⩾", ">=" ]
         },
         {
-            "token": "less_than",
+            "kind": "less_than",
             "valid": "<"
         },
         {
-            "token": "less_than_or_equal",
+            "kind": "less_than_or_equal",
             "valid": [ "≤", "⩽", "<=" ]
         },
         {
-            "token": "plus_equals",
+            "kind": "plus_equals",
             "valid": "+="
         },
         {
-            "token": "minus_equals",
+            "kind": "minus_equals",
             "valid": "-="
         },
         {
-            "token": "asterisk_equals",
+            "kind": "asterisk_equals",
             "valid": "*="
         },
         {
-            "token": "slash_equals",
+            "kind": "slash_equals",
             "valid": "/="
         },
         {
-            "token": "identifier",
+            "kind": "identifier",
             "valid": [ "a", "n", "z", "A", "N", "Z", "i", "j", "k", "user", "T1" ]
         }
     ],
     "future_tokens": [
         {
-            "token": "string_literal",
+            "kind": "string_literal",
             "valid": [
                 {
                     "text": "\"Hello World!\"",
@@ -152,7 +160,7 @@
             ]
         },
         {
-            "token": "escaped_identifier",
+            "kind": "escaped_identifier",
             "valid": [
                 {
                     "text": "\\var",
@@ -161,7 +169,7 @@
             ]
         },
         {
-            "token": "escaped_string_identifier",
+            "kind": "escaped_string_identifier",
             "valid": [
                 {
                     "text": "\\\"Hello and Goodbye!\"",
