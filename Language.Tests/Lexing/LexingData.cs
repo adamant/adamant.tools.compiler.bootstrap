@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -49,14 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
         {
             var data = GetJsonLexingData();
 
-            // Tests
-            var tokenTests = ParseTokens(data.Value<JArray>("tokens"));
-
-            // All Tokens
-            var tokens = data.Value<JArray>("permute_tokens").Cast<JObject>().SelectMany(ParseTokenGroup);
-            var whitespace = data["whitespace"].ToObject<string[]>().Select(text => TestToken.Whitespace(true, text)).ToList();
-            var comments = data["comments"].ToObject<string[]>().Select(text => TestToken.Comment(true, text)).ToList();
-            AllTokens = tokenTests.Concat(tokens).Concat(whitespace).Concat(comments).ToList().AsReadOnly();
+            AllTokens = ParseTokens(data.Value<JArray>("tokens"));
             PermuteTokens = AllTokens.Where(t => t.Permute).ToList().AsReadOnly();
 
             // Separate Tokens
@@ -84,16 +76,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
             return tokensJson.Cast<JObject>().Select(ParseToken).ToList().AsReadOnly();
         }
 
-        private IList<TestTokenSequence> ParseSequenceTests(JArray testsJson)
-        {
-            return testsJson.Cast<JArray>().Select(ParseSequenceTest).ToList().AsReadOnly();
-        }
-
-        private TestTokenSequence ParseSequenceTest(JArray testJson)
-        {
-            return new TestTokenSequence(testJson.Cast<JObject>().Select(ParseToken));
-        }
-
         private TestToken ParseToken(JObject tokenJson)
         {
             var permute = tokenJson.Value<bool?>("permute") ?? true;
@@ -102,29 +84,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
             var isValid = tokenJson.Value<bool?>("is_valid") ?? true;
             object value = ParseValue(tokenJson["value"]);
             return new TestToken(permute, kind, text, isValid, value);
-        }
-
-        private static IEnumerable<TestToken> ParseTokenGroup(JObject tokenGroupJson)
-        {
-            var kind = ParseKind(tokenGroupJson["kind"]).ToTokenKind();
-
-            var validValuesJson = tokenGroupJson["valid"];
-            IEnumerable<TestToken> testTokens;
-            switch (validValuesJson.Type)
-            {
-                case JTokenType.String:
-                    testTokens = ParseValidValue(kind, validValuesJson).Yield();
-                    break;
-                case JTokenType.Array:
-                    testTokens = validValuesJson.ToObject<JToken[]>().Select(validValue => ParseValidValue(kind, validValue));
-                    break;
-                default:
-                    throw new NotSupportedException($"'valid' property does not support type {validValuesJson.Type}");
-            }
-            if (tokenGroupJson.TryGetValue("invalid", out JToken invalidValuesJson))
-                testTokens = testTokens.Concat(invalidValuesJson.ToObject<JToken[]>().Select(invalidValue => ParseInvalidValue(kind, invalidValue)));
-
-            return testTokens;
         }
 
         private static TestTokenKind ParseKind(JToken kindJson)
@@ -142,32 +101,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
                     return TestTokenKind.Whitespace();
                 default:
                     return TestTokenKind.Token(Enum.Parse<TokenKind>(kind.Replace("_", ""), ignoreCase: true));
-            }
-        }
-
-        private static TestToken ParseValidValue(TokenKind kind, JToken token)
-        {
-            switch (token.Type)
-            {
-                case JTokenType.String:
-                    return TestToken.Valid(true, kind, token.ToObject<string>());
-                case JTokenType.Object:
-                    return TestToken.Valid(true, kind, token["text"].ToObject<string>(), ParseValue(token["value"]));
-                default:
-                    throw new NotSupportedException($"'{token}' not supported as valid token");
-            }
-        }
-
-        private static TestToken ParseInvalidValue(TokenKind kind, JToken token)
-        {
-            switch (token.Type)
-            {
-                case JTokenType.String:
-                    return TestToken.Invalid(true, kind, token.ToObject<string>());
-                case JTokenType.Object:
-                    return TestToken.Invalid(true, kind, token["text"].ToObject<string>(), ParseValue(token["value"]));
-                default:
-                    throw new NotSupportedException($"'{token}' not supported as valid token");
             }
         }
 
@@ -209,7 +142,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
             switch (matcher.Type)
             {
                 case JTokenType.String:
-                    return new TestTokenMatcher(ParseKind(matcher.ToObject<string>()), default(string));
+                    return new TestTokenMatcher(ParseKind(matcher), default(string));
                 case JTokenType.Object:
                     var pair = ((JObject)matcher).Single<KeyValuePair<string, JToken>>();
                     return new TestTokenMatcher(ParseKind(pair.Key), pair.Value.ToObject<string>());

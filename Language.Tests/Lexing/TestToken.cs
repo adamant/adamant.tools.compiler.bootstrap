@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Xunit.Abstractions;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
@@ -13,41 +13,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
 
         public TestToken(bool permute, TestTokenKind kind, string text, bool isValid, object value)
         {
+            Requires.NotNull(nameof(text), text);
             Permute = permute;
             Kind = kind;
             Text = text;
             IsValid = isValid;
             Value = value;
-        }
-
-        public static TestToken Valid(bool permute, TokenKind kind, string text)
-        {
-            return new TestToken(permute, TestTokenKind.Token(kind), text, true, null);
-        }
-
-        public static TestToken Valid(bool permute, TokenKind kind, string text, object value)
-        {
-            return new TestToken(permute, TestTokenKind.Token(kind), text, true, value);
-        }
-
-        public static TestToken Invalid(bool permute, TokenKind kind, string text)
-        {
-            return new TestToken(permute, TestTokenKind.Token(kind), text, false, null);
-        }
-
-        public static TestToken Invalid(bool permute, TokenKind kind, string text, object value)
-        {
-            return new TestToken(permute, TestTokenKind.Token(kind), text, false, value);
-        }
-
-        public static TestToken Whitespace(bool permute, string text)
-        {
-            return new TestToken(permute, TestTokenKind.Whitespace(), text, true, null);
-        }
-
-        public static TestToken Comment(bool permute, string text)
-        {
-            return new TestToken(permute, TestTokenKind.Comment(), text, true, null);
         }
 
         public override string ToString()
