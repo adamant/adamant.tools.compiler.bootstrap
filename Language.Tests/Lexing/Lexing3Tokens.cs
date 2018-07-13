@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
         internal void LexesAllValidTokenCombinations()
         {
             var sequences = LexingData.Instance.ThreeTokenSequences;
-            output.WriteLine($"Sequence Count={sequences.Count}");
+            output.WriteLine($"Sequence Count={sequences.Count:n0}");
             foreach (var sequence in sequences)
                 LexAssert.LexesTo(string.Concat(sequence.Select(s => s.Text)), sequence.Where(s => s.Kind.Category == TestTokenCategory.Token));
         }
