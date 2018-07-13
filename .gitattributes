@@ -13,3 +13,5 @@
 *.cs        text eol=crlf
 *.sln       text eol=crlf
 *.csproj    text eol=crlf
+
+*.json		text eol=lf encoding=UTF-8

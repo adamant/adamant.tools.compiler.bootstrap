@@ -4,25 +4,25 @@ using Xunit.Abstractions;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
 {
-    public class LexingTests
+    public class LexerTests
     {
         private readonly ITestOutputHelper output;
 
-        public LexingTests(ITestOutputHelper output)
+        public LexerTests(ITestOutputHelper output)
         {
             this.output = output;
         }
 
         [Theory]
-        [MemberData(nameof(GetTestSequenceData))]
-        public static void SequenceLexes(TestTokenSequence tokens)
+        [MemberData(nameof(GetTokenTestsData))]
+        public static void TokenLexes(TestToken token)
         {
-            LexAssert.LexesCorrectly(tokens);
+            LexAssert.LexesCorrectly(token);
         }
 
-        public static TheoryData<TestTokenSequence> GetTestSequenceData()
+        public static TheoryData<TestToken> GetTokenTestsData()
         {
-            return LexingData.GetTheoryData(LexingData.Instance.Tests);
+            return LexingData.GetTheoryData(LexingData.Instance.TokenTests);
         }
 
         [Theory]
