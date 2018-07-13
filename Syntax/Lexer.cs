@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 
@@ -172,6 +173,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     case '⩽':
                         yield return NewOperatorToken(TokenKind.LessThanOrEqual);
                         break;
+                    case '"':
+                        yield return LexString();
+                        break;
                     default:
                         if (IsIdentiferStartCharacter(currentChar))
                         {
@@ -234,6 +238,64 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             void NewError(DiagnosticLevel level, string message)
             {
                 tokenDiagnosticInfos.Add(new DiagnosticInfo(level, DiagnosticPhase.Lexing, message));
+            }
+
+            StringToken LexString()
+            {
+                tokenEnd = tokenStart + 1;
+                var content = new StringBuilder();
+                char currentChar;
+                while (tokenEnd < source.Length && (currentChar = source[tokenEnd]) != '"')
+                {
+                    // if Escape Sequence
+                    if (currentChar == '\\')
+                    {
+                        tokenEnd += 1;
+                        if (tokenEnd >= source.Length)
+                        {
+                            content.Append(currentChar);
+                            NewError(DiagnosticLevel.CompilationError, "Invalid string escape sequence `\\EOF`.");
+                        }
+                        else
+                        {
+                            currentChar = source[tokenEnd];
+                            switch (currentChar)
+                            {
+                                case '"':
+                                case '\\':
+                                    content.Append(currentChar);
+                                    break;
+                                case 'n':
+                                    content.Append('\n');
+                                    break;
+                                case 'r':
+                                    content.Append('\r');
+                                    break;
+                                case '0':
+                                    content.Append('\0');
+                                    break;
+                                case 't':
+                                    content.Append('\t');
+                                    break;
+                                default:
+                                    NewError(DiagnosticLevel.CompilationError, $"Invalid string escape sequence `\\{currentChar}`.");
+                                    content.Append('\\');
+                                    content.Append(currentChar);
+                                    break;
+                            }
+                        }
+                    }
+                    else
+                        content.Append(currentChar);
+                    tokenEnd += 1;
+                }
+
+                // To include the close quote
+                if (tokenEnd < source.Length && source[tokenEnd] == '"')
+                    tokenEnd += 1;
+                var token = new StringToken(source, TextSpan.FromStartEnd(tokenStart, tokenEnd), content.ToString(), tokenDiagnosticInfos);
+                tokenDiagnosticInfos.Clear();
+                return token;
             }
         }
 

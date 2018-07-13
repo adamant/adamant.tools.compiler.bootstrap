@@ -33,6 +33,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
             return new TestToken(TestTokenKind.Token(kind), text, false, null);
         }
 
+        public static TestToken Invalid(TokenKind kind, string text, object value)
+        {
+            return new TestToken(TestTokenKind.Token(kind), text, false, value);
+        }
+
         public static TestToken Whitespace(string text)
         {
             return new TestToken(TestTokenKind.Whitespace(), text, true, null);

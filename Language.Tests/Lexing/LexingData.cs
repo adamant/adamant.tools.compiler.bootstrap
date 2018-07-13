@@ -74,7 +74,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
                     throw new NotSupportedException($"'valid' property does not support type {valid.Type}");
             }
             if (token.TryGetValue("invalid", out JToken invalid))
-                testTokens = testTokens.Concat(invalid.ToObject<string[]>().Select(text => TestToken.Invalid(kind, text)));
+                testTokens = testTokens.Concat(invalid.ToObject<JToken[]>().Select(invalidValue => ParseInvalidToken(kind, invalidValue)));
 
             return testTokens;
         }
@@ -100,6 +100,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
                     return TestToken.Valid(kind, token.ToObject<string>());
                 case JTokenType.Object:
                     return TestToken.Valid(kind, token["text"].ToObject<string>(), ParseValue(token["value"]));
+                default:
+                    throw new NotSupportedException($"'{token}' not supported as valid token");
+            }
+        }
+
+        private static TestToken ParseInvalidToken(TokenKind kind, JToken token)
+        {
+            switch (token.Type)
+            {
+                case JTokenType.String:
+                    return TestToken.Invalid(kind, token.ToObject<string>());
+                case JTokenType.Object:
+                    return TestToken.Invalid(kind, token["text"].ToObject<string>(), ParseValue(token["value"]));
                 default:
                     throw new NotSupportedException($"'{token}' not supported as valid token");
             }

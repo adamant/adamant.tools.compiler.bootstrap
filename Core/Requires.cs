@@ -26,5 +26,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
             if (!Enum.IsDefined(typeof(E), value))
                 throw new InvalidEnumArgumentException(name, Convert.ToInt32(value), typeof(E));
         }
+
+        public static void That(string name, bool condition)
+        {
+            if (!condition)
+                throw new ArgumentException("Does not satisfy condition", name);
+        }
     }
 }

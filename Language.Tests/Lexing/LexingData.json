@@ -128,6 +128,29 @@
     ],
     "future_tokens": [
         {
+            "token": "string_literal",
+            "valid": [
+                {
+                    "text": "\"Hello World!\"",
+                    "value": "Hello World!"
+                },
+                {
+                    "text": "\"\\\"\\n\\r\\0\\t\\u(0)\\u(FFFF)\\u(10FFFF)\\\\\"",
+                    "value": "\"\n\r\u0000\t\u0000\uFFFF\uDBFF\uDFFF\\"
+                },
+                {
+                    "text": "\"♠\"",
+                    "value": "♠"
+                }
+            ],
+            "invalid": [
+                {
+                    "text": "\"\\",
+                    "value": "\\"
+                }
+            ]
+        },
+        {
             "token": "escaped_identifier",
             "valid": [
                 {
@@ -147,7 +170,7 @@
         }
     ],
     "whitespace": [ " ", "\t", "\n", "\r\n", "\t\t", "    " ],
-    "comments": [ "/**/", "/***/", "/*/**/", "// foo\n" ],
+    "comments": [ "/**/", "/***/", "/*/**/", "/* *c */", "//\r", "// foo\n" ],
     "separate": [
         [ "plus", "equals" ],
         [ "plus", "equals_equals" ],

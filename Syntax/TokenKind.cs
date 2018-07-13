@@ -56,5 +56,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         Identifier,
         EscapedIdentifier, // TODO this should just be a kind of indentifier
         EscapedStringIdentifier, // TODO this should just be a kind of indentifier
+        StringLiteral,
     }
 }
