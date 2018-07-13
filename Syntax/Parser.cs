@@ -1,12 +1,14 @@
+using System;
+using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Core;
+
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class Parser
     {
-        private readonly ILexer lexer;
-
-        public Parser(ILexer lexer)
+        public SyntaxTree Parse(IEnumerable<Token> tokens, SourceReference reference)
         {
-            this.lexer = lexer;
+            throw new NotImplementedException();
         }
     }
 }

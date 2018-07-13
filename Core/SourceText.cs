@@ -1,5 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
+    /// The text of a source file
     public class SourceText
     {
         public readonly string Content;
