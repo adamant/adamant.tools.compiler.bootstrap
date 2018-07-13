@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -8,16 +7,9 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class Lexer : IEnumerable<Token>
+    public class Lexer : ILexer
     {
-        private readonly SourceText source;
-
-        public Lexer(SourceText source)
-        {
-            this.source = source ?? throw new ArgumentNullException(nameof(source));
-        }
-
-        public IEnumerator<Token> GetEnumerator()
+        public IEnumerable<Token> Lex(SourceText source)
         {
             var tokenStart = 0;
             var tokenEnd = -1; // One past the end position to allow for zero length spans
@@ -332,10 +324,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             }
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
 
         private static bool IsIdentiferStartCharacter(char c)
         {

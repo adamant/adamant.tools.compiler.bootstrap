@@ -15,4 +15,8 @@
     <ProjectReference Include="..\Framework\Framework.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Tree\" />
+  </ItemGroup>
+
 </Project>

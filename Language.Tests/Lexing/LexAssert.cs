@@ -18,8 +18,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
         public static void LexesCorrectly(TestTokenSequence sequence)
         {
             var source = new SourceText(sequence.ToString());
-            var lexer = new Lexer(source);
-            var tokens = lexer.ToList();
+            var lexer = new Lexer();
+            var tokens = lexer.Lex(source);
             Assert.Collection(tokens, sequence.WhereIsToken().Tokens.Select(Inspector).Append(AssertEndOfFile).ToArray());
         }
         private static Action<Token> Inspector(TestToken expected)
