@@ -19,10 +19,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
         public static LexingData Instance { get { return instance.Value; } }
         #endregion
 
-        public readonly IList<TestToken> TokenTests;
         public readonly IList<TestToken> AllTokens;
+        private readonly IList<TestToken> PermuteTokens;
         private readonly TestTokenMatchers SeparateTokens;
-        public readonly IList<TestTokenSequence> OneTokenSequences;
         public readonly IList<TestTokenSequence> TwoTokenSequences;
         public readonly IList<TestTokenSequence> ThreeTokenSequences;
         public readonly IList<TestTokenSequence> FourTokenSequences;
@@ -51,20 +50,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
             var data = GetJsonLexingData();
 
             // Tests
-            TokenTests = ParseTokenTests(data.Value<JArray>("token_tests"));
+            var tokenTests = ParseTokens(data.Value<JArray>("tokens"));
 
             // All Tokens
             var tokens = data.Value<JArray>("permute_tokens").Cast<JObject>().SelectMany(ParseTokenGroup);
             var whitespace = data["whitespace"].ToObject<string[]>().Select(text => TestToken.Whitespace(true, text)).ToList();
             var comments = data["comments"].ToObject<string[]>().Select(text => TestToken.Comment(true, text)).ToList();
-            AllTokens = tokens.Concat(whitespace).Concat(comments).ToList().AsReadOnly();
+            AllTokens = tokenTests.Concat(tokens).Concat(whitespace).Concat(comments).ToList().AsReadOnly();
+            PermuteTokens = AllTokens.Where(t => t.Permute).ToList().AsReadOnly();
 
             // Separate Tokens
             SeparateTokens = GetSeparateTokens(data);
 
             // Token Sequences
-            OneTokenSequences = AllTokens.Select(TestTokenSequence.Single).ToList().AsReadOnly();
-            TwoTokenSequences = GetSequencesWithOneMoreToken(OneTokenSequences);
+            var oneTokenSequences = PermuteTokens.Select(TestTokenSequence.Single).ToList().AsReadOnly();
+            TwoTokenSequences = GetSequencesWithOneMoreToken(oneTokenSequences);
             ThreeTokenSequences = GetSequencesWithOneMoreToken(TwoTokenSequences);
             FourTokenSequences = GetSequencesWithOneMoreToken(ThreeTokenSequences);
         }
@@ -79,9 +79,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
             return data;
         }
 
-        private IList<TestToken> ParseTokenTests(JArray testsJson)
+        private IList<TestToken> ParseTokens(JArray tokensJson)
         {
-            return testsJson.Cast<JObject>().Select(ParseToken).ToList().AsReadOnly();
+            return tokensJson.Cast<JObject>().Select(ParseToken).ToList().AsReadOnly();
         }
 
         private IList<TestTokenSequence> ParseSequenceTests(JArray testsJson)
@@ -220,7 +220,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
         private IList<TestTokenSequence> GetSequencesWithOneMoreToken(IList<TestTokenSequence> sequences)
         {
             return sequences
-                .SelectMany(_ => AllTokens, (sequence, token) => sequence.Append(token))
+                .SelectMany(_ => PermuteTokens, (sequence, token) => sequence.Append(token))
                 .Where(DoesNotContainInvalidPair)
                 .ToList()
                 .AsReadOnly();

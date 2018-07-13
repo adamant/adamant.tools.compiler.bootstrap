@@ -14,27 +14,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         }
 
         [Theory]
-        [MemberData(nameof(GetTokenTestsData))]
-        public static void TokenLexes(TestToken token)
+        [MemberData(nameof(GetAllTokensData))]
+        public static void EachTokenLexes(TestToken token)
         {
             LexAssert.LexesCorrectly(token);
         }
 
-        public static TheoryData<TestToken> GetTokenTestsData()
+        public static TheoryData<TestToken> GetAllTokensData()
         {
-            return LexingData.GetTheoryData(LexingData.Instance.TokenTests);
-        }
-
-        [Theory]
-        [MemberData(nameof(GetOneTokenSequenceData))]
-        public static void EachTokenLexes(TestTokenSequence tokens)
-        {
-            LexAssert.LexesCorrectly(tokens);
-        }
-
-        public static TheoryData<TestTokenSequence> GetOneTokenSequenceData()
-        {
-            return LexingData.GetTheoryData(LexingData.Instance.OneTokenSequences);
+            return LexingData.GetTheoryData(LexingData.Instance.AllTokens);
         }
 
         [Theory]
