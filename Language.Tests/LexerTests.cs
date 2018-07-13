@@ -38,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         }
 
         [Fact]
-        public void SequenceOf3TokensLexes()
+        public void SequencesOf3TokensLexes()
         {
             var sequences = LexingData.Instance.ThreeTokenSequences;
             output.WriteLine($"Sequence Count={sequences.Count:n0}");
@@ -47,7 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         }
 
         [Fact]
-        public void SequenceOf4TokensLexes()
+        public void SequencesOf4TokensLexes()
         {
             var sequences = LexingData.Instance.FourTokenSequences;
             output.WriteLine($"Sequence Count={sequences.Count:n0}");

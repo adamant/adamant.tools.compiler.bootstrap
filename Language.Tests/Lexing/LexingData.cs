@@ -101,7 +101,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
             var text = tokenJson.Value<string>("text");
             var isValid = tokenJson.Value<bool?>("is_valid") ?? true;
             object value = ParseValue(tokenJson["value"]);
-            return new TestToken(permute, kind, text, true, value);
+            return new TestToken(permute, kind, text, isValid, value);
         }
 
         private static IEnumerable<TestToken> ParseTokenGroup(JObject tokenGroupJson)
