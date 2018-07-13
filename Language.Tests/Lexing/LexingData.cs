@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
 {
-    using TestTokenMatchers = IList<Tuple<TestTokenMatcher, TestTokenMatcher>>;
+    using TestTokenMatchers = IDictionary<Tuple<TestTokenKind, TestTokenKind>, IList<Tuple<TestTokenMatcher, TestTokenMatcher>>>;
 
     public class LexingData
     {
@@ -144,7 +144,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
         {
             var separate = data["separate"].ToObject<JArray[]>();
             // Fill in every value so we don't have to worry about checking if they are there later
-            var matchers = new List<Tuple<TestTokenMatcher, TestTokenMatcher>>();
+            var matchers = new Dictionary<Tuple<TestTokenKind, TestTokenKind>, IList<Tuple<TestTokenMatcher, TestTokenMatcher>>>();
             foreach (var sequence in separate)
             {
                 if (sequence.Count != 2)
@@ -152,7 +152,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
 
                 var first = ParseTokenMatcher(sequence[0]);
                 var second = ParseTokenMatcher(sequence[1]);
-                matchers.Add(Tuple.Create(first, second));
+                var key = Tuple.Create(first.Kind, second.Kind);
+                if (!matchers.ContainsKey(key))
+                    matchers.Add(key, new List<Tuple<TestTokenMatcher, TestTokenMatcher>>());
+
+                matchers[key].Add(Tuple.Create(first, second));
             }
             return matchers;
         }
@@ -186,11 +190,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
             foreach (var token in sequence.Tokens)
             {
                 if (previous != null)
-                    foreach (var pair in SeparateTokens)
-                    {
-                        if (pair.Item1.Matches(previous) && pair.Item2.Matches(token))
-                            return false;
-                    }
+                {
+                    var key = Tuple.Create(previous.Kind, token.Kind);
+                    if (separate.TryGetValue(key, out var matchers))
+                        foreach (var matcherPair in matchers)
+                            if (matcherPair.Item1.Matches(previous) && matcherPair.Item2.Matches(token))
+                                return false;
+                }
 
                 previous = token;
             }

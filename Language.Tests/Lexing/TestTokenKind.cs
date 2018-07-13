@@ -64,7 +64,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
         void IXunitSerializable.Deserialize(IXunitSerializationInfo info)
         {
             Category = info.GetValue<TestTokenCategory>("Category");
-            TokenKind = info.GetValue<TokenKind?>("Category");
+            TokenKind = info.GetValue<TokenKind?>("TokenKind");
         }
 
         void IXunitSerializable.Serialize(IXunitSerializationInfo info)
