@@ -59,7 +59,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
 
         private static JObject GetJsonLexingData()
         {
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "Lexing", "LexingData.json");
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "Lexing.json");
             if (!File.Exists(path))
                 throw new ArgumentException($"Could not find file at path: {path}");
             var content = File.ReadAllText(path);
