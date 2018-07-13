@@ -5,6 +5,7 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Newtonsoft.Json.Linq;
+using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
 {
@@ -20,10 +21,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
 
         public readonly IList<TestToken> AllTokens;
         private readonly TestTokenMatchers SeparateTokens;
-        public readonly IList<TestToken[]> OneTokenSequences;
-        public readonly IList<TestToken[]> TwoTokenSequences;
-        public readonly IList<TestToken[]> ThreeTokenSequences;
-        public readonly IList<TestToken[]> FourTokenSequences;
+        public readonly IList<TestTokenSequence> OneTokenSequences;
+        public readonly IList<TestTokenSequence> TwoTokenSequences;
+        public readonly IList<TestTokenSequence> ThreeTokenSequences;
+        public readonly IList<TestTokenSequence> FourTokenSequences;
+
+        public static TheoryData<TestTokenSequence> GetTheoryData(IEnumerable<TestTokenSequence> sequences)
+        {
+            var data = new TheoryData<TestTokenSequence>();
+            foreach (var sequence in sequences)
+            {
+                data.Add(sequence);
+            }
+            return data;
+        }
 
         private LexingData()
         {
@@ -40,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
             SeparateTokens = GetSeparateTokens(data);
 
             // Token Sequences
-            OneTokenSequences = AllTokens.Select(token => new[] { token }).ToList().AsReadOnly();
+            OneTokenSequences = AllTokens.Select(TestTokenSequence.Single).ToList().AsReadOnly();
             TwoTokenSequences = GetSequencesWithOneMoreToken(OneTokenSequences);
             ThreeTokenSequences = GetSequencesWithOneMoreToken(TwoTokenSequences);
             FourTokenSequences = GetSequencesWithOneMoreToken(ThreeTokenSequences);
@@ -159,29 +170,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
                     throw new NotSupportedException($"'{matcher}' not supported as token matcher");
             }
         }
-        private IList<TestToken[]> GetSequencesWithOneMoreToken(IList<TestToken[]> sequences)
+        private IList<TestTokenSequence> GetSequencesWithOneMoreToken(IList<TestTokenSequence> sequences)
         {
             return sequences
-                .SelectMany(_ => AllTokens, (sequence, token) => sequence.Append(token).ToArray())
+                .SelectMany(_ => AllTokens, (sequence, token) => sequence.Append(token))
                 .Where(DoesNotContainInvalidPair)
                 .ToList()
                 .AsReadOnly();
         }
 
-        private bool DoesNotContainInvalidPair(TestToken[] sequence)
+        private bool DoesNotContainInvalidPair(TestTokenSequence sequence)
         {
             var separate = SeparateTokens;
-            // Don't look at the last element, it has nothing after it
-            for (var i = 0; i < sequence.Length - 1; i++)
+            TestToken previous = null;
+            foreach (var token in sequence.Tokens)
             {
-                var first = sequence[i];
-                var second = sequence[i + 1];
-                foreach (var pair in SeparateTokens)
-                {
-                    if (pair.Item1.Matches(first) && pair.Item2.Matches(second))
-                        return false;
-                }
+                if (previous != null)
+                    foreach (var pair in SeparateTokens)
+                    {
+                        if (pair.Item1.Matches(previous) && pair.Item2.Matches(token))
+                            return false;
+                    }
+
+                previous = token;
             }
+
             return true;
         }
     }

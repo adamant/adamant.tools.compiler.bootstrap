@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
@@ -8,14 +6,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
     {
         [Theory]
         [MemberData(nameof(GetTwoTokenSequenceData))]
-        internal void LexesAllValidTokenCombinations(string text, TestToken[] expectedTokens)
+        public void LexesAllValidTokenCombinations(TestTokenSequence tokens)
         {
-            LexAssert.LexesTo(text, expectedTokens);
+            LexAssert.LexesCorrectly(tokens);
         }
 
-        public static IEnumerable<object[]> GetTwoTokenSequenceData()
+        public static TheoryData<TestTokenSequence> GetTwoTokenSequenceData()
         {
-            return LexingData.Instance.TwoTokenSequences.Select(TestToken.GetSequenceData);
+            return LexingData.GetTheoryData(LexingData.Instance.TwoTokenSequences);
         }
     }
 }

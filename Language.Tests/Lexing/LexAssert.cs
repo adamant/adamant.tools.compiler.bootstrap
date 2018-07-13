@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
@@ -10,12 +9,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
 {
     public static class LexAssert
     {
-        internal static void LexesTo(string text, IEnumerable<TestToken> expectedTokens)
+        internal static void LexesCorrectly(TestTokenSequence sequence)
         {
-            var source = new SourceText(text);
+            var source = new SourceText(sequence.ToString());
             var lexer = new Lexer(source);
             var tokens = lexer.ToList();
-            Assert.Collection(tokens, expectedTokens.Select(Inspector).Append(AssertEndOfFile).ToArray());
+            Assert.Collection(tokens, sequence.WhereIsToken().Tokens.Select(Inspector).Append(AssertEndOfFile).ToArray());
         }
         private static Action<Token> Inspector(TestToken expected)
         {

@@ -20,6 +20,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
                 throw new ArgumentOutOfRangeException(name, value, $"End not in string of length {inString.Length}");
         }
 
+        public static void NotNull(string name, object value)
+        {
+            if (value == null)
+                throw new ArgumentNullException(name);
+        }
+
         public static void ValidEnum<E>(string name, E value)
             where E : Enum
         {

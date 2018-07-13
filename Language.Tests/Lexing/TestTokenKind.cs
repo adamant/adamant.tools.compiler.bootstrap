@@ -1,12 +1,13 @@
 using System;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
+using Xunit.Abstractions;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
 {
-    public struct TestTokenKind
+    public struct TestTokenKind : IXunitSerializable
     {
-        public readonly TestTokenCategory Category;
-        public readonly TokenKind? TokenKind;
+        public TestTokenCategory Category { get; private set; }
+        public TokenKind? TokenKind { get; private set; }
 
         private TestTokenKind(TestTokenCategory category, TokenKind? tokenKind)
         {
@@ -58,6 +59,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
             if (Category == TestTokenCategory.Token)
                 return TokenKind.ToString();
             return Category.ToString();
+        }
+
+        void IXunitSerializable.Deserialize(IXunitSerializationInfo info)
+        {
+            Category = info.GetValue<TestTokenCategory>("Category");
+            TokenKind = info.GetValue<TokenKind?>("Category");
+        }
+
+        void IXunitSerializable.Serialize(IXunitSerializationInfo info)
+        {
+            info.AddValue("Category", Category);
+            info.AddValue("TokenKind", TokenKind);
         }
     }
 }

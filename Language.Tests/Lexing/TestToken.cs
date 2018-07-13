@@ -1,14 +1,14 @@
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
+using Xunit.Abstractions;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
 {
-    public class TestToken
+    public class TestToken : IXunitSerializable
     {
-        public readonly TestTokenKind Kind;
-        public readonly string Text;
-        public readonly bool IsValid;
-        public readonly object Value;
+        public TestTokenKind Kind { get; private set; }
+        public string Text { get; private set; }
+        public bool IsValid { get; private set; }
+        public object Value { get; private set; }
 
         public TestToken(TestTokenKind kind, string text, bool isValid, object value)
         {
@@ -54,13 +54,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
             return $"{Kind}{validMarker}=`{Text}`";
         }
 
-        public static object[] GetSequenceData(TestToken[] sequence)
+        void IXunitSerializable.Deserialize(IXunitSerializationInfo info)
         {
-            return new object[]
-                {
-                    string.Concat(sequence.Select(s => s.Text)),
-                    sequence.Where(s => s.Kind.Category == TestTokenCategory.Token).ToArray()
-                };
+            Kind = info.GetValue<TestTokenKind>("Kind");
+            Text = info.GetValue<string>("Text");
+            IsValid = info.GetValue<bool>("IsValid");
+            Value = info.GetValue<object>("Value");
+        }
+
+        void IXunitSerializable.Serialize(IXunitSerializationInfo info)
+        {
+            info.AddValue("Kind", Kind);
+            info.AddValue("Text", Text);
+            info.AddValue("IsValid", IsValid);
+            info.AddValue("Value", Value);
         }
     }
 }
