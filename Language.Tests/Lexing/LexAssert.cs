@@ -3,6 +3,7 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
@@ -22,12 +23,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
             {
                 Assert.Equal(expected.Kind.TokenKind, token.Kind);
                 Assert.Equal(expected.Text, token.Text);
-                if (expected.Value == null)
-                    Assert.IsType<Token>(token);
-                else if (expected.Value is string)
-                    Assert.Equal(expected.Value, Assert.IsType<StringToken>(token).Value);
-                else
-                    throw new NotSupportedException($"Expected token value of `{expected.Value} not supported`");
+                switch (token.Kind)
+                {
+                    case TokenKind.Identifier:
+                        var identifierToken = Assert.IsType<IdentifierToken>(token);
+                        if (expected.Value != null)
+                            Assert.Equal(expected.Value, identifierToken.Value);
+                        break;
+                    case TokenKind.StringLiteral:
+                        var stringLiteralToken = Assert.IsType<StringToken>(token);
+                        if (expected.Value != null)
+                            Assert.Equal(expected.Value, stringLiteralToken.Value);
+                        break;
+                    default:
+                        Assert.IsType<Token>(token);
+                        Assert.Null(expected.Value);
+                        break;
+                }
                 Assert.Equal(expected.IsValid, !token.DiagnosticInfos.Any(d => d.Level > DiagnosticLevel.Warning));
             };
         }

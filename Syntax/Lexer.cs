@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
@@ -183,7 +184,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                             while (tokenEnd < source.Length && IsIdentifierCharacter(source[tokenEnd]))
                                 tokenEnd += 1;
 
-
                             yield return NewIdentifierOrKeywordToken();
                         }
                         else if (currentChar == '!' && NextCharIs('='))
@@ -219,8 +219,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             Token NewIdentifierOrKeywordToken()
             {
                 // TODO check for keywords
-                var kind = TokenKind.Identifier;
-                return NewToken(kind); // TODO create IdentifierToken with value, IsEscaped etc.
+
+                var span = TextSpan.FromStartEnd(tokenStart, tokenEnd);
+                var token = new IdentifierToken(source, span, IdentifierKind.Normal, source[span], tokenDiagnosticInfos);
+                tokenDiagnosticInfos.Clear();
+                return token;
             }
 
             bool NextCharIs(char c)

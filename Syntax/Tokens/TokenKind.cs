@@ -1,4 +1,4 @@
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 {
     /// Roslyn very consistently names their tokens composed of Unicode Symbols
     /// as the concatination of the symbol names followed by "Token". However,
