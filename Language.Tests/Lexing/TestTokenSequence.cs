@@ -16,6 +16,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
             tokens = new TestToken[0];
         }
 
+        public TestTokenSequence(IEnumerable<TestToken> tokens)
+        {
+            this.tokens = tokens.ToArray();
+        }
+
         private TestTokenSequence(TestToken[] tokens)
         {
             this.tokens = tokens;

@@ -14,6 +14,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         }
 
         [Theory]
+        [MemberData(nameof(GetTestSequenceData))]
+        public static void SequenceLexes(TestTokenSequence tokens)
+        {
+            LexAssert.LexesCorrectly(tokens);
+        }
+
+        public static TheoryData<TestTokenSequence> GetTestSequenceData()
+        {
+            return LexingData.GetTheoryData(LexingData.Instance.Tests);
+        }
+
+        [Theory]
         [MemberData(nameof(GetOneTokenSequenceData))]
         public static void EachTokenLexes(TestTokenSequence tokens)
         {

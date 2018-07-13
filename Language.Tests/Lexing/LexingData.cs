@@ -19,6 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
         public static LexingData Instance { get { return instance.Value; } }
         #endregion
 
+        public readonly IList<TestTokenSequence> Tests;
         public readonly IList<TestToken> AllTokens;
         private readonly TestTokenMatchers SeparateTokens;
         public readonly IList<TestTokenSequence> OneTokenSequences;
@@ -40,9 +41,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
         {
             var data = GetJsonLexingData();
 
+            // Tests
+            Tests = ParseTests(data.Value<JArray>("tests"));
+
             // All Tokens
-            var tokenData = (JArray)data["tokens"];
-            var tokens = tokenData.Cast<JObject>().SelectMany(ParseToken);
+            var tokens = data.Value<JArray>("tokens").Cast<JObject>().SelectMany(ParseTokenGroup);
             var whitespace = data["whitespace"].ToObject<string[]>().Select(text => TestToken.Whitespace(text)).ToList();
             var comments = data["comments"].ToObject<string[]>().Select(text => TestToken.Comment(text)).ToList();
             AllTokens = tokens.Concat(whitespace).Concat(comments).ToList().AsReadOnly();
@@ -67,27 +70,51 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
             return data;
         }
 
-        private static IEnumerable<TestToken> ParseToken(JObject token)
+        private IList<TestTokenSequence> ParseTests(JArray testsJson)
         {
-            var kind = ParseKind(token["kind"].ToObject<string>()).ToTokenKind();
+            return testsJson.Cast<JArray>().Select(ParseTest).ToList().AsReadOnly();
+        }
 
-            var valid = token["valid"];
+        private TestTokenSequence ParseTest(JArray testJson)
+        {
+            return new TestTokenSequence(testJson.Cast<JObject>().Select(ParseToken));
+        }
+
+        private TestToken ParseToken(JObject tokenJson)
+        {
+            var kind = ParseKind(tokenJson["kind"]);
+            var text = tokenJson.Value<string>("text");
+            var isValid = tokenJson.Value<bool?>("is_valid") ?? true;
+            object value = ParseValue(tokenJson["value"]);
+            return new TestToken(kind, text, true, value);
+        }
+
+        private static IEnumerable<TestToken> ParseTokenGroup(JObject tokenGroupJson)
+        {
+            var kind = ParseKind(tokenGroupJson["kind"]).ToTokenKind();
+
+            var validValuesJson = tokenGroupJson["valid"];
             IEnumerable<TestToken> testTokens;
-            switch (valid.Type)
+            switch (validValuesJson.Type)
             {
                 case JTokenType.String:
-                    testTokens = TestToken.Valid(kind, valid.ToObject<string>()).Yield();
+                    testTokens = ParseValidValue(kind, validValuesJson).Yield();
                     break;
                 case JTokenType.Array:
-                    testTokens = valid.ToObject<JToken[]>().Select(validValue => ParseValidToken(kind, validValue));
+                    testTokens = validValuesJson.ToObject<JToken[]>().Select(validValue => ParseValidValue(kind, validValue));
                     break;
                 default:
-                    throw new NotSupportedException($"'valid' property does not support type {valid.Type}");
+                    throw new NotSupportedException($"'valid' property does not support type {validValuesJson.Type}");
             }
-            if (token.TryGetValue("invalid", out JToken invalid))
-                testTokens = testTokens.Concat(invalid.ToObject<JToken[]>().Select(invalidValue => ParseInvalidToken(kind, invalidValue)));
+            if (tokenGroupJson.TryGetValue("invalid", out JToken invalidValuesJson))
+                testTokens = testTokens.Concat(invalidValuesJson.ToObject<JToken[]>().Select(invalidValue => ParseInvalidValue(kind, invalidValue)));
 
             return testTokens;
+        }
+
+        private static TestTokenKind ParseKind(JToken kindJson)
+        {
+            return ParseKind(kindJson.ToObject<string>());
         }
 
         private static TestTokenKind ParseKind(string kind)
@@ -103,7 +130,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
             }
         }
 
-        private static TestToken ParseValidToken(TokenKind kind, JToken token)
+        private static TestToken ParseValidValue(TokenKind kind, JToken token)
         {
             switch (token.Type)
             {
@@ -116,7 +143,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
             }
         }
 
-        private static TestToken ParseInvalidToken(TokenKind kind, JToken token)
+        private static TestToken ParseInvalidValue(TokenKind kind, JToken token)
         {
             switch (token.Type)
             {
@@ -131,6 +158,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
 
         private static object ParseValue(JToken value)
         {
+            if (value == null) return null; // null when property not present
             switch (value.Type)
             {
                 case JTokenType.String:
