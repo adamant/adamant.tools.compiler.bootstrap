@@ -7,7 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 {
-    public class Token
+    public class Token : Syntax
     {
         public readonly SourceText Source;
         public readonly TextSpan Span;
