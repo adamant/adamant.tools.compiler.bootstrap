@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing;
+using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         [MemberData(nameof(GetAllTokensData))]
         public static void EachTokenLexes(TestToken token)
         {
-            LexAssert.LexesCorrectly(token);
+            Assert.LexesCorrectly(token);
         }
 
         public static TheoryData<TestToken> GetAllTokensData()
@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         [MemberData(nameof(GetTwoTokenSequenceData))]
         public static void SequenceOf2TokensLexes(TestTokenSequence tokens)
         {
-            LexAssert.LexesCorrectly(tokens);
+            Assert.LexesCorrectly(tokens);
         }
 
         public static TheoryData<TestTokenSequence> GetTwoTokenSequenceData()
@@ -43,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             var sequences = LexingData.Instance.ThreeTokenSequences;
             output.WriteLine($"Sequence Count={sequences.Count:n0}");
             foreach (var sequence in sequences)
-                LexAssert.LexesCorrectly(sequence);
+                Assert.LexesCorrectly(sequence);
         }
 
         [Fact]
@@ -52,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             var sequences = LexingData.Instance.FourTokenSequences;
             output.WriteLine($"Sequence Count={sequences.Count:n0}");
             foreach (var sequence in sequences)
-                LexAssert.LexesCorrectly(sequence);
+                Assert.LexesCorrectly(sequence);
         }
     }
 }

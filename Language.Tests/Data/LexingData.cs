@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
+namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
 {
     using TestTokenMatchers = IDictionary<Tuple<TestTokenKind, TestTokenKind>, IList<Tuple<TestTokenMatcher, TestTokenMatcher>>>;
 

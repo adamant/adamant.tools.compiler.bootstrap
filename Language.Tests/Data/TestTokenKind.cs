@@ -2,7 +2,7 @@ using System;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Xunit.Abstractions;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
+namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
 {
     public struct TestTokenKind : IXunitSerializable
     {

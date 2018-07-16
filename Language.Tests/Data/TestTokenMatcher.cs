@@ -1,4 +1,4 @@
-namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
+namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
 {
     public struct TestTokenMatcher
     {

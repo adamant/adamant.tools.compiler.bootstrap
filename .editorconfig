@@ -13,6 +13,9 @@ insert_final_newline = true
 [*.{c,rsrc}]
 end_of_line = lf
 
+[*.{xml,csproj}]
+indent_size = 2
+
 [*.{bat}]
 end_of_line = crlf
 

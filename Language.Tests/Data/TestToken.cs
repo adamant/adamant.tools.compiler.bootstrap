@@ -1,7 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Xunit.Abstractions;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
+namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
 {
     public class TestToken : IXunitSerializable
     {
@@ -10,6 +10,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
         public string Text { get; private set; }
         public bool IsValid { get; private set; }
         public object Value { get; private set; }
+
+        // Required by IXunitSerializable
+        public TestToken()
+        {
+            Permute = false;
+            Kind = TestTokenKind.Comment();
+            Text = "/* default constructed token */";
+            IsValid = true;
+            Value = null;
+        }
 
         public TestToken(bool permute, TestTokenKind kind, string text, bool isValid, object value)
         {

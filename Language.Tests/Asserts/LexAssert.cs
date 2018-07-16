@@ -2,13 +2,13 @@ using System;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
+using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
-using Xunit;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
+namespace Xunit
 {
-    public static class LexAssert
+    public partial class Assert
     {
         public static void LexesCorrectly(TestToken token)
         {

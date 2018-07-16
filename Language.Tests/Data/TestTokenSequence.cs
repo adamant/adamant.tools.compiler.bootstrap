@@ -3,7 +3,7 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Xunit.Abstractions;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Lexing
+namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
 {
     public class TestTokenSequence : IXunitSerializable
     {
