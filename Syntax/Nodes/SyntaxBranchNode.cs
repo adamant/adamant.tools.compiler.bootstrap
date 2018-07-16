@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tree
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
 {
     /// For lack of a better name, we use the tree terminology here of internal
     /// tree nodes being called "branches". Thus `SyntaxBranchNode` is by analogy

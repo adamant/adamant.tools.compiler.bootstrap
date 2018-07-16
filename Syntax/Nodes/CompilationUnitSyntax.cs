@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tree
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
 {
     public class CompilationUnitSyntax : SyntaxBranchNode
     {

@@ -1,7 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tree
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
 {
     public class SkippedTokensSyntax : SyntaxBranchNode
     {

@@ -17,13 +17,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             CodeReference = codeRef;
             Code = code;
             this.tokens = tokens.GetEnumerator();
-            Finished = this.tokens.MoveNext();
+            Finished = !this.tokens.MoveNext();
         }
 
         public Token Consume()
         {
             var current = Current;
-            Finished = tokens.MoveNext();
+            Finished = !tokens.MoveNext();
             return current;
         }
     }
