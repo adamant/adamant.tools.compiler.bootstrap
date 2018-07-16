@@ -9,14 +9,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class Lexer : ILexer
     {
-        public IEnumerable<Token> Lex(SourceText source)
+        public IEnumerable<Token> Lex(CodeText code)
         {
             var tokenStart = 0;
             var tokenEnd = -1; // One past the end position to allow for zero length spans
             var tokenDiagnosticInfos = new List<DiagnosticInfo>();
-            while (tokenStart < source.Length)
+            while (tokenStart < code.Length)
             {
-                var currentChar = source[tokenStart];
+                var currentChar = code[tokenStart];
                 switch (currentChar)
                 {
                     case ' ':
@@ -102,7 +102,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         {
                             // it is a line comment `//`
                             tokenStart += 2;
-                            while (tokenStart < source.Length && source[tokenStart] != '\r' && source[tokenStart] != '\n')
+                            while (tokenStart < code.Length && code[tokenStart] != '\r' && code[tokenStart] != '\n')
                             {
                                 tokenStart += 1;
                             }
@@ -113,9 +113,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                             // it is a block comment `/*`
                             tokenStart += 2;
                             var lastCharWasStar = false;
-                            while (tokenStart < source.Length && !(lastCharWasStar && source[tokenStart] == '/'))
+                            while (tokenStart < code.Length && !(lastCharWasStar && code[tokenStart] == '/'))
                             {
-                                lastCharWasStar = source[tokenStart] == '*';
+                                lastCharWasStar = code[tokenStart] == '*';
                                 tokenStart += 1;
                             }
                             tokenStart += 1; // move past the final '/'
@@ -173,7 +173,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         if (IsIdentiferStartCharacter(currentChar))
                         {
                             tokenEnd = tokenStart + 1;
-                            while (tokenEnd < source.Length && IsIdentifierCharacter(source[tokenEnd]))
+                            while (tokenEnd < code.Length && IsIdentifierCharacter(code[tokenEnd]))
                                 tokenEnd += 1;
 
                             yield return NewIdentifierOrKeywordToken();
@@ -203,7 +203,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                 // If we were given an end value, set tokenEnd correctly
                 tokenEnd = end ?? tokenEnd;
 
-                var token = Token.New(source, TextSpan.FromStartEnd(tokenStart, tokenEnd), kind, tokenDiagnosticInfos);
+                var token = Token.New(code, TextSpan.FromStartEnd(tokenStart, tokenEnd), kind, tokenDiagnosticInfos);
                 tokenDiagnosticInfos.Clear();
                 return token;
             }
@@ -213,7 +213,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                 // TODO check for keywords
 
                 var span = TextSpan.FromStartEnd(tokenStart, tokenEnd);
-                var token = new IdentifierToken(source, span, IdentifierKind.Normal, source[span], tokenDiagnosticInfos);
+                var token = new IdentifierToken(code, span, IdentifierKind.Normal, code[span], tokenDiagnosticInfos);
                 tokenDiagnosticInfos.Clear();
                 return token;
             }
@@ -221,13 +221,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             bool NextCharIs(char c)
             {
                 var index = tokenStart + 1;
-                return index < source.Length && source[index] == c;
+                return index < code.Length && code[index] == c;
             }
 
             bool CharIs(int i, char c)
             {
                 var index = tokenStart + i;
-                return index < source.Length && source[index] == c;
+                return index < code.Length && code[index] == c;
             }
 
             void NewError(DiagnosticLevel level, string message)
@@ -240,13 +240,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                 tokenEnd = tokenStart + 1;
                 var content = new StringBuilder();
                 char currentChar;
-                while (tokenEnd < source.Length && (currentChar = source[tokenEnd]) != '"')
+                while (tokenEnd < code.Length && (currentChar = code[tokenEnd]) != '"')
                 {
                     // if Escape Sequence
                     if (currentChar == '\\')
                     {
                         tokenEnd += 1;
-                        if (tokenEnd >= source.Length)
+                        if (tokenEnd >= code.Length)
                         {
                             content.Append(currentChar);
                             NewError(DiagnosticLevel.CompilationError, "Invalid string escape sequence `\\EOF`.");
@@ -254,7 +254,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         }
                         else
                         {
-                            currentChar = source[tokenEnd];
+                            currentChar = code[tokenEnd];
                             switch (currentChar)
                             {
                                 case '"':
@@ -275,13 +275,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                                     break;
                                 case 'u':
                                     tokenEnd += 1; // consume the 'u'
-                                    if (tokenEnd < source.Length && source[tokenEnd] == '(')
+                                    if (tokenEnd < code.Length && code[tokenEnd] == '(')
                                         tokenEnd += 1;
                                     else
-                                        NewError(DiagnosticLevel.CompilationError, $"Unicode escape sequence must begin `\\u(` rather than `\\{source[tokenEnd]}`.");
+                                        NewError(DiagnosticLevel.CompilationError, $"Unicode escape sequence must begin `\\u(` rather than `\\{code[tokenEnd]}`.");
 
                                     var codepoint = new StringBuilder(6);
-                                    while (tokenEnd < source.Length && IsHexDigit(currentChar = source[tokenEnd]))
+                                    while (tokenEnd < code.Length && IsHexDigit(currentChar = code[tokenEnd]))
                                     {
                                         codepoint.Append(currentChar);
                                         tokenEnd += 1;
@@ -289,12 +289,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 
                                     content.Append(char.ConvertFromUtf32(Convert.ToInt32(codepoint.ToString(), 16)));
 
-                                    if (tokenEnd >= source.Length)
+                                    if (tokenEnd >= code.Length)
                                     {
                                         NewError(DiagnosticLevel.CompilationError, $"Unclosed Unicode escape sequence.");
                                         break;
                                     }
-                                    else if (tokenEnd < source.Length && source[tokenEnd] == ')')
+                                    else if (tokenEnd < code.Length && code[tokenEnd] == ')')
                                         tokenEnd += 1;
                                     else
                                         NewError(DiagnosticLevel.CompilationError, $"Unicode escape sequence must be terminated with `)`.");
@@ -316,9 +316,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                 }
 
                 // To include the close quote
-                if (tokenEnd < source.Length && source[tokenEnd] == '"')
+                if (tokenEnd < code.Length && code[tokenEnd] == '"')
                     tokenEnd += 1;
-                var token = new StringToken(source, TextSpan.FromStartEnd(tokenStart, tokenEnd), content.ToString(), tokenDiagnosticInfos);
+                var token = new StringToken(code, TextSpan.FromStartEnd(tokenStart, tokenEnd), content.ToString(), tokenDiagnosticInfos);
                 tokenDiagnosticInfos.Clear();
                 return token;
             }

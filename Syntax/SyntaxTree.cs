@@ -5,14 +5,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class SyntaxTree
     {
-        public SourceReference SourceReference { get; }
-        public SourceText Source { get; }
+        public CodeReference CodeReference { get; }
+        public CodeText Code { get; }
         public CompilationUnitSyntax CompilationUnit { get; }
 
-        public SyntaxTree(SourceReference sourceReference, SourceText source, CompilationUnitSyntax compilationUnit)
+        public SyntaxTree(CodeReference CodeReference, CodeText code, CompilationUnitSyntax compilationUnit)
         {
-            SourceReference = sourceReference;
-            Source = source;
+            this.CodeReference = CodeReference;
+            Code = code;
             CompilationUnit = compilationUnit;
         }
     }

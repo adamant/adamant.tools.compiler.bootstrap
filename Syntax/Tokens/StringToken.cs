@@ -8,8 +8,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
     {
         public readonly string Value;
 
-        public StringToken(SourceText source, TextSpan span, string value, IEnumerable<DiagnosticInfo> diagnosticInfos)
-            : base(source, span, TokenKind.StringLiteral, false, diagnosticInfos)
+        public StringToken(CodeText code, TextSpan span, string value, IEnumerable<DiagnosticInfo> diagnosticInfos)
+            : base(code, span, TokenKind.StringLiteral, false, diagnosticInfos)
         {
             Value = value;
         }

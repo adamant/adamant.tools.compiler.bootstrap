@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         {
             if (tokens.Finished)
             {
-                throw new NotImplementedException("return a missing token at end of source text");
+                throw new NotImplementedException("return a missing token at end of code text");
             }
             else if (tokens.Current.Kind != kind)
             {

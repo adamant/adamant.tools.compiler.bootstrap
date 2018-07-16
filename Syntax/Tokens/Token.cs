@@ -9,37 +9,37 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 {
     public class Token : Syntax
     {
-        public readonly SourceText Source;
+        public readonly CodeText Code;
         public readonly TextSpan Span;
         public readonly TokenKind Kind;
-        public string Text => Source[Span];
+        public string Text => Code[Span];
         public readonly bool IsMissing;
         public IEnumerable<DiagnosticInfo> DiagnosticInfos => diagnosticInfos;
         private readonly List<DiagnosticInfo> diagnosticInfos;
 
-        protected Token(SourceText source, TextSpan span, TokenKind kind, bool isMissing, IEnumerable<DiagnosticInfo> diagnosticInfos)
+        protected Token(CodeText code, TextSpan span, TokenKind kind, bool isMissing, IEnumerable<DiagnosticInfo> diagnosticInfos)
         {
-            Requires.InString(source.Content, nameof(span), span);
+            Requires.InString(code.Content, nameof(span), span);
             Requires.ValidEnum(nameof(kind), kind);
-            Source = source ?? throw new ArgumentNullException(nameof(source));
+            Code = code ?? throw new ArgumentNullException(nameof(code));
             Span = span;
             Kind = kind;
             IsMissing = isMissing;
             this.diagnosticInfos = (diagnosticInfos ?? throw new ArgumentNullException(nameof(diagnosticInfos))).ToList();
         }
 
-        public static Token New(SourceText source, TextSpan span, TokenKind kind, IEnumerable<DiagnosticInfo> diagnosticInfos)
+        public static Token New(CodeText code, TextSpan span, TokenKind kind, IEnumerable<DiagnosticInfo> diagnosticInfos)
         {
             Requires.That(nameof(kind), kind != TokenKind.StringLiteral);
             Requires.That(nameof(kind), kind != TokenKind.Identifier);
-            return new Token(source, span, kind, false, diagnosticInfos);
+            return new Token(code, span, kind, false, diagnosticInfos);
         }
 
-        public static Token NewMissing(SourceText source, int start, TokenKind kind)
+        public static Token NewMissing(CodeText code, int start, TokenKind kind)
         {
             Requires.That(nameof(kind), kind != TokenKind.Identifier);
             var diagnostic = new DiagnosticInfo(DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, $"Missing token of kind {kind}");
-            return new Token(source, new TextSpan(start, 0), kind, true, diagnostic.Yield());
+            return new Token(code, new TextSpan(start, 0), kind, true, diagnostic.Yield());
         }
 
         public override string ToString()

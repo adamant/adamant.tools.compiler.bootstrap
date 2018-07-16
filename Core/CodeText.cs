@@ -1,7 +1,7 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
-    /// The text of a source file
-    public class SourceText
+    /// The text of a source code file
+    public class CodeText
     {
         public readonly string Content;
         public int Length => Content.Length;
@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
         public string this[TextSpan span] => Content.Substring(span.Start, span.Length);
         public char this[int index] => Content[index];
 
-        public SourceText(string content)
+        public CodeText(string content)
         {
             Content = content;
         }

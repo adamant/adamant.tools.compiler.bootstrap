@@ -1,5 +1,5 @@
 <test>
-  <code context="CompilationUnit"/>
+  <code kind="compilation_unit"/>
   <syntax>
     <compilation_unit>
       <function_declaration access="public" name="foo" body="block1" return_type="type1" >

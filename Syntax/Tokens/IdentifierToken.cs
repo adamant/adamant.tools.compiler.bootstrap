@@ -10,12 +10,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         public readonly string Value;
 
         public IdentifierToken(
-            SourceText source,
+            CodeText code,
             TextSpan span,
             IdentifierKind kind,
             string value,
             IEnumerable<DiagnosticInfo> diagnosticInfos)
-            : base(source, span, TokenKind.Identifier, false, diagnosticInfos)
+            : base(code, span, TokenKind.Identifier, false, diagnosticInfos)
         {
             IdentifierKind = kind;
             Value = value;

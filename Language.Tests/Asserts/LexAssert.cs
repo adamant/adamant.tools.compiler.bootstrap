@@ -17,9 +17,9 @@ namespace Xunit
 
         public static void LexesCorrectly(TestTokenSequence sequence)
         {
-            var source = new SourceText(sequence.ToString());
+            var code = new CodeText(sequence.ToString());
             var lexer = new Lexer();
-            var tokens = lexer.Lex(source);
+            var tokens = lexer.Lex(code);
             Assert.Collection(tokens, sequence.WhereIsToken().Tokens.Select(Inspector).Append(AssertEndOfFile).ToArray());
         }
         private static Action<Token> Inspector(TestToken expected)

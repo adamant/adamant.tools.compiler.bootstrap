@@ -6,6 +6,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public interface ILexer
     {
-        IEnumerable<Token> Lex(SourceText source);
+        IEnumerable<Token> Lex(CodeText code);
     }
 }
