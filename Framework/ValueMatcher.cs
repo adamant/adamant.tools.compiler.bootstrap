@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
@@ -12,6 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
             this.value = value;
         }
 
+        [DebuggerStepThrough]
         public void With(Action<MatchBuilder<T>> buildArms)
         {
             var arms = new List<MatchArm<T>>();
@@ -38,6 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
             this.value = value;
         }
 
+        [DebuggerStepThrough]
         public R With(Action<MatchBuilder<T, R>> buildArms)
         {
             var arms = new List<MatchArm<T, R>>();

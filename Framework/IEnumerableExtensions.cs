@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
@@ -25,6 +27,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
                 yield break;
             else
                 yield return value.Value;
+        }
+
+        public static IEnumerable<Tuple<TFirst, TSecond>> Zip<TFirst, TSecond>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second)
+        {
+            return first.Zip(second, (f, s) => Tuple.Create(f, s));
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
@@ -12,6 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
             this.arms = arms;
         }
 
+        [DebuggerStepThrough]
         public MatchBuilder<T> Is<S>(Action<S> arm)
             where S : T
         {
@@ -26,11 +28,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         //        throw new NotImplementedException();
         //    }
 
+        [DebuggerStepThrough]
         public void Any(Action<T> arm)
         {
             throw new NotImplementedException();
         }
 
+        [DebuggerStepThrough]
         public void Any(Action arm)
         {
             throw new NotImplementedException();
@@ -46,6 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
             this.arms = arms;
         }
 
+        [DebuggerStepThrough]
         public MatchBuilder<T, R> Is<S>(Func<S, R> arm)
             where S : T
         {
