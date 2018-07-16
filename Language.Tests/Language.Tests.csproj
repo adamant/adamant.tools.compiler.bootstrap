@@ -36,6 +36,12 @@
     <None Update="Lexing.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Parse\Functions\OneArgument.ad">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Parse\Functions\OneArgument.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Parse\Functions\NoArguments.ad">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

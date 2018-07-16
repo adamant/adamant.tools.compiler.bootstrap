@@ -2,9 +2,9 @@ using System.Collections.Generic;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tree
 {
-    public class CompilationUnitSyntax : SyntaxNode
+    public class CompilationUnitSyntax : SyntaxBranchNode
     {
-        public CompilationUnitSyntax(IEnumerable<Syntax> children)
+        public CompilationUnitSyntax(IEnumerable<SyntaxNode> children)
             : base(children)
         {
         }

@@ -1,3 +1,4 @@
+using System;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Xunit.Abstractions;
 
@@ -11,14 +12,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
         public bool IsValid { get; private set; }
         public object Value { get; private set; }
 
-        // Required by IXunitSerializable
+        [Obsolete("Required by IXunitSerializable", true)]
         public TestToken()
         {
-            Permute = false;
-            Kind = TestTokenKind.Comment();
-            Text = "/* default constructed token */";
-            IsValid = true;
-            Value = null;
         }
 
         public TestToken(bool permute, TestTokenKind kind, string text, bool isValid, object value)
@@ -37,22 +33,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
             return $"{Kind}{validMarker}=`{Text}`";
         }
 
-        void IXunitSerializable.Deserialize(IXunitSerializationInfo info)
-        {
-            Permute = info.GetValue<bool>("Permute");
-            Kind = info.GetValue<TestTokenKind>("Kind");
-            Text = info.GetValue<string>("Text");
-            IsValid = info.GetValue<bool>("IsValid");
-            Value = info.GetValue<object>("Value");
-        }
-
         void IXunitSerializable.Serialize(IXunitSerializationInfo info)
         {
-            info.AddValue("Permute", Permute);
-            info.AddValue("Kind", Kind);
-            info.AddValue("Text", Text);
-            info.AddValue("IsValid", IsValid);
-            info.AddValue("Value", Value);
+            info.AddValue(nameof(Permute), Permute);
+            info.AddValue(nameof(Kind), Kind);
+            info.AddValue(nameof(Text), Text);
+            info.AddValue(nameof(IsValid), IsValid);
+            info.AddValue(nameof(Value), Value);
+        }
+
+        void IXunitSerializable.Deserialize(IXunitSerializationInfo info)
+        {
+            Permute = info.GetValue<bool>(nameof(Permute));
+            Kind = info.GetValue<TestTokenKind>(nameof(Kind));
+            Text = info.GetValue<string>(nameof(Text));
+            IsValid = info.GetValue<bool>(nameof(IsValid));
+            Value = info.GetValue<object>(nameof(Value));
         }
     }
 }

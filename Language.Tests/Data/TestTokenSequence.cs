@@ -59,14 +59,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
             return string.Concat(tokens.Select(t => t.Text));
         }
 
-        void IXunitSerializable.Deserialize(IXunitSerializationInfo info)
-        {
-            tokens = info.GetValue<TestToken[]>("tokens");
-        }
-
         void IXunitSerializable.Serialize(IXunitSerializationInfo info)
         {
-            info.AddValue("tokens", tokens);
+            info.AddValue(nameof(tokens), tokens);
+        }
+
+        void IXunitSerializable.Deserialize(IXunitSerializationInfo info)
+        {
+            tokens = info.GetValue<TestToken[]>(nameof(tokens));
         }
     }
 }

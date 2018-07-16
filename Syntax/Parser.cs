@@ -34,7 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             return new CompilationUnitSyntax(children);
         }
 
-        public Syntax ParseDeclaration(ITokenStream tokens)
+        public SyntaxNode ParseDeclaration(ITokenStream tokens)
         {
             throw new NotImplementedException();
         }
@@ -42,12 +42,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         #endregion
 
         #region Helper Functions
-        private IList<Syntax> NewChildList()
+        private IList<SyntaxNode> NewChildList()
         {
-            return new List<Syntax>();
+            return new List<SyntaxNode>();
         }
 
-        private void EnsureAdvance(ITokenStream tokens, Token start, IList<Syntax> children)
+        private void EnsureAdvance(ITokenStream tokens, Token start, IList<SyntaxNode> children)
         {
             if (tokens.Current == start)
                 // We have not advanced at all when trying to parse a declaration.

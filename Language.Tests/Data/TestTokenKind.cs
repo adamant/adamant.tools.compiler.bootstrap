@@ -61,16 +61,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
             return Category.ToString();
         }
 
-        void IXunitSerializable.Deserialize(IXunitSerializationInfo info)
-        {
-            Category = info.GetValue<TestTokenCategory>("Category");
-            TokenKind = info.GetValue<TokenKind?>("TokenKind");
-        }
-
         void IXunitSerializable.Serialize(IXunitSerializationInfo info)
         {
-            info.AddValue("Category", Category);
-            info.AddValue("TokenKind", TokenKind);
+            info.AddValue(nameof(Category), Category);
+            info.AddValue(nameof(TokenKind), TokenKind);
+        }
+
+        void IXunitSerializable.Deserialize(IXunitSerializationInfo info)
+        {
+            Category = info.GetValue<TestTokenCategory>(nameof(Category));
+            TokenKind = info.GetValue<TokenKind?>(nameof(TokenKind));
         }
     }
 }

@@ -7,6 +7,13 @@
         <identifier value="foo"/>
         <parameter_list>
           <left_paren/>
+          <parameter>
+            <identifier value="_"/>
+            <colon/>
+            <primitive_type>
+              <int_keyword/>
+            </primitive_type>
+          </parameter>
           <right_paren/>
         </parameter_list>
         <right_arrow/>

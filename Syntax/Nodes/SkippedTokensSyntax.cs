@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tree
 {
-    public class SkippedTokensSyntax : SyntaxNode
+    public class SkippedTokensSyntax : SyntaxBranchNode
     {
         public SkippedTokensSyntax(Token token)
             : base(token.Yield())
