@@ -235,7 +235,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                 tokenDiagnosticInfos.Add(new DiagnosticInfo(level, DiagnosticPhase.Lexing, message));
             }
 
-            StringToken LexString()
+            StringLiteralToken LexString()
             {
                 tokenEnd = tokenStart + 1;
                 var content = new StringBuilder();
@@ -318,7 +318,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                 // To include the close quote
                 if (tokenEnd < code.Length && code[tokenEnd] == '"')
                     tokenEnd += 1;
-                var token = new StringToken(code, TextSpan.FromStartEnd(tokenStart, tokenEnd), content.ToString(), tokenDiagnosticInfos);
+                var token = new StringLiteralToken(code, TextSpan.FromStartEnd(tokenStart, tokenEnd), content.ToString(), tokenDiagnosticInfos);
                 tokenDiagnosticInfos.Clear();
                 return token;
             }

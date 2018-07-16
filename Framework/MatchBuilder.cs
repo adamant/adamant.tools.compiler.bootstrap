@@ -1,0 +1,56 @@
+using System;
+using System.Collections.Generic;
+
+namespace Adamant.Tools.Compiler.Bootstrap.Framework
+{
+    public struct MatchBuilder<T>
+    {
+        private readonly IList<MatchArm<T>> arms;
+
+        internal MatchBuilder(IList<MatchArm<T>> arms)
+        {
+            this.arms = arms;
+        }
+
+        public MatchBuilder<T> Is<S>(Action<S> arm)
+            where S : T
+        {
+            arms.Add(new MatchArm<T>(v => v is S, v => arm((S)v)));
+            return this;
+        }
+
+        //    public static void NotNull<T, S>(this IMatchStatementBuilder<T> builder, Action<S> arm)
+        //        where S : T
+        //        where T : class
+        //    {
+        //        throw new NotImplementedException();
+        //    }
+
+        public void Any(Action<T> arm)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Any(Action arm)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public struct MatchBuilder<T, R>
+    {
+        private readonly IList<MatchArm<T, R>> arms;
+
+        internal MatchBuilder(IList<MatchArm<T, R>> arms)
+        {
+            this.arms = arms;
+        }
+
+        public MatchBuilder<T, R> Is<S>(Func<S, R> arm)
+            where S : T
+        {
+            arms.Add(new MatchArm<T, R>(v => v is S, v => arm((S)v)));
+            return this;
+        }
+    }
+}

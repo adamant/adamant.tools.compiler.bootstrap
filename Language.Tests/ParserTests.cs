@@ -3,9 +3,12 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Tree;
 using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
@@ -24,9 +27,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             switch (testCase.SyntaxKind)
             {
                 case ParseTestSyntaxKind.CompilationUnit:
-                    //var compilationUnit = parser.ParseCompilationUnit(tokenStream);
-                    //AssertSyntaxMatches(testCase.ExpectedParse, compilationUnit);
-                    // TODO validate syntax tree
+                    var compilationUnit = parser.ParseCompilationUnit(tokenStream);
+                    AssertSyntaxMatches(testCase.ExpectedParse, compilationUnit);
                     break;
                 case ParseTestSyntaxKind.Expression:
                     throw new NotImplementedException();
@@ -37,7 +39,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
 
         private void AssertSyntaxMatches(XElement expected, SyntaxNode syntax)
         {
-            throw new NotImplementedException();
+            // TODO  Finish checking syntax matches expected
+            Match.On(syntax).With(m => m
+                .Is<Token>(t =>
+                {
+                    var expectedKind = expected.Name.LocalName.Replace("_", "");
+                })
+                .Is<SyntaxBranchNode>(n => { })
+            );
         }
 
         /// Loads all *.xml test cases for parsing.

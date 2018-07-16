@@ -35,8 +35,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
             return new Token(code, span, kind, false, diagnosticInfos);
         }
 
-        public static Token NewMissing(CodeText code, int start, TokenKind kind)
+        public static Token Missing(CodeText code, int start, TokenKind kind)
         {
+            Requires.That(nameof(kind), kind != TokenKind.StringLiteral);
             Requires.That(nameof(kind), kind != TokenKind.Identifier);
             var diagnostic = new DiagnosticInfo(DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, $"Missing token of kind {kind}");
             return new Token(code, new TextSpan(start, 0), kind, true, diagnostic.Yield());

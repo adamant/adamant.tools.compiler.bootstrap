@@ -1,4 +1,3 @@
-using System;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
@@ -24,13 +23,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         public static Token Expect(this ITokenStream tokens, TokenKind kind)
         {
             if (tokens.Finished)
-            {
-                throw new NotImplementedException("return a missing token at end of code text");
-            }
+                return Token.Missing(tokens.Code, tokens.Code.Length, kind);
             else if (tokens.Current.Kind != kind)
-            {
-                throw new NotImplementedException("return missing token at current token location");
-            }
+                return Token.Missing(tokens.Code, tokens.Current.Span.Start, kind);
             else
                 return tokens.Consume();
         }

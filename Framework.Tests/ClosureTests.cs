@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using Xunit;
 using Xunit.Abstractions;
+using Xunit.Categories;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
 {
@@ -15,6 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         }
 
         [Fact]
+        [Exploratory]
         public void ClosureType()
         {
             output.WriteLine(Foo(x => x).Name);

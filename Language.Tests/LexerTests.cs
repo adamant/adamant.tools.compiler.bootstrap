@@ -7,6 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Xunit;
 using Xunit.Abstractions;
+using Xunit.Categories;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
 {
@@ -44,6 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         }
 
         [Fact]
+        [Category("Slow")]
         public void SequencesOf3TokensLexes()
         {
             var sequences = LexingData.Instance.ThreeTokenSequences;
@@ -53,6 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         }
 
         [Fact]
+        [Category("Slow")]
         public void SequencesOf4TokensLexes()
         {
             var sequences = LexingData.Instance.FourTokenSequences;
@@ -90,7 +93,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
                         Assert.Equal(expected.Value, identifierToken.Value);
                     break;
                 case TokenKind.StringLiteral:
-                    var stringLiteralToken = Assert.IsType<StringToken>(token);
+                    var stringLiteralToken = Assert.IsType<StringLiteralToken>(token);
                     if (expected.Value != null)
                         Assert.Equal(expected.Value, stringLiteralToken.Value);
                     break;
