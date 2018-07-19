@@ -42,7 +42,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
 
         public TokenKind ToTokenKind()
         {
-            if (Category != TestTokenCategory.Token)
+            if (!(Category == TestTokenCategory.Token
+                || (Category == TestTokenCategory.Keyword && TokenKind != null)))
                 throw new NotSupportedException($"Can't convert TestTokenKind with Category=`{Category}` to TokenKind");
             return TokenKind.Value;
         }
@@ -67,7 +68,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
         public override string ToString()
         {
             if (Category == TestTokenCategory.Token
-                || Category == TestTokenCategory.Keyword)
+                || (Category == TestTokenCategory.Keyword && TokenKind != null))
                 return TokenKind.ToString();
             return Category.ToString();
         }

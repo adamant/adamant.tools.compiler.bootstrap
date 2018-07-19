@@ -153,7 +153,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
             if (MatchesAnyKeyword(matchers.Item1.Kind))
             {
                 if (MatchesAnyKeyword(matchers.Item2.Kind))
-                    return Keywords().Zip(Keywords());
+                    return Keywords().CrossJoin(Keywords());
 
                 return Keywords().Select(k => Tuple.Create(k, matchers.Item2));
             }
@@ -193,7 +193,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
         private IList<TestTokenSequence> GetSequencesWithOneMoreToken(IList<TestTokenSequence> sequences)
         {
             return sequences
-                .SelectMany(_ => PermuteTokens, (sequence, token) => sequence.Append(token))
+                .CrossJoin(PermuteTokens, (sequence, token) => sequence.Append(token))
                 .Where(DoesNotContainInvalidPair)
                 .ToList()
                 .AsReadOnly();

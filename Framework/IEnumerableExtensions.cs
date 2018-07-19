@@ -29,9 +29,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
                 yield return value.Value;
         }
 
-        public static IEnumerable<Tuple<TFirst, TSecond>> Zip<TFirst, TSecond>(this IEnumerable<TFirst> first, IEnumerable<TSecond> second)
+        public static IEnumerable<Tuple<TFirst, TSecond>> Zip<TFirst, TSecond>(
+            this IEnumerable<TFirst> first,
+            IEnumerable<TSecond> second)
         {
             return first.Zip(second, (f, s) => Tuple.Create(f, s));
+        }
+
+        public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source)
+        {
+            return new HashSet<T>(source);
+        }
+
+        public static IEnumerable<TResult> CrossJoin<TFirst, TSecond, TResult>(
+            this IEnumerable<TFirst> first,
+            IEnumerable<TSecond> second,
+            Func<TFirst, TSecond, TResult> resultSelector)
+        {
+            return first.SelectMany(_ => second, resultSelector);
+        }
+
+        public static IEnumerable<Tuple<TFirst, TSecond>> CrossJoin<TFirst, TSecond>(
+            this IEnumerable<TFirst> first,
+            IEnumerable<TSecond> second)
+        {
+            return first.SelectMany(_ => second, (f, s) => Tuple.Create(f, s));
         }
     }
 }

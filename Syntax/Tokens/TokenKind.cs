@@ -23,6 +23,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
     public enum TokenKind
     {
         EndOfFile = 0,
+
+        // Symbols
         LeftBrace, // `{` U+007B
         RightBrace, // `}` U+007D
         LeftParen, // `(` U+0028
@@ -53,8 +55,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         MinusEquals, // `-=` U+002D, U+003D
         AsteriskEquals, // `*=` U+002A, U+003D
         SlashEquals, // `/=` U+002F, U+003D
+
+        // Identifiers
         Identifier,
+
+        // Literals
         StringLiteral,
+
+        // Keywords
         PublicKeyword,
+        VarKeyword,
+        VoidKeyword,
+        IntKeyword,
     }
 }

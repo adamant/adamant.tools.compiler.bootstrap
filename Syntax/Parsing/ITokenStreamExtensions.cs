@@ -12,6 +12,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             return tokens.Finished;
         }
 
+        public static bool CurrentIs(this ITokenStream tokens, TokenKind kind)
+        {
+            return !tokens.Finished && tokens.Current.Kind == kind;
+        }
+
         public static Token Accept(this ITokenStream tokens, TokenKind kind)
         {
             if (!tokens.Finished && tokens.Current.Kind == kind)
