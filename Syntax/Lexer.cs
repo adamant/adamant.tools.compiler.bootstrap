@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
@@ -9,6 +11,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class Lexer : ILexer
     {
+        public static IReadOnlyDictionary<string, TokenKind> Keywords;
+
+        static Lexer()
+        {
+            var keywordDictionary = new Dictionary<string, TokenKind>();
+            var keywords = Enum.GetValues(typeof(TokenKind))
+                .Cast<TokenKind>()
+                .Where(t => t.ToString().EndsWith("Keyword"));
+            var keywordLength = "Keyword".Length;
+            foreach (var keyword in keywords)
+            {
+                var enumName = keyword.ToString();
+                var text = enumName
+                    .Substring(0, enumName.Length - keywordLength)
+                    .ToLower();
+                keywordDictionary.Add(text, keyword);
+            }
+
+            Keywords = new ReadOnlyDictionary<string, TokenKind>(keywordDictionary);
+        }
+
         public IEnumerable<Token> Lex(CodeText code)
         {
             var tokenStart = 0;
@@ -210,10 +233,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 
             Token NewIdentifierOrKeywordToken()
             {
-                // TODO check for keywords
-
                 var span = TextSpan.FromStartEnd(tokenStart, tokenEnd);
-                var token = new IdentifierToken(code, span, IdentifierKind.Normal, code[span], tokenDiagnosticInfos);
+                var value = code[span];
+                Token token;
+                if (Keywords.TryGetValue(value, out TokenKind keywordKind))
+                {
+                    token = Token.New(code, span, keywordKind, tokenDiagnosticInfos);
+                }
+                else
+                    token = new IdentifierToken(code, span, IdentifierKind.Normal, value, tokenDiagnosticInfos);
+
                 tokenDiagnosticInfos.Clear();
                 return token;
             }

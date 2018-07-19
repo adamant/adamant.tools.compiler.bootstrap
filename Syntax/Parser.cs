@@ -36,7 +36,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 
         public SyntaxNode ParseDeclaration(ITokenStream tokens)
         {
+            var accessModifier = ParseAccessModifier(tokens);
             throw new NotImplementedException();
+        }
+
+        private Token ParseAccessModifier(ITokenStream tokens)
+        {
+            switch (tokens.Current.Kind)
+            {
+                case TokenKind.PublicKeyword:
+                    return tokens.Consume();
+                default:
+                    return tokens.MissingToken(TokenKind.PublicKeyword);
+            }
         }
 
         #endregion

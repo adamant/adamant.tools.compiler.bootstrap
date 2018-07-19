@@ -10,12 +10,14 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Xunit;
+using Xunit.Categories;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
 {
     public class ParserTests
     {
         [Theory]
+        [Category("Parser")]
         [MemberData(nameof(GetAllParseTestCases))]
         public void Parses(ParseTestCase testCase)
         {

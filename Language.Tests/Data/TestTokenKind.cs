@@ -30,6 +30,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
             return new TestTokenKind(TestTokenCategory.Token, kind);
         }
 
+        public static TestTokenKind Keyword()
+        {
+            return new TestTokenKind(TestTokenCategory.Keyword, null);
+        }
+
+        public static TestTokenKind Keyword(TokenKind kind)
+        {
+            return new TestTokenKind(TestTokenCategory.Keyword, kind);
+        }
+
         public TokenKind ToTokenKind()
         {
             if (Category != TestTokenCategory.Token)
@@ -56,7 +66,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
         }
         public override string ToString()
         {
-            if (Category == TestTokenCategory.Token)
+            if (Category == TestTokenCategory.Token
+                || Category == TestTokenCategory.Keyword)
                 return TokenKind.ToString();
             return Category.ToString();
         }

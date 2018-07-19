@@ -22,10 +22,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
         public static Token Expect(this ITokenStream tokens, TokenKind kind)
         {
-            if (tokens.Finished)
-                return Token.Missing(tokens.Code, tokens.Code.Length, kind);
-            else if (tokens.Current.Kind != kind)
-                return Token.Missing(tokens.Code, tokens.Current.Span.Start, kind);
+            if (tokens.Finished || tokens.Current.Kind != kind)
+                return tokens.MissingToken(kind);
             else
                 return tokens.Consume();
         }
@@ -33,6 +31,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         public static bool AtEndOfFile(this ITokenStream tokens)
         {
             return tokens.Finished || tokens.Current.Kind == TokenKind.EndOfFile;
+        }
+
+        public static Token MissingToken(this ITokenStream tokens, TokenKind kind)
+        {
+            if (tokens.Finished)
+                return Token.Missing(tokens.Code, tokens.Code.Length, kind);
+            else
+                return Token.Missing(tokens.Code, tokens.Current.Span.Start, kind);
         }
     }
 }

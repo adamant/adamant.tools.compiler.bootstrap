@@ -54,8 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         AsteriskEquals, // `*=` U+002A, U+003D
         SlashEquals, // `/=` U+002F, U+003D
         Identifier,
-        EscapedIdentifier, // TODO this should just be a kind of indentifier
-        EscapedStringIdentifier, // TODO this should just be a kind of indentifier
         StringLiteral,
+        PublicKeyword,
     }
 }

@@ -21,6 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         }
 
         [Theory]
+        [Category("Lexer")]
         [MemberData(nameof(GetAllTokensData))]
         public static void EachTokenLexes(TestToken token)
         {
@@ -33,6 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         }
 
         [Theory]
+        [Category("Lexer")]
         [MemberData(nameof(GetTwoTokenSequenceData))]
         public static void SequenceOf2TokensLexes(TestTokenSequence tokens)
         {
@@ -45,6 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         }
 
         [Fact]
+        [Category("Lexer")]
         [Category("Slow")]
         public void SequencesOf3TokensLexes()
         {
@@ -55,6 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         }
 
         [Fact]
+        [Category("Lexer")]
         [Category("Slow")]
         public void SequencesOf4TokensLexes()
         {

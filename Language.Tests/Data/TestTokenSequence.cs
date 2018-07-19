@@ -51,7 +51,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
 
         private static bool IsToken(TestToken t)
         {
-            return t.Kind.Category == TestTokenCategory.Token;
+            return t.Kind.Category == TestTokenCategory.Token
+                || t.Kind.Category == TestTokenCategory.Keyword;
         }
 
         public override string ToString()
