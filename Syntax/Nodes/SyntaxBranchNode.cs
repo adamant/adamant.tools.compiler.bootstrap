@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
     ///     `Syntax` would conflict with the `Syntax` namespace
     public abstract class SyntaxBranchNode : SyntaxNode
     {
-        public readonly IList<SyntaxNode> Children;
+        public readonly IReadOnlyList<SyntaxNode> Children;
 
         protected SyntaxBranchNode(IEnumerable<SyntaxNode> children)
         {

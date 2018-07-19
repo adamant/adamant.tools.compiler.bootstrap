@@ -56,6 +56,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
                     Assert.True(n.GetType().Name.Equals(expectedKind, StringComparison.InvariantCultureIgnoreCase),
                         $"Expected {expectedKind}, found {n.GetType().Name}");
                     // TODO Check Attributes
+
                     foreach (var child in expected.Elements().Zip(n.Children))
                         AssertSyntaxMatches(child.Item1, child.Item2);
                 })

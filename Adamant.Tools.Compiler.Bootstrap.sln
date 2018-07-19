@@ -26,6 +26,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Framework.Tests", "Framewor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Semantics", "Semantics\Semantics.csproj", "{A043AAA8-3F0C-4251-9DCB-70FC70ED5E3C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{51A803B9-C590-4AEA-B74F-E40038CD029C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +66,10 @@ Global
 		{A043AAA8-3F0C-4251-9DCB-70FC70ED5E3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A043AAA8-3F0C-4251-9DCB-70FC70ED5E3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A043AAA8-3F0C-4251-9DCB-70FC70ED5E3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51A803B9-C590-4AEA-B74F-E40038CD029C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51A803B9-C590-4AEA-B74F-E40038CD029C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51A803B9-C590-4AEA-B74F-E40038CD029C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51A803B9-C590-4AEA-B74F-E40038CD029C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -6,4 +6,13 @@
     <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Semantics</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Types\" />
+    <Folder Include="Symbols\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Syntax\Syntax.csproj" />
+  </ItemGroup>
+
 </Project>

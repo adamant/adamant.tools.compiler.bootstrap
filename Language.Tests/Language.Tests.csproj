@@ -29,10 +29,23 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Semantics\Semantics.csproj" />
     <ProjectReference Include="..\Syntax\Syntax.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Analyze\Functions\NoArguments.ad">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Analyze\Functions\NoArguments.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Analyze\Functions\OneArgument.ad">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Analyze\Functions\OneArgument.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Lexing.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

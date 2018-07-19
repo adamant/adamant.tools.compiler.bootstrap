@@ -1,0 +1,24 @@
+<test>
+  <semantic_tree>
+    <package>
+      <compilation_unit>
+        <function_declaration access="public" name="foo" body="block1" return_type="type1" >
+          <public_keyword/>
+          <identifier value="foo"/>
+          <parameter_list>
+            <left_paren/>
+            <right_paren/>
+          </parameter_list>
+          <right_arrow/>
+          <primitive_type id="type1">
+            <void_keyword/>
+          </primitive_type>
+          <block id="block1">
+            <left_brace/>
+            <right_brace/>
+          </block>
+        </function_declaration>
+      </compilation_unit>
+    </package>
+  </semantic_tree>
+</test>
