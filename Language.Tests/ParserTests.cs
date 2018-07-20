@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Xml.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -30,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             {
                 case ParseTestSyntaxKind.CompilationUnit:
                     var compilationUnit = parser.ParseCompilationUnit(tokenStream);
-                    AssertSyntaxMatches(testCase.ExpectedParse, compilationUnit);
+                    AssertSyntaxMatches(testCase.ExpectedParse, testCase.ExpectedParse, compilationUnit);
                     break;
                 case ParseTestSyntaxKind.Expression:
                     throw new NotImplementedException();
@@ -39,28 +40,47 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             }
         }
 
-        private void AssertSyntaxMatches(XElement expected, SyntaxNode syntax)
+        private void AssertSyntaxMatches(XElement rootExpected, XElement expected, SyntaxNode syntax)
         {
-            // TODO  Finish checking syntax matches expected
             var expectedKind = expected.Name.LocalName.Replace("_", "");
             Match.On(syntax).With(m => m
                 .Is<Token>(t =>
                 {
                     Assert.True(t.Kind.ToString().Equals(expectedKind, StringComparison.InvariantCultureIgnoreCase),
                         $"Expected {expectedKind}, found {t.Kind}");
-                    // TODO check value
+                    var value = expected.Attribute("value");
+                    if (value != null)
+                        Match.On(t).With(m2 => m2
+                            .Is<IdentifierToken>(i => Assert.Equal(value.Value, i.Value)));
                 })
                 .Is<SyntaxBranchNode>(n =>
                 {
                     expectedKind += "Syntax";
                     Assert.True(n.GetType().Name.Equals(expectedKind, StringComparison.InvariantCultureIgnoreCase),
                         $"Expected {expectedKind}, found {n.GetType().Name}");
-                    // TODO Check Attributes
+
+                    foreach (var attribute in expected.Attributes().Where(a => a.Name != "id"))
+                    {
+                        var expectedChildIndex = expected.Elements()
+                            .Select((e, i) => new { Element = e, Index = i })
+                            .Where(x => x.Element.Attribute("id")?.Value == attribute.Value)
+                            .Select(x => x.Index)
+                            .Single();
+                        var expectedChild = n.Children[expectedChildIndex];
+                        var actualChild = GetProperty(n, attribute.Name.LocalName.Replace("_", ""));
+                        Assert.Equal(expectedChild, actualChild);
+                    }
 
                     foreach (var child in expected.Elements().Zip(n.Children))
-                        AssertSyntaxMatches(child.Item1, child.Item2);
+                        AssertSyntaxMatches(rootExpected, child.Item1, child.Item2);
                 })
             );
+        }
+
+        private SyntaxNode GetProperty(SyntaxNode node, string name)
+        {
+            var property = node.GetType().GetProperty(name, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+            return (SyntaxNode)property.GetValue(node);
         }
 
         /// Loads all *.xml test cases for parsing.
