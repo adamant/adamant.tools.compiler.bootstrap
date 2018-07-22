@@ -6,4 +6,8 @@
     <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Emit</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Framework\Framework.csproj" />
+  </ItemGroup>
+
 </Project>
