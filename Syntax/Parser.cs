@@ -4,6 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Parse.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
@@ -11,14 +12,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class Parser
     {
-        public SyntaxTree Parse(CodeReference codeRef, CodeText code, IEnumerable<Token> tokens)
+        public SyntaxTree<CompilationUnitSyntax> Parse(CodeReference codeRef, CodeText code, IEnumerable<Token> tokens)
         {
             return Parse(new TokenStream(codeRef, code, tokens));
         }
 
-        public SyntaxTree Parse(ITokenStream tokens)
+        public SyntaxTree<CompilationUnitSyntax> Parse(ITokenStream tokens)
         {
-            return new SyntaxTree(tokens.CodeReference, tokens.Code, ParseCompilationUnit(tokens));
+            return new SyntaxTree<CompilationUnitSyntax>(tokens.CodeReference, tokens.Code, ParseCompilationUnit(tokens));
         }
 
         #region Parse Syntax Functions

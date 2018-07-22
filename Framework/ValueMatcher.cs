@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
                 }
             }
 
-            throw new NonExhaustiveMatchException();
+            throw new NonExhaustiveMatchException(value?.GetType()?.Name);
         }
     }
 

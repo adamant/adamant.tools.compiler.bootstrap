@@ -5,6 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 
 namespace API
 {
@@ -21,7 +22,7 @@ namespace API
             throw new NotImplementedException();
         }
 
-        private static IEnumerable<SyntaxTree> Parse(IEnumerable<CodeFile> files)
+        private static IEnumerable<SyntaxTree<CompilationUnitSyntax>> Parse(IEnumerable<CodeFile> files)
         {
             var lexer = new Lexer();
             var parser = new Parser();

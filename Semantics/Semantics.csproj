@@ -6,6 +6,10 @@
     <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Semantics</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG;NETCOREAPP2_0</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Syntax\Syntax.csproj" />
   </ItemGroup>

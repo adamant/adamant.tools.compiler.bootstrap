@@ -40,6 +40,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             }
         }
 
+        [Fact]
+        [Category("Parser")]
+        public void CanGetAllParseTestCases()
+        {
+            GetAllParseTestCases();
+        }
+
         private void AssertSyntaxMatches(XElement rootExpected, XElement expected, SyntaxNode syntax)
         {
             var expectedKind = expected.Name.LocalName.Replace("_", "");

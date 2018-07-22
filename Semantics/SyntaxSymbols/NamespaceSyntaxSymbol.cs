@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
     public class NamespaceSyntaxSymbol : ISyntaxSymbol
     {
         public string Name { get; }
-        private readonly IList<ISyntaxSymbol> children = new List<ISyntaxSymbol>();
+        private readonly HashSet<ISyntaxSymbol> children = new HashSet<ISyntaxSymbol>();
         public IEnumerable<ISyntaxSymbol> Children => children;
 
         //private readonly IList<NamespaceSyntax> declarations;
@@ -19,6 +19,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
         {
             Requires.NotNull(nameof(name), name);
             Name = name;
+        }
+
+        public void AddChild(ISyntaxSymbol child)
+        {
+            children.Add(child);
         }
     }
 }

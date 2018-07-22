@@ -28,6 +28,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             AssertLexesCorrectly(token);
         }
 
+        [Fact]
+        [Category("Lexer")]
+        public void CanGetAllTokensData()
+        {
+            GetAllTokensData();
+        }
+
         public static TheoryData<TestToken> GetAllTokensData()
         {
             return LexingData.GetTheoryData(LexingData.Instance.AllTokens);
@@ -39,6 +46,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         public static void SequenceOf2TokensLexes(TestTokenSequence tokens)
         {
             AssertLexesCorrectly(tokens);
+        }
+
+        [Fact]
+        [Category("Lexer")]
+        public void CanGetTwoTokenSequenceData()
+        {
+            GetTwoTokenSequenceData();
         }
 
         public static TheoryData<TestTokenSequence> GetTwoTokenSequenceData()
@@ -59,6 +73,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
 
         [Fact]
         [Category("Lexer")]
+        public void CanGetThreeTokenSequences()
+        {
+            var _ = LexingData.Instance.ThreeTokenSequences;
+        }
+
+
+        [Fact]
+        [Category("Lexer")]
         [Category("Slow")]
         public void SequencesOf4TokensLexes()
         {
@@ -66,6 +88,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             output.WriteLine($"Sequence Count={sequences.Count:n0}");
             foreach (var sequence in sequences)
                 AssertLexesCorrectly(sequence);
+        }
+
+        [Fact]
+        [Category("Lexer")]
+        public void CanGetFourTokenSequences()
+        {
+            var _ = LexingData.Instance.FourTokenSequences;
         }
 
         internal static void AssertLexesCorrectly(TestToken token)

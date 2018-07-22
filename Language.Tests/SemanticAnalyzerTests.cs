@@ -30,6 +30,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             AssertSemanticsMatch(testCase.ExpectedSemanticTree, package);
         }
 
+        [Fact]
+        [Category("Semantic Analyzer")]
+        public void CanGetAllAnalyzerTestCases()
+        {
+            GetAllAnalyzerTestCases();
+        }
+
         private void AssertSemanticsMatch(XElement expected, SemanticNode node)
         {
             // TODO  Finish checking semantics matches expected
@@ -38,8 +45,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
                         $"Expected {expectedKind}, found {node.GetType().Name}");
             // TODO Check Attributes
 
-            foreach (var child in expected.Elements().Zip(node.Children))
-                AssertSemanticsMatch(child.Item1, child.Item2);
         }
 
         /// Loads all *.xml test cases for the analyzer.

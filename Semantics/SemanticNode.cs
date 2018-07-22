@@ -1,15 +1,11 @@
-using System.Collections.Generic;
-using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Syntax;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
-    public class SemanticNode
+    public abstract class SemanticNode
     {
-        public readonly IReadOnlyList<SemanticNode> Children;
+        public SyntaxNode Syntax => GetSyntax();
 
-        protected SemanticNode(IEnumerable<SemanticNode> children)
-        {
-            Children = children.ToList().AsReadOnly();
-        }
+        protected abstract SyntaxNode GetSyntax();
     }
 }
