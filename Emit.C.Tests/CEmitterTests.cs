@@ -11,8 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C.Tests
         public void PreambleSetsUpEachSection()
         {
             var code = new Code();
-            var emitter = new CEmitter();
-            emitter.EmitPreamble(code);
+            new CEmitter().EmitPreamble(code);
             const string expected =
 @"#include ""RuntimeLibrary.h""
 
@@ -32,6 +31,21 @@ enum Type_ID
 ";
             Assert.Equal(expected.NormalizeLineEndings(CCodeBuilder.LineTerminator), code.ToString());
             Assert.Equal(1, code.TypeIdDeclaration.CurrentIndentDepth);
+        }
+
+        [Fact]
+        [Category("Emitter")]
+        public void PostambleClosesTypeIdEnum()
+        {
+            var code = new Code();
+            code.TypeIdDeclaration.BeginBlock();
+            new CEmitter().EmitPostamble(code);
+            const string expected =
+@"{
+};
+typedef enum Type_ID Type_ID;
+";
+            Assert.Equal(expected.NormalizeLineEndings(CCodeBuilder.LineTerminator), code.TypeIdDeclaration.Code);
         }
     }
 }

@@ -42,14 +42,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             throw new NotImplementedException();
         }
+
         internal void EmitEntryPointAdapter(Code code, Package package)
         {
-            throw new NotImplementedException();
+            // TODO implement
         }
 
         internal void EmitPostamble(Code code)
         {
-            throw new NotImplementedException();
+            // Close the Type_ID enum
+            code.TypeIdDeclaration.EndBlockWithSemicolon();
+            code.TypeIdDeclaration.AppendLine("typedef enum Type_ID Type_ID;");
         }
     }
 }
