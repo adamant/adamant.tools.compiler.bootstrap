@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Framework\Framework.csproj" />
+    <ProjectReference Include="..\Semantics\Semantics.csproj" />
   </ItemGroup>
 
 </Project>

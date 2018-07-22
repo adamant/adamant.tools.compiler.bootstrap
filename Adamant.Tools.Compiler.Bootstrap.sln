@@ -32,6 +32,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emit", "Emit\Emit.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emit.C", "Emit.C\Emit.C.csproj", "{6EB02F9D-5FBA-4B4D-A4FC-5403826C6C8A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Emit.C.Tests", "Emit.C.Tests\Emit.C.Tests.csproj", "{13C542B6-37C0-4EE0-A411-CA73000EAE5B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -82,6 +84,10 @@ Global
 		{6EB02F9D-5FBA-4B4D-A4FC-5403826C6C8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6EB02F9D-5FBA-4B4D-A4FC-5403826C6C8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6EB02F9D-5FBA-4B4D-A4FC-5403826C6C8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13C542B6-37C0-4EE0-A411-CA73000EAE5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13C542B6-37C0-4EE0-A411-CA73000EAE5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13C542B6-37C0-4EE0-A411-CA73000EAE5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13C542B6-37C0-4EE0-A411-CA73000EAE5B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

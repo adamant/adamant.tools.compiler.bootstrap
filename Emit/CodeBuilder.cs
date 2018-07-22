@@ -4,7 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit
 {
-    public abstract class SourceFileBuilder
+    public abstract class CodeBuilder
     {
         private readonly StringBuilder code = new StringBuilder();
         public string Code => code.ToString();
@@ -13,12 +13,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit
         public int CurrentIndentDepth { get; private set; }
         public string CurrentIndent => IndentCharacters.Repeat(CurrentIndentDepth);
 
-        protected SourceFileBuilder(string indentCharacters)
+        protected CodeBuilder(string indentCharacters)
             : this(indentCharacters, Environment.NewLine)
         {
         }
 
-        protected SourceFileBuilder(string indentCharacters, string lineTerminator)
+        protected CodeBuilder(string indentCharacters, string lineTerminator)
         {
             IndentCharacters = indentCharacters;
             LineTerminator = lineTerminator;

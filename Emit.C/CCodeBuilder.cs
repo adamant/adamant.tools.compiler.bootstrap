@@ -1,15 +1,17 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
-    public class CSourceFileBuilder : SourceFileBuilder
+    public class CCodeBuilder : CodeBuilder
     {
+        public new const string LineTerminator = "\n";
+
         /// Whether we need a black separator line before the next declaration
         public bool NeedsDeclarationSeparatorLine { get; private set; }
 
         /// Whether we need a blank separator line before the next statement
         public bool NeedsStatementSeparatorLine { get; private set; }
 
-        public CSourceFileBuilder(string indentCharacters = "    ")
-            : base(indentCharacters)
+        public CCodeBuilder(string indentCharacters = "    ")
+            : base(indentCharacters, LineTerminator)
         {
         }
 
