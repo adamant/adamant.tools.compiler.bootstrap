@@ -4,7 +4,7 @@ using Xunit.Categories;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C.Tests
 {
-    public class CEmitterTests
+    public class BasicEmitTests
     {
         [Fact]
         [Category("Emitter")]

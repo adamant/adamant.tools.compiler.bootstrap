@@ -1,4 +1,3 @@
-using System;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
@@ -40,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
         internal void Emit(Code code, CompilationUnit compilationUnit)
         {
-            throw new NotImplementedException();
+            // TODO implement
         }
 
         internal void EmitEntryPointAdapter(Code code, Package package)

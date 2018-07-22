@@ -17,4 +17,16 @@
     <ProjectReference Include="..\Emit.C\Emit.C.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Functions\NoArguments.ad">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Functions\NoArguments.c">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Functions\OneArgument.ad">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

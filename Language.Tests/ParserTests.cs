@@ -87,6 +87,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         private SyntaxNode GetProperty(SyntaxNode node, string name)
         {
             var property = node.GetType().GetProperty(name, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+            Assert.True(property != null, $"No property '{name}' on node type {node.GetType().Name}");
             return (SyntaxNode)property.GetValue(node);
         }
 
