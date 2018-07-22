@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Xml.Linq;
+using Newtonsoft.Json.Linq;
 using Xunit.Abstractions;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
@@ -9,14 +9,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
     {
         public string CodePath { get; private set; }
         public string Code { get; private set; }
-        public XElement ExpectedSemanticTree { get; private set; }
+        public JObject ExpectedSemanticTree { get; private set; }
 
         [Obsolete("Required by IXunitSerializable", true)]
         public AnalyzerTestCase()
         {
         }
 
-        public AnalyzerTestCase(string codePath, string code, XElement expectedSemanticTree)
+        public AnalyzerTestCase(string codePath, string code, JObject expectedSemanticTree)
         {
             CodePath = codePath;
             Code = code;
@@ -43,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
         {
             CodePath = info.GetValue<string>(nameof(CodePath));
             Code = info.GetValue<string>(nameof(Code));
-            ExpectedSemanticTree = XElement.Parse(info.GetValue<string>(nameof(ExpectedSemanticTree)));
+            ExpectedSemanticTree = JObject.Parse(info.GetValue<string>(nameof(ExpectedSemanticTree)));
         }
     }
 }

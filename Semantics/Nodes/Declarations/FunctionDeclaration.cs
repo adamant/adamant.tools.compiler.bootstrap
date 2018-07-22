@@ -11,9 +11,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations
         public new FunctionDeclarationSyntax Syntax { get; }
         public AccessLevel Access { get; }
         public string Name { get; }
+        public IReadOnlyList<Parameter> Parameters { get; }
         public TypeName ReturnType { get; }
         public Block Body { get; }
-        public IReadOnlyList<Parameter> Parameters { get; }
 
         public FunctionDeclaration(
             FunctionDeclarationSyntax syntax,

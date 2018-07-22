@@ -1,0 +1,30 @@
+{
+    "#type": "test",
+    "semantic_tree": {
+        "#type": "package",
+        "compilation_units": [
+            {
+                "#type": "compilation_unit",
+                "declarations": [
+                    {
+                        "#type": "function_declaration",
+                        "access": "public",
+                        "name": "func",
+                        "parameters": [],
+                        "return_type": {
+                            "#type": "type_name",
+                            "type": {
+                                "#type": "primitive_type",
+                                "kind": "void"
+                            }
+                        },
+                        "body": {
+                            "#type": "block",
+                            "statements": []
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}

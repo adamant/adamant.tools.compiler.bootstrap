@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         [Category("Lexer")]
         public void CanGetAllTokensData()
         {
-            GetAllTokensData();
+            Assert.NotEmpty(GetAllTokensData());
         }
 
         public static TheoryData<TestToken> GetAllTokensData()
@@ -52,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         [Category("Lexer")]
         public void CanGetTwoTokenSequenceData()
         {
-            GetTwoTokenSequenceData();
+            Assert.NotEmpty(GetTwoTokenSequenceData());
         }
 
         public static TheoryData<TestTokenSequence> GetTwoTokenSequenceData()
@@ -75,7 +75,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         [Category("Lexer")]
         public void CanGetThreeTokenSequences()
         {
-            var _ = LexingData.Instance.ThreeTokenSequences;
+            Assert.NotEmpty(LexingData.Instance.ThreeTokenSequences);
         }
 
 
@@ -94,7 +94,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         [Category("Lexer")]
         public void CanGetFourTokenSequences()
         {
-            var _ = LexingData.Instance.FourTokenSequences;
+            Assert.NotEmpty(LexingData.Instance.FourTokenSequences);
         }
 
         internal static void AssertLexesCorrectly(TestToken token)

@@ -1,12 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml.Linq;
+using System.Reflection;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
+using Newtonsoft.Json.Linq;
 using Xunit;
 using Xunit.Categories;
 
@@ -34,17 +36,52 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         [Category("Semantic Analyzer")]
         public void CanGetAllAnalyzerTestCases()
         {
-            GetAllAnalyzerTestCases();
+            Assert.NotEmpty(GetAllAnalyzerTestCases());
         }
 
-        private void AssertSemanticsMatch(XElement expected, SemanticNode node)
+        private void AssertSemanticsMatch(JObject expectedValue, object value)
         {
             // TODO  Finish checking semantics matches expected
-            var expectedKind = expected.Name.LocalName.Replace("_", "");
-            Assert.True(node.GetType().Name.Equals(expectedKind, StringComparison.InvariantCultureIgnoreCase),
-                        $"Expected {expectedKind}, found {node.GetType().Name}");
-            // TODO Check Attributes
+            var expectedType = expectedValue.Value<string>("#type").Replace("_", "");
+            Assert.True(value.GetType().Name.Equals(expectedType, StringComparison.InvariantCultureIgnoreCase),
+                        $"Expected {expectedType}, found {value.GetType().Name}");
 
+            foreach (var property in expectedValue.Properties().Where(p => p.Name != "#type"))
+            {
+                var expected = property.Value;
+                var actual = GetProperty(value, property.Name.Replace("_", ""));
+                switch (expected.Type)
+                {
+                    case JTokenType.Boolean:
+                        Assert.Equal(expected.ToObject<bool>(), actual);
+                        break;
+                    case JTokenType.String:
+                        if (actual is string actualString)
+                            Assert.Equal(expected.ToObject<string>(), actualString);
+                        else
+                            Assert.Equal(expected.ToObject(actual.GetType()), actual);
+                        break;
+                    case JTokenType.Array:
+                        var expectedObjects = expected.ToObject<JObject[]>();
+                        var actualObjects = (IEnumerable<object>)actual;
+                        Assert.Equal(expectedObjects.Length, actualObjects.Count());
+                        foreach (var item in expectedObjects.Zip(actualObjects))
+                            AssertSemanticsMatch(item.Item1, item.Item2);
+                        break;
+                    case JTokenType.Object:
+                        AssertSemanticsMatch((JObject)expected, actual);
+                        break;
+                    default:
+                        throw new NotSupportedException(expected.Type.ToString());
+                }
+            }
+        }
+
+        private object GetProperty(object value, string name)
+        {
+            var property = value.GetType().GetProperty(name, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+            Assert.True(property != null, $"No property '{name}' on type {value.GetType().Name}");
+            return property.GetValue(value);
         }
 
         /// Loads all *.xml test cases for the analyzer.
@@ -53,14 +90,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             var testCases = new TheoryData<AnalyzerTestCase>();
             var currentDirectory = Directory.GetCurrentDirectory();
             var parseDirectory = Path.Combine(currentDirectory, "Analyze");
-            foreach (string testFile in Directory.EnumerateFiles(parseDirectory, "*.xml", SearchOption.AllDirectories))
+            foreach (string testFile in Directory.EnumerateFiles(parseDirectory, "*.json", SearchOption.AllDirectories))
             {
                 var codeFile = Path.ChangeExtension(testFile, "ad");
                 var codePath = Path.GetRelativePath(currentDirectory, codeFile);
                 var code = File.ReadAllText(codeFile, CodeFile.Encoding);
-                var testXml = XDocument.Load(testFile).Element("test");
-                var expectedSemanticTreeXml = testXml.Element("semantic_tree").Elements().Single();
-                testCases.Add(new AnalyzerTestCase(codePath, code, expectedSemanticTreeXml));
+                var testJson = JObject.Parse(File.ReadAllText(testFile));
+                if (testJson.Value<string>("#type") != "test")
+                    throw new InvalidDataException("Test doesn't have #type: \"test\"");
+                var expectedSemanticTreeJson = testJson.Value<JObject>("semantic_tree");
+                testCases.Add(new AnalyzerTestCase(codePath, code, expectedSemanticTreeJson));
             }
             return testCases;
         }

@@ -5,12 +5,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
 {
     public class PrimitiveType : ObjectType
     {
-        public static readonly PrimitiveType Int = new PrimitiveType(TokenKind.IntKeyword);
-        public static readonly PrimitiveType Void = new PrimitiveType(TokenKind.VoidKeyword);
+        public static readonly PrimitiveType Int = new PrimitiveType(PrimitiveTypeKind.Int);
+        public static readonly PrimitiveType Void = new PrimitiveType(PrimitiveTypeKind.Void);
 
-        public TokenKind Kind { get; }
+        public PrimitiveTypeKind Kind { get; }
 
-        private PrimitiveType(TokenKind kind)
+        private PrimitiveType(PrimitiveTypeKind kind)
         {
             Kind = kind;
         }

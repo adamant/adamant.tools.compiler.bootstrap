@@ -44,7 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         [Category("Parser")]
         public void CanGetAllParseTestCases()
         {
-            GetAllParseTestCases();
+            Assert.NotEmpty(GetAllParseTestCases());
         }
 
         private void AssertSyntaxMatches(XElement rootExpected, XElement expected, SyntaxNode syntax)

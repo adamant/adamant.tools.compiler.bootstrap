@@ -1,0 +1,43 @@
+{
+    "#type": "test",
+    "semantic_tree": {
+        "#type": "package",
+        "compilation_units": [
+            {
+                "#type": "compilation_unit",
+                "declarations": [
+                    {
+                        "#type": "function_declaration",
+                        "access": "public",
+                        "name": "func",
+                        "parameters": [
+                            {
+                                "#type": "parameter",
+                                "mutable_binding": false,
+                                "name": "_",
+                                "type": {
+                                    "#type": "type_name",
+                                    "type": {
+                                        "#type": "primitive_type",
+                                        "kind": "int"
+                                    }
+                                }
+                            }
+                        ],
+                        "return_type": {
+                            "#type": "type_name",
+                            "type": {
+                                "#type": "primitive_type",
+                                "kind": "void"
+                            }
+                        },
+                        "body": {
+                            "#type": "block",
+                            "statements": []
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}

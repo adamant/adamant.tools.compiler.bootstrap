@@ -37,13 +37,13 @@
     <None Update="Analyze\Functions\NoArguments.ad">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Analyze\Functions\NoArguments.xml">
+    <None Update="Analyze\Functions\NoArguments.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Analyze\Functions\OneArgument.ad">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Analyze\Functions\OneArgument.xml">
+    <None Update="Analyze\Functions\OneArgument.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Lexing.json">

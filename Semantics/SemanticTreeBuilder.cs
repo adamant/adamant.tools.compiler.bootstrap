@@ -55,10 +55,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             }
         }
 
-        private IEnumerable<Parameter> Build(ParameterListSyntax parameters, SyntaxAnnotation<DataType> typeAnnotations)
+        private IEnumerable<Parameter> Build(ParameterListSyntax parameterList, SyntaxAnnotation<DataType> typeAnnotations)
         {
-            return parameters.Children
-                .Select(parameter => new Parameter())
+            return parameterList.Parameters
+                .Select(p => new Parameter(p, p.VarKeyword != null, p.Identifier.Value, Build(p.Type, typeAnnotations)))
                 .ToList();
         }
 
