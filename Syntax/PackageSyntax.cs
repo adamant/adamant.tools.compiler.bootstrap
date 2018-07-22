@@ -4,7 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class PackageSyntax
+    public class PackageSyntax : SyntaxNode
     {
         public IReadOnlyList<SyntaxTree<CompilationUnitSyntax>> SyntaxTrees { get; }
 

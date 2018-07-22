@@ -62,9 +62,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                 .ToList();
         }
 
-        private DataType Build(TypeSyntax type, SyntaxAnnotation<DataType> typeAnnotations)
+        private TypeName Build(TypeSyntax type, SyntaxAnnotation<DataType> typeAnnotations)
         {
-            return typeAnnotations[type];
+            return new TypeName(type, typeAnnotations[type]);
         }
 
         private Block Build(BlockSyntax block, SyntaxAnnotation<DataType> typeAnnotations)

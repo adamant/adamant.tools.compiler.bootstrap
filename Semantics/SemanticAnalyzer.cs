@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Parse.Types;
@@ -49,9 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                 .Select(tree => treeBuilder.Build(tree))
                 .ToList();
 
-            throw new NotImplementedException();
-
-            //return new Package();
+            return new Package(package, compilationUnits);
         }
     }
 }

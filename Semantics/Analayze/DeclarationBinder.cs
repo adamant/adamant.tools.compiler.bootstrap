@@ -84,12 +84,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analayze
             return symbol;
         }
 
-        private DataType BindType(TypeSyntax type, NameScope scope, SyntaxAnnotation<DataType> typeAnnotations)
+        private DataType BindType(TypeSyntax typeSyntax, NameScope scope, SyntaxAnnotation<DataType> typeAnnotations)
         {
-            return MatchInto<DataType>.On(type).With(m => m
+            return MatchInto<DataType>.On(typeSyntax).With(m => m
                 .Is<PrimitiveTypeSyntax>(p =>
                 {
-                    return PrimitiveType.New(p.Keyword.Kind);
+                    var type = PrimitiveType.New(p.Keyword.Kind);
+                    typeAnnotations.Add(typeSyntax, type);
+                    return type;
                 })
             );
         }
