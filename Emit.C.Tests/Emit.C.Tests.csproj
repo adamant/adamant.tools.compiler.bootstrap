@@ -18,6 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Functions\OneArgument.c">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Functions\NoArguments.ad">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

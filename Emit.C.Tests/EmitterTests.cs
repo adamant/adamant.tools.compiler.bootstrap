@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C.Tests
         {
             var package = Compile(testCase);
             var code = new Code();
-            new CEmitter().Emit(code, package.CompilationUnits.Single());
+            new CEmitter().Emit(package.CompilationUnits.Single(), code);
             AssertEmittedCodeMatches(testCase.Expected, code);
         }
 
