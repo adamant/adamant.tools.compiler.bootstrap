@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Emit.C</AssemblyName>
+    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Emit.C</RootNamespace>
+  </PropertyGroup>
+
+</Project>
