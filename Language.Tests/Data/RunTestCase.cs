@@ -1,4 +1,5 @@
 using System;
+using System.Text.RegularExpressions;
 using Adamant.Tools.Compiler.Bootstrap.Framework.Tests.Data;
 using Xunit.Abstractions;
 
@@ -9,6 +10,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
         public string Code { get; private set; }
         public string Stdout { get; private set; }
         public string Stderr { get; private set; }
+        public int ExitCode
+        {
+            get
+            {
+                var exitCode = Regex.Match(Code, @"// exit code: (?<exitCode>\d+)").Groups["exitCode"].Value;
+                return int.Parse(exitCode);
+            }
+        }
 
         [Obsolete("Required by IXunitSerializable", true)]
         public RunTestCase()

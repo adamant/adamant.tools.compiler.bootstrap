@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -34,8 +33,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             var codeFile = new CodeFile(code, codePath);
             var cCodeFile = Path.Combine(runTestsDirectory, Path.ChangeExtension(testCase.CodePath, "c"));
             CompileAdamantToC(codeFile, cCodeFile);
-            CompileCToExecutable(cCodeFile);
-            throw new NotImplementedException();
+            var executable = CompileCToExecutable(cCodeFile);
+            AssertRuns(testCase, executable);
         }
 
         private void CompileAdamantToC(CodeFile code, string outputPath)
@@ -46,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             File.WriteAllText(outputPath, cCode, Encoding.ASCII);
         }
 
-        private void CompileCToExecutable(string cCodeFile)
+        private string CompileCToExecutable(string cCodeFile)
         {
             var options = "-std=c11 -fsanitize=undefined -fsanitize=integer -fsanitize=nullability -Wall -Wno-incompatible-pointer-types";
             // Next thing is needed for windows
@@ -71,6 +70,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             output.WriteLine("clang stderr:");
             output.WriteLine(process.StandardError.ReadToEnd());
             Assert.True(process.ExitCode == 0, $"clang exited with {process.ExitCode}");
+            return outputPath;
+        }
+
+        private void AssertRuns(RunTestCase testCase, string executable)
+        {
+            var startInfo = new ProcessStartInfo(executable)
+            {
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true,
+                UseShellExecute = false,
+            };
+
+            var process = Process.Start(startInfo);
+            process.WaitForExit();
+            Assert.Equal(testCase.Stdout ?? "", process.StandardOutput.ReadToEnd());
+            Assert.Equal(testCase.Stderr ?? "", process.StandardError.ReadToEnd());
+            Assert.Equal(testCase.ExitCode, process.ExitCode);
         }
 
         [Fact]

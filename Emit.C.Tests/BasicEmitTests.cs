@@ -1,3 +1,5 @@
+using Adamant.Tools.Compiler.Bootstrap.API;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Xunit;
 using Xunit.Categories;
@@ -47,6 +49,30 @@ enum Type_ID
 typedef enum Type_ID Type_ID;
 ";
             Assert.Equal(expected.NormalizeLineEndings(CCodeBuilder.LineTerminator), code.TypeIdDeclaration.Code);
+        }
+
+        [Fact]
+        [Category("Emitter")]
+        public void EmitsEntryPointAdapterForNoArgVoidReturnMain()
+        {
+            const string code =
+@"public main() -> void
+{
+}";
+
+            var codeFile = new CodeFile(new CodeText(code), new CodePath(nameof(EmitsEntryPointAdapterForNoArgVoidReturnMain)));
+            var package = new AdamantCompiler().CompilePackage(codeFile.Yield());
+            var cCode = new Code();
+            new CEmitter().EmitEntryPointAdapter(cCode, package);
+            const string expected =
+@"// Entry Point Adapter
+int32_t main(const int argc, char const * const * const argv)
+{
+    main__0();
+    return 0;
+}
+";
+            Assert.Equal(expected.NormalizeLineEndings(CCodeBuilder.LineTerminator), cCode.Definitions.Code);
         }
     }
 }

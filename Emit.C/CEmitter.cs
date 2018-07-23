@@ -120,7 +120,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
         internal void EmitEntryPointAdapter(Code code, Package package)
         {
-            // TODO implement
+            if (package.EntryPoint == null) return;
+
+            var entryPoint = package.EntryPoint;
+            code.Definitions.DeclarationSeparatorLine();
+            code.Definitions.AppendLine("// Entry Point Adapter");
+            code.Definitions.AppendLine("int32_t main(const int argc, char const * const * const argv)");
+            code.Definitions.BeginBlock();
+            code.Definitions.AppendLine($"{nameMangler.FunctionName(entryPoint)}();");
+            code.Definitions.AppendLine("return 0;");
+            code.Definitions.EndBlock();
         }
 
         internal void EmitPostamble(Code code)

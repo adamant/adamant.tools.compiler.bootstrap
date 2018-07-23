@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Parse.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analayze;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Validation;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
@@ -48,7 +50,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                 .Select(tree => treeBuilder.Build(tree))
                 .ToList();
 
-            return new Package(package, compilationUnits);
+            var entryPoint = FindEntryPoint(compilationUnits);
+            return new Package(package, compilationUnits, entryPoint);
+        }
+
+        private FunctionDeclaration FindEntryPoint(IEnumerable<CompilationUnit> compilationUnits)
+        {
+            return compilationUnits
+                .SelectMany(cu => cu.Declarations.OfType<FunctionDeclaration>())
+                .Where(f => f.Name == "main")
+                .SingleOrDefault();
         }
     }
 }
