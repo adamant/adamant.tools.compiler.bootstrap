@@ -14,12 +14,12 @@ using Xunit.Categories;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
 {
-    public class SemanticAnalyzerTests
+    public class AnalyzeTests
     {
         [Theory]
-        [Category("Semantic Analyzer")]
+        [Category("Analyze")]
         [MemberData(nameof(GetAllAnalyzerTestCases))]
-        public void Analyzes(AnalyzerTestCase testCase)
+        public void Analyzes(AnalyzeTestCase testCase)
         {
             var codePath = new CodePath(testCase.CodePath);
             var code = new CodeText(testCase.Code);
@@ -33,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         }
 
         [Fact]
-        [Category("Semantic Analyzer")]
+        [Category("Analyze")]
         public void CanGetAllAnalyzerTestCases()
         {
             Assert.NotEmpty(GetAllAnalyzerTestCases());
@@ -85,21 +85,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         }
 
         /// Loads all *.xml test cases for the analyzer.
-        public static TheoryData<AnalyzerTestCase> GetAllAnalyzerTestCases()
+        public static TheoryData<AnalyzeTestCase> GetAllAnalyzerTestCases()
         {
-            var testCases = new TheoryData<AnalyzerTestCase>();
+            var testCases = new TheoryData<AnalyzeTestCase>();
             var currentDirectory = Directory.GetCurrentDirectory();
-            var parseDirectory = Path.Combine(currentDirectory, "Analyze");
-            foreach (string testFile in Directory.EnumerateFiles(parseDirectory, "*.json", SearchOption.AllDirectories))
+            var analyzeTestsDirectory = Path.Combine(currentDirectory, "Analyze");
+            foreach (string testFile in Directory.EnumerateFiles(analyzeTestsDirectory, "*.json", SearchOption.AllDirectories))
             {
                 var codeFile = Path.ChangeExtension(testFile, "ad");
-                var codePath = Path.GetRelativePath(currentDirectory, codeFile);
+                var codePath = Path.GetRelativePath(analyzeTestsDirectory, codeFile);
                 var code = File.ReadAllText(codeFile, CodeFile.Encoding);
                 var testJson = JObject.Parse(File.ReadAllText(testFile));
                 if (testJson.Value<string>("#type") != "test")
                     throw new InvalidDataException("Test doesn't have #type: \"test\"");
                 var expectedSemanticTreeJson = testJson.Value<JObject>("semantic_tree");
-                testCases.Add(new AnalyzerTestCase(codePath, code, expectedSemanticTreeJson));
+                testCases.Add(new AnalyzeTestCase(codePath, code, expectedSemanticTreeJson));
             }
             return testCases;
         }

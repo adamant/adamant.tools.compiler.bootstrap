@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -7,9 +6,9 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 
-namespace API
+namespace Adamant.Tools.Compiler.Bootstrap.API
 {
-    public class Compiler
+    public class AdamantCompiler
     {
         public Package CompilePackage(IEnumerable<CodeFile> files)
         {
@@ -17,9 +16,9 @@ namespace API
             var packageSyntax = new PackageSyntax(syntaxTrees);
 
             var analyzer = new SemanticAnalyzer();
-            analyzer.Analyze(packageSyntax);
+            var package = analyzer.Analyze(packageSyntax);
 
-            throw new NotImplementedException();
+            return package;
         }
 
         private static IEnumerable<SyntaxTree<CompilationUnitSyntax>> Parse(IEnumerable<CodeFile> files)

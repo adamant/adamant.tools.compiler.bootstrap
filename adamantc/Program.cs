@@ -1,9 +1,9 @@
-using McMaster.Extensions.CommandLineUtils;
 using System;
+using McMaster.Extensions.CommandLineUtils;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AdamantC
 {
-    public class Program
+    public static class Program
     {
         public static int Main(string[] args)
         {

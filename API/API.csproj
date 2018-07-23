@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Language.API</AssemblyName>
+    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Language.API</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

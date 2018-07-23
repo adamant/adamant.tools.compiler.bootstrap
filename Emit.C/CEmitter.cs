@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Emit.C.Properties;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C.Tests;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
@@ -30,15 +31,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             return code.ToString();
         }
 
-        #region Emit Semantic Nodes
+        public static string RuntimeLibraryCode => Resources.RuntimeLibraryCode;
+        public const string RuntimeLibraryCodeFileName = "RuntimeLibrary.c";
+        public static string RuntimeLibraryHeader => Resources.RuntimeLibraryHeader;
+        public const string RuntimeLibraryHeaderFileName = "RuntimeLibrary.h";
+
         internal void EmitPreamble(Code code)
         {
             // Setup the beginning of each section
-            code.Includes.AppendLine("#include \"RuntimeLibrary.h\"");
+            code.Includes.AppendLine($"#include \"{RuntimeLibraryHeaderFileName}\"");
 
             code.TypeIdDeclaration.AppendLine("// Type ID Declarations");
             code.TypeIdDeclaration.AppendLine("enum Type_ID");
             code.TypeIdDeclaration.BeginBlock();
+            code.TypeIdDeclaration.AppendLine("never__0__0TypeID = 0,");
             // TODO setup primitive types?
 
             code.TypeDeclarations.AppendLine("// Type Declarations");
@@ -48,6 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.Definitions.AppendLine("// Definitions");
         }
 
+        #region Emit Semantic Nodes
         internal void Emit(CompilationUnit compilationUnit, Code code)
         {
             foreach (var declaration in compilationUnit.Declarations)

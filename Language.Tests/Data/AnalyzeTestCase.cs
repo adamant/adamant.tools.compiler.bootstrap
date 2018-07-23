@@ -1,38 +1,39 @@
 using System;
 using Adamant.Tools.Compiler.Bootstrap.Framework.Tests.Data;
+using Newtonsoft.Json.Linq;
 using Xunit.Abstractions;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Emit.C.Tests.Data
+namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
 {
-    public class EmitterTestCase : TestCase
+    public class AnalyzeTestCase : TestCase
     {
         public string Code { get; private set; }
-        public string Expected { get; private set; }
+        public JObject ExpectedSemanticTree { get; private set; }
 
         [Obsolete("Required by IXunitSerializable", true)]
-        public EmitterTestCase()
+        public AnalyzeTestCase()
         {
         }
 
-        public EmitterTestCase(string codePath, string code, string expected)
+        public AnalyzeTestCase(string codePath, string code, JObject expectedSemanticTree)
             : base(codePath)
         {
             Code = code;
-            Expected = expected;
+            ExpectedSemanticTree = expectedSemanticTree;
         }
 
         public override void Serialize(IXunitSerializationInfo info)
         {
             base.Serialize(info);
             info.AddValue(nameof(Code), Code);
-            info.AddValue(nameof(Expected), Expected);
+            info.AddValue(nameof(ExpectedSemanticTree), ExpectedSemanticTree.ToString());
         }
 
         public override void Deserialize(IXunitSerializationInfo info)
         {
             base.Deserialize(info);
             Code = info.GetValue<string>(nameof(Code));
-            Expected = info.GetValue<string>(nameof(Expected));
+            ExpectedSemanticTree = JObject.Parse(info.GetValue<string>(nameof(ExpectedSemanticTree)));
         }
     }
 }

@@ -1,6 +1,7 @@
 *           text=auto
 
-*.vson      text
+*.vson      text eol=lf encoding=UTF-8
+*.json      text eol=lf encoding=UTF-8
 *.ad        text
 *.md        text
 *.bat       text eol=crlf
@@ -14,4 +15,4 @@
 *.sln       text eol=crlf
 *.csproj    text eol=crlf
 
-*.json		text eol=lf encoding=UTF-8
+

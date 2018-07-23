@@ -1,10 +1,12 @@
 using Xunit;
+using Xunit.Categories;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework.Tests
 {
     public class YieldTests
     {
         [Fact]
+        [UnitTest]
         public void YeildIsSingleItem()
         {
             var x = new object();
@@ -12,6 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework.Tests
         }
 
         [Fact]
+        [UnitTest]
         public void YieldOfNullIsSingleItem()
         {
             object x = null;
@@ -19,6 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework.Tests
         }
 
         [Fact]
+        [UnitTest]
         public void YieldValueOfClassIsSingleItem()
         {
             var x = new object();
@@ -26,6 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework.Tests
         }
 
         [Fact]
+        [UnitTest]
         public void YieldValueOfNullClassIsEmpty()
         {
             object x = null;
@@ -33,6 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework.Tests
         }
 
         [Fact]
+        [UnitTest]
         public void YieldValueOfValueTypeIsSingleItem()
         {
             int? x = 42;
@@ -40,6 +46,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework.Tests
         }
 
         [Fact]
+        [UnitTest]
         public void YieldValueOfNullValueTypeIsEmpty()
         {
             int? x = null;

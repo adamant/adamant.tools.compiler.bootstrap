@@ -15,10 +15,10 @@ using Xunit.Categories;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
 {
-    public class ParserTests
+    public class ParseTests
     {
         [Theory]
-        [Category("Parser")]
+        [Category("Parse")]
         [MemberData(nameof(GetAllParseTestCases))]
         public void Parses(ParseTestCase testCase)
         {
@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         }
 
         [Fact]
-        [Category("Parser")]
+        [Category("Parse")]
         public void CanGetAllParseTestCases()
         {
             Assert.NotEmpty(GetAllParseTestCases());
@@ -96,11 +96,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         {
             var testCases = new TheoryData<ParseTestCase>();
             var currentDirectory = Directory.GetCurrentDirectory();
-            var parseDirectory = Path.Combine(currentDirectory, "Parse");
-            foreach (string testFile in Directory.EnumerateFiles(parseDirectory, "*.xml", SearchOption.AllDirectories))
+            var parseTestsDirectory = Path.Combine(currentDirectory, "Parse");
+            foreach (string testFile in Directory.EnumerateFiles(parseTestsDirectory, "*.xml", SearchOption.AllDirectories))
             {
                 var codeFile = Path.ChangeExtension(testFile, "ad");
-                var codePath = Path.GetRelativePath(currentDirectory, codeFile);
+                var codePath = Path.GetRelativePath(parseTestsDirectory, codeFile);
                 var code = File.ReadAllText(codeFile, CodeFile.Encoding);
                 var testXml = XDocument.Load(testFile).Element("test");
                 var codeXml = testXml.Element("code");

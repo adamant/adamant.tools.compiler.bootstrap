@@ -11,17 +11,17 @@ using Xunit.Categories;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
 {
-    public class LexerTests
+    public class LexTests
     {
         private readonly ITestOutputHelper output;
 
-        public LexerTests(ITestOutputHelper output)
+        public LexTests(ITestOutputHelper output)
         {
             this.output = output;
         }
 
         [Theory]
-        [Category("Lexer")]
+        [Category("Lex")]
         [MemberData(nameof(GetAllTokensData))]
         public static void EachTokenLexes(TestToken token)
         {
@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         }
 
         [Fact]
-        [Category("Lexer")]
+        [Category("Lex")]
         public void CanGetAllTokensData()
         {
             Assert.NotEmpty(GetAllTokensData());
@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         }
 
         [Theory]
-        [Category("Lexer")]
+        [Category("Lex")]
         [MemberData(nameof(GetTwoTokenSequenceData))]
         public static void SequenceOf2TokensLexes(TestTokenSequence tokens)
         {
@@ -49,7 +49,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         }
 
         [Fact]
-        [Category("Lexer")]
+        [Category("Lex")]
         public void CanGetTwoTokenSequenceData()
         {
             Assert.NotEmpty(GetTwoTokenSequenceData());
@@ -61,7 +61,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         }
 
         [Fact]
-        [Category("Lexer")]
+        [Category("Lex")]
         [Category("Slow")]
         public void SequencesOf3TokensLexes()
         {
@@ -72,7 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         }
 
         [Fact]
-        [Category("Lexer")]
+        [Category("Lex")]
         public void CanGetThreeTokenSequences()
         {
             Assert.NotEmpty(LexingData.Instance.ThreeTokenSequences);
@@ -80,7 +80,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
 
 
         [Fact]
-        [Category("Lexer")]
+        [Category("Lex")]
         [Category("Slow")]
         public void SequencesOf4TokensLexes()
         {
@@ -91,7 +91,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         }
 
         [Fact]
-        [Category("Lexer")]
+        [Category("Lex")]
         public void CanGetFourTokenSequences()
         {
             Assert.NotEmpty(LexingData.Instance.FourTokenSequences);

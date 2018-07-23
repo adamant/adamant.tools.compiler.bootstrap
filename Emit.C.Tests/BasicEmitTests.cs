@@ -18,6 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C.Tests
 // Type ID Declarations
 enum Type_ID
 {
+    never__0__0TypeID = 0,
 
 // Type Declarations
 

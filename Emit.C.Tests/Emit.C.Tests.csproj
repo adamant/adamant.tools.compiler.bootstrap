@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Emit.C\Emit.C.csproj" />
+    <ProjectReference Include="..\Framework.Tests\Framework.Tests.csproj" />
   </ItemGroup>
 
   <ItemGroup>
