@@ -1,3 +1,6 @@
 [submodule "stdlib"]
 	path = stdlib
 	url = https://github.com/adamant/adamant.stdlib.git
+[submodule "tests"]
+	path = tests
+	url = https://github.com/adamant/adamant.language.tests.git
