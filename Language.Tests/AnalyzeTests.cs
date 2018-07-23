@@ -88,8 +88,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         public static TheoryData<AnalyzeTestCase> GetAllAnalyzerTestCases()
         {
             var testCases = new TheoryData<AnalyzeTestCase>();
-            var currentDirectory = Directory.GetCurrentDirectory();
-            var analyzeTestsDirectory = Path.Combine(currentDirectory, "Analyze");
+            var testsDirectory = TestsDirectory.Get();
+            var analyzeTestsDirectory = Path.Combine(testsDirectory, "analyze");
             foreach (string testFile in Directory.EnumerateFiles(analyzeTestsDirectory, "*.json", SearchOption.AllDirectories))
             {
                 var codeFile = Path.ChangeExtension(testFile, "ad");
