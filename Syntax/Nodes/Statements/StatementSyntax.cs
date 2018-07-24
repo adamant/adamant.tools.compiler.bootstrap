@@ -2,9 +2,9 @@ using System.Collections.Generic;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements
 {
-    public class BlockSyntax : StatementSyntax
+    public abstract class StatementSyntax : SyntaxBranchNode
     {
-        public BlockSyntax(IEnumerable<SyntaxNode> children)
+        protected StatementSyntax(IEnumerable<SyntaxNode> children)
             : base(children)
         {
         }

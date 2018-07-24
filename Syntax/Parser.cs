@@ -99,12 +99,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             }
         }
 
+        private IEnumerable<SyntaxNode> ParseSyntaxList(
+            ITokenStream tokens,
+            Func<ITokenStream, SyntaxNode> parseItem,
+            TokenKind terminator)
+        {
+            if (tokens.Finished || tokens.CurrentIs(terminator))
+                yield break;
+
+            yield return parseItem(tokens);
+            while (!tokens.CurrentIs(terminator))
+            {
+                yield return parseItem(tokens);
+            }
+        }
+
         private SyntaxNode ParseBlock(ITokenStream tokens)
         {
             var children = NewChildList();
             children.Add(tokens.Expect(TokenKind.LeftBrace));
+            children.AddRange(ParseSyntaxList(tokens, ParseStatement, TokenKind.RightBrace));
             children.Add(tokens.Expect(TokenKind.RightBrace));
             return new BlockSyntax(children);
+        }
+
+        private SyntaxNode ParseStatement(ITokenStream tokens)
+        {
+            var children = NewChildList();
+            children.Add(tokens.Expect(TokenKind.ReturnKeyword));
+            children.Add(tokens.Expect(TokenKind.Semicolon));
+            return new ReturnStatementSyntax(children);
         }
 
         private SyntaxNode ParseType(ITokenStream tokens)
@@ -113,6 +137,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             {
                 case TokenKind.VoidKeyword:
                 case TokenKind.IntKeyword:
+                case TokenKind.BoolKeyword:
                     var keyword = tokens.Consume();
                     return new PrimitiveTypeSyntax(keyword);
                 default:

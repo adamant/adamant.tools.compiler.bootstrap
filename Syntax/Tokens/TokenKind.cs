@@ -67,5 +67,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         VarKeyword,
         VoidKeyword,
         IntKeyword,
+        BoolKeyword,
+        ReturnKeyword,
     }
 }
