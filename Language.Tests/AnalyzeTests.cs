@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         [MemberData(nameof(GetAllAnalyzerTestCases))]
         public void Analyzes(AnalyzeTestCase testCase)
         {
-            var codePath = new CodePath(testCase.CodePath);
+            var codePath = new CodePath(testCase.RelativeCodePath);
             var code = new CodeText(testCase.Code);
             var tokens = new Lexer().Lex(code);
             var parser = new Parser();
@@ -92,14 +92,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             var analyzeTestsDirectory = Path.Combine(testsDirectory, "analyze");
             foreach (string testFile in Directory.EnumerateFiles(analyzeTestsDirectory, "*.json", SearchOption.AllDirectories))
             {
-                var codeFile = Path.ChangeExtension(testFile, "ad");
-                var codePath = Path.GetRelativePath(analyzeTestsDirectory, codeFile);
-                var code = File.ReadAllText(codeFile, CodeFile.Encoding);
-                var testJson = JObject.Parse(File.ReadAllText(testFile));
-                if (testJson.Value<string>("#type") != "test")
-                    throw new InvalidDataException("Test doesn't have #type: \"test\"");
-                var expectedSemanticTreeJson = testJson.Value<JObject>("semantic_tree");
-                testCases.Add(new AnalyzeTestCase(codePath, code, expectedSemanticTreeJson));
+                var fullCodePath = Path.ChangeExtension(testFile, "ad");
+                var relativeCodePath = Path.GetRelativePath(analyzeTestsDirectory, fullCodePath);
+                testCases.Add(new AnalyzeTestCase(fullCodePath, relativeCodePath));
             }
             return testCases;
         }

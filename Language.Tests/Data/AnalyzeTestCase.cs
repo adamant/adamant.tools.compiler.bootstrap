@@ -1,39 +1,34 @@
 using System;
+using System.IO;
 using Adamant.Tools.Compiler.Bootstrap.Framework.Tests.Data;
 using Newtonsoft.Json.Linq;
-using Xunit.Abstractions;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
 {
     public class AnalyzeTestCase : TestCase
     {
-        public string Code { get; private set; }
-        public JObject ExpectedSemanticTree { get; private set; }
+        private readonly Lazy<JObject> expectedSemanticTree = new Lazy<JObject>(() => null);
+        public JObject ExpectedSemanticTree => expectedSemanticTree.Value;
 
         [Obsolete("Required by IXunitSerializable", true)]
         public AnalyzeTestCase()
         {
+            expectedSemanticTree = new Lazy<JObject>(GetExpected);
         }
 
-        public AnalyzeTestCase(string codePath, string code, JObject expectedSemanticTree)
-            : base(codePath)
+        public AnalyzeTestCase(string fullCodePath, string relativeCodePath)
+            : base(fullCodePath, relativeCodePath)
         {
-            Code = code;
-            ExpectedSemanticTree = expectedSemanticTree;
+            expectedSemanticTree = new Lazy<JObject>(GetExpected);
         }
 
-        public override void Serialize(IXunitSerializationInfo info)
+        private JObject GetExpected()
         {
-            base.Serialize(info);
-            info.AddValue(nameof(Code), Code);
-            info.AddValue(nameof(ExpectedSemanticTree), ExpectedSemanticTree.ToString());
-        }
-
-        public override void Deserialize(IXunitSerializationInfo info)
-        {
-            base.Deserialize(info);
-            Code = info.GetValue<string>(nameof(Code));
-            ExpectedSemanticTree = JObject.Parse(info.GetValue<string>(nameof(ExpectedSemanticTree)));
+            var testFile = Path.ChangeExtension(FullCodePath, "json");
+            var testJson = JObject.Parse(File.ReadAllText(testFile));
+            if (testJson.Value<string>("#type") != "test")
+                throw new InvalidDataException("Test doesn't have #type: \"test\"");
+            return testJson.Value<JObject>("semantic_tree");
         }
     }
 }

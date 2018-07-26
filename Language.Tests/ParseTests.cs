@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         [MemberData(nameof(GetAllParseTestCases))]
         public void Parses(ParseTestCase testCase)
         {
-            var codePath = new CodePath(testCase.CodePath);
+            var codePath = new CodePath(testCase.RelativeCodePath);
             var code = new CodeText(testCase.Code);
             var tokens = new Lexer().Lex(code);
             var tokenStream = new TokenStream(codePath, code, tokens);
@@ -99,14 +99,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             var parseTestsDirectory = Path.Combine(testsDirectory, "parse");
             foreach (string testFile in Directory.EnumerateFiles(parseTestsDirectory, "*.xml", SearchOption.AllDirectories))
             {
-                var codeFile = Path.ChangeExtension(testFile, "ad");
-                var codePath = Path.GetRelativePath(parseTestsDirectory, codeFile);
-                var code = File.ReadAllText(codeFile, CodeFile.Encoding);
-                var testXml = XDocument.Load(testFile).Element("test");
-                var codeXml = testXml.Element("code");
-                var syntaxKind = Enum.Parse<ParseTestSyntaxKind>(codeXml.Attribute("kind").Value.Replace("_", ""), true);
-                var expectedParseXml = testXml.Element("expected_parse").Elements().Single();
-                testCases.Add(new ParseTestCase(codePath, code, syntaxKind, expectedParseXml));
+                var fullCodePath = Path.ChangeExtension(testFile, "ad");
+                var relativeCodePath = Path.GetRelativePath(parseTestsDirectory, fullCodePath);
+                testCases.Add(new ParseTestCase(fullCodePath, relativeCodePath));
             }
             return testCases;
         }

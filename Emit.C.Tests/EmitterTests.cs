@@ -15,7 +15,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C.Tests
 {
     public class EmitterTests
     {
-
         [Theory]
         [Category("Emitter")]
         [MemberData(nameof(GetAllEmitterTestCases))]
@@ -29,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C.Tests
 
         private static Package Compile(EmitterTestCase testCase)
         {
-            var codePath = new CodePath(testCase.CodePath);
+            var codePath = new CodePath(testCase.RelativeCodePath);
             var code = new CodeText(testCase.Code);
             var tokens = new Lexer().Lex(code);
             var parser = new Parser();
@@ -77,11 +76,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C.Tests
             var currentDirectory = Directory.GetCurrentDirectory();
             foreach (string testFile in Directory.EnumerateFiles(currentDirectory, "*.c", SearchOption.AllDirectories))
             {
-                var codeFile = Path.ChangeExtension(testFile, "ad");
-                var codePath = Path.GetRelativePath(currentDirectory, codeFile);
-                var code = File.ReadAllText(codeFile, CodeFile.Encoding);
-                var expected = File.ReadAllText(testFile);
-                testCases.Add(new EmitterTestCase(codePath, code, expected));
+                var fullCodePath = Path.ChangeExtension(testFile, "ad");
+                var relativeCodePath = Path.GetRelativePath(currentDirectory, fullCodePath);
+                testCases.Add(new EmitterTestCase(fullCodePath, relativeCodePath));
             }
             return testCases;
         }

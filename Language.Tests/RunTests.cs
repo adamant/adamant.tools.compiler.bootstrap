@@ -28,10 +28,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         {
             var testsDirectory = TestsDirectory.Get();
             var runTestsDirectory = Path.Combine(testsDirectory, "run");
-            var codePath = new CodePath(testCase.CodePath);
+            var codePath = new CodePath(testCase.RelativeCodePath);
             var code = new CodeText(testCase.Code);
             var codeFile = new CodeFile(code, codePath);
-            var cCodeFile = Path.Combine(runTestsDirectory, Path.ChangeExtension(testCase.CodePath, "c"));
+            var cCodeFile = Path.Combine(runTestsDirectory, Path.ChangeExtension(testCase.RelativeCodePath, "c"));
             CompileAdamantToC(codeFile, cCodeFile);
             var executable = CompileCToExecutable(cCodeFile);
             AssertRuns(testCase, executable);
@@ -103,15 +103,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             var testCases = new TheoryData<RunTestCase>();
             var testsDirectory = TestsDirectory.Get();
             var runTestsDirectory = Path.Combine(testsDirectory, "run");
-            foreach (string codeFile in Directory.EnumerateFiles(runTestsDirectory, "*.ad", SearchOption.AllDirectories))
+            foreach (string fullCodePath in Directory.EnumerateFiles(runTestsDirectory, "*.ad", SearchOption.AllDirectories))
             {
-                var codePath = Path.GetRelativePath(runTestsDirectory, codeFile);
-                var code = File.ReadAllText(codeFile);
-                var stdoutFile = Path.ChangeExtension(codeFile, "stdout");
-                var stdout = File.Exists(stdoutFile) ? File.ReadAllText(stdoutFile) : null;
-                var stderrFile = Path.ChangeExtension(codeFile, "stderr");
-                var stderr = File.Exists(stderrFile) ? File.ReadAllText(stderrFile) : null;
-                testCases.Add(new RunTestCase(codePath, code, stdout, stderr));
+                var relativeCodePath = Path.GetRelativePath(runTestsDirectory, fullCodePath);
+                testCases.Add(new RunTestCase(fullCodePath, relativeCodePath));
             }
             return testCases;
         }

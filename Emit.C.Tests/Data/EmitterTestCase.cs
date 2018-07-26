@@ -1,38 +1,30 @@
 using System;
+using System.IO;
 using Adamant.Tools.Compiler.Bootstrap.Framework.Tests.Data;
-using Xunit.Abstractions;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C.Tests.Data
 {
     public class EmitterTestCase : TestCase
     {
-        public string Code { get; private set; }
-        public string Expected { get; private set; }
+        private readonly Lazy<string> expected;
+        public string Expected => expected.Value;
 
         [Obsolete("Required by IXunitSerializable", true)]
         public EmitterTestCase()
         {
+            expected = new Lazy<string>(GetExpected);
         }
 
-        public EmitterTestCase(string codePath, string code, string expected)
-            : base(codePath)
+        public EmitterTestCase(string fullCodePath, string relativeCodePath)
+            : base(fullCodePath, relativeCodePath)
         {
-            Code = code;
-            Expected = expected;
+            expected = new Lazy<string>(GetExpected);
         }
 
-        public override void Serialize(IXunitSerializationInfo info)
+        private string GetExpected()
         {
-            base.Serialize(info);
-            info.AddValue(nameof(Code), Code);
-            info.AddValue(nameof(Expected), Expected);
-        }
-
-        public override void Deserialize(IXunitSerializationInfo info)
-        {
-            base.Deserialize(info);
-            Code = info.GetValue<string>(nameof(Code));
-            Expected = info.GetValue<string>(nameof(Expected));
+            var testFile = Path.ChangeExtension(FullCodePath, "c");
+            return File.ReadAllText(testFile);
         }
     }
 }

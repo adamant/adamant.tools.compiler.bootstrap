@@ -1,43 +1,50 @@
 using System;
+using System.IO;
+using System.Linq;
 using System.Xml.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework.Tests.Data;
-using Xunit.Abstractions;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
 {
     public class ParseTestCase : TestCase
     {
-        public string Code { get; private set; }
-        public ParseTestSyntaxKind SyntaxKind { get; private set; }
-        public XElement ExpectedParse { get; private set; }
+        private readonly Lazy<XElement> testXml;
+        private readonly Lazy<ParseTestSyntaxKind> syntaxKind;
+        public ParseTestSyntaxKind SyntaxKind => syntaxKind.Value;
+        private readonly Lazy<XElement> expectedParse;
+        public XElement ExpectedParse => expectedParse.Value;
 
         [Obsolete("Required by IXunitSerializable", true)]
         public ParseTestCase()
         {
+            testXml = new Lazy<XElement>(GetTestXml);
+            syntaxKind = new Lazy<ParseTestSyntaxKind>(GetSyntaxKind);
+            expectedParse = new Lazy<XElement>(GetExpectedParse);
         }
 
-        public ParseTestCase(string codePath, string code, ParseTestSyntaxKind syntaxKind, XElement expectedParse)
-            : base(codePath)
+        public ParseTestCase(string fullCodePath, string relativeCodePath)
+            : base(fullCodePath, relativeCodePath)
         {
-            Code = code;
-            SyntaxKind = syntaxKind;
-            ExpectedParse = expectedParse;
+            testXml = new Lazy<XElement>(GetTestXml);
+            syntaxKind = new Lazy<ParseTestSyntaxKind>(GetSyntaxKind);
+            expectedParse = new Lazy<XElement>(GetExpectedParse);
         }
 
-        public override void Serialize(IXunitSerializationInfo info)
+        private XElement GetTestXml()
         {
-            base.Serialize(info);
-            info.AddValue(nameof(Code), Code);
-            info.AddValue(nameof(SyntaxKind), SyntaxKind);
-            info.AddValue(nameof(ExpectedParse), ExpectedParse.ToString());
+            var testFile = Path.ChangeExtension(FullCodePath, "xml");
+            return XDocument.Load(testFile).Element("test");
         }
 
-        public override void Deserialize(IXunitSerializationInfo info)
+        private ParseTestSyntaxKind GetSyntaxKind()
         {
-            base.Deserialize(info);
-            Code = info.GetValue<string>(nameof(Code));
-            SyntaxKind = info.GetValue<ParseTestSyntaxKind>(nameof(SyntaxKind));
-            ExpectedParse = XElement.Parse(info.GetValue<string>(nameof(ExpectedParse)));
+            var codeXml = testXml.Value.Element("code");
+            return Enum.Parse<ParseTestSyntaxKind>(codeXml.Attribute("kind").Value.Replace("_", ""), true);
+        }
+
+        private XElement GetExpectedParse()
+        {
+            return testXml.Value.Element("expected_parse").Elements().Single();
         }
     }
 }

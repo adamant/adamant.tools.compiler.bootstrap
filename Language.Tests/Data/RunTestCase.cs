@@ -1,15 +1,16 @@
 using System;
+using System.IO;
 using System.Text.RegularExpressions;
 using Adamant.Tools.Compiler.Bootstrap.Framework.Tests.Data;
-using Xunit.Abstractions;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
 {
     public class RunTestCase : TestCase
     {
-        public string Code { get; private set; }
-        public string Stdout { get; private set; }
-        public string Stderr { get; private set; }
+        private readonly Lazy<string> stdout;
+        public string Stdout => stdout.Value;
+        private readonly Lazy<string> stderr;
+        public string Stderr => stderr.Value;
         public int ExitCode
         {
             get
@@ -22,30 +23,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
         [Obsolete("Required by IXunitSerializable", true)]
         public RunTestCase()
         {
+            stdout = new Lazy<string>(GetStdout);
+            stderr = new Lazy<string>(GetStderr);
         }
 
-        public RunTestCase(string codePath, string code, string stdout, string stderr)
-            : base(codePath)
+        public RunTestCase(string fullCodePath, string relativeCodePath)
+            : base(fullCodePath, relativeCodePath)
         {
-            Code = code;
-            Stdout = stdout;
-            Stderr = stderr;
+            stdout = new Lazy<string>(GetStdout);
+            stderr = new Lazy<string>(GetStderr);
         }
 
-        public override void Serialize(IXunitSerializationInfo info)
+        private string GetStdout()
         {
-            base.Serialize(info);
-            info.AddValue(nameof(Code), Code);
-            info.AddValue(nameof(Stdout), Stdout);
-            info.AddValue(nameof(Stderr), Stderr);
+            var stdoutFile = Path.ChangeExtension(FullCodePath, "stdout");
+            return File.Exists(stdoutFile) ? File.ReadAllText(stdoutFile) : null;
         }
 
-        public override void Deserialize(IXunitSerializationInfo info)
+        private string GetStderr()
         {
-            base.Deserialize(info);
-            Code = info.GetValue<string>(nameof(Code));
-            Stdout = info.GetValue<string>(nameof(Stdout));
-            Stderr = info.GetValue<string>(nameof(Stderr));
+            var stderrFile = Path.ChangeExtension(FullCodePath, "stderr");
+            return File.Exists(stderrFile) ? File.ReadAllText(stderrFile) : null;
         }
     }
 }
