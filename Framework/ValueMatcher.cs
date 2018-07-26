@@ -52,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
                     return arm.action(value);
             }
 
-            throw new NonExhaustiveMatchException();
+            throw new NonExhaustiveMatchException($"Matching value of type {value?.GetType().FullName}");
         }
     }
 }

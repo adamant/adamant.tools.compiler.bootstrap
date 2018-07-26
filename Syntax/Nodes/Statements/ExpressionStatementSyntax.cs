@@ -6,9 +6,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements
 {
     public class ExpressionStatementSyntax : StatementSyntax
     {
-        public ExpressionSyntax Expression => (ExpressionSyntax)Children.Single();
+        public ExpressionSyntax Expression => Children.OfType<ExpressionSyntax>().Single();
 
-        public ExpressionStatementSyntax(IEnumerable<SyntaxNode> children) : base(children)
+        public ExpressionStatementSyntax(IEnumerable<SyntaxNode> children)
+            : base(children)
         {
         }
     }

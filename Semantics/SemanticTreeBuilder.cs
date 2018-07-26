@@ -1,15 +1,22 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Parse.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.Operators;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
@@ -69,7 +76,39 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
         private Block Build(BlockSyntax block, SyntaxAnnotation<DataType> typeAnnotations)
         {
-            return new Block(block);
+            var statements = block.Statements.Select(s => Build(s, typeAnnotations));
+            return new Block(block, statements);
+        }
+
+        private Statement Build(StatementSyntax statement, SyntaxAnnotation<DataType> typeAnnotations)
+        {
+            return MatchInto<Statement>.On(statement).With(m => m
+                .Is<BlockSyntax>(b => Build(b, typeAnnotations))
+                .Is<ExpressionStatementSyntax>(es => new ExpressionStatement(es, Build(es.Expression, typeAnnotations)))
+            );
+        }
+
+        private Expression Build(ExpressionSyntax expression, SyntaxAnnotation<DataType> typeAnnotations)
+        {
+            return MatchInto<Expression>.On(expression).With(m => m
+                .Is<BinaryOperatorExpressionSyntax>(op => Build(op, typeAnnotations))
+                .Is<IdentifierNameSyntax>(i => new VariableExpression(i))
+                .Is<ReturnExpressionSyntax>(r => new ReturnExpression(r, Build(r.Expression, typeAnnotations)))
+            );
+        }
+
+        private BinaryOperatorExpression Build(BinaryOperatorExpressionSyntax expression, SyntaxAnnotation<DataType> typeAnnotations)
+        {
+            var leftOperand = Build(expression.LeftOperand, typeAnnotations);
+            var rightOperand = Build(expression.RightOperand, typeAnnotations);
+            switch (expression.Operator.Kind)
+            {
+                case TokenKind.Plus:
+                    return new AddExpression(expression, leftOperand, rightOperand);
+                default:
+                    throw new InvalidEnumArgumentException(expression.Operator.Kind.ToString());
+            }
+
         }
     }
 }
