@@ -21,9 +21,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
         public readonly IReadOnlyList<TestToken> AllTokens;
         private readonly IReadOnlyList<TestToken> PermuteTokens;
         private readonly IReadOnlyList<Tuple<TestTokenMatcher, TestTokenMatcher>> SeparateTokens;
-        public readonly IReadOnlyList<TestTokenSequence> AllTwoTokenSequences;
-        public readonly IReadOnlyList<TestTokenSequence> ThreeTokenSequences;
-        public readonly IReadOnlyList<TestTokenSequence> FourTokenSequences;
+
+        private readonly Lazy<IReadOnlyList<TestTokenSequence>> allTwoTokenSequences;
+        public IReadOnlyList<TestTokenSequence> AllTwoTokenSequences => allTwoTokenSequences.Value;
+        private readonly Lazy<IReadOnlyList<TestTokenSequence>> threeTokenSequences;
+        public IReadOnlyList<TestTokenSequence> ThreeTokenSequences => threeTokenSequences.Value;
+        private readonly Lazy<IReadOnlyList<TestTokenSequence>> fourTokenSequences;
+        public IReadOnlyList<TestTokenSequence> FourTokenSequences => fourTokenSequences.Value;
 
         public static TheoryData<TestToken> GetTheoryData(IEnumerable<TestToken> tokens)
         {
@@ -55,14 +59,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
             SeparateTokens = GetSeparateTokens(data);
 
             // Token Sequences
-            var allOneTokenSequences = AllTokens.Select(TestTokenSequence.Single).ToList().AsReadOnly();
-            AllTwoTokenSequences = GetSequencesWithOneMoreToken(allOneTokenSequences, AllTokens);
+            allTwoTokenSequences = new Lazy<IReadOnlyList<TestTokenSequence>>(() =>
+            {
+                var allOneTokenSequences = AllTokens.Select(TestTokenSequence.Single).ToList().AsReadOnly();
+                return GetSequencesWithOneMoreToken(allOneTokenSequences, AllTokens);
+            });
 
             // For three and four token sequeneces, we only consider the permute tokens
-            var oneTokenSequences = PermuteTokens.Select(TestTokenSequence.Single).ToList().AsReadOnly();
-            var twoTokenSequences = GetSequencesWithOneMoreToken(oneTokenSequences);
-            ThreeTokenSequences = GetSequencesWithOneMoreToken(twoTokenSequences);
-            FourTokenSequences = GetSequencesWithOneMoreToken(ThreeTokenSequences);
+            threeTokenSequences = new Lazy<IReadOnlyList<TestTokenSequence>>(() =>
+            {
+                var oneTokenSequences = PermuteTokens.Select(TestTokenSequence.Single).ToList().AsReadOnly();
+                var twoTokenSequences = GetSequencesWithOneMoreToken(oneTokenSequences);
+                return GetSequencesWithOneMoreToken(twoTokenSequences);
+            });
+            fourTokenSequences = new Lazy<IReadOnlyList<TestTokenSequence>>(() => GetSequencesWithOneMoreToken(threeTokenSequences.Value));
         }
 
         private static JObject GetJsonLexingData()

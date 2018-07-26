@@ -43,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         [Theory]
         [Category("Lex")]
         [MemberData(nameof(Get2TokenSequenceData))]
-        public static void SequenceOf2TokensLexes(TestTokenSequence tokens)
+        public static void SequencesOf2TokensLexes(TestTokenSequence tokens)
         {
             AssertLexesCorrectly(tokens);
         }
