@@ -5,6 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Parse.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Literals;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
@@ -128,12 +129,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 
         private StatementSyntax ParseStatement(ITokenStream tokens)
         {
-            var children = NewChildList();
-            children.Add(tokens.Expect(TokenKind.ReturnKeyword));
-            if (!tokens.CurrentIs(TokenKind.Semicolon))
-                children.Add(ParseExpression(tokens));
-            children.Add(tokens.Expect(TokenKind.Semicolon));
-            return new ReturnStatementSyntax(children);
+            switch (tokens.Current.Kind)
+            {
+                case TokenKind.LeftBrace:
+                    return ParseBlock(tokens);
+                default:
+                    var children = NewChildList();
+                    children.Add(ParseExpression(tokens));
+                    children.Add(tokens.Expect(TokenKind.Semicolon));
+                    return new ExpressionStatementSyntax(children);
+            }
         }
 
         private ExpressionSyntax ParseExpression(ITokenStream tokens, OperatorPrecedence minPrecendence = OperatorPrecedence.Min)
@@ -235,6 +240,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             var children = NewChildList();
             switch (tokens.Current.Kind)
             {
+                case TokenKind.ReturnKeyword:
+                    children.Add(tokens.Expect(TokenKind.ReturnKeyword));
+                    if (!tokens.CurrentIs(TokenKind.Semicolon))
+                        children.Add(ParseExpression(tokens));
+                    return new ReturnExpressionSyntax(children);
                 case TokenKind.LeftParen:
                     children.Add(tokens.Expect(TokenKind.LeftParen));
                     children.Add(ParseExpression(tokens));
@@ -254,7 +264,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                 default:
                     return new IdentifierNameSyntax(tokens.MissingToken(TokenKind.Identifier));
             }
-            throw new NotImplementedException();
         }
 
         private TypeSyntax ParseType(ITokenStream tokens)
