@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
     {
         private TestToken[] tokens;
 
-        public IEnumerable<TestToken> Tokens => tokens;
+        public IReadOnlyList<TestToken> Tokens => tokens;
 
         public TestTokenSequence()
         {

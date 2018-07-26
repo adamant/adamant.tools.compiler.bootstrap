@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
 {
-    using TestTokenMatchers = IDictionary<Tuple<TestTokenKind, TestTokenKind>, IList<Tuple<TestTokenMatcher, TestTokenMatcher>>>;
 
     public class LexingData
     {
@@ -20,12 +18,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
         public static LexingData Instance { get { return instance.Value; } }
         #endregion
 
-        public readonly IList<TestToken> AllTokens;
-        private readonly IList<TestToken> PermuteTokens;
-        private readonly TestTokenMatchers SeparateTokens;
-        public readonly IList<TestTokenSequence> TwoTokenSequences;
-        public readonly IList<TestTokenSequence> ThreeTokenSequences;
-        public readonly IList<TestTokenSequence> FourTokenSequences;
+        public readonly IReadOnlyList<TestToken> AllTokens;
+        private readonly IReadOnlyList<TestToken> PermuteTokens;
+        private readonly IReadOnlyList<Tuple<TestTokenMatcher, TestTokenMatcher>> SeparateTokens;
+        public readonly IReadOnlyList<TestTokenSequence> AllTwoTokenSequences;
+        public readonly IReadOnlyList<TestTokenSequence> ThreeTokenSequences;
+        public readonly IReadOnlyList<TestTokenSequence> FourTokenSequences;
 
         public static TheoryData<TestToken> GetTheoryData(IEnumerable<TestToken> tokens)
         {
@@ -57,9 +55,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
             SeparateTokens = GetSeparateTokens(data);
 
             // Token Sequences
+            var allOneTokenSequences = AllTokens.Select(TestTokenSequence.Single).ToList().AsReadOnly();
+            AllTwoTokenSequences = GetSequencesWithOneMoreToken(allOneTokenSequences, AllTokens);
+
+            // For three and four token sequeneces, we only consider the permute tokens
             var oneTokenSequences = PermuteTokens.Select(TestTokenSequence.Single).ToList().AsReadOnly();
-            TwoTokenSequences = GetSequencesWithOneMoreToken(oneTokenSequences);
-            ThreeTokenSequences = GetSequencesWithOneMoreToken(TwoTokenSequences);
+            var twoTokenSequences = GetSequencesWithOneMoreToken(oneTokenSequences);
+            ThreeTokenSequences = GetSequencesWithOneMoreToken(twoTokenSequences);
             FourTokenSequences = GetSequencesWithOneMoreToken(ThreeTokenSequences);
         }
 
@@ -73,7 +75,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
             return data;
         }
 
-        private IList<TestToken> ParseTokens(JArray tokensJson)
+        private IReadOnlyList<TestToken> ParseTokens(JArray tokensJson)
         {
             return tokensJson.Cast<JObject>().Select(ParseToken).ToList().AsReadOnly();
         }
@@ -105,6 +107,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
                     return TestTokenKind.Comment();
                 case "whitespace":
                     return TestTokenKind.Whitespace();
+                case "token":
+                    return TestTokenKind.AnyToken();
                 default:
                     return TestTokenKind.Token(Enum.Parse<TokenKind>(kind.Replace("_", ""), ignoreCase: true));
             }
@@ -122,58 +126,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
             }
         }
 
-        private static TestTokenMatchers GetSeparateTokens(JObject data)
+        private static IReadOnlyList<Tuple<TestTokenMatcher, TestTokenMatcher>> GetSeparateTokens(JObject data)
         {
             var separate = data["separate"].ToObject<JArray[]>();
-            // Fill in every value so we don't have to worry about checking if they are there later
-            var matchers = new Dictionary<Tuple<TestTokenKind, TestTokenKind>, IList<Tuple<TestTokenMatcher, TestTokenMatcher>>>();
+            var matchers = new List<Tuple<TestTokenMatcher, TestTokenMatcher>>();
             foreach (var sequence in separate)
             {
                 if (sequence.Count != 2)
                     throw new InvalidDataException($"Separate sequence has more that two tokens `{sequence}`");
 
-                var first = ParseTokenMatcher(sequence[0]);
-                var second = ParseTokenMatcher(sequence[1]);
-                // The open matchers may refer to "keyword" that needs to be converted to all keywords
-                var openMatcherPair = Tuple.Create(first, second);
-                foreach (var matcherPair in ExpandKeywords(openMatcherPair))
-                {
-                    var key = Tuple.Create(matcherPair.Item1.Kind, matcherPair.Item2.Kind);
-                    if (!matchers.ContainsKey(key))
-                        matchers.Add(key, new List<Tuple<TestTokenMatcher, TestTokenMatcher>>());
-
-                    matchers[key].Add(matcherPair);
-                }
+                matchers.Add(Tuple.Create(ParseTokenMatcher(sequence[0]), ParseTokenMatcher(sequence[1])));
             }
-            return matchers;
-        }
-
-        private static IEnumerable<Tuple<TestTokenMatcher, TestTokenMatcher>> ExpandKeywords(Tuple<TestTokenMatcher, TestTokenMatcher> matchers)
-        {
-            if (MatchesAnyKeyword(matchers.Item1.Kind))
-            {
-                if (MatchesAnyKeyword(matchers.Item2.Kind))
-                    return Keywords().CrossJoin(Keywords());
-
-                return Keywords().Select(k => Tuple.Create(k, matchers.Item2));
-            }
-            else if (MatchesAnyKeyword(matchers.Item2.Kind))
-            {
-                return Keywords().Select(k => Tuple.Create(matchers.Item1, k));
-            }
-            else
-                return matchers.Yield();
-        }
-
-        private static bool MatchesAnyKeyword(TestTokenKind kind)
-        {
-            return kind.Category == TestTokenCategory.Keyword
-                && kind.TokenKind == null;
-        }
-
-        private static IEnumerable<TestTokenMatcher> Keywords()
-        {
-            return Lexer.Keywords.Select(pair => new TestTokenMatcher(TestTokenKind.Keyword(pair.Value), pair.Key));
+            return matchers.AsReadOnly();
         }
 
         private static TestTokenMatcher ParseTokenMatcher(JToken matcher)
@@ -190,32 +154,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
                     throw new NotSupportedException($"'{matcher}' not supported as token matcher");
             }
         }
-        private IList<TestTokenSequence> GetSequencesWithOneMoreToken(IList<TestTokenSequence> sequences)
+        private IReadOnlyList<TestTokenSequence> GetSequencesWithOneMoreToken(IReadOnlyList<TestTokenSequence> sequences, IReadOnlyList<TestToken> crossWith = null)
         {
             return sequences
-                .CrossJoin(PermuteTokens, (sequence, token) => sequence.Append(token))
-                .Where(DoesNotContainInvalidPair)
+                .CrossJoin(crossWith ?? PermuteTokens, (sequence, token) => sequence.Append(token))
+                .Where(DoesNotContainEndInInvalidPair)
                 .ToList()
                 .AsReadOnly();
         }
 
-        private bool DoesNotContainInvalidPair(TestTokenSequence sequence)
+        private bool DoesNotContainEndInInvalidPair(TestTokenSequence sequence)
         {
-            var separate = SeparateTokens;
-            TestToken previous = null;
-            foreach (var token in sequence.Tokens)
-            {
-                if (previous != null)
-                {
-                    var key = Tuple.Create(previous.Kind, token.Kind);
-                    if (separate.TryGetValue(key, out var matchers))
-                        foreach (var matcherPair in matchers)
-                            if (matcherPair.Item1.Matches(previous) && matcherPair.Item2.Matches(token))
-                                return false;
-                }
+            var lastIndex = sequence.Tokens.Count - 1;
+            var secondToLast = sequence.Tokens[lastIndex - 1];
+            var last = sequence.Tokens[lastIndex];
 
-                previous = token;
-            }
+            foreach (var matcherPair in SeparateTokens)
+                if (matcherPair.Item1.Matches(secondToLast) && matcherPair.Item2.Matches(last))
+                    return false;
 
             return true;
         }

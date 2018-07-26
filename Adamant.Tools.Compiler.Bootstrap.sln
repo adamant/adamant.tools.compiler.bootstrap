@@ -21,6 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		.gitmodules = .gitmodules
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Framework.Tests", "Framework.Tests\Framework.Tests.csproj", "{6B2BCDD1-9468-4477-BFE1-8CB65F675D08}"
@@ -34,6 +35,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Emit.C", "Emit.C\Emit.C.csproj", "{6EB02F9D-5FBA-4B4D-A4FC-5403826C6C8A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Emit.C.Tests", "Emit.C.Tests\Emit.C.Tests.csproj", "{13C542B6-37C0-4EE0-A411-CA73000EAE5B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{8D74A93C-CA04-4283-9FBD-31C8D9B08F34}"
+	ProjectSection(SolutionItems) = preProject
+		docs\CoreFeatures.md = docs\CoreFeatures.md
+		docs\Implemented.md = docs\Implemented.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

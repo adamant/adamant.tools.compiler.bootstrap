@@ -42,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
 
         [Theory]
         [Category("Lex")]
-        [MemberData(nameof(GetTwoTokenSequenceData))]
+        [MemberData(nameof(Get2TokenSequenceData))]
         public static void SequenceOf2TokensLexes(TestTokenSequence tokens)
         {
             AssertLexesCorrectly(tokens);
@@ -50,14 +50,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
 
         [Fact]
         [Category("Lex")]
-        public void CanGetTwoTokenSequenceData()
+        public void CanGet2TokenSequenceData()
         {
-            Assert.NotEmpty(GetTwoTokenSequenceData());
+            Assert.NotEmpty(Get2TokenSequenceData());
         }
 
-        public static TheoryData<TestTokenSequence> GetTwoTokenSequenceData()
+        public static TheoryData<TestTokenSequence> Get2TokenSequenceData()
         {
-            return LexingData.GetTheoryData(LexingData.Instance.TwoTokenSequences);
+            return LexingData.GetTheoryData(LexingData.Instance.AllTwoTokenSequences);
         }
 
         [Fact]
@@ -73,7 +73,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
 
         [Fact]
         [Category("Lex")]
-        public void CanGetThreeTokenSequences()
+        public void CanGet3TokenSequences()
         {
             Assert.NotEmpty(LexingData.Instance.ThreeTokenSequences);
         }
@@ -92,7 +92,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
 
         [Fact]
         [Category("Lex")]
-        public void CanGetFourTokenSequences()
+        public void CanGet4TokenSequences()
         {
             Assert.NotEmpty(LexingData.Instance.FourTokenSequences);
         }

@@ -30,6 +30,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
             return new TestTokenKind(TestTokenCategory.Token, kind);
         }
 
+        public static TestTokenKind AnyToken()
+        {
+            return new TestTokenKind(TestTokenCategory.Token, null);
+        }
+
         public static TestTokenKind Keyword()
         {
             return new TestTokenKind(TestTokenCategory.Keyword, null);
@@ -46,6 +51,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
                 || (Category == TestTokenCategory.Keyword && TokenKind != null)))
                 throw new NotSupportedException($"Can't convert TestTokenKind with Category=`{Category}` to TokenKind");
             return TokenKind.Value;
+        }
+
+        public bool Matches(TestTokenKind other)
+        {
+            return Category == other.Category
+                && (TokenKind == null || TokenKind == other.TokenKind);
         }
 
         public static bool operator ==(TestTokenKind lhs, TestTokenKind rhs)
@@ -67,8 +78,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
         }
         public override string ToString()
         {
-            if (Category == TestTokenCategory.Token
-                || (Category == TestTokenCategory.Keyword && TokenKind != null))
+            if (TokenKind != null)
                 return TokenKind.ToString();
             return Category.ToString();
         }

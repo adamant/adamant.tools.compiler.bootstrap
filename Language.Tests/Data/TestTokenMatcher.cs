@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
 
         public bool Matches(TestToken token)
         {
-            return Kind == token.Kind
+            return Kind.Matches(token.Kind)
                 && (Text == null || Text == token.Text);
         }
     }
