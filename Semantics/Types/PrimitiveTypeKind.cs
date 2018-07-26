@@ -4,5 +4,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
     {
         Void = 1,
         Int,
+        Bool,
     }
 }

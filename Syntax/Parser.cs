@@ -4,6 +4,9 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Parse.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Literals;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
@@ -37,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             return new CompilationUnitSyntax(children);
         }
 
-        public SyntaxNode ParseDeclaration(ITokenStream tokens)
+        public DeclarationSyntax ParseDeclaration(ITokenStream tokens)
         {
             var children = NewChildList();
             children.Add(ParseAccessModifier(tokens));
@@ -51,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             return new FunctionDeclarationSyntax(children);
         }
 
-        private SyntaxNode ParseParameterList(ITokenStream tokens)
+        private ParameterListSyntax ParseParameterList(ITokenStream tokens)
         {
             var children = NewChildList();
             children.Add(tokens.Expect(TokenKind.LeftParen));
@@ -60,7 +63,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             return new ParameterListSyntax(children);
         }
 
-        private SyntaxNode ParseParameter(ITokenStream tokens)
+        private ParameterSyntax ParseParameter(ITokenStream tokens)
         {
             var children = NewChildList();
             switch (tokens.Current.Kind)
@@ -114,7 +117,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             }
         }
 
-        private SyntaxNode ParseBlock(ITokenStream tokens)
+        private BlockSyntax ParseBlock(ITokenStream tokens)
         {
             var children = NewChildList();
             children.Add(tokens.Expect(TokenKind.LeftBrace));
@@ -123,15 +126,138 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             return new BlockSyntax(children);
         }
 
-        private SyntaxNode ParseStatement(ITokenStream tokens)
+        private StatementSyntax ParseStatement(ITokenStream tokens)
         {
             var children = NewChildList();
             children.Add(tokens.Expect(TokenKind.ReturnKeyword));
+            if (!tokens.CurrentIs(TokenKind.Semicolon))
+                children.Add(ParseExpression(tokens));
             children.Add(tokens.Expect(TokenKind.Semicolon));
             return new ReturnStatementSyntax(children);
         }
 
-        private SyntaxNode ParseType(ITokenStream tokens)
+        private ExpressionSyntax ParseExpression(ITokenStream tokens, OperatorPrecedence minPrecendence = OperatorPrecedence.Min)
+        {
+            var expression = ParseAtom(tokens);
+
+            for (; ; )
+            {
+                var children = NewChildList();
+                children.Add(expression);
+
+                OperatorPrecedence? precedence = null;
+                var leftAssociative = true;
+                //var suffixOperator = false;
+                switch (tokens.Current.Kind)
+                {
+                    case TokenKind.Equals:
+                    case TokenKind.PlusEquals:
+                    case TokenKind.MinusEquals:
+                    case TokenKind.AsteriskEquals:
+                    case TokenKind.SlashEquals:
+                        if (minPrecendence <= OperatorPrecedence.Assignment)
+                        {
+                            precedence = OperatorPrecedence.Assignment;
+                            leftAssociative = false;
+                            children.Add(tokens.Consume());
+                        }
+                        break;
+                    case TokenKind.EqualsEquals:
+                    case TokenKind.NotEqual:
+                        if (minPrecendence <= OperatorPrecedence.Equality)
+                        {
+                            precedence = OperatorPrecedence.Equality;
+                            children.Add(tokens.Consume());
+                        }
+                        break;
+                    case TokenKind.LessThan:
+                    case TokenKind.LessThanOrEqual:
+                    case TokenKind.GreaterThan:
+                    case TokenKind.GreaterThanOrEqual:
+                        if (minPrecendence <= OperatorPrecedence.Relational)
+                        {
+                            precedence = OperatorPrecedence.Relational;
+                            children.Add(tokens.Consume());
+                        }
+                        break;
+                    case TokenKind.Plus:
+                    case TokenKind.Minus:
+                        if (minPrecendence <= OperatorPrecedence.Additive)
+                        {
+                            precedence = OperatorPrecedence.Additive;
+                            children.Add(tokens.Consume());
+                        }
+                        break;
+                    case TokenKind.Asterisk:
+                    case TokenKind.Slash:
+                        if (minPrecendence <= OperatorPrecedence.Multiplicative)
+                        {
+                            precedence = OperatorPrecedence.Multiplicative;
+                            children.Add(tokens.Consume());
+                        }
+                        break;
+                    case TokenKind.LeftParen:
+                        if (minPrecendence <= OperatorPrecedence.Primary)
+                        {
+                            // Invocation
+                            precedence = OperatorPrecedence.Primary;
+                            //suffixOperator = true;
+                            throw new NotImplementedException();
+                            // TODO children.Add(ParseCallArguments(tokens));
+                        }
+                        break;
+                    case TokenKind.Dot:
+                        if (minPrecendence <= OperatorPrecedence.Primary)
+                        {
+                            // Member Access
+                            precedence = OperatorPrecedence.Primary;
+                            children.Add(tokens.Consume());
+                        }
+                        break;
+                    default:
+                        return expression;
+                }
+
+                // if we did't match any operator
+                if (precedence == null)
+                    return expression;
+
+                if (leftAssociative)
+                    precedence += 1;
+                children.Add(ParseExpression(tokens, precedence.Value));
+                expression = new BinaryOperatorExpressionSyntax(children);
+            }
+        }
+
+        // An atom is the unit of an expression that occurs between infix operators, i.e. an identifier, literal, group, or new
+        private ExpressionSyntax ParseAtom(ITokenStream tokens)
+        {
+            var children = NewChildList();
+            switch (tokens.Current.Kind)
+            {
+                case TokenKind.LeftParen:
+                    children.Add(tokens.Expect(TokenKind.LeftParen));
+                    children.Add(ParseExpression(tokens));
+                    children.Add(tokens.Expect(TokenKind.RightParen));
+                    return new ParenthesizedExpressionSyntax(children);
+                case TokenKind.Minus:
+                case TokenKind.Plus:
+                case TokenKind.AtSign:
+                case TokenKind.Caret:
+                    children.Add(tokens.Consume());
+                    children.Add(ParseExpression(tokens, OperatorPrecedence.Unary));
+                    return new UnaryOperatorExpressionSyntax(children);
+                case TokenKind.StringLiteral:
+                    return new StringLiteralExpressionSyntax(tokens.Consume());
+                case TokenKind.Identifier:
+                    return new IdentifierNameSyntax(tokens.Expect(TokenKind.Identifier));
+                default:
+                    return new IdentifierNameSyntax(tokens.MissingToken(TokenKind.Identifier));
+            }
+            throw new NotImplementedException();
+        }
+
+        private TypeSyntax ParseType(ITokenStream tokens)
         {
             switch (tokens.Current.Kind)
             {

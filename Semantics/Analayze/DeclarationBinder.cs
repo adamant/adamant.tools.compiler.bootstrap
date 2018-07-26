@@ -8,9 +8,11 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analayze
 {
+    /// Binds declarations of functions and variables to their declared types
     public class DeclarationBinder
     {
         public void BindDeclarations(PackageSyntaxSymbol packageSymbol, SyntaxAnnotation<DataType> typeAnnotations)
@@ -46,6 +48,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analayze
                     var functionScope = new NameScope(scope, symbol);
                     BindChildren(symbol, f.Body, functionScope, typeAnnotations);
                 })
+                // TODO varible declarations syntax needs checked
+                // TODO for loop syntax needs checked
+                // TODO if let syntax needs checked
+                .Ignore<StatementSyntax>()
             );
         }
 

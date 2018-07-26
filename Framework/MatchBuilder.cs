@@ -29,6 +29,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         //    }
 
         [DebuggerStepThrough]
+        public MatchBuilder<T> Ignore<S>()
+            where S : T
+        {
+            arms.Add(new MatchArm<T>(v => v is S, Ignore));
+            return this;
+        }
+
+        [DebuggerStepThrough]
         public void Any(Action<T> arm)
         {
             throw new NotImplementedException();
@@ -38,6 +46,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         public void Any(Action arm)
         {
             throw new NotImplementedException();
+        }
+
+        private static void Ignore(T value)
+        {
         }
     }
 

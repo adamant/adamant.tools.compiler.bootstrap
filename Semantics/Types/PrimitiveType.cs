@@ -7,6 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
     {
         public static readonly PrimitiveType Int = new PrimitiveType(PrimitiveTypeKind.Int);
         public static readonly PrimitiveType Void = new PrimitiveType(PrimitiveTypeKind.Void);
+        public static readonly PrimitiveType Bool = new PrimitiveType(PrimitiveTypeKind.Bool);
 
         public PrimitiveTypeKind Kind { get; }
 
@@ -23,6 +24,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                     return Int;
                 case TokenKind.VoidKeyword:
                     return Void;
+                case TokenKind.BoolKeyword:
+                    return Bool;
                 default:
                     throw new InvalidEnumArgumentException($"Token kind `{kind}` is not a primitive type keyword");
             }
