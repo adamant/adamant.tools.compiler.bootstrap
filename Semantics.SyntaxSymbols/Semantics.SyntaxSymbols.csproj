@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols</AssemblyName>
+    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Syntax\Syntax.csproj" />
+  </ItemGroup>
+
+</Project>

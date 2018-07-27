@@ -4,7 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Parse.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Binders;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
@@ -15,38 +15,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analayze
     /// Binds declarations of functions and variables to their declared types
     public class DeclarationBinder
     {
-        public void BindDeclarations(PackageSyntaxSymbol packageSymbol, SyntaxAnnotation<DataType> typeAnnotations)
+        internal void BindDeclarations(PackageSyntax package, Annotations annotations)
         {
+            var packageSymbol = annotations.Symbol(package);
             var globalScope = new NameScope(packageSymbol.GlobalNamespace);
             foreach (var tree in packageSymbol.Declaration.SyntaxTrees)
-                BindDeclarations(packageSymbol.GlobalNamespace, tree.Root, globalScope, typeAnnotations);
+                BindDeclarations(tree.Root, globalScope, annotations);
         }
 
         private void BindDeclarations(
-            ISyntaxSymbol parentSymbol,
             SyntaxBranchNode syntax,
             NameScope scope,
-            SyntaxAnnotation<DataType> typeAnnotations)
+            Annotations annotations)
         {
-            Requires.NotNull(nameof(parentSymbol), parentSymbol);
             Requires.NotNull(nameof(syntax), syntax);
             Requires.NotNull(nameof(scope), scope);
-            Requires.NotNull(nameof(typeAnnotations), typeAnnotations);
+            Requires.NotNull(nameof(annotations), annotations);
 
             Match.On(syntax).With(m => m
-                .Is<CompilationUnitSyntax>(cu => BindChildren(parentSymbol, cu, scope, typeAnnotations))
+                .Is<CompilationUnitSyntax>(cu => BindChildren(cu, scope, annotations))
                 .Is<FunctionDeclarationSyntax>(f =>
                 {
-                    var parameterSymbols = BindParameters(parentSymbol, f.Parameters, scope, typeAnnotations);
-                    var returnType = BindType(f.ReturnType, scope, typeAnnotations);
-                    var functionType = new FunctionType(parameterSymbols.Select(p => p.Type), returnType);
-                    typeAnnotations.Add(f, functionType);
-                    var name = f.Name.Text;
-                    var symbol = new DeclarationSyntaxSymbol(name, functionType, f);
-                    symbol.AddChildren(parameterSymbols);
-                    parentSymbol.AddChild(symbol);
+                    var parameterTypes = BindParameters(f.Parameters, scope, annotations);
+                    var returnType = BindType(f.ReturnType, scope, annotations);
+                    var functionType = new FunctionType(parameterTypes, returnType);
+                    annotations.Add(f, functionType);
+                    var symbol = annotations.Symbol(f);
                     var functionScope = new NameScope(scope, symbol);
-                    BindChildren(symbol, f.Body, functionScope, typeAnnotations);
+                    BindChildren(f.Body, functionScope, annotations);
                 })
                 // TODO varible declarations syntax needs checked
                 // TODO for loop syntax needs checked
@@ -56,47 +52,42 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analayze
         }
 
         private void BindChildren(
-            ISyntaxSymbol parentSymbol,
             SyntaxBranchNode syntax,
             NameScope scope,
-            SyntaxAnnotation<DataType> typeAnnotations)
+            Annotations annotations)
         {
             foreach (var child in syntax.Children)
                 if (child is SyntaxBranchNode childNode)
-                    BindDeclarations(parentSymbol, childNode, scope, typeAnnotations);
+                    BindDeclarations(childNode, scope, annotations);
         }
 
-        private IEnumerable<DeclarationSyntaxSymbol> BindParameters(
-            ISyntaxSymbol parentSymbol,
+        private static IEnumerable<DataType> BindParameters(
             ParameterListSyntax parameterList,
             NameScope scope,
-            SyntaxAnnotation<DataType> typeAnnotations)
+            Annotations annotations)
         {
             return parameterList.Parameters
-                .Select(parameter => BindParameter(parentSymbol, parameter, scope, typeAnnotations))
+                .Select(parameter => BindParameter(parameter, scope, annotations))
                 .ToList();
         }
 
-        private DeclarationSyntaxSymbol BindParameter(
-            ISyntaxSymbol parentSymbol,
+        private static DataType BindParameter(
             ParameterSyntax parameter,
             NameScope scope,
-            SyntaxAnnotation<DataType> typeAnnotations)
+            Annotations annotations)
         {
-            var identifier = parameter.Identifier;
-            var type = BindType(parameter.Type, scope, typeAnnotations);
-            var symbol = new DeclarationSyntaxSymbol(identifier.Value, type, parameter);
-            typeAnnotations.Add(parameter, type);
-            return symbol;
+            var type = BindType(parameter.Type, scope, annotations);
+            annotations.Add(parameter, type);
+            return type;
         }
 
-        private DataType BindType(TypeSyntax typeSyntax, NameScope scope, SyntaxAnnotation<DataType> typeAnnotations)
+        private static DataType BindType(TypeSyntax typeSyntax, NameScope scope, Annotations annotations)
         {
             return MatchInto<DataType>.On(typeSyntax).With(m => m
                 .Is<PrimitiveTypeSyntax>(p =>
                 {
                     var type = PrimitiveType.New(p.Keyword.Kind);
-                    typeAnnotations.Add(typeSyntax, type);
+                    annotations.Add(typeSyntax, type);
                     return type;
                 })
             );

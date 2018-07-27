@@ -1,47 +1,32 @@
 using System.Collections.Generic;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Parse.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analayze;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Validation;
-using Adamant.Tools.Compiler.Bootstrap.Syntax;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
     public class SemanticAnalyzer
     {
-        private static readonly TypeSet<SyntaxBranchNode> DeclaredTypeNodeTypes = new TypeSet<SyntaxBranchNode>();
-        private static readonly TypeSet<SyntaxBranchNode> DeclarationNodeTypes = new TypeSet<SyntaxBranchNode>();
-
-        static SemanticAnalyzer()
-        {
-            DeclarationNodeTypes.Add<FunctionDeclarationSyntax>();
-            DeclarationNodeTypes.Add<ParameterSyntax>();
-            DeclarationNodeTypes.Add<PrimitiveTypeSyntax>();
-        }
-
-        private readonly DeclaredTypesAnalyzer declaredTypesAnalyzer = new DeclaredTypesAnalyzer();
+        private readonly SyntaxSymbolBuilder syntaxSymbolBuilder = new SyntaxSymbolBuilder();
         private readonly DeclarationBinder declarationBinder = new DeclarationBinder();
-        private readonly AnnotationValidator validator = new AnnotationValidator();
+
 
         public Package Analyze(PackageSyntax package)
         {
-            var typeAnnotations = new SyntaxAnnotation<DataType>();
+            var syntaxSymbols = syntaxSymbolBuilder.Build(package);
 
-            var packageSyntaxSymbol = declaredTypesAnalyzer.GetDeclaredTypes(package, typeAnnotations);
+            var annotations = new Annotations(package, syntaxSymbols);
+            annotations.ValidateSymbolsAnnotations();
 
-            validator.AssertNodesAreAnnotated(DeclaredTypeNodeTypes, package, typeAnnotations);
+            declarationBinder.BindDeclarations(package, annotations);
 
-            declarationBinder.BindDeclarations(packageSyntaxSymbol, typeAnnotations);
+            annotations.ValidateAnnotations();
 
-            validator.AssertNodesAreAnnotated(DeclarationNodeTypes, package, typeAnnotations);
-
-            var treeBuilder = new SemanticTreeBuilder(typeAnnotations);
+            var treeBuilder = new SemanticTreeBuilder(annotations);
 
             var compilationUnits = package.SyntaxTrees
 #if RELEASE
@@ -54,12 +39,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             return new Package(package, compilationUnits, entryPoint);
         }
 
-        private FunctionDeclaration FindEntryPoint(IEnumerable<CompilationUnit> compilationUnits)
+        private static FunctionDeclaration FindEntryPoint(IEnumerable<CompilationUnit> compilationUnits)
         {
             return compilationUnits
                 .SelectMany(cu => cu.Declarations.OfType<FunctionDeclaration>())
-                .Where(f => f.Name == "main")
-                .SingleOrDefault();
+                .SingleOrDefault(f => f.Name == "main");
         }
     }
 }

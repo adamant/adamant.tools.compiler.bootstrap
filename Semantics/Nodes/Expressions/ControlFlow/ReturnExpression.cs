@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.Syntax;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.ControlFlow

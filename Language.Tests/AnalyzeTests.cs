@@ -8,6 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Newtonsoft.Json.Linq;
 using Xunit;
 using Xunit.Categories;
@@ -26,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             var tokens = new Lexer().Lex(code);
             var parser = new Parser();
             var syntaxTree = parser.Parse(codePath, code, tokens);
-            var packageSyntax = new PackageSyntax(syntaxTree.Yield());
+            var packageSyntax = new PackageSyntax(syntaxTree.Yield().ToList());
             var analyzer = new SemanticAnalyzer();
             var package = analyzer.Analyze(packageSyntax);
             AssertSemanticsMatch(testCase.ExpectedSemanticTree, package);

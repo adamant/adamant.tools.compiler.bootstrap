@@ -19,8 +19,8 @@ This is a list of core features that need to ne implemented or at least accounte
 * Generic Types
 * Associated Functions
 * Generic Types over Values (i.e. fixed length arrays)
-* Definiate assignment
-* Destrcutor value access rules
+* Definite assignment
+* Destructor value access rules
 * Exception types
 * Effect Typing
 * Async/await
@@ -31,3 +31,5 @@ This is a list of core features that need to ne implemented or at least accounte
 * Optional Types
 * Void type as type parameter
 * Unsafe code
+* Type Inference
+* Constant Evaluation

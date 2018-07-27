@@ -37,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             AssertRuns(testCase, executable);
         }
 
-        private void CompileAdamantToC(CodeFile code, string outputPath)
+        private static void CompileAdamantToC(CodeFile code, string outputPath)
         {
             var package = new AdamantCompiler().CompilePackage(code.Yield());
             // TODO Assert.Empty(package.GetDiagnostics().Where(d=>d.IsError);
@@ -73,7 +73,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             return outputPath;
         }
 
-        private void AssertRuns(RunTestCase testCase, string executable)
+        private static void AssertRuns(RunTestCase testCase, string executable)
         {
             var startInfo = new ProcessStartInfo(executable)
             {
@@ -103,7 +103,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             var testCases = new TheoryData<RunTestCase>();
             var testsDirectory = TestsDirectory.Get();
             var runTestsDirectory = Path.Combine(testsDirectory, "run");
-            foreach (string fullCodePath in Directory.EnumerateFiles(runTestsDirectory, "*.ad", SearchOption.AllDirectories))
+            foreach (var fullCodePath in Directory.EnumerateFiles(runTestsDirectory, "*.ad", SearchOption.AllDirectories))
             {
                 var relativeCodePath = Path.GetRelativePath(runTestsDirectory, fullCodePath);
                 testCases.Add(new RunTestCase(fullCodePath, relativeCodePath));

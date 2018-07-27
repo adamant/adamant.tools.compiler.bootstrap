@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             return package;
         }
 
-        private static IEnumerable<SyntaxTree<CompilationUnitSyntax>> Parse(IEnumerable<CodeFile> files)
+        private static IList<SyntaxTree<CompilationUnitSyntax>> Parse(IEnumerable<CodeFile> files)
         {
             var lexer = new Lexer();
             var parser = new Parser();
@@ -31,7 +31,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                 {
                     var tokens = lexer.Lex(file.Code);
                     return parser.Parse(file.Reference, file.Code, tokens);
-                });
+                })
+                .ToList();
         }
     }
 }

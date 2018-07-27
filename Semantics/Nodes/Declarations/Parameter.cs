@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.Syntax;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations

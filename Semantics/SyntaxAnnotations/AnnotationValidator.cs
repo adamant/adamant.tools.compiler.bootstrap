@@ -4,9 +4,9 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations
 {
-    public class AnnotationValidator
+    internal class AnnotationValidator
     {
         [Conditional("DEBUG")]
         public void AssertNodesAreAnnotated<T>(
@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                 AssertNodesAreAnnotated(nodeTypes, tree.Root, annotations);
         }
 
-        private void AssertNodesAreAnnotated<T>(
+        private static void AssertNodesAreAnnotated<T>(
             TypeSet<SyntaxBranchNode> nodeTypes,
             SyntaxBranchNode node,
             SyntaxAnnotation<T> annotations)

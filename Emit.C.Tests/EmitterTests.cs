@@ -8,6 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Xunit;
 using Xunit.Categories;
 
@@ -33,7 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C.Tests
             var tokens = new Lexer().Lex(code);
             var parser = new Parser();
             var syntaxTree = parser.Parse(codePath, code, tokens);
-            var packageSyntax = new PackageSyntax(syntaxTree.Yield());
+            var packageSyntax = new PackageSyntax(syntaxTree.Yield().ToList());
             var analyzer = new SemanticAnalyzer();
             return analyzer.Analyze(packageSyntax);
         }

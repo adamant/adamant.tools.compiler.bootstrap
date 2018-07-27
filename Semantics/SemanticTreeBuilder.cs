@@ -10,7 +10,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.Operators;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
@@ -24,34 +24,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
     public class SemanticTreeBuilder
     {
-        private readonly SyntaxAnnotation<DataType> typeAnnotations;
+        private readonly Annotations annotations;
 
-        public SemanticTreeBuilder(SyntaxAnnotation<DataType> typeAnnotations)
+        internal SemanticTreeBuilder(Annotations annotations)
         {
-            this.typeAnnotations = typeAnnotations;
+            this.annotations = annotations;
         }
 
         public CompilationUnit Build(SyntaxTree<CompilationUnitSyntax> syntaxTree)
         {
-            var declarations = syntaxTree.Root.Declarations.Select(d => Build(d, typeAnnotations));
+            var declarations = syntaxTree.Root.Declarations.Select(Build);
             return new CompilationUnit(syntaxTree.Root, declarations);
         }
 
-        private Declaration Build(DeclarationSyntax declaration, SyntaxAnnotation<DataType> typeAnnotations)
+        private Declaration Build(DeclarationSyntax declaration)
         {
             return MatchInto<Declaration>.On(declaration).With(m => m
                 .Is<FunctionDeclarationSyntax>(f =>
                 {
-                    var access = BuildAccessModifier(f.AccessModifier, typeAnnotations);
+                    var access = BuildAccessModifier(f.AccessModifier);
                     var name = f.Name.Value;
-                    var parameters = Build(f.Parameters, typeAnnotations);
-                    var returnType = Build(f.ReturnType, typeAnnotations);
-                    var body = Build(f.Body, typeAnnotations);
+                    var parameters = Build(f.Parameters);
+                    var returnType = Build(f.ReturnType);
+                    var body = Build(f.Body);
                     return new FunctionDeclaration(f, access, name, parameters, returnType, body);//TODO pass them into the constructor
                 }));
         }
 
-        private AccessLevel BuildAccessModifier(Token accessModifier, SyntaxAnnotation<DataType> typeAnnotations)
+        private static AccessLevel BuildAccessModifier(Token accessModifier)
         {
             switch (accessModifier.Kind)
             {
@@ -62,45 +62,45 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             }
         }
 
-        private IEnumerable<Parameter> Build(ParameterListSyntax parameterList, SyntaxAnnotation<DataType> typeAnnotations)
+        private IEnumerable<Parameter> Build(ParameterListSyntax parameterList)
         {
             return parameterList.Parameters
-                .Select(p => new Parameter(p, p.VarKeyword != null, p.Identifier.Value, Build(p.Type, typeAnnotations)))
+                .Select(p => new Parameter(p, p.VarKeyword != null, p.Identifier.Value, Build(p.Type)))
                 .ToList();
         }
 
-        private TypeName Build(TypeSyntax type, SyntaxAnnotation<DataType> typeAnnotations)
+        private TypeName Build(TypeSyntax type)
         {
-            return new TypeName(type, typeAnnotations[type]);
+            return new TypeName(type, annotations.Type(type));
         }
 
-        private Block Build(BlockSyntax block, SyntaxAnnotation<DataType> typeAnnotations)
+        private Block Build(BlockSyntax block)
         {
-            var statements = block.Statements.Select(s => Build(s, typeAnnotations));
+            var statements = block.Statements.Select(Build);
             return new Block(block, statements);
         }
 
-        private Statement Build(StatementSyntax statement, SyntaxAnnotation<DataType> typeAnnotations)
+        private Statement Build(StatementSyntax statement)
         {
             return MatchInto<Statement>.On(statement).With(m => m
-                .Is<BlockSyntax>(b => Build(b, typeAnnotations))
-                .Is<ExpressionStatementSyntax>(es => new ExpressionStatement(es, Build(es.Expression, typeAnnotations)))
+                .Is<BlockSyntax>(Build)
+                .Is<ExpressionStatementSyntax>(es => new ExpressionStatement(es, Build(es.Expression)))
             );
         }
 
-        private Expression Build(ExpressionSyntax expression, SyntaxAnnotation<DataType> typeAnnotations)
+        private Expression Build(ExpressionSyntax expression)
         {
             return MatchInto<Expression>.On(expression).With(m => m
-                .Is<BinaryOperatorExpressionSyntax>(op => Build(op, typeAnnotations))
+                .Is<BinaryOperatorExpressionSyntax>(Build)
                 .Is<IdentifierNameSyntax>(i => new VariableExpression(i))
-                .Is<ReturnExpressionSyntax>(r => new ReturnExpression(r, Build(r.Expression, typeAnnotations)))
+                .Is<ReturnExpressionSyntax>(r => new ReturnExpression(r, Build(r.Expression)))
             );
         }
 
-        private BinaryOperatorExpression Build(BinaryOperatorExpressionSyntax expression, SyntaxAnnotation<DataType> typeAnnotations)
+        private BinaryOperatorExpression Build(BinaryOperatorExpressionSyntax expression)
         {
-            var leftOperand = Build(expression.LeftOperand, typeAnnotations);
-            var rightOperand = Build(expression.RightOperand, typeAnnotations);
+            var leftOperand = Build(expression.LeftOperand);
+            var rightOperand = Build(expression.RightOperand);
             switch (expression.Operator.Kind)
             {
                 case TokenKind.Plus:
