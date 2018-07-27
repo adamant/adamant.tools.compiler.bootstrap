@@ -1,7 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Binders
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 {
     public class NameScope
     {

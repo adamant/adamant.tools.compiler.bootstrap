@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
 {
     public interface IPackageSyntaxSymbol : ISyntaxSymbol
     {
-        INamespaceSyntaxSymbol GlobalNamespace { get; }
+        IGlobalNamespaceSyntaxSymbol GlobalNamespace { get; }
         PackageSyntax Declaration { get; }
         new IReadOnlyList<PackageSyntax> Declarations { get; }
     }

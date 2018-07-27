@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Binders;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
@@ -15,34 +14,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analayze
     /// Binds declarations of functions and variables to their declared types
     public class DeclarationBinder
     {
-        internal void BindDeclarations(PackageSyntax package, Annotations annotations)
+        private readonly Annotations annotations;
+
+        internal DeclarationBinder(Annotations annotations)
+        {
+            this.annotations = annotations;
+        }
+
+        internal void BindDeclarations(PackageSyntax package)
         {
             var packageSymbol = annotations.Symbol(package);
-            var globalScope = new NameScope(packageSymbol.GlobalNamespace);
             foreach (var tree in packageSymbol.Declaration.SyntaxTrees)
-                BindDeclarations(tree.Root, globalScope, annotations);
+                BindDeclarations(tree.Root);
         }
 
         private void BindDeclarations(
-            SyntaxBranchNode syntax,
-            NameScope scope,
-            Annotations annotations)
+            SyntaxBranchNode syntax)
         {
             Requires.NotNull(nameof(syntax), syntax);
-            Requires.NotNull(nameof(scope), scope);
             Requires.NotNull(nameof(annotations), annotations);
 
             Match.On(syntax).With(m => m
-                .Is<CompilationUnitSyntax>(cu => BindChildren(cu, scope, annotations))
+                .Is<CompilationUnitSyntax>(BindChildren)
                 .Is<FunctionDeclarationSyntax>(f =>
                 {
-                    var parameterTypes = BindParameters(f.Parameters, scope, annotations);
-                    var returnType = BindType(f.ReturnType, scope, annotations);
+                    var parameterTypes = BindParameters(f.Parameters);
+                    var returnType = BindType(f.ReturnType);
                     var functionType = new FunctionType(parameterTypes, returnType);
                     annotations.Add(f, functionType);
-                    var symbol = annotations.Symbol(f);
-                    var functionScope = new NameScope(scope, symbol);
-                    BindChildren(f.Body, functionScope, annotations);
+                    BindChildren(f.Body);
                 })
                 // TODO varible declarations syntax needs checked
                 // TODO for loop syntax needs checked
@@ -52,36 +52,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analayze
         }
 
         private void BindChildren(
-            SyntaxBranchNode syntax,
-            NameScope scope,
-            Annotations annotations)
+            SyntaxBranchNode syntax)
         {
             foreach (var child in syntax.Children)
                 if (child is SyntaxBranchNode childNode)
-                    BindDeclarations(childNode, scope, annotations);
+                    BindDeclarations(childNode);
         }
 
-        private static IEnumerable<DataType> BindParameters(
-            ParameterListSyntax parameterList,
-            NameScope scope,
-            Annotations annotations)
+        private IEnumerable<DataType> BindParameters(ParameterListSyntax parameterList)
         {
             return parameterList.Parameters
-                .Select(parameter => BindParameter(parameter, scope, annotations))
+                .Select(BindParameter)
                 .ToList();
         }
 
-        private static DataType BindParameter(
-            ParameterSyntax parameter,
-            NameScope scope,
-            Annotations annotations)
+        private DataType BindParameter(ParameterSyntax parameter)
         {
-            var type = BindType(parameter.Type, scope, annotations);
+            var type = BindType(parameter.Type);
             annotations.Add(parameter, type);
             return type;
         }
 
-        private static DataType BindType(TypeSyntax typeSyntax, NameScope scope, Annotations annotations)
+        private DataType BindType(TypeSyntax typeSyntax)
         {
             return MatchInto<DataType>.On(typeSyntax).With(m => m
                 .Is<PrimitiveTypeSyntax>(p =>

@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
             Children = children.AsReadOnly();
         }
 
-        public void Add(SyntaxSymbol child)
+        public void AddChild(SyntaxSymbol child)
         {
             children.Add(child);
         }
@@ -43,11 +43,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
         private readonly List<T> declarations = new List<T>();
         public IReadOnlyList<T> Declarations { get; }
 
+        protected SyntaxSymbol(string name)
+            : base(name)
+        {
+        }
+
         protected SyntaxSymbol(
             string name,
             T declaration)
             : base(name)
         {
+            Requires.NotNull(nameof(declaration), declaration);
             Declarations = declarations.AsReadOnly();
             declarations.Add(declaration);
         }

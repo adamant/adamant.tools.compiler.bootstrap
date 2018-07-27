@@ -20,21 +20,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
         }
 
         private static void Build(
-            NamespaceSyntaxSymbol globalNamespace,
+            GlobalNamespaceSyntaxSymbol globalNamespace,
             CompilationUnitSyntax compilationUnit,
             SyntaxAnnotation<ISyntaxSymbol> symbols)
         {
+            // Basically, every compilation unit is a declaration of the global namespace
+            globalNamespace.AddDeclaration(compilationUnit);
+            symbols.Add(compilationUnit, globalNamespace);
             foreach (var declaration in compilationUnit.Declarations)
                 Build(globalNamespace, declaration, symbols);
         }
 
-        private static void Build(NamespaceSyntaxSymbol globalNamespace, DeclarationSyntax declaration, SyntaxAnnotation<ISyntaxSymbol> symbols)
+        private static void Build(GlobalNamespaceSyntaxSymbol globalNamespace, DeclarationSyntax declaration, SyntaxAnnotation<ISyntaxSymbol> symbols)
         {
             Match.On(declaration).With(m => m
                 .Is<FunctionDeclarationSyntax>(f =>
                 {
                     var symbol = new DeclarationSyntaxSymbol(f.Name.Value, f);
-                    globalNamespace.Add((symbol));
+                    globalNamespace.AddChild((symbol));
                     symbols.Add(f, symbol);
                     foreach (var parameter in f.Parameters.Parameters)
                         Build(symbol, parameter, symbols);
@@ -45,7 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
         {
             // TODO eventually we need to pay attention to redeclarations
             var symbol = new DeclarationSyntaxSymbol(parameter.Identifier.Value, parameter);
-            functionSymbol.Add(symbol);
+            functionSymbol.AddChild(symbol);
             symbols.Add(parameter, symbol);
         }
     }

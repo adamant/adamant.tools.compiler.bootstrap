@@ -1,15 +1,15 @@
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class SyntaxAnnotation<TValue>
     {
-        private readonly Dictionary<SyntaxBranchNode, TValue> annotations = new Dictionary<SyntaxBranchNode, TValue>();
+        private readonly ConcurrentDictionary<SyntaxBranchNode, TValue> annotations = new ConcurrentDictionary<SyntaxBranchNode, TValue>();
 
-        public void Add(SyntaxBranchNode syntax, TValue value)
+        public bool Add(SyntaxBranchNode syntax, TValue value)
         {
-            annotations.Add(syntax, value);
+            return annotations.TryAdd(syntax, value);
         }
 
         public TValue this[SyntaxBranchNode syntax] => annotations[syntax];

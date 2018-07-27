@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
@@ -18,6 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations
         {
             NodesTypesWithSyntaxSymbols.Add<FunctionDeclarationSyntax>();
             NodesTypesWithSyntaxSymbols.Add<ParameterSyntax>();
+            NodesTypesWithSyntaxSymbols.Add<CompilationUnitSyntax>();
 
             DeclarationNodeTypes.Add<FunctionDeclarationSyntax>();
             DeclarationNodeTypes.Add<ParameterSyntax>();
@@ -27,6 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations
         private readonly PackageSyntax package;
         private readonly SyntaxAnnotation<ISyntaxSymbol> symbols;
         private readonly SyntaxAnnotation<DataType> types = new SyntaxAnnotation<DataType>();
+        private readonly SyntaxAnnotation<NameScope> scopes = new SyntaxAnnotation<NameScope>();
 
         public Annotations(PackageSyntax package, SyntaxAnnotation<ISyntaxSymbol> symbols)
         {
@@ -62,6 +65,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations
         public IPackageSyntaxSymbol Symbol(PackageSyntax syntax)
         {
             return (IPackageSyntaxSymbol)symbols[syntax];
+        }
+
+        public IGlobalNamespaceSyntaxSymbol Symbol(CompilationUnitSyntax syntax)
+        {
+            return (IGlobalNamespaceSyntaxSymbol)symbols[syntax];
+        }
+
+        public void Add(SyntaxBranchNode syntax, NameScope scope)
+        {
+            scopes.Add(syntax, scope);
         }
     }
 }
