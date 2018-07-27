@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
+using Adamant.Tools.Compiler.Bootstrap.Semantics;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit
 {

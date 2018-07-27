@@ -20,9 +20,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
             buildArms(new MatchBuilder<T>(arms));
             foreach (var arm in arms)
             {
-                if (arm.condition(value))
+                if (arm.Condition(value))
                 {
-                    arm.action(value);
+                    arm.Action(value);
                     return;
                 }
             }
@@ -48,8 +48,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
 
             foreach (var arm in arms)
             {
-                if (arm.condition(value))
-                    return arm.action(value);
+                if (arm.Condition(value))
+                    return arm.Action(value);
             }
 
             throw new NonExhaustiveMatchException($"Matching value of type {value?.GetType().FullName}");

@@ -43,10 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
 
         public TestTokenSequence WhereIsToken()
         {
-            if (tokens.All(IsToken))
-                return this;
-            else
-                return new TestTokenSequence(tokens.Where(IsToken).ToArray());
+            return tokens.All(IsToken) ? this : new TestTokenSequence(tokens.Where(IsToken).ToArray());
         }
 
         private static bool IsToken(TestToken t)

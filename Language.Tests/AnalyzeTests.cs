@@ -64,8 +64,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
                         break;
                     case JTokenType.Array:
                         var expectedObjects = expected.ToObject<JObject[]>();
-                        var actualObjects = (IEnumerable<object>)actual;
-                        Assert.Equal(expectedObjects.Length, actualObjects.Count());
+                        var actualObjects = (IReadOnlyCollection<object>)actual;
+                        Assert.Equal(expectedObjects.Length, actualObjects.Count);
                         foreach (var item in expectedObjects.Zip(actualObjects))
                             AssertSemanticsMatch(item.Item1, item.Item2);
                         break;

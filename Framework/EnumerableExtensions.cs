@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
-    public static class IEnumerableExtensions
+    public static class EnumerableExtensions
     {
         public static IEnumerable<T> Yield<T>(this T value)
         {
@@ -33,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
             this IEnumerable<TFirst> first,
             IEnumerable<TSecond> second)
         {
-            return first.Zip(second, (f, s) => Tuple.Create(f, s));
+            return first.Zip(second, Tuple.Create);
         }
 
         public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source)
@@ -53,7 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
             this IEnumerable<TFirst> first,
             IEnumerable<TSecond> second)
         {
-            return first.SelectMany(_ => second, (f, s) => Tuple.Create(f, s));
+            return first.SelectMany(_ => second, Tuple.Create);
         }
     }
 }

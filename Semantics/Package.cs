@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
-using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
     public class Package : SemanticNode
     {

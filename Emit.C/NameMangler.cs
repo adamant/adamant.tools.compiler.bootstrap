@@ -2,7 +2,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Emit.C.Tests
+namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
     public class NameMangler
     {

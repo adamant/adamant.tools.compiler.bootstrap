@@ -38,22 +38,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
         public virtual void DeclarationSeparatorLine()
         {
-            if (NeedsDeclarationSeparatorLine)
-            {
-                base.BlankLine();
-                NeedsDeclarationSeparatorLine = false;
-                NeedsStatementSeparatorLine = false;
-            }
+            if (!NeedsDeclarationSeparatorLine) return;
+            base.BlankLine();
+            NeedsDeclarationSeparatorLine = false;
+            NeedsStatementSeparatorLine = false;
         }
 
         public virtual void StatementSeparatorLine()
         {
-            if (NeedsStatementSeparatorLine)
-            {
-                base.BlankLine();
-                NeedsDeclarationSeparatorLine = false;
-                NeedsStatementSeparatorLine = false;
-            }
+            if (!NeedsStatementSeparatorLine) return;
+            base.BlankLine();
+            NeedsDeclarationSeparatorLine = false;
+            NeedsStatementSeparatorLine = false;
         }
 
         public override void BeginBlock()

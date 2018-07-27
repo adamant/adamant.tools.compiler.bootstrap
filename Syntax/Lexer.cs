@@ -9,7 +9,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class Lexer : ILexer
+    public class Lexer
     {
         public static IReadOnlyDictionary<string, TokenKind> Keywords;
 
@@ -236,7 +236,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                 var span = TextSpan.FromStartEnd(tokenStart, tokenEnd);
                 var value = code[span];
                 Token token;
-                if (Keywords.TryGetValue(value, out TokenKind keywordKind))
+                if (Keywords.TryGetValue(value, out var keywordKind))
                 {
                     token = Token.New(code, span, keywordKind, tokenDiagnosticInfos);
                 }
@@ -320,13 +320,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 
                                     if (tokenEnd >= code.Length)
                                     {
-                                        NewError(DiagnosticLevel.CompilationError, $"Unclosed Unicode escape sequence.");
+                                        NewError(DiagnosticLevel.CompilationError, "Unclosed Unicode escape sequence.");
                                         break;
                                     }
                                     else if (tokenEnd < code.Length && code[tokenEnd] == ')')
                                         tokenEnd += 1;
                                     else
-                                        NewError(DiagnosticLevel.CompilationError, $"Unicode escape sequence must be terminated with `)`.");
+                                        NewError(DiagnosticLevel.CompilationError, "Unicode escape sequence must be terminated with `)`.");
 
                                     // We have already consumed all the characters of the escape sequence and now want to continue the loop
                                     continue;

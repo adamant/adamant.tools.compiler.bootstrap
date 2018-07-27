@@ -2,13 +2,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Parse.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Binders;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analayze
 {

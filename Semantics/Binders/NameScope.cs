@@ -29,10 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Binders
                     return childSymbol;
             }
 
-            if (Parent != null)
-                return Parent.LookupName(name);
-
-            return null;
+            return Parent?.LookupName(name);
         }
     }
 }

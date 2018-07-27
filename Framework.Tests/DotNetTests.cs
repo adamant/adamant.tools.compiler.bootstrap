@@ -5,7 +5,7 @@ using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
+namespace Adamant.Tools.Compiler.Bootstrap.Framework.Tests
 {
     public class DotNetTests
     {

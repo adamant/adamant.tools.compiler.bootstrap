@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 {
-    public static class ITokenStreamExtensions
+    public static class TokenStreamExtensions
     {
         public static bool Next(this ITokenStream tokens)
         {

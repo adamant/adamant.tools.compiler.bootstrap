@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
 {
     public class AnalyzeTestCase : TestCase
     {
-        private readonly Lazy<JObject> expectedSemanticTree = new Lazy<JObject>(() => null);
+        private readonly Lazy<JObject> expectedSemanticTree;
         public JObject ExpectedSemanticTree => expectedSemanticTree.Value;
 
         [Obsolete("Required by IXunitSerializable", true)]

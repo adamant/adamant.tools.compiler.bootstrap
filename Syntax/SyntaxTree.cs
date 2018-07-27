@@ -13,9 +13,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         public CodeText Code { get; }
         public TSyntax Root { get; }
 
-        public SyntaxTree(CodeReference CodeReference, CodeText code, TSyntax root)
+        public SyntaxTree(CodeReference codeReference, CodeText code, TSyntax root)
         {
-            this.CodeReference = CodeReference;
+            CodeReference = codeReference;
             Code = code;
             Root = root;
         }

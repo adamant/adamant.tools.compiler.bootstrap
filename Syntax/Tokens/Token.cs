@@ -20,9 +20,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 
         protected Token(CodeText code, TextSpan span, TokenKind kind, bool isMissing, IEnumerable<DiagnosticInfo> diagnosticInfos)
         {
+            Requires.NotNull(nameof(code), code);
             Requires.InString(code.Text, nameof(span), span);
             Requires.ValidEnum(nameof(kind), kind);
-            Code = code ?? throw new ArgumentNullException(nameof(code));
+            Code = code;
             Span = span;
             Kind = kind;
             IsMissing = isMissing;

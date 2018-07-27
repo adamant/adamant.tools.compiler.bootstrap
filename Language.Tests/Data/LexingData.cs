@@ -15,12 +15,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
         #region Singleton
         private static readonly Lazy<LexingData> instance = new Lazy<LexingData>(() => new LexingData());
 
-        public static LexingData Instance { get { return instance.Value; } }
+        public static LexingData Instance => instance.Value;
         #endregion
 
         public readonly IReadOnlyList<TestToken> AllTokens;
-        private readonly IReadOnlyList<TestToken> PermuteTokens;
-        private readonly IReadOnlyList<Tuple<TestTokenMatcher, TestTokenMatcher>> SeparateTokens;
+        private readonly IReadOnlyList<TestToken> permuteTokens;
+        private readonly IReadOnlyList<Tuple<TestTokenMatcher, TestTokenMatcher>> separateTokens;
 
         private readonly Lazy<IReadOnlyList<TestTokenSequence>> allTwoTokenSequences;
         public IReadOnlyList<TestTokenSequence> AllTwoTokenSequences => allTwoTokenSequences.Value;
@@ -53,10 +53,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
             var data = GetJsonLexingData();
 
             AllTokens = ParseTokens(data.Value<JArray>("tokens"));
-            PermuteTokens = AllTokens.Where(t => t.Permute).ToList().AsReadOnly();
+            permuteTokens = AllTokens.Where(t => t.Permute).ToList().AsReadOnly();
 
             // Separate Tokens
-            SeparateTokens = GetSeparateTokens(data);
+            separateTokens = GetSeparateTokens(data);
 
             // Token Sequences
             allTwoTokenSequences = new Lazy<IReadOnlyList<TestTokenSequence>>(() =>
@@ -68,7 +68,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
             // For three and four token sequeneces, we only consider the permute tokens
             threeTokenSequences = new Lazy<IReadOnlyList<TestTokenSequence>>(() =>
             {
-                var oneTokenSequences = PermuteTokens.Select(TestTokenSequence.Single).ToList().AsReadOnly();
+                var oneTokenSequences = permuteTokens.Select(TestTokenSequence.Single).ToList().AsReadOnly();
                 var twoTokenSequences = GetSequencesWithOneMoreToken(oneTokenSequences);
                 return GetSequencesWithOneMoreToken(twoTokenSequences);
             });
@@ -167,7 +167,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
         private IReadOnlyList<TestTokenSequence> GetSequencesWithOneMoreToken(IReadOnlyList<TestTokenSequence> sequences, IReadOnlyList<TestToken> crossWith = null)
         {
             return sequences
-                .CrossJoin(crossWith ?? PermuteTokens, (sequence, token) => sequence.Append(token))
+                .CrossJoin(crossWith ?? permuteTokens, (sequence, token) => sequence.Append(token))
                 .Where(DoesNotContainEndInInvalidPair)
                 .ToList()
                 .AsReadOnly();
@@ -179,7 +179,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
             var secondToLast = sequence.Tokens[lastIndex - 1];
             var last = sequence.Tokens[lastIndex];
 
-            foreach (var matcherPair in SeparateTokens)
+            foreach (var matcherPair in separateTokens)
                 if (matcherPair.Item1.Matches(secondToLast) && matcherPair.Item2.Matches(last))
                     return false;
 

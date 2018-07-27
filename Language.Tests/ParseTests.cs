@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             {
                 case ParseTestSyntaxKind.CompilationUnit:
                     var compilationUnit = parser.ParseCompilationUnit(tokenStream);
-                    AssertSyntaxMatches(testCase.ExpectedParse, testCase.ExpectedParse, compilationUnit);
+                    AssertSyntaxMatches(testCase.ExpectedParse, compilationUnit);
                     break;
                 case ParseTestSyntaxKind.Expression:
                     throw new NotImplementedException();
@@ -47,7 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             Assert.NotEmpty(GetAllParseTestCases());
         }
 
-        private void AssertSyntaxMatches(XElement rootExpected, XElement expected, SyntaxNode syntax)
+        private void AssertSyntaxMatches(XElement expected, SyntaxNode syntax)
         {
             var expectedKind = expected.Name.LocalName.Replace("_", "");
             Match.On(syntax).With(m => m
@@ -79,7 +79,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
                     }
 
                     foreach (var child in expected.Elements().Zip(n.Children))
-                        AssertSyntaxMatches(rootExpected, child.Item1, child.Item2);
+                        AssertSyntaxMatches(child.Item1, child.Item2);
                 })
             );
         }

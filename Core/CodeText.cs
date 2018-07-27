@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
     {
         public readonly string Text;
         public int Length => Text.Length;
-        public readonly TextLines Lines;
+        //public readonly TextLines Lines;
 
         public string this[TextSpan span] => Text.Substring(span.Start, span.Length);
         public char this[int index] => Text[index];

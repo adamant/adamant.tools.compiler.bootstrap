@@ -1,6 +1,6 @@
-using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Parse.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes
 {

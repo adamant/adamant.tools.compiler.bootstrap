@@ -10,15 +10,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         {
         }
 
-        public NonExhaustiveMatchException(string message) : base(message)
+        public NonExhaustiveMatchException(string message)
+            : base(message)
         {
         }
 
-        public NonExhaustiveMatchException(string message, Exception innerException) : base(message, innerException)
+        public NonExhaustiveMatchException(string message, Exception innerException)
+            : base(message, innerException)
         {
         }
 
-        protected NonExhaustiveMatchException(SerializationInfo info, StreamingContext context) : base(info, context)
+        protected NonExhaustiveMatchException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
         }
     }

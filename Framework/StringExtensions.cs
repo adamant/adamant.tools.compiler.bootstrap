@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
     public static class StringExtensions
     {
-        private static readonly Regex lineEndings = new Regex(@"\r\n|\n\r|\n|\r", RegexOptions.Compiled);
+        private static readonly Regex LineEndings = new Regex(@"\r\n|\n\r|\n|\r", RegexOptions.Compiled);
 
         public static string Repeat(this string input, int count)
         {
@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
 
         public static string NormalizeLineEndings(this string input, string lineEnding)
         {
-            return lineEndings.Replace(input, lineEnding);
+            return LineEndings.Replace(input, lineEnding);
         }
     }
 }

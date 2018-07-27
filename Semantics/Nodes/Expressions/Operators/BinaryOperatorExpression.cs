@@ -11,6 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.Operators
 
         protected BinaryOperatorExpression(BinaryOperatorExpressionSyntax syntax, Expression leftOperand, Expression rightOperand)
         {
+            Syntax = syntax;
             LeftOperand = leftOperand;
             RightOperand = rightOperand;
         }

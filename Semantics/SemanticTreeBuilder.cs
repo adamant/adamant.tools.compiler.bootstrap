@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Parse.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions;
@@ -18,6 +17,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics

@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-using Adamant.Tools.Compiler.Bootstrap.Syntax;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Parse.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Types
 {
     public abstract class TypeSyntax : SyntaxBranchNode
     {
