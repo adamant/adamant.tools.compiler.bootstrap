@@ -76,7 +76,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             base.EndBlock();
             base.AppendLine("}");
-            NeedsDeclarationSeparatorLine = false;
+            NeedsDeclarationSeparatorLine = true;
             NeedsStatementSeparatorLine = true;
         }
 
