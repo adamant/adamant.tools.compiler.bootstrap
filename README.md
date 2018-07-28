@@ -10,8 +10,8 @@ The compiler is under active development. It is in a very early stage, and there
 
 A rough plan of the next items to get working is:
 
-1. Checking binding mutability (`let` vs `var`) on `int` and `bool` variable types.
-2. Typecheck `int` vs `bool` expressions for basic operations.
+1. Typecheck `int` vs `bool` expressions for basic operations.
+2. Checking binding mutability (`let` vs `var`) on `int` and `bool` variable types.
 3. Typecheck strings to handle overload of `+`?
 4. Optional types?
 5. Add classes without members.
