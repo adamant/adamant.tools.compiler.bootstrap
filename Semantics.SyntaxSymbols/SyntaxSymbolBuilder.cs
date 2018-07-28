@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
                     var symbol = new DeclarationSyntaxSymbol(f.Name.Value, f);
                     globalNamespace.AddChild((symbol));
                     symbols.Add(f, symbol);
-                    foreach (var parameter in f.Parameters.Parameters)
+                    foreach (var parameter in f.ParameterList.Parameters)
                         Build(symbol, parameter, symbols);
                 }));
         }

@@ -8,6 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
     {
         private readonly T value;
 
+        [DebuggerStepThrough]
         public ValueMatcher(T value)
         {
             this.value = value;
@@ -35,6 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
     {
         private readonly T value;
 
+        [DebuggerStepThrough]
         public ValueMatcher(T value)
         {
             this.value = value;

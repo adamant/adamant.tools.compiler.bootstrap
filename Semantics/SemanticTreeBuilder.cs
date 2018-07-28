@@ -10,7 +10,6 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.Operators;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations;
-using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
@@ -31,10 +30,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             this.annotations = annotations;
         }
 
-        public CompilationUnit Build(SyntaxTree<CompilationUnitSyntax> syntaxTree)
+        public CompilationUnit Build(CompilationUnitSyntax compilationUnit)
         {
-            var declarations = syntaxTree.Root.Declarations.Select(Build);
-            return new CompilationUnit(syntaxTree.Root, declarations);
+            var declarations = compilationUnit.Declarations.Select(Build);
+            return new CompilationUnit(compilationUnit, declarations);
         }
 
         private Declaration Build(DeclarationSyntax declaration)
@@ -44,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                 {
                     var access = BuildAccessModifier(f.AccessModifier);
                     var name = f.Name.Value;
-                    var parameters = Build(f.Parameters);
+                    var parameters = Build(f.ParameterList);
                     var returnType = Build(f.ReturnType);
                     var body = Build(f.Body);
                     return new FunctionDeclaration(f, access, name, parameters, returnType, body);//TODO pass them into the constructor

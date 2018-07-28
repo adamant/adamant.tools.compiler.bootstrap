@@ -28,8 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analayze
                 BindDeclarations(tree.Root);
         }
 
-        private void BindDeclarations(
-            SyntaxBranchNode syntax)
+        private void BindDeclarations(SyntaxBranchNode syntax)
         {
             Requires.NotNull(nameof(syntax), syntax);
             Requires.NotNull(nameof(annotations), annotations);
@@ -38,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analayze
                 .Is<CompilationUnitSyntax>(BindChildren)
                 .Is<FunctionDeclarationSyntax>(f =>
                 {
-                    var parameterTypes = BindParameters(f.Parameters);
+                    var parameterTypes = BindParameters(f.ParameterList);
                     var returnType = BindType(f.ReturnType);
                     var functionType = new FunctionType(parameterTypes, returnType);
                     annotations.Add(f, functionType);

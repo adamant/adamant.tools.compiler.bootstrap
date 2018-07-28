@@ -8,6 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
     {
         private readonly IList<MatchArm<T>> arms;
 
+        [DebuggerStepThrough]
         internal MatchBuilder(IList<MatchArm<T>> arms)
         {
             this.arms = arms;
@@ -17,9 +18,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         public MatchBuilder<T> Is<S>(Action<S> arm)
             where S : T
         {
-            arms.Add(new MatchArm<T>(v => v is S, v => arm((S)v)));
+            arms.Add(new MatchArm<T>(IsOfType<S>, MatchAction<T>.Create(arm)));
             return this;
         }
+
+        [DebuggerStepThrough]
+        internal static bool IsOfType<S>(T v) => v is S;
 
         //    public static void NotNull<T, S>(this IMatchStatementBuilder<T> builder, Action<S> arm)
         //        where S : T
@@ -32,22 +36,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         public MatchBuilder<T> Ignore<S>()
             where S : T
         {
-            arms.Add(new MatchArm<T>(v => v is S, Ignore));
+            arms.Add(new MatchArm<T>(IsOfType<S>, Ignore));
             return this;
         }
 
         [DebuggerStepThrough]
         public void Any(Action<T> arm)
         {
-            throw new NotImplementedException();
+            arms.Add(new MatchArm<T>(arm));
         }
 
         [DebuggerStepThrough]
         public void Any(Action arm)
         {
-            throw new NotImplementedException();
+            arms.Add(new MatchArm<T>(MatchAction<T>.Create(arm)));
         }
 
+        [DebuggerStepThrough]
         private static void Ignore(T value)
         {
         }
@@ -57,6 +62,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
     {
         private readonly IList<MatchArm<T, R>> arms;
 
+        [DebuggerStepThrough]
         internal MatchBuilder(IList<MatchArm<T, R>> arms)
         {
             this.arms = arms;
@@ -66,8 +72,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         public MatchBuilder<T, R> Is<S>(Func<S, R> arm)
             where S : T
         {
-            arms.Add(new MatchArm<T, R>(v => v is S, v => arm((S)v)));
+            arms.Add(new MatchArm<T, R>(MatchBuilder<T>.IsOfType<S>, MatchAction<T>.Create(arm)));
             return this;
         }
+
+        [DebuggerStepThrough]
+        public void Any(Func<T, R> arm)
+        {
+            arms.Add(new MatchArm<T, R>(arm));
+        }
+
+        [DebuggerStepThrough]
+        public void Any(Func<R> arm)
+        {
+            arms.Add(new MatchArm<T, R>(MatchAction<T>.Create(arm)));
+        }
+
     }
 }

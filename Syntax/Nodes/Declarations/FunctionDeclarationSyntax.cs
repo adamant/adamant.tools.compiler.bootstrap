@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
     {
         public Token AccessModifier => (Token)Children.First();
         public IdentifierToken Name => Children.OfType<IdentifierToken>().Single();
-        public ParameterListSyntax Parameters => Children.OfType<ParameterListSyntax>().Single();
+        public ParameterListSyntax ParameterList => Children.OfType<ParameterListSyntax>().Single();
         public TypeSyntax ReturnType => Children.OfType<TypeSyntax>().Single();
         public BlockSyntax Body => Children.OfType<BlockSyntax>().Single();
 

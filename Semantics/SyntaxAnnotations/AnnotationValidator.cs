@@ -23,10 +23,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations
             SyntaxBranchNode node,
             SyntaxAnnotation<T> annotations)
         {
-            if (nodeTypes.Contains(node.GetType())
-                && !IsAnnotated(node, annotations))
-                // Don't use Debug.Assert() becuase it doesn't play well with the test runner
-                throw new Exception($"Node of type {node.GetType().Name} should have annotation of type {typeof(T).Name}, but doesn't");
+            var shouldBeAnnotated = nodeTypes.Contains(node.GetType());
+            var isAnnotated = IsAnnotated(node, annotations);
+            // Don't use Debug.Assert() becuase it doesn't play well with the test runner
+            if (shouldBeAnnotated && !isAnnotated)
+                throw new Exception($"Node of type {node.GetType().Name} should have annotation of type {typeof(T).GetFriendlyName()}, but doesn't.");
+            if (isAnnotated && !shouldBeAnnotated)
+                throw new Exception($"Node of type {node.GetType().Name} should NOT have annotation of type {typeof(T).GetFriendlyName()}, but does.");
+
 
             foreach (var child in node.Children)
                 if (child is SyntaxBranchNode childNode)

@@ -1,3 +1,4 @@
+using System;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols;
@@ -11,15 +12,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations
 {
     internal class Annotations
     {
-        private static readonly TypeSet<SyntaxBranchNode> NodesTypesWithSyntaxSymbols = new TypeSet<SyntaxBranchNode>();
+        private static readonly TypeSet<SyntaxBranchNode> NodesTypesWithSymbols = new TypeSet<SyntaxBranchNode>();
+        private static readonly TypeSet<SyntaxBranchNode> NodesTypesWithScopes = new TypeSet<SyntaxBranchNode>();
         private static readonly TypeSet<SyntaxBranchNode> DeclarationNodeTypes = new TypeSet<SyntaxBranchNode>();
         private static readonly AnnotationValidator Validator = new AnnotationValidator();
 
         static Annotations()
         {
-            NodesTypesWithSyntaxSymbols.Add<FunctionDeclarationSyntax>();
-            NodesTypesWithSyntaxSymbols.Add<ParameterSyntax>();
-            NodesTypesWithSyntaxSymbols.Add<CompilationUnitSyntax>();
+            NodesTypesWithSymbols.Add<FunctionDeclarationSyntax>();
+            NodesTypesWithSymbols.Add<ParameterSyntax>();
+            NodesTypesWithSymbols.Add<CompilationUnitSyntax>();
+
+            NodesTypesWithScopes.Add<CompilationUnitSyntax>();
+            NodesTypesWithScopes.Add<FunctionDeclarationSyntax>();
 
             DeclarationNodeTypes.Add<FunctionDeclarationSyntax>();
             DeclarationNodeTypes.Add<ParameterSyntax>();
@@ -28,8 +33,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations
 
         private readonly PackageSyntax package;
         private readonly SyntaxAnnotation<ISyntaxSymbol> symbols;
-        private readonly SyntaxAnnotation<DataType> types = new SyntaxAnnotation<DataType>();
+        private readonly SyntaxAnnotation<DataType> oldTypes = new SyntaxAnnotation<DataType>();
         private readonly SyntaxAnnotation<NameScope> scopes = new SyntaxAnnotation<NameScope>();
+        private readonly SyntaxAnnotation<Lazy<DataType>> types = new SyntaxAnnotation<Lazy<DataType>>();
 
         public Annotations(PackageSyntax package, SyntaxAnnotation<ISyntaxSymbol> symbols)
         {
@@ -37,26 +43,46 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations
             this.package = package;
         }
 
-        public DataType Type(SyntaxBranchNode syntax)
-        {
-            return types[syntax];
-        }
-
+        #region Validations
         public void ValidateSymbolsAnnotations()
         {
-            Validator.AssertNodesAreAnnotated(NodesTypesWithSyntaxSymbols, package, symbols);
+            Validator.AssertNodesAreAnnotated(NodesTypesWithSymbols, package, symbols);
         }
 
-        public void ValidateAnnotations()
+        public void ValidateNameScopeAnnotations()
+        {
+            Validator.AssertNodesAreAnnotated(NodesTypesWithScopes, package, scopes);
+        }
+
+        public void ValidateOldTypeAnnotations()
+        {
+            Validator.AssertNodesAreAnnotated(DeclarationNodeTypes, package, oldTypes);
+        }
+
+        public void ValidateTypeAnnotations()
         {
             Validator.AssertNodesAreAnnotated(DeclarationNodeTypes, package, types);
+        }
+        #endregion
+
+        #region Add
+        public void Add(SyntaxBranchNode syntax, NameScope scope)
+        {
+            scopes.Add(syntax, scope);
         }
 
         public void Add(SyntaxBranchNode syntax, DataType type)
         {
-            types.Add(syntax, type);
+            oldTypes.Add(syntax, type);
         }
 
+        internal void Add(SyntaxBranchNode syntax, Lazy<DataType> type)
+        {
+            types.Add(syntax, type);
+        }
+        #endregion
+
+        #region Get
         public ISyntaxSymbol Symbol(SyntaxBranchNode syntax)
         {
             return symbols[syntax];
@@ -72,9 +98,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations
             return (IGlobalNamespaceSyntaxSymbol)symbols[syntax];
         }
 
-        public void Add(SyntaxBranchNode syntax, NameScope scope)
+        public DataType Type(SyntaxBranchNode syntax)
         {
-            scopes.Add(syntax, scope);
+            return oldTypes[syntax];
         }
+        #endregion
     }
 }
