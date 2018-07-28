@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
@@ -34,7 +35,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                     foreach (var parameter in f.ParameterList.Parameters)
                         BindParameter(parameter);
                     Bind(f.ReturnType);
-                }));
+                })
+            // TODO varible declarations syntax needs checked
+            // TODO for loop syntax needs checked
+            // TODO if let syntax needs checked
+            );
         }
 
         private void BindParameter(ParameterSyntax parameter)
@@ -48,31 +53,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             Match.On(type).With(m => m
                .Is<PrimitiveTypeSyntax>(p =>
                {
-                   AddTypeAnnotation(p, GetType);
+                   AddTypeAnnotation(p, PrimitiveType.New(p.Keyword.Kind));
                }));
         }
         #endregion
 
+        #region AddTypeAnnotation
         private void AddTypeAnnotation<T>(T syntax, Func<T, DataType> getType)
             where T : SyntaxBranchNode
         {
             annotations.Add(syntax, new Lazy<DataType>(() => getType(syntax)));
         }
 
-        #region Get Type
-        private DataType GetType(FunctionDeclarationSyntax functionDeclaration)
+        private void AddTypeAnnotation<T>(T syntax, DataType type)
+            where T : SyntaxBranchNode
         {
-            throw new NotImplementedException();
+            annotations.Add(syntax, new Lazy<DataType>(type));
+        }
+        #endregion
+
+        #region Get Type
+        private DataType GetType(FunctionDeclarationSyntax function)
+        {
+            var parameterTypes = function.ParameterList.Parameters.Select(p => annotations.Type(p));
+            var returnType = annotations.Type(function.ReturnType);
+            return new FunctionType(parameterTypes, returnType);
         }
 
         private DataType GetType(ParameterSyntax parameter)
         {
-            throw new NotImplementedException();
-        }
-
-        private DataType GetType(PrimitiveTypeSyntax primitiveType)
-        {
-            throw new NotImplementedException();
+            return annotations.Type(parameter.Type);
         }
         #endregion
     }

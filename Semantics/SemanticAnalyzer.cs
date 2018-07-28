@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Analayze;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
@@ -21,10 +20,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             BuildNameScopes(package, annotations);
 
             BindTypeBuilders(package, annotations);
-
-            BindDeclarations(package, annotations);
-
-            annotations.ValidateOldTypeAnnotations();
 
             var compilationUnits = package.SyntaxTrees
 #if RELEASE
@@ -58,11 +53,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             var typeBuilder = new TypeBuilder(annotations);
             Parallel.ForEach(package.SyntaxTrees.Select(t => t.Root), typeBuilder.BindBuilders);
             annotations.ValidateTypeAnnotations();
-        }
-
-        private static void BindDeclarations(PackageSyntax package, Annotations annotations)
-        {
-            new DeclarationBinder(annotations).BindDeclarations(package);
         }
 
         private static CompilationUnit Analyze(CompilationUnitSyntax compilationUnit, Annotations annotations)

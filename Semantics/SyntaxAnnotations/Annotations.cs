@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations
     {
         private static readonly TypeSet<SyntaxBranchNode> NodesTypesWithSymbols = new TypeSet<SyntaxBranchNode>();
         private static readonly TypeSet<SyntaxBranchNode> NodesTypesWithScopes = new TypeSet<SyntaxBranchNode>();
-        private static readonly TypeSet<SyntaxBranchNode> DeclarationNodeTypes = new TypeSet<SyntaxBranchNode>();
+        private static readonly TypeSet<SyntaxBranchNode> NodeTypesWithDataTypes = new TypeSet<SyntaxBranchNode>();
         private static readonly AnnotationValidator Validator = new AnnotationValidator();
 
         static Annotations()
@@ -26,9 +26,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations
             NodesTypesWithScopes.Add<CompilationUnitSyntax>();
             NodesTypesWithScopes.Add<FunctionDeclarationSyntax>();
 
-            DeclarationNodeTypes.Add<FunctionDeclarationSyntax>();
-            DeclarationNodeTypes.Add<ParameterSyntax>();
-            DeclarationNodeTypes.Add<PrimitiveTypeSyntax>();
+            NodeTypesWithDataTypes.Add<FunctionDeclarationSyntax>();
+            NodeTypesWithDataTypes.Add<ParameterSyntax>();
+            NodeTypesWithDataTypes.Add<PrimitiveTypeSyntax>();
         }
 
         private readonly PackageSyntax package;
@@ -54,14 +54,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations
             Validator.AssertNodesAreAnnotated(NodesTypesWithScopes, package, scopes);
         }
 
-        public void ValidateOldTypeAnnotations()
-        {
-            Validator.AssertNodesAreAnnotated(DeclarationNodeTypes, package, oldTypes);
-        }
-
         public void ValidateTypeAnnotations()
         {
-            Validator.AssertNodesAreAnnotated(DeclarationNodeTypes, package, types);
+            Validator.AssertNodesAreAnnotated(NodeTypesWithDataTypes, package, types);
         }
         #endregion
 
@@ -100,7 +95,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations
 
         public DataType Type(SyntaxBranchNode syntax)
         {
-            return oldTypes[syntax];
+            //return oldTypes[syntax];
+            return types[syntax].Value;
         }
         #endregion
     }
