@@ -66,7 +66,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
                                 break;
                             case Name _:
                             case DataType _:
-                                Assert.Equal(expected, actual.ToString());
+                                Assert.Equal(expected.ToObject<string>(), actual.ToString());
                                 break;
                             default:
                                 Assert.Equal(expected.ToObject(actual.GetType()), actual);

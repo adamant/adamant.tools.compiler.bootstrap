@@ -8,6 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Types;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using DataType = Adamant.Tools.Compiler.Bootstrap.Semantics.Types.DataType;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
@@ -46,6 +47,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             var rightOperandType = annotations.Type(binaryOperatorExpression.RightOperand);
             if (leftOperandType != rightOperandType)
                 throw new Exception("oparands to binary operator do not have same type"); // TODO give  a proper compiler error
+            if (binaryOperatorExpression.Operator.Kind == TokenKind.Plus
+                && leftOperandType == PrimitiveType.Bool)
+                return DataType.Unknown; // TODO add a compiler error
+
             return leftOperandType;
         }
 
