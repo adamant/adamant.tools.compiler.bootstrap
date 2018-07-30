@@ -11,10 +11,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
         /// Variables can be redeclared, so for a variable that is declared multiple
         /// times within a function scope, each declaration is given a unique
         /// declaration number starting with 1. Symbols with a single declaration
-        /// have a declaration number of 0. Note that partial class declarations
+        /// have a null declaration number. Note that partial class declarations
         /// are not redeclarations and are given a single symbol with multiple declarations
         /// </summary>
-        int DeclarationNumber { get; }
+        int? DeclarationNumber { get; }
 
         IReadOnlyList<ISyntaxSymbol> Children { get; }
 

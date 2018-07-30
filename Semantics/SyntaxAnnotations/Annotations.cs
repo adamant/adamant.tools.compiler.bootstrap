@@ -1,62 +1,75 @@
 using System;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations
 {
-    internal class Annotations
+    public class Annotations
     {
-        private static readonly TypeSet<SyntaxBranchNode> NodesTypesWithSymbols = new TypeSet<SyntaxBranchNode>();
-        private static readonly TypeSet<SyntaxBranchNode> NodesTypesWithScopes = new TypeSet<SyntaxBranchNode>();
+        private static readonly TypeSet<SyntaxBranchNode> NodeTypesWithSymbols = new TypeSet<SyntaxBranchNode>();
+        private static readonly TypeSet<SyntaxBranchNode> NodeTypesWithScopes = new TypeSet<SyntaxBranchNode>();
         private static readonly TypeSet<SyntaxBranchNode> NodeTypesWithDataTypes = new TypeSet<SyntaxBranchNode>();
+        private static readonly TypeSet<SyntaxBranchNode> NodeTypesWithNames = new TypeSet<SyntaxBranchNode>();
         private static readonly AnnotationValidator Validator = new AnnotationValidator();
 
         static Annotations()
         {
-            NodesTypesWithSymbols.Add<FunctionDeclarationSyntax>();
-            NodesTypesWithSymbols.Add<ParameterSyntax>();
-            NodesTypesWithSymbols.Add<CompilationUnitSyntax>();
+            NodeTypesWithSymbols.Add<FunctionDeclarationSyntax>();
+            NodeTypesWithSymbols.Add<ParameterSyntax>();
+            NodeTypesWithSymbols.Add<CompilationUnitSyntax>();
 
-            NodesTypesWithScopes.Add<CompilationUnitSyntax>();
-            NodesTypesWithScopes.Add<FunctionDeclarationSyntax>();
+            NodeTypesWithScopes.Add<CompilationUnitSyntax>();
+            NodeTypesWithScopes.Add<FunctionDeclarationSyntax>();
+            NodeTypesWithScopes.Add<IdentifierNameSyntax>();
+            NodeTypesWithScopes.Add<ParameterSyntax>();
 
             NodeTypesWithDataTypes.Add<FunctionDeclarationSyntax>();
             NodeTypesWithDataTypes.Add<ParameterSyntax>();
             NodeTypesWithDataTypes.Add<PrimitiveTypeSyntax>();
+
+            NodeTypesWithNames.Add<PackageSyntax>();
+            NodeTypesWithNames.Add<IdentifierNameSyntax>();
+            NodeTypesWithNames.Add<ParameterSyntax>();
+            NodeTypesWithNames.Add<FunctionDeclarationSyntax>();
+            NodeTypesWithNames.Add<CompilationUnitSyntax>();
         }
 
-        private readonly PackageSyntax package;
+        public PackageSyntax Package { get; }
         private readonly SyntaxAnnotation<ISyntaxSymbol> symbols;
         private readonly SyntaxAnnotation<DataType> oldTypes = new SyntaxAnnotation<DataType>();
         private readonly SyntaxAnnotation<NameScope> scopes = new SyntaxAnnotation<NameScope>();
         private readonly SyntaxAnnotation<Lazy<DataType>> types = new SyntaxAnnotation<Lazy<DataType>>();
+        private readonly SyntaxAnnotation<Lazy<Name>> names = new SyntaxAnnotation<Lazy<Name>>();
 
         public Annotations(PackageSyntax package, SyntaxAnnotation<ISyntaxSymbol> symbols)
         {
             this.symbols = symbols;
-            this.package = package;
+            Package = package;
         }
 
         #region Validations
         public void ValidateSymbolsAnnotations()
         {
-            Validator.AssertNodesAreAnnotated(NodesTypesWithSymbols, package, symbols);
+            Validator.AssertNodesAreAnnotated(NodeTypesWithSymbols, Package, symbols);
         }
 
         public void ValidateNameScopeAnnotations()
         {
-            Validator.AssertNodesAreAnnotated(NodesTypesWithScopes, package, scopes);
+            Validator.AssertNodesAreAnnotated(NodeTypesWithScopes, Package, scopes);
         }
 
-        public void ValidateTypeAnnotations()
+        public void ValidateAnnotationBindings()
         {
-            Validator.AssertNodesAreAnnotated(NodeTypesWithDataTypes, package, types);
+            Validator.AssertNodesAreAnnotated(NodeTypesWithDataTypes, Package, types);
+            Validator.AssertNodesAreAnnotated(NodeTypesWithNames, Package, names);
         }
         #endregion
 
@@ -71,9 +84,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations
             oldTypes.Add(syntax, type);
         }
 
-        internal void Add(SyntaxBranchNode syntax, Lazy<DataType> type)
+        public void Add(SyntaxBranchNode syntax, Lazy<DataType> type)
         {
             types.Add(syntax, type);
+        }
+
+        public void Add(SyntaxBranchNode syntax, Lazy<Name> name)
+        {
+            names.Add(syntax, name);
         }
         #endregion
 
@@ -93,10 +111,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations
             return (IGlobalNamespaceSyntaxSymbol)symbols[syntax];
         }
 
+        public NameScope Scope(SyntaxBranchNode syntax)
+        {
+            return scopes[syntax];
+        }
+
         public DataType Type(SyntaxBranchNode syntax)
         {
-            //return oldTypes[syntax];
             return types[syntax].Value;
+        }
+
+        public Name Name(SyntaxBranchNode syntax)
+        {
+            return names[syntax].Value;
         }
         #endregion
     }

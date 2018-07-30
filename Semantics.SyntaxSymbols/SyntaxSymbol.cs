@@ -4,11 +4,10 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
 {
-
     internal abstract class SyntaxSymbol : ISyntaxSymbol
     {
         public string Name { get; }
-        public int DeclarationNumber { get; }
+        public int? DeclarationNumber { get; }
 
         private readonly List<SyntaxSymbol> children = new List<SyntaxSymbol>();
         public IReadOnlyList<SyntaxSymbol> Children { get; }
@@ -46,6 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
         protected SyntaxSymbol(string name)
             : base(name)
         {
+            Declarations = declarations.AsReadOnly();
         }
 
         protected SyntaxSymbol(

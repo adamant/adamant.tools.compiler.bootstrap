@@ -7,6 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Newtonsoft.Json.Linq;
@@ -57,10 +58,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
                         Assert.Equal(expected.ToObject<bool>(), actual);
                         break;
                     case JTokenType.String:
-                        if (actual is string actualString)
-                            Assert.Equal(expected.ToObject<string>(), actualString);
-                        else
-                            Assert.Equal(expected.ToObject(actual.GetType()), actual);
+                        switch (actual)
+                        {
+                            case string actualString:
+                                Assert.Equal(expected.ToObject<string>(), actualString);
+                                break;
+                            case Name _:
+                            case Type _:
+                                Assert.Equal(expected, actual.ToString());
+                                break;
+                            default:
+                                Assert.Equal(expected.ToObject(actual.GetType()), actual);
+                                break;
+                        }
                         break;
                     case JTokenType.Array:
                         var expectedObjects = expected.ToObject<JObject[]>();

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions;
@@ -91,7 +92,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         {
             return MatchInto<Expression>.On(expression).With(m => m
                 .Is<BinaryOperatorExpressionSyntax>(Build)
-                .Is<IdentifierNameSyntax>(i => new VariableExpression(i))
+                .Is<IdentifierNameSyntax>(i => new VariableExpression(i, (VariableName)annotations.Name(i)))
                 .Is<ReturnExpressionSyntax>(r => new ReturnExpression(r, Build(r.Expression)))
             );
         }
