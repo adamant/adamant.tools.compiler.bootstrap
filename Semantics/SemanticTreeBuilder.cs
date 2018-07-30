@@ -104,7 +104,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             switch (expression.Operator.Kind)
             {
                 case TokenKind.Plus:
-                    return new AddExpression(expression, leftOperand, rightOperand);
+                    return new AddExpression(expression, leftOperand, rightOperand, annotations.Type(expression));
                 default:
                     throw new InvalidEnumArgumentException(expression.Operator.Kind.ToString());
             }

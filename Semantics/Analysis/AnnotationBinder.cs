@@ -84,6 +84,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                 })
                 .Is<BinaryOperatorExpressionSyntax>(binOp =>
                 {
+                    AnnotateType(binOp, typeChecker.GetType);
                     Bind(binOp.LeftOperand);
                     Bind(binOp.RightOperand);
                 })

@@ -10,16 +10,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions
         public new IdentifierNameSyntax Syntax { get; }
         public string Name => Syntax.Identifier.Text;
         public VariableName VariableName { get; }
-        public DataType Type { get; }
 
         public VariableExpression(
             IdentifierNameSyntax syntax,
             VariableName variableName,
             DataType type)
+            : base(type)
         {
             Syntax = syntax;
             VariableName = variableName;
-            Type = type;
         }
 
         protected override SyntaxNode GetSyntax()

@@ -7,6 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Types;
 
@@ -35,6 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations
             NodeTypesWithDataTypes.Add<ParameterSyntax>();
             NodeTypesWithDataTypes.Add<PrimitiveTypeSyntax>();
             NodeTypesWithDataTypes.Add<IdentifierNameSyntax>();
+            NodeTypesWithDataTypes.Add<BinaryOperatorExpressionSyntax>();
 
             NodeTypesWithNames.Add<PackageSyntax>();
             NodeTypesWithNames.Add<IdentifierNameSyntax>();
