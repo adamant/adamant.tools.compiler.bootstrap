@@ -1,4 +1,5 @@
 using System;
+using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Xunit.Abstractions;
 

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
+using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
@@ -261,7 +262,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 
             void NewError(DiagnosticLevel level, string message)
             {
-                tokenDiagnosticInfos.Add(new DiagnosticInfo(level, DiagnosticPhase.Lexing, message));
+                tokenDiagnosticInfos.Add(Error.LexError(level, message));
             }
 
             StringLiteralToken LexString()
@@ -352,7 +353,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                 return token;
             }
         }
-
 
         private static bool IsIdentiferStartCharacter(char c)
         {

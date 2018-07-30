@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
+using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 
@@ -41,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         {
             Requires.That(nameof(kind), kind != TokenKind.StringLiteral);
             Requires.That(nameof(kind), kind != TokenKind.Identifier);
-            var diagnostic = new DiagnosticInfo(DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, $"Missing token of kind {kind}");
+            var diagnostic = Error.MissingToken(kind);
             return new Token(code, new TextSpan(start, 0), kind, true, diagnostic.Yield());
         }
 

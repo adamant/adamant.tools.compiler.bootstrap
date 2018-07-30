@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
@@ -53,6 +54,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             {
                 var expected = property.Value;
                 var actual = GetProperty(value, property.Name.Replace("_", ""));
+                if (actual is IEnumerable<DiagnosticInfo> diagnostics)
+                {
+                    Assert.Equal(expected.ToObject<int[]>().OrderBy(x => x), diagnostics.Select(d => d.ErrorCode).OrderBy(x => x));
+                    return;
+                }
                 switch (expected.Type)
                 {
                     case JTokenType.Boolean:

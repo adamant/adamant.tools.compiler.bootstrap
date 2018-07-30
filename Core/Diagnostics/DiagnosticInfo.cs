@@ -6,9 +6,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics
     {
         public readonly DiagnosticLevel Level;
         public readonly DiagnosticPhase Phase;
+        public readonly int ErrorCode;
         public readonly string Message;
 
-        public DiagnosticInfo(DiagnosticLevel level, DiagnosticPhase phase, string message)
+        internal DiagnosticInfo(DiagnosticLevel level, DiagnosticPhase phase, int errorCode, string message)
         {
             if (string.IsNullOrWhiteSpace(message))
                 throw new ArgumentException("message", nameof(message));
@@ -17,6 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics
             Requires.ValidEnum(nameof(phase), phase);
             Level = level;
             Phase = phase;
+            ErrorCode = errorCode;
             Message = message;
         }
     }
