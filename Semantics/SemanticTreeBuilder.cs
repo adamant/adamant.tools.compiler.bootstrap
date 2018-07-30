@@ -92,7 +92,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         {
             return MatchInto<Expression>.On(expression).With(m => m
                 .Is<BinaryOperatorExpressionSyntax>(Build)
-                .Is<IdentifierNameSyntax>(i => new VariableExpression(i, (VariableName)annotations.Name(i)))
+                .Is<IdentifierNameSyntax>(i => new VariableExpression(i, (VariableName)annotations.Name(i), annotations.Type(i)))
                 .Is<ReturnExpressionSyntax>(r => new ReturnExpression(r, Build(r.Expression)))
             );
         }

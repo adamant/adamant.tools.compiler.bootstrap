@@ -28,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
                 }
             }
 
-            throw new NonExhaustiveMatchException(value?.GetType()?.Name);
+            throw NonExhaustiveMatchException.For(value);
         }
     }
 
@@ -54,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
                     return arm.Action(value);
             }
 
-            throw new NonExhaustiveMatchException($"Matching value of type {value?.GetType().FullName}");
+            throw NonExhaustiveMatchException.For(value);
         }
     }
 }

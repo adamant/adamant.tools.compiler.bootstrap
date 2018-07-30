@@ -24,8 +24,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         internal AnnotationBinder(Annotations annotations)
         {
             this.annotations = annotations;
-            this.typeChecker = new TypeChecker(annotations);
-            this.nameBinder = new NameBinder(annotations);
+            typeChecker = new TypeChecker(annotations);
+            nameBinder = new NameBinder(annotations);
         }
 
         /// This doesn't actually compute the types etc, rather it associates
@@ -87,7 +87,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                     Bind(binOp.LeftOperand);
                     Bind(binOp.RightOperand);
                 })
-                .Is<IdentifierNameSyntax>(n => AnnotateName(n, nameBinder.GetName)));
+                .Is<IdentifierNameSyntax>(n =>
+                {
+                    AnnotateName(n, nameBinder.GetName);
+                    AnnotateType(n, typeChecker.GetType);
+                }));
         }
 
         private void BindParameter(ParameterSyntax parameter)

@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
     [Serializable]
-    internal class NonExhaustiveMatchException : Exception
+    public class NonExhaustiveMatchException : Exception
     {
         public NonExhaustiveMatchException()
         {
@@ -23,6 +23,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         protected NonExhaustiveMatchException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
+        }
+
+
+        public static NonExhaustiveMatchException For(object value)
+        {
+            return new NonExhaustiveMatchException($"Matching value of type {value?.GetType().FullName}");
         }
     }
 }

@@ -34,6 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations
             NodeTypesWithDataTypes.Add<FunctionDeclarationSyntax>();
             NodeTypesWithDataTypes.Add<ParameterSyntax>();
             NodeTypesWithDataTypes.Add<PrimitiveTypeSyntax>();
+            NodeTypesWithDataTypes.Add<IdentifierNameSyntax>();
 
             NodeTypesWithNames.Add<PackageSyntax>();
             NodeTypesWithNames.Add<IdentifierNameSyntax>();

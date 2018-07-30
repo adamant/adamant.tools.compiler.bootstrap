@@ -8,6 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Newtonsoft.Json.Linq;
@@ -64,7 +65,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
                                 Assert.Equal(expected.ToObject<string>(), actualString);
                                 break;
                             case Name _:
-                            case Type _:
+                            case DataType _:
                                 Assert.Equal(expected, actual.ToString());
                                 break;
                             default:
