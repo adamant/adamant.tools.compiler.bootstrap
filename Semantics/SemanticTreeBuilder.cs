@@ -34,7 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public CompilationUnit Build(CompilationUnitSyntax compilationUnit)
         {
             var declarations = compilationUnit.Declarations.Select(Build);
-            return new CompilationUnit(compilationUnit, declarations);
+            return new CompilationUnit(compilationUnit, declarations, annotations.Diagnostics(compilationUnit));
         }
 
         private Declaration Build(DeclarationSyntax declaration)
@@ -47,7 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                     var parameters = Build(f.ParameterList);
                     var returnType = Build(f.ReturnType);
                     var body = Build(f.Body);
-                    return new FunctionDeclaration(f, access, name, parameters, returnType, body);//TODO pass them into the constructor
+                    return new FunctionDeclaration(f, annotations.Diagnostics(f), access, name, parameters, returnType, body);//TODO pass them into the constructor
                 }));
         }
 
@@ -65,26 +65,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         private IEnumerable<Parameter> Build(ParameterListSyntax parameterList)
         {
             return parameterList.Parameters
-                .Select(p => new Parameter(p, p.VarKeyword != null, p.Identifier.Value, Build(p.Type)))
+                .Select(p => new Parameter(p, annotations.Diagnostics(p), p.VarKeyword != null, p.Identifier.Value, Build(p.Type)))
                 .ToList();
         }
 
         private TypeName Build(TypeSyntax type)
         {
-            return new TypeName(type, annotations.Type(type));
+            return new TypeName(type, annotations.Diagnostics(type), annotations.Type(type));
         }
 
         private Block Build(BlockSyntax block)
         {
             var statements = block.Statements.Select(Build);
-            return new Block(block, statements);
+            return new Block(block, annotations.Diagnostics(block), statements);
         }
 
         private Statement Build(StatementSyntax statement)
         {
             return MatchInto<Statement>.On(statement).With(m => m
                 .Is<BlockSyntax>(Build)
-                .Is<ExpressionStatementSyntax>(es => new ExpressionStatement(es, Build(es.Expression)))
+                .Is<ExpressionStatementSyntax>(es => new ExpressionStatement(es, annotations.Diagnostics(statement), Build(es.Expression)))
             );
         }
 
@@ -92,8 +92,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         {
             return MatchInto<Expression>.On(expression).With(m => m
                 .Is<BinaryOperatorExpressionSyntax>(Build)
-                .Is<IdentifierNameSyntax>(i => new VariableExpression(i, (VariableName)annotations.Name(i), annotations.Type(i)))
-                .Is<ReturnExpressionSyntax>(r => new ReturnExpression(r, Build(r.Expression)))
+                .Is<IdentifierNameSyntax>(i => new VariableExpression(i, annotations.Diagnostics(expression), (VariableName)annotations.Name(i), annotations.Type(i)))
+                .Is<ReturnExpressionSyntax>(r => new ReturnExpression(r, annotations.Diagnostics(expression), Build(r.Expression)))
             );
         }
 
@@ -104,11 +104,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             switch (expression.Operator.Kind)
             {
                 case TokenKind.Plus:
-                    return new AddExpression(expression, leftOperand, rightOperand, annotations.Type(expression));
+                    return new AddExpression(expression, annotations.Diagnostics(expression), leftOperand, rightOperand, annotations.Type(expression));
                 default:
                     throw new InvalidEnumArgumentException(expression.Operator.Kind.ToString());
             }
-
         }
     }
 }

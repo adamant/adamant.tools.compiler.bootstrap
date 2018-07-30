@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
@@ -17,11 +18,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations
 
         public FunctionDeclaration(
             FunctionDeclarationSyntax syntax,
+            IEnumerable<DiagnosticInfo> diagnostics,
             AccessLevel access,
             string name,
             IEnumerable<Parameter> parameters,
             TypeName returnType,
             Block body)
+            : base(diagnostics)
         {
             Syntax = syntax;
             Access = access;

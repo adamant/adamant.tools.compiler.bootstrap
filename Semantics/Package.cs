@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
@@ -15,7 +16,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         // References
         // Symbol
 
-        public Package(PackageSyntax syntax, IEnumerable<CompilationUnit> compilationUnits, FunctionDeclaration entryPoint)
+        public Package(
+            PackageSyntax syntax,
+            IEnumerable<DiagnosticInfo> diagnostics,
+            IEnumerable<CompilationUnit> compilationUnits,
+            FunctionDeclaration entryPoint)
+            : base(diagnostics)
         {
             CompilationUnits = compilationUnits.ToList().AsReadOnly();
             Syntax = syntax;

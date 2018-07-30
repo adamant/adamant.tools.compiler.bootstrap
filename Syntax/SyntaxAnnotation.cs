@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Concurrent;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 
@@ -17,6 +18,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         public bool TryGetValue(SyntaxBranchNode syntax, out TValue value)
         {
             return annotations.TryGetValue(syntax, out value);
+        }
+
+        public TValue GetOrAdd(SyntaxBranchNode syntax, Func<SyntaxBranchNode, TValue> valueFactory)
+        {
+            return annotations.GetOrAdd(syntax, valueFactory);
         }
     }
 }

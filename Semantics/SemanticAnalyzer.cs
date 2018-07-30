@@ -28,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                 .ToList();
 
             var entryPoint = FindEntryPoint(compilationUnits);
-            return new Package(package, compilationUnits, entryPoint);
+            return new Package(package, annotations.Diagnostics(package), compilationUnits, entryPoint);
         }
 
         private static Annotations BuildSyntaxSymbols(PackageSyntax package)

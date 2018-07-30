@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
@@ -47,7 +49,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations
 
         public PackageSyntax Package { get; }
         private readonly SyntaxAnnotation<ISyntaxSymbol> symbols;
-        private readonly SyntaxAnnotation<DataType> oldTypes = new SyntaxAnnotation<DataType>();
+        private readonly SyntaxAnnotation<List<DiagnosticInfo>> diagnostics = new SyntaxAnnotation<List<DiagnosticInfo>>();
         private readonly SyntaxAnnotation<NameScope> scopes = new SyntaxAnnotation<NameScope>();
         private readonly SyntaxAnnotation<Lazy<DataType>> types = new SyntaxAnnotation<Lazy<DataType>>();
         private readonly SyntaxAnnotation<Lazy<Name>> names = new SyntaxAnnotation<Lazy<Name>>();
@@ -77,14 +79,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations
         #endregion
 
         #region Add
+
+        public void Add(SyntaxBranchNode syntax, DiagnosticInfo diagnostic)
+        {
+            // TODO this list isn't thread safe
+            diagnostics.GetOrAdd(syntax, _ => new List<DiagnosticInfo>())
+                .Add(diagnostic);
+        }
+
         public void Add(SyntaxBranchNode syntax, NameScope scope)
         {
             scopes.Add(syntax, scope);
-        }
-
-        public void Add(SyntaxBranchNode syntax, DataType type)
-        {
-            oldTypes.Add(syntax, type);
         }
 
         public void Add(SyntaxBranchNode syntax, Lazy<DataType> type)
@@ -112,6 +117,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations
         public IGlobalNamespaceSyntaxSymbol Symbol(CompilationUnitSyntax syntax)
         {
             return (IGlobalNamespaceSyntaxSymbol)symbols[syntax];
+        }
+
+        public IReadOnlyCollection<DiagnosticInfo> Diagnostics(SyntaxBranchNode syntax)
+        {
+            return diagnostics.GetOrAdd(syntax, _ => new List<DiagnosticInfo>());
         }
 
         public NameScope Scope(SyntaxBranchNode syntax)
