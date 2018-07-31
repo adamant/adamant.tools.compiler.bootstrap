@@ -1,10 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Grammars;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxAnnotations;
@@ -15,22 +12,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
     public class SemanticAnalyzer
     {
-        private static readonly Lazy<AttributeGrammar> Grammar = new Lazy<AttributeGrammar>(BuildGrammar);
-
-        public static AttributeGrammar BuildGrammar()
-        {
-            var grammar = new AttributeGrammar();
-            ChildrenGrammar.Build(grammar);
-            SemanticNodeTypeGrammar.Build(grammar);
-            TypeGrammar.Build(grammar);
-            return grammar;
-        }
-
         public Package Analyze(PackageSyntax package)
         {
-            var grammar = Grammar.Value;
-            var f = grammar.ApplyTo(package);
-
             var annotations = BuildSyntaxSymbols(package);
 
             BuildNameScopes(package, annotations);
