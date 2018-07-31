@@ -8,7 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 {
     public class NameScopeBuilder
     {

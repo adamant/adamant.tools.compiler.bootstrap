@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Names;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 {
     public class NameBinder
     {

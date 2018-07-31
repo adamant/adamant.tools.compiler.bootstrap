@@ -44,11 +44,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{8D74A93C-C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Semantics.SyntaxSymbols", "Semantics.SyntaxSymbols\Semantics.SyntaxSymbols.csproj", "{1E4BFF1E-6630-4C7C-AD9E-9E3FF6F582C3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Semantics.Names", "Semantics.Names\Semantics.Names.csproj", "{73B6E2FE-401C-419F-AA6D-0B0745CD71D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Semantics.Names", "Semantics.Names\Semantics.Names.csproj", "{73B6E2FE-401C-419F-AA6D-0B0745CD71D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Semantics.Types", "Semantics.Types\Semantics.Types.csproj", "{E4E6E6BD-0FDC-4323-97CF-9D72CCB6350A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Semantics.Types", "Semantics.Types\Semantics.Types.csproj", "{E4E6E6BD-0FDC-4323-97CF-9D72CCB6350A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Syntax", "Core.Syntax\Core.Syntax.csproj", "{8921ADA4-C0A9-471D-94C3-8DE1EA6276A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Syntax", "Core.Syntax\Core.Syntax.csproj", "{8921ADA4-C0A9-471D-94C3-8DE1EA6276A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

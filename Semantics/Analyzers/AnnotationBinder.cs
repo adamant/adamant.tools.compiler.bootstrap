@@ -13,7 +13,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Types;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 {
     public class AnnotationBinder
     {
