@@ -6,6 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
     public class PackageSyntax : SyntaxBranchNode
     {
         public IReadOnlyList<SyntaxTree<CompilationUnitSyntax>> SyntaxTrees { get; }
+        public IEnumerable<CompilationUnitSyntax> CompilationUnits => Children.Cast<CompilationUnitSyntax>();
 
         public PackageSyntax(ICollection<SyntaxTree<CompilationUnitSyntax>> syntaxTrees)
             : base(syntaxTrees.Select(t => t.Root))

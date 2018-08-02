@@ -14,6 +14,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
     {
         public Package Analyze(PackageSyntax package)
         {
+            //var attributes = new Attributes(package);
+            //var packageSymbol = attributes.SyntaxSymbol.Package;
+            //var packageName = attributes.Name[package];
+            //var packageSemantics = attributes.Node[package];
+
+
             var annotations = BuildSyntaxSymbols(package);
 
             BuildNameScopes(package, annotations);
@@ -28,7 +34,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                 .ToList();
 
             var entryPoint = FindEntryPoint(compilationUnits);
-            return new Package(package, annotations.Diagnostics(package), compilationUnits, entryPoint);
+            var oldPackageSemantics = new Package(package, annotations.Diagnostics(package), compilationUnits, entryPoint);
+            //return packageSemantics;
+            return oldPackageSemantics;
         }
 
         private static Annotations BuildSyntaxSymbols(PackageSyntax package)
