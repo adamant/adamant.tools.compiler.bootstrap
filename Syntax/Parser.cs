@@ -47,13 +47,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             var children = NewChildList();
             children.Add(ParseAccessModifier(tokens));
 
-            // Function Declaration
-            children.Add(tokens.Expect(TokenKind.Identifier));
-            children.Add(ParseParameterList(tokens));
-            children.Add(tokens.Expect(TokenKind.RightArrow));
-            children.Add(ParseType(tokens));
-            children.Add(ParseBlock(tokens));
-            return new FunctionDeclarationSyntax(children);
+            switch (tokens.Current.Kind)
+            {
+                case TokenKind.ClassKeyword:
+                    children.Add(tokens.Expect(TokenKind.ClassKeyword));
+                    children.Add(tokens.Expect(TokenKind.Identifier));
+                    children.Add(tokens.Expect(TokenKind.OpenBrace));
+                    children.Add(tokens.Expect(TokenKind.CloseBrace));
+                    return new ClassDeclarationSyntax(children);
+                default:
+                    // Function Declaration
+                    children.Add(tokens.Expect(TokenKind.Identifier));
+                    children.Add(ParseParameterList(tokens));
+                    children.Add(tokens.Expect(TokenKind.RightArrow));
+                    children.Add(ParseType(tokens));
+                    children.Add(ParseBlock(tokens));
+                    return new FunctionDeclarationSyntax(children);
+            }
         }
 
         private ParameterListSyntax ParseParameterList(ITokenStream tokens)
