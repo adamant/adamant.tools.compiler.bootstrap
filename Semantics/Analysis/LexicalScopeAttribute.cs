@@ -16,17 +16,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         {
         }
 
+        public LexicalScope this[SyntaxBranchNode s] => Get(s);
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LexicalScope Get(SyntaxBranchNode syntax)
         {
-            return Attributes.Get(syntax, Key, Compute);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private TNameScope Get<TNameScope>(SyntaxBranchNode syntax)
-            where TNameScope : LexicalScope
-        {
-            return (TNameScope)Attributes.Get(syntax, Key, Compute);
+            return Attributes.GetOrAdd(syntax, Key, Compute);
         }
 
         private LexicalScope Compute(SyntaxBranchNode syntax)

@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SyntaxSymbol Get(PackageSyntax syntax)
         {
-            return Attributes.Get(syntax, Key, Compute);
+            return Attributes.GetOrAdd(syntax, Key, Compute);
         }
 
         private SyntaxSymbol Compute(PackageSyntax package)
@@ -44,8 +44,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
 
         private IEnumerable<SyntaxSymbol> Compute(IEnumerable<DeclarationSyntax> declarations)
         {
-            //declarations.GroupBy(d => d.)
-            throw new System.NotImplementedException();
+            return declarations.GroupBy(d => d.Name.Value).Select(g =>
+            {
+                var children = Compute(g.SelectMany(d => d.Children.OfType<DeclarationSyntax>()));
+                return new SyntaxSymbol(g.Key, g, children);
+            });
         }
     }
 }

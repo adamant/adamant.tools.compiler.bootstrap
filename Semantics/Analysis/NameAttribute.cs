@@ -28,14 +28,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Name Get(SyntaxBranchNode syntax)
         {
-            return Attributes.Get(syntax, Key, Compute);
+            return Attributes.GetOrAdd(syntax, Key, Compute);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private TName Get<TName>(SyntaxBranchNode syntax)
             where TName : Name
         {
-            return (TName)Attributes.Get(syntax, Key, Compute);
+            return (TName)Attributes.GetOrAdd(syntax, Key, Compute);
         }
 
         private Name Compute(SyntaxBranchNode syntax)
@@ -63,7 +63,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public GlobalNamespaceName GetGlobalNamespace(PackageSyntax s) => Attributes.Get(s, "GlobalNamespaceName", ComputeGlobalNamespaceName);
+        public GlobalNamespaceName GetGlobalNamespace(PackageSyntax s) => Attributes.GetOrAdd(s, "GlobalNamespaceName", ComputeGlobalNamespaceName);
 
         private GlobalNamespaceName ComputeGlobalNamespaceName(PackageSyntax package)
         {

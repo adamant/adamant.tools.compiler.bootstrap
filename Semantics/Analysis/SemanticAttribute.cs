@@ -10,6 +10,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         protected NameAttribute Name => Attributes.Name;
         protected SyntaxSymbolAttribute SyntaxSymbol => Attributes.SyntaxSymbol;
         protected LexicalScopeAttribute NameScope => Attributes.NameScope;
+        protected NodeAttribute Node => Attributes.Node;
+        protected DiagnosticsAttribute Diagnostics => Attributes.Diagnostics;
+        protected AllDiagnosticsAttribute AllDiagnostics => Attributes.AllDiagnostics;
 
         protected SemanticAttribute(SemanticAttributes attributes)
         {

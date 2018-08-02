@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
@@ -14,10 +15,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
     {
         public Package Analyze(PackageSyntax package)
         {
-            //var attributes = new Attributes(package);
-            //var packageSymbol = attributes.SyntaxSymbol.Package;
-            //var packageName = attributes.Name[package];
-            //var packageSemantics = attributes.Node[package];
+            var attributes = new SemanticAttributes(package);
+            var packageSymbol = attributes.SyntaxSymbol.Package;
+            var packageName = attributes.Name[package];
+            var packageSemantics = attributes.Node[package];
 
 
             var annotations = BuildSyntaxSymbols(package);
@@ -35,8 +36,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             var entryPoint = FindEntryPoint(compilationUnits);
             var oldPackageSemantics = new Package(package, annotations.Diagnostics(package), compilationUnits, entryPoint);
-            //return packageSemantics;
-            return oldPackageSemantics;
+            return packageSemantics;
+            //return oldPackageSemantics;
         }
 
         private static Annotations BuildSyntaxSymbols(PackageSyntax package)

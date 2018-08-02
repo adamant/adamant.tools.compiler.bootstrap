@@ -19,18 +19,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         public readonly LexicalScopeAttribute NameScope;
         public readonly SyntaxSymbolAttribute SyntaxSymbol;
         public readonly NodeAttribute Node;
+        public readonly DiagnosticsAttribute Diagnostics;
+        public readonly AllDiagnosticsAttribute AllDiagnostics;
 
         private readonly ReadOnlyDictionary<SyntaxBranchNode, ConcurrentDictionary<string, Lazy<object>>> values;
 
         public SemanticAttributes(PackageSyntax package)
         {
             Package = package;
+
             Type = new TypeAttribute(this);
             Parent = new ParentAttribute(this);
             Name = new NameAttribute(this);
             NameScope = new LexicalScopeAttribute(this);
             SyntaxSymbol = new SyntaxSymbolAttribute(this);
             Node = new NodeAttribute(this);
+            Diagnostics = new DiagnosticsAttribute(this);
+            AllDiagnostics = new AllDiagnosticsAttribute(this);
 
             values = AllBranchesWithParents(package).AsReadOnly();
         }
@@ -43,7 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         }
 
         private void AllBranchesWithParents(
-            Dictionary<SyntaxBranchNode, ConcurrentDictionary<string, Lazy<object>>> attributes,
+            IDictionary<SyntaxBranchNode, ConcurrentDictionary<string, Lazy<object>>> attributes,
             SyntaxBranchNode syntax,
             SyntaxBranchNode parentSyntax)
         {
@@ -55,7 +60,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                 AllBranchesWithParents(attributes, child, syntax);
         }
 
-        public TReturn Get<TSyntax, TReturn>(TSyntax syntax, string attribute, Func<TSyntax, TReturn> factory)
+        public TReturn GetOrAdd<TSyntax, TReturn>(TSyntax syntax, string attribute, Func<TSyntax, TReturn> factory)
             where TSyntax : SyntaxBranchNode
         {
             var lazy = values[syntax].GetOrAdd(attribute, (a, s) => new Lazy<object>(factory(s)), syntax);
@@ -68,6 +73,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                 return (TReturn)lazy.Value;
 
             throw new Exception($"No '{attribute}' for node of type {syntax.GetType().Name}");
+        }
+
+        public bool HasAttribute(SyntaxBranchNode syntax, string attribute)
+        {
+            return values[syntax].ContainsKey(attribute);
         }
     }
 }

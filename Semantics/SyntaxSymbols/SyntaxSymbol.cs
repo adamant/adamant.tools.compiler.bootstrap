@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
 {
@@ -46,6 +47,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
             IEnumerable<CompilationUnitSyntax> declarations,
             IEnumerable<SyntaxSymbol> children)
             : this(false, "", null, declarations, children)
+        {
+        }
+
+        public SyntaxSymbol(
+            string name,
+            IEnumerable<DeclarationSyntax> declarations,
+            IEnumerable<SyntaxSymbol> children)
+            : this(false, name, null, declarations, children)
         {
         }
     }

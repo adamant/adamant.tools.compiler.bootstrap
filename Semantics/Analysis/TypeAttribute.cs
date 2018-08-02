@@ -22,14 +22,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public DataType Get(SyntaxBranchNode syntax)
         {
-            return Attributes.Get(syntax, Key, Compute);
+            return Attributes.GetOrAdd(syntax, Key, Compute);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private TDataType Get<TDataType>(SyntaxBranchNode syntax)
             where TDataType : DataType
         {
-            return (TDataType)Attributes.Get(syntax, Key, Compute);
+            return (TDataType)Attributes.GetOrAdd(syntax, Key, Compute);
         }
 
         private DataType Compute(SyntaxBranchNode syntax)

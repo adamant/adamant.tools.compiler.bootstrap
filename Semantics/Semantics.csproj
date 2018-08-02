@@ -11,6 +11,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile  Update="SemanticAnalysis.*.cs" >
+      <DependentUpon>SemanticAnalysis.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Semantics.Names\Semantics.Names.csproj" />
     <ProjectReference Include="..\Semantics.SyntaxSymbols\Semantics.SyntaxSymbols.csproj" />
     <ProjectReference Include="..\Syntax\Syntax.csproj" />

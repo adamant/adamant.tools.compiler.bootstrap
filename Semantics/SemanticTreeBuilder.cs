@@ -66,7 +66,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         private IEnumerable<Parameter> Build(ParameterListSyntax parameterList)
         {
             return parameterList.Parameters
-                .Select(p => new Parameter(p, annotations.Diagnostics(p), p.VarKeyword != null, p.Identifier.Value, Build(p.Type)))
+                .Select(p => new Parameter(p, annotations.Diagnostics(p), p.VarKeyword != null, p.Name.Value, Build(p.Type)))
                 .ToList();
         }
 

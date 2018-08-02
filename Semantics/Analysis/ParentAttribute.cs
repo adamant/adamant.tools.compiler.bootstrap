@@ -18,6 +18,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         public CompilationUnitSyntax this[FunctionDeclarationSyntax s] => Get<CompilationUnitSyntax>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public SyntaxBranchNode Get(SyntaxBranchNode syntax)
+        {
+            return Attributes.Get<SyntaxBranchNode>(syntax, Key);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private TSyntax Get<TSyntax>(SyntaxBranchNode syntax)
             where TSyntax : SyntaxBranchNode
         {

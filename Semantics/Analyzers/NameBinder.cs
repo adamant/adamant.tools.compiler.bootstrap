@@ -44,13 +44,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             var scope = annotations.Scope(parameter);
             var functionSyntax = scope.Symbol.Declarations.Single();
             var parentName = (ScopeName)annotations.Name(functionSyntax);
-            return new VariableName(parentName, parameter.Identifier.Text);
+            return new VariableName(parentName, parameter.Name.Text);
         }
 
         public Name GetName(IdentifierNameSyntax identifierName)
         {
             var nameScope = annotations.Scope(identifierName);
-            var symbol = nameScope.LookupName(identifierName.Identifier.Text);
+            var symbol = nameScope.LookupName(identifierName.Name.Text);
             var declaration = symbol.Declarations.Single();
             return annotations.Name(declaration);
         }

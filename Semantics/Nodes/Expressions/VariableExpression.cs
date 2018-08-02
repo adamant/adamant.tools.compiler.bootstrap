@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions
     public class VariableExpression : Expression
     {
         public new IdentifierNameSyntax Syntax { get; }
-        public string Name => Syntax.Identifier.Text;
+        public string Name => Syntax.Name.Text;
         public VariableName VariableName { get; }
 
         public VariableExpression(

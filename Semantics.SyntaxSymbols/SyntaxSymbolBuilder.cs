@@ -47,7 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
         private static void Build(DeclarationSyntaxSymbol functionSymbol, ParameterSyntax parameter, SyntaxAnnotation<ISyntaxSymbol> symbols)
         {
             // TODO eventually we need to pay attention to redeclarations
-            var symbol = new DeclarationSyntaxSymbol(parameter.Identifier.Value, parameter);
+            var symbol = new DeclarationSyntaxSymbol(parameter.Name.Value, parameter);
             functionSymbol.AddChild(symbol);
             symbols.Add(parameter, symbol);
         }
