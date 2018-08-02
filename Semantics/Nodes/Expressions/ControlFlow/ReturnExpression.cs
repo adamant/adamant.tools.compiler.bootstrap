@@ -15,6 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.ControlFl
             ReturnExpressionSyntax syntax,
             IEnumerable<DiagnosticInfo> diagnostics,
             Expression expression)
+        // TODO take in the type rather than assuming never here (let that be semantic analysis
             : base(diagnostics, PrimitiveType.Never)
         {
             Syntax = syntax;

@@ -17,5 +17,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
         {
             Children = children.ToList().AsReadOnly();
         }
+
+        /// No guarantee of the order is made.
+        public IEnumerable<SyntaxBranchNode> DescendantBranchesAndSelf()
+        {
+            var branches = new Stack<SyntaxBranchNode>();
+            branches.Push(this);
+            while (branches.Any())
+            {
+                var branch = branches.Pop();
+                yield return branch;
+                // If we reversed the children, we would have a pre-order traversal,
+                // bu this is more efficent
+                foreach (var child in branch.Children.OfType<SyntaxBranchNode>())
+                    branches.Push(child);
+            }
+        }
     }
 }

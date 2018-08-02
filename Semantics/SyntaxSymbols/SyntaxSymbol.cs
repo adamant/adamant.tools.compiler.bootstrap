@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 
@@ -8,7 +7,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
 {
     public class SyntaxSymbol
     {
-        public bool IsPackage { get; }
         public string Name { get; }
 
         /// <summary>
@@ -25,28 +23,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
         public IReadOnlyList<SyntaxSymbol> Children { get; }
 
         protected SyntaxSymbol(
-            bool isPackage,
             string name,
             int? declarationNumber,
             IEnumerable<SyntaxBranchNode> declarations,
             IEnumerable<SyntaxSymbol> children)
         {
-            IsPackage = isPackage;
             Name = name;
             DeclarationNumber = declarationNumber;
             Declarations = declarations.ToList().AsReadOnly();
             Children = children.ToList().AsReadOnly();
         }
 
-        public SyntaxSymbol(PackageSyntax declaration, IEnumerable<SyntaxSymbol> children)
-            : this(true, "default", null, declaration.Yield(), children)
-        {
-        }
-
         public SyntaxSymbol(
             IEnumerable<CompilationUnitSyntax> declarations,
             IEnumerable<SyntaxSymbol> children)
-            : this(false, "", null, declarations, children)
+            : this("", null, declarations, children)
         {
         }
 
@@ -54,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
             string name,
             IEnumerable<DeclarationSyntax> declarations,
             IEnumerable<SyntaxSymbol> children)
-            : this(false, name, null, declarations, children)
+            : this(name, null, declarations, children)
         {
         }
     }
