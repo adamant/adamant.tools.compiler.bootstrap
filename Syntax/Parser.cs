@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
@@ -288,7 +289,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     var keyword = tokens.Consume();
                     return new PrimitiveTypeSyntax(keyword);
                 default:
-                    throw new NotImplementedException(tokens.Current.Kind.ToString());
+                    throw NonExhaustiveMatchException.For(tokens.Current);
             }
         }
 

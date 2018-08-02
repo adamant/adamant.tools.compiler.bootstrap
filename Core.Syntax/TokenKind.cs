@@ -64,6 +64,7 @@ namespace Core.Syntax
 
         // Keywords
         PublicKeyword,
+        LetKeyword,
         VarKeyword,
         VoidKeyword,
         IntKeyword,
