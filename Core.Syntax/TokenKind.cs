@@ -69,5 +69,8 @@ namespace Core.Syntax
         IntKeyword,
         BoolKeyword,
         ReturnKeyword,
+        ClassKeyword,
+        NewKeyword,
+        DeleteKeyword,
     }
 }
