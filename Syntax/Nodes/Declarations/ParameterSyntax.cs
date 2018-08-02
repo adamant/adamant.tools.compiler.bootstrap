@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using Core.Syntax;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
 {

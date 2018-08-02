@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
@@ -12,6 +11,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using Core.Syntax;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
@@ -59,9 +59,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         private ParameterListSyntax ParseParameterList(ITokenStream tokens)
         {
             var children = NewChildList();
-            children.Add(tokens.Expect(TokenKind.LeftParen));
-            children.AddRange(ParseSyntaxList(tokens, ParseParameter, TokenKind.Comma, TokenKind.RightParen));
-            children.Add(tokens.Expect(TokenKind.RightParen));
+            children.Add(tokens.Expect(TokenKind.OpenParen));
+            children.AddRange(ParseSyntaxList(tokens, ParseParameter, TokenKind.Comma, TokenKind.CloseParen));
+            children.Add(tokens.Expect(TokenKind.CloseParen));
             return new ParameterListSyntax(children);
         }
 
@@ -122,9 +122,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         private BlockSyntax ParseBlock(ITokenStream tokens)
         {
             var children = NewChildList();
-            children.Add(tokens.Expect(TokenKind.LeftBrace));
-            children.AddRange(ParseSyntaxList(tokens, ParseStatement, TokenKind.RightBrace));
-            children.Add(tokens.Expect(TokenKind.RightBrace));
+            children.Add(tokens.Expect(TokenKind.OpenBrace));
+            children.AddRange(ParseSyntaxList(tokens, ParseStatement, TokenKind.CloseBrace));
+            children.Add(tokens.Expect(TokenKind.CloseBrace));
             return new BlockSyntax(children);
         }
 
@@ -132,7 +132,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         {
             switch (tokens.Current.Kind)
             {
-                case TokenKind.LeftBrace:
+                case TokenKind.OpenBrace:
                     return ParseBlock(tokens);
                 default:
                     var children = NewChildList();
@@ -202,7 +202,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                             children.Add(tokens.Consume());
                         }
                         break;
-                    case TokenKind.LeftParen:
+                    case TokenKind.OpenParen:
                         if (minPrecendence <= OperatorPrecedence.Primary)
                         {
                             // Invocation
@@ -247,10 +247,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     if (!tokens.CurrentIs(TokenKind.Semicolon))
                         children.Add(ParseExpression(tokens));
                     return new ReturnExpressionSyntax(children);
-                case TokenKind.LeftParen:
-                    children.Add(tokens.Expect(TokenKind.LeftParen));
+                case TokenKind.OpenParen:
+                    children.Add(tokens.Expect(TokenKind.OpenParen));
                     children.Add(ParseExpression(tokens));
-                    children.Add(tokens.Expect(TokenKind.RightParen));
+                    children.Add(tokens.Expect(TokenKind.CloseParen));
                     return new ParenthesizedExpressionSyntax(children);
                 case TokenKind.Minus:
                 case TokenKind.Plus:

@@ -1,6 +1,6 @@
 using System;
-using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using Core.Syntax;
 using Xunit.Abstractions;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data

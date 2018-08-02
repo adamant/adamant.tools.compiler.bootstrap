@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
-using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
+using Core.Syntax;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 {

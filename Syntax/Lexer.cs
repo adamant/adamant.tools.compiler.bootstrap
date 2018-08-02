@@ -5,8 +5,8 @@ using System.Linq;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
-using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using Core.Syntax;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
@@ -50,22 +50,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         tokenStart += 1;
                         continue;
                     case '{':
-                        yield return NewOperatorToken(TokenKind.LeftBrace);
+                        yield return NewOperatorToken(TokenKind.OpenBrace);
                         break;
                     case '}':
-                        yield return NewOperatorToken(TokenKind.RightBrace);
+                        yield return NewOperatorToken(TokenKind.CloseBrace);
                         break;
                     case '(':
-                        yield return NewOperatorToken(TokenKind.LeftParen);
+                        yield return NewOperatorToken(TokenKind.OpenParen);
                         break;
                     case ')':
-                        yield return NewOperatorToken(TokenKind.RightParen);
+                        yield return NewOperatorToken(TokenKind.CloseParen);
                         break;
                     case '[':
-                        yield return NewOperatorToken(TokenKind.LeftBracket);
+                        yield return NewOperatorToken(TokenKind.OpenBracket);
                         break;
                     case ']':
-                        yield return NewOperatorToken(TokenKind.RightBracket);
+                        yield return NewOperatorToken(TokenKind.CloseBracket);
                         break;
                     case ';':
                         yield return NewOperatorToken(TokenKind.Semicolon);
