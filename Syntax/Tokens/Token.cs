@@ -40,10 +40,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 
         public static Token Missing(CodeText code, int start, TokenKind kind)
         {
-            Requires.That(nameof(kind), kind != TokenKind.StringLiteral);
-            Requires.That(nameof(kind), kind != TokenKind.Identifier);
             var diagnostic = Error.MissingToken(kind);
-            return new Token(code, new TextSpan(start, 0), kind, true, diagnostic.Yield());
+            var span = new TextSpan(start, 0);
+            switch (kind)
+            {
+                case TokenKind.Identifier:
+                    return new IdentifierToken(code, span, IdentifierKind.Normal, "", diagnostic.Yield());
+                case TokenKind.StringLiteral:
+                    return new StringLiteralToken(code, span, "", diagnostic.Yield());
+                default:
+                    return new Token(code, span, kind, true, diagnostic.Yield());
+            }
         }
 
         public override string ToString()

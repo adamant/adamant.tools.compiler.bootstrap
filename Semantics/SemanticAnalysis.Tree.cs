@@ -13,9 +13,9 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Names;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Core.Syntax;
 

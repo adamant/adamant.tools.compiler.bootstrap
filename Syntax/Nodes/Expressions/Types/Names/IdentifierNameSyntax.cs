@@ -2,7 +2,7 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Names
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names
 {
     public class IdentifierNameSyntax : NameSyntax
     {

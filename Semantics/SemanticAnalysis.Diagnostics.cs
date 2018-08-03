@@ -7,8 +7,8 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
@@ -51,7 +51,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                 case CompilationUnitSyntax _:
                 case StatementSyntax _:
                 case PackageSyntax _:
-                case TypeSyntax _:
                     // These node types don't require any analysis
                     break;
                 default:

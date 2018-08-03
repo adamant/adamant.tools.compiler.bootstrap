@@ -2,7 +2,7 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types
 {
     public class PrimitiveTypeSyntax : TypeSyntax
     {
