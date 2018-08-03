@@ -21,9 +21,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements
             Expression = expression;
         }
 
-        protected override SyntaxNode GetSyntax()
-        {
-            return Syntax;
-        }
+        protected override SyntaxNode GetSyntax() => Syntax;
     }
 }

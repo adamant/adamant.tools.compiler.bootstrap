@@ -2,14 +2,17 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using Core.Syntax;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
@@ -45,10 +48,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                     var parameterTypes = function.Parameters.Select(Type);
                     var returnType = Type(function.ReturnType);
                     return new FunctionType(parameterTypes, returnType);
+
                 case ParameterSyntax parameter:
                     return Type(parameter.Type);
+
                 case PrimitiveTypeSyntax primitiveType:
                     return PrimitiveType.New(primitiveType.Keyword.Kind);
+
                 case BinaryOperatorExpressionSyntax binaryOperatorExpression:
                     var leftOperandType = Type(binaryOperatorExpression.LeftOperand);
                     var rightOperandType = Type(binaryOperatorExpression.RightOperand);
@@ -59,15 +65,40 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                         AddDiagnostic(binaryOperatorExpression, Error.OperatorCannotBeAppliedToOperandsOfType(binaryOperatorExpression.Operator.Kind, leftOperandType, rightOperandType));
                         return DataType.Unknown;
                     }
-
                     return leftOperandType;
+
+                case ClassDeclarationSyntax classDeclaration:
+                    return new ObjectType(Name(classDeclaration), false);
+
                 case IdentifierNameSyntax identifierName:
-                    var variableName = Name(identifierName);
-                    var symbol = PackageSyntaxSymbol.Lookup(variableName);
-                    var variableDeclaration = symbol.Declarations.Single();
-                    return Type(variableDeclaration);
+                    {
+                        var name = Name(identifierName);
+                        switch (name)
+                        {
+                            case VariableName variableName:
+                                var variableSymbol = PackageSyntaxSymbol.Lookup(variableName);
+                                var variableDeclaration = variableSymbol.Declarations.Single();
+                                return Type(variableDeclaration);
+
+                            case ReferenceTypeName referenceTypeName:
+                                var classSymbol = PackageSyntaxSymbol.Lookup(referenceTypeName);
+                                var classdeclaration = classSymbol.Declarations.Single();
+                                return Type(classdeclaration);
+
+                            default:
+                                throw NonExhaustiveMatchException.For(name);
+                        }
+                    }
+
                 case ReturnExpressionSyntax _:
                     return PrimitiveType.Never;
+
+                case VariableDeclarationStatementSyntax variableDeclaration:
+                    return Type(variableDeclaration.Type);
+
+                case NewObjectExpressionSyntax newObjectExpression:
+                    return Type(newObjectExpression.Type);
+
                 default:
                     throw NonExhaustiveMatchException.For(syntax);
             }

@@ -1,4 +1,3 @@
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
@@ -6,12 +5,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names
 {
     public class IdentifierNameSyntax : NameSyntax
     {
-        // It could be a missing token, so then it wouldn't be an IdentifierToken
-        public Token Name => (Token)Children.Single();
+        public IdentifierToken Name { get; }
 
-        public IdentifierNameSyntax(Token token)
+        public IdentifierNameSyntax(IdentifierToken token)
             : base(token.Yield())
         {
+            Name = token;
         }
     }
 }

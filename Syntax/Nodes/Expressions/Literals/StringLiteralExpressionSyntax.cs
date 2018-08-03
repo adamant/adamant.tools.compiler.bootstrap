@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Literals
 {
     public class StringLiteralExpressionSyntax : LiteralExpressionSyntax
     {
-        public StringLiteralExpressionSyntax(Token token)
+        public StringLiteralExpressionSyntax(StringLiteralToken token)
             : base(token.Yield())
         {
         }

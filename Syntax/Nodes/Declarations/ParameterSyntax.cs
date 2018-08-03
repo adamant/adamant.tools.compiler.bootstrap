@@ -8,13 +8,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
 {
     public class ParameterSyntax : DeclarationSyntax
     {
-        public Token VarKeyword => Children.OfType<Token>().SingleOrDefault(t => t.Kind == TokenKind.VarKeyword);
-        public override IdentifierToken Name => Children.OfType<IdentifierToken>().Single();
-        public TypeSyntax Type => Children.OfType<TypeSyntax>().Single();
+        public Token VarKeyword { get; }
+        public override IdentifierToken Name { get; }
+        public TypeSyntax Type { get; }
 
         public ParameterSyntax(IEnumerable<SyntaxNode> children)
             : base(children)
         {
+            VarKeyword = Children.OfType<Token>().SingleOrDefault(t => t.Kind == TokenKind.VarKeyword);
+            Name = Children.OfType<IdentifierToken>().Single();
+            Type = Children.OfType<TypeSyntax>().Single();
         }
     }
 }

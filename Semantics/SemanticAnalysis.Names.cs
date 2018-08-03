@@ -21,11 +21,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public FunctionName Name(FunctionDeclarationSyntax s) => Name<FunctionName>(s);
 
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ObjectTypeName Name(ClassDeclarationSyntax s) => Name<ObjectTypeName>(s);
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public VariableName Name(ParameterSyntax s) => Name<VariableName>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public VariableName Name(IdentifierNameSyntax s) => Name<VariableName>(s);
+        public Name Name(IdentifierNameSyntax s) => Name<Name>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Name Name(SyntaxBranchNode syntax)
@@ -51,6 +55,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                 case CompilationUnitSyntax compilationUnit:
                     return GlobalNamespaceName(Parent(compilationUnit));
 
+                case ClassDeclarationSyntax classDeclaration:
+                    {
+                        var parentName = Name(Parent(classDeclaration));
+                        return new ReferenceTypeName(parentName, classDeclaration.Name.Value);
+                    }
                 case FunctionDeclarationSyntax functionDeclaration:
                     {
                         var parentName = Name(Parent(functionDeclaration));

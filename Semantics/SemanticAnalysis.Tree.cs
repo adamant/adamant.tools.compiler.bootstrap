@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions;
@@ -13,6 +14,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
@@ -58,6 +60,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         private TNode Node<TNode>(SyntaxBranchNode syntax)
             where TNode : SemanticNode
         {
+            if (syntax == null) return null;
             return (TNode)attributes.GetOrAdd(syntax, NodeAttribute, ComputeNode);
         }
 
@@ -77,8 +80,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                         .Select(Node)
                         .ToList();
                     return new Package(package, AllDiagnostics(package), compilationUnits, EntryPoint(package));
+
                 case CompilationUnitSyntax compilationUnit:
                     return new CompilationUnit(compilationUnit, compilationUnit.Declarations.Select(Node), AllDiagnostics(compilationUnit));
+
                 case FunctionDeclarationSyntax function:
                     return new FunctionDeclaration(
                         function,
@@ -88,21 +93,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                         function.Parameters.Select(Node),
                         Node(function.ReturnType),
                         Node(function.Body)); // TODO change this to a list of statements
+
                 case ParameterSyntax parameter:
                     return new Parameter(parameter, AllDiagnostics(parameter),
                         parameter.VarKeyword != null, parameter.Name.Value, Node(parameter.Type));
+
                 case BlockSyntax block:
                     var statements = block.Statements.Select(Node);
                     return new Block(block, AllDiagnostics(block), statements);
+
                 case ExpressionStatementSyntax expressionStatement:
                     return new ExpressionStatement(expressionStatement,
                         AllDiagnostics(expressionStatement), Node(expressionStatement.Expression));
+
                 case IdentifierNameSyntax identifierName:
-                    return new VariableExpression(identifierName, AllDiagnostics(identifierName),
-                        Name(identifierName), Type(identifierName));
+                    var name = Name(identifierName);
+                    switch (name)
+                    {
+                        case VariableName variableName:
+                            return new VariableExpression(identifierName, AllDiagnostics(identifierName),
+                                variableName, Type(identifierName));
+                        case ReferenceTypeName typeName:
+                            return new TypeName(identifierName, AllDiagnostics(identifierName), Type(identifierName));
+                        default:
+                            throw NonExhaustiveMatchException.For(name);
+                    }
+
                 case ReturnExpressionSyntax returnExpression:
                     return new ReturnExpression(returnExpression, AllDiagnostics(returnExpression),
                         Node(returnExpression.Expression));
+
                 case BinaryOperatorExpressionSyntax binaryOperatorExpression:
                     {
                         var leftOperand = Node(binaryOperatorExpression.LeftOperand);
@@ -115,8 +135,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                                 throw new InvalidEnumArgumentException(binaryOperatorExpression.Operator.Kind.ToString());
                         }
                     }
+
                 case TypeSyntax type:
                     return new TypeName(type, AllDiagnostics(type), Type(type));
+
+                case VariableDeclarationStatementSyntax variableDeclaration:
+                    return new VariableDeclarationStatement(variableDeclaration,
+                        AllDiagnostics(variableDeclaration),
+                        variableDeclaration.Binding.Kind == TokenKind.VarKeyword,
+                        variableDeclaration.Name.Value,
+                        Type(variableDeclaration),
+                        Node(variableDeclaration.Initializer));
+
+                case NewObjectExpressionSyntax newObject:
+                    return new NewObjectExpression(newObject,
+                        AllDiagnostics(newObject),
+                        Type(newObject),
+                        newObject.Arguments.Select(Node));
+
                 default:
                     throw NonExhaustiveMatchException.For(syntax);
             }

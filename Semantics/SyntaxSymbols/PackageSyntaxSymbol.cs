@@ -32,6 +32,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
                     return Lookup(ns);
                 case FunctionName f:
                     return Lookup(f);
+                case ReferenceTypeName rt:
+                    return Lookup(rt);
                 default:
                     throw NonExhaustiveMatchException.For(scopeName);
             }
@@ -53,6 +55,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
         {
             var packageSymbol = Lookup(globalNamespace.Package);
             return packageSymbol?.Children.Single(c => c.Name == "");
+        }
+
+        public SyntaxSymbol Lookup(ReferenceTypeName type)
+        {
+            var scopeSymbol = Lookup(type.Scope);
+            return scopeSymbol?.Children.SingleOrDefault(c => c.Name == type.EntityName);
         }
 
         public SyntaxSymbol Lookup(PackageName package)

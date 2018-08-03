@@ -21,9 +21,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements
             Statements = statements.ToList().AsReadOnly();
         }
 
-        protected override SyntaxNode GetSyntax()
-        {
-            return Syntax;
-        }
+        protected override SyntaxNode GetSyntax() => Syntax;
     }
 }

@@ -7,6 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Literals;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
@@ -189,7 +190,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 
                 OperatorPrecedence? precedence = null;
                 var leftAssociative = true;
-                //var suffixOperator = false;
                 switch (tokens.Current.Kind)
                 {
                     case TokenKind.Equals:
@@ -278,6 +278,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             var children = NewChildList();
             switch (tokens.Current.Kind)
             {
+                case TokenKind.NewKeyword:
+                    children.Add(tokens.Expect(TokenKind.NewKeyword));
+                    children.Add(ParseType(tokens));
+                    children.Add(ParseArgumentList(tokens));
+                    return new NewObjectExpressionSyntax(children);
                 case TokenKind.ReturnKeyword:
                     children.Add(tokens.Expect(TokenKind.ReturnKeyword));
                     if (!tokens.CurrentIs(TokenKind.Semicolon))
@@ -296,11 +301,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     children.Add(ParseExpression(tokens, OperatorPrecedence.Unary));
                     return new UnaryOperatorExpressionSyntax(children);
                 case TokenKind.StringLiteral:
-                    return new StringLiteralExpressionSyntax(tokens.Consume());
+                    return new StringLiteralExpressionSyntax((StringLiteralToken)tokens.Consume());
                 case TokenKind.Identifier:
-                    return new IdentifierNameSyntax(tokens.Expect(TokenKind.Identifier));
+                    return new IdentifierNameSyntax((IdentifierToken)tokens.Expect(TokenKind.Identifier));
                 default:
-                    return new IdentifierNameSyntax(tokens.MissingToken(TokenKind.Identifier));
+                    return new IdentifierNameSyntax((IdentifierToken)tokens.MissingToken(TokenKind.Identifier));
             }
         }
 
@@ -314,7 +319,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     var keyword = tokens.Consume();
                     return new PrimitiveTypeSyntax(keyword);
                 case TokenKind.Identifier:
-                    var name = tokens.Expect(TokenKind.Identifier);
+                    var name = (IdentifierToken)tokens.Expect(TokenKind.Identifier);
                     return new IdentifierNameSyntax(name);
                 default:
                     throw NonExhaustiveMatchException.For(tokens.Current);
@@ -332,6 +337,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             }
         }
 
+        private ArgumentListSyntax ParseArgumentList(ITokenStream tokens)
+        {
+            var children = NewChildList();
+            children.Add(tokens.Expect(TokenKind.OpenParen));
+            children.AddRange(ParseSyntaxList(tokens, t => ParseExpression(t), TokenKind.Comma, TokenKind.CloseParen));
+            children.Add(tokens.Expect(TokenKind.CloseParen));
+            return new ArgumentListSyntax(children);
+        }
         #endregion
 
         #region Helper Functions

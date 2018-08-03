@@ -8,16 +8,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
 {
     public class FunctionDeclarationSyntax : DeclarationSyntax
     {
-        public Token AccessModifier => (Token)Children.First();
-        public override IdentifierToken Name => Children.OfType<IdentifierToken>().Single();
-        public ParameterListSyntax ParameterList => Children.OfType<ParameterListSyntax>().Single();
-        public IEnumerable<ParameterSyntax> Parameters => ParameterList.Parameters;
-        public TypeSyntax ReturnType => Children.OfType<TypeSyntax>().Single();
-        public BlockSyntax Body => Children.OfType<BlockSyntax>().Single();
+        public Token AccessModifier { get; }
+        public override IdentifierToken Name { get; }
+        public ParameterListSyntax ParameterList { get; }
+        public IReadOnlyList<ParameterSyntax> Parameters { get; }
+        public TypeSyntax ReturnType { get; }
+        public BlockSyntax Body { get; }
 
         public FunctionDeclarationSyntax(IEnumerable<SyntaxNode> children)
             : base(children)
         {
+            AccessModifier = (Token)Children.First();
+            Name = Children.OfType<IdentifierToken>().Single();
+            ParameterList = Children.OfType<ParameterListSyntax>().Single();
+            Parameters = ParameterList.Parameters;
+            ReturnType = Children.OfType<TypeSyntax>().Single();
+            Body = Children.OfType<BlockSyntax>().Single();
         }
     }
 }

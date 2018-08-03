@@ -15,10 +15,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
         private FunctionDeclaration ComputeEntryPoint(PackageSyntax package)
         {
-            var entryPoint = package.DescendantBranchesAndSelf()
+            return Node(package.DescendantBranchesAndSelf()
                 .OfType<FunctionDeclarationSyntax>()
-                .SingleOrDefault(f => f.Name.Value == "main");
-            return entryPoint != null ? Node(entryPoint) : null;
+                .SingleOrDefault(f => f.Name.Value == "main"));
         }
     }
 }
