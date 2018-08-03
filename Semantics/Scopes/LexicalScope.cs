@@ -6,22 +6,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
     public class LexicalScope
     {
         public readonly LexicalScope EnclosingScope;
-        public readonly SyntaxSymbol Symbol;
+        public readonly ISyntaxSymbol Symbol;
 
-        public LexicalScope(SyntaxSymbol symbol)
+        public LexicalScope(ISyntaxSymbol symbol)
         {
             Requires.NotNull(nameof(symbol), symbol);
             Symbol = symbol;
         }
 
-        public LexicalScope(LexicalScope enclosingScope, SyntaxSymbol symbol)
+        public LexicalScope(LexicalScope enclosingScope, ISyntaxSymbol symbol)
         {
+            Requires.NotNull(nameof(enclosingScope), enclosingScope);
             Requires.NotNull(nameof(symbol), symbol);
             EnclosingScope = enclosingScope;
             Symbol = symbol;
         }
 
-        public SyntaxSymbol LookupName(string name)
+        public ISyntaxSymbol LookupName(string name)
         {
             foreach (var childSymbol in Symbol.Children)
                 if (childSymbol.Name == name)

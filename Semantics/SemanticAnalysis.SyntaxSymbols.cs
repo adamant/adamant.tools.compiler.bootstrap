@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -5,6 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
@@ -17,44 +19,53 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public PackageSyntaxSymbol SyntaxSymbol(PackageSyntax syntax)
         {
-            return attributes.GetOrAdd(syntax, SyntaxSymbolAttribute, ComputeSyntaxSymbol);
+            return attributes.GetOrAdd(syntax, SyntaxSymbolAttribute, ComputePackageSyntaxSymbol);
         }
 
-        private static PackageSyntaxSymbol ComputeSyntaxSymbol(PackageSyntax package)
+        private PackageSyntaxSymbol ComputePackageSyntaxSymbol(PackageSyntax package)
         {
             var compilationUnits = package.CompilationUnits.ToList();
-            var globalNamespace = new SyntaxSymbol(compilationUnits,
-                ComputeSyntaxSymbol(compilationUnits.SelectMany(cu => cu.Children.OfType<DeclarationSyntax>())));
+            var globalNamespace = new GlobalNamespaceSyntaxSymbol(compilationUnits,
+                ComputeDeclarationSyntaxSymbols(compilationUnits.SelectMany(cu => cu.Children.OfType<DeclarationSyntax>())));
             return new PackageSyntaxSymbol(package, globalNamespace);
         }
 
-        private static IEnumerable<SyntaxSymbol> ComputeSyntaxSymbol(IEnumerable<DeclarationSyntax> declarations)
+        private IEnumerable<IDeclarationSyntaxSymbol> ComputeDeclarationSyntaxSymbols(IEnumerable<DeclarationSyntax> declarations)
         {
-            return declarations.GroupBy(d => d.Name.Value).Select(g =>
-            {
-                var children = ComputeSyntaxSymbol(g.SelectMany(ChildrenWithSymbols));
-                return new SyntaxSymbol(g.Key, g, children);
-            });
+            var lookup = declarations.ToLookup(d => d is NamespaceSyntax);
+
+            return lookup[true].Cast<NamespaceSyntax>().GroupBy(ns => ns.Name.Value)
+                .Select<IGrouping<string, NamespaceSyntax>, IDeclarationSyntaxSymbol>(g => throw new NotImplementedException())
+                .Concat(lookup[false].Select(ComputeDeclarationSyntaxSymbol));
         }
 
-        private static IEnumerable<DeclarationSyntax> ChildrenWithSymbols(SyntaxBranchNode declaration)
+        private IDeclarationSyntaxSymbol ComputeDeclarationSyntaxSymbol(DeclarationSyntax declaration)
         {
             switch (declaration)
             {
                 case FunctionDeclarationSyntax function:
-                    return function.Parameters;
+                    var variableSymbols = function.Parameters
+                        .Select(p => new VariableSyntaxSymbol(p, null))
+                        .Concat(function.Body.DecendantStatementsAndSelf()
+                            .OfType<VariableDeclarationStatementSyntax>()
+                            .Select(v => new VariableSyntaxSymbol(v, null)));
+                    return new FunctionSyntaxSymbol(function, variableSymbols);
+
+                case ClassDeclarationSyntax classDeclaration:
+                    return new TypeSyntaxSymbol(classDeclaration);
+
                 default:
-                    return declaration.Children.OfType<DeclarationSyntax>();
+                    throw NonExhaustiveMatchException.For(declaration);
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public SyntaxSymbol SyntaxSymbol(SyntaxBranchNode syntax)
+        public ISyntaxSymbol SyntaxSymbol(SyntaxBranchNode syntax)
         {
             return attributes.GetOrAdd(syntax, SyntaxSymbolAttribute, ComputeSyntaxSymbol);
         }
 
-        private SyntaxSymbol ComputeSyntaxSymbol(SyntaxBranchNode syntax)
+        private ISyntaxSymbol ComputeSyntaxSymbol(SyntaxBranchNode syntax)
         {
             switch (syntax)
             {

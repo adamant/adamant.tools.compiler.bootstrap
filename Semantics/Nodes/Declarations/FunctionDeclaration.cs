@@ -7,7 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations
 {
-    public class FunctionDeclaration : Declaration
+    public class FunctionDeclaration : MemberDeclaration
     {
         public new FunctionDeclarationSyntax Syntax { get; }
         public AccessLevel Access { get; }

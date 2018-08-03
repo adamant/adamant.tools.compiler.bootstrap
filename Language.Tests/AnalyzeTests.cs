@@ -89,6 +89,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
                     case JTokenType.Object:
                         AssertSemanticsMatch((JObject)expected, actual);
                         break;
+                    case JTokenType.Null:
+                        Assert.Null(actual);
+                        break;
                     default:
                         throw new NotSupportedException(expected.Type.ToString());
                 }

@@ -7,7 +7,6 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
@@ -46,6 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                 case ExpressionSyntax _:
                 case FunctionDeclarationSyntax _:
                 case ParameterSyntax _:
+                case ClassDeclarationSyntax _:
                     Type(syntax);
                     break;
                 case CompilationUnitSyntax _:

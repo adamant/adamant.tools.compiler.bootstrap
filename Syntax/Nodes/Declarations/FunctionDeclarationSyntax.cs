@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
 {
-    public class FunctionDeclarationSyntax : DeclarationSyntax
+    public class FunctionDeclarationSyntax : MemberDeclarationSyntax
     {
         public Token AccessModifier { get; }
         public override IdentifierToken Name { get; }

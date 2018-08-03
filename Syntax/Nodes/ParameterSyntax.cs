@@ -4,12 +4,12 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Core.Syntax;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
 {
-    public class ParameterSyntax : DeclarationSyntax
+    public class ParameterSyntax : SyntaxBranchNode
     {
         public Token VarKeyword { get; }
-        public override IdentifierToken Name { get; }
+        public IdentifierToken Name { get; }
         public TypeSyntax Type { get; }
 
         public ParameterSyntax(IEnumerable<SyntaxNode> children)

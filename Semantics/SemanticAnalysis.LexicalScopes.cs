@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Runtime.CompilerServices;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
@@ -24,15 +23,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             switch (syntax)
             {
                 case CompilationUnitSyntax compilationUnit:
-                    var globalNamespaceSymbol = PackageSyntaxSymbol.Children.Single();
-                    var globalScope = new LexicalScope(globalNamespaceSymbol);
-                    return globalScope;
+                    return new LexicalScope(PackageSyntaxSymbol.GlobalNamespace);
+
                 case FunctionDeclarationSyntax function:
                     {
                         var enclosingScope = LexicalScope(Parent(function));
                         var symbol = SyntaxSymbol(function);
                         return new LexicalScope(enclosingScope, symbol);
                     }
+
                 case StatementSyntax _:
                 case ExpressionSyntax _:
                 case ParameterSyntax _:
@@ -42,6 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                         var enclosingScope = LexicalScope(Parent(syntax));
                         return enclosingScope;
                     }
+
                 default:
                     throw NonExhaustiveMatchException.For(syntax);
             }

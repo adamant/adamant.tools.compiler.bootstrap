@@ -4,16 +4,18 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
 {
-    public class ClassDeclarationSyntax : DeclarationSyntax
+    public class ClassDeclarationSyntax : MemberDeclarationSyntax
     {
         public Token AccessModifier { get; }
         public override IdentifierToken Name { get; }
+        public IReadOnlyList<MemberDeclarationSyntax> Members { get; }
 
         public ClassDeclarationSyntax(IEnumerable<SyntaxNode> children)
             : base(children)
         {
             AccessModifier = (Token)Children.First();
             Name = Children.OfType<IdentifierToken>().Single();
+            Members = Children.OfType<MemberDeclarationSyntax>().ToList().AsReadOnly();
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
     public class ObjectType : DataType
     {
         public ObjectTypeName Name { get; }
-        public bool IsMutable;
+        public bool IsMutable { get; }
 
         public ObjectType(ObjectTypeName name, bool isMutable)
         {

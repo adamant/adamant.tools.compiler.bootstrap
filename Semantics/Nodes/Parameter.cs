@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes
 {
-    public class Parameter : Declaration
+    public class Parameter : SemanticNode
     {
         public new ParameterSyntax Syntax { get; }
         public bool MutableBinding { get; }

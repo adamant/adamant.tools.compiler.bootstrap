@@ -4,18 +4,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
 {
     public class VariableName : Name
     {
-        public ScopeName Scope { get; }
+        public FunctionName Function { get; }
         // TODO add declaration number
 
-        public VariableName(ScopeName scope, string name)
+        public VariableName(FunctionName function, string name)
             : base(name)
         {
-            Scope = scope;
+            Function = function;
         }
 
         public override void GetFullName(StringBuilder builder)
         {
-            Scope.GetFullNameScope(builder);
+            Function.GetFullNameScope(builder);
             builder.Append(EntityName);
         }
     }

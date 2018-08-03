@@ -28,6 +28,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public DataType Type(TypeSyntax syntax) => Type((SyntaxBranchNode)syntax);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ObjectType Type(ClassDeclarationSyntax syntax) => Type<ObjectType>(syntax);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public DataType Type(SyntaxBranchNode syntax)
         {
             return attributes.GetOrAdd(syntax, TypeAttribute, ComputeType);
@@ -77,12 +80,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                         {
                             case VariableName variableName:
                                 var variableSymbol = PackageSyntaxSymbol.Lookup(variableName);
-                                var variableDeclaration = variableSymbol.Declarations.Single();
+                                var variableDeclaration = variableSymbol.Declaration;
                                 return Type(variableDeclaration);
 
                             case ReferenceTypeName referenceTypeName:
                                 var classSymbol = PackageSyntaxSymbol.Lookup(referenceTypeName);
-                                var classdeclaration = classSymbol.Declarations.Single();
+                                var classdeclaration = classSymbol.Declaration;
                                 return Type(classdeclaration);
 
                             default:

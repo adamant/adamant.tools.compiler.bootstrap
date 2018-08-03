@@ -5,6 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
@@ -69,9 +70,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                 case ParameterSyntax parameter:
                     {
                         var scope = LexicalScope(parameter);
-                        var functionSyntax = scope.Symbol.Declarations.Single();
-                        var parentName = (ScopeName)Name(functionSyntax);
-                        return new VariableName(parentName, parameter.Name.Text);
+                        var functionSyntax = (FunctionDeclarationSyntax)scope.Symbol.Declarations.Single();
+                        var functionName = Name(functionSyntax);
+                        return new VariableName(functionName, parameter.Name.Text);
                     }
                 case IdentifierNameSyntax identifierName:
                     {
@@ -79,6 +80,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                         var symbol = nameScope.LookupName(identifierName.Name.Text);
                         var declaration = symbol.Declarations.Single();
                         return Name(declaration);
+                    }
+                case VariableDeclarationStatementSyntax variableDeclaration:
+                    {
+                        var functionName = Name(EnclosingFunction(variableDeclaration));
+                        return new VariableName(functionName, variableDeclaration.Name.Value);
                     }
                 default:
                     throw NonExhaustiveMatchException.For(syntax);

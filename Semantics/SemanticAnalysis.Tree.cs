@@ -39,6 +39,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public Declaration Node(DeclarationSyntax s) => Node<Declaration>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public MemberDeclaration Node(MemberDeclarationSyntax s) => Node<MemberDeclaration>(s);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public FunctionDeclaration Node(FunctionDeclarationSyntax s) => Node<FunctionDeclaration>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -131,6 +134,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                         {
                             case TokenKind.Plus:
                                 return new AddExpression(binaryOperatorExpression, AllDiagnostics(binaryOperatorExpression), leftOperand, rightOperand, Type(binaryOperatorExpression));
+
+                            case TokenKind.Equals:
+                                return new AssignmentExpression(binaryOperatorExpression,
+                                    AllDiagnostics(binaryOperatorExpression), leftOperand,
+                                    rightOperand, Type(binaryOperatorExpression));
+
                             default:
                                 throw new InvalidEnumArgumentException(binaryOperatorExpression.Operator.Kind.ToString());
                         }
@@ -152,6 +161,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                         AllDiagnostics(newObject),
                         Type(newObject),
                         newObject.Arguments.Select(Node));
+
+                case ClassDeclarationSyntax classDeclaration:
+                    return new ClassDeclaration(
+                        classDeclaration,
+                        AllDiagnostics(classDeclaration),
+                        AccessLevel(classDeclaration.AccessModifier),
+                        Type(classDeclaration),
+                        classDeclaration.Members.Select(Node));
 
                 default:
                     throw NonExhaustiveMatchException.For(syntax);
