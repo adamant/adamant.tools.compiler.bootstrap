@@ -3,6 +3,14 @@ using Core.Syntax;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics
 {
+
+    /// <summary>
+    /// Error Code Ranges:
+    /// 1-999: Lexical Errors
+    /// 1000-1999: Parsing Errors
+    /// 2000-2999: Type Errors
+    /// 3000-3999: Borrow Checking Errors
+    /// </summary>
     public static class Error
     {
         public static DiagnosticInfo MissingToken(TokenKind kind)
@@ -18,7 +26,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics
 
         public static DiagnosticInfo OperatorCannotBeAppliedToOperandsOfType(TokenKind @operator, DataType leftOperandType, DataType rightOperandType)
         {
-            return new DiagnosticInfo(DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3, $"Operator `{@operator}` cannot be applied to operands of type `{leftOperandType}` and `{rightOperandType}`.");
+            return new DiagnosticInfo(DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 2001, $"Operator `{@operator}` cannot be applied to operands of type `{leftOperandType}` and `{rightOperandType}`.");
+        }
+
+        public static DiagnosticInfo BorrowedValueDoesNotLiveLongEnought(TextSpan expression)
+        {
+            return new DiagnosticInfo(DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3001, $"Borrowed values does not live long enough");
         }
     }
 }
