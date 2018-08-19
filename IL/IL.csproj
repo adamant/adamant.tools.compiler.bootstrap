@@ -6,4 +6,8 @@
     <RootNamespace>Adamant.Tools.Compiler.Bootstrap.IL</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Semantics.Types\Semantics.Types.csproj" />
+  </ItemGroup>
+
 </Project>

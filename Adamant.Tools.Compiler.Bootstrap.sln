@@ -48,7 +48,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Semantics.Types", "Semantic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Syntax", "Core.Syntax\Core.Syntax.csproj", "{8921ADA4-C0A9-471D-94C3-8DE1EA6276A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IL", "IL\IL.csproj", "{40562F85-7C7B-4E87-A307-229D57EB74C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IL", "IL\IL.csproj", "{40562F85-7C7B-4E87-A307-229D57EB74C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Semantics.Tests", "Semantics.Tests\Semantics.Tests.csproj", "{84D37D24-C01A-4BD8-A9F6-36DD13FE812C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -120,6 +122,10 @@ Global
 		{40562F85-7C7B-4E87-A307-229D57EB74C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{40562F85-7C7B-4E87-A307-229D57EB74C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{40562F85-7C7B-4E87-A307-229D57EB74C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84D37D24-C01A-4BD8-A9F6-36DD13FE812C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84D37D24-C01A-4BD8-A9F6-36DD13FE812C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84D37D24-C01A-4BD8-A9F6-36DD13FE812C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84D37D24-C01A-4BD8-A9F6-36DD13FE812C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
