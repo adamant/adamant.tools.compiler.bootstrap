@@ -3,7 +3,6 @@ using Core.Syntax;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics
 {
-
     /// <summary>
     /// Error Code Ranges:
     /// 1-999: Lexical Errors

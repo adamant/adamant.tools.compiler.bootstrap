@@ -8,6 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         {
             var analysis = new SemanticAnalysis(packageSyntax);
             var package = analysis.Package;
+            // TODO lower to IL and do borrow checking
             return package;
         }
     }

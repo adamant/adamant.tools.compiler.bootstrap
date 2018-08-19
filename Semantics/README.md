@@ -17,3 +17,9 @@ To support the above design goals, the current plan is to analyze compilation un
 3. Analyze each compilation unit it parallel. This allows the relatively independent creation of the semantic tree for each compilation unit. Partial types could be an issue with this that will have to be dealt with when we reach it.
 
 Note that due to the complexity of the issues of dealing with cycles in evaluation, we are not currently attempting to handle this. Instead, we will rely on `Lazy<T>` to throw exceptions when cycles occur. This will not provide friendly error messages, but once the errors cycles can lead to are understood, we can develop a better strategy for handling them.
+
+## Simplifications for Semantic Tree
+
+* Don't include parenthezied expressions
+* Unify the different kinds of blocks
+* All loops as `loop`?
