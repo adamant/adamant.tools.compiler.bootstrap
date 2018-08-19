@@ -6,16 +6,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
     [Serializable]
     public class NonExhaustiveMatchException : Exception
     {
-        public NonExhaustiveMatchException()
+        internal NonExhaustiveMatchException()
         {
         }
 
-        public NonExhaustiveMatchException(string message)
+        internal NonExhaustiveMatchException(string message)
             : base(message)
         {
         }
 
-        public NonExhaustiveMatchException(string message, Exception innerException)
+        internal NonExhaustiveMatchException(string message, Exception innerException)
             : base(message, innerException)
         {
         }

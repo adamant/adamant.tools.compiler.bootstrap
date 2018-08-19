@@ -8,9 +8,8 @@ using ILFunctionDeclaration = Adamant.Tools.Compiler.Bootstrap.IL.Declarations.F
 using ILPackage = Adamant.Tools.Compiler.Bootstrap.IL.Package;
 using ILTypeDeclaration = Adamant.Tools.Compiler.Bootstrap.IL.Declarations.TypeDeclaration;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
 {
-
     public class IntermediateLanguageGenerator
     {
         public ILPackage Convert(Package package)
@@ -22,21 +21,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             return ilPackage;
         }
 
-        private IEnumerable<ILDeclaration> Convert(CompilationUnit compilationUnit)
+        private static IEnumerable<ILDeclaration> Convert(CompilationUnit compilationUnit)
         {
             return compilationUnit.Declarations.Select(Convert);
         }
 
-        private ILDeclaration Convert(Declaration declaration)
+        private static ILDeclaration Convert(Declaration declaration)
         {
             switch (declaration)
             {
-                case ClassDeclaration c:
-                    return new ILTypeDeclaration();
-                case FunctionDeclaration func:
-                    return new ILFunctionDeclaration(func.Name, func.Parameters.Count);
+                case ClassDeclaration @class:
+                    return Convert(@class);
+                case FunctionDeclaration function:
+                    return Convert(function);
             }
             throw new NotImplementedException();
+        }
+
+        private static ILTypeDeclaration Convert(ClassDeclaration @class)
+        {
+            return new ILTypeDeclaration(@class.Name, true);
+        }
+
+        private static ILFunctionDeclaration Convert(FunctionDeclaration function)
+        {
+            return new FunctionIntermediateLanguageGenerator(function).Convert();
         }
     }
 }

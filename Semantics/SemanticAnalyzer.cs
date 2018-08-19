@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Semantics.IL;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics

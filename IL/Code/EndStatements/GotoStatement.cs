@@ -1,6 +1,6 @@
-namespace Adamant.Tools.Compiler.Bootstrap.IL.Code.Statements
+namespace Adamant.Tools.Compiler.Bootstrap.IL.Code.EndStatements
 {
-    public class GotoStatement : BranchingStatement
+    public class GotoStatement : EndStatement
     {
         public readonly int BlockNumber;
 
