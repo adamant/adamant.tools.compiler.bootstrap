@@ -10,5 +10,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Declarations
             Name = name;
             IsReference = isReference;
         }
+
+        internal override void ToString(AsmBuilder builder)
+        {
+            var kind = IsReference ? "class" : "struct";
+            builder.AppendLine($"public {kind} {Name}");
+            builder.BeginBlock();
+            builder.EndBlock();
+        }
     }
 }

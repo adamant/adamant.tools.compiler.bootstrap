@@ -19,5 +19,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL
         {
             declarations.Add(declaration);
         }
+
+        public override string ToString()
+        {
+            var builder = new AsmBuilder();
+            builder.AppendLine($"package {Name}");
+            foreach (var declaration in declarations)
+            {
+                builder.BlankLine(); // This will give us a blank line after the package declaration too
+                declaration.ToString(builder);
+            }
+
+            return builder.Code;
+        }
     }
 }

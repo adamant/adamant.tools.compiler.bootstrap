@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.IL.Code;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IL.Declarations
@@ -28,8 +29,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Declarations
 
         public LocalVariableDeclaration AddVariable(bool mutableBinding, DataType type, string name = null)
         {
-            var variable = new LocalVariableDeclaration(mutableBinding, type, variableDeclarations.Count);
-            variable.Name = name;
+            var variable = new LocalVariableDeclaration(mutableBinding, type, variableDeclarations.Count)
+            {
+                Name = name
+            };
             variableDeclarations.Add(variable);
             return variable;
         }
@@ -49,6 +52,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Declarations
             var block = new BasicBlock(basicBlocks.Count);
             basicBlocks.Add(block);
             return block;
+        }
+
+        internal override void ToString(AsmBuilder builder)
+        {
+            builder.AppendLine($"public function {Name}() -> %0: {ReturnType}");
+            builder.BeginBlock();
+            foreach (var variable in variableDeclarations.Skip(Arity + 1))
+            {
+                variable.ToString(builder);
+            }
+
+            foreach (var block in basicBlocks)
+            {
+                builder.BlankLine();
+                block.ToString(builder);
+            }
+            builder.EndBlock();
         }
     }
 }

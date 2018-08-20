@@ -78,7 +78,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
 
         private static JObject GetJsonLexingData()
         {
-            var path = Path.Combine(TestsDirectory.Get(), "lex", "token_tests.json");
+            var path = Path.Combine(LangTestsDirectory.Get(), "lex", "token_tests.json");
             if (!File.Exists(path))
                 throw new ArgumentException($"Could not find file at path: {path}");
             var content = File.ReadAllText(path);

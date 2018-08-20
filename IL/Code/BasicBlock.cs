@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.EndStatements;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.Statements;
 
-namespace Adamant.Tools.Compiler.Bootstrap.IL
+namespace Adamant.Tools.Compiler.Bootstrap.IL.Code
 {
     public class BasicBlock
     {
@@ -27,6 +27,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL
         {
             Requires.That(nameof(EndStatement), EndStatement == null);
             EndStatement = endStatement;
+        }
+
+        internal void ToString(AsmBuilder builder)
+        {
+            builder.AppendLine($"bb{Number}:");
+            builder.BeginBlock();
+            foreach (var statement in statements)
+                statement.ToString(builder);
+
+            EndStatement.ToString(builder);
+            builder.EndBlock();
         }
     }
 }

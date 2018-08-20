@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
 
         public static string GetRuntimeDirectory()
         {
-            var testsDirectory = TestsDirectory.Get();
+            var testsDirectory = LangTestsDirectory.Get();
             return Path.Combine(testsDirectory, "runtime");
         }
         public static string GetRuntimeLibraryPath()

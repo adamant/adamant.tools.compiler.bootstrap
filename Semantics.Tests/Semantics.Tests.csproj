@@ -6,4 +6,20 @@
     <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Semantics.Tests</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="ILFor\**" />
+    <EmbeddedResource Remove="ILFor\**" />
+    <None Remove="ILFor\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit" Version="2.4.0" />
+    <PackageReference Include="xunit.categories" Version="2.0.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Language.Tests\Language.Tests.csproj" />
+  </ItemGroup>
+
 </Project>

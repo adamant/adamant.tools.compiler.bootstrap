@@ -2,7 +2,7 @@ using System;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Emit
+namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
     public abstract class CodeBuilder
     {
@@ -43,6 +43,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit
         public virtual void EndLine(string value)
         {
             code.Append(value);
+            code.Append(LineTerminator);
+        }
+
+        public virtual void EndLine()
+        {
             code.Append(LineTerminator);
         }
 

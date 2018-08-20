@@ -8,5 +8,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Code.LValues
         {
             VariableNumber = variableNumber;
         }
+
+        public override string ToString()
+        {
+            return $"%{VariableNumber}";
+        }
     }
 }

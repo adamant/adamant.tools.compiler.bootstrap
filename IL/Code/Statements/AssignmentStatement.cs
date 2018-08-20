@@ -13,5 +13,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Code.Statements
             LValue = lValue;
             RValue = rValue;
         }
+
+        internal override void ToString(AsmBuilder builder)
+        {
+            builder.AppendLine($"{LValue} = borrow {RValue}");
+        }
     }
 }

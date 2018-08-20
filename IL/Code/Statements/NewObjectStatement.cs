@@ -17,5 +17,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Code.Statements
             ResultInto = resultInto;
             Type = type;
         }
+
+        internal override void ToString(AsmBuilder builder)
+        {
+            builder.AppendLine($"{ResultInto} = new {Type}({string.Join(',', Arguments)})");
+        }
     }
 }

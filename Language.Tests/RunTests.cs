@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         [MemberData(nameof(GetAllRunTestCases))]
         public void Runs(RunTestCase testCase)
         {
-            var testsDirectory = TestsDirectory.Get();
+            var testsDirectory = LangTestsDirectory.Get();
             var runTestsDirectory = Path.Combine(testsDirectory, "run");
             var codePath = new CodePath(testCase.RelativeCodePath);
             var code = new CodeText(testCase.Code);
@@ -101,7 +101,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         public static TheoryData<RunTestCase> GetAllRunTestCases()
         {
             var testCases = new TheoryData<RunTestCase>();
-            var testsDirectory = TestsDirectory.Get();
+            var testsDirectory = LangTestsDirectory.Get();
             var runTestsDirectory = Path.Combine(testsDirectory, "run");
             foreach (var fullCodePath in Directory.EnumerateFiles(runTestsDirectory, "*.ad", SearchOption.AllDirectories))
             {

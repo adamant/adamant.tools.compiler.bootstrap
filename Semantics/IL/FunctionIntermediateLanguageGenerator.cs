@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.IL;
+using Adamant.Tools.Compiler.Bootstrap.IL.Code;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.EndStatements;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.LValues;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.Statements;
@@ -33,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
             // Temp Variable for return
             il.Let(function.ReturnType.Type);
             foreach (var parameter in function.Parameters)
-                il.AddVariable(parameter.MutableBinding, parameter.Type.Type);
+                il.AddVariable(parameter.MutableBinding, parameter.Type.Type, parameter.Name);
 
             var entryBlock = il.EntryBlock;
             blocks.Add(function.Body, entryBlock);
@@ -113,6 +113,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
 
                 case VariableExpression variableExpression:
                     currentBlock.Add(new AssignmentStatement(lvalue, LookupVariable(variableExpression.Name)));
+                    break;
+
+                case AddExpression addExpression:
+                    currentBlock.Add(new AddStatement(lvalue, ConvertToLValue(addExpression.LeftOperand), ConvertToLValue(addExpression.RightOperand)));
                     break;
 
                 default:

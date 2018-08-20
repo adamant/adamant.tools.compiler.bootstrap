@@ -8,5 +8,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Code.EndStatements
         {
             BlockNumber = blockNumber;
         }
+
+
+        internal override void ToString(AsmBuilder builder)
+        {
+            builder.AppendLine($"goto bb{BlockNumber}");
+        }
     }
 }

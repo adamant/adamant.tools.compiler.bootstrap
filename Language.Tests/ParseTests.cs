@@ -95,7 +95,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         public static TheoryData<ParseTestCase> GetAllParseTestCases()
         {
             var testCases = new TheoryData<ParseTestCase>();
-            var testsDirectory = TestsDirectory.Get();
+            var testsDirectory = LangTestsDirectory.Get();
             var parseTestsDirectory = Path.Combine(testsDirectory, "parse");
             foreach (string testFile in Directory.EnumerateFiles(parseTestsDirectory, "*.xml", SearchOption.AllDirectories))
             {

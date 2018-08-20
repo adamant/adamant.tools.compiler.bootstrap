@@ -5,13 +5,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
     public class SemanticAnalyzer
     {
-        public Package Analyze(PackageSyntax packageSyntax)
+        public AnalysisResult Analyze(PackageSyntax packageSyntax)
         {
             var analysis = new SemanticAnalysis(packageSyntax);
             var package = analysis.Package;
-            // TODO lower to IL and do borrow checking
             var ilPackage = new IntermediateLanguageGenerator().Convert(package);
-            return package;
+            // TODO do borrow checking
+            return new AnalysisResult(package, ilPackage);
         }
     }
 }

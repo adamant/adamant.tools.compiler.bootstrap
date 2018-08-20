@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C.Tests
             var syntaxTree = parser.Parse(codePath, code, tokens);
             var packageSyntax = new PackageSyntax(syntaxTree.Yield().ToList());
             var analyzer = new SemanticAnalyzer();
-            return analyzer.Analyze(packageSyntax);
+            return analyzer.Analyze(packageSyntax).Package;
         }
 
         private void AssertEmittedCodeMatches(string expected, Code code)

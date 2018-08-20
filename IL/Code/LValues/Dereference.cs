@@ -8,5 +8,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Code.LValues
         {
             DereferencedValue = dereferencedValue;
         }
+
+        public override string ToString()
+        {
+            return $"^{DereferencedValue}";
+        }
     }
 }

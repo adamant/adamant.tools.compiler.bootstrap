@@ -1,0 +1,19 @@
+package default
+
+public class Test
+{
+}
+
+public function func() -> %0: default::Test
+{
+    let %1: &default::Test // y
+    let %2: &default::Test // x
+
+    bb0:
+    {
+        %2 = new default::Test()
+        %1 = borrow %2
+        %0 = borrow %1
+        return
+    }
+}

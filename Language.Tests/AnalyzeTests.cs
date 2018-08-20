@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             var syntaxTree = parser.Parse(codePath, code, tokens);
             var packageSyntax = new PackageSyntax(syntaxTree.Yield().ToList());
             var analyzer = new SemanticAnalyzer();
-            var package = analyzer.Analyze(packageSyntax);
+            var package = analyzer.Analyze(packageSyntax).Package;
             AssertSemanticsMatch(testCase.ExpectedSemanticTree, package);
         }
 
@@ -43,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             Assert.NotEmpty(GetAllAnalyzerTestCases());
         }
 
-        private void AssertSemanticsMatch(JObject expectedValue, object value)
+        private static void AssertSemanticsMatch(JObject expectedValue, object value)
         {
             // TODO  Finish checking semantics matches expected
             var expectedType = expectedValue.Value<string>("#type").Replace("_", "");
@@ -98,7 +98,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             }
         }
 
-        private object GetProperty(object value, string name)
+        private static object GetProperty(object value, string name)
         {
             var property = value.GetType().GetProperty(name, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
             Assert.True(property != null, $"No property '{name}' on type {value.GetType().Name}");
@@ -109,7 +109,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         public static TheoryData<AnalyzeTestCase> GetAllAnalyzerTestCases()
         {
             var testCases = new TheoryData<AnalyzeTestCase>();
-            var testsDirectory = TestsDirectory.Get();
+            var testsDirectory = LangTestsDirectory.Get();
             var analyzeTestsDirectory = Path.Combine(testsDirectory, "analyze");
             foreach (string testFile in Directory.EnumerateFiles(analyzeTestsDirectory, "*.json", SearchOption.AllDirectories))
             {

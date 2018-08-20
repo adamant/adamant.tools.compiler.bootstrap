@@ -15,6 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Framework\Framework.csproj" />
     <ProjectReference Include="..\Semantics.Types\Semantics.Types.csproj" />
   </ItemGroup>
 

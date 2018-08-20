@@ -1,7 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.LValues;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 
-namespace Adamant.Tools.Compiler.Bootstrap.IL
+namespace Adamant.Tools.Compiler.Bootstrap.IL.Code
 {
     public class LocalVariableDeclaration
     {
@@ -19,6 +19,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL
             MutableBinding = mutableBinding;
             Type = type;
             Reference = new VariableReference(number);
+        }
+
+        internal void ToString(AsmBuilder builder)
+        {
+            var binding = MutableBinding ? "var" : "let";
+            builder.BeginLine($"{binding} %{Number}: &{Type}");
+            if (Name != null)
+                builder.Append($" // {Name}");
+            builder.EndLine();
         }
     }
 }

@@ -1,3 +1,5 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
+
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
     public class CCodeBuilder : CodeBuilder
@@ -18,6 +20,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         public override void EndLine(string value)
         {
             base.EndLine(value);
+            NeedsDeclarationSeparatorLine = true;
+            NeedsStatementSeparatorLine = false;
+        }
+
+        public override void EndLine()
+        {
+            base.EndLine();
             NeedsDeclarationSeparatorLine = true;
             NeedsStatementSeparatorLine = false;
         }
