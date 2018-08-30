@@ -102,6 +102,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                 case NewObjectExpressionSyntax newObjectExpression:
                     return Type(newObjectExpression.Type);
 
+                case LifetimeTypeSyntax lifetimeType:
+                    Lifetime lifetime;
+                    if (lifetimeType.Lifetime.Kind == TokenKind.OwnedKeyword)
+                        lifetime = OwnedLifetime.Instance;
+                    else
+                        lifetime = new NamedLifetime(lifetimeType.Lifetime.Text);
+                    return new LifetimeType(Type(lifetimeType.TypeName), lifetime);
+
                 default:
                     throw NonExhaustiveMatchException.For(syntax);
             }

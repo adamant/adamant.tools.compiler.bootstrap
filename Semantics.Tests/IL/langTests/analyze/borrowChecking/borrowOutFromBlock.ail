@@ -7,7 +7,7 @@ public class Test
 public function func() -> %0: default::Test
 {
     let %1: &default::Test // y
-    let %2: &default::Test // x
+    let %2: &default::Test$owned // x
 
     bb0:
     {
