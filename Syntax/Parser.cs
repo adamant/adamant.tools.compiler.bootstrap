@@ -319,8 +319,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     var keyword = tokens.Consume();
                     return new PrimitiveTypeSyntax(keyword);
                 case TokenKind.Identifier:
-                    var name = (IdentifierToken)tokens.Expect(TokenKind.Identifier);
-                    return new IdentifierNameSyntax(name);
+                    var identifier = (IdentifierToken)tokens.Expect(TokenKind.Identifier);
+                    var name = new IdentifierNameSyntax(identifier);
+                    if (tokens.CurrentIs(TokenKind.Dollar))
+                    {
+                        var children = NewChildList();
+                        children.Add(name);
+                        children.Add(tokens.Accept(TokenKind.Dollar));
+                        if (tokens.CurrentIs(TokenKind.Identifier))
+                            children.Add(tokens.Accept(TokenKind.Identifier));
+                        else
+                            children.Add(tokens.Expect(TokenKind.OwnedKeyword));
+                        return new LifetimeTypeSyntax(children);
+                    }
+                    return name;
                 default:
                     throw NonExhaustiveMatchException.For(tokens.Current);
             }

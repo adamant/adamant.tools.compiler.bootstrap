@@ -74,5 +74,6 @@ namespace Core.Syntax
         ClassKeyword,
         NewKeyword,
         DeleteKeyword,
+        OwnedKeyword,
     }
 }
