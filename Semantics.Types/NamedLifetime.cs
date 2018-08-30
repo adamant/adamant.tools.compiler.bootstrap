@@ -9,6 +9,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             Name = name;
         }
 
+        public override bool IsOwned => false;
+
         public override string ToString()
         {
             return Name;

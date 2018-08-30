@@ -11,6 +11,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.Operators;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using ILFunctionDeclaration = Adamant.Tools.Compiler.Bootstrap.IL.Declarations.FunctionDeclaration;
 using Statement = Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements.Statement;
 
@@ -53,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
             return il;
         }
 
-        private LValue LookupVariable(string name)
+        private VariableReference LookupVariable(string name)
         {
             return il.VariableDeclarations.Single(v => v.Name == name).Reference;
         }
@@ -77,11 +78,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
                 case Block block:
                     foreach (var statementInBlock in block.Statements)
                         Convert(statementInBlock);
+
+                    // Now we need to delete any owned varibles
+                    foreach (var variableDeclaration in block.Statements.OfType<VariableDeclarationStatement>().Where(IsOwned))
+                    {
+                        currentBlock.Add(new DeleteStatement(LookupVariable(variableDeclaration.Name).VariableNumber));
+                    }
                     break;
 
                 default:
                     throw NonExhaustiveMatchException.For(statement);
             }
+        }
+
+        private static bool IsOwned(VariableDeclarationStatement declaration)
+        {
+            if (declaration.Type is LifetimeType type)
+                return type.IsOwned;
+
+            return false;
         }
 
         private void Convert(Expression expression)

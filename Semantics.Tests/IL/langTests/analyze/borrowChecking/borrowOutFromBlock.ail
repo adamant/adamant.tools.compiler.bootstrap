@@ -13,6 +13,7 @@ public function func() -> %0: default::Test
     {
         %2 = new default::Test()
         %1 = %2
+        delete %2
         %0 = %1
         return
     }

@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Code
 {
     public class LocalVariableDeclaration
     {
-        public readonly int Number; // The declaration number is used as its name int the IR
+        public readonly int Number; // The declaration number is used as its name in the IR
 
         // If this declaration corresponds to an argument or local variable, what it was named. Not guaranteed unique
         public string Name = null;

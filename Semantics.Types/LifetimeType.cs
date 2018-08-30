@@ -11,6 +11,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             Lifetime = lifetime;
         }
 
+        public bool IsOwned => Lifetime.IsOwned;
+
         public override string ToString()
         {
             return $"{Type}${Lifetime}";

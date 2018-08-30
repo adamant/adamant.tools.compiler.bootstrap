@@ -1,17 +1,17 @@
 namespace Adamant.Tools.Compiler.Bootstrap.IL.Code.Statements
 {
-    public class DropStatement : Statement
+    public class DeleteStatement : Statement
     {
         public readonly int VariableNumber;
 
-        public DropStatement(int variableNumber)
+        public DeleteStatement(int variableNumber)
         {
             VariableNumber = variableNumber;
         }
 
         internal override void ToString(AsmBuilder builder)
         {
-            builder.AppendLine($"drop %{VariableNumber}");
+            builder.AppendLine($"delete %{VariableNumber}");
         }
     }
 }
