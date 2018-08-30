@@ -85,6 +85,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     case '|':
                         yield return NewOperatorToken(TokenKind.Pipe);
                         break;
+                    case '$':
+                        yield return NewOperatorToken(TokenKind.Dollar);
+                        break;
                     case '→':
                         yield return NewOperatorToken(TokenKind.RightArrow);
                         break;
@@ -242,7 +245,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     token = Token.New(code, span, keywordKind, tokenDiagnosticInfos);
                 }
                 else
-                    token = new IdentifierToken(code, span, IdentifierKind.Normal, value, tokenDiagnosticInfos);
+                    token = new IdentifierToken(code, span, IdentifierKind.Normal, false, value, tokenDiagnosticInfos);
 
                 tokenDiagnosticInfos.Clear();
                 return token;
@@ -348,7 +351,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                 // To include the close quote
                 if (tokenEnd < code.Length && code[tokenEnd] == '"')
                     tokenEnd += 1;
-                var token = new StringLiteralToken(code, TextSpan.FromStartEnd(tokenStart, tokenEnd), content.ToString(), tokenDiagnosticInfos);
+                var token = new StringLiteralToken(code, TextSpan.FromStartEnd(tokenStart, tokenEnd), false, content.ToString(), tokenDiagnosticInfos);
                 tokenDiagnosticInfos.Clear();
                 return token;
             }

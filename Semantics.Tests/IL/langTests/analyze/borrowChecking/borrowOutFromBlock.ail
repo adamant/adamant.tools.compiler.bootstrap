@@ -12,8 +12,8 @@ public function func() -> %0: default::Test
     bb0:
     {
         %2 = new default::Test()
-        %1 = borrow %2
-        %0 = borrow %1
+        %1 = %2
+        %0 = %1
         return
     }
 }

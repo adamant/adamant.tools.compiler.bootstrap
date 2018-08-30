@@ -9,12 +9,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes
     {
         public SyntaxNode Syntax => GetSyntax();
         public IReadOnlyList<DiagnosticInfo> Diagnostics { get; }
+        private readonly List<DiagnosticInfo> diagnostics;
 
         protected SemanticNode(IEnumerable<DiagnosticInfo> diagnostics)
         {
-            Diagnostics = diagnostics.ToList().AsReadOnly();
+            this.diagnostics = diagnostics.ToList();
+            Diagnostics = this.diagnostics.AsReadOnly();
         }
 
         protected abstract SyntaxNode GetSyntax();
+
+        internal void AddDiagnostic(DiagnosticInfo diagnostic)
+        {
+            diagnostics.Add(diagnostic);
+        }
     }
 }

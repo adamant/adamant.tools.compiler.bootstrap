@@ -20,6 +20,6 @@ Note that due to the complexity of the issues of dealing with cycles in evaluati
 
 ## Simplifications for Semantic Tree
 
-* Don't include parenthezied expressions
+* Don't include parenthesized expressions
 * Unify the different kinds of blocks
 * All loops as `loop`?

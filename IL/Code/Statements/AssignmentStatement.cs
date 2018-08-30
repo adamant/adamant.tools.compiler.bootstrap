@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Code.Statements
 
         internal override void ToString(AsmBuilder builder)
         {
-            builder.AppendLine($"{LValue} = borrow {RValue}");
+            builder.AppendLine($"{LValue} = {RValue}");
         }
     }
 }

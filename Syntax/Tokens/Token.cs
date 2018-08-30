@@ -45,9 +45,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
             switch (kind)
             {
                 case TokenKind.Identifier:
-                    return new IdentifierToken(code, span, IdentifierKind.Normal, "", diagnostic.Yield());
+                    return new IdentifierToken(code, span, IdentifierKind.Normal, true, "", diagnostic.Yield());
                 case TokenKind.StringLiteral:
-                    return new StringLiteralToken(code, span, "", diagnostic.Yield());
+                    return new StringLiteralToken(code, span, true, "", diagnostic.Yield());
                 default:
                     return new Token(code, span, kind, true, diagnostic.Yield());
             }

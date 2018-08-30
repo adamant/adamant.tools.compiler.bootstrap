@@ -9,8 +9,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
     {
         public readonly string Value;
 
-        public StringLiteralToken(CodeText code, TextSpan span, string value, IEnumerable<DiagnosticInfo> diagnosticInfos)
-            : base(code, span, TokenKind.StringLiteral, false, diagnosticInfos)
+        public StringLiteralToken(CodeText code, TextSpan span, bool isMissing, string value, IEnumerable<DiagnosticInfo> diagnosticInfos)
+            : base(code, span, TokenKind.StringLiteral, isMissing, diagnosticInfos)
         {
             Value = value;
         }

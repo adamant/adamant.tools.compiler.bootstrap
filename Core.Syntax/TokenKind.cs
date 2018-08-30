@@ -37,6 +37,7 @@ namespace Core.Syntax
         Colon, // `:` U+003A
         Question, // `?` U+003F
         Pipe, // `|` U+007C
+        Dollar, // `$` U+0024
         RightArrow, // `→` U+2192
         AtSign, // `@` U+0040 (named at sign to distinguish it from the word "at")
         Caret, // `^` U+005E

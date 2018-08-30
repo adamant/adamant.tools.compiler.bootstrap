@@ -14,9 +14,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
             CodeText code,
             TextSpan span,
             IdentifierKind kind,
+            bool isMissing,
             string value,
             IEnumerable<DiagnosticInfo> diagnosticInfos)
-            : base(code, span, TokenKind.Identifier, false, diagnosticInfos)
+            : base(code, span, TokenKind.Identifier, isMissing, diagnosticInfos)
         {
             IdentifierKind = kind;
             Value = value;
