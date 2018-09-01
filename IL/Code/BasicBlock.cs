@@ -18,15 +18,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Code
             Statements = statements.AsReadOnly();
         }
 
-        public void Add(Statement statement)
+        public void Add(SimpleStatement statement)
         {
-            statements.Add(statement);
+            if (EndStatement == null)
+                statements.Add(statement);
+            else
+                statements.Insert(statements.Count - 2, statement);
         }
 
         public void End(EndStatement endStatement)
         {
             Requires.That(nameof(EndStatement), EndStatement == null);
             EndStatement = endStatement;
+            statements.Add(EndStatement);
         }
 
         internal void ToString(AsmBuilder builder)

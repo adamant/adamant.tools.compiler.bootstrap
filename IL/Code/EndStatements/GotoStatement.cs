@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Adamant.Tools.Compiler.Bootstrap.IL.Code.EndStatements
 {
     public class GotoStatement : EndStatement
@@ -9,6 +11,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Code.EndStatements
             BlockNumber = blockNumber;
         }
 
+        public override IEnumerable<int> OutBlocks()
+        {
+            yield return BlockNumber;
+        }
 
         internal override void ToString(AsmBuilder builder)
         {

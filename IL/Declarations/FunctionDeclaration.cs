@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code;
+using Adamant.Tools.Compiler.Bootstrap.IL.Refs;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IL.Declarations
@@ -52,6 +53,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Declarations
             var block = new BasicBlock(basicBlocks.Count);
             basicBlocks.Add(block);
             return block;
+        }
+
+        public Edges Edges()
+        {
+            return new Edges(this);
         }
 
         internal override void ToString(AsmBuilder builder)

@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.IL.Code.LValues;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IL.Code.Statements
 {
-    public class CallStatement : Statement
+    public class CallStatement : SimpleStatement
     {
         public readonly LValue LValue;
         public readonly string FunctionName;

@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.IL.Code.RValues;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IL.Code.Statements
 {
-    public class AssignmentStatement : Statement
+    public class AssignmentStatement : SimpleStatement
     {
         public LValue LValue { get; }
         public RValue RValue { get; }

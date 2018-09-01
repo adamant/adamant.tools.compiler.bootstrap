@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.IL.Code.Statements
 {
-    public class DeleteStatement : Statement
+    public class DeleteStatement : SimpleStatement
     {
         public readonly int VariableNumber;
 

@@ -81,9 +81,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
 
                     // Now we need to delete any owned varibles
                     foreach (var variableDeclaration in block.Statements.OfType<VariableDeclarationStatement>().Where(IsOwned))
-                    {
                         currentBlock.Add(new DeleteStatement(LookupVariable(variableDeclaration.Name).VariableNumber));
-                    }
+
                     break;
 
                 default:

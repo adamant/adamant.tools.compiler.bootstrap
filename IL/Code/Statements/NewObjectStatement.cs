@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IL.Code.Statements
 {
-    public class NewObjectStatement : Statement
+    public class NewObjectStatement : SimpleStatement
     {
         public readonly LValue ResultInto;
         public readonly DataType Type;

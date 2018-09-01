@@ -1,0 +1,6 @@
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BorrowChecker
+{
+    public class Title : Claim
+    {
+    }
+}

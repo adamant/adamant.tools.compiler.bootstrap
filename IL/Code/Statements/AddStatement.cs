@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.IL.Code.LValues;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IL.Code.Statements
 {
-    public class AddStatement : Statement
+    public class AddStatement : SimpleStatement
     {
         public LValue LValue { get; }
         public LValue LeftOperand { get; }
