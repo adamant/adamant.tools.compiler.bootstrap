@@ -62,7 +62,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Declarations
 
         internal override void ToString(AsmBuilder builder)
         {
-            builder.AppendLine($"public function {Name}() -> %0: {ReturnType}");
+            builder.AppendLine($"public function {Name}() -> %0: &{ReturnType}");
             builder.BeginBlock();
             foreach (var variable in variableDeclarations.Skip(Arity + 1))
             {

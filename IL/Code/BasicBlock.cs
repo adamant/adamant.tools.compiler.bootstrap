@@ -40,7 +40,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Code
             foreach (var statement in statements)
                 statement.ToString(builder);
 
-            EndStatement.ToString(builder);
             builder.EndBlock();
         }
     }

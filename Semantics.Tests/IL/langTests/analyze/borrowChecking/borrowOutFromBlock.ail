@@ -12,9 +12,9 @@ public function func() -> %0: &default::Test$owned
     bb0:
     {
         %2 = new default::Test()
-        %1 = %2 // $1 = $2
-        delete ^%2 // Thus both $1 and $2 are unusable // kills %2
-        %0 = %1 // But then we try to use $1 // kills %1
+        %1 = %2
+        delete ^%2
+        %0 = %1
         return
     }
 }

@@ -72,6 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
                                 break;
                             case Name _:
                             case DataType _:
+                            case OwnedLifetime _:
                                 Assert.Equal(expected.ToObject<string>(), actual.ToString());
                                 break;
                             default:

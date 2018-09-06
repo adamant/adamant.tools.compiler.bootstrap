@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Code.Statements
 
         internal override void ToString(AsmBuilder builder)
         {
-            builder.AppendLine($"delete %{VariableNumber}");
+            builder.AppendLine($"delete ^%{VariableNumber}");
         }
     }
 }
