@@ -10,7 +10,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             var analysis = new SemanticAnalysis(packageSyntax);
             var package = analysis.Package;
             var ilPackage = new IntermediateLanguageGenerator().Convert(package);
-            // TODO do borrow checking
+            var borrowChecker = new BorrowChecker.BorrowChecker();
+            borrowChecker.Check(ilPackage);
             return new AnalysisResult(package, ilPackage);
         }
     }

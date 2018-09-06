@@ -18,6 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Declarations
         public IReadOnlyList<BasicBlock> BasicBlocks { get; }
         private readonly List<BasicBlock> basicBlocks = new List<BasicBlock>();
         public BasicBlock EntryBlock => basicBlocks.First();
+        public BasicBlock ExitBlock => basicBlocks.Last(); // TODO this is likely not right
 
         public FunctionDeclaration(string name, int arity)
         {

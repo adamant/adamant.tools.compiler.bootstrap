@@ -6,14 +6,14 @@ using Adamant.Tools.Compiler.Bootstrap.IL.Declarations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IL.Refs
 {
-    public class Transistions : ReadOnlyCollection<Transistion>
+    public class Transitions : ReadOnlyCollection<Transition>
     {
         private readonly ILookup<Statement, Statement> from;
         private readonly ILookup<Statement, Statement> to;
 
-        public Transistions(FunctionDeclaration function)
-            : base(function.BasicBlocks.SelectMany(b => b.Statements.Zip(b.Statements.Skip(1), (s1, s2) => new Transistion(s1, s2)))
-                  .Concat(function.Edges().Select(e => new Transistion(e.From.EndStatement, e.To.Statements.First())))
+        public Transitions(FunctionDeclaration function)
+            : base(function.BasicBlocks.SelectMany(b => b.Statements.Zip(b.Statements.Skip(1), (s1, s2) => new Transition(s1, s2)))
+                  .Concat(function.Edges().Select(e => new Transition(e.From.EndStatement, e.To.Statements.First())))
                   .ToList())
         {
             from = this.ToLookup(e => e.From, e => e.To);

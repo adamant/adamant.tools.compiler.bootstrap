@@ -3,12 +3,12 @@ using Adamant.Tools.Compiler.Bootstrap.IL.Code.Statements;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IL.Refs
 {
-    public struct Transistion
+    public struct Transition
     {
         public readonly Statement From;
         public readonly Statement To;
 
-        public Transistion(Statement from, Statement to)
+        public Transition(Statement from, Statement to)
         {
             From = from;
             To = to;

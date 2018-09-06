@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
         private readonly Dictionary<SemanticNode, BasicBlock> blocks;
         private readonly ILFunctionDeclaration il;
         private bool converted;
-        private BasicBlock currentBlock;
+        private readonly BasicBlock currentBlock;
 
         public FunctionIntermediateLanguageGenerator(FunctionDeclaration function)
         {
@@ -47,6 +47,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
             {
                 foreach (var statement in function.Body.Statements)
                     Convert(statement);
+
+                if (!function.Body.Statements.Any())
+                    currentBlock.End(new ReturnStatement());
 
                 converted = true;
             }
@@ -79,7 +82,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
                     foreach (var statementInBlock in block.Statements)
                         Convert(statementInBlock);
 
-                    // Now we need to delete any owned varibles
+                    // Now we need to delete any owned variables
                     foreach (var variableDeclaration in block.Statements.OfType<VariableDeclarationStatement>().Where(IsOwned))
                         currentBlock.Add(new DeleteStatement(LookupVariable(variableDeclaration.Name).VariableNumber));
 
