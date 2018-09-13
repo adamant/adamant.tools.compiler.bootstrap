@@ -39,13 +39,91 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BorrowChecker
 
         private void Check(ILFunctionDeclaration function)
         {
+            // TODO we need to check definite assignment as well
+
             var edges = new Edges(function);
-            var transitions = new Transitions(function);
+
             // Compute aliveness at point after each statement
-            var liveBefore = ComputeLiveness(function, edges, transitions);
+            var liveBefore = ComputeLiveness(function, edges);
+
+            // Now do borrow checking with claims
+            var blocks = new Queue<BasicBlock>();
+            blocks.Enqueue(function.EntryBlock);
+            var claims = new Claims();
+            var nextObject = function.VariableDeclarations.Count + 1;
+
+            while (blocks.Any())
+            {
+                var block = blocks.Dequeue();
+
+                var claimsBeforeStatement = new HashSet<Claim>();
+                foreach (var predecessor in edges.To(block).Select(b => b.EndStatement))
+                    claimsBeforeStatement.UnionWith(claims.After(predecessor));
+
+                foreach (var statement in block.Statements)
+                {
+                    var claimsAfterStatement = claims.After(statement);
+                    claimsAfterStatement.UnionWith(claimsBeforeStatement);
+
+                    // Create any new claims and drop any dead claims
+                    switch (statement)
+                    {
+                        case NewObjectStatement newObjectStatement:
+                            {
+                                var title = new Title(newObjectStatement.ResultInto.CoreVariable(),
+                                    nextObject);
+                                nextObject += 1;
+                                claimsAfterStatement.Add(title);
+                                break;
+                            }
+                        case AssignmentStatement assignmentStatement:
+                            {
+                                var claim = GetClaim(assignmentStatement.RValue, claimsBeforeStatement);
+                                var loan = new Loan(assignmentStatement.LValue.CoreVariable(),
+                                    assignmentStatement.RValue,
+                                    claim.Object);
+                                claimsAfterStatement.Add(loan);
+                                break;
+                            }
+                        case DeleteStatement deleteStatement:
+                            {
+                                var title = GetTitle(deleteStatement.VariableNumber,
+                                    claimsBeforeStatement);
+                                claimsAfterStatement.RemoveWhere(c => c.Variable == title.Variable);
+                                break;
+                            }
+                        case AddStatement _: // Add only applies to copy types so no loans
+                        case ReturnStatement _:
+                            break;
+                        default:
+                            throw NonExhaustiveMatchException.For(statement);
+                    }
+
+                    // Get Ready for next statement
+                    claimsBeforeStatement = claimsAfterStatement;
+                }
+            }
         }
 
-        private LiveVariables ComputeLiveness(ILFunctionDeclaration function, Edges edges, Transitions transitions)
+
+        private static Claim GetClaim(RValue rvalue, HashSet<Claim> claimsBeforeStatement)
+        {
+            var coreVariable = rvalue.CoreVariable();
+            return claimsBeforeStatement.Single(t => t.Variable == coreVariable);
+        }
+
+        private static Title GetTitle(RValue rvalue, HashSet<Claim> claimsBeforeStatement)
+        {
+            var coreVariable = rvalue.CoreVariable();
+            return GetTitle(coreVariable, claimsBeforeStatement);
+        }
+
+        private static Title GetTitle(int variable, HashSet<Claim> claimsBeforeStatement)
+        {
+            return claimsBeforeStatement.OfType<Title>().Single(t => t.Variable == variable);
+        }
+
+        private static LiveVariables ComputeLiveness(ILFunctionDeclaration function, Edges edges)
         {
             var blocks = new Queue<BasicBlock>();
             blocks.Enqueue(function.ExitBlock);
@@ -58,8 +136,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BorrowChecker
                 var liveBeforeBlock = new BitArray(liveVariables.Before(block.Statements.First()));
 
                 var liveAfterStatement = new BitArray(numberOfVariables);
-                foreach (var predecessor in edges.From(block).Select(b => b.Statements.First()))
-                    liveAfterStatement.Or(liveVariables.Before(predecessor));
+                foreach (var successor in edges.From(block).Select(b => b.Statements.First()))
+                    liveAfterStatement.Or(liveVariables.Before(successor));
 
                 foreach (var statement in block.Statements.Reverse())
                 {
@@ -89,6 +167,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BorrowChecker
                         default:
                             throw NonExhaustiveMatchException.For(statement);
                     }
+
+                    // For the next statement
+                    liveAfterStatement = liveBeforeStatement;
                 }
 
                 if (!liveBeforeBlock.Equals(liveVariables.Before(block.Statements.First())))
@@ -99,7 +180,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BorrowChecker
             return liveVariables;
         }
 
-        private void KillVariables(BitArray variables, LValue lvalue)
+        private static void KillVariables(BitArray variables, LValue lvalue)
         {
             switch (lvalue)
             {
@@ -113,7 +194,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BorrowChecker
                     throw NonExhaustiveMatchException.For(lvalue);
             }
         }
-        private void LiveVariables(BitArray variables, RValue rValue)
+        private static void LiveVariables(BitArray variables, RValue rValue)
         {
             switch (rValue)
             {

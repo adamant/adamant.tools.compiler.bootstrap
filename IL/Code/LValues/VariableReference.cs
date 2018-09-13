@@ -13,5 +13,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Code.LValues
         {
             return $"%{VariableNumber}";
         }
+
+        public override int CoreVariable()
+        {
+            return VariableNumber;
+        }
     }
 }

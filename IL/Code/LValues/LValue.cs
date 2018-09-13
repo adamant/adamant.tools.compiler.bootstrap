@@ -4,5 +4,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Code.LValues
 {
     public abstract class LValue : RValue
     {
+        public abstract override int CoreVariable();
     }
 }

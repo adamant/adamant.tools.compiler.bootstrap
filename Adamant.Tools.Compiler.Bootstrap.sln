@@ -50,7 +50,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Syntax", "Core.Syntax\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IL", "IL\IL.csproj", "{40562F85-7C7B-4E87-A307-229D57EB74C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Semantics.Tests", "Semantics.Tests\Semantics.Tests.csproj", "{84D37D24-C01A-4BD8-A9F6-36DD13FE812C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Semantics.Tests", "Semantics.Tests\Semantics.Tests.csproj", "{84D37D24-C01A-4BD8-A9F6-36DD13FE812C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
