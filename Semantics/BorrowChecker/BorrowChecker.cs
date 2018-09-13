@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.EndStatements;
@@ -17,28 +19,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BorrowChecker
 {
     public class BorrowChecker
     {
-        public void Check(ILPackage package)
+        public IEnumerable<DiagnosticInfo> Check(ILPackage package)
         {
+            var diagnostics = new List<DiagnosticInfo>();
             foreach (var declaration in package.Declarations)
                 switch (declaration)
                 {
                     case ILFunctionDeclaration function:
-                        Check(function);
+                        diagnostics.AddRange(Check(function));
                         break;
 
                     case ILTypeDeclaration typeDeclaration:
                         Check(typeDeclaration);
                         break;
                 }
+
+            return diagnostics;
         }
 
-        private void Check(ILTypeDeclaration typeDeclaration)
+        private static void Check(ILTypeDeclaration typeDeclaration)
         {
             // Currently nothing to check
         }
 
-        private void Check(ILFunctionDeclaration function)
+        private static IEnumerable<DiagnosticInfo> Check(ILFunctionDeclaration function)
         {
+            var diagnostics = new List<DiagnosticInfo>();
             // TODO we need to check definite assignment as well
 
             var edges = new Edges(function);
@@ -65,7 +71,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BorrowChecker
                     var claimsAfterStatement = claims.After(statement);
                     claimsAfterStatement.UnionWith(claimsBeforeStatement);
 
-                    // Create any new claims and drop any dead claims
+                    // Create/drop any claims modified by the statement
                     switch (statement)
                     {
                         case NewObjectStatement newObjectStatement:
@@ -89,6 +95,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BorrowChecker
                             {
                                 var title = GetTitle(deleteStatement.VariableNumber,
                                     claimsBeforeStatement);
+                                CheckCanMove(title.Object, claimsBeforeStatement, diagnostics);
                                 claimsAfterStatement.RemoveWhere(c => c.Variable == title.Variable);
                                 break;
                             }
@@ -99,28 +106,44 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BorrowChecker
                             throw NonExhaustiveMatchException.For(statement);
                     }
 
+                    // TODO drop claims due to liveness
+
                     // Get Ready for next statement
                     claimsBeforeStatement = claimsAfterStatement;
                 }
             }
+
+            return diagnostics;
         }
 
+        private static void CheckCanMove(
+            int @object,
+            HashSet<Claim> claims,
+            List<DiagnosticInfo> diagnostics)
+        {
+            var canTake = claims.OfType<Loan>().SelectMany(l => l.Restrictions)
+                .Any(r => r.Place == @object && !r.CanTake);
+            if (!canTake)
+            {
+                diagnostics.Add(Error.BorrowedValueDoesNotLiveLongEnough(TextSpan.FromStartEnd(0, 0)));
+            }
+        }
 
-        private static Claim GetClaim(RValue rvalue, HashSet<Claim> claimsBeforeStatement)
+        private static Claim GetClaim(RValue rvalue, HashSet<Claim> claims)
         {
             var coreVariable = rvalue.CoreVariable();
-            return claimsBeforeStatement.Single(t => t.Variable == coreVariable);
+            return claims.Single(t => t.Variable == coreVariable);
         }
 
-        private static Title GetTitle(RValue rvalue, HashSet<Claim> claimsBeforeStatement)
+        private static Title GetTitle(RValue rvalue, HashSet<Claim> claims)
         {
             var coreVariable = rvalue.CoreVariable();
-            return GetTitle(coreVariable, claimsBeforeStatement);
+            return GetTitle(coreVariable, claims);
         }
 
-        private static Title GetTitle(int variable, HashSet<Claim> claimsBeforeStatement)
+        private static Title GetTitle(int variable, HashSet<Claim> claims)
         {
-            return claimsBeforeStatement.OfType<Title>().Single(t => t.Variable == variable);
+            return claims.OfType<Title>().Single(t => t.Variable == variable);
         }
 
         private static LiveVariables ComputeLiveness(ILFunctionDeclaration function, Edges edges)

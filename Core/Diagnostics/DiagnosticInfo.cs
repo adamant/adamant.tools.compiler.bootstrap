@@ -2,6 +2,7 @@ using System;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics
 {
+    // TODO need clearer name for this
     public class DiagnosticInfo
     {
         public readonly DiagnosticLevel Level;

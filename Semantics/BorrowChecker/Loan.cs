@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.IL.Code.LValues;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.RValues;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BorrowChecker
@@ -10,6 +12,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BorrowChecker
         public Loan(int variable, RValue rvalue, int @object)
             : base(variable, @object)
         {
+            var restrictions = new List<Restriction>();
+            GatherRestrictions(rvalue, restrictions);
+            Restrictions = restrictions.AsReadOnly();
+        }
+
+        private static void GatherRestrictions(RValue rvalue, List<Restriction> restrictions)
+        {
+            switch (rvalue)
+            {
+                case VariableReference variable:
+                    restrictions.Add(new Restriction(variable.VariableNumber, false));
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.For(rvalue);
+            }
         }
     }
 }

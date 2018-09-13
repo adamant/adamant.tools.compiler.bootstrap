@@ -28,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics
             return new DiagnosticInfo(DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 2001, $"Operator `{@operator}` cannot be applied to operands of type `{leftOperandType}` and `{rightOperandType}`.");
         }
 
-        public static DiagnosticInfo BorrowedValueDoesNotLiveLongEnought(TextSpan expression)
+        public static DiagnosticInfo BorrowedValueDoesNotLiveLongEnough(TextSpan expression)
         {
             return new DiagnosticInfo(DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3001, $"Borrowed values does not live long enough");
         }
