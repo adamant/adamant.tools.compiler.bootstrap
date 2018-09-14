@@ -4,3 +4,6 @@
 [submodule "tests"]
 	path = tests
 	url = https://github.com/adamant/adamant.language.tests.git
+[submodule "katas"]
+	path = katas
+	url = https://github.com/adamant/adamant.katas.git
