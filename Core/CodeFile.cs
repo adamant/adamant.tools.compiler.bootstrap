@@ -1,3 +1,4 @@
+using System.IO;
 using System.Text;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core
@@ -16,6 +17,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
         {
             Code = text;
             Reference = reference;
+        }
+
+        public static CodeFile Load(string path)
+        {
+            var fullPath = Path.GetFullPath(path);
+            return new CodeFile(new CodeText(File.ReadAllText(fullPath, Encoding)), new CodePath(fullPath));
         }
     }
 }
