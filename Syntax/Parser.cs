@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Literals;
@@ -32,6 +33,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         public CompilationUnitSyntax ParseCompilationUnit(ITokenStream tokens)
         {
             var children = NewChildList();
+
+            // Namespace Declaration
+            if (tokens.CurrentIs(TokenKind.NamespaceKeyword))
+            {
+                var namespaceChildren = NewChildList();
+                namespaceChildren.Add(tokens.Expect(TokenKind.NamespaceKeyword));
+                namespaceChildren.Add(ParseQualifiedName(tokens));
+                namespaceChildren.Add(tokens.Expect(TokenKind.Semicolon));
+                children.Add(new CompilationUnitNamespaceSyntax(children));
+            }
+
+            // Child Declarations
             while (!tokens.AtEndOfFile())
             {
                 var start = tokens.Current;
@@ -43,7 +56,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             return new CompilationUnitSyntax(children);
         }
 
-        public DeclarationSyntax ParseDeclaration(ITokenStream tokens)
+        public SyntaxBranchNode ParseDeclaration(ITokenStream tokens)
         {
             var children = NewChildList();
             children.Add(ParseAccessModifier(tokens));
@@ -56,6 +69,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     children.Add(tokens.Expect(TokenKind.OpenBrace));
                     children.Add(tokens.Expect(TokenKind.CloseBrace));
                     return new ClassDeclarationSyntax(children);
+                case TokenKind.UsingKeyword:
+                    children.Add(tokens.Expect(TokenKind.UsingKeyword));
+                    children.Add(ParseQualifiedName(tokens));
+                    children.Add(tokens.Expect(TokenKind.Semicolon));
+                    return new UsingSyntax(children);
                 default:
                     // Function Declaration
                     children.Add(tokens.Expect(TokenKind.Identifier));
@@ -67,7 +85,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             }
         }
 
-        private ParameterListSyntax ParseParameterList(ITokenStream tokens)
+        private static NameSyntax ParseQualifiedName(ITokenStream tokens)
+        {
+            NameSyntax name = new IdentifierNameSyntax((IdentifierToken)tokens.Expect(TokenKind.Identifier));
+            while (tokens.CurrentIs(TokenKind.Dot))
+            {
+                var children = NewChildList();
+                children.Add(name);
+                children.Add(tokens.Expect(TokenKind.Dot));
+                children.Add(new IdentifierNameSyntax((IdentifierToken)tokens.Expect(TokenKind.Identifier)));
+                name = new QualifiedNameSyntax(children);
+            }
+            return name;
+        }
+
+        private static ParameterListSyntax ParseParameterList(ITokenStream tokens)
         {
             var children = NewChildList();
             children.Add(tokens.Expect(TokenKind.OpenParen));
@@ -76,7 +108,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             return new ParameterListSyntax(children);
         }
 
-        private ParameterSyntax ParseParameter(ITokenStream tokens)
+        private static ParameterSyntax ParseParameter(ITokenStream tokens)
         {
             var children = NewChildList();
             switch (tokens.Current.Kind)
@@ -111,7 +143,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             yield return parseItem(tokens);
             if (tokens.Current == start)
                 yield return new SkippedTokensSyntax(tokens.Consume());
-            while (!tokens.CurrentIs(terminator))
+            while (!tokens.CurrentIs(terminator) && !tokens.AtEndOfFile())
             {
                 start = tokens.Current;
                 yield return tokens.Expect(separator);
@@ -133,7 +165,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             yield return parseItem(tokens);
             if (tokens.Current == start)
                 yield return new SkippedTokensSyntax(tokens.Consume());
-            while (!tokens.CurrentIs(terminator))
+            while (!tokens.CurrentIs(terminator) && !tokens.AtEndOfFile())
             {
                 start = tokens.Current;
                 yield return parseItem(tokens);

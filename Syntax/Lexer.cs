@@ -203,6 +203,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     case '"':
                         yield return LexString();
                         break;
+                    case '0':
                     case '1':
                     case '2':
                     case '3':

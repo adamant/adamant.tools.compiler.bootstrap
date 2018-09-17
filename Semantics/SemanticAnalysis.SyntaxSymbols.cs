@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -32,11 +31,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
         private IEnumerable<IDeclarationSyntaxSymbol> ComputeDeclarationSyntaxSymbols(IEnumerable<DeclarationSyntax> declarations)
         {
-            var lookup = declarations.ToLookup(d => d is NamespaceSyntax);
+            return declarations.Select(ComputeDeclarationSyntaxSymbol);
+            //var lookup = declarations.ToLookup(d => d is CompilationUnitNamespaceSyntax);
 
-            return lookup[true].Cast<NamespaceSyntax>().GroupBy(ns => ns.Name.Value)
-                .Select<IGrouping<string, NamespaceSyntax>, IDeclarationSyntaxSymbol>(g => throw new NotImplementedException())
-                .Concat(lookup[false].Select(ComputeDeclarationSyntaxSymbol));
+            //return lookup[true].Cast<CompilationUnitNamespaceSyntax>().GroupBy(ns => ns.Name.Value)
+            //    .Select<IGrouping<string, CompilationUnitNamespaceSyntax>, IDeclarationSyntaxSymbol>(g => throw new NotImplementedException())
+            //    .Concat(lookup[false].Select(ComputeDeclarationSyntaxSymbol));
         }
 
         private IDeclarationSyntaxSymbol ComputeDeclarationSyntaxSymbol(DeclarationSyntax declaration)

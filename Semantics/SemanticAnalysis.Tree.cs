@@ -36,6 +36,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public CompilationUnit Node(CompilationUnitSyntax s) => Node<CompilationUnit>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public CompilationUnitNamespaceDeclaration Node(CompilationUnitNamespaceSyntax s) => Node<CompilationUnitNamespaceDeclaration>(s);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Declaration Node(DeclarationSyntax s) => Node<Declaration>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -85,7 +88,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                     return new Package(package, AllDiagnostics(package), compilationUnits, EntryPoint(package));
 
                 case CompilationUnitSyntax compilationUnit:
-                    return new CompilationUnit(compilationUnit, compilationUnit.Declarations.Select(Node), AllDiagnostics(compilationUnit));
+                    {
+                        var @namespace = compilationUnit.Namespace != null
+                            ? Node(compilationUnit.Namespace)
+                            : null;
+                        return new CompilationUnit(compilationUnit, AllDiagnostics(compilationUnit),
+                            @namespace, compilationUnit.Declarations.Select(Node));
+                    }
+                case CompilationUnitNamespaceSyntax @namespace:
+                    return new CompilationUnitNamespaceDeclaration(@namespace, AllDiagnostics(@namespace));
 
                 case FunctionDeclarationSyntax function:
                     return new FunctionDeclaration(

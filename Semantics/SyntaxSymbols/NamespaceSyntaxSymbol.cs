@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
@@ -11,17 +12,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
 
         int? ISyntaxSymbol.DeclarationNumber => null;
 
-        public IReadOnlyList<NamespaceSyntax> Declarations { get; }
-        IEnumerable<DeclarationSyntax> IDeclarationSyntaxSymbol.Declarations => Declarations;
+        public IReadOnlyList<CompilationUnitNamespaceSyntax> Declarations { get; }
+        IEnumerable<DeclarationSyntax> IDeclarationSyntaxSymbol.Declarations => throw new NotImplementedException();
         IEnumerable<SyntaxBranchNode> ISyntaxSymbol.Declarations => Declarations;
 
         public IReadOnlyList<IDeclarationSyntaxSymbol> Children { get; }
         IEnumerable<ISyntaxSymbol> ISyntaxSymbol.Children => Children;
 
-        public NamespaceSyntaxSymbol(IEnumerable<NamespaceSyntax> declarations, IEnumerable<IDeclarationSyntaxSymbol> children)
+        public NamespaceSyntaxSymbol(IEnumerable<CompilationUnitNamespaceSyntax> declarations, IEnumerable<IDeclarationSyntaxSymbol> children)
         {
             Declarations = declarations.ToList().AsReadOnly();
-            Name = Declarations.First().Name.Value;
+            throw new NotImplementedException();
+            //Name = Declarations.First().Name.Value;
             Children = children.ToList().AsReadOnly();
         }
     }

@@ -6,11 +6,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
 {
     public class CompilationUnitSyntax : SyntaxBranchNode
     {
-        public IEnumerable<DeclarationSyntax> Declarations => Children.OfType<DeclarationSyntax>();
+        public CompilationUnitNamespaceSyntax Namespace { get; }
+        public IReadOnlyList<DeclarationSyntax> Declarations { get; }
 
         public CompilationUnitSyntax(IEnumerable<SyntaxNode> children)
             : base(children)
         {
+            Namespace = Children.OfType<CompilationUnitNamespaceSyntax>().SingleOrDefault();
+            Declarations = Children.OfType<DeclarationSyntax>().ToList().AsReadOnly();
         }
     }
 }

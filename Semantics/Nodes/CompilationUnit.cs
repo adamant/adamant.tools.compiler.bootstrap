@@ -9,15 +9,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes
     public class CompilationUnit : SemanticNode
     {
         public new CompilationUnitSyntax Syntax { get; }
+        public CompilationUnitNamespaceDeclaration Namespace { get; }
         public IReadOnlyList<Declaration> Declarations { get; }
 
         public CompilationUnit(
             CompilationUnitSyntax syntax,
-            IEnumerable<Declaration> declarations,
-            IEnumerable<DiagnosticInfo> diagnostics)
+            IEnumerable<DiagnosticInfo> diagnostics,
+            CompilationUnitNamespaceDeclaration @namespace,
+            IEnumerable<Declaration> declarations)
             : base(diagnostics)
         {
             Syntax = syntax;
+            Namespace = @namespace;
             Declarations = declarations.ToList().AsReadOnly();
         }
 
