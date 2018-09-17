@@ -49,6 +49,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                     Type(syntax);
                     break;
                 case CompilationUnitSyntax _:
+                case CompilationUnitNamespaceSyntax _:
                 case StatementSyntax _:
                 case PackageSyntax _:
                     // These node types don't require any analysis

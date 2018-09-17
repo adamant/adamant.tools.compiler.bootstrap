@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                 namespaceChildren.Add(tokens.Expect(TokenKind.NamespaceKeyword));
                 namespaceChildren.Add(ParseQualifiedName(tokens));
                 namespaceChildren.Add(tokens.Expect(TokenKind.Semicolon));
-                children.Add(new CompilationUnitNamespaceSyntax(children));
+                children.Add(new CompilationUnitNamespaceSyntax(namespaceChildren));
             }
 
             // Child Declarations
