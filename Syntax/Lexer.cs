@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
@@ -74,7 +75,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         yield return NewOperatorToken(TokenKind.Comma);
                         break;
                     case '.':
-                        yield return NewOperatorToken(TokenKind.Dot);
+                        if (NextCharIs('.'))
+                        {
+                            // it is `..`
+                            yield return NewOperatorToken(TokenKind.DotDot, 2);
+                        }
+                        else
+                            yield return NewOperatorToken(TokenKind.Dot);
                         break;
                     case ':':
                         yield return NewOperatorToken(TokenKind.Colon);
@@ -196,8 +203,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     case '"':
                         yield return LexString();
                         break;
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
+                        tokenEnd = tokenStart + 1;
+                        while (tokenEnd < code.Length && IsIntegerCharacter(code[tokenEnd]))
+                            tokenEnd += 1;
+
+                        var span = TextSpan.FromStartEnd(tokenStart, tokenEnd);
+                        var value = BigInteger.Parse(code[span]);
+                        yield return new IntegerLiteralToken(code, span, false, value, tokenDiagnosticInfos);
+                        tokenDiagnosticInfos.Clear();
+                        break;
                     default:
-                        if (IsIdentiferStartCharacter(currentChar))
+                        if (IsIdentifierStartCharacter(currentChar))
                         {
                             tokenEnd = tokenStart + 1;
                             while (tokenEnd < code.Length && IsIdentifierCharacter(code[tokenEnd]))
@@ -357,7 +382,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             }
         }
 
-        private static bool IsIdentiferStartCharacter(char c)
+        private static bool IsIntegerCharacter(char c)
+        {
+            return c >= '0' && c <= '9';
+        }
+
+        private static bool IsIdentifierStartCharacter(char c)
         {
             return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
         }

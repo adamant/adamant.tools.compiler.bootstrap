@@ -41,10 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
         public static Token MissingToken(this ITokenStream tokens, TokenKind kind)
         {
-            if (tokens.Finished)
-                return Token.Missing(tokens.Code, tokens.Code.Length, kind);
-            else
-                return Token.Missing(tokens.Code, tokens.Current.Span.Start, kind);
+            return Token.Missing(tokens.Code, tokens.Finished ? tokens.Code.Length : tokens.Current.Span.Start, kind);
         }
     }
 }

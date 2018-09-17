@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
@@ -99,7 +98,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             return new ParameterSyntax(children);
         }
 
-        private IEnumerable<SyntaxNode> ParseSyntaxList(
+        private static IEnumerable<SyntaxNode> ParseSyntaxList(
             ITokenStream tokens,
             Func<ITokenStream, SyntaxNode> parseItem,
             TokenKind separator,
@@ -122,7 +121,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             }
         }
 
-        private IEnumerable<SyntaxNode> ParseSyntaxList(
+        private static IEnumerable<SyntaxNode> ParseSyntaxList(
             ITokenStream tokens,
             Func<ITokenStream, SyntaxNode> parseItem,
             TokenKind terminator)
@@ -179,7 +178,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             }
         }
 
-        private ExpressionSyntax ParseExpression(ITokenStream tokens, OperatorPrecedence minPrecendence = OperatorPrecedence.Min)
+        private ExpressionSyntax ParseExpression(ITokenStream tokens, OperatorPrecedence minPrecedence = OperatorPrecedence.Min)
         {
             var expression = ParseAtom(tokens);
 
@@ -197,16 +196,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     case TokenKind.MinusEquals:
                     case TokenKind.AsteriskEquals:
                     case TokenKind.SlashEquals:
-                        if (minPrecendence <= OperatorPrecedence.Assignment)
+                        if (minPrecedence <= OperatorPrecedence.Assignment)
                         {
                             precedence = OperatorPrecedence.Assignment;
                             leftAssociative = false;
                             children.Add(tokens.Consume());
                         }
                         break;
+                    case TokenKind.OrKeyword:
+                    case TokenKind.XorKeyword:
+                        if (minPrecedence <= OperatorPrecedence.LogicalOr)
+                        {
+                            precedence = OperatorPrecedence.LogicalOr;
+                            children.Add(tokens.Consume());
+                        }
+                        break;
+                    case TokenKind.AndKeyword:
+                        if (minPrecedence <= OperatorPrecedence.LogicalAnd)
+                        {
+                            precedence = OperatorPrecedence.LogicalAnd;
+                            children.Add(tokens.Consume());
+                        }
+                        break;
                     case TokenKind.EqualsEquals:
                     case TokenKind.NotEqual:
-                        if (minPrecendence <= OperatorPrecedence.Equality)
+                        if (minPrecedence <= OperatorPrecedence.Equality)
                         {
                             precedence = OperatorPrecedence.Equality;
                             children.Add(tokens.Consume());
@@ -216,15 +230,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     case TokenKind.LessThanOrEqual:
                     case TokenKind.GreaterThan:
                     case TokenKind.GreaterThanOrEqual:
-                        if (minPrecendence <= OperatorPrecedence.Relational)
+                        if (minPrecedence <= OperatorPrecedence.Relational)
                         {
                             precedence = OperatorPrecedence.Relational;
                             children.Add(tokens.Consume());
                         }
                         break;
+                    case TokenKind.DotDot:
+                        if (minPrecedence <= OperatorPrecedence.Range)
+                        {
+                            precedence = OperatorPrecedence.Range;
+                            children.Add(tokens.Consume());
+                        }
+                        break;
                     case TokenKind.Plus:
                     case TokenKind.Minus:
-                        if (minPrecendence <= OperatorPrecedence.Additive)
+                        if (minPrecedence <= OperatorPrecedence.Additive)
                         {
                             precedence = OperatorPrecedence.Additive;
                             children.Add(tokens.Consume());
@@ -232,24 +253,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         break;
                     case TokenKind.Asterisk:
                     case TokenKind.Slash:
-                        if (minPrecendence <= OperatorPrecedence.Multiplicative)
+                        if (minPrecedence <= OperatorPrecedence.Multiplicative)
                         {
                             precedence = OperatorPrecedence.Multiplicative;
                             children.Add(tokens.Consume());
                         }
                         break;
                     case TokenKind.OpenParen:
-                        if (minPrecendence <= OperatorPrecedence.Primary)
+                        if (minPrecedence <= OperatorPrecedence.Primary)
                         {
-                            // Invocation
-                            precedence = OperatorPrecedence.Primary;
-                            //suffixOperator = true;
-                            throw new NotImplementedException();
-                            // TODO children.Add(ParseCallArguments(tokens));
+                            children.Add(ParseArgumentList(tokens));
+                            expression = new InvocationSyntax(children);
+                            continue;
                         }
                         break;
                     case TokenKind.Dot:
-                        if (minPrecendence <= OperatorPrecedence.Primary)
+                        if (minPrecedence <= OperatorPrecedence.Primary)
                         {
                             // Member Access
                             precedence = OperatorPrecedence.Primary;
@@ -260,7 +279,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         return expression;
                 }
 
-                // if we did't match any operator
+                // if we didn't match any operator
                 if (precedence == null)
                     return expression;
 
@@ -315,26 +334,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             {
                 case TokenKind.VoidKeyword:
                 case TokenKind.IntKeyword:
+                case TokenKind.UIntKeyword:
                 case TokenKind.BoolKeyword:
-                    var keyword = tokens.Consume();
-                    return new PrimitiveTypeSyntax(keyword);
-                case TokenKind.Identifier:
-                    var identifier = (IdentifierToken)tokens.Expect(TokenKind.Identifier);
-                    var name = new IdentifierNameSyntax(identifier);
-                    if (tokens.CurrentIs(TokenKind.Dollar))
+                case TokenKind.StringKeyword:
                     {
+                        var keyword = tokens.Consume();
+                        return new PrimitiveTypeSyntax(keyword);
+                    }
+                case TokenKind.Identifier:
+                default: // If it is something else, we assume it should be an identifier name
+                    {
+                        var identifier = (IdentifierToken)tokens.Expect(TokenKind.Identifier);
+                        var name = new IdentifierNameSyntax(identifier);
+                        if (!tokens.CurrentIs(TokenKind.Dollar)) return name;
+
                         var children = NewChildList();
                         children.Add(name);
                         children.Add(tokens.Accept(TokenKind.Dollar));
-                        if (tokens.CurrentIs(TokenKind.Identifier))
-                            children.Add(tokens.Accept(TokenKind.Identifier));
-                        else
-                            children.Add(tokens.Expect(TokenKind.OwnedKeyword));
+                        children.Add(tokens.CurrentIs(TokenKind.Identifier)
+                            ? tokens.Accept(TokenKind.Identifier)
+                            : tokens.Expect(TokenKind.OwnedKeyword));
                         return new LifetimeTypeSyntax(children);
                     }
-                    return name;
-                default:
-                    throw NonExhaustiveMatchException.For(tokens.Current);
             }
         }
 
@@ -343,6 +364,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             switch (tokens.Current.Kind)
             {
                 case TokenKind.PublicKeyword:
+                case TokenKind.PrivateKeyword:
                     return tokens.Consume();
                 default:
                     return tokens.MissingToken(TokenKind.PublicKeyword);

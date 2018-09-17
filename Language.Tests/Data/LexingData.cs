@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Core.Syntax;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -66,7 +65,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
                 return GetSequencesWithOneMoreToken(allOneTokenSequences, AllTokens);
             });
 
-            // For three and four token sequeneces, we only consider the permute tokens
+            // For three and four token sequences, we only consider the permute tokens
             threeTokenSequences = new Lazy<IReadOnlyList<TestTokenSequence>>(() =>
             {
                 var oneTokenSequences = permuteTokens.Select(TestTokenSequence.Single).ToList().AsReadOnly();
@@ -91,13 +90,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
             return tokensJson.Cast<JObject>().Select(ParseToken).ToList().AsReadOnly();
         }
 
-        private TestToken ParseToken(JObject tokenJson)
+        private static TestToken ParseToken(JObject tokenJson)
         {
             var permute = tokenJson.Value<bool?>("permute") ?? true;
             var text = tokenJson.Value<string>("text");
             var kind = ParseKind(tokenJson["kind"], text);
             var isValid = tokenJson.Value<bool?>("is_valid") ?? true;
-            object value = ParseValue(tokenJson["value"]);
+            var value = ParseValue(tokenJson["value"]);
             return new TestToken(permute, kind, text, isValid, value);
         }
 
@@ -132,6 +131,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
             {
                 case JTokenType.String:
                     return value.ToObject<string>();
+                case JTokenType.Integer:
+                    return value.ToObject<long>();
                 default:
                     throw new NotSupportedException($"'{value}' not supported as token value");
             }
@@ -169,12 +170,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
         {
             return sequences
                 .CrossJoin(crossWith ?? permuteTokens, (sequence, token) => sequence.Append(token))
-                .Where(DoesNotContainEndInInvalidPair)
+                .Where(DoesNotEndInInvalidPair)
                 .ToList()
                 .AsReadOnly();
         }
 
-        private bool DoesNotContainEndInInvalidPair(TestTokenSequence sequence)
+        private bool DoesNotEndInInvalidPair(TestTokenSequence sequence)
         {
             var lastIndex = sequence.Tokens.Count - 1;
             var secondToLast = sequence.Tokens[lastIndex - 1];

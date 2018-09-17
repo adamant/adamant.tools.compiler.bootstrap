@@ -28,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
                 var branch = branches.Pop();
                 yield return branch;
                 // If we reversed the children, we would have a pre-order traversal,
-                // but this is more efficent
+                // but this is more efficient
                 foreach (var child in branch.Children.OfType<SyntaxBranchNode>())
                     branches.Push(child);
             }

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Numerics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data;
@@ -130,6 +131,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
                     var stringLiteralToken = Assert.IsType<StringLiteralToken>(token);
                     if (expected.Value != null)
                         Assert.Equal(expected.Value, stringLiteralToken.Value);
+                    break;
+                case TokenKind.IntegerLiteral:
+                    var integerLiteralToken = Assert.IsType<IntegerLiteralToken>(token);
+                    if (expected.Value != null)
+                    {
+                        var expectedValue = (BigInteger)(long)expected.Value;
+                        Assert.Equal(expectedValue, integerLiteralToken.Value);
+                    }
                     break;
                 default:
                     Assert.IsType<Token>(token);
