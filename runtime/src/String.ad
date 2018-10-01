@@ -1,0 +1,15 @@
+namespace adamant.tools.compiler.runtime;
+
+public struct String$s
+{
+    public let count: size;
+    protected let data: @byte;
+
+    // Unsafe because it can violate the invariants that `data` point to a buffer
+    // of at least `count` bytes and that those bytes be valid UTF-8
+    public unsafe init(count: size, data: @byte)
+    {
+        self.count = count;
+        self.data = data;
+    }
+}

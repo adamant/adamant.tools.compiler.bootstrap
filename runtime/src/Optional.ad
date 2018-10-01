@@ -1,0 +1,7 @@
+namespace adamant.tools.compiler.runtime;
+
+public enum struct Optional[T]
+{
+    Some(T),
+    None
+}
