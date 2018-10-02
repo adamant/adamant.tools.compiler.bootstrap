@@ -2,9 +2,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
 {
     public enum PrimitiveTypeKind
     {
-        Void = 1,
+        Void,
         Never,
         Int,
         Bool,
+        UInt,
+        Size,
+        Byte,
+        String
     }
 }

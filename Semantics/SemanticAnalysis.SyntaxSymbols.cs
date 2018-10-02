@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -32,7 +31,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
         private static IEnumerable<IDeclarationSyntaxSymbol> ComputeDeclarationSyntaxSymbols(IEnumerable<DeclarationSyntax> declarations)
         {
-            return declarations.Select(ComputeDeclarationSyntaxSymbol);
+            return declarations
+                .Where(d => !(d is IncompleteDeclarationSyntax))
+                .Select(ComputeDeclarationSyntaxSymbol);
             //var lookup = declarations.ToLookup(d => d is CompilationUnitNamespaceSyntax);
 
             //return lookup[true].Cast<CompilationUnitNamespaceSyntax>().GroupBy(ns => ns.Name.Value)
@@ -55,6 +56,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                 case ClassDeclarationSyntax classDeclaration:
                     return new TypeSyntaxSymbol(classDeclaration);
 
+                case EnumStructDeclarationSyntax enumStruct:
+                    return new TypeSyntaxSymbol(enumStruct);
+
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
             }
@@ -72,9 +76,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             {
                 case FunctionDeclarationSyntax function:
                     var parentSymbol = SyntaxSymbol(Parent(function));
-                    if (function.Name.IsMissing)
-                        throw new Exception();
-                    return parentSymbol.Children.Single(c => c.Name == function.Name.Value);
+                    // Because the function could be missing a name, we have to find the correct symbol by whether we declare it
+                    return parentSymbol.Children.Single(c => c.Declarations.Contains(function));
                 case CompilationUnitSyntax compilationUnit:
                     var packageSymbol = SyntaxSymbol(Parent(compilationUnit));
                     return packageSymbol.GlobalNamespace;

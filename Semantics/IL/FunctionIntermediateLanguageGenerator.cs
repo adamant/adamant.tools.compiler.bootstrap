@@ -132,8 +132,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
                     currentBlock.Add(new AssignmentStatement(lvalue, LookupVariable(variableExpression.Name)));
                     break;
 
-                case AddExpression addExpression:
-                    currentBlock.Add(new AddStatement(lvalue, ConvertToLValue(addExpression.LeftOperand), ConvertToLValue(addExpression.RightOperand)));
+                case PlusExpression plusExpression:
+                    currentBlock.Add(new AddStatement(lvalue, ConvertToLValue(plusExpression.LeftOperand), ConvertToLValue(plusExpression.RightOperand)));
                     break;
 
                 default:

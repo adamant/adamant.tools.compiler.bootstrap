@@ -25,6 +25,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         {
         }
 
+        public static NonExhaustiveMatchException ForEnum<T>(T value)
+            where T : struct, Enum
+        {
+            return new NonExhaustiveMatchException($"Matching value {typeof(T).Name}.{value}");
+        }
 
         public static NonExhaustiveMatchException For(object value)
         {

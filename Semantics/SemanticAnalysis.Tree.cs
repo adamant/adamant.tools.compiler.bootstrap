@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -146,15 +145,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                         switch (binaryOperatorExpression.Operator.Kind)
                         {
                             case TokenKind.Plus:
-                                return new AddExpression(binaryOperatorExpression, AllDiagnostics(binaryOperatorExpression), leftOperand, rightOperand, Type(binaryOperatorExpression));
+                                return new PlusExpression(binaryOperatorExpression,
+                                    AllDiagnostics(binaryOperatorExpression),
+                                    leftOperand, rightOperand, Type(binaryOperatorExpression));
+
+                            case TokenKind.Dot:
+                                return new MemberAccessExpression(binaryOperatorExpression,
+                                    AllDiagnostics(binaryOperatorExpression),
+                                    leftOperand, rightOperand, Type(binaryOperatorExpression));
+
+                            case TokenKind.DotDot:
+                                return new DotDotExpression(binaryOperatorExpression,
+                                    AllDiagnostics(binaryOperatorExpression),
+                                    leftOperand, rightOperand, Type(binaryOperatorExpression));
 
                             case TokenKind.Equals:
                                 return new AssignmentExpression(binaryOperatorExpression,
-                                    AllDiagnostics(binaryOperatorExpression), leftOperand,
-                                    rightOperand, Type(binaryOperatorExpression));
+                                    AllDiagnostics(binaryOperatorExpression),
+                                    leftOperand, rightOperand, Type(binaryOperatorExpression));
+
+                            case TokenKind.AsteriskEquals:
+                                return new AsteriskAssignmentExpression(binaryOperatorExpression,
+                                    AllDiagnostics(binaryOperatorExpression),
+                                    leftOperand, rightOperand, Type(binaryOperatorExpression));
 
                             default:
-                                throw new InvalidEnumArgumentException(binaryOperatorExpression.Operator.Kind.ToString());
+                                throw NonExhaustiveMatchException.ForEnum(binaryOperatorExpression.Operator.Kind);
                         }
                     }
 
@@ -174,6 +190,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                         AllDiagnostics(newObject),
                         Type(newObject),
                         newObject.Arguments.Select(Node));
+
+                case InvocationSyntax invocation:
+                    return new InvocationExpression(invocation,
+                        AllDiagnostics(invocation),
+                        Type(invocation),
+                        Node(invocation.Callee),
+                        invocation.Arguments.Select(Node));
+
+                case ParenthesizedExpressionSyntax parenthesizedExpression:
+                    // Parentheses are dropped from the semantic tree
+                    return Node(parenthesizedExpression.Expression);
 
                 case ClassDeclarationSyntax classDeclaration:
                     return new ClassDeclaration(

@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
 
         IEnumerable<ISyntaxSymbol> ISyntaxSymbol.Children => Enumerable.Empty<ISyntaxSymbol>();
 
-        public TypeSyntaxSymbol(ClassDeclarationSyntax declaration)
+        public TypeSyntaxSymbol(DeclarationSyntax declaration)
         {
             Name = declaration.Name.Value;
             Declaration = declaration;

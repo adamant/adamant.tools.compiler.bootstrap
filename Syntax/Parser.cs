@@ -83,7 +83,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         case TokenKind.ClassKeyword:
                             throw new NotImplementedException("Parsing enum classes not implemented");
                         default:
-                            throw NonExhaustiveMatchException.For(tokens.Current.Kind);
+                            throw NonExhaustiveMatchException.ForEnum(tokens.Current.Kind);
                     }
                 case TokenKind.UsingKeyword:
                     children.Add(tokens.Expect(TokenKind.UsingKeyword));
@@ -226,14 +226,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     children.Add(tokens.Consume());
                     children.Add(tokens.Expect(TokenKind.Identifier));
                     children.Add(tokens.Expect(TokenKind.Colon));
-                    children.Add(ParseType(tokens));
+                    var type = ParseType(tokens);
+                    children.Add(type);
+                    ExpressionSyntax initializer = null;
                     if (tokens.CurrentIs(TokenKind.Equals))
                     {
                         children.Add(tokens.Expect(TokenKind.Equals));
-                        children.Add(ParseExpression(tokens));
+                        initializer = ParseExpression(tokens);
+                        children.Add(initializer);
                     }
                     children.Add(tokens.Expect(TokenKind.Semicolon));
-                    return new VariableDeclarationStatementSyntax(children);
+                    return new VariableDeclarationStatementSyntax(children, type, initializer);
                 default:
                     children.Add(ParseExpression(tokens));
                     children.Add(tokens.Expect(TokenKind.Semicolon));
