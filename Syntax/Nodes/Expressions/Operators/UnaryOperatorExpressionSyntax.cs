@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators
 {
@@ -7,10 +6,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators
     {
         public ExpressionSyntax Operand { get; }
 
-        public UnaryOperatorExpressionSyntax(IEnumerable<SyntaxNode> children)
-            : base(children)
+        public UnaryOperatorExpressionSyntax(Token @operator, ExpressionSyntax operand)
+            : base(null, @operator, operand)
         {
-            Operand = Children.OfType<ExpressionSyntax>().Single();
+            Operand = operand;
         }
     }
 }

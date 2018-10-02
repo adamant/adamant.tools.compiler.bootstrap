@@ -1,16 +1,19 @@
-using System.Collections.Generic;
-using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
 {
     public class ParenthesizedExpressionSyntax : ExpressionSyntax
     {
+        public Token OpenParen { get; }
         public ExpressionSyntax Expression { get; }
+        public Token CloseParen { get; }
 
-        public ParenthesizedExpressionSyntax(IEnumerable<SyntaxNode> children)
-            : base(children)
+        public ParenthesizedExpressionSyntax(Token openParen, ExpressionSyntax expression, Token closeParen)
+            : base(openParen, expression, closeParen)
         {
-            Expression = Children.OfType<ExpressionSyntax>().Single();
+            OpenParen = openParen;
+            Expression = expression;
+            CloseParen = closeParen;
         }
     }
 }

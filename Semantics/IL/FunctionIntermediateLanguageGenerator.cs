@@ -105,7 +105,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
         {
             switch (expression)
             {
-                case AssignmentExpression assignment:
+                case AssignExpression assignment:
                     var lvalue = ConvertToLValue(assignment.LeftOperand);
                     ConvertAssignment(lvalue, assignment.RightOperand);
                     break;
@@ -132,7 +132,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
                     currentBlock.Add(new AssignmentStatement(lvalue, LookupVariable(variableExpression.Name)));
                     break;
 
-                case PlusExpression plusExpression:
+                case AddExpression plusExpression:
                     currentBlock.Add(new AddStatement(lvalue, ConvertToLValue(plusExpression.LeftOperand), ConvertToLValue(plusExpression.RightOperand)));
                     break;
 

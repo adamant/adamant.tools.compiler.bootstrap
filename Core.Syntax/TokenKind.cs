@@ -34,13 +34,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core.Syntax
         CloseBracket, // `]` U+005D
         Semicolon, // `;` U+003B
         Comma, // `,` U+002C
+        Dollar, // `$` U+0024
+        Pipe, // `|` U+007C
+        Question, // `?` U+003F
+        Colon, // `:` U+003A
+        RightArrow, // `→` U+2192, `->` U+002D, U+003E
+
+        // Operators
         Dot, // `.` U+002E
         DotDot, // `..` U+002E, U+002E
-        Colon, // `:` U+003A
-        Question, // `?` U+003F
-        Pipe, // `|` U+007C
-        Dollar, // `$` U+0024
-        RightArrow, // `→` U+2192, `->` U+002D, U+003E
         AtSign, // `@` U+0040 (named at sign to distinguish it from the word "at")
         Caret, // `^` U+005E
         Plus, // `+` U+002B
@@ -58,6 +60,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core.Syntax
         MinusEquals, // `-=` U+002D, U+003D
         AsteriskEquals, // `*=` U+002A, U+003D
         SlashEquals, // `/=` U+002F, U+003D
+        AndKeyword,
+        OrKeyword,
+        XorKeyword,
+        FirstOperator = Dot,
+        LastOperator = XorKeyword,
 
         // Identifiers
         Identifier,
@@ -92,9 +99,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core.Syntax
         InKeyword,
         IfKeyword,
         ElseKeyword,
-        AndKeyword,
-        OrKeyword,
-        XorKeyword,
         StructKeyword,
         EnumKeyword,
         UnsafeKeyword,

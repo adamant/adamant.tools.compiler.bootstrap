@@ -5,6 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.Operators
 {
+    // TODO this shouldn't exist, it should just be a function call to the correct operator overload
     public class DotDotExpression : BinaryOperatorExpression
     {
         public DotDotExpression(

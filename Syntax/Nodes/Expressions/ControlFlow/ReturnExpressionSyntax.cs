@@ -1,16 +1,17 @@
-using System.Collections.Generic;
-using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow
 {
     public class ReturnExpressionSyntax : ExpressionSyntax
     {
+        public Token ReturnKeyword { get; }
         public ExpressionSyntax Expression { get; }
 
-        public ReturnExpressionSyntax(IEnumerable<SyntaxNode> children)
-            : base(children)
+        public ReturnExpressionSyntax(Token returnKeyword, ExpressionSyntax expression)
+            : base(returnKeyword, expression)
         {
-            Expression = Children.OfType<ExpressionSyntax>().SingleOrDefault();
+            ReturnKeyword = returnKeyword;
+            Expression = expression;
         }
     }
 }

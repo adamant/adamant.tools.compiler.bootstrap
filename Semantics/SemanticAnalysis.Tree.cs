@@ -145,7 +145,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                         switch (binaryOperatorExpression.Operator.Kind)
                         {
                             case TokenKind.Plus:
-                                return new PlusExpression(binaryOperatorExpression,
+                                return new AddExpression(binaryOperatorExpression,
                                     AllDiagnostics(binaryOperatorExpression),
                                     leftOperand, rightOperand, Type(binaryOperatorExpression));
 
@@ -160,12 +160,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                                     leftOperand, rightOperand, Type(binaryOperatorExpression));
 
                             case TokenKind.Equals:
-                                return new AssignmentExpression(binaryOperatorExpression,
+                                return new AssignExpression(binaryOperatorExpression,
                                     AllDiagnostics(binaryOperatorExpression),
                                     leftOperand, rightOperand, Type(binaryOperatorExpression));
 
                             case TokenKind.AsteriskEquals:
-                                return new AsteriskAssignmentExpression(binaryOperatorExpression,
+                                return new MultiplyAssignExpression(binaryOperatorExpression,
                                     AllDiagnostics(binaryOperatorExpression),
                                     leftOperand, rightOperand, Type(binaryOperatorExpression));
 

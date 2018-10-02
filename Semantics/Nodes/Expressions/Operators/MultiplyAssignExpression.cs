@@ -5,9 +5,12 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.Operators
 {
-    public class AsteriskAssignmentExpression : BinaryOperatorExpression
+    /// <summary>
+    /// Multiply assign of primitive types
+    /// </summary>
+    public class MultiplyAssignExpression : BinaryOperatorExpression
     {
-        public AsteriskAssignmentExpression(
+        public MultiplyAssignExpression(
             BinaryOperatorExpressionSyntax syntax,
             IEnumerable<DiagnosticInfo> diagnostics,
             Expression leftOperand,

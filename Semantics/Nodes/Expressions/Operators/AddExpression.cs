@@ -5,9 +5,13 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.Operators
 {
-    public class AssignmentExpression : BinaryOperatorExpression
+    /// <summary>
+    /// This is an actual add between primitive types, a user defined plus operator
+    /// should be a function call
+    /// </summary>
+    public class AddExpression : BinaryOperatorExpression
     {
-        public AssignmentExpression(
+        public AddExpression(
             BinaryOperatorExpressionSyntax syntax,
             IEnumerable<DiagnosticInfo> diagnostics,
             Expression leftOperand,

@@ -1,5 +1,5 @@
-using System.Collections.Generic;
-using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators
@@ -8,10 +8,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators
     {
         public Token Operator { get; }
 
-        public OperatorExpressionSyntax(IEnumerable<SyntaxNode> children)
-            : base(children)
+        public OperatorExpressionSyntax(ExpressionSyntax leftHand, Token @operator, ExpressionSyntax rightHand)
+            : base(leftHand, @operator, rightHand)
         {
-            Operator = Children.OfType<Token>().Single();
+            Requires.That(nameof(@operator), @operator.Kind.IsOperator());
+            Operator = @operator;
         }
     }
 }

@@ -286,9 +286,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 
             for (; ; )
             {
-                var children = NewChildList();
-                children.Add(expression);
-
+                Token @operator = null;
                 OperatorPrecedence? precedence = null;
                 var leftAssociative = true;
                 switch (tokens.Current.Kind)
@@ -302,7 +300,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         {
                             precedence = OperatorPrecedence.Assignment;
                             leftAssociative = false;
-                            children.Add(tokens.Consume());
+                            @operator = tokens.Consume();
                         }
                         break;
                     case TokenKind.OrKeyword:
@@ -310,14 +308,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         if (minPrecedence <= OperatorPrecedence.LogicalOr)
                         {
                             precedence = OperatorPrecedence.LogicalOr;
-                            children.Add(tokens.Consume());
+                            @operator = tokens.Consume();
                         }
                         break;
                     case TokenKind.AndKeyword:
                         if (minPrecedence <= OperatorPrecedence.LogicalAnd)
                         {
                             precedence = OperatorPrecedence.LogicalAnd;
-                            children.Add(tokens.Consume());
+                            @operator = tokens.Consume();
                         }
                         break;
                     case TokenKind.EqualsEquals:
@@ -325,7 +323,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         if (minPrecedence <= OperatorPrecedence.Equality)
                         {
                             precedence = OperatorPrecedence.Equality;
-                            children.Add(tokens.Consume());
+                            @operator = tokens.Consume();
                         }
                         break;
                     case TokenKind.LessThan:
@@ -335,14 +333,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         if (minPrecedence <= OperatorPrecedence.Relational)
                         {
                             precedence = OperatorPrecedence.Relational;
-                            children.Add(tokens.Consume());
+                            @operator = tokens.Consume();
                         }
                         break;
                     case TokenKind.DotDot:
                         if (minPrecedence <= OperatorPrecedence.Range)
                         {
                             precedence = OperatorPrecedence.Range;
-                            children.Add(tokens.Consume());
+                            @operator = tokens.Consume();
                         }
                         break;
                     case TokenKind.Plus:
@@ -350,7 +348,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         if (minPrecedence <= OperatorPrecedence.Additive)
                         {
                             precedence = OperatorPrecedence.Additive;
-                            children.Add(tokens.Consume());
+                            @operator = tokens.Consume();
                         }
                         break;
                     case TokenKind.Asterisk:
@@ -358,7 +356,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         if (minPrecedence <= OperatorPrecedence.Multiplicative)
                         {
                             precedence = OperatorPrecedence.Multiplicative;
-                            children.Add(tokens.Consume());
+                            @operator = tokens.Consume();
                         }
                         break;
                     case TokenKind.OpenParen:
@@ -377,7 +375,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         {
                             // Member Access
                             precedence = OperatorPrecedence.Primary;
-                            children.Add(tokens.Consume());
+                            @operator = tokens.Consume();
                         }
                         break;
                     default:
@@ -385,14 +383,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                 }
 
                 // if we didn't match any operator
-                if (precedence == null)
+                if (@operator == null)
                     return expression;
 
                 if (leftAssociative)
                     precedence += 1;
 
-                children.Add(ParseExpression(tokens, precedence.Value));
-                expression = new BinaryOperatorExpressionSyntax(children);
+                var rightOperand = ParseExpression(tokens, precedence.Value);
+                expression = new BinaryOperatorExpressionSyntax(expression, @operator, rightOperand);
             }
         }
 
@@ -400,33 +398,38 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         [MustUseReturnValue]
         private ExpressionSyntax ParseAtom(ITokenStream tokens)
         {
-            var children = NewChildList();
             switch (tokens.Current.Kind)
             {
                 case TokenKind.NewKeyword:
-                    var newKeyword = tokens.Expect(TokenKind.NewKeyword);
-                    var type = ParseType(tokens);
-                    var openParen = tokens.Expect(TokenKind.OpenParen);
-                    var arguments = ParseArguments(tokens);
-                    var closeParen = tokens.Expect(TokenKind.CloseParen);
-                    return new NewObjectExpressionSyntax(newKeyword, type, openParen, arguments, closeParen);
+                    {
+                        var newKeyword = tokens.Expect(TokenKind.NewKeyword);
+                        var type = ParseType(tokens);
+                        var openParen = tokens.Expect(TokenKind.OpenParen);
+                        var arguments = ParseArguments(tokens);
+                        var closeParen = tokens.Expect(TokenKind.CloseParen);
+                        return new NewObjectExpressionSyntax(newKeyword, type, openParen, arguments,
+                            closeParen);
+                    }
                 case TokenKind.ReturnKeyword:
-                    children.Add(tokens.Expect(TokenKind.ReturnKeyword));
-                    if (!tokens.CurrentIs(TokenKind.Semicolon))
-                        children.Add(ParseExpression(tokens));
-                    return new ReturnExpressionSyntax(children);
+                    {
+                        var returnKeyword = tokens.Expect(TokenKind.ReturnKeyword);
+                        var expression = tokens.CurrentIs(TokenKind.Semicolon) ? null : ParseExpression(tokens);
+                        return new ReturnExpressionSyntax(returnKeyword, expression);
+                    }
                 case TokenKind.OpenParen:
-                    children.Add(tokens.Expect(TokenKind.OpenParen));
-                    children.Add(ParseExpression(tokens));
-                    children.Add(tokens.Expect(TokenKind.CloseParen));
-                    return new ParenthesizedExpressionSyntax(children);
+                    {
+                        var openParen = tokens.Expect(TokenKind.OpenParen);
+                        var expression = ParseExpression(tokens);
+                        var closeParen = tokens.Expect(TokenKind.CloseParen);
+                        return new ParenthesizedExpressionSyntax(openParen, expression, closeParen);
+                    }
                 case TokenKind.Minus:
                 case TokenKind.Plus:
                 case TokenKind.AtSign:
                 case TokenKind.Caret:
-                    children.Add(tokens.Consume());
-                    children.Add(ParseExpression(tokens, OperatorPrecedence.Unary));
-                    return new UnaryOperatorExpressionSyntax(children);
+                    var @operator = tokens.Consume();
+                    var operand = ParseExpression(tokens, OperatorPrecedence.Unary);
+                    return new UnaryOperatorExpressionSyntax(@operator, operand);
                 case TokenKind.StringLiteral:
                     return new StringLiteralExpressionSyntax((StringLiteralToken)tokens.Consume());
                 case TokenKind.Identifier:

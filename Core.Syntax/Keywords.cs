@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
+namespace Adamant.Tools.Compiler.Bootstrap.Core.Syntax
 {
     public static class Keywords
     {
@@ -16,6 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
             TokenKinds = Enum.GetValues(typeof(TokenKind))
                 .Cast<TokenKind>()
                 .Where(t => t.ToString().EndsWith("Keyword"))
+                .Distinct() // This is returning duplicates because of the FirstOperator and LastOperator values
                 .ToList().AsReadOnly();
 
             var keywordDictionary = new Dictionary<string, TokenKind>();

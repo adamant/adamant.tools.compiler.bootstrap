@@ -5,9 +5,9 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.Operators
 {
-    public class PlusExpression : BinaryOperatorExpression
+    public class AssignExpression : BinaryOperatorExpression
     {
-        public PlusExpression(
+        public AssignExpression(
             BinaryOperatorExpressionSyntax syntax,
             IEnumerable<DiagnosticInfo> diagnostics,
             Expression leftOperand,
