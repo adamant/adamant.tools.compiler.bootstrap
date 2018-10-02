@@ -347,8 +347,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     case TokenKind.OpenParen:
                         if (minPrecedence <= OperatorPrecedence.Primary)
                         {
-                            children.Add(ParseArgumentList(tokens));
-                            expression = new InvocationSyntax(children);
+                            var callee = expression;
+                            var openParen = tokens.Expect(TokenKind.OpenParen);
+                            var arguments = ParseArgumentList(tokens);
+                            var closeParen = tokens.Expect(TokenKind.CloseParen);
+                            expression = new InvocationSyntax(callee, openParen, arguments, closeParen);
                             continue;
                         }
                         break;
@@ -384,10 +387,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             switch (tokens.Current.Kind)
             {
                 case TokenKind.NewKeyword:
-                    children.Add(tokens.Expect(TokenKind.NewKeyword));
-                    children.Add(ParseType(tokens));
-                    children.Add(ParseArgumentList(tokens));
-                    return new NewObjectExpressionSyntax(children);
+                    var newKeyword = tokens.Expect(TokenKind.NewKeyword);
+                    var type = ParseType(tokens);
+                    var openParen = tokens.Expect(TokenKind.OpenParen);
+                    var arguments = ParseArgumentList(tokens);
+                    var closeParen = tokens.Expect(TokenKind.CloseParen);
+                    return new NewObjectExpressionSyntax(newKeyword, type, openParen, arguments, closeParen);
                 case TokenKind.ReturnKeyword:
                     children.Add(tokens.Expect(TokenKind.ReturnKeyword));
                     if (!tokens.CurrentIs(TokenKind.Semicolon))
@@ -462,13 +467,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         }
 
         [MustUseReturnValue]
-        private ArgumentListSyntax ParseArgumentList(ITokenStream tokens)
+        private SeparatedListSyntax<ExpressionSyntax> ParseArgumentList(ITokenStream tokens)
         {
-            var children = NewChildList();
-            children.Add(tokens.Expect(TokenKind.OpenParen));
-            children.AddRange(ParseSyntaxList(tokens, t => ParseExpression(t), TokenKind.Comma, TokenKind.CloseParen));
-            children.Add(tokens.Expect(TokenKind.CloseParen));
-            return new ArgumentListSyntax(children);
+            return new SeparatedListSyntax<ExpressionSyntax>(ParseSyntaxList(tokens, t => ParseExpression(t), TokenKind.Comma, TokenKind.CloseParen));
         }
         #endregion
 

@@ -1,21 +1,24 @@
-using System.Collections.Generic;
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
 {
     public class NewObjectExpressionSyntax : ExpressionSyntax
     {
+        public Token NewKeyword { get; }
         public TypeSyntax Type { get; }
-        public ArgumentListSyntax ArgumentList { get; }
-        public IReadOnlyList<ExpressionSyntax> Arguments { get; }
+        public Token OpenParen { get; }
+        public SeparatedListSyntax<ExpressionSyntax> Arguments { get; }
+        public Token CloseParen { get; }
 
-        public NewObjectExpressionSyntax(IEnumerable<SyntaxNode> children)
-            : base(children)
+        public NewObjectExpressionSyntax(Token newKeyword, TypeSyntax type, Token openParen, SeparatedListSyntax<ExpressionSyntax> arguments, Token closeParen)
+            : base(newKeyword, type, openParen, arguments, closeParen)
         {
-            Type = Children.OfType<TypeSyntax>().Single();
-            ArgumentList = Children.OfType<ArgumentListSyntax>().Single();
-            Arguments = ArgumentList.Arguments;
+            NewKeyword = newKeyword;
+            Type = type;
+            OpenParen = openParen;
+            Arguments = arguments;
+            CloseParen = closeParen;
         }
     }
 }

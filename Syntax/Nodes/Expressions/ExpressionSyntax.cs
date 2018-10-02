@@ -8,5 +8,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
             : base(children)
         {
         }
+
+        protected ExpressionSyntax(params SyntaxNode[] children)
+            : base(children)
+        {
+        }
     }
 }

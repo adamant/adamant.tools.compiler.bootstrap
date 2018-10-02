@@ -1,20 +1,21 @@
-using System.Collections.Generic;
-using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
 {
     public class InvocationSyntax : ExpressionSyntax
     {
         public ExpressionSyntax Callee { get; set; }
-        public ArgumentListSyntax ArgumentList { get; }
-        public IReadOnlyList<ExpressionSyntax> Arguments { get; }
+        public Token OpenParen { get; }
+        public SeparatedListSyntax<ExpressionSyntax> Arguments { get; }
+        public Token CloseParen { get; }
 
-        public InvocationSyntax(IEnumerable<SyntaxNode> children)
-            : base(children)
+        public InvocationSyntax(ExpressionSyntax callee, Token openParen, SeparatedListSyntax<ExpressionSyntax> arguments, Token closeParen)
+            : base(callee, openParen, arguments, closeParen)
         {
-            Callee = Children.OfType<ExpressionSyntax>().First();
-            ArgumentList = Children.OfType<ArgumentListSyntax>().Single();
-            Arguments = ArgumentList.Arguments;
+            Callee = callee;
+            OpenParen = openParen;
+            Arguments = arguments;
+            CloseParen = closeParen;
         }
     }
 }

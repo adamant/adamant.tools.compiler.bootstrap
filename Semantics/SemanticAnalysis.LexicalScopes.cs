@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                 case ExpressionSyntax _:
                 case ParameterSyntax _:
                 case ParameterListSyntax _:
-                case ArgumentListSyntax _:
+                case SeparatedListSyntax<ExpressionSyntax> _:
                     {
                         // Inherit
                         var enclosingScope = LexicalScope(Parent(syntax));
