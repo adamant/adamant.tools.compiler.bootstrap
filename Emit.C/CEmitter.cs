@@ -77,7 +77,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     code.Definitions.DeclarationSeparatorLine();
                     code.Definitions.AppendLine($"{returnType} {name}({parameters})");
                     Emit(code, f.Body);
-                }));
+                })
+                .Ignore<IncompleteDeclaration>());
         }
 
         internal void Emit(Code code, Block block)

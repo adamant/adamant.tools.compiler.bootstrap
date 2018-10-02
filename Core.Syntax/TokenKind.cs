@@ -80,6 +80,7 @@ namespace Core.Syntax
         StringKeyword,
         ReturnKeyword,
         ClassKeyword,
+        FnKeyword,
         NewKeyword,
         InitKeyword,
         DeleteKeyword,

@@ -56,7 +56,7 @@ typedef enum Type_ID Type_ID;
         public void EmitsEntryPointAdapterForNoArgVoidReturnMain()
         {
             const string code =
-@"public main() -> void
+@"public fn main() -> void
 {
 }";
 

@@ -23,7 +23,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
 
         private static IEnumerable<ILDeclaration> Convert(CompilationUnit compilationUnit)
         {
-            return compilationUnit.Declarations.Select(Convert);
+            return compilationUnit.Declarations
+                .Select(Convert)
+                // Incomplete Declarations Return Null
+                .Where(d => d != null);
         }
 
         private static ILDeclaration Convert(Declaration declaration)
@@ -34,6 +37,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
                     return Convert(@class);
                 case FunctionDeclaration function:
                     return Convert(function);
+                case IncompleteDeclaration _:
+                    return null;
             }
             throw new NotImplementedException();
         }

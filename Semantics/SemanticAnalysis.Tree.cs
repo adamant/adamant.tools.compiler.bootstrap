@@ -183,6 +183,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                         Type(classDeclaration),
                         classDeclaration.Members.Select(Node));
 
+                case IncompleteDeclarationSyntax incompleteDeclaration:
+                    return new IncompleteDeclaration(incompleteDeclaration, AllDiagnostics(incompleteDeclaration));
+
                 default:
                     throw NonExhaustiveMatchException.For(syntax);
             }

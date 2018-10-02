@@ -74,14 +74,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     children.Add(ParseQualifiedName(tokens));
                     children.Add(tokens.Expect(TokenKind.Semicolon));
                     return new UsingSyntax(children);
-                default:
-                    // Function Declaration
+                case TokenKind.FnKeyword:
+                    children.Add(tokens.Expect(TokenKind.FnKeyword));
                     children.Add(tokens.Expect(TokenKind.Identifier));
                     children.Add(ParseParameterList(tokens));
                     children.Add(tokens.Expect(TokenKind.RightArrow));
                     children.Add(ParseType(tokens));
                     children.Add(ParseBlock(tokens));
                     return new FunctionDeclarationSyntax(children);
+                default:
+                    children.Add(tokens.Expect(TokenKind.Identifier));
+                    if (tokens.CurrentIs(TokenKind.OpenParen))
+                        children.Add(ParseParameterList(tokens));
+                    if (tokens.CurrentIs(TokenKind.RightArrow))
+                    {
+                        children.Add(tokens.Expect(TokenKind.RightArrow));
+                        children.Add(ParseType(tokens));
+                    }
+                    if (tokens.CurrentIs(TokenKind.OpenBrace))
+                    {
+                        // TODO Read in everything until next close brace
+                    }
+                    return new IncompleteDeclarationSyntax(children);
+
             }
         }
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -21,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             return attributes.GetOrAdd(syntax, SyntaxSymbolAttribute, ComputePackageSyntaxSymbol);
         }
 
-        private PackageSyntaxSymbol ComputePackageSyntaxSymbol(PackageSyntax package)
+        private static PackageSyntaxSymbol ComputePackageSyntaxSymbol(PackageSyntax package)
         {
             var compilationUnits = package.CompilationUnits.ToList();
             var globalNamespace = new GlobalNamespaceSyntaxSymbol(compilationUnits,
@@ -29,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             return new PackageSyntaxSymbol(package, globalNamespace);
         }
 
-        private IEnumerable<IDeclarationSyntaxSymbol> ComputeDeclarationSyntaxSymbols(IEnumerable<DeclarationSyntax> declarations)
+        private static IEnumerable<IDeclarationSyntaxSymbol> ComputeDeclarationSyntaxSymbols(IEnumerable<DeclarationSyntax> declarations)
         {
             return declarations.Select(ComputeDeclarationSyntaxSymbol);
             //var lookup = declarations.ToLookup(d => d is CompilationUnitNamespaceSyntax);
@@ -39,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             //    .Concat(lookup[false].Select(ComputeDeclarationSyntaxSymbol));
         }
 
-        private IDeclarationSyntaxSymbol ComputeDeclarationSyntaxSymbol(DeclarationSyntax declaration)
+        private static IDeclarationSyntaxSymbol ComputeDeclarationSyntaxSymbol(DeclarationSyntax declaration)
         {
             switch (declaration)
             {
@@ -71,6 +72,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             {
                 case FunctionDeclarationSyntax function:
                     var parentSymbol = SyntaxSymbol(Parent(function));
+                    if (function.Name.IsMissing)
+                        throw new Exception();
                     return parentSymbol.Children.Single(c => c.Name == function.Name.Value);
                 case CompilationUnitSyntax compilationUnit:
                     var packageSymbol = SyntaxSymbol(Parent(compilationUnit));

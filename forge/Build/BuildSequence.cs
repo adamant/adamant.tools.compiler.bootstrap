@@ -45,7 +45,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
                 var codeFiles = sourcePaths.Select(CodeFile.Load).ToList();
                 var package = compiler.CompilePackage(codeFiles);
                 var cCode = new CEmitter().Emit(package);
-                var outputPath = Path.Combine(project.Path, ".forge-cache", "program.c");
+                var cacheDir = Path.Combine(project.Path, ".forge-cache");
+                Directory.CreateDirectory(cacheDir); // Ensure the cache directory exists
+                var outputPath = Path.Combine(cacheDir, "program.c");
                 File.WriteAllText(outputPath, cCode, Encoding.ASCII);
             }
         }

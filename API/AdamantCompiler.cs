@@ -25,7 +25,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             var lexer = new Lexer();
             var parser = new Parser();
 
-            return files.AsParallel()
+            return files
+#if RELEASE
+                .AsParallel()
+#endif
                 .Select(file =>
                 {
                     var tokens = lexer.Lex(file.Code);
