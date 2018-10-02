@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
@@ -13,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations
         public AccessLevel Access { get; }
         public string Name { get; }
         public IReadOnlyList<Parameter> Parameters { get; }
-        public TypeName ReturnType { get; }
+        public Expression ReturnType { get; }
         public Block Body { get; }
 
         public FunctionDeclaration(
@@ -22,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations
             AccessLevel access,
             string name,
             IEnumerable<Parameter> parameters,
-            TypeName returnType,
+            Expression returnType,
             Block body)
             : base(diagnostics)
         {

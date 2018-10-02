@@ -85,8 +85,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
                             case ReferenceTypeName referenceTypeName:
                                 var classSymbol = PackageSyntaxSymbol.Lookup(referenceTypeName);
-                                var classdeclaration = classSymbol.Declaration;
-                                return Type(classdeclaration);
+                                var classDeclaration = classSymbol.Declaration;
+                                return Type(classDeclaration);
+
+                            case UnknownName _:
+                                return UnknownType.Instance;
 
                             default:
                                 throw NonExhaustiveMatchException.For(name);

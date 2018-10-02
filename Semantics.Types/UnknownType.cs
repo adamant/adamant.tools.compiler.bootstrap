@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
 
         public override string ToString()
         {
-            return "unknown";
+            return "⧼Unknown Type⧽";
         }
     }
 }

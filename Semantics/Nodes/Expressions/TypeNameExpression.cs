@@ -4,18 +4,16 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions
 {
-    public class TypeName : SemanticNode
+    public class TypeNameExpression : Expression
     {
         public new TypeSyntax Syntax { get; }
-        public DataType Type { get; }
 
-        public TypeName(TypeSyntax syntax, IEnumerable<DiagnosticInfo> diagnostics, DataType type)
-            : base(diagnostics)
+        public TypeNameExpression(TypeSyntax syntax, IEnumerable<DiagnosticInfo> diagnostics, DataType type)
+            : base(diagnostics, type)
         {
             Syntax = syntax;
-            Type = type;
         }
 
         protected override SyntaxNode GetSyntax()

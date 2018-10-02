@@ -76,8 +76,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                     }
                 case IdentifierNameSyntax identifierName:
                     {
+                        if (identifierName.Name.IsMissing)
+                            return UnknownName.Instance;
                         var nameScope = LexicalScope(identifierName);
                         var symbol = nameScope.LookupName(identifierName.Name.Text);
+                        if (symbol == null) // TODO should this be a compiler error?
+                            return UnknownName.Instance;
                         var declaration = symbol.Declarations.Single();
                         return Name(declaration);
                     }

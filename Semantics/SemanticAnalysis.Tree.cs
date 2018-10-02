@@ -60,7 +60,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public Expression Node(ExpressionSyntax s) => Node<Expression>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public TypeName Node(TypeSyntax s) => Node<TypeName>(s);
+        public Expression Node(TypeSyntax s) => Node<Expression>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private TNode Node<TNode>(SyntaxBranchNode syntax)
@@ -128,7 +128,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                             return new VariableExpression(identifierName, AllDiagnostics(identifierName),
                                 variableName, Type(identifierName));
                         case ReferenceTypeName typeName:
-                            return new TypeName(identifierName, AllDiagnostics(identifierName), Type(identifierName));
+                            return new TypeNameExpression(identifierName, AllDiagnostics(identifierName), Type(identifierName));
+                        case UnknownName _:
+                            return new UnknownExpression(identifierName, AllDiagnostics(identifierName));
                         default:
                             throw NonExhaustiveMatchException.For(name);
                     }
@@ -157,7 +159,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                     }
 
                 case TypeSyntax type:
-                    return new TypeName(type, AllDiagnostics(type), Type(type));
+                    return new TypeNameExpression(type, AllDiagnostics(type), Type(type));
 
                 case VariableDeclarationStatementSyntax variableDeclaration:
                     return new VariableDeclarationStatement(variableDeclaration,

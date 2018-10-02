@@ -67,17 +67,21 @@ namespace Core.Syntax
 
         // Keywords
         PublicKeyword,
+        ProtectedKeyword,
         PrivateKeyword,
         LetKeyword,
         VarKeyword,
         VoidKeyword,
         IntKeyword,
         UIntKeyword,
+        ByteKeyword,
+        SizeKeyword,
         BoolKeyword,
         StringKeyword,
         ReturnKeyword,
         ClassKeyword,
         NewKeyword,
+        InitKeyword,
         DeleteKeyword,
         OwnedKeyword,
         NamespaceKeyword,
@@ -89,5 +93,11 @@ namespace Core.Syntax
         AndKeyword,
         OrKeyword,
         XorKeyword,
+        StructKeyword,
+        EnumKeyword,
+        UnsafeKeyword,
+        SafeKeyword,
+        SelfKeyword,
+        BaseKeyword,
     }
 }
