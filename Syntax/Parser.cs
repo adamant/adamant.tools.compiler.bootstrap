@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
@@ -34,6 +33,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         public CompilationUnitSyntax ParseCompilationUnit(ITokenStream tokens)
         {
             var children = NewChildList();
+
+            // TODO whitespace and comments before namespace
 
             // Namespace Declaration
             if (tokens.CurrentIs(TokenKind.NamespaceKeyword))
@@ -83,7 +84,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         case TokenKind.ClassKeyword:
                             throw new NotImplementedException("Parsing enum classes not implemented");
                         default:
-                            throw NonExhaustiveMatchException.ForEnum(tokens.Current.Kind);
+                            return ParseIncompleteDeclaration(tokens, children);
                     }
                 case TokenKind.UsingKeyword:
                     children.Add(tokens.Expect(TokenKind.UsingKeyword));
@@ -96,24 +97,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     children.Add(ParseParameterList(tokens));
                     children.Add(tokens.Expect(TokenKind.RightArrow));
                     children.Add(ParseType(tokens));
-                    children.Add(ParseBlock(tokens));
+                    children.Add(ParseStatementBlock(tokens));
                     return new FunctionDeclarationSyntax(children);
                 default:
-                    children.Add(tokens.Expect(TokenKind.Identifier));
-                    if (tokens.CurrentIs(TokenKind.OpenParen))
-                        children.Add(ParseParameterList(tokens));
-                    if (tokens.CurrentIs(TokenKind.RightArrow))
-                    {
-                        children.Add(tokens.Expect(TokenKind.RightArrow));
-                        children.Add(ParseType(tokens));
-                    }
-                    if (tokens.CurrentIs(TokenKind.OpenBrace))
-                    {
-                        // TODO Read in everything until next close brace
-                    }
-                    return new IncompleteDeclarationSyntax(children);
-
+                    return ParseIncompleteDeclaration(tokens, children);
             }
+        }
+
+        private static SyntaxBranchNode ParseIncompleteDeclaration(ITokenStream tokens, List<SyntaxNode> children)
+        {
+            children.Add(tokens.Expect(TokenKind.Identifier));
+            if (tokens.CurrentIs(TokenKind.OpenParen))
+                children.Add(ParseParameterList(tokens));
+            if (tokens.CurrentIs(TokenKind.RightArrow))
+            {
+                children.Add(tokens.Expect(TokenKind.RightArrow));
+                children.Add(ParseType(tokens));
+            }
+
+            if (tokens.CurrentIs(TokenKind.OpenBrace))
+            {
+                // TODO Read in everything until next close brace
+            }
+
+            return new IncompleteDeclarationSyntax(children);
         }
 
         private static NameSyntax ParseQualifiedName(ITokenStream tokens)
@@ -205,7 +212,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             }
         }
 
-        private BlockSyntax ParseBlock(ITokenStream tokens)
+        private BlockSyntax ParseStatementBlock(ITokenStream tokens)
         {
             var children = NewChildList();
             children.Add(tokens.Expect(TokenKind.OpenBrace));
@@ -220,7 +227,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             switch (tokens.Current.Kind)
             {
                 case TokenKind.OpenBrace:
-                    return ParseBlock(tokens);
+                    return ParseStatementBlock(tokens);
                 case TokenKind.LetKeyword:
                 case TokenKind.VarKeyword:
                     children.Add(tokens.Consume());
@@ -402,6 +409,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                 case TokenKind.IntKeyword:
                 case TokenKind.UIntKeyword:
                 case TokenKind.BoolKeyword:
+                case TokenKind.ByteKeyword:
                 case TokenKind.StringKeyword:
                     {
                         var keyword = tokens.Consume();
@@ -430,6 +438,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             switch (tokens.Current.Kind)
             {
                 case TokenKind.PublicKeyword:
+                case TokenKind.ProtectedKeyword:
                 case TokenKind.PrivateKeyword:
                     return tokens.Consume();
                 default:
@@ -453,7 +462,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             return new List<SyntaxNode>();
         }
 
-        private static void EnsureAdvance(ITokenStream tokens, Token start, IList<SyntaxNode> children)
+        private static void EnsureAdvance(ITokenStream tokens, Token start, ICollection<SyntaxNode> children)
         {
             if (tokens.Current == start)
                 // We have not advanced at all when trying to parse a declaration.
