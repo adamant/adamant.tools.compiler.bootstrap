@@ -125,6 +125,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         [MustUseReturnValue]
         private static IncompleteDeclarationSyntax ParseIncompleteDeclaration(ITokenStream tokens, IList<SyntaxNode> children)
         {
+            var startToken = tokens.Current;
             children.Add(tokens.ExpectIdentifier());
             if (tokens.CurrentIs(TokenKind.OpenParen))
                 children.Add(ParseParameters(tokens));
@@ -138,6 +139,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             {
                 // TODO Read in everything until next close brace
             }
+
+            EnsureAdvance(tokens, startToken, children);
 
             return new IncompleteDeclarationSyntax(children);
         }
