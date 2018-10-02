@@ -5,13 +5,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
 {
     public class PackageSyntax : SyntaxBranchNode
     {
-        public IReadOnlyList<SyntaxTree<CompilationUnitSyntax>> SyntaxTrees { get; }
-        public IEnumerable<CompilationUnitSyntax> CompilationUnits => Children.Cast<CompilationUnitSyntax>();
+        public IReadOnlyList<CompilationUnitSyntax> CompilationUnits { get; }
 
-        public PackageSyntax(ICollection<SyntaxTree<CompilationUnitSyntax>> syntaxTrees)
-            : base(syntaxTrees.Select(t => t.Root))
+        public PackageSyntax(IEnumerable<CompilationUnitSyntax> compilationUnits)
+            : base(compilationUnits)
         {
-            SyntaxTrees = syntaxTrees.ToList().AsReadOnly();
+            CompilationUnits = Children.OfType<CompilationUnitSyntax>().ToList().AsReadOnly();
         }
     }
 }

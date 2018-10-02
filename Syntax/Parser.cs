@@ -20,14 +20,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class Parser
     {
-        public SyntaxTree<CompilationUnitSyntax> Parse(CodeFile file, IEnumerable<Token> tokens)
+        public CompilationUnitSyntax Parse(CodeFile file, IEnumerable<Token> tokens)
         {
             return Parse(new TokenStream(file, tokens));
         }
 
-        public SyntaxTree<CompilationUnitSyntax> Parse(ITokenStream tokens)
+        public CompilationUnitSyntax Parse(ITokenStream tokens)
         {
-            return new SyntaxTree<CompilationUnitSyntax>(tokens.File, ParseCompilationUnit(tokens));
+            return ParseCompilationUnit(tokens);
         }
 
         #region Parse Syntax Functions

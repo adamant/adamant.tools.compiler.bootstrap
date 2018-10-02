@@ -11,8 +11,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
     {
         public Package CompilePackage(IEnumerable<CodeFile> files)
         {
-            var syntaxTrees = Parse(files);
-            var packageSyntax = new PackageSyntax(syntaxTrees);
+            var compilationUnits = Parse(files);
+            var packageSyntax = new PackageSyntax(compilationUnits);
 
             var analyzer = new SemanticAnalyzer();
             var analysis = analyzer.Analyze(packageSyntax);
@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             return analysis.Package;
         }
 
-        private static IList<SyntaxTree<CompilationUnitSyntax>> Parse(IEnumerable<CodeFile> files)
+        private static IList<CompilationUnitSyntax> Parse(IEnumerable<CodeFile> files)
         {
             var lexer = new Lexer();
             var parser = new Parser();
