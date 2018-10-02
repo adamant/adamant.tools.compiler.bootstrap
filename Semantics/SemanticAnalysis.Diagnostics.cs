@@ -46,6 +46,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                 case FunctionDeclarationSyntax _:
                 case ParameterSyntax _:
                 case ClassDeclarationSyntax _:
+                case EnumStructDeclarationSyntax _:
                     Type(syntax);
                     break;
                 case CompilationUnitSyntax _:

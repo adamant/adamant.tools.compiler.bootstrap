@@ -20,6 +20,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public CompilationUnitSyntax Parent(ClassDeclarationSyntax s) => Parent<CompilationUnitSyntax>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public CompilationUnitSyntax Parent(EnumStructDeclarationSyntax s) => Parent<CompilationUnitSyntax>(s);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SyntaxBranchNode Parent(SyntaxBranchNode s)
         {
             return attributes.Get<SyntaxBranchNode>(s, ParentAttribute);

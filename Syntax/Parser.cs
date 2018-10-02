@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
@@ -69,6 +70,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     children.Add(tokens.Expect(TokenKind.OpenBrace));
                     children.Add(tokens.Expect(TokenKind.CloseBrace));
                     return new ClassDeclarationSyntax(children);
+                case TokenKind.EnumKeyword:
+                    children.Add(tokens.Expect(TokenKind.EnumKeyword));
+                    switch (tokens.Current.Kind)
+                    {
+                        case TokenKind.StructKeyword:
+                            children.Add(tokens.Expect(TokenKind.StructKeyword));
+                            children.Add(tokens.Expect(TokenKind.Identifier));
+                            children.Add(tokens.Expect(TokenKind.OpenBrace));
+                            children.Add(tokens.Expect(TokenKind.CloseBrace));
+                            return new EnumStructDeclarationSyntax(children);
+                        case TokenKind.ClassKeyword:
+                            throw new NotImplementedException("Parsing enum classes not implemented");
+                        default:
+                            throw NonExhaustiveMatchException.For(tokens.Current.Kind);
+                    }
                 case TokenKind.UsingKeyword:
                     children.Add(tokens.Expect(TokenKind.UsingKeyword));
                     children.Add(ParseQualifiedName(tokens));

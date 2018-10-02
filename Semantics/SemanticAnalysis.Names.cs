@@ -27,6 +27,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public ObjectTypeName Name(ClassDeclarationSyntax s) => Name<ObjectTypeName>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ObjectTypeName Name(EnumStructDeclarationSyntax s) => Name<ObjectTypeName>(s);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public VariableName Name(ParameterSyntax s) => Name<VariableName>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -60,6 +63,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                     {
                         var parentName = Name(Parent(classDeclaration));
                         return new ReferenceTypeName(parentName, classDeclaration.Name.Value);
+                    }
+                case EnumStructDeclarationSyntax enumDeclaration:
+                    {
+                        var parentName = Name(Parent(enumDeclaration));
+                        return new ReferenceTypeName(parentName, enumDeclaration.Name.Value);
                     }
                 case FunctionDeclarationSyntax functionDeclaration:
                     {

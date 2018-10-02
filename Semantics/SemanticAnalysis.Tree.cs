@@ -183,6 +183,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                         Type(classDeclaration),
                         classDeclaration.Members.Select(Node));
 
+                case EnumStructDeclarationSyntax enumDeclaration:
+                    return new EnumStructDeclaration(
+                        enumDeclaration,
+                        AllDiagnostics(enumDeclaration),
+                        AccessLevel(enumDeclaration.AccessModifier),
+                        Type(enumDeclaration),
+                        enumDeclaration.Members.Select(Node));
+
                 case IncompleteDeclarationSyntax incompleteDeclaration:
                     return new IncompleteDeclaration(incompleteDeclaration, AllDiagnostics(incompleteDeclaration));
 

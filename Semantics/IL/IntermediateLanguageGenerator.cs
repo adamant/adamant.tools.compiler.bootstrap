@@ -1,6 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
 using ILDeclaration = Adamant.Tools.Compiler.Bootstrap.IL.Declarations.Declaration;
@@ -35,17 +35,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
             {
                 case ClassDeclaration @class:
                     return Convert(@class);
+                case EnumStructDeclaration enumStruct:
+                    return Convert(enumStruct);
                 case FunctionDeclaration function:
                     return Convert(function);
                 case IncompleteDeclaration _:
                     return null;
+                default:
+                    throw NonExhaustiveMatchException.For(declaration);
             }
-            throw new NotImplementedException();
         }
 
         private static ILTypeDeclaration Convert(ClassDeclaration @class)
         {
             return new ILTypeDeclaration(@class.Name, true);
+        }
+
+        private static ILTypeDeclaration Convert(EnumStructDeclaration enumStruct)
+        {
+            return new ILTypeDeclaration(enumStruct.Name, false);
         }
 
         private static ILFunctionDeclaration Convert(FunctionDeclaration function)

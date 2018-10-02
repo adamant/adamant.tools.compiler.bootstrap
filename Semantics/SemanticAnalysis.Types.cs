@@ -31,6 +31,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public ObjectType Type(ClassDeclarationSyntax syntax) => Type<ObjectType>(syntax);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ObjectType Type(EnumStructDeclarationSyntax syntax) => Type<ObjectType>(syntax);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public DataType Type(SyntaxBranchNode syntax)
         {
             return attributes.GetOrAdd(syntax, TypeAttribute, ComputeType);
@@ -73,6 +76,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                 case ClassDeclarationSyntax classDeclaration:
                     return new ObjectType(Name(classDeclaration), false);
 
+                case EnumStructDeclarationSyntax enumDeclaration:
+                    return new ObjectType(Name(enumDeclaration), false);
+
                 case IdentifierNameSyntax identifierName:
                     {
                         var name = Name(identifierName);
@@ -89,7 +95,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                                 return Type(classDeclaration);
 
                             case UnknownName _:
-                                return UnknownType.Instance;
+                                return DataType.Unknown;
 
                             default:
                                 throw NonExhaustiveMatchException.For(name);
