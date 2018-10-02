@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                 case StatementSyntax _:
                 case ExpressionSyntax _:
                 case ParameterSyntax _:
-                case ParameterListSyntax _:
+                case SeparatedListSyntax<ParameterSyntax> _:
                 case SeparatedListSyntax<ExpressionSyntax> _:
                     {
                         // Inherit

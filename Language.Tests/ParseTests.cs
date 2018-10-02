@@ -64,7 +64,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
                 .Is<SyntaxBranchNode>(n =>
                 {
                     expectedKind += "Syntax";
-                    Assert.True(n.GetType().Name.Equals(expectedKind, StringComparison.InvariantCultureIgnoreCase),
+                    var name = n.GetType().Name;
+                    // Remove generics modifier
+                    var index = name.IndexOf('`');
+                    if (index >= 0)
+                        name = name.Substring(0, index);
+                    Assert.True(name.Equals(expectedKind, StringComparison.InvariantCultureIgnoreCase),
                         $"Expected {expectedKind}, found {n.GetType().Name}");
 
                     foreach (var attribute in expected.Attributes().Where(a => a.Name != "id"))

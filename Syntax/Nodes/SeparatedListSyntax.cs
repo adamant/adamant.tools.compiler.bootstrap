@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
@@ -10,8 +11,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
     {
         public readonly IReadOnlyList<T> Items;
         public readonly IReadOnlyList<Token> Separators;
-        public SeparatedListSyntax(IEnumerable<SyntaxNode> children)
-            : base(children)
+        public SeparatedListSyntax(CodeFile file, TextSpan? span, IEnumerable<SyntaxNode> children)
+            : base(file, span, children)
         {
             // TODO validate that it alternates between them
             Items = Children.OfType<T>().ToList().AsReadOnly();

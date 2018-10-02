@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
@@ -66,7 +67,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         public SyntaxBranchNode ParseDeclaration(ITokenStream tokens)
         {
             var children = NewChildList();
-            children.Add(ParseAccessModifier(tokens));
+            var accessModifier = ParseAccessModifier(tokens);
+            children.Add(accessModifier);
 
             switch (tokens.Current.Kind)
             {
@@ -97,13 +99,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     children.Add(tokens.Expect(TokenKind.Semicolon));
                     return new UsingSyntax(children);
                 case TokenKind.FunctionKeyword:
-                    children.Add(tokens.Expect(TokenKind.FunctionKeyword));
-                    children.Add(tokens.ExpectIdentifier());
-                    children.Add(ParseParameterList(tokens));
-                    children.Add(tokens.Expect(TokenKind.RightArrow));
-                    children.Add(ParseType(tokens));
-                    children.Add(ParseStatementBlock(tokens));
-                    return new FunctionDeclarationSyntax(children);
+                    var functionKeyword = tokens.Expect(TokenKind.FunctionKeyword);
+                    var name = tokens.ExpectIdentifier();
+                    var openParen = tokens.Expect(TokenKind.OpenParen);
+                    var parameters = ParseParameters(tokens);
+                    var closeParen = tokens.Expect(TokenKind.CloseParen);
+                    var arrow = tokens.Expect(TokenKind.RightArrow);
+                    var returnType = ParseType(tokens);
+                    var body = ParseStatementBlock(tokens);
+                    return new FunctionDeclarationSyntax(accessModifier, functionKeyword, name, openParen, parameters, closeParen, arrow, returnType, body);
                 default:
                     return ParseIncompleteDeclaration(tokens, children);
             }
@@ -114,7 +118,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         {
             children.Add(tokens.ExpectIdentifier());
             if (tokens.CurrentIs(TokenKind.OpenParen))
-                children.Add(ParseParameterList(tokens));
+                children.Add(ParseParameters(tokens));
             if (tokens.CurrentIs(TokenKind.RightArrow))
             {
                 children.Add(tokens.Expect(TokenKind.RightArrow));
@@ -145,13 +149,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         }
 
         [MustUseReturnValue]
-        private static ParameterListSyntax ParseParameterList(ITokenStream tokens)
+        private static SeparatedListSyntax<ParameterSyntax> ParseParameters(ITokenStream tokens)
         {
-            var children = NewChildList();
-            children.Add(tokens.Expect(TokenKind.OpenParen));
-            children.AddRange(ParseSyntaxList(tokens, ParseParameter, TokenKind.Comma, TokenKind.CloseParen));
-            children.Add(tokens.Expect(TokenKind.CloseParen));
-            return new ParameterListSyntax(children);
+            // What if there isn't a current token?
+            var file = tokens.Current.File;
+            var emptySpan = tokens.MissingToken(TokenKind.Comma).Span;
+            var parameters = ParseSyntaxList(tokens, ParseParameter, TokenKind.Comma, TokenKind.CloseParen).ToList();
+            var span = parameters.Any() ? default : emptySpan;
+            return new SeparatedListSyntax<ParameterSyntax>(file, span, parameters);
         }
 
         [MustUseReturnValue]
@@ -349,7 +354,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         {
                             var callee = expression;
                             var openParen = tokens.Expect(TokenKind.OpenParen);
-                            var arguments = ParseArgumentList(tokens);
+                            var arguments = ParseArguments(tokens);
                             var closeParen = tokens.Expect(TokenKind.CloseParen);
                             expression = new InvocationSyntax(callee, openParen, arguments, closeParen);
                             continue;
@@ -390,7 +395,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     var newKeyword = tokens.Expect(TokenKind.NewKeyword);
                     var type = ParseType(tokens);
                     var openParen = tokens.Expect(TokenKind.OpenParen);
-                    var arguments = ParseArgumentList(tokens);
+                    var arguments = ParseArguments(tokens);
                     var closeParen = tokens.Expect(TokenKind.CloseParen);
                     return new NewObjectExpressionSyntax(newKeyword, type, openParen, arguments, closeParen);
                 case TokenKind.ReturnKeyword:
@@ -467,9 +472,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         }
 
         [MustUseReturnValue]
-        private SeparatedListSyntax<ExpressionSyntax> ParseArgumentList(ITokenStream tokens)
+        private SeparatedListSyntax<ExpressionSyntax> ParseArguments(ITokenStream tokens)
         {
-            return new SeparatedListSyntax<ExpressionSyntax>(ParseSyntaxList(tokens, t => ParseExpression(t), TokenKind.Comma, TokenKind.CloseParen));
+            // What if there isn't a current token?
+            var file = tokens.Current.File;
+            var emptySpan = tokens.MissingToken(TokenKind.Comma).Span;
+            var arguments = ParseSyntaxList(tokens, t => ParseExpression(t), TokenKind.Comma, TokenKind.CloseParen).ToList();
+            var span = arguments.Any() ? default : emptySpan;
+            return new SeparatedListSyntax<ExpressionSyntax>(file, span, arguments);
         }
         #endregion
 

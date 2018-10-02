@@ -25,6 +25,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
             Span = new TextSpan(firstChild.Span.Start, Children.Sum(c => c.Span.Length));
         }
 
+        protected SyntaxBranchNode(CodeFile file, TextSpan? span, IEnumerable<SyntaxNode> children)
+        {
+            File = file;
+            Children = children.ToList().AsReadOnly();
+            Span = span ?? new TextSpan(Children.First().Span.Start, Children.Sum(c => c.Span.Length));
+        }
+
         protected SyntaxBranchNode(params SyntaxNode[] children)
         {
             Children = children.Where(c => c != null).ToList().AsReadOnly();

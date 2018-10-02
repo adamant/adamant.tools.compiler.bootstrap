@@ -8,5 +8,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
             : base(children)
         {
         }
+
+        protected MemberDeclarationSyntax(params SyntaxNode[] children)
+            : base(children)
+        {
+        }
     }
 }
