@@ -37,34 +37,48 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         [MustUseReturnValue]
         public CompilationUnitSyntax ParseCompilationUnit(ITokenStream tokens)
         {
-            var children = NewChildList();
+            var @namespace = ParseCompilationUnitNamespace(tokens);
+            var usingDirectives = ParseUsingDirectives(tokens).ToList().AsReadOnly();
+            var declarations = ParseDeclarations(tokens).ToList().AsReadOnly();
+            var endOfFile = tokens.Expect(TokenKind.EndOfFile);
 
-            // TODO whitespace and comments before namespace
-
-            // Namespace Declaration
-            if (tokens.CurrentIs(TokenKind.NamespaceKeyword))
-            {
-                var namespaceChildren = NewChildList();
-                namespaceChildren.Add(tokens.Expect(TokenKind.NamespaceKeyword));
-                namespaceChildren.Add(ParseQualifiedName(tokens));
-                namespaceChildren.Add(tokens.Expect(TokenKind.Semicolon));
-                children.Add(new CompilationUnitNamespaceSyntax(namespaceChildren));
-            }
-
-            // Child Declarations
-            while (!tokens.AtEndOfFile())
-            {
-                var start = tokens.Current;
-                children.Add(ParseDeclaration(tokens));
-                EnsureAdvance(tokens, start, children);
-            }
-            children.Add(tokens.Expect(TokenKind.EndOfFile));
-
-            return new CompilationUnitSyntax(children);
+            return new CompilationUnitSyntax(@namespace, usingDirectives, declarations, endOfFile);
         }
 
         [MustUseReturnValue]
-        public SyntaxBranchNode ParseDeclaration(ITokenStream tokens)
+        private IEnumerable<DeclarationSyntax> ParseDeclarations(ITokenStream tokens)
+        {
+            while (!tokens.AtEndOfFile())
+            {
+                yield return ParseDeclaration(tokens);
+            }
+        }
+
+        [MustUseReturnValue]
+        private static CompilationUnitNamespaceSyntax ParseCompilationUnitNamespace(ITokenStream tokens)
+        {
+            if (!tokens.CurrentIs(TokenKind.NamespaceKeyword)) return null;
+
+            var namespaceKeyword = tokens.Expect(TokenKind.NamespaceKeyword);
+            var name = ParseQualifiedName(tokens);
+            var semicolon = tokens.Expect(TokenKind.Semicolon);
+            return new CompilationUnitNamespaceSyntax(namespaceKeyword, name, semicolon);
+        }
+
+        [MustUseReturnValue]
+        public IEnumerable<UsingDirectiveSyntax> ParseUsingDirectives(ITokenStream tokens)
+        {
+            while (tokens.CurrentIs(TokenKind.UsingKeyword))
+            {
+                var usingKeyword = tokens.Expect(TokenKind.UsingKeyword);
+                var name = ParseQualifiedName(tokens);
+                var semicolon = tokens.Expect(TokenKind.Semicolon);
+                yield return new UsingDirectiveSyntax(usingKeyword, name, semicolon);
+            }
+        }
+
+        [MustUseReturnValue]
+        public DeclarationSyntax ParseDeclaration(ITokenStream tokens)
         {
             var children = NewChildList();
             var accessModifier = ParseAccessModifier(tokens);
@@ -93,11 +107,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         default:
                             return ParseIncompleteDeclaration(tokens, children);
                     }
-                case TokenKind.UsingKeyword:
-                    children.Add(tokens.Expect(TokenKind.UsingKeyword));
-                    children.Add(ParseQualifiedName(tokens));
-                    children.Add(tokens.Expect(TokenKind.Semicolon));
-                    return new UsingSyntax(children);
                 case TokenKind.FunctionKeyword:
                     var functionKeyword = tokens.Expect(TokenKind.FunctionKeyword);
                     var name = tokens.ExpectIdentifier();
@@ -114,7 +123,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         }
 
         [MustUseReturnValue]
-        private static SyntaxBranchNode ParseIncompleteDeclaration(ITokenStream tokens, List<SyntaxNode> children)
+        private static IncompleteDeclarationSyntax ParseIncompleteDeclaration(ITokenStream tokens, IList<SyntaxNode> children)
         {
             children.Add(tokens.ExpectIdentifier());
             if (tokens.CurrentIs(TokenKind.OpenParen))
