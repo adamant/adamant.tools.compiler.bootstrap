@@ -25,6 +25,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
             Span = new TextSpan(firstChild.Span.Start, Children.Sum(c => c.Span.Length));
         }
 
+        protected SyntaxBranchNode(params SyntaxNode[] children)
+        {
+            Children = children.Where(c => c != null).ToList().AsReadOnly();
+            var firstChild = Children.First();
+            File = firstChild.File;
+            Span = new TextSpan(firstChild.Span.Start, Children.Sum(c => c.Span.Length));
+        }
+
         /// No guarantee of the order is made.
         public IEnumerable<SyntaxBranchNode> DescendantBranchesAndSelf()
         {
@@ -41,10 +49,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
             }
         }
 
-        public override void AllDiagnostics(IList<Diagnostic> list)
+        public override void AllDiagnostics(IList<Diagnostic> diagnostics)
         {
             foreach (var child in Children)
-                child.AllDiagnostics(list);
+                child.AllDiagnostics(diagnostics);
         }
     }
 }

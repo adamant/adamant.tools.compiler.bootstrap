@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
 {

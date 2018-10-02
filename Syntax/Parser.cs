@@ -14,22 +14,26 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class Parser
     {
+        [MustUseReturnValue]
         public CompilationUnitSyntax Parse(CodeFile file, IEnumerable<Token> tokens)
         {
             return Parse(new TokenStream(file, tokens));
         }
 
+        [MustUseReturnValue]
         public CompilationUnitSyntax Parse(ITokenStream tokens)
         {
             return ParseCompilationUnit(tokens);
         }
 
         #region Parse Syntax Functions
+        [MustUseReturnValue]
         public CompilationUnitSyntax ParseCompilationUnit(ITokenStream tokens)
         {
             var children = NewChildList();
@@ -58,6 +62,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             return new CompilationUnitSyntax(children);
         }
 
+        [MustUseReturnValue]
         public SyntaxBranchNode ParseDeclaration(ITokenStream tokens)
         {
             var children = NewChildList();
@@ -67,7 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             {
                 case TokenKind.ClassKeyword:
                     children.Add(tokens.Expect(TokenKind.ClassKeyword));
-                    children.Add(tokens.Expect(TokenKind.Identifier));
+                    children.Add(tokens.ExpectIdentifier());
                     children.Add(tokens.Expect(TokenKind.OpenBrace));
                     children.Add(tokens.Expect(TokenKind.CloseBrace));
                     return new ClassDeclarationSyntax(children);
@@ -77,7 +82,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     {
                         case TokenKind.StructKeyword:
                             children.Add(tokens.Expect(TokenKind.StructKeyword));
-                            children.Add(tokens.Expect(TokenKind.Identifier));
+                            children.Add(tokens.ExpectIdentifier());
                             children.Add(tokens.Expect(TokenKind.OpenBrace));
                             children.Add(tokens.Expect(TokenKind.CloseBrace));
                             return new EnumStructDeclarationSyntax(children);
@@ -93,7 +98,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     return new UsingSyntax(children);
                 case TokenKind.FunctionKeyword:
                     children.Add(tokens.Expect(TokenKind.FunctionKeyword));
-                    children.Add(tokens.Expect(TokenKind.Identifier));
+                    children.Add(tokens.ExpectIdentifier());
                     children.Add(ParseParameterList(tokens));
                     children.Add(tokens.Expect(TokenKind.RightArrow));
                     children.Add(ParseType(tokens));
@@ -104,9 +109,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             }
         }
 
+        [MustUseReturnValue]
         private static SyntaxBranchNode ParseIncompleteDeclaration(ITokenStream tokens, List<SyntaxNode> children)
         {
-            children.Add(tokens.Expect(TokenKind.Identifier));
+            children.Add(tokens.ExpectIdentifier());
             if (tokens.CurrentIs(TokenKind.OpenParen))
                 children.Add(ParseParameterList(tokens));
             if (tokens.CurrentIs(TokenKind.RightArrow))
@@ -123,6 +129,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             return new IncompleteDeclarationSyntax(children);
         }
 
+        [MustUseReturnValue]
         private static NameSyntax ParseQualifiedName(ITokenStream tokens)
         {
             NameSyntax name = new IdentifierNameSyntax((IdentifierToken)tokens.Expect(TokenKind.Identifier));
@@ -137,6 +144,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             return name;
         }
 
+        [MustUseReturnValue]
         private static ParameterListSyntax ParseParameterList(ITokenStream tokens)
         {
             var children = NewChildList();
@@ -146,6 +154,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             return new ParameterListSyntax(children);
         }
 
+        [MustUseReturnValue]
         private static ParameterSyntax ParseParameter(ITokenStream tokens)
         {
             var children = NewChildList();
@@ -158,16 +167,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                 //      `self`
                 //    throw new NotImplementedException();
                 default:
-                    if (tokens.CurrentIs(TokenKind.VarKeyword))
-                        children.Add(tokens.Expect(TokenKind.VarKeyword));
-                    children.Add(tokens.Expect(TokenKind.Identifier));
-                    children.Add(tokens.Expect(TokenKind.Colon));
-                    children.Add(ParseType(tokens));
-                    break;
+                    var varKeyword = tokens.Accept(TokenKind.VarKeyword);
+                    var name = tokens.ExpectIdentifier();
+                    var colon = tokens.Expect(TokenKind.Colon);
+                    var type = ParseType(tokens);
+                    return new ParameterSyntax(varKeyword, name, colon, type);
             }
-            return new ParameterSyntax(children);
         }
 
+        [MustUseReturnValue]
         private static IEnumerable<SyntaxNode> ParseSyntaxList(
             ITokenStream tokens,
             Func<ITokenStream, SyntaxNode> parseItem,
@@ -191,6 +199,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             }
         }
 
+        [MustUseReturnValue]
         private static IEnumerable<SyntaxNode> ParseSyntaxList(
             ITokenStream tokens,
             Func<ITokenStream, SyntaxNode> parseItem,
@@ -212,6 +221,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             }
         }
 
+        [MustUseReturnValue]
         private BlockSyntax ParseStatementBlock(ITokenStream tokens)
         {
             var children = NewChildList();
@@ -221,6 +231,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             return new BlockSyntax(children);
         }
 
+        [MustUseReturnValue]
         private StatementSyntax ParseStatement(ITokenStream tokens)
         {
             var children = NewChildList();
@@ -251,6 +262,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             }
         }
 
+        [MustUseReturnValue]
         private ExpressionSyntax ParseExpression(ITokenStream tokens, OperatorPrecedence minPrecedence = OperatorPrecedence.Min)
         {
             var expression = ParseAtom(tokens);
@@ -365,6 +377,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         }
 
         // An atom is the unit of an expression that occurs between infix operators, i.e. an identifier, literal, group, or new
+        [MustUseReturnValue]
         private ExpressionSyntax ParseAtom(ITokenStream tokens)
         {
             var children = NewChildList();
@@ -401,6 +414,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             }
         }
 
+        [MustUseReturnValue]
         private static TypeSyntax ParseType(ITokenStream tokens)
         {
             switch (tokens.Current.Kind)
@@ -433,6 +447,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             }
         }
 
+        [MustUseReturnValue]
         private static Token ParseAccessModifier(ITokenStream tokens)
         {
             switch (tokens.Current.Kind)
@@ -446,6 +461,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             }
         }
 
+        [MustUseReturnValue]
         private ArgumentListSyntax ParseArgumentList(ITokenStream tokens)
         {
             var children = NewChildList();
@@ -457,6 +473,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         #endregion
 
         #region Helper Functions
+        [MustUseReturnValue]
         private static List<SyntaxNode> NewChildList()
         {
             return new List<SyntaxNode>();

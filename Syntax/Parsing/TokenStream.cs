@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 {
@@ -18,6 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             Finished = !this.tokens.MoveNext();
         }
 
+        [MustUseReturnValue]
         public Token Consume()
         {
             var current = Current;

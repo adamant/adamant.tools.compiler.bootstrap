@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
@@ -10,14 +7,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
     {
         public Token VarKeyword { get; }
         public IdentifierToken Name { get; }
+        public Token Colon { get; }
         public TypeSyntax Type { get; }
 
-        public ParameterSyntax(IEnumerable<SyntaxNode> children)
-            : base(children)
+        public ParameterSyntax(Token varKeyword, IdentifierToken name, Token colon, TypeSyntax type)
+            : base(varKeyword, name, colon, type)
         {
-            VarKeyword = Children.OfType<Token>().SingleOrDefault(t => t.Kind == TokenKind.VarKeyword);
-            Name = Children.OfType<IdentifierToken>().Single();
-            Type = Children.OfType<TypeSyntax>().Single();
+            VarKeyword = varKeyword;
+            Name = name;
+            Colon = colon;
+            Type = type;
         }
     }
 }

@@ -7,11 +7,13 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class Lexer
     {
+        [MustUseReturnValue]
         public IEnumerable<Token> Lex(CodeFile file)
         {
             var code = file.Code;
@@ -366,18 +368,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MustUseReturnValue]
         private static bool IsIntegerCharacter(char c)
         {
             return c >= '0' && c <= '9';
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MustUseReturnValue]
         private static bool IsIdentifierStartCharacter(char c)
         {
             return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MustUseReturnValue]
         private static bool IsIdentifierCharacter(char c)
         {
 
@@ -385,6 +390,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MustUseReturnValue]
         private static bool IsHexDigit(char c)
         {
             return (c >= '0' && c <= '9')

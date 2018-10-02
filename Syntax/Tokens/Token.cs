@@ -34,6 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         public static Token New(CodeFile file, TextSpan span, TokenKind kind, IEnumerable<DiagnosticInfo> diagnosticInfos)
         {
             Requires.That(nameof(kind), kind != TokenKind.StringLiteral);
+            Requires.That(nameof(kind), kind != TokenKind.IntegerLiteral);
             Requires.That(nameof(kind), kind != TokenKind.Identifier);
             return new Token(file, span, kind, false, diagnosticInfos);
         }
@@ -59,10 +60,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
             return $"{Kind}{validMarker}=`{Text}`";
         }
 
-        public override void AllDiagnostics(IList<Diagnostic> list)
+        public override void AllDiagnostics(IList<Diagnostic> diagnostics)
         {
             foreach (var diagnosticInfo in diagnosticInfos)
-                list.Add(new Diagnostic(File, Span, diagnosticInfo));
+                diagnostics.Add(new Diagnostic(File, Span, diagnosticInfo));
         }
     }
 }

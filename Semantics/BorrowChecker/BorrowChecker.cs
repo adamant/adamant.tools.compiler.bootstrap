@@ -125,7 +125,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BorrowChecker
                 .Any(r => r.Place == @object && !r.CanTake);
             if (!canTake)
             {
-                diagnostics.Add(Error.BorrowedValueDoesNotLiveLongEnough(TextSpan.FromStartEnd(0, 0)));
+                diagnostics.Add(Error.BorrowedValueDoesNotLiveLongEnough());
             }
         }
 

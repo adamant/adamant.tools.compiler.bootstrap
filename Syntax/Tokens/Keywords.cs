@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 {
     public static class Keywords
     {
