@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Core.Syntax</AssemblyName>
+    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Core.Syntax</RootNamespace>
   </PropertyGroup>
 
 </Project>

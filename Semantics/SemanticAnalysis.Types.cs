@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
+using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols;
@@ -13,7 +14,6 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
-using Core.Syntax;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {

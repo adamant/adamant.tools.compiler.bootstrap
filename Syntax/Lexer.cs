@@ -5,8 +5,8 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
+using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
-using Core.Syntax;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {

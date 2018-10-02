@@ -1,5 +1,5 @@
+using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
-using Core.Syntax;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics
 {

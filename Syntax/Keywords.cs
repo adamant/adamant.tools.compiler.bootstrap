@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Core.Syntax;
+using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
