@@ -81,7 +81,7 @@ namespace Core.Syntax
         StringKeyword,
         ReturnKeyword,
         ClassKeyword,
-        FnKeyword,
+        FunctionKeyword,
         NewKeyword,
         InitKeyword,
         DeleteKeyword,
@@ -100,6 +100,7 @@ namespace Core.Syntax
         UnsafeKeyword,
         SafeKeyword,
         SelfKeyword,
+        SelfTypeKeyword,
         BaseKeyword,
     }
 }

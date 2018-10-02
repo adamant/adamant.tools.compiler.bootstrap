@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Core.Syntax;
 using Newtonsoft.Json.Linq;
 using Xunit;
@@ -112,7 +113,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
                 case "keyword":
                     if (text == null)
                         return TestTokenKind.Keyword();
-                    return TestTokenKind.Keyword(Enum.Parse<TokenKind>(text + "Keyword", ignoreCase: true));
+                    return TestTokenKind.Keyword(Keywords.Map[text]);
                 case "comment":
                     return TestTokenKind.Comment();
                 case "whitespace":

@@ -90,8 +90,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     children.Add(ParseQualifiedName(tokens));
                     children.Add(tokens.Expect(TokenKind.Semicolon));
                     return new UsingSyntax(children);
-                case TokenKind.FnKeyword:
-                    children.Add(tokens.Expect(TokenKind.FnKeyword));
+                case TokenKind.FunctionKeyword:
+                    children.Add(tokens.Expect(TokenKind.FunctionKeyword));
                     children.Add(tokens.Expect(TokenKind.Identifier));
                     children.Add(ParseParameterList(tokens));
                     children.Add(tokens.Expect(TokenKind.RightArrow));

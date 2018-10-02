@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
@@ -13,27 +12,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class Lexer
     {
-        public static IReadOnlyDictionary<string, TokenKind> Keywords;
-
-        static Lexer()
-        {
-            var keywordDictionary = new Dictionary<string, TokenKind>();
-            var keywords = Enum.GetValues(typeof(TokenKind))
-                .Cast<TokenKind>()
-                .Where(t => t.ToString().EndsWith("Keyword"));
-            var keywordLength = "Keyword".Length;
-            foreach (var keyword in keywords)
-            {
-                var enumName = keyword.ToString();
-                var text = enumName
-                    .Substring(0, enumName.Length - keywordLength)
-                    .ToLower();
-                keywordDictionary.Add(text, keyword);
-            }
-
-            Keywords = new ReadOnlyDictionary<string, TokenKind>(keywordDictionary);
-        }
-
         public IEnumerable<Token> Lex(CodeFile file)
         {
             var code = file.Code;
@@ -270,7 +248,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                 var span = TextSpan.FromStartEnd(tokenStart, tokenEnd);
                 var value = code[span];
                 Token token;
-                if (Keywords.TryGetValue(value, out var keywordKind))
+                if (Keywords.Map.TryGetValue(value, out var keywordKind))
                 {
                     token = Token.New(file, span, keywordKind, tokenDiagnosticInfos);
                 }
@@ -387,22 +365,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool IsIntegerCharacter(char c)
         {
             return c >= '0' && c <= '9';
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool IsIdentifierStartCharacter(char c)
         {
             return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool IsIdentifierCharacter(char c)
         {
 
             return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || char.IsNumber(c);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool IsHexDigit(char c)
         {
             return (c >= '0' && c <= '9')
