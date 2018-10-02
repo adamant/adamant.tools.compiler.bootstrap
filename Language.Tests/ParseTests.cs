@@ -24,8 +24,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         {
             var codePath = new CodePath(testCase.RelativeCodePath);
             var code = new CodeText(testCase.Code);
-            var tokens = new Lexer().Lex(code);
-            var tokenStream = new TokenStream(codePath, code, tokens);
+            var file = new CodeFile(codePath, code);
+            var tokens = new Lexer().Lex(file);
+            var tokenStream = new TokenStream(file, tokens);
             var parser = new Parser();
             switch (testCase.SyntaxKind)
             {

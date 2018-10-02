@@ -30,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             var runTestsDirectory = Path.Combine(testsDirectory, "run");
             var codePath = new CodePath(testCase.RelativeCodePath);
             var code = new CodeText(testCase.Code);
-            var codeFile = new CodeFile(code, codePath);
+            var codeFile = new CodeFile(codePath, code);
             var cCodeFile = Path.Combine(runTestsDirectory, Path.ChangeExtension(testCase.RelativeCodePath, "c"));
             CompileAdamantToC(codeFile, cCodeFile);
             var executable = CompileCToExecutable(cCodeFile);

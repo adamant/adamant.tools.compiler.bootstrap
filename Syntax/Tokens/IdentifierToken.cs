@@ -11,13 +11,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         public readonly string Value;
 
         public IdentifierToken(
-            CodeText code,
+            CodeFile file,
             TextSpan span,
             IdentifierKind kind,
             bool isMissing,
             string value,
             IEnumerable<DiagnosticInfo> diagnosticInfos)
-            : base(code, span, TokenKind.Identifier, isMissing, diagnosticInfos)
+            : base(file, span, TokenKind.Identifier, isMissing, diagnosticInfos)
         {
             IdentifierKind = kind;
             Value = value;

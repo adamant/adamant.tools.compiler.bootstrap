@@ -9,14 +9,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     public class SyntaxTree<TSyntax>
         where TSyntax : SyntaxNode
     {
-        public CodeReference CodeReference { get; }
-        public CodeText Code { get; }
+        public CodeFile File { get; }
         public TSyntax Root { get; }
 
-        public SyntaxTree(CodeReference codeReference, CodeText code, TSyntax root)
+        public SyntaxTree(CodeFile file, TSyntax root)
         {
-            CodeReference = codeReference;
-            Code = code;
+            File = file;
             Root = root;
         }
     }

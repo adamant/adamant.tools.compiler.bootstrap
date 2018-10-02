@@ -29,5 +29,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.Operators
         {
             return Syntax;
         }
+
+        public override void AllDiagnostics(IList<Diagnostic> list)
+        {
+            base.AllDiagnostics(list);
+            LeftOperand.AllDiagnostics(list);
+            RightOperand.AllDiagnostics(list);
+        }
     }
 }

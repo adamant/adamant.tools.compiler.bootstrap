@@ -60,7 +60,7 @@ typedef enum Type_ID Type_ID;
 {
 }";
 
-            var codeFile = new CodeFile(new CodeText(code), new CodePath(nameof(EmitsEntryPointAdapterForNoArgVoidReturnMain)));
+            var codeFile = new CodeFile(new CodePath(nameof(EmitsEntryPointAdapterForNoArgVoidReturnMain)), new CodeText(code));
             var package = new AdamantCompiler().CompilePackage(codeFile.Yield());
             var cCode = new Code();
             new CEmitter().EmitEntryPointAdapter(cCode, package);

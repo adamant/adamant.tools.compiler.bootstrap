@@ -9,5 +9,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
         {
             Path = path;
         }
+
+        public override string ToString()
+        {
+            return Path;
+        }
     }
 }

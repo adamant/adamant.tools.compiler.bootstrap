@@ -34,8 +34,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             Keywords = new ReadOnlyDictionary<string, TokenKind>(keywordDictionary);
         }
 
-        public IEnumerable<Token> Lex(CodeText code)
+        public IEnumerable<Token> Lex(CodeFile file)
         {
+            var code = file.Code;
             var tokenStart = 0;
             var tokenEnd = -1; // One past the end position to allow for zero length spans
             var tokenDiagnosticInfos = new List<DiagnosticInfo>();
@@ -219,7 +220,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 
                         var span = TextSpan.FromStartEnd(tokenStart, tokenEnd);
                         var value = BigInteger.Parse(code[span]);
-                        yield return new IntegerLiteralToken(code, span, false, value, tokenDiagnosticInfos);
+                        yield return new IntegerLiteralToken(file, span, false, value, tokenDiagnosticInfos);
                         tokenDiagnosticInfos.Clear();
                         break;
                     default:
@@ -256,7 +257,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                 // If we were given an end value, set tokenEnd correctly
                 tokenEnd = end ?? tokenEnd;
 
-                var token = Token.New(code, TextSpan.FromStartEnd(tokenStart, tokenEnd), kind, tokenDiagnosticInfos);
+                var token = Token.New(file, TextSpan.FromStartEnd(tokenStart, tokenEnd), kind, tokenDiagnosticInfos);
                 tokenDiagnosticInfos.Clear();
                 return token;
             }
@@ -268,10 +269,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                 Token token;
                 if (Keywords.TryGetValue(value, out var keywordKind))
                 {
-                    token = Token.New(code, span, keywordKind, tokenDiagnosticInfos);
+                    token = Token.New(file, span, keywordKind, tokenDiagnosticInfos);
                 }
                 else
-                    token = new IdentifierToken(code, span, IdentifierKind.Normal, false, value, tokenDiagnosticInfos);
+                    token = new IdentifierToken(file, span, IdentifierKind.Normal, false, value, tokenDiagnosticInfos);
 
                 tokenDiagnosticInfos.Clear();
                 return token;
@@ -377,7 +378,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                 // To include the close quote
                 if (tokenEnd < code.Length && code[tokenEnd] == '"')
                     tokenEnd += 1;
-                var token = new StringLiteralToken(code, TextSpan.FromStartEnd(tokenStart, tokenEnd), false, content.ToString(), tokenDiagnosticInfos);
+                var token = new StringLiteralToken(file, TextSpan.FromStartEnd(tokenStart, tokenEnd), false, content.ToString(), tokenDiagnosticInfos);
                 tokenDiagnosticInfos.Clear();
                 return token;
             }

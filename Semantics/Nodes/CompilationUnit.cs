@@ -28,5 +28,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes
         {
             return Syntax;
         }
+
+        public override void AllDiagnostics(IList<Diagnostic> list)
+        {
+            base.AllDiagnostics(list);
+            Syntax.AllDiagnostics(list);
+            Namespace.AllDiagnostics(list);
+            foreach (var declaration in Declarations)
+                declaration.AllDiagnostics(list);
+        }
     }
 }

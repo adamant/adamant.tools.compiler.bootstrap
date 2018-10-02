@@ -6,16 +6,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 {
     public class TokenStream : ITokenStream
     {
-        public CodeReference CodeReference { get; }
-        public CodeText Code { get; }
+        public CodeFile File { get; }
         public bool Finished { get; private set; }
         private readonly IEnumerator<Token> tokens;
         public Token Current => Finished ? null : tokens.Current;
 
-        public TokenStream(CodeReference codeRef, CodeText code, IEnumerable<Token> tokens)
+        public TokenStream(CodeFile file, IEnumerable<Token> tokens)
         {
-            CodeReference = codeRef;
-            Code = code;
+            File = file;
             this.tokens = tokens.GetEnumerator();
             Finished = !this.tokens.MoveNext();
         }

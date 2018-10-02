@@ -5,8 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 {
     public interface ITokenStream
     {
-        CodeReference CodeReference { get; }
-        CodeText Code { get; }
+        CodeFile File { get; }
         bool Finished { get; }
         Token Current { get; }
         Token Consume();

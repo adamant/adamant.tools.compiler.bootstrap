@@ -32,5 +32,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         {
             return Syntax;
         }
+
+        public IList<Diagnostic> AllDiagnostics()
+        {
+            var diagnostics = new List<Diagnostic>();
+            foreach (var compilationUnit in CompilationUnits)
+                compilationUnit.AllDiagnostics(diagnostics);
+
+            return diagnostics;
+        }
     }
 }

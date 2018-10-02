@@ -31,8 +31,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
 #endif
                 .Select(file =>
                 {
-                    var tokens = lexer.Lex(file.Code);
-                    return parser.Parse(file.Reference, file.Code, tokens);
+                    var tokens = lexer.Lex(file);
+                    return parser.Parse(file, tokens);
                 })
                 .ToList();
         }

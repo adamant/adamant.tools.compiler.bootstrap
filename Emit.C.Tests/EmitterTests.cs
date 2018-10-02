@@ -30,9 +30,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C.Tests
         {
             var codePath = new CodePath(testCase.RelativeCodePath);
             var code = new CodeText(testCase.Code);
-            var tokens = new Lexer().Lex(code);
+            var file = new CodeFile(codePath, code);
+            var tokens = new Lexer().Lex(file);
             var parser = new Parser();
-            var syntaxTree = parser.Parse(codePath, code, tokens);
+            var syntaxTree = parser.Parse(file, tokens);
             var packageSyntax = new PackageSyntax(syntaxTree.Yield().ToList());
             var analyzer = new SemanticAnalyzer();
             return analyzer.Analyze(packageSyntax).Package;

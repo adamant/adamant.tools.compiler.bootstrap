@@ -106,9 +106,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
 
         internal static void AssertLexesCorrectly(TestTokenSequence sequence)
         {
+            var codeRef = new CodePath("test.ad");
             var code = new CodeText(sequence.ToString());
+            var file = new CodeFile(codeRef, code);
             var lexer = new Lexer();
-            var tokens = lexer.Lex(code);
+            var tokens = lexer.Lex(file);
             Assert.Collection(tokens, sequence.WhereIsToken().Tokens.Select(Inspector).Append(AssertEndOfFile).ToArray());
         }
         private static Action<Token> Inspector(TestToken expected)

@@ -11,45 +11,45 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 {
     public class Token : SyntaxNode
     {
-        public readonly CodeText Code;
-        public readonly TextSpan Span;
+        public override CodeFile File { get; }
+        public override TextSpan Span { get; }
         public readonly TokenKind Kind;
-        public string Text => Code[Span];
+        public string Text => File.Code[Span];
         public readonly bool IsMissing;
         public IEnumerable<DiagnosticInfo> DiagnosticInfos => diagnosticInfos;
         private readonly List<DiagnosticInfo> diagnosticInfos;
 
-        protected Token(CodeText code, TextSpan span, TokenKind kind, bool isMissing, IEnumerable<DiagnosticInfo> diagnosticInfos)
+        protected Token(CodeFile file, TextSpan span, TokenKind kind, bool isMissing, IEnumerable<DiagnosticInfo> diagnosticInfos)
         {
-            Requires.NotNull(nameof(code), code);
-            Requires.InString(code.Text, nameof(span), span);
+            Requires.NotNull(nameof(file), file);
+            Requires.InString(file.Code.Text, nameof(span), span);
             Requires.ValidEnum(nameof(kind), kind);
-            Code = code;
+            File = file;
             Span = span;
             Kind = kind;
             IsMissing = isMissing;
             this.diagnosticInfos = (diagnosticInfos ?? throw new ArgumentNullException(nameof(diagnosticInfos))).ToList();
         }
 
-        public static Token New(CodeText code, TextSpan span, TokenKind kind, IEnumerable<DiagnosticInfo> diagnosticInfos)
+        public static Token New(CodeFile file, TextSpan span, TokenKind kind, IEnumerable<DiagnosticInfo> diagnosticInfos)
         {
             Requires.That(nameof(kind), kind != TokenKind.StringLiteral);
             Requires.That(nameof(kind), kind != TokenKind.Identifier);
-            return new Token(code, span, kind, false, diagnosticInfos);
+            return new Token(file, span, kind, false, diagnosticInfos);
         }
 
-        public static Token Missing(CodeText code, int start, TokenKind kind)
+        public static Token Missing(CodeFile file, int start, TokenKind kind)
         {
             var diagnostic = Error.MissingToken(kind);
             var span = new TextSpan(start, 0);
             switch (kind)
             {
                 case TokenKind.Identifier:
-                    return new IdentifierToken(code, span, IdentifierKind.Normal, true, "", diagnostic.Yield());
+                    return new IdentifierToken(file, span, IdentifierKind.Normal, true, "", diagnostic.Yield());
                 case TokenKind.StringLiteral:
-                    return new StringLiteralToken(code, span, true, "", diagnostic.Yield());
+                    return new StringLiteralToken(file, span, true, "", diagnostic.Yield());
                 default:
-                    return new Token(code, span, kind, true, diagnostic.Yield());
+                    return new Token(file, span, kind, true, diagnostic.Yield());
             }
         }
 
@@ -57,6 +57,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         {
             var validMarker = IsMissing || DiagnosticInfos.Any(d => d.Level > DiagnosticLevel.Warning) ? "*" : "";
             return $"{Kind}{validMarker}=`{Text}`";
+        }
+
+        public override void AllDiagnostics(IList<Diagnostic> list)
+        {
+            foreach (var diagnosticInfo in diagnosticInfos)
+                list.Add(new Diagnostic(File, Span, diagnosticInfo));
         }
     }
 }

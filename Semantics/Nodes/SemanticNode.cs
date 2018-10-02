@@ -23,5 +23,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes
         {
             diagnostics.Add(diagnostic);
         }
+
+        public virtual void AllDiagnostics(IList<Diagnostic> list)
+        {
+            foreach (var diagnosticInfo in diagnostics)
+            {
+                list.Add(new Diagnostic(Syntax.File, Syntax.Span, diagnosticInfo));
+            }
+        }
     }
 }

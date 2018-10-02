@@ -26,5 +26,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.ControlFl
         {
             return Syntax;
         }
+
+        public override void AllDiagnostics(IList<Diagnostic> list)
+        {
+            base.AllDiagnostics(list);
+            Expression.AllDiagnostics(list);
+        }
     }
 }

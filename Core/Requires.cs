@@ -20,6 +20,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
                 throw new ArgumentOutOfRangeException(name, value, $"End not in string of length {inString.Length}");
         }
 
+        public static void InString(string inString, string name, int value)
+        {
+            // Start is allowed to be equal to length to allow for a zero length span after the last character
+            if (value < 0 || value >= inString.Length)
+                throw new ArgumentOutOfRangeException(name, value, $"Value not in string of length {inString.Length}");
+        }
+
         public static void NotNull(string name, object value)
         {
             if (value == null)
@@ -38,5 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
             if (!condition)
                 throw new ArgumentException("Does not satisfy condition", name);
         }
+
+
     }
 }

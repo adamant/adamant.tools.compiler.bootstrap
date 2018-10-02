@@ -24,5 +24,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions
         }
 
         protected override SyntaxNode GetSyntax() => Syntax;
+
+        public override void AllDiagnostics(IList<Diagnostic> list)
+        {
+            base.AllDiagnostics(list);
+            foreach (var argument in Arguments)
+                argument.AllDiagnostics(list);
+        }
     }
 }

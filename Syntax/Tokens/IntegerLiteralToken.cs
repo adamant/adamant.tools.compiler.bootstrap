@@ -10,8 +10,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
     {
         public readonly BigInteger Value;
 
-        public IntegerLiteralToken(CodeText code, TextSpan span, bool isMissing, BigInteger value, IEnumerable<DiagnosticInfo> diagnosticInfos)
-            : base(code, span, TokenKind.IntegerLiteral, isMissing, diagnosticInfos)
+        public IntegerLiteralToken(CodeFile file, TextSpan span, bool isMissing, BigInteger value, IEnumerable<DiagnosticInfo> diagnosticInfos)
+            : base(file, span, TokenKind.IntegerLiteral, isMissing, diagnosticInfos)
         {
             Value = value;
         }
