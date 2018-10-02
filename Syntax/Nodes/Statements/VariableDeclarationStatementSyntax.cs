@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements
         {
             Binding = Children.OfType<Token>().First();
             Name = Children.OfType<IdentifierToken>().Single();
-            Type = Children.OfType<TypeSyntax>().Single();
+            Type = Children.OfType<TypeSyntax>().SingleOrDefault();
             HasInitializer = Children.OfType<Token>().Any(t => t.Kind == TokenKind.Equals);
             if (HasInitializer)
                 Initializer = Children.OfType<ExpressionSyntax>().Last();

@@ -22,6 +22,7 @@ namespace Core.Syntax
     /// naming when it doesn't make sense
     public enum TokenKind
     {
+        Unexpected = -1,
         EndOfFile = 0,
 
         // Symbols

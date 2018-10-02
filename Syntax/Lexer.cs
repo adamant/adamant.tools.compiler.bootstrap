@@ -238,7 +238,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                             yield return NewOperatorToken(TokenKind.NotEqual, 2);
                         }
                         else
-                            throw new NotImplementedException($"Current char=`{currentChar}`");
+                        {
+                            NewError(DiagnosticLevel.CompilationError, "Unexpected Character");
+                            yield return NewToken(TokenKind.Unexpected, tokenStart + 1);
+                        }
                         break;
                 }
                 tokenStart = tokenEnd;
