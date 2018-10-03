@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -9,6 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Config
         public string Name { get; }
         public ReadOnlyCollection<string> Authors { get; }
         public ProjectTemplate Template { get; }
+        public IReadOnlyList<Project> ReferencedProjects { get; }
 
         public Project(ProjectFile file)
         {
@@ -16,6 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Config
             Name = file.Name;
             Authors = file.Authors.ToList().AsReadOnly();
             Template = file.Template;
+            ReferencedProjects = new List<Project>().AsReadOnly();
         }
     }
 }

@@ -36,16 +36,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge
                         "Package to build", CommandOptionType.SingleValue);
                     var verboseOption = cmd.Option("-v|--verbose", "Use verbose output",
                         CommandOptionType.NoValue);
-                    cmd.OnExecute(() =>
+                    cmd.OnExecute(async () =>
                     {
-                        var taskScheduler = NewTaskScheduler(
-                           allowParallelOption.OptionalValue() ?? DefaultAllowParallel,
-                           maxConcurrencyOption.OptionalValue());
+                        var allowParallel = allowParallelOption.OptionalValue() ?? DefaultAllowParallel;
+                        var maxConcurrency = maxConcurrencyOption.OptionalValue();
                         var verbose = verboseOption.HasValue();
                         var packagePath = packageOption.Value() ?? ".";
-                        var projectFile = ProjectFile.Load(packagePath);
-                        var buildSequence = new BuildSequence() { new Project(projectFile) };
-                        buildSequence.Build(verbose);
+
+                        await Build(packagePath, verbose, allowParallel, maxConcurrency);
                     });
                 });
 
@@ -56,6 +54,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge
             });
 
             return app.Execute(args);
+        }
+
+        private static async Task Build(
+            string packagePath,
+            bool verbose,
+            bool allowParallel,
+            int? maxConcurrency)
+        {
+            var projectFile = ProjectFile.Load(packagePath);
+            var projectSet = new ProjectSet() { new Project(projectFile) };
+            projectSet.LoadDependencies();
+            var taskScheduler = NewTaskScheduler(
+                allowParallel,
+                maxConcurrency);
+            await projectSet.Build(taskScheduler, verbose);
         }
 
         private static TaskScheduler NewTaskScheduler(bool allowParallel, int? maxConcurrency)

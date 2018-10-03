@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Xunit;
 using Xunit.Categories;
 
@@ -34,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework.Tests
                 Tuple.Create(3, "2"),
                 Tuple.Create(3, "3"),
             }.ToHashSet();
-            Assert.Equal(expected, items1.CrossJoin(items2, (x, y) => Tuple.Create(x, y)).ToHashSet());
+            Assert.Equal(expected, items1.CrossJoin(items2, Tuple.Create).ToHashSet());
         }
     }
 }

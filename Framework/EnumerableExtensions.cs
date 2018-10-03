@@ -36,11 +36,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
             return first.Zip(second, Tuple.Create);
         }
 
-        public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source)
-        {
-            return new HashSet<T>(source);
-        }
-
         public static IEnumerable<TResult> CrossJoin<TFirst, TSecond, TResult>(
             this IEnumerable<TFirst> first,
             IEnumerable<TSecond> second,
