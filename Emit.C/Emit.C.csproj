@@ -4,6 +4,11 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Emit.C</AssemblyName>
     <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Emit.C</RootNamespace>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

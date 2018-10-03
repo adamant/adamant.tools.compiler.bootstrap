@@ -79,7 +79,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                     // in parallel.
                     //var syntaxSymbol = SyntaxSymbol.Package;
                     var compilationUnits = package.CompilationUnits
-#if RELEASE
+#if !DEBUG
                         .AsParallel()
 #endif
                         .Select(Node)

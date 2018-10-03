@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Adamant.Tools.Compiler.Bootstrap.Forge.Build;
 using Adamant.Tools.Compiler.Bootstrap.Forge.Config;
 using McMaster.Extensions.CommandLineUtils;
@@ -6,6 +7,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge
 {
     public static class Program
     {
+#if DEBUG
+        public const bool DefaultAllowParallel = false;
+#else
+        public const bool DefaultAllowParallel = true;
+#endif
+
         public static int Main(string[] args)
         {
             var app = new CommandLineApplication()
@@ -16,6 +23,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge
 
             app.HelpOption();
 
+            var allowParallelOption = app.Option<bool>("--allow-parallel", "Allow parallel processing", CommandOptionType.SingleOrNoValue, true);
+            var maxConcurrencyOption = app.Option<int>("--max-concurrency",
+                "The max number of tasks to run concurrently",
+                CommandOptionType.SingleValue, true);
+
+
             app.Command("build", cmd =>
                 {
                     cmd.Description = "Compile a package and all of its dependencies";
@@ -25,6 +38,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge
                         CommandOptionType.NoValue);
                     cmd.OnExecute(() =>
                     {
+                        var taskScheduler = NewTaskScheduler(
+                           allowParallelOption.OptionalValue() ?? DefaultAllowParallel,
+                           maxConcurrencyOption.OptionalValue());
                         var verbose = verboseOption.HasValue();
                         var packagePath = packageOption.Value() ?? ".";
                         var projectFile = ProjectFile.Load(packagePath);
@@ -40,6 +56,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge
             });
 
             return app.Execute(args);
+        }
+
+        private static TaskScheduler NewTaskScheduler(bool allowParallel, int? maxConcurrency)
+        {
+            ConcurrentExclusiveSchedulerPair taskSchedulerPair;
+            if (maxConcurrency is int concurrency)
+                taskSchedulerPair = new ConcurrentExclusiveSchedulerPair(TaskScheduler.Default, concurrency);
+            else
+                taskSchedulerPair = new ConcurrentExclusiveSchedulerPair(TaskScheduler.Default);
+
+            return allowParallel
+                ? taskSchedulerPair.ConcurrentScheduler
+                : taskSchedulerPair.ExclusiveScheduler;
         }
     }
 }

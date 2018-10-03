@@ -8,6 +8,12 @@
     <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Framework.Tests</AssemblyName>
 
     <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Framework.Tests</RootNamespace>
+
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

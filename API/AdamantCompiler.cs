@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             var parser = new Parser();
 
             return files
-#if RELEASE
+#if !DEBUG
                 .AsParallel()
 #endif
                 .Select(file =>
