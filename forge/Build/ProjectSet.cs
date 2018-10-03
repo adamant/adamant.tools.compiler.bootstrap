@@ -81,6 +81,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             var projectBuilds = await projectBuildsTask;
             var sourceDir = Path.Combine(project.Path, "src");
             var sourcePaths = Directory.EnumerateFiles(sourceDir, "*.ad", SearchOption.AllDirectories);
+            // TODO switch to the async version of the compiler
+            //var codeFiles = sourcePaths.Select(p => new CodePath(p)).ToList();
+            //var package = await compiler.CompilePackageAsync(codeFiles);
             var codeFiles = sourcePaths.Select(CodeFile.Load).ToList();
             var package = compiler.CompilePackage(codeFiles);
             var diagnostics = package.AllDiagnostics();
