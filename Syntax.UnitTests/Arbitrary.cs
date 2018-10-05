@@ -5,23 +5,17 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Fare;
 using FsCheck;
-using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tests
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
 {
-    public class PsuedoTokenGenerators
+    public class Arbitrary
     {
-        /// <summary>
-        /// This is what FsCheck actually calls to get the generators
-        /// </summary>
-        /// <returns></returns>
-        [UsedImplicitly]
-        public static Arbitrary<PsuedoToken> ArbitraryPsuedoToken()
+        public static Arbitrary<PsuedoToken> PsuedoToken()
         {
             return Arb.From(GenPsuedoToken());
         }
 
-        public static Gen<PsuedoToken> GenPsuedoToken()
+        private static Gen<PsuedoToken> GenPsuedoToken()
         {
             return Gen.OneOf(
                 GenSymbol(),
@@ -32,13 +26,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tests
                 GenStringLiteral());
         }
 
-        public static Gen<PsuedoToken> GenSymbol()
+        private static Gen<PsuedoToken> GenSymbol()
         {
             return Gen.Elements(Symbols.AsEnumerable())
                 .Select(item => new PsuedoToken(item.Value, item.Key));
         }
 
-        public static Gen<string> GenRegex(string pattern)
+        private static Gen<string> GenRegex(string pattern)
         {
             return Gen.Sized(size =>
             {
@@ -49,33 +43,33 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tests
             });
         }
 
-        public static Gen<PsuedoToken> GenWhitespace()
+        private static Gen<PsuedoToken> GenWhitespace()
         {
             return GenRegex("[ \t\n\r]")
                 .Select(s => new PsuedoToken(TokenKind.Whitespace, s));
         }
 
-        public static Gen<PsuedoToken> GenComment()
+        private static Gen<PsuedoToken> GenComment()
         {
             // Covers both block comments and line comments
             return GenRegex(@"/\*(\**[^/])*\*/|//.*")
                 .Select(s => new PsuedoToken(TokenKind.Comment, s));
         }
 
-        public static Gen<PsuedoToken> GenIdentifier()
+        private static Gen<PsuedoToken> GenIdentifier()
         {
             return GenRegex(@"[a-zA-Z_][a-zA-Z_0-9]*")
                 .Where(s => !Symbols.ContainsKey(s)) // don't emit keywords
                 .Select(s => new PsuedoToken(TokenKind.Identifier, s, s));
         }
 
-        public static Gen<PsuedoToken> GenIntegerLiteral()
+        private static Gen<PsuedoToken> GenIntegerLiteral()
         {
             return GenRegex(@"0|[1-9][0-9]*")
                 .Select(s => new PsuedoToken(TokenKind.IntegerLiteral, s, BigInteger.Parse(s)));
         }
 
-        public static Gen<PsuedoToken> GenStringLiteral()
+        private static Gen<PsuedoToken> GenStringLiteral()
         {
             // @"""([^\\]|\\(r|n|0|t|'|""|\\|u\([0-9a-fA-F]{1,6}\)))*"""
             return GenRegex(@"\""([^\\""]|\\(r|n|0|t|\'|\""))*\""")

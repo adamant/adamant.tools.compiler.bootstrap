@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -6,29 +5,23 @@ using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core.Tests;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using Adamant.Tools.Compiler.Bootstrap.UnitTests.Framework;
 using FsCheck;
 using FsCheck.Xunit;
 using Xunit;
+using Xunit.Abstractions;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tests
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
 {
     public class LexerSpec
     {
-        /// <summary>
-        /// Registers generators needed for psuedo token generation. Invokes
-        /// <see cref="PsuedoTokenGenerators.ArbitraryPsuedoToken"/>
-        /// </summary>
-        static LexerSpec()
-        {
-            Arb.Register<PsuedoTokenGenerators>();
-        }
-
-        private static Property Check(Func<bool> condition)
-        {
-            return condition.ToProperty();
-        }
-
         private readonly Lexer lexer = new Lexer();
+
+        private readonly ITestOutputHelper testOutput;
+        public LexerSpec(ITestOutputHelper testOutput)
+        {
+            this.testOutput = testOutput;
+        }
 
         [Theory]
         [InlineData("hello", "hello")]
@@ -123,24 +116,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tests
             });
         }
 
-        [Property(MaxTest = 10_000)]
-        public bool Tokens_concatenate_to_input(NonNull<string> input)
+        //[Property(MaxTest = 10_000)]
+        [Fact]
+        public void Tokens_concatenate_to_input()
         {
-            var file = input.ToFakeCodeFile();
-            var output = lexer.Lex(file);
-            return input.Get == Concat(output, file);
+            Prop.ForAll<NonNull<string>>(input =>
+            {
+                var file = input.ToFakeCodeFile();
+                var output = lexer.Lex(file);
+                return input.Get == Concat(output, file);
+            }).QuickCheckThrowOnFailure(10_000, testOutput);
         }
 
-        [Property(MaxTest = 5_000)]
-        public Property Token_lexes(NonNull<PsuedoToken> nonNullToken)
+        [Fact]
+        public void Token_lexes()
         {
-            var token = nonNullToken.Get;
-            var file = token.ToFakeCodeFile();
-            var output = lexer.Lex(file);
-            var outputAsPsuedoTokens = PsuedoTokensFor(output, file);
-            var expectedPsuedoTokens = token.Yield().Append(PsuedoToken.EndOfFile());
-            return Check(() => expectedPsuedoTokens.SequenceEqual(outputAsPsuedoTokens))
-                .Label($"Output: {Display(outputAsPsuedoTokens)} != Expected: {Display(expectedPsuedoTokens)}");
+            Prop.ForAll(Arbitrary.PsuedoToken(), token =>
+            {
+                var file = token.ToFakeCodeFile();
+                var output = lexer.Lex(file);
+                var outputAsPsuedoTokens = PsuedoTokensFor(output, file);
+                var expectedPsuedoTokens = token.Yield().Append(PsuedoToken.EndOfFile()).ToList();
+                return expectedPsuedoTokens.SequenceEqual(outputAsPsuedoTokens)
+                    .Collect(token.Kind)
+                    .Label($"Output: {Display(outputAsPsuedoTokens)} != Expected: {Display(expectedPsuedoTokens)}");
+            }).QuickCheckThrowOnFailure(testOutput);
         }
 
         #region Helper functions
@@ -162,7 +162,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tests
             return string.Concat(tokens.Select(t => t.Text(file.Code)));
         }
 
-        private static List<PsuedoToken> PsuedoTokensFor(IEnumerable<Token> tokens, CodeFile file)
+        public static List<PsuedoToken> PsuedoTokensFor(IEnumerable<Token> tokens, CodeFile file)
         {
             return tokens.Select(t => PsuedoToken.For(t, file.Code)).ToList();
         }
@@ -174,7 +174,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tests
 
         public static IEnumerable<object[]> SymbolsTheoryData()
         {
-            return PsuedoTokenGenerators.Symbols.Select(item => new object[] { item.Key, item.Value });
+            return Arbitrary.Symbols.Select(item => new object[] { item.Key, item.Value });
         }
         #endregion
     }
