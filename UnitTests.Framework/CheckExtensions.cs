@@ -5,7 +5,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.UnitTests.Framework
 {
     public static class CheckExtensions
     {
-        public static void QuickCheckThrowOnFailure(
+        public static void QuickCheckThrow(
+            this Property property,
+            ITestOutputHelper testOutput)
+        {
+            Check.One(Config.QuickThrowOnFailure.WithTestOutput(testOutput), property);
+        }
+
+        public static void QuickCheckThrow(
             this Property property,
             int maxTest,
             ITestOutputHelper testOutput)

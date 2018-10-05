@@ -7,7 +7,6 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.UnitTests.Framework;
 using FsCheck;
-using FsCheck.Xunit;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -65,15 +64,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
             Assert.Null(token.Value);
         }
 
-        //[Property]
-        //public Property Valid_token_sequence_lexes_back_to_itself(NonNull<List<NonNull<PsuedoToken>>> tokens)
-        //{
-        //    var input = string.Concat(tokens.Get.Select(t => t.Get.Text));
-        //    var fi = input.ToFakeCodeFile();
-        //    var output = lexer.Lex(fi);
-        //    return Check(() => tokens.Get.Select(t => t.Get).SequenceEqual(output.Select(t => PsuedoToken.For(t, fi.Code)))).Check(new Configuration() { });
-        //}
-
         [Fact]
         public void End_of_file_in_block_comment()
         {
@@ -116,7 +106,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
             });
         }
 
-        //[Property(MaxTest = 10_000)]
         [Fact]
         public void Tokens_concatenate_to_input()
         {
@@ -125,7 +114,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
                 var file = input.ToFakeCodeFile();
                 var output = lexer.Lex(file);
                 return input.Get == Concat(output, file);
-            }).QuickCheckThrowOnFailure(10_000, testOutput);
+            }).QuickCheckThrow(10_000, testOutput);
         }
 
         [Fact]
@@ -140,7 +129,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
                 return expectedPsuedoTokens.SequenceEqual(outputAsPsuedoTokens)
                     .Collect(token.Kind)
                     .Label($"Output: {Display(outputAsPsuedoTokens)} != Expected: {Display(expectedPsuedoTokens)}");
-            }).QuickCheckThrowOnFailure(testOutput);
+            }).QuickCheckThrow(1_000, testOutput);
+        }
+
+        [Fact]
+        public void Valid_token_sequence_lexes_back_to_itself()
+        {
+            Prop.ForAll<NonNull<List<NonNull<PsuedoToken>>>>(tokens =>
+            {
+                var input = string.Concat(tokens.Get.Select(t => t.Get.Text));
+                var fi = input.ToFakeCodeFile();
+                var output = lexer.Lex(fi);
+                return tokens.Get.Select(t => t.Get).SequenceEqual(output.Select(t => PsuedoToken.For(t, fi.Code)));
+            }).QuickCheckThrow(testOutput);
         }
 
         #region Helper functions

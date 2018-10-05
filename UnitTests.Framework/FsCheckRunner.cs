@@ -32,7 +32,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.UnitTests.Framework
 
         public void OnFinished(string name, TestResult result)
         {
-            testOutput.WriteLine(Runner.onFinishedToString(name, result));
+            var message = Runner.onFinishedToString(name, result);
+            if (result.IsTrue)
+                testOutput.WriteLine(message);
+            else
+                throw new Exception(message);
         }
     }
 }
