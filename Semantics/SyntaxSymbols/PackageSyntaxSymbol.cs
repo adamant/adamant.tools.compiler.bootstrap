@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
         int? ISyntaxSymbol.DeclarationNumber => null;
 
         public PackageSyntax Declaration { get; }
-        IEnumerable<SyntaxBranchNode> ISyntaxSymbol.Declarations => Declaration.Yield();
+        IEnumerable<SyntaxNode> ISyntaxSymbol.Declarations => Declaration.Yield();
 
         public GlobalNamespaceSyntaxSymbol GlobalNamespace { get; }
         IEnumerable<ISyntaxSymbol> ISyntaxSymbol.Children => GlobalNamespace.Yield();

@@ -6,16 +6,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
 {
     public class ClassDeclarationSyntax : MemberDeclarationSyntax
     {
-        public Token AccessModifier { get; }
+        public SimpleToken AccessModifier { get; }
+        public SimpleToken ClassKeyword { get; }
         public override IdentifierToken Name { get; }
+        public SimpleToken OpenBrace { get; }
         public IReadOnlyList<MemberDeclarationSyntax> Members { get; }
+        public SimpleToken CloseBrace { get; }
 
-        public ClassDeclarationSyntax(IEnumerable<SyntaxNode> children)
-            : base(children)
+        public ClassDeclarationSyntax(
+            SimpleToken accessModifier,
+            SimpleToken classKeyword,
+            IdentifierToken name,
+            SimpleToken openBrace,
+            IEnumerable<MemberDeclarationSyntax> members,
+            SimpleToken closeBrace)
         {
-            AccessModifier = (Token)Children.First();
-            Name = Children.OfType<IdentifierToken>().Single();
-            Members = Children.OfType<MemberDeclarationSyntax>().ToList().AsReadOnly();
+            AccessModifier = accessModifier;
+            ClassKeyword = classKeyword;
+            Name = name;
+            OpenBrace = openBrace;
+            Members = members.ToList().AsReadOnly();
+            CloseBrace = closeBrace;
         }
     }
 }

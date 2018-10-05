@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations
 
         public EnumStructDeclaration(
             EnumStructDeclarationSyntax syntax,
-            IEnumerable<DiagnosticInfo> diagnostics,
+            IEnumerable<Diagnostic> diagnostics,
             AccessLevel access,
             ObjectType type,
             IEnumerable<MemberDeclaration> members)
@@ -34,7 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations
 
         protected override SyntaxNode GetSyntax() => Syntax;
 
-        public override void AllDiagnostics(IList<Diagnostic> list)
+        public override void AllDiagnostics(List<Diagnostic> list)
         {
             base.AllDiagnostics(list);
             foreach (var member in Members)

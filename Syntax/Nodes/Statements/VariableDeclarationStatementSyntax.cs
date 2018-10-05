@@ -9,19 +9,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements
 {
     public class VariableDeclarationStatementSyntax : StatementSyntax
     {
-        public Token Binding { get; }
+        public SimpleToken Binding { get; }
         public IdentifierToken Name { get; }
         public TypeSyntax Type { get; }
         public bool HasInitializer => Initializer != null;
         public ExpressionSyntax Initializer { get; }
 
         public VariableDeclarationStatementSyntax(IEnumerable<SyntaxNode> children, TypeSyntax type, ExpressionSyntax initializer)
-            : base(children)
         {
-            Requires.That(nameof(type), type == null || Children.Contains(type));
-            Requires.That(nameof(initializer), initializer == null || Children.Contains(initializer));
-            Binding = Children.OfType<Token>().First();
-            Name = Children.OfType<IdentifierToken>().Single();
+            var childNodes = children.ToList();
+            Requires.That(nameof(type), type == null || childNodes.Contains(type));
+            Requires.That(nameof(initializer), initializer == null || childNodes.Contains(initializer));
+            Binding = childNodes.OfType<SimpleToken>().First();
+            Name = childNodes.OfType<IdentifierToken>().Single();
             Type = type;
             Initializer = initializer;
         }

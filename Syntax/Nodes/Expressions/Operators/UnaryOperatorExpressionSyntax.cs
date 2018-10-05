@@ -6,8 +6,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators
     {
         public ExpressionSyntax Operand { get; }
 
-        public UnaryOperatorExpressionSyntax(Token @operator, ExpressionSyntax operand)
-            : base(null, @operator, operand)
+        public UnaryOperatorExpressionSyntax(SimpleToken @operator, ExpressionSyntax operand)
+            : base(@operator)
         {
             Operand = operand;
         }

@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements
 
         public VariableDeclarationStatement(
             VariableDeclarationStatementSyntax syntax,
-            IEnumerable<DiagnosticInfo> diagnostics,
+            IEnumerable<Diagnostic> diagnostics,
             bool mutableBinding,
             string name,
             DataType type,
@@ -33,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements
 
         protected override SyntaxNode GetSyntax() => Syntax;
 
-        public override void AllDiagnostics(IList<Diagnostic> list)
+        public override void AllDiagnostics(List<Diagnostic> list)
         {
             base.AllDiagnostics(list);
             Initializer?.AllDiagnostics(list);

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Core.Syntax
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 {
     public static class Keywords
     {
@@ -12,17 +12,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core.Syntax
 
         static Keywords()
         {
-            TokenKinds = Enum.GetValues(typeof(TokenKind))
-                .Cast<TokenKind>()
-                .Where(t => t.ToString().EndsWith("Keyword"))
-                .Distinct() // This is returning duplicates because of the FirstOperator and LastOperator values
+            // Some values have multiple names, to be sure we get the right things, we need to go by names not values
+            var keywordNames = Enum.GetNames(typeof(TokenKind))
+                .Where(n => n.EndsWith("Keyword"))
+                .ToList()
+                ;
+            TokenKinds = keywordNames
+                .Select(Enum.Parse<TokenKind>)
                 .ToList().AsReadOnly();
 
             var keywordDictionary = new Dictionary<string, TokenKind>();
 
             var keywordLength = "Keyword".Length;
-            foreach (var tokenKind in TokenKinds)
+            foreach (var keywordName in keywordNames)
             {
+                var tokenKind = Enum.Parse<TokenKind>(keywordName);
                 string keyword;
                 switch (tokenKind)
                 {
@@ -35,9 +39,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core.Syntax
                         break;
 
                     default:
-                        var enumName = tokenKind.ToString();
-                        keyword = enumName
-                            .Substring(0, enumName.Length - keywordLength)
+                        keyword = keywordName
+                            .Substring(0, keywordName.Length - keywordLength)
                             .ToLower();
                         break;
                 }

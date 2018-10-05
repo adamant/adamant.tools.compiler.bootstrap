@@ -1,4 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names
@@ -7,10 +6,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names
     {
         public IdentifierToken Name { get; }
 
-        public IdentifierNameSyntax(IdentifierToken token)
-            : base(token.Yield())
+        public IdentifierNameSyntax(IdentifierToken name)
         {
-            Name = token;
+            Name = name;
         }
     }
 }

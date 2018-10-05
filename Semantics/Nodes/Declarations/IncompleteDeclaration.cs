@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations
     {
         public new IncompleteDeclarationSyntax Syntax { get; }
 
-        public IncompleteDeclaration(IncompleteDeclarationSyntax syntax, IEnumerable<DiagnosticInfo> diagnostics)
+        public IncompleteDeclaration(IncompleteDeclarationSyntax syntax, IEnumerable<Diagnostic> diagnostics)
             : base(diagnostics)
         {
             Syntax = syntax;

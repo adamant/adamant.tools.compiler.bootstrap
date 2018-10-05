@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.ControlFl
 
         public ReturnExpression(
             ReturnExpressionSyntax syntax,
-            IEnumerable<DiagnosticInfo> diagnostics,
+            IEnumerable<Diagnostic> diagnostics,
             Expression expression)
         // TODO take in the type rather than assuming never here (let that be semantic analysis
             : base(diagnostics, PrimitiveType.Never)
@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.ControlFl
             return Syntax;
         }
 
-        public override void AllDiagnostics(IList<Diagnostic> list)
+        public override void AllDiagnostics(List<Diagnostic> list)
         {
             base.AllDiagnostics(list);
             Expression.AllDiagnostics(list);

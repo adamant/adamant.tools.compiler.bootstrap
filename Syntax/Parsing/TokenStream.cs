@@ -8,23 +8,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
     public class TokenStream : ITokenStream
     {
         public CodeFile File { get; }
-        public bool Finished { get; private set; }
         private readonly IEnumerator<Token> tokens;
-        public Token Current => Finished ? null : tokens.Current;
+        public Token? Current { get; private set; }
 
         public TokenStream(CodeFile file, IEnumerable<Token> tokens)
         {
             File = file;
             this.tokens = tokens.GetEnumerator();
-            Finished = !this.tokens.MoveNext();
+            Current = this.tokens.MoveNext() ? this.tokens.Current : default(Token?);
         }
 
         [MustUseReturnValue]
-        public Token Consume()
+        public bool Next()
         {
-            var current = Current;
-            Finished = !tokens.MoveNext();
-            return current;
+            var hasValue = tokens.MoveNext();
+            Current = hasValue ? tokens.Current : default(Token?);
+            return hasValue;
         }
     }
 }

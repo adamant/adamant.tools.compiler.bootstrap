@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements
 
         public Block(
             BlockSyntax syntax,
-            IEnumerable<DiagnosticInfo> diagnostics,
+            IEnumerable<Diagnostic> diagnostics,
             IEnumerable<Statement> statements)
             : base(diagnostics)
         {
@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements
 
         protected override SyntaxNode GetSyntax() => Syntax;
 
-        public override void AllDiagnostics(IList<Diagnostic> list)
+        public override void AllDiagnostics(List<Diagnostic> list)
         {
             base.AllDiagnostics(list);
             foreach (var statement in Statements)

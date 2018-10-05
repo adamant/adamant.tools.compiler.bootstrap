@@ -1,5 +1,3 @@
-using System.ComponentModel;
-using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
@@ -21,29 +19,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
           : base(name, false)
         {
             Kind = name.Kind;
-        }
-
-        public static PrimitiveType New(TokenKind kind)
-        {
-            switch (kind)
-            {
-                case TokenKind.IntKeyword:
-                    return Int;
-                case TokenKind.UIntKeyword:
-                    return UInt;
-                case TokenKind.ByteKeyword:
-                    return Byte;
-                case TokenKind.SizeKeyword:
-                    return Size;
-                case TokenKind.VoidKeyword:
-                    return Void;
-                case TokenKind.BoolKeyword:
-                    return Bool;
-                case TokenKind.StringKeyword:
-                    return String;
-                default:
-                    throw new InvalidEnumArgumentException($"Token kind `{kind}` is not a primitive type keyword");
-            }
         }
     }
 }

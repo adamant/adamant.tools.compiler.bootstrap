@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
         /// </summary>
         int? DeclarationNumber { get; }
 
-        IEnumerable<SyntaxBranchNode> Declarations { get; }
+        IEnumerable<SyntaxNode> Declarations { get; }
 
         IEnumerable<ISyntaxSymbol> Children { get; }
 

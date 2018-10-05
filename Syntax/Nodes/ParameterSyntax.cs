@@ -3,15 +3,14 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
 {
-    public class ParameterSyntax : SyntaxBranchNode
+    public class ParameterSyntax : SyntaxNode
     {
-        public Token VarKeyword { get; }
+        public SimpleToken? VarKeyword { get; }
         public IdentifierToken Name { get; }
-        public Token Colon { get; }
+        public SimpleToken Colon { get; }
         public TypeSyntax Type { get; }
 
-        public ParameterSyntax(Token varKeyword, IdentifierToken name, Token colon, TypeSyntax type)
-            : base(varKeyword, name, colon, type)
+        public ParameterSyntax(SimpleToken? varKeyword, IdentifierToken name, SimpleToken colon, TypeSyntax type)
         {
             VarKeyword = varKeyword;
             Name = name;

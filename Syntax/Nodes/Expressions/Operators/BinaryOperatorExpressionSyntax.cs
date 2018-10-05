@@ -7,8 +7,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators
         public ExpressionSyntax LeftOperand { get; }
         public ExpressionSyntax RightOperand { get; }
 
-        public BinaryOperatorExpressionSyntax(ExpressionSyntax leftOperand, Token @operator, ExpressionSyntax rightOperand)
-            : base(leftOperand, @operator, rightOperand)
+        public BinaryOperatorExpressionSyntax(ExpressionSyntax leftOperand, SimpleToken @operator, ExpressionSyntax rightOperand)
+            : base(@operator)
         {
             LeftOperand = leftOperand;
             RightOperand = rightOperand;

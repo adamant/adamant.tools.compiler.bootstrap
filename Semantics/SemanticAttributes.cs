@@ -10,31 +10,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
     public class SemanticAttributes
     {
         public PackageSyntax Package { get; }
-        private readonly ReadOnlyDictionary<SyntaxBranchNode, ConcurrentDictionary<string, Lazy<object>>> values;
+        private readonly ReadOnlyDictionary<SyntaxNode, ConcurrentDictionary<string, Lazy<object>>> values;
 
         public SemanticAttributes(PackageSyntax package)
         {
             Package = package;
-            values = package.DescendantBranchesAndSelf()
+            values = package.DescendantsAndSelf()
                 .ToDictionary(branch => branch,
                     branch => new ConcurrentDictionary<string, Lazy<object>>())
                 .AsReadOnly();
         }
 
         public TReturn GetOrAdd<TSyntax, TReturn>(TSyntax syntax, string attribute, Func<TSyntax, TReturn> valueFactory)
-            where TSyntax : SyntaxBranchNode
+            where TSyntax : SyntaxNode
         {
             var lazy = values[syntax].GetOrAdd(attribute, (a, s) => new Lazy<object>(valueFactory(s)), syntax);
             return (TReturn)lazy.Value;
         }
 
-        public TReturn GetOrAdd<TReturn>(SyntaxBranchNode syntax, string attribute, Lazy<object> value)
+        public TReturn GetOrAdd<TReturn>(SyntaxNode syntax, string attribute, Lazy<object> value)
         {
             var lazy = values[syntax].GetOrAdd(attribute, value);
             return (TReturn)lazy.Value;
         }
 
-        public TReturn Get<TReturn>(SyntaxBranchNode syntax, string attribute)
+        public TReturn Get<TReturn>(SyntaxNode syntax, string attribute)
         {
             if (values[syntax].TryGetValue(attribute, out var lazy))
                 return (TReturn)lazy.Value;
@@ -42,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             throw new Exception($"No '{attribute}' for node of type {syntax.GetType().Name}");
         }
 
-        public bool HasAttribute(SyntaxBranchNode syntax, string attribute)
+        public bool HasAttribute(SyntaxNode syntax, string attribute)
         {
             return values[syntax].ContainsKey(attribute);
         }

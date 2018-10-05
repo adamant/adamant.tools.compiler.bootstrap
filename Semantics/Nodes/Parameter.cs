@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes
 
         public Parameter(
             ParameterSyntax syntax,
-            IEnumerable<DiagnosticInfo> diagnostics,
+            IEnumerable<Diagnostic> diagnostics,
             bool mutableBinding,
             string name,
             Expression type)
@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes
             return Syntax;
         }
 
-        public override void AllDiagnostics(IList<Diagnostic> list)
+        public override void AllDiagnostics(List<Diagnostic> list)
         {
             base.AllDiagnostics(list);
             Type.AllDiagnostics(list);

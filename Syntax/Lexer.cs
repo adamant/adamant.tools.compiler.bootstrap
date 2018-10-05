@@ -5,7 +5,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
-using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
@@ -17,20 +16,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         public IEnumerable<Token> Lex(CodeFile file)
         {
             var code = file.Code;
+            var text = code.Text;
             var tokenStart = 0;
             var tokenEnd = -1; // One past the end position to allow for zero length spans
-            var tokenDiagnosticInfos = new List<DiagnosticInfo>();
-            while (tokenStart < code.Length)
+            var diagnostics = new List<Diagnostic>();
+            while (tokenStart < text.Length)
             {
-                var currentChar = code[tokenStart];
+                var currentChar = text[tokenStart];
                 switch (currentChar)
                 {
-                    case ' ':
-                    case '\t':
-                    case '\n':
-                    case '\r':
-                        tokenStart += 1;
-                        continue;
                     case '{':
                         yield return NewOperatorToken(TokenKind.OpenBrace);
                         break;
@@ -94,15 +88,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                             yield return NewOperatorToken(TokenKind.Plus);
                         break;
                     case '-':
-                        if (NextCharIs('='))
-                            // it is `-=`
-                            yield return NewOperatorToken(TokenKind.MinusEquals, 2);
-                        else if (NextCharIs('>'))
-                            // it is `->`
-                            yield return NewOperatorToken(TokenKind.RightArrow, 2);
-                        else
-                            // it is `-`
-                            yield return NewOperatorToken(TokenKind.Minus);
+                        switch (NextChar())
+                        {
+                            case '=':
+                                // it is `-=`
+                                yield return NewOperatorToken(TokenKind.MinusEquals, 2);
+                                break;
+                            case '>':
+                                // it is `->`
+                                yield return NewOperatorToken(TokenKind.RightArrow, 2);
+                                break;
+                            default:
+                                // it is `-`
+                                yield return NewOperatorToken(TokenKind.Minus);
+                                break;
+                        }
                         break;
                     case '*':
                         if (NextCharIs('='))
@@ -113,35 +113,39 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                             yield return NewOperatorToken(TokenKind.Asterisk);
                         break;
                     case '/':
-                        if (NextCharIs('/'))
+                        switch (NextChar())
                         {
-                            // it is a line comment `//`
-                            tokenStart += 2;
-                            while (tokenStart < code.Length && code[tokenStart] != '\r' && code[tokenStart] != '\n')
-                            {
-                                tokenStart += 1;
-                            }
-                            continue;
+                            case '/':
+                                // it is a line comment `//`
+                                tokenEnd = tokenStart + 2;
+                                while (tokenEnd < text.Length && text[tokenEnd] != '\r' && text[tokenEnd] != '\n')
+                                    tokenEnd += 1;
+
+                                yield return NewToken(TokenKind.Comment, tokenEnd);
+                                break;
+                            case '*':
+                                // it is a block comment `/*`
+                                tokenEnd = tokenStart + 2;
+                                var lastCharWasStar = false;
+                                while (tokenEnd < text.Length && !(lastCharWasStar && text[tokenEnd] == '/'))
+                                {
+                                    lastCharWasStar = text[tokenEnd] == '*';
+                                    tokenEnd += 1;
+                                }
+                                // If we didn't run into the end of the file, we need to move past the file '/'
+                                if (tokenEnd < text.Length)
+                                    tokenEnd += 1;
+                                yield return NewToken(TokenKind.Comment, tokenEnd);
+                                break;
+                            case '=':
+                                // it is `/=`
+                                yield return NewOperatorToken(TokenKind.SlashEquals, 2);
+                                break;
+                            default:
+                                // it is `/`
+                                yield return NewOperatorToken(TokenKind.Slash);
+                                break;
                         }
-                        else if (NextCharIs('*'))
-                        {
-                            // it is a block comment `/*`
-                            tokenStart += 2;
-                            var lastCharWasStar = false;
-                            while (tokenStart < code.Length && !(lastCharWasStar && code[tokenStart] == '/'))
-                            {
-                                lastCharWasStar = code[tokenStart] == '*';
-                                tokenStart += 1;
-                            }
-                            tokenStart += 1; // move past the final '/'
-                            continue;
-                        }
-                        else if (NextCharIs('='))
-                            // it is `/=`
-                            yield return NewOperatorToken(TokenKind.SlashEquals, 2);
-                        else
-                            // it is `/`
-                            yield return NewOperatorToken(TokenKind.Slash);
                         break;
                     case '=':
                         if (NextCharIs('='))
@@ -195,19 +199,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     case '8':
                     case '9':
                         tokenEnd = tokenStart + 1;
-                        while (tokenEnd < code.Length && IsIntegerCharacter(code[tokenEnd]))
+                        while (tokenEnd < text.Length && IsIntegerCharacter(text[tokenEnd]))
                             tokenEnd += 1;
 
                         var span = TextSpan.FromStartEnd(tokenStart, tokenEnd);
                         var value = BigInteger.Parse(code[span]);
-                        yield return new IntegerLiteralToken(file, span, false, value, tokenDiagnosticInfos);
-                        tokenDiagnosticInfos.Clear();
+                        yield return new Token(TokenKind.IntegerLiteral, span, value);
                         break;
                     default:
-                        if (IsIdentifierStartCharacter(currentChar))
+                        if (char.IsWhiteSpace(currentChar))
                         {
                             tokenEnd = tokenStart + 1;
-                            while (tokenEnd < code.Length && IsIdentifierCharacter(code[tokenEnd]))
+                            while (tokenEnd < text.Length && char.IsWhiteSpace(text[tokenEnd]))
+                                tokenEnd += 1;
+
+                            yield return NewToken(TokenKind.Whitespace, tokenEnd);
+                        }
+                        else if (IsIdentifierStartCharacter(currentChar))
+                        {
+                            tokenEnd = tokenStart + 1;
+                            while (tokenEnd < text.Length && IsIdentifierCharacter(text[tokenEnd]))
                                 tokenEnd += 1;
 
                             yield return NewIdentifierOrKeywordToken();
@@ -228,142 +239,154 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             }
 
             // The end of file token provides something to attach any final errors to
-            yield return NewToken(TokenKind.EndOfFile, tokenStart);
+            yield return NewToken(TokenKind.EndOfFile, tokenStart, diagnostics.AsReadOnly());
+            yield break;
 
             Token NewOperatorToken(TokenKind kind, int length = 1)
             {
                 return NewToken(kind, tokenStart + length);
             }
 
-            Token NewToken(TokenKind kind, int? end = null)
+            Token NewToken(TokenKind kind, int? end = null, object value = null)
             {
                 // If we were given an end value, set tokenEnd correctly
                 tokenEnd = end ?? tokenEnd;
 
-                var token = Token.New(file, TextSpan.FromStartEnd(tokenStart, tokenEnd), kind, tokenDiagnosticInfos);
-                tokenDiagnosticInfos.Clear();
-                return token;
+                return new Token(kind, TextSpan.FromStartEnd(tokenStart, tokenEnd), value);
             }
 
             Token NewIdentifierOrKeywordToken()
             {
                 var span = TextSpan.FromStartEnd(tokenStart, tokenEnd);
                 var value = code[span];
-                Token token;
                 if (Keywords.Map.TryGetValue(value, out var keywordKind))
-                {
-                    token = Token.New(file, span, keywordKind, tokenDiagnosticInfos);
-                }
-                else
-                    token = new IdentifierToken(file, span, IdentifierKind.Normal, false, value, tokenDiagnosticInfos);
+                    return new Token(keywordKind, span);
 
-                tokenDiagnosticInfos.Clear();
-                return token;
+                return new Token(TokenKind.Identifier, span, value);
             }
 
+            char? NextChar()
+            {
+                var index = tokenStart + 1;
+                return index < text.Length ? text[index] : default;
+            }
+
+            // TODO replace all uses of this with `switch(NextChar())`
             bool NextCharIs(char c)
             {
                 var index = tokenStart + 1;
-                return index < code.Length && code[index] == c;
+                return index < text.Length && text[index] == c;
             }
 
             bool CharIs(int i, char c)
             {
                 var index = tokenStart + i;
-                return index < code.Length && code[index] == c;
+                return index < text.Length && text[index] == c;
             }
 
             void NewError(DiagnosticLevel level, string message)
             {
-                tokenDiagnosticInfos.Add(Error.LexError(level, message));
+                // TODO report correct span
+                diagnostics.Add(SyntaxError.LexError(file, new TextSpan(tokenStart, 0), level, message));
             }
 
-            StringLiteralToken LexString()
+            Token LexString()
             {
                 tokenEnd = tokenStart + 1;
                 var content = new StringBuilder();
                 char currentChar;
-                while (tokenEnd < code.Length && (currentChar = code[tokenEnd]) != '"')
+                while (tokenEnd < text.Length && (currentChar = text[tokenEnd]) != '"')
                 {
-                    // if Escape Sequence
-                    if (currentChar == '\\')
-                    {
-                        tokenEnd += 1;
-                        if (tokenEnd >= code.Length)
-                        {
-                            content.Append(currentChar);
-                            NewError(DiagnosticLevel.CompilationError, "Invalid string escape sequence `\\EOF`.");
-                            break; // we hit the end of file and need to not add to tokenEnd any more
-                        }
-                        else
-                        {
-                            currentChar = code[tokenEnd];
-                            switch (currentChar)
-                            {
-                                case '"':
-                                case '\\':
-                                    content.Append(currentChar);
-                                    break;
-                                case 'n':
-                                    content.Append('\n');
-                                    break;
-                                case 'r':
-                                    content.Append('\r');
-                                    break;
-                                case '0':
-                                    content.Append('\0');
-                                    break;
-                                case 't':
-                                    content.Append('\t');
-                                    break;
-                                case 'u':
-                                    tokenEnd += 1; // consume the 'u'
-                                    if (tokenEnd < code.Length && code[tokenEnd] == '(')
-                                        tokenEnd += 1;
-                                    else
-                                        NewError(DiagnosticLevel.CompilationError, $"Unicode escape sequence must begin `\\u(` rather than `\\{code[tokenEnd]}`.");
-
-                                    var codepoint = new StringBuilder(6);
-                                    while (tokenEnd < code.Length && IsHexDigit(currentChar = code[tokenEnd]))
-                                    {
-                                        codepoint.Append(currentChar);
-                                        tokenEnd += 1;
-                                    }
-
-                                    content.Append(char.ConvertFromUtf32(Convert.ToInt32(codepoint.ToString(), 16)));
-
-                                    if (tokenEnd >= code.Length)
-                                    {
-                                        NewError(DiagnosticLevel.CompilationError, "Unclosed Unicode escape sequence.");
-                                        break;
-                                    }
-                                    else if (tokenEnd < code.Length && code[tokenEnd] == ')')
-                                        tokenEnd += 1;
-                                    else
-                                        NewError(DiagnosticLevel.CompilationError, "Unicode escape sequence must be terminated with `)`.");
-
-                                    // We have already consumed all the characters of the escape sequence and now want to continue the loop
-                                    continue;
-                                default:
-                                    NewError(DiagnosticLevel.CompilationError, $"Invalid string escape sequence `\\{currentChar}`.");
-                                    content.Append('\\');
-                                    content.Append(currentChar);
-                                    break;
-                            }
-                        }
-                    }
-                    else
-                        content.Append(currentChar);
-
                     tokenEnd += 1;
+
+                    if (currentChar != '\\')
+                    {
+                        content.Append(currentChar);
+                        continue;
+                    }
+
+                    // Escape Sequence (i.e. "\\")
+
+                    if (tokenEnd >= text.Length)
+                    {
+                        content.Append(currentChar);
+                        NewError(DiagnosticLevel.CompilationError, "Invalid string escape sequence `\\EOF`.");
+                        break; // we hit the end of file and need to not add to tokenEnd any more
+                    }
+
+                    // Escape Sequence with next char (i.e. "\\x")
+                    currentChar = text[tokenEnd];
+                    tokenEnd += 1;
+                    switch (currentChar)
+                    {
+                        case '"':
+                        case '\'':
+                        case '\\':
+                            content.Append(currentChar);
+                            break;
+                        case 'n':
+                            content.Append('\n');
+                            break;
+                        case 'r':
+                            content.Append('\r');
+                            break;
+                        case '0':
+                            content.Append('\0');
+                            break;
+                        case 't':
+                            content.Append('\t');
+                            break;
+                        case 'u':
+                            if (tokenEnd >= text.Length)
+                            {
+                                NewError(DiagnosticLevel.CompilationError,
+                                    "Unclosed Unicode escape sequence.");
+                                break;
+                            }
+                            else if (text[tokenEnd] == '(')
+                                tokenEnd += 1;
+                            else
+                            {
+                                NewError(DiagnosticLevel.CompilationError,
+                                    $"Unicode escape sequence must begin `\\u(` rather than `\\u{text[tokenEnd]}`.");
+                                break;
+                            }
+
+                            var codepoint = new StringBuilder(6);
+                            while (tokenEnd < text.Length &&
+                                   IsHexDigit(currentChar = text[tokenEnd]))
+                            {
+                                codepoint.Append(currentChar);
+                                tokenEnd += 1;
+                            }
+
+                            content.Append(
+                                char.ConvertFromUtf32(Convert.ToInt32(codepoint.ToString(),
+                                    16)));
+
+                            if (tokenEnd >= text.Length)
+                                NewError(DiagnosticLevel.CompilationError,
+                                    "Unclosed Unicode escape sequence.");
+                            else if (text[tokenEnd] == ')')
+                                tokenEnd += 1;
+                            else
+                                NewError(DiagnosticLevel.CompilationError,
+                                    "Unicode escape sequence must be terminated with `)`.");
+                            break;
+                        default:
+                            NewError(DiagnosticLevel.CompilationError,
+                                $"Invalid string escape sequence `\\{currentChar}`.");
+                            content.Append('\\');
+                            content.Append(currentChar);
+                            break;
+                    }
                 }
 
                 // To include the close quote
-                if (tokenEnd < code.Length && code[tokenEnd] == '"')
+                if (tokenEnd < text.Length && text[tokenEnd] == '"')
                     tokenEnd += 1;
-                var token = new StringLiteralToken(file, TextSpan.FromStartEnd(tokenStart, tokenEnd), false, content.ToString(), tokenDiagnosticInfos);
-                tokenDiagnosticInfos.Clear();
-                return token;
+
+                return new Token(TokenKind.StringLiteral, TextSpan.FromStartEnd(tokenStart, tokenEnd), content.ToString());
             }
         }
 
@@ -385,7 +408,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         [MustUseReturnValue]
         private static bool IsIdentifierCharacter(char c)
         {
-
             return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || char.IsNumber(c);
         }
 

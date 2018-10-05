@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions
     {
         public new TypeSyntax Syntax { get; }
 
-        public TypeNameExpression(TypeSyntax syntax, IEnumerable<DiagnosticInfo> diagnostics, DataType type)
+        public TypeNameExpression(TypeSyntax syntax, IEnumerable<Diagnostic> diagnostics, DataType type)
             : base(diagnostics, type)
         {
             Syntax = syntax;

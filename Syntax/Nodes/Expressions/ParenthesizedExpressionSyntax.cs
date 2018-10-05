@@ -4,12 +4,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
 {
     public class ParenthesizedExpressionSyntax : ExpressionSyntax
     {
-        public Token OpenParen { get; }
+        public SimpleToken OpenParen { get; }
         public ExpressionSyntax Expression { get; }
-        public Token CloseParen { get; }
+        public SimpleToken CloseParen { get; }
 
-        public ParenthesizedExpressionSyntax(Token openParen, ExpressionSyntax expression, Token closeParen)
-            : base(openParen, expression, closeParen)
+        public ParenthesizedExpressionSyntax(SimpleToken openParen, ExpressionSyntax expression, SimpleToken closeParen)
         {
             OpenParen = openParen;
             Expression = expression;

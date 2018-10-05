@@ -1,7 +1,7 @@
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
-using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols;
@@ -14,6 +14,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
@@ -22,10 +23,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public const string TypeAttribute = "Type";
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public DataType Type(ParameterSyntax syntax) => Type((SyntaxBranchNode)syntax);
+        public DataType Type(ParameterSyntax syntax) => Type((SyntaxNode)syntax);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public DataType Type(TypeSyntax syntax) => Type((SyntaxBranchNode)syntax);
+        public DataType Type(TypeSyntax syntax) => Type((SyntaxNode)syntax);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ObjectType Type(ClassDeclarationSyntax syntax) => Type<ObjectType>(syntax);
@@ -34,19 +35,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public ObjectType Type(EnumStructDeclarationSyntax syntax) => Type<ObjectType>(syntax);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public DataType Type(SyntaxBranchNode syntax)
+        public DataType Type(SyntaxNode syntax)
         {
             return attributes.GetOrAdd(syntax, TypeAttribute, ComputeType);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private TDataType Type<TDataType>(SyntaxBranchNode syntax)
+        private TDataType Type<TDataType>(SyntaxNode syntax)
             where TDataType : DataType
         {
             return (TDataType)attributes.GetOrAdd(syntax, TypeAttribute, ComputeType);
         }
 
-        private DataType ComputeType(SyntaxBranchNode syntax)
+        private DataType ComputeType(SyntaxNode syntax)
         {
             switch (syntax)
             {
@@ -59,7 +60,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                     return Type(parameter.Type);
 
                 case PrimitiveTypeSyntax primitiveType:
-                    return PrimitiveType.New(primitiveType.Keyword.Kind);
+                    switch (primitiveType.Keyword.Kind)
+                    {
+                        case TokenKind.IntKeyword:
+                            return PrimitiveType.Int;
+                        case TokenKind.UIntKeyword:
+                            return PrimitiveType.UInt;
+                        case TokenKind.ByteKeyword:
+                            return PrimitiveType.Byte;
+                        case TokenKind.SizeKeyword:
+                            return PrimitiveType.Size;
+                        case TokenKind.VoidKeyword:
+                            return PrimitiveType.Void;
+                        case TokenKind.BoolKeyword:
+                            return PrimitiveType.Bool;
+                        case TokenKind.StringKeyword:
+                            return PrimitiveType.String;
+                        default:
+                            throw new InvalidEnumArgumentException($"Token kind `{primitiveType.Keyword.Kind}` is not a primitive type keyword");
+                    }
 
                 case BinaryOperatorExpressionSyntax binaryOperatorExpression:
                     var leftOperandType = Type(binaryOperatorExpression.LeftOperand);
@@ -68,7 +87,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                         || (binaryOperatorExpression.Operator.Kind == TokenKind.Plus
                         && leftOperandType == PrimitiveType.Bool))
                     {
-                        AddDiagnostic(binaryOperatorExpression, Error.OperatorCannotBeAppliedToOperandsOfType(binaryOperatorExpression.Operator.Kind, leftOperandType, rightOperandType));
+                        // TODO pass correct file and span
+                        AddDiagnostic(binaryOperatorExpression, SemanticError.OperatorCannotBeAppliedToOperandsOfType(null, new TextSpan(0, 0), binaryOperatorExpression.Operator.Kind, leftOperandType, rightOperandType));
                         return DataType.Unknown;
                     }
                     return leftOperandType;
@@ -116,7 +136,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                     if (lifetimeType.Lifetime.Kind == TokenKind.OwnedKeyword)
                         lifetime = OwnedLifetime.Instance;
                     else
-                        lifetime = new NamedLifetime(lifetimeType.Lifetime.Text);
+                        lifetime = new NamedLifetime(lifetimeType.Lifetime.Value);
                     return new LifetimeType(Type(lifetimeType.TypeName), lifetime);
 
                 default:

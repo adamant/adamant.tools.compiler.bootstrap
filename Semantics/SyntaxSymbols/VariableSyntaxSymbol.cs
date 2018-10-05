@@ -12,8 +12,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
         public string Name { get; }
         public int? DeclarationNumber { get; }
 
-        public SyntaxBranchNode Declaration { get; }
-        IEnumerable<SyntaxBranchNode> ISyntaxSymbol.Declarations => Declaration.Yield();
+        public SyntaxNode Declaration { get; }
+        IEnumerable<SyntaxNode> ISyntaxSymbol.Declarations => Declaration.Yield();
 
         IEnumerable<ISyntaxSymbol> ISyntaxSymbol.Children => Enumerable.Empty<ISyntaxSymbol>();
 

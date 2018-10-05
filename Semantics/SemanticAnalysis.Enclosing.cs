@@ -11,12 +11,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         private const string EnclosingFunctionAttribute = "EnclosingFunction";
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public FunctionDeclarationSyntax EnclosingFunction(SyntaxBranchNode s)
+        public FunctionDeclarationSyntax EnclosingFunction(SyntaxNode s)
         {
             return attributes.GetOrAdd(s, EnclosingFunctionAttribute, ComputeEnclosingFunction);
         }
 
-        private FunctionDeclarationSyntax ComputeEnclosingFunction(SyntaxBranchNode syntax)
+        private FunctionDeclarationSyntax ComputeEnclosingFunction(SyntaxNode syntax)
         {
             switch (syntax)
             {

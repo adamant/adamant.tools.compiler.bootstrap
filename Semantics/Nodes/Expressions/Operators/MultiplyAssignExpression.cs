@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.Operators
     {
         public MultiplyAssignExpression(
             BinaryOperatorExpressionSyntax syntax,
-            IEnumerable<DiagnosticInfo> diagnostics,
+            IEnumerable<Diagnostic> diagnostics,
             Expression leftOperand,
             Expression rightOperand,
             DataType type)

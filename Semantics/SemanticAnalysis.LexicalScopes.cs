@@ -13,12 +13,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public const string LexicalScopeAttribute = "LexicalScope";
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public LexicalScope LexicalScope(SyntaxBranchNode syntax)
+        public LexicalScope LexicalScope(SyntaxNode syntax)
         {
             return attributes.GetOrAdd(syntax, LexicalScopeAttribute, ComputeLexicalScope);
         }
 
-        private LexicalScope ComputeLexicalScope(SyntaxBranchNode syntax)
+        private LexicalScope ComputeLexicalScope(SyntaxNode syntax)
         {
             switch (syntax)
             {

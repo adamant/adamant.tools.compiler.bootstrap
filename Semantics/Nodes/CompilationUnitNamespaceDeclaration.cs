@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes
 
         public CompilationUnitNamespaceDeclaration(
             CompilationUnitNamespaceSyntax syntax,
-            IEnumerable<DiagnosticInfo> diagnostics)
+            IEnumerable<Diagnostic> diagnostics)
             : base(diagnostics)
         {
             Syntax = syntax;

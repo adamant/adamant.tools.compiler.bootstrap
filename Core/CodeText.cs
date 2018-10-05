@@ -15,6 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
 
         public CodeText(string text)
         {
+            Requires.NotNull(nameof(text), text);
             Text = text;
             lines = new Lazy<TextLines>(GetLines);
         }

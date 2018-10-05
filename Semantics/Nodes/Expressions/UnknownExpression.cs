@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions
     {
         public new SyntaxNode Syntax { get; }
 
-        public UnknownExpression(SyntaxNode syntax, IEnumerable<DiagnosticInfo> diagnostics)
+        public UnknownExpression(SyntaxNode syntax, IEnumerable<Diagnostic> diagnostics)
             : base(diagnostics, DataType.Unknown)
         {
             Syntax = syntax;

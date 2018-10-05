@@ -1,32 +1,22 @@
 using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
-using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
 {
-    public class SkippedTokensSyntax : SyntaxBranchNode
+    public class SkippedTokensSyntax : SyntaxNode
     {
-        public IReadOnlyList<DiagnosticInfo> Diagnostics;
+        // TODO remove
+        public IReadOnlyList<Diagnostic> Diagnostics;
 
-        public SkippedTokensSyntax(Token token)
-            : base(token.Yield())
+        public SkippedTokensSyntax(CodeFile file, SimpleToken token)
         {
-            var diagnostics = new List<DiagnosticInfo>();
+            var diagnostics = new List<Diagnostic>();
             if (token.Kind != TokenKind.Unexpected)
-                diagnostics.Add(Error.SkippedToken());
+                diagnostics.Add(SyntaxError.SkippedToken(file, token.Span));
 
             Diagnostics = diagnostics.AsReadOnly();
-        }
-
-        public override void AllDiagnostics(IList<Diagnostic> diagnostics)
-        {
-            base.AllDiagnostics(diagnostics);
-            foreach (var diagnosticInfo in Diagnostics)
-            {
-                diagnostics.Add(new Diagnostic(File, Span, diagnosticInfo));
-            }
         }
     }
 }

@@ -96,8 +96,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
                         .OrderBy(d => d.File.Reference.ToString())
                         .ThenBy(d => d.Position))
                     {
-                        Console.WriteLine($"{diagnostic.File.Reference}:{diagnostic.Position.Line}:{diagnostic.Position.Column} {diagnostic.Info.Level} {diagnostic.Info.ErrorCode}");
-                        Console.WriteLine(diagnostic.Info.Message);
+                        Console.WriteLine($"{diagnostic.File.Reference}:{diagnostic.Position.Line}:{diagnostic.Position.Column} {diagnostic.Level} {diagnostic.ErrorCode}");
+                        Console.WriteLine(diagnostic.Message);
                     }
                 }
                 return package;

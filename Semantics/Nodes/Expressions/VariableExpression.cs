@@ -10,12 +10,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions
     public class VariableExpression : Expression
     {
         public new IdentifierNameSyntax Syntax { get; }
-        public string Name => Syntax.Name.Text;
+        public string Name => Syntax.Name.Value;
         public VariableName VariableName { get; }
 
         public VariableExpression(
             IdentifierNameSyntax syntax,
-            IEnumerable<DiagnosticInfo> diagnostics,
+            IEnumerable<Diagnostic> diagnostics,
             VariableName variableName,
             DataType type)
             : base(diagnostics, type)

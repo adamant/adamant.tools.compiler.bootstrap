@@ -1,5 +1,5 @@
 using System.Runtime.CompilerServices;
-using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
@@ -11,46 +11,84 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool CurrentIs(this ITokenStream tokens, TokenKind kind)
         {
-            return !tokens.Finished && tokens.Current.Kind == kind;
+            return tokens.Current?.Kind == kind;
         }
 
         [MustUseReturnValue]
-        public static Token Accept(this ITokenStream tokens, TokenKind kind)
+        public static SimpleToken? AcceptSimple(this ITokenStream tokens, TokenKind kind)
         {
-            if (tokens.CurrentIs(kind))
-                return tokens.Consume();
+            if (tokens.Current?.Kind != kind) return null;
 
-            return null;
+            var token = (SimpleToken)tokens.Current;
+            tokens.Next();
+            return token;
         }
 
         [MustUseReturnValue]
-        public static Token Expect(this ITokenStream tokens, TokenKind kind)
+        public static SimpleToken ExpectSimple(this ITokenStream tokens, TokenKind kind)
         {
-            if (tokens.CurrentIs(kind))
-                return tokens.Consume();
+            if (tokens.Current?.Kind != kind) return (SimpleToken)tokens.MissingToken();
 
-            return tokens.MissingToken(kind);
+            var token = (SimpleToken)tokens.Current;
+            tokens.Next();
+            return token;
+        }
+
+        [MustUseReturnValue]
+        public static SimpleToken ExpectSimple(this ITokenStream tokens)
+        {
+            if (tokens.Current?.Kind.HasValue() ?? true)
+                return (SimpleToken)tokens.MissingToken();
+
+            var token = (SimpleToken)tokens.Current;
+            tokens.Next();
+            return token;
+        }
+
+        [MustUseReturnValue]
+        public static StringLiteralToken ExpectStringLiteral(this ITokenStream tokens)
+        {
+            if (tokens.Current?.Kind != TokenKind.StringLiteral)
+                return (StringLiteralToken)tokens.MissingToken();
+
+            var token = (StringLiteralToken)tokens.Current;
+            tokens.Next();
+            return token;
         }
 
         [MustUseReturnValue]
         public static IdentifierToken ExpectIdentifier(this ITokenStream tokens)
         {
-            if (tokens.CurrentIs(TokenKind.Identifier))
-                return (IdentifierToken)tokens.Consume();
+            if (!tokens.Current?.Kind.IsIdentifier() ?? true)
+                return (IdentifierToken)tokens.MissingToken();
 
-            return (IdentifierToken)tokens.MissingToken(TokenKind.Identifier);
+            var token = (IdentifierToken)tokens.Current;
+            tokens.Next();
+            return token;
+        }
+
+        [MustUseReturnValue]
+        public static EndOfFileToken ExpectEndOfFile(this ITokenStream tokens)
+        {
+            if (tokens.Current?.Kind != TokenKind.EndOfFile)
+                return (EndOfFileToken)tokens.MissingToken();
+
+            var token = (EndOfFileToken)tokens.Current;
+            tokens.Next();
+            return token;
         }
 
         [MustUseReturnValue]
         public static bool AtEndOfFile(this ITokenStream tokens)
         {
-            return tokens.Finished || tokens.Current.Kind == TokenKind.EndOfFile;
+            return tokens.Current?.Kind == TokenKind.EndOfFile;
         }
 
         [MustUseReturnValue]
-        public static Token MissingToken(this ITokenStream tokens, TokenKind kind)
+        public static Token MissingToken(this ITokenStream tokens)
         {
-            return Token.Missing(tokens.File, tokens.Finished ? tokens.File.Code.Length : tokens.Current.Span.Start, kind);
+            var start = tokens.Current?.Span.Start ?? tokens.File.Code.Length;
+            return new Token(TokenKind.Missing, new TextSpan(start, 0));
         }
     }
 }

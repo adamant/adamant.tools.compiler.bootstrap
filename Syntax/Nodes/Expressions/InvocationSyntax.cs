@@ -5,12 +5,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
     public class InvocationSyntax : ExpressionSyntax
     {
         public ExpressionSyntax Callee { get; set; }
-        public Token OpenParen { get; }
+        public SimpleToken OpenParen { get; }
         public SeparatedListSyntax<ExpressionSyntax> Arguments { get; }
-        public Token CloseParen { get; }
+        public SimpleToken CloseParen { get; }
 
-        public InvocationSyntax(ExpressionSyntax callee, Token openParen, SeparatedListSyntax<ExpressionSyntax> arguments, Token closeParen)
-            : base(callee, openParen, arguments, closeParen)
+        public InvocationSyntax(ExpressionSyntax callee, SimpleToken openParen, SeparatedListSyntax<ExpressionSyntax> arguments, SimpleToken closeParen)
         {
             Callee = callee;
             OpenParen = openParen;

@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
 
         public IReadOnlyList<CompilationUnitNamespaceSyntax> Declarations { get; }
         IEnumerable<DeclarationSyntax> IDeclarationSyntaxSymbol.Declarations => throw new NotImplementedException();
-        IEnumerable<SyntaxBranchNode> ISyntaxSymbol.Declarations => Declarations;
+        IEnumerable<SyntaxNode> ISyntaxSymbol.Declarations => Declarations;
 
         public IReadOnlyList<IDeclarationSyntaxSymbol> Children { get; }
         IEnumerable<ISyntaxSymbol> ISyntaxSymbol.Children => Children;

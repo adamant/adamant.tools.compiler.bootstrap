@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions
     {
         public DataType Type { get; }
 
-        protected Expression(IEnumerable<DiagnosticInfo> diagnostics, DataType type)
+        protected Expression(IEnumerable<Diagnostic> diagnostics, DataType type)
             : base(diagnostics)
         {
             Type = type;

@@ -8,10 +8,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes
     public abstract class SemanticNode
     {
         public SyntaxNode Syntax => GetSyntax();
-        public IReadOnlyList<DiagnosticInfo> Diagnostics { get; }
-        private readonly List<DiagnosticInfo> diagnostics;
+        public IReadOnlyList<Diagnostic> Diagnostics { get; }
+        private readonly List<Diagnostic> diagnostics;
 
-        protected SemanticNode(IEnumerable<DiagnosticInfo> diagnostics)
+        protected SemanticNode(IEnumerable<Diagnostic> diagnostics)
         {
             this.diagnostics = diagnostics.ToList();
             Diagnostics = this.diagnostics.AsReadOnly();
@@ -19,17 +19,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes
 
         protected abstract SyntaxNode GetSyntax();
 
-        internal void AddDiagnostic(DiagnosticInfo diagnostic)
+        internal void AddDiagnostic(Diagnostic diagnostic)
         {
             diagnostics.Add(diagnostic);
         }
 
-        public virtual void AllDiagnostics(IList<Diagnostic> list)
+        public virtual void AllDiagnostics(List<Diagnostic> list)
         {
-            foreach (var diagnosticInfo in diagnostics)
-            {
-                list.Add(new Diagnostic(Syntax.File, Syntax.Span, diagnosticInfo));
-            }
+            foreach (var diagnostic in diagnostics)
+                list.Add(diagnostic);
         }
     }
 }

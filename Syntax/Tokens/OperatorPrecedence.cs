@@ -1,4 +1,4 @@
-namespace Adamant.Tools.Compiler.Bootstrap.Core.Syntax
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 {
     public enum OperatorPrecedence
     {

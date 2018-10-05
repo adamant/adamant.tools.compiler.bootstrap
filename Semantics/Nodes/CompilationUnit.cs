@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes
 
         public CompilationUnit(
             CompilationUnitSyntax syntax,
-            IEnumerable<DiagnosticInfo> diagnostics,
+            IEnumerable<Diagnostic> diagnostics,
             CompilationUnitNamespaceDeclaration @namespace,
             IEnumerable<Declaration> declarations)
             : base(diagnostics)
@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes
             return Syntax;
         }
 
-        public override void AllDiagnostics(IList<Diagnostic> list)
+        public override void AllDiagnostics(List<Diagnostic> list)
         {
             base.AllDiagnostics(list);
             Syntax.AllDiagnostics(list);

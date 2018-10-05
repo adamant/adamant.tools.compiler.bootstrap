@@ -1,69 +1,33 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics.Contracts;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
-using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 {
-    public class Token : SyntaxNode
+    /// For maximum performance and minimum memory footprint, tokens are structs
+    /// with as few and as small of data fields as possible. This struct can
+    /// be any token whether it has a value or not.
+    public readonly struct Token : IToken
     {
-        public override CodeFile File { get; }
-        public override TextSpan Span { get; }
         public readonly TokenKind Kind;
-        public string Text => File.Code[Span];
-        public readonly bool IsMissing;
-        public IEnumerable<DiagnosticInfo> DiagnosticInfos => diagnosticInfos;
-        private readonly List<DiagnosticInfo> diagnosticInfos;
+        public bool IsMissing => Kind == TokenKind.Missing;
+        public readonly TextSpan Span;
+        public readonly object Value;
 
-        protected Token(CodeFile file, TextSpan span, TokenKind kind, bool isMissing, IEnumerable<DiagnosticInfo> diagnosticInfos)
+        public Token(TokenKind kind, TextSpan span, object value = null)
         {
-            Requires.NotNull(nameof(file), file);
-            Requires.InString(file.Code.Text, nameof(span), span);
-            Requires.ValidEnum(nameof(kind), kind);
-            File = file;
-            Span = span;
             Kind = kind;
-            IsMissing = isMissing;
-            this.diagnosticInfos = (diagnosticInfos ?? throw new ArgumentNullException(nameof(diagnosticInfos))).ToList();
+            Span = span;
+            Value = value;
         }
 
-        public static Token New(CodeFile file, TextSpan span, TokenKind kind, IEnumerable<DiagnosticInfo> diagnosticInfos)
-        {
-            Requires.That(nameof(kind), kind != TokenKind.StringLiteral);
-            Requires.That(nameof(kind), kind != TokenKind.IntegerLiteral);
-            Requires.That(nameof(kind), kind != TokenKind.Identifier);
-            return new Token(file, span, kind, false, diagnosticInfos);
-        }
+        TokenKind IToken.Kind => Kind;
+        TextSpan IToken.Span => Span;
+        object IToken.Value => Value;
 
-        public static Token Missing(CodeFile file, int start, TokenKind kind)
+        [Pure]
+        public string Text(CodeText code)
         {
-            var diagnostic = Error.MissingToken(kind);
-            var span = new TextSpan(start, 0);
-            switch (kind)
-            {
-                case TokenKind.Identifier:
-                    return new IdentifierToken(file, span, IdentifierKind.Normal, true, "", diagnostic.Yield());
-                case TokenKind.StringLiteral:
-                    return new StringLiteralToken(file, span, true, "", diagnostic.Yield());
-                default:
-                    return new Token(file, span, kind, true, diagnostic.Yield());
-            }
-        }
-
-        public override string ToString()
-        {
-            var validMarker = IsMissing || DiagnosticInfos.Any(d => d.Level > DiagnosticLevel.Warning) ? "*" : "";
-            return $"{Kind}{validMarker}=`{Text}`";
-        }
-
-        public override void AllDiagnostics(IList<Diagnostic> diagnostics)
-        {
-            foreach (var diagnosticInfo in diagnosticInfos)
-                diagnostics.Add(new Diagnostic(File, Span, diagnosticInfo));
+            return Span.GetText(code.Text);
         }
     }
 }

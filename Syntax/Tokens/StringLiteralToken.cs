@@ -1,18 +1,29 @@
-using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
-using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 {
-    public class StringLiteralToken : Token
+    public readonly struct StringLiteralToken : IToken
     {
+        public TokenKind Kind => IsMissing ? TokenKind.Missing : TokenKind.StringLiteral;
+        public readonly bool IsMissing;
+        public readonly TextSpan Span;
         public readonly string Value;
 
-        public StringLiteralToken(CodeFile file, TextSpan span, bool isMissing, string value, IEnumerable<DiagnosticInfo> diagnosticInfos)
-            : base(file, span, TokenKind.StringLiteral, isMissing, diagnosticInfos)
+        private StringLiteralToken(TokenKind kind, TextSpan span, string value)
         {
+            Requires.That(nameof(kind), kind == TokenKind.Missing || kind == TokenKind.StringLiteral);
+            IsMissing = kind == TokenKind.Missing;
+            Span = span;
             Value = value;
+        }
+
+        bool IToken.IsMissing => IsMissing;
+        TextSpan IToken.Span => Span;
+        object IToken.Value => Value;
+
+        public static explicit operator StringLiteralToken(Token token)
+        {
+            return new StringLiteralToken(token.Kind, token.Span, (string)token.Value);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
         int? ISyntaxSymbol.DeclarationNumber => null;
 
         public IReadOnlyList<CompilationUnitSyntax> Declarations { get; }
-        IEnumerable<SyntaxBranchNode> ISyntaxSymbol.Declarations => Declarations;
+        IEnumerable<SyntaxNode> ISyntaxSymbol.Declarations => Declarations;
 
         public IReadOnlyList<IDeclarationSyntaxSymbol> Children { get; }
         IEnumerable<ISyntaxSymbol> ISyntaxSymbol.Children => Children;

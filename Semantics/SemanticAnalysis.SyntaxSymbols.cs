@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         {
             var compilationUnits = package.CompilationUnits.ToList();
             var globalNamespace = new GlobalNamespaceSyntaxSymbol(compilationUnits,
-                ComputeDeclarationSyntaxSymbols(compilationUnits.SelectMany(cu => cu.Children.OfType<DeclarationSyntax>())));
+                ComputeDeclarationSyntaxSymbols(compilationUnits.SelectMany(cu => cu.Declarations)));
             return new PackageSyntaxSymbol(package, globalNamespace);
         }
 
@@ -48,7 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                 case FunctionDeclarationSyntax function:
                     var variableSymbols = function.Parameters
                         .Select(p => new VariableSyntaxSymbol(p, null))
-                        .Concat(function.Body.DecendantStatementsAndSelf()
+                        .Concat(function.Body.DescendantsAndSelf()
                             .OfType<VariableDeclarationStatementSyntax>()
                             .Select(v => new VariableSyntaxSymbol(v, null)));
                     return new FunctionSyntaxSymbol(function, variableSymbols);
@@ -65,12 +65,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ISyntaxSymbol SyntaxSymbol(SyntaxBranchNode syntax)
+        public ISyntaxSymbol SyntaxSymbol(SyntaxNode syntax)
         {
             return attributes.GetOrAdd(syntax, SyntaxSymbolAttribute, ComputeSyntaxSymbol);
         }
 
-        private ISyntaxSymbol ComputeSyntaxSymbol(SyntaxBranchNode syntax)
+        private ISyntaxSymbol ComputeSyntaxSymbol(SyntaxNode syntax)
         {
             switch (syntax)
             {

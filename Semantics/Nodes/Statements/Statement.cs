@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements
 {
     public abstract class Statement : SemanticNode
     {
-        protected Statement(IEnumerable<DiagnosticInfo> diagnostics)
+        protected Statement(IEnumerable<Diagnostic> diagnostics)
             : base(diagnostics)
         {
         }

@@ -6,11 +6,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
 {
     public class IncompleteDeclarationSyntax : DeclarationSyntax
     {
-        public override IdentifierToken Name => Children.OfType<IdentifierToken>().First();
+        public override IdentifierToken Name { get; }
+        public IReadOnlyList<Token> Tokens { get; }
 
-        public IncompleteDeclarationSyntax(IEnumerable<SyntaxNode> children)
-            : base(children)
+        public IncompleteDeclarationSyntax(IdentifierToken name, IEnumerable<Token> tokens)
         {
+            Name = name;
+            Tokens = tokens.ToList().AsReadOnly();
         }
     }
 }

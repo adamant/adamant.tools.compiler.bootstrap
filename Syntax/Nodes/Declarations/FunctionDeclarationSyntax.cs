@@ -6,27 +6,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
 {
     public class FunctionDeclarationSyntax : MemberDeclarationSyntax
     {
-        public Token AccessModifier { get; }
-        public Token FunctionKeyword { get; }
+        public SimpleToken AccessModifier { get; }
+        public SimpleToken FunctionKeyword { get; }
         public override IdentifierToken Name { get; }
-        public Token OpenParen { get; }
+        public SimpleToken OpenParen { get; }
         public SeparatedListSyntax<ParameterSyntax> Parameters { get; }
-        public Token CloseParen { get; }
-        public Token Arrow { get; }
+        public SimpleToken CloseParen { get; }
+        public SimpleToken Arrow { get; }
         public TypeSyntax ReturnType { get; }
         public BlockSyntax Body { get; }
 
         public FunctionDeclarationSyntax(
-            Token accessModifier,
-            Token functionKeyword,
+            SimpleToken accessModifier,
+            SimpleToken functionKeyword,
             IdentifierToken name,
-            Token openParen,
+            SimpleToken openParen,
             SeparatedListSyntax<ParameterSyntax> parameters,
-            Token closeParen,
-            Token arrow,
+            SimpleToken closeParen,
+            SimpleToken arrow,
             TypeSyntax returnType,
             BlockSyntax body)
-            : base(accessModifier, functionKeyword, name, openParen, parameters, closeParen, arrow, returnType, body)
         {
             AccessModifier = accessModifier;
             FunctionKeyword = functionKeyword;

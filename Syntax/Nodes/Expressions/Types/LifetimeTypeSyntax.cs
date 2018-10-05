@@ -8,13 +8,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types
     public class LifetimeTypeSyntax : TypeSyntax
     {
         public readonly NameSyntax TypeName;
-        public readonly Token Lifetime;
+        public readonly IdentifierToken Lifetime;
 
         public LifetimeTypeSyntax(IEnumerable<SyntaxNode> children)
-            : base(children)
         {
             TypeName = children.OfType<NameSyntax>().Single();
-            Lifetime = children.OfType<Token>().Last();
+            Lifetime = children.OfType<IdentifierToken>().Last();
         }
     }
 }

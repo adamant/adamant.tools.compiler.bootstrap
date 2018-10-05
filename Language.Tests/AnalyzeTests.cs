@@ -55,7 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             {
                 var expected = property.Value;
                 var actual = GetProperty(value, property.Name.Replace("_", ""));
-                if (actual is IEnumerable<DiagnosticInfo> diagnostics)
+                if (actual is IEnumerable<Diagnostic> diagnostics)
                 {
                     Assert.Equal(expected.ToObject<int[]>().OrderBy(x => x), diagnostics.Select(d => d.ErrorCode).OrderBy(x => x));
                     return;

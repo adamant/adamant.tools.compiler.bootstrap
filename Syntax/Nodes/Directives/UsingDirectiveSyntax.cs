@@ -3,14 +3,13 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives
 {
-    public class UsingDirectiveSyntax : SyntaxBranchNode
+    public class UsingDirectiveSyntax : SyntaxNode
     {
-        public Token UsingKeyword { get; }
+        public SimpleToken UsingKeyword { get; }
         public NameSyntax Name { get; }
-        public Token Semicolon { get; }
+        public SimpleToken Semicolon { get; }
 
-        public UsingDirectiveSyntax(Token usingKeyword, NameSyntax name, Token semicolon)
-            : base(usingKeyword, name, semicolon)
+        public UsingDirectiveSyntax(SimpleToken usingKeyword, NameSyntax name, SimpleToken semicolon)
         {
             UsingKeyword = usingKeyword;
             Name = name;

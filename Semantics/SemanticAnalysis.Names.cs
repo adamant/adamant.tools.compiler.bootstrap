@@ -36,19 +36,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public Name Name(IdentifierNameSyntax s) => Name<Name>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Name Name(SyntaxBranchNode syntax)
+        public Name Name(SyntaxNode syntax)
         {
             return attributes.GetOrAdd(syntax, NameAttribute, ComputeName);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private TName Name<TName>(SyntaxBranchNode syntax)
+        private TName Name<TName>(SyntaxNode syntax)
             where TName : Name
         {
             return (TName)attributes.GetOrAdd(syntax, NameAttribute, ComputeName);
         }
 
-        private Name ComputeName(SyntaxBranchNode syntax)
+        private Name ComputeName(SyntaxNode syntax)
         {
             switch (syntax)
             {
@@ -80,14 +80,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                         var scope = LexicalScope(parameter);
                         var functionSyntax = (FunctionDeclarationSyntax)scope.Symbol.Declarations.Single();
                         var functionName = Name(functionSyntax);
-                        return new VariableName(functionName, parameter.Name.Text);
+                        return new VariableName(functionName, parameter.Name.Value);
                     }
                 case IdentifierNameSyntax identifierName:
                     {
                         if (identifierName.Name.IsMissing)
                             return UnknownName.Instance;
                         var nameScope = LexicalScope(identifierName);
-                        var symbol = nameScope.LookupName(identifierName.Name.Text);
+                        var symbol = nameScope.LookupName(identifierName.Name.Value);
                         if (symbol == null) // TODO should this be a compiler error?
                             return UnknownName.Instance;
                         var declaration = symbol.Declarations.Single();

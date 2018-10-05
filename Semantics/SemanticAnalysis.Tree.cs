@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
@@ -62,14 +61,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public Expression Node(TypeSyntax s) => Node<Expression>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private TNode Node<TNode>(SyntaxBranchNode syntax)
+        private TNode Node<TNode>(SyntaxNode syntax)
             where TNode : SemanticNode
         {
             if (syntax == null) return null;
             return (TNode)attributes.GetOrAdd(syntax, NodeAttribute, ComputeNode);
         }
 
-        private SemanticNode ComputeNode(SyntaxBranchNode syntax)
+        private SemanticNode ComputeNode(SyntaxNode syntax)
         {
             switch (syntax)
             {
@@ -102,7 +101,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                         function,
                         AllDiagnostics(function),
                         AccessLevel(function.AccessModifier),
-                        function.Name.Text,
+                        function.Name.Value,
                         function.Parameters.Select(Node),
                         Node(function.ReturnType),
                         Node(function.Body)); // TODO change this to a list of statements
@@ -227,7 +226,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         }
 
         // TODO should this be an actual attribute?
-        public AccessLevel AccessLevel(Token accessModifier)
+        public AccessLevel AccessLevel(SimpleToken accessModifier)
         {
             switch (accessModifier.Kind)
             {

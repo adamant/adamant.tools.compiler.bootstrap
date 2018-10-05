@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.Operators
     {
         public MemberAccessExpression(
             BinaryOperatorExpressionSyntax syntax,
-            IEnumerable<DiagnosticInfo> diagnostics,
+            IEnumerable<Diagnostic> diagnostics,
             Expression leftOperand,
             Expression rightOperand,
             DataType type)

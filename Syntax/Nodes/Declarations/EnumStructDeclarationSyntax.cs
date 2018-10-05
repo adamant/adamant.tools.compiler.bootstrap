@@ -6,16 +6,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
 {
     public class EnumStructDeclarationSyntax : DeclarationSyntax
     {
-        public Token AccessModifier { get; }
+        public SimpleToken AccessModifier { get; }
+        public SimpleToken EnumKeyword { get; }
+        public SimpleToken StructKeyword { get; }
         public override IdentifierToken Name { get; }
+        public SimpleToken OpenBrace { get; }
         public IReadOnlyList<MemberDeclarationSyntax> Members { get; }
+        public SimpleToken CloseBrace { get; }
 
-        public EnumStructDeclarationSyntax(IEnumerable<SyntaxNode> children)
-            : base(children)
+        public EnumStructDeclarationSyntax(
+            SimpleToken accessModifier,
+            SimpleToken enumKeyword,
+            SimpleToken structKeyword,
+            IdentifierToken name,
+            SimpleToken openBrace,
+            IEnumerable<MemberDeclarationSyntax> members,
+            SimpleToken closeBrace)
         {
-            AccessModifier = (Token)Children.First();
-            Name = Children.OfType<IdentifierToken>().Single();
-            Members = Children.OfType<MemberDeclarationSyntax>().ToList().AsReadOnly();
+            AccessModifier = accessModifier;
+            EnumKeyword = enumKeyword;
+            StructKeyword = structKeyword;
+            Name = name;
+            OpenBrace = openBrace;
+            CloseBrace = closeBrace;
+            Members = members.ToList().AsReadOnly();
         }
     }
 }

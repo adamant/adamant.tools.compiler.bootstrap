@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
 
         public FunctionDeclarationSyntax Declaration { get; }
         IEnumerable<DeclarationSyntax> IDeclarationSyntaxSymbol.Declarations => Declaration.Yield();
-        IEnumerable<SyntaxBranchNode> ISyntaxSymbol.Declarations => Declaration.Yield();
+        IEnumerable<SyntaxNode> ISyntaxSymbol.Declarations => Declaration.Yield();
 
         public IReadOnlyList<VariableSyntaxSymbol> Children { get; }
         IEnumerable<ISyntaxSymbol> ISyntaxSymbol.Children => Children;

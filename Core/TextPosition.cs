@@ -2,7 +2,7 @@ using System;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
-    public struct TextPosition : IComparable<TextPosition>
+    public readonly struct TextPosition : IComparable<TextPosition>
     {
         public readonly int CharacterOffset; // Zero based
         public readonly int Line; // One based

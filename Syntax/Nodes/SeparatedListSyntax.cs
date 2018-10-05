@@ -1,22 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
 {
-    public class SeparatedListSyntax<T> : SyntaxBranchNode, IEnumerable<T>
-        where T : SyntaxBranchNode
+    public class SeparatedListSyntax<T> : SyntaxNode, IEnumerable<T>
+        where T : SyntaxNode
     {
         public readonly IReadOnlyList<T> Items;
-        public readonly IReadOnlyList<Token> Separators;
-        public SeparatedListSyntax(CodeFile file, TextSpan? span, IEnumerable<SyntaxNode> children)
-            : base(file, span, children)
+        public readonly IReadOnlyList<SimpleToken> Separators;
+        public SeparatedListSyntax(IEnumerable<SyntaxNode> children)
         {
             // TODO validate that it alternates between them
-            Items = Children.OfType<T>().ToList().AsReadOnly();
-            Separators = Children.OfType<Token>().ToList().AsReadOnly();
+            Items = children.OfType<T>().ToList().AsReadOnly();
+            Separators = children.OfType<SimpleToken>().ToList().AsReadOnly();
         }
 
         public IEnumerator<T> GetEnumerator()

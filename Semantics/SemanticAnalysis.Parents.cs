@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
@@ -23,14 +22,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public CompilationUnitSyntax Parent(EnumStructDeclarationSyntax s) => Parent<CompilationUnitSyntax>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public SyntaxBranchNode Parent(SyntaxBranchNode s)
+        public SyntaxNode Parent(SyntaxNode s)
         {
-            return attributes.Get<SyntaxBranchNode>(s, ParentAttribute);
+            return attributes.Get<SyntaxNode>(s, ParentAttribute);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private TSyntax Parent<TSyntax>(SyntaxBranchNode syntax)
-            where TSyntax : SyntaxBranchNode
+        private TSyntax Parent<TSyntax>(SyntaxNode syntax)
+            where TSyntax : SyntaxNode
         {
             return attributes.Get<TSyntax>(syntax, ParentAttribute);
         }
@@ -40,11 +39,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             AddParentAttributes(package, null);
         }
 
-        private void AddParentAttributes(SyntaxBranchNode syntax, SyntaxBranchNode parent)
+        private void AddParentAttributes(SyntaxNode syntax, SyntaxNode parent)
         {
-            attributes.GetOrAdd<SyntaxBranchNode>(syntax, ParentAttribute, new Lazy<object>(parent));
-            foreach (var child in syntax.Children.OfType<SyntaxBranchNode>())
-                AddParentAttributes(child, syntax);
+            //attributes.GetOrAdd<SyntaxNode>(syntax, ParentAttribute, new Lazy<object>(parent));
+            //foreach (var child in syntax.ChildNodes.OfType<SyntaxNode>())
+            //    AddParentAttributes(child, syntax);
+            throw new NotImplementedException();
         }
     }
 }

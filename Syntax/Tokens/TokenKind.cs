@@ -1,4 +1,4 @@
-namespace Adamant.Tools.Compiler.Bootstrap.Core.Syntax
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 {
     /// Roslyn very consistently names their tokens composed of Unicode Symbols
     /// as the concatenation of the symbol names followed by "Token". However,
@@ -20,10 +20,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core.Syntax
     /// it doesn't really make sense to me to use them.  I'm going to name
     /// things after their single character version, but not follow Unicode
     /// naming when it doesn't make sense
-    public enum TokenKind
+    public enum TokenKind : sbyte
     {
+        // These need to be first to avoid emitting them as the names of things
+        // Also, the following thing mus have a hardcoded value
+        FirstOperator = Dot,
+        LastOperator = XorKeyword,
+
+        // Negative values for "error" cases
+        Missing = -2,
         Unexpected = -1,
-        EndOfFile = 0,
+
+        // Value 0 intentionally not used to avoid accidental defaults to something
+        Whitespace = 1,
+        Comment,
+        EndOfFile,
 
         // Symbols
         OpenBrace, // `{` U+007B
@@ -63,11 +74,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core.Syntax
         AndKeyword,
         OrKeyword,
         XorKeyword,
-        FirstOperator = Dot,
-        LastOperator = XorKeyword,
 
         // Identifiers
         Identifier,
+        EscapedIdentifier,
+        EscapedStringIdentifier,
 
         // Literals
         IntegerLiteral,

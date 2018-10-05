@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.Operators
 
         protected BinaryOperatorExpression(
             BinaryOperatorExpressionSyntax syntax,
-            IEnumerable<DiagnosticInfo> diagnostics,
+            IEnumerable<Diagnostic> diagnostics,
             Expression leftOperand,
             Expression rightOperand,
             DataType type)
@@ -30,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.Operators
             return Syntax;
         }
 
-        public override void AllDiagnostics(IList<Diagnostic> list)
+        public override void AllDiagnostics(List<Diagnostic> list)
         {
             base.AllDiagnostics(list);
             LeftOperand.AllDiagnostics(list);

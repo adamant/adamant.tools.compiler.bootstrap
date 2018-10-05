@@ -1,26 +1,34 @@
-using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
-using Adamant.Tools.Compiler.Bootstrap.Core.Syntax;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 {
-    public class IdentifierToken : Token
+    public readonly struct IdentifierToken : IToken
     {
-        public readonly IdentifierKind IdentifierKind;
+        public readonly TokenKind Kind;
+        public bool IsMissing => Kind == TokenKind.Missing;
+        public readonly TextSpan Span;
         public readonly string Value;
 
-        public IdentifierToken(
-            CodeFile file,
-            TextSpan span,
-            IdentifierKind kind,
-            bool isMissing,
-            string value,
-            IEnumerable<DiagnosticInfo> diagnosticInfos)
-            : base(file, span, TokenKind.Identifier, isMissing, diagnosticInfos)
+        public IdentifierToken(TokenKind kind, TextSpan span, string value)
         {
-            IdentifierKind = kind;
+            Requires.That(nameof(kind), kind == TokenKind.Missing || kind.IsIdentifier());
+            Kind = kind;
+            Span = span;
             Value = value;
+        }
+
+        TokenKind IToken.Kind => Kind;
+        TextSpan IToken.Span => Span;
+        object IToken.Value => Value;
+
+        public static explicit operator IdentifierToken(Token token)
+        {
+            return new IdentifierToken(token.Kind, token.Span, (string)token.Value);
+        }
+
+        public static implicit operator Token(IdentifierToken token)
+        {
+            return new Token(token.Kind, token.Span, token.Value);
         }
     }
 }

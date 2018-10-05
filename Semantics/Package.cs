@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
         public Package(
             PackageSyntax syntax,
-            IEnumerable<DiagnosticInfo> diagnostics,
+            IEnumerable<Diagnostic> diagnostics,
             IEnumerable<CompilationUnit> compilationUnits,
             FunctionDeclaration entryPoint)
             : base(diagnostics)

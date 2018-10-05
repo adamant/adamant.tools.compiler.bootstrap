@@ -9,9 +9,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements
         public ExpressionSyntax Expression { get; }
 
         public ExpressionStatementSyntax(IEnumerable<SyntaxNode> children)
-            : base(children)
         {
-            Expression = Children.OfType<ExpressionSyntax>().Single();
+            Expression = children.OfType<ExpressionSyntax>().Single();
         }
     }
 }

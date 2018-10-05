@@ -16,29 +16,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         private const string DiagnosticsAttribute = "Diagnostics";
         private const string AllDiagnosticsAttribute = "AllDiagnostics";
 
-        private readonly IReadOnlyCollection<DiagnosticInfo> noDiagnostics = new ReadOnlyCollectionBuilder<DiagnosticInfo>().ToReadOnlyCollection();
+        private readonly IReadOnlyCollection<Diagnostic> noDiagnostics = new ReadOnlyCollectionBuilder<Diagnostic>().ToReadOnlyCollection();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public IReadOnlyCollection<DiagnosticInfo> IncompleteDiagnostics(SyntaxBranchNode syntax)
+        public IReadOnlyCollection<Diagnostic> IncompleteDiagnostics(SyntaxNode syntax)
         {
             return attributes.GetOrAdd(syntax, DiagnosticsAttribute, NewDiagnosticsBag);
         }
 
-        private static ConcurrentBag<DiagnosticInfo> NewDiagnosticsBag(SyntaxBranchNode syntax)
+        private static ConcurrentBag<Diagnostic> NewDiagnosticsBag(SyntaxNode syntax)
         {
-            return new ConcurrentBag<DiagnosticInfo>();
+            return new ConcurrentBag<Diagnostic>();
         }
 
-        private void AddDiagnostic(SyntaxBranchNode syntax, DiagnosticInfo diagnostic)
+        private void AddDiagnostic(SyntaxNode syntax, Diagnostic diagnostic)
         {
             attributes.GetOrAdd(syntax, DiagnosticsAttribute, NewDiagnosticsBag).Add(diagnostic);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public IReadOnlyCollection<DiagnosticInfo> AllDiagnostics(SyntaxBranchNode s) =>
+        public IReadOnlyCollection<Diagnostic> AllDiagnostics(SyntaxNode s) =>
             attributes.GetOrAdd(s, AllDiagnosticsAttribute, ComputeAllDiagnostics);
 
-        private IReadOnlyCollection<DiagnosticInfo> ComputeAllDiagnostics(SyntaxBranchNode syntax)
+        private IReadOnlyCollection<Diagnostic> ComputeAllDiagnostics(SyntaxNode syntax)
         {
             switch (syntax)
             {
@@ -60,7 +60,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                     throw NonExhaustiveMatchException.For(syntax);
             }
 
-            IReadOnlyCollection<DiagnosticInfo> diagnostics;
+            IReadOnlyCollection<Diagnostic> diagnostics;
             if (attributes.HasAttribute(syntax, "Diagnostics")
                 && (diagnostics = IncompleteDiagnostics(syntax)).Any())
                 return diagnostics;

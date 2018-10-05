@@ -1,3 +1,5 @@
+using System;
+
 namespace Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics
 {
     public class Diagnostic
@@ -5,17 +7,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics
         public readonly CodeFile File;
         public readonly TextSpan Span;
         public readonly TextPosition Position;
-        public readonly DiagnosticInfo Info;
+        public readonly DiagnosticLevel Level;
+        public readonly DiagnosticPhase Phase;
+        public readonly int ErrorCode;
+        public readonly string Message;
 
         public Diagnostic(
             CodeFile file,
             TextSpan span,
-            DiagnosticInfo info)
+            DiagnosticLevel level,
+            DiagnosticPhase phase,
+            int errorCode,
+            string message)
         {
-            Info = info ?? throw new System.ArgumentNullException(nameof(info));
+            if (string.IsNullOrWhiteSpace(message))
+                throw new ArgumentException("message", nameof(message));
+
+            Requires.ValidEnum(nameof(level), level);
+            Requires.ValidEnum(nameof(phase), phase);
+
             File = file;
             Span = span;
             Position = file.Code.PositionOfStart(span);
+            Level = level;
+            Phase = phase;
+            ErrorCode = errorCode;
+            Message = message;
         }
     }
 }

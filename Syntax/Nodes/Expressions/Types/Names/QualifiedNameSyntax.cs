@@ -1,18 +1,18 @@
-using System.Collections.Generic;
-using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names
 {
     public class QualifiedNameSyntax : NameSyntax
     {
         public NameSyntax Qualifier { get; }
+        public SimpleToken Dot { get; }
         public IdentifierNameSyntax Name { get; }
 
-        public QualifiedNameSyntax(IEnumerable<SyntaxNode> children)
-            : base(children)
+        public QualifiedNameSyntax(NameSyntax qualifier, SimpleToken dot, IdentifierNameSyntax name)
         {
-            Qualifier = Children.OfType<NameSyntax>().First();
-            Name = Children.OfType<IdentifierNameSyntax>().Last();
+            Qualifier = qualifier;
+            Dot = dot;
+            Name = name;
         }
     }
 }

@@ -4,11 +4,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow
 {
     public class ReturnExpressionSyntax : ExpressionSyntax
     {
-        public Token ReturnKeyword { get; }
+        public SimpleToken ReturnKeyword { get; }
         public ExpressionSyntax Expression { get; }
 
-        public ReturnExpressionSyntax(Token returnKeyword, ExpressionSyntax expression)
-            : base(returnKeyword, expression)
+        public ReturnExpressionSyntax(SimpleToken returnKeyword, ExpressionSyntax expression)
         {
             ReturnKeyword = returnKeyword;
             Expression = expression;

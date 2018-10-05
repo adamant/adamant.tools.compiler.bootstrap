@@ -33,6 +33,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
                 throw new ArgumentNullException(name);
         }
 
+        public static void Null(string name, object value)
+        {
+            if (value != null)
+                throw new ArgumentException("Must be null", name);
+        }
+
         public static void ValidEnum<E>(string name, E value)
             where E : Enum
         {
@@ -45,7 +51,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
             if (!condition)
                 throw new ArgumentException("Does not satisfy condition", name);
         }
-
-
     }
 }

@@ -3,14 +3,13 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
 {
-    public class CompilationUnitNamespaceSyntax : SyntaxBranchNode
+    public class CompilationUnitNamespaceSyntax : SyntaxNode
     {
-        public Token NamespaceKeyword { get; }
+        public SimpleToken NamespaceKeyword { get; }
         public NameSyntax Name { get; }
-        public Token Semicolon { get; }
+        public SimpleToken Semicolon { get; }
 
-        public CompilationUnitNamespaceSyntax(Token namespaceKeyword, NameSyntax name, Token semicolon)
-            : base(namespaceKeyword, name, semicolon)
+        public CompilationUnitNamespaceSyntax(SimpleToken namespaceKeyword, NameSyntax name, SimpleToken semicolon)
         {
             NamespaceKeyword = namespaceKeyword;
             Name = name;

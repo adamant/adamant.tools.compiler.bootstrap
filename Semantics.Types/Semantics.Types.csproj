@@ -12,7 +12,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Core.Syntax\Core.Syntax.csproj" />
     <ProjectReference Include="..\Semantics.Names\Semantics.Names.csproj" />
   </ItemGroup>
 

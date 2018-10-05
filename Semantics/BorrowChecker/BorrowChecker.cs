@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code;
@@ -19,9 +18,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BorrowChecker
 {
     public class BorrowChecker
     {
-        public IEnumerable<DiagnosticInfo> Check(ILPackage package)
+        public IEnumerable<Diagnostic> Check(ILPackage package)
         {
-            var diagnostics = new List<DiagnosticInfo>();
+            var diagnostics = new List<Diagnostic>();
             foreach (var declaration in package.Declarations)
                 switch (declaration)
                 {
@@ -42,9 +41,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BorrowChecker
             // Currently nothing to check
         }
 
-        private static IEnumerable<DiagnosticInfo> Check(ILFunctionDeclaration function)
+        private static IEnumerable<Diagnostic> Check(ILFunctionDeclaration function)
         {
-            var diagnostics = new List<DiagnosticInfo>();
+            var diagnostics = new List<Diagnostic>();
             // TODO we need to check definite assignment as well
 
             var edges = new Edges(function);
@@ -119,13 +118,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BorrowChecker
         private static void CheckCanMove(
             int @object,
             HashSet<Claim> claims,
-            List<DiagnosticInfo> diagnostics)
+            List<Diagnostic> diagnostics)
         {
             var canTake = claims.OfType<Loan>().SelectMany(l => l.Restrictions)
                 .Any(r => r.Place == @object && !r.CanTake);
             if (!canTake)
             {
-                diagnostics.Add(Error.BorrowedValueDoesNotLiveLongEnough());
+                //diagnostics.Add(SemanticError.BorrowedValueDoesNotLiveLongEnough());
+                throw new NotImplementedException();
             }
         }
 
