@@ -27,7 +27,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
 
         public TextPosition PositionOfStart(in TextSpan span)
         {
-            var charOffset = span.Start;
+            return PositionOf(span.Start);
+        }
+
+        public TextPosition PositionOfEnd(in TextSpan span)
+        {
+            if (span.IsEmpty)
+                return PositionOfStart(span);
+            // End is one past, we want the actual last char
+            return PositionOf(span.End - 1);
+        }
+
+        private TextPosition PositionOf(int charOffset)
+        {
             var lineNumber = Lines.LineContainingOffset(charOffset);
             var lineStart = Lines.StartOfLine[lineNumber];
 

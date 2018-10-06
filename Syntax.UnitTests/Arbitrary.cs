@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -14,6 +15,37 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
         {
             return Arb.From(GenPsuedoToken());
         }
+
+        public static Arbitrary<List<PsuedoToken>> PsuedoTokenList()
+        {
+            return Arb.From(GenPsuedoTokenList());
+        }
+
+        private static Gen<List<PsuedoToken>> GenPsuedoTokenList()
+        {
+            //Gen.Sized(size =>
+            //{
+            //    Arb.Generate<int>().Select(length =>
+            //    {
+            //        var tokens = new List<PsuedoToken>(length);
+            //        for (int i = 0; i < length; i++)
+            //        {
+            //            var lastToken = tokens.LastOrDefault();
+            //            var newToken = GenPsuedoToken().
+            //        }
+
+            //        return tokens;
+            //    });
+            //});
+            //return Gen.ListOf(GenPsuedoToken()).Select(l => l.ToList());
+            throw new NotImplementedException();
+        }
+
+        //private static IEnumerable<Gen<PsuedoToken>> GenPsuedoTokens()
+        //{
+        //    var lastToken = null;
+
+        //}
 
         private static Gen<PsuedoToken> GenPsuedoToken()
         {
@@ -165,5 +197,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
             { "owned", TokenKind.OwnedKeyword },
             { "self", TokenKind.SelfKeyword }
         }.AsReadOnly();
+
+        //public static IReadOnlyDictionary<TokenKind, List<Func<PsuedoToken, PsuedoToken, bool>>> PairRestrictions = new ReadOnlyDictionary<TokenKind, List<Func<PsuedoToken, PsuedoToken, bool>>>(
+        //    new Dictionary<TokenKind, List<Func<PsuedoToken, PsuedoToken, bool>>>()
+        //    {
+        //        {TokenKind.Dot, }
+        //    });
     }
 }

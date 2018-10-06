@@ -6,7 +6,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics
     {
         public readonly CodeFile File;
         public readonly TextSpan Span;
-        public readonly TextPosition Position;
+        public readonly TextPosition StartPosition;
+        public readonly TextPosition EndPosition;
         public readonly DiagnosticLevel Level;
         public readonly DiagnosticPhase Phase;
         public readonly int ErrorCode;
@@ -28,7 +29,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics
 
             File = file;
             Span = span;
-            Position = file.Code.PositionOfStart(span);
+            StartPosition = file.Code.PositionOfStart(span);
+            EndPosition = file.Code.PositionOfEnd(span);
             Level = level;
             Phase = phase;
             ErrorCode = errorCode;

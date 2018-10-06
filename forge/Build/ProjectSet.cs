@@ -94,9 +94,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
                     Console.WriteLine($"Build FAILED {project.Name} ({project.Path})");
                     foreach (var diagnostic in diagnostics
                         .OrderBy(d => d.File.Reference.ToString())
-                        .ThenBy(d => d.Position))
+                        .ThenBy(d => d.StartPosition))
                     {
-                        Console.WriteLine($"{diagnostic.File.Reference}:{diagnostic.Position.Line}:{diagnostic.Position.Column} {diagnostic.Level} {diagnostic.ErrorCode}");
+                        Console.WriteLine($"{diagnostic.File.Reference}:{diagnostic.StartPosition.Line}:{diagnostic.StartPosition.Column} {diagnostic.Level} {diagnostic.ErrorCode}");
                         Console.WriteLine(diagnostic.Message);
                     }
                 }

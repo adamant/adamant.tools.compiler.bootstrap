@@ -135,6 +135,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                                 // If we didn't run into the end of the file, we need to move past the file '/'
                                 if (tokenEnd < text.Length)
                                     tokenEnd += 1;
+                                else // Else error
+                                    diagnostics.Add(SyntaxError.UnclosedBlockComment(file,
+                                        TextSpan.FromStartEnd(tokenStart, tokenEnd)));
+
                                 yield return NewToken(TokenKind.Comment, tokenEnd);
                                 break;
                             case '=':
@@ -382,9 +386,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     }
                 }
 
-                // To include the close quote
-                if (tokenEnd < text.Length && text[tokenEnd] == '"')
-                    tokenEnd += 1;
+                if (tokenEnd < text.Length)
+                {
+                    // To include the close quote
+                    if (text[tokenEnd] == '"') tokenEnd += 1;
+                }
+                else
+                    diagnostics.Add(SyntaxError.UnclosedStringLiteral(file,
+                        TextSpan.FromStartEnd(tokenStart, tokenEnd)));
 
                 return new Token(TokenKind.StringLiteral, TextSpan.FromStartEnd(tokenStart, tokenEnd), content.ToString());
             }
