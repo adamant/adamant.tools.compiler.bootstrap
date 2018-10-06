@@ -71,7 +71,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
                 case BigInteger i:
                     return $"{Kind}{textValue} {i}";
                 case IReadOnlyList<Diagnostic> diagnostics:
-                    return $"{Kind}{textValue} [{string.Join(", ", diagnostics.Select(d => $"{d.ErrorCode}@{d.StartPosition.Line}:{d.StartPosition.Column}"))}]";
+                    return $"{Kind}{textValue} [{diagnostics.DebugFormat()}]";
                 default:
                     return $"{Kind}{textValue} InvalidValue={Value}";
             }

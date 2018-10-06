@@ -3,7 +3,7 @@ using System.Diagnostics.Contracts;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
-    public readonly struct TextSpan : IEquatable<TextSpan>
+    public readonly struct TextSpan : IEquatable<TextSpan>, IComparable<TextSpan>
     {
         public readonly int Start;
         public int End => Start + Length;
@@ -68,6 +68,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
         public override string ToString()
         {
             return $"TextSpan({Start},{Length})";
+        }
+
+        public int CompareTo(TextSpan other)
+        {
+            var startComparison = Start.CompareTo(other.Start);
+            return startComparison != 0 ? startComparison : Length.CompareTo(other.Length);
         }
     }
 }

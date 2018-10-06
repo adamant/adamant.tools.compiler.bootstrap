@@ -23,19 +23,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1002, "End-of-file in string constant");
         }
 
+        public static Diagnostic InvalidEscapeSequence(CodeFile file, TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1003, "Unrecognized escape sequence");
+        }
+
+        public static Diagnostic CStyleNotEquals(CodeFile file, TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1004, "Use `≠` or `=/=` for not equal instead of `!=`");
+        }
+
+        public static Diagnostic UnexpectedCharacter(CodeFile file, TextSpan span, char character)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1005, $"Unexpected character `{character}`");
+        }
+
         public static Diagnostic MissingToken(CodeFile file, TextSpan span, TokenKind kind)
         {
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 2, $"Missing {kind} token.");
-        }
-
-        // TODO break this into specific errors rather than taking a generic message
-        public static Diagnostic LexError(
-            CodeFile file,
-            TextSpan span,
-            DiagnosticLevel level,
-            string message)
-        {
-            return new Diagnostic(file, span, level, DiagnosticPhase.Lexing, 1, message);
         }
 
         public static Diagnostic SkippedToken(CodeFile file, TextSpan span)

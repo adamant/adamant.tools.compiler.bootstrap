@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core.Tests;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
@@ -24,8 +22,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
         {
             var file = identifier.ToFakeCodeFile();
             var output = lexer.Lex(file);
-            var token = AssertSingleTokenNoErrors(output);
-            AssertToken(token, TokenKind.Identifier, 0, identifier.Length, value);
+            var token = output.AssertSingleNoErrors();
+            token.AssertIs(TokenKind.Identifier, 0, identifier.Length, value);
         }
 
         [Theory]
@@ -38,8 +36,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
         {
             var file = literal.ToFakeCodeFile();
             var output = lexer.Lex(file);
-            var token = AssertSingleTokenNoErrors(output);
-            AssertToken(token, TokenKind.StringLiteral, 0, literal.Length, value);
+            var token = output.AssertSingleNoErrors();
+            token.AssertIs(TokenKind.StringLiteral, 0, literal.Length, value);
         }
 
         [Theory]
@@ -48,8 +46,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
         {
             var file = symbol.ToFakeCodeFile();
             var output = lexer.Lex(file);
-            var token = AssertSingleTokenNoErrors(output);
-            AssertToken(token, kind, 0, symbol.Length);
+            var token = output.AssertSingleNoErrors();
+            token.AssertIs(kind, 0, symbol.Length);
+        }
+
+        public static IEnumerable<object[]> SymbolsTheoryData()
+        {
+            return Arbitrary.Symbols.Select(item => new object[] { item.Key, item.Value });
+        }
+
+        [Fact]
+        public void Error_for_c_style_not_equals_operator()
+        {
+            var file = "x!=y".ToFakeCodeFile();
+            var output = lexer.Lex(file);
+            var (token, diagnostics) = output.AssertCount(3);
+            token[0].AssertIs(TokenKind.Identifier, 0, 1, "x");
+            token[1].AssertIs(TokenKind.NotEqual, 1, 2);
+            token[2].AssertIs(TokenKind.Identifier, 3, 1, "y");
+            diagnostics.AssertCount(1);
+            diagnostics[0].AssertError(1004, 1, 2);
         }
 
         [Theory]
@@ -65,43 +81,87 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
         {
             var file = comment.ToFakeCodeFile();
             var output = lexer.Lex(file);
-            var token = AssertSingleTokenNoErrors(output);
-            AssertToken(token, TokenKind.Comment, 0, comment.Length);
+            var token = output.AssertSingleNoErrors();
+            token.AssertIs(TokenKind.Comment, 0, comment.Length);
         }
 
         [Fact]
         public void End_of_file_in_block_comment()
         {
             var file = "/*".ToFakeCodeFile();
-            var tokens = lexer.Lex(file).ToList();
-            var (comment, diagnostics) = AssertSingleTokenWithErrors(tokens);
-            AssertToken(comment, TokenKind.Comment, 0, 2);
-            var diagnostic = AssertSingleDiagnostic(diagnostics);
-            AssertError(diagnostic, 1001, 0, 2);
+            var tokens = lexer.Lex(file);
+            var (comment, diagnostics) = tokens.AssertSingleWithErrors();
+            comment.AssertIs(TokenKind.Comment, 0, 2);
+            var diagnostic = diagnostics.AssertSingle();
+            diagnostic.AssertError(1001, 0, 2);
         }
 
         [Fact]
         public void End_of_file_in_string_gives_error()
         {
-            var tokens = lexer.Lex(@"""Hello".ToFakeCodeFile()).ToList();
-            var (literal, diagnostics) = AssertSingleTokenWithErrors(tokens);
-            AssertToken(literal, TokenKind.StringLiteral, 0, 6, "Hello");
-            var diagnostic = AssertSingleDiagnostic(diagnostics);
-            AssertError(diagnostic, 1002, 0, 6);
+            var file = @"""Hello".ToFakeCodeFile();
+            var tokens = lexer.Lex(file);
+            var (token, diagnostics) = tokens.AssertSingleWithErrors();
+            token.AssertIs(TokenKind.StringLiteral, 0, 6, "Hello");
+            var diagnostic = diagnostics.AssertSingle();
+            diagnostic.AssertError(1002, 0, 6);
         }
 
-        [Fact]
-        public void End_of_file_unicode_escape()
+        [Theory]
+        [InlineData(@"""\", "")]
+        [InlineData(@"""\a""", "a")]
+        [InlineData(@"""\m""", "m")]
+        [InlineData(@"""\x""", "x")]
+        // Unicode escapes could be stopped with EOF, End of string or invalid char
+        // at each of the different states
+        [InlineData(@"""\u""", "u")]
+        [InlineData(@"""\u", "u")]
+        [InlineData(@"""\u|""", "u|")]
+        [InlineData(@"""\u(", "u(")]
+        [InlineData(@"""\u(""", "u(")]
+        [InlineData(@"""\u(|""", "u(|")]
+        [InlineData(@"""\u(1f", "\u001f")]
+        [InlineData(@"""\u(1f""", "\u001f")]
+        [InlineData(@"""\u(1f|""", "\u001f|")]
+        [InlineData(@"""\u()""", "u()")]
+        [InlineData(@"""\u(110000)""", "u(110000)")] // 1 too high
+        public void InvalidEscapeSequence(string literal, string expectedValue)
         {
-            var tokens = lexer.Lex(@"""\u".ToFakeCodeFile()).ToList();
-            Assert.Collection(tokens, comment =>
+            var file = literal.ToFakeCodeFile();
+            var tokens = lexer.Lex(file);
+            var (token, diagnostics) = tokens.AssertSingleWithErrors();
+            token.AssertIs(TokenKind.StringLiteral, 0, literal.Length, expectedValue);
+            var completeString = literal.EndsWith("\"");
+            var expectedDiagnosticCount = completeString ? 1 : 2;
+            var diagnostic = diagnostics.AssertCount(expectedDiagnosticCount);
+
+            var expectedLength = literal.Length;
+            if (literal.Contains('|')) expectedLength -= 1;
+            if (completeString)
+                diagnostic[0].AssertError(1003, 1, expectedLength - 2);
+            else
             {
-                Assert.True(comment.Span.Length == 2, "Comment length of 2");
-            }, t2 =>
-            {
-                var eof = (EndOfFileToken)t2;
-                Assert.Collection(eof.Value, diagnostics => { });
-            });
+                diagnostic[0].AssertError(1002, 0, literal.Length);
+                diagnostic[1].AssertError(1003, 1, expectedLength - 1);
+            }
+        }
+
+        [Theory]
+        [InlineData(" % ")]
+        [InlineData(" ~ ")]
+        [InlineData(" ` ")]
+        [InlineData(" \u0007 ")] // Bell Character
+        public void UnexpectedCharacter(string text)
+        {
+            var file = text.ToFakeCodeFile();
+            var output = lexer.Lex(file);
+            var (token, diagnostics) = output.AssertCount(3);
+            token[0].AssertIs(TokenKind.Whitespace, 0, 1);
+            token[1].AssertIs(TokenKind.Unexpected, 1, 1);
+            token[2].AssertIs(TokenKind.Whitespace, 2, 1);
+            diagnostics.AssertCount(1);
+            diagnostics[0].AssertError(1005, 1, 1);
+            Assert.True(diagnostics[0].Message.Contains(text[1]), "Doesn't contain character");
         }
 
         [Property(MaxTest = 10_000)]
@@ -111,7 +171,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
             {
                 var file = input.ToFakeCodeFile();
                 var output = lexer.Lex(file);
-                return input.Get == Concat(output, file);
+                return input.Get == output.Concat(file);
             });
         }
 
@@ -122,10 +182,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
             {
                 var file = token.ToFakeCodeFile();
                 var output = lexer.Lex(file);
-                var outputAsPsuedoTokens = PsuedoTokensFor(output, file);
+                var outputAsPsuedoTokens = output.ToPsuedoTokens(file);
                 var expectedPsuedoTokens = token.Yield().Append(PsuedoToken.EndOfFile()).ToList();
                 return expectedPsuedoTokens.SequenceEqual(outputAsPsuedoTokens)
-                    .Label($"Output: {Display(outputAsPsuedoTokens)} != Expected: {Display(expectedPsuedoTokens)}")
+                    .Label($"Output: {outputAsPsuedoTokens.DebugFormat()} != Expected: {expectedPsuedoTokens.DebugFormat()}")
                     .Collect(token.Kind);
             });
         }
@@ -135,97 +195,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
         {
             return Prop.ForAll(Arbitrary.PsuedoTokenList(), tokens =>
             {
-                var input = Concat(tokens);
+                var input = tokens.Concat();
                 var file = input.ToFakeCodeFile();
                 var output = lexer.Lex(file);
-                var outputAsPsuedoTokens = PsuedoTokensFor(output, file);
+                var outputAsPsuedoTokens = output.ToPsuedoTokens(file);
                 var expectedPsuedoTokens = tokens.Append(PsuedoToken.EndOfFile()).ToList();
                 return expectedPsuedoTokens.SequenceEqual(outputAsPsuedoTokens)
-                    .Label($"Output: {Display(outputAsPsuedoTokens)} != Expected: {Display(expectedPsuedoTokens)}");
+                    .Label($"Output: {outputAsPsuedoTokens.DebugFormat()} != Expected: {expectedPsuedoTokens.DebugFormat()}");
             });
         }
-
-        #region Helper functions
-        private static void AssertToken(
-            Token actual,
-            TokenKind expectedKind,
-            int expectedStart,
-            int expectedLength,
-            object expectedValue = null)
-        {
-            Assert.Equal(expectedKind, actual.Kind);
-            Assert.True(expectedStart == actual.Span.Start, $"Expected token start {expectedStart}, was {actual.Span.Start}");
-            Assert.True(expectedLength == actual.Span.Length, $"Expected token length {expectedLength}, was {actual.Span.Length}");
-            Assert.Equal(expectedValue, actual.Value);
-        }
-
-        private static Token AssertSingleTokenNoErrors(IEnumerable<Token> tokens)
-        {
-            var list = tokens.ToList();
-            Assert.Collection(list, token => { },
-                eof =>
-                {
-                    Assert.Equal(TokenKind.EndOfFile, eof.Kind);
-                    Assert.Equal(new TextSpan(list[0].Span.End, 0), eof.Span);
-                    Assert.Empty((IReadOnlyList<Diagnostic>)eof.Value);
-                });
-            return list[0];
-        }
-        private static (Token, IReadOnlyList<Diagnostic>) AssertSingleTokenWithErrors(IEnumerable<Token> tokens)
-        {
-            var list = tokens.ToList();
-            Assert.Collection(list, token => { },
-                    eof =>
-                    {
-                        Assert.Equal(TokenKind.EndOfFile, eof.Kind);
-                        Assert.Equal(new TextSpan(list[0].Span.End, 0), eof.Span);
-                        Assert.NotEmpty((IReadOnlyList<Diagnostic>)eof.Value);
-                    });
-            return (list[0], (IReadOnlyList<Diagnostic>)list[1].Value);
-        }
-
-        private static Diagnostic AssertSingleDiagnostic(IReadOnlyList<Diagnostic> diagnostics)
-        {
-            Assert.True(diagnostics.Count == 1, $"Expected single diagnostic, were {diagnostics.Count}");
-            return diagnostics[0];
-        }
-
-        private static void AssertError(Diagnostic diagnostic, int errorCode, int start, int length)
-        {
-            Assert.Equal(DiagnosticLevel.CompilationError, diagnostic.Level);
-            AssertDiagnostic(diagnostic, errorCode, start, length);
-        }
-        private static void AssertDiagnostic(Diagnostic diagnostic, int errorCode, int start, int length)
-        {
-            Assert.Equal(DiagnosticPhase.Lexing, diagnostic.Phase);
-            Assert.Equal(errorCode, diagnostic.ErrorCode);
-            Assert.True(start == diagnostic.Span.Start, $"Expected diagnostic start {start}, was {diagnostic.Span.Start}");
-            Assert.True(length == diagnostic.Span.Length, $"Expected diagnostic length {length}, was {diagnostic.Span.Length}");
-        }
-
-        private static string Concat(IEnumerable<PsuedoToken> tokens)
-        {
-            return string.Concat(tokens.Select(t => t.Text));
-        }
-        private static string Concat(IEnumerable<Token> tokens, CodeFile file)
-        {
-            return string.Concat(tokens.Select(t => t.Text(file.Code)));
-        }
-
-        public static List<PsuedoToken> PsuedoTokensFor(IEnumerable<Token> tokens, CodeFile file)
-        {
-            return tokens.Select(t => PsuedoToken.For(t, file.Code)).ToList();
-        }
-
-        private static string Display(IEnumerable<PsuedoToken> tokens)
-        {
-            return string.Join(", ", tokens);
-        }
-
-        public static IEnumerable<object[]> SymbolsTheoryData()
-        {
-            return Arbitrary.Symbols.Select(item => new object[] { item.Key, item.Value });
-        }
-        #endregion
     }
 }

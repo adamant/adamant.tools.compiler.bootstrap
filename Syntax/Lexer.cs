@@ -229,12 +229,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         }
                         else if (currentChar == '!' && NextCharIs('='))
                         {
-                            NewError(DiagnosticLevel.CompilationError, "Use `≠` or `=/=` for not equal instead of `!=`.");
+                            diagnostics.Add(SyntaxError.CStyleNotEquals(file, new TextSpan(tokenStart, 2)));
                             yield return NewOperatorToken(TokenKind.NotEqual, 2);
                         }
                         else
                         {
-                            NewError(DiagnosticLevel.CompilationError, "Unexpected Character");
+                            diagnostics.Add(SyntaxError.UnexpectedCharacter(file, new TextSpan(tokenStart, 1), currentChar));
                             yield return NewToken(TokenKind.Unexpected, tokenStart + 1);
                         }
                         break;
@@ -288,12 +288,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                 return index < text.Length && text[index] == c;
             }
 
-            void NewError(DiagnosticLevel level, string message)
-            {
-                // TODO report correct span
-                diagnostics.Add(SyntaxError.LexError(file, new TextSpan(tokenStart, 0), level, message));
-            }
-
             Token LexString()
             {
                 tokenEnd = tokenStart + 1;
@@ -310,15 +304,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     }
 
                     // Escape Sequence (i.e. "\\")
+                    // In case of an invalid escape sequence, we just drop the `\` from the value
 
                     if (tokenEnd >= text.Length)
                     {
-                        content.Append(currentChar);
-                        NewError(DiagnosticLevel.CompilationError, "Invalid string escape sequence `\\EOF`.");
+                        // Just the slash is invalid
+                        var errorSpan = TextSpan.FromStartEnd(tokenEnd - 1, tokenEnd);
+                        diagnostics.Add(SyntaxError.InvalidEscapeSequence(file, errorSpan));
                         break; // we hit the end of file and need to not add to tokenEnd any more
                     }
 
                     // Escape Sequence with next char (i.e. "\\x")
+                    var escapeStart = tokenEnd - 1;
                     currentChar = text[tokenEnd];
                     tokenEnd += 1;
                     switch (currentChar)
@@ -341,48 +338,66 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                             content.Append('\t');
                             break;
                         case 'u':
-                            if (tokenEnd >= text.Length)
                             {
-                                NewError(DiagnosticLevel.CompilationError,
-                                    "Unclosed Unicode escape sequence.");
+                                if (tokenEnd < text.Length && text[tokenEnd] == '(')
+                                    tokenEnd += 1;
+                                else
+                                {
+                                    content.Append('u');
+                                    var errorSpan = TextSpan.FromStartEnd(escapeStart, tokenEnd);
+                                    diagnostics.Add(SyntaxError.InvalidEscapeSequence(file, errorSpan));
+                                    break;
+                                }
+
+                                var codepoint = new StringBuilder(6);
+                                while (tokenEnd < text.Length &&
+                                       IsHexDigit(currentChar = text[tokenEnd]))
+                                {
+                                    codepoint.Append(currentChar);
+                                    tokenEnd += 1;
+                                }
+
+                                int value;
+                                if (codepoint.Length > 0
+                                    && codepoint.Length <= 6
+                                    && (value = Convert.ToInt32(codepoint.ToString(), 16)) <= 0x10FFFF)
+                                {
+                                    // TODO disallow surrogate pairs
+                                    content.Append(char.ConvertFromUtf32(value));
+                                }
+                                else
+                                {
+                                    content.Append("u(");
+                                    content.Append(codepoint);
+                                    // Include the closing ')' in the escape sequence if it is present
+                                    if (tokenEnd < text.Length && text[tokenEnd] == ')')
+                                    {
+                                        content.Append(')');
+                                        tokenEnd += 1;
+                                    }
+                                    var errorSpan = TextSpan.FromStartEnd(escapeStart, tokenEnd);
+                                    diagnostics.Add(SyntaxError.InvalidEscapeSequence(file, errorSpan));
+                                    break;
+                                }
+
+                                if (tokenEnd < text.Length && text[tokenEnd] == ')')
+                                    tokenEnd += 1;
+                                else
+                                {
+                                    var errorSpan = TextSpan.FromStartEnd(escapeStart, tokenEnd);
+                                    diagnostics.Add(SyntaxError.InvalidEscapeSequence(file, errorSpan));
+                                }
                                 break;
                             }
-                            else if (text[tokenEnd] == '(')
-                                tokenEnd += 1;
-                            else
-                            {
-                                NewError(DiagnosticLevel.CompilationError,
-                                    $"Unicode escape sequence must begin `\\u(` rather than `\\u{text[tokenEnd]}`.");
-                                break;
-                            }
-
-                            var codepoint = new StringBuilder(6);
-                            while (tokenEnd < text.Length &&
-                                   IsHexDigit(currentChar = text[tokenEnd]))
-                            {
-                                codepoint.Append(currentChar);
-                                tokenEnd += 1;
-                            }
-
-                            content.Append(
-                                char.ConvertFromUtf32(Convert.ToInt32(codepoint.ToString(),
-                                    16)));
-
-                            if (tokenEnd >= text.Length)
-                                NewError(DiagnosticLevel.CompilationError,
-                                    "Unclosed Unicode escape sequence.");
-                            else if (text[tokenEnd] == ')')
-                                tokenEnd += 1;
-                            else
-                                NewError(DiagnosticLevel.CompilationError,
-                                    "Unicode escape sequence must be terminated with `)`.");
-                            break;
                         default:
-                            NewError(DiagnosticLevel.CompilationError,
-                                $"Invalid string escape sequence `\\{currentChar}`.");
-                            content.Append('\\');
-                            content.Append(currentChar);
-                            break;
+                            {
+                                // Last two chars form the invalid sequence
+                                var errorSpan = TextSpan.FromStartEnd(tokenEnd - 2, tokenEnd);
+                                diagnostics.Add(SyntaxError.InvalidEscapeSequence(file, errorSpan));
+                                // drop the `/` keep the character after
+                                content.Append(currentChar);
+                                break;
+                            }
                     }
                 }
 
