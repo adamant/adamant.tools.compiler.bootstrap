@@ -4,12 +4,16 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core.Tests;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework;
 using FsCheck;
 using FsCheck.Xunit;
 using Xunit;
+using Xunit.Categories;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
 {
+    [Category("Lex")]
+    [UnitTest]
     public class LexerSpec
     {
         private readonly Lexer lexer = new Lexer();
@@ -125,7 +129,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
         [InlineData(@"""\u(1f|""", "\u001f|")]
         [InlineData(@"""\u()""", "u()")]
         [InlineData(@"""\u(110000)""", "u(110000)")] // 1 too high
-        public void InvalidEscapeSequence(string literal, string expectedValue)
+        public void Invalid_escape_sequence(string literal, string expectedValue)
         {
             var file = literal.ToFakeCodeFile();
             var tokens = lexer.Lex(file);
@@ -151,7 +155,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
         [InlineData(" ~ ")]
         [InlineData(" ` ")]
         [InlineData(" \u0007 ")] // Bell Character
-        public void UnexpectedCharacter(string text)
+        public void Unexpected_character(string text)
         {
             var file = text.ToFakeCodeFile();
             var output = lexer.Lex(file);

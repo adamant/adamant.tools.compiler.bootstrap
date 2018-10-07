@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Xunit;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
 {
     public static class AssertExtensions
     {

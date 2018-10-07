@@ -4,7 +4,6 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C.Tests.Data;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
@@ -33,8 +32,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C.Tests
             var file = new CodeFile(codePath, code);
             var tokens = new Lexer().Lex(file);
             var parser = new Parser();
-            var syntaxTree = parser.Parse(file, tokens);
-            var packageSyntax = new PackageSyntax(syntaxTree.Yield().ToList());
+            var compilationUnit = parser.Parse(file, tokens);
+            var packageSyntax = new PackageSyntax(compilationUnit.ToSyntaxList());
             var analyzer = new SemanticAnalyzer();
             return analyzer.Analyze(packageSyntax).Package;
         }

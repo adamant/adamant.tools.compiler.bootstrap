@@ -1,16 +1,17 @@
-using System.Collections.Generic;
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements
 {
     public class ExpressionStatementSyntax : StatementSyntax
     {
         public ExpressionSyntax Expression { get; }
+        public SimpleToken Semicolon { get; }
 
-        public ExpressionStatementSyntax(IEnumerable<SyntaxNode> children)
+        public ExpressionStatementSyntax(ExpressionSyntax expression, in SimpleToken semicolon)
         {
-            Expression = children.OfType<ExpressionSyntax>().Single();
+            Expression = expression;
+            Semicolon = semicolon;
         }
     }
 }

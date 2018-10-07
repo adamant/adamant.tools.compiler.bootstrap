@@ -57,7 +57,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                     var tokens = lexer.Lex(file);
                     return parser.Parse(file, tokens);
                 })
-                .ToList();
+                .ToSyntaxList();
             var packageSyntax = new PackageSyntax(compilationUnits);
 
             var analyzer = new SemanticAnalyzer();

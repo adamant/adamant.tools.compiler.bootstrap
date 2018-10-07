@@ -29,7 +29,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         [MustUseReturnValue]
         public CompilationUnitSyntax Parse(ITokenStream tokens)
         {
-            return ParseCompilationUnit(tokens);
+            if (tokens is TokenStreamWithoutTrivia noTrivia)
+                return ParseCompilationUnit(noTrivia);
+
+            return ParseCompilationUnit(new TokenStreamWithoutTrivia(tokens));
         }
 
         #region Parse Syntax Functions
@@ -37,8 +40,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         public CompilationUnitSyntax ParseCompilationUnit(ITokenStream tokens)
         {
             var @namespace = ParseCompilationUnitNamespace(tokens);
-            var usingDirectives = ParseUsingDirectives(tokens).ToList().AsReadOnly();
-            var declarations = ParseDeclarations(tokens).ToList().AsReadOnly();
+            var usingDirectives = ParseUsingDirectives(tokens).ToSyntaxList();
+            var declarations = ParseDeclarations(tokens).ToSyntaxList();
             var endOfFile = tokens.ExpectEndOfFile();
 
             return new CompilationUnitSyntax(@namespace, usingDirectives, declarations, endOfFile);
@@ -89,7 +92,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         var name = tokens.ExpectIdentifier();
                         var openBrace = tokens.ExpectSimple(TokenKind.OpenBrace);
                         var closeBrace = tokens.ExpectSimple(TokenKind.CloseBrace);
-                        return new ClassDeclarationSyntax(accessModifier, classKeyword, name, openBrace, Enumerable.Empty<MemberDeclarationSyntax>(), closeBrace);
+                        return new ClassDeclarationSyntax(accessModifier, classKeyword, name, openBrace, SyntaxList<MemberDeclarationSyntax>.Empty, closeBrace);
                     }
                 case TokenKind.EnumKeyword:
                     {
@@ -101,7 +104,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                                 var name = tokens.ExpectIdentifier();
                                 var openBrace = tokens.ExpectSimple(TokenKind.OpenBrace);
                                 var closeBrace = tokens.ExpectSimple(TokenKind.CloseBrace);
-                                return new EnumStructDeclarationSyntax(accessModifier, enumKeyword, structKeyword, name, openBrace, Enumerable.Empty<MemberDeclarationSyntax>(), closeBrace);
+                                return new EnumStructDeclarationSyntax(accessModifier, enumKeyword, structKeyword, name, openBrace, SyntaxList<MemberDeclarationSyntax>.Empty, closeBrace);
                             case TokenKind.ClassKeyword:
                                 throw new NotImplementedException(
                                     "Parsing enum classes not implemented");
@@ -132,10 +135,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         [MustUseReturnValue]
         private static IncompleteDeclarationSyntax ParseIncompleteDeclaration(ITokenStream tokens, SimpleToken accessModifier)
         {
-            var skipped = new List<Token>() { accessModifier };
+            var skipped = new List<ISyntaxNodeOrToken>() { (Token)accessModifier };
             var startToken = tokens.Current;
             var name = tokens.ExpectIdentifier();
-            skipped.Add(name);
+            skipped.Add((Token)name);
             throw new NotImplementedException();
             //if (tokens.Current == start)
             //    // We have not advanced at all when trying to parse a declaration.
@@ -162,18 +165,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         [MustUseReturnValue]
         private static SeparatedListSyntax<ParameterSyntax> ParseParameters(ITokenStream tokens)
         {
-            // What if there isn't a current token?
-
-            var emptySpan = tokens.MissingToken().Span;
-            var parameters = ParseSyntaxList(tokens, ParseParameter, TokenKind.Comma, TokenKind.CloseParen).ToList();
-            var span = parameters.Any() ? default : emptySpan;
-            return new SeparatedListSyntax<ParameterSyntax>(parameters);
+            return ParseSeparatedSyntaxList(tokens, ParseParameter, TokenKind.Comma, TokenKind.CloseParen);
         }
 
         [MustUseReturnValue]
         private static ParameterSyntax ParseParameter(ITokenStream tokens)
         {
-            var children = new List<SyntaxNode>();
             switch (tokens.Current?.Kind)
             {
                 //case TokenKind.MutableKeyword:
@@ -192,60 +189,73 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         }
 
         [MustUseReturnValue]
-        private static IEnumerable<T> ParseSyntaxList<T>(
+        private static SeparatedListSyntax<T> ParseSeparatedSyntaxList<T>(
             ITokenStream tokens,
             Func<ITokenStream, T> parseItem,
             TokenKind separator,
             TokenKind terminator)
             where T : SyntaxNode
         {
-            //if (tokens.Finished || tokens.CurrentIs(terminator))
-            //    yield break;
-
-            //var start = tokens.Current;
-            //yield return parseItem(tokens);
-            //if (tokens.Current == start)
-            //    yield return new SkippedTokensSyntax(tokens.ConsumeAny());
-            //while (!tokens.CurrentIs(terminator) && !tokens.AtEndOfFile())
-            //{
-            //    start = tokens.Current;
-            //    yield return tokens.Expect(separator);
-            //    yield return parseItem(tokens);
-            //    if (tokens.Current == start)
-            //        yield return new SkippedTokensSyntax(tokens.ConsumeAny());
-            //}
-            throw new NotImplementedException();
+            return new SeparatedListSyntax<T>(ParseSeparatedSyntaxEnumerable(tokens, parseItem, separator, terminator));
         }
 
         [MustUseReturnValue]
-        private static IEnumerable<T> ParseSyntaxList<T>(
+        private static IEnumerable<ISyntaxNodeOrToken> ParseSeparatedSyntaxEnumerable(
             ITokenStream tokens,
             Func<ITokenStream, SyntaxNode> parseItem,
+            TokenKind separator,
+            TokenKind terminator)
+        {
+            while (tokens.Current?.Kind != terminator && !tokens.AtEndOfFile())
+            {
+                var start = tokens.Current;
+                yield return parseItem(tokens);
+                if (tokens.Current == start)
+                {
+                    tokens.Next();
+                    throw new NotImplementedException("Error for skipped token");
+                }
+                if (tokens.Current?.Kind == separator)
+
+                    yield return (Token)tokens.ExpectSimple(separator);
+                else
+                    yield break;
+            }
+        }
+
+        [MustUseReturnValue]
+        private static SyntaxList<T> ParseSyntaxList<T>(
+                 ITokenStream tokens,
+                 Func<ITokenStream, T> parseItem,
+                 TokenKind terminator)
+                 where T : SyntaxNode
+        {
+            return ParseSyntaxEnumerable(tokens, parseItem, terminator).ToSyntaxList();
+        }
+
+        [MustUseReturnValue]
+        private static IEnumerable<T> ParseSyntaxEnumerable<T>(
+            ITokenStream tokens,
+            Func<ITokenStream, T> parseItem,
             TokenKind terminator)
             where T : SyntaxNode
         {
-            //if (tokens.Finished || tokens.CurrentIs(terminator))
-            //    yield break;
+            while (tokens.Current?.Kind != terminator && !tokens.AtEndOfFile())
+            {
+                var start = tokens.Current;
+                yield return parseItem(tokens);
+                if (tokens.Current != start) continue;
 
-            //var start = tokens.Current;
-            //yield return parseItem(tokens);
-            //if (tokens.Current == start)
-            //    yield return new SkippedTokensSyntax(tokens.ConsumeAny());
-            //while (!tokens.CurrentIs(terminator) && !tokens.AtEndOfFile())
-            //{
-            //    start = tokens.Current;
-            //    yield return parseItem(tokens);
-            //    if (tokens.Current == start)
-            //        yield return new SkippedTokensSyntax(tokens.ConsumeAny());
-            //}
-            throw new NotImplementedException();
+                tokens.Next();
+                throw new NotImplementedException("Error for skipped token");
+            }
         }
 
         [MustUseReturnValue]
         private BlockSyntax ParseStatementBlock(ITokenStream tokens)
         {
             var openBrace = tokens.ExpectSimple(TokenKind.OpenBrace);
-            var statements = ParseSyntaxList<StatementSyntax>(tokens, ParseStatement, TokenKind.CloseBrace).ToList();
+            var statements = ParseSyntaxList<StatementSyntax>(tokens, ParseStatement, TokenKind.CloseBrace);
             var closeBrace = tokens.ExpectSimple(TokenKind.CloseBrace);
             return new BlockSyntax(openBrace, statements, closeBrace);
         }
@@ -253,33 +263,33 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         [MustUseReturnValue]
         private StatementSyntax ParseStatement(ITokenStream tokens)
         {
-            var children = new List<SyntaxNode>();
             switch (tokens.Current?.Kind)
             {
                 case TokenKind.OpenBrace:
                     return ParseStatementBlock(tokens);
                 case TokenKind.LetKeyword:
                 case TokenKind.VarKeyword:
-                    //children.Add(tokens.ConsumeAny());
-                    //children.Add(tokens.Expect(TokenKind.Identifier));
-                    //children.Add(tokens.Expect(TokenKind.Colon));
-                    //var type = ParseType(tokens);
-                    //children.Add(type);
-                    //ExpressionSyntax initializer = null;
-                    //if (tokens.CurrentIs(TokenKind.Equals))
-                    //{
-                    //    children.Add(tokens.Expect(TokenKind.Equals));
-                    //    initializer = ParseExpression(tokens);
-                    //    children.Add(initializer);
-                    //}
-                    //children.Add(tokens.Expect(TokenKind.Semicolon));
-                    //return new VariableDeclarationStatementSyntax(children, type, initializer);
-                    throw new NotImplementedException();
+                    {
+                        var binding = tokens.ExpectSimple();
+                        var name = tokens.ExpectIdentifier();
+                        var colon = tokens.ExpectSimple(TokenKind.Colon);
+                        var type = ParseType(tokens);
+                        SimpleToken? equals = null;
+                        ExpressionSyntax initializer = null;
+                        if (tokens.Current?.Kind == TokenKind.Equals)
+                        {
+                            equals = tokens.ExpectSimple(TokenKind.Equals);
+                            initializer = ParseExpression(tokens);
+                        }
+                        var semicolon = tokens.ExpectSimple(TokenKind.Semicolon);
+                        return new VariableDeclarationStatementSyntax(binding, name, colon, type, equals, initializer, semicolon);
+                    }
                 default:
-                    //children.Add(ParseExpression(tokens));
-                    //children.Add(tokens.Expect(TokenKind.Semicolon));
-                    //return new ExpressionStatementSyntax(children);
-                    throw new NotImplementedException();
+                    {
+                        var expression = ParseExpression(tokens);
+                        var semicolon = tokens.ExpectSimple(TokenKind.Semicolon);
+                        return new ExpressionStatementSyntax(expression, semicolon);
+                    }
             }
         }
 
@@ -470,15 +480,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         var name = new IdentifierNameSyntax(identifier);
                         if (!tokens.CurrentIs(TokenKind.Dollar)) return name;
 
-                        //var children = NewChildList();
-                        //children.Add(name);
-                        //var dollar = tokens.Expect(TokenKind.Dollar);
-                        //AnyToken
-                        //if (tokens.Current?.Kind.IsIdentifier() ?? false)
-                        //    ? tokens.Accept(TokenKind.Identifier)
-                        //    : tokens.Expect(TokenKind.OwnedKeyword));
-                        //return new LifetimeTypeSyntax(children);
-                        throw new NotImplementedException();
+                        var dollar = tokens.ExpectSimple(TokenKind.Dollar);
+                        var lifetime = (tokens.Current?.Kind.IsIdentifier() ?? false)
+                            ? (Token)tokens.ExpectIdentifier()
+                            : tokens.ExpectSimple(TokenKind.OwnedKeyword);
+                        return new LifetimeTypeSyntax(name, dollar, lifetime);
                     }
             }
         }
@@ -501,7 +507,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         private SeparatedListSyntax<ExpressionSyntax> ParseArguments(ITokenStream tokens)
         {
             // What if there isn't a current token?
-            var arguments = ParseSyntaxList(tokens, t => ParseExpression(t), TokenKind.Comma, TokenKind.CloseParen).ToList();
+            var arguments = ParseSeparatedSyntaxList(tokens, t => ParseExpression(t), TokenKind.Comma, TokenKind.CloseParen).ToList();
             return new SeparatedListSyntax<ExpressionSyntax>(arguments);
         }
         #endregion

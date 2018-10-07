@@ -52,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             switch (syntax)
             {
                 case FunctionDeclarationSyntax function:
-                    var parameterTypes = function.Parameters.Select(Type);
+                    var parameterTypes = function.Parameters.Nodes().Select(Type);
                     var returnType = Type(function.ReturnType);
                     return new FunctionType(parameterTypes, returnType);
 
@@ -136,7 +136,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                     if (lifetimeType.Lifetime.Kind == TokenKind.OwnedKeyword)
                         lifetime = OwnedLifetime.Instance;
                     else
-                        lifetime = new NamedLifetime(lifetimeType.Lifetime.Value);
+                        lifetime = new NamedLifetime((string)lifetimeType.Lifetime.Value);
                     return new LifetimeType(Type(lifetimeType.TypeName), lifetime);
 
                 default:

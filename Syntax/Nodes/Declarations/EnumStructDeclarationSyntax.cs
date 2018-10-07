@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
@@ -11,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
         public SimpleToken StructKeyword { get; }
         public override IdentifierToken Name { get; }
         public SimpleToken OpenBrace { get; }
-        public IReadOnlyList<MemberDeclarationSyntax> Members { get; }
+        public SyntaxList<MemberDeclarationSyntax> Members { get; }
         public SimpleToken CloseBrace { get; }
 
         public EnumStructDeclarationSyntax(
@@ -20,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
             SimpleToken structKeyword,
             IdentifierToken name,
             SimpleToken openBrace,
-            IEnumerable<MemberDeclarationSyntax> members,
+            SyntaxList<MemberDeclarationSyntax> members,
             SimpleToken closeBrace)
         {
             AccessModifier = accessModifier;
@@ -29,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
             Name = name;
             OpenBrace = openBrace;
             CloseBrace = closeBrace;
-            Members = members.ToList().AsReadOnly();
+            Members = members;
         }
     }
 }

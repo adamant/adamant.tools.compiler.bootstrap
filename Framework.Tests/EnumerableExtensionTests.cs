@@ -5,10 +5,10 @@ using Xunit.Categories;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework.Tests
 {
+    [UnitTest]
     public class EnumerableExtensionTests
     {
         [Fact]
-        [UnitTest]
         public void ZipWithoutResultSelectorCreatesTuples()
         {
             var items1 = new[] { 1, 2, 3 };
@@ -18,7 +18,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework.Tests
         }
 
         [Fact]
-        [UnitTest]
         public void CrossJoinCreatesEveryCombination()
         {
             var items1 = new[] { 1, 2, 3 };

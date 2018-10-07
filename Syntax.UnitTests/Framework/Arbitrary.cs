@@ -7,7 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Fare;
 using FsCheck;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
 {
     public class Arbitrary
     {

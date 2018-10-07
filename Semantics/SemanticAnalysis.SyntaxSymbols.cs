@@ -46,7 +46,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             switch (declaration)
             {
                 case FunctionDeclarationSyntax function:
-                    var variableSymbols = function.Parameters
+                    var variableSymbols = function.Parameters.Nodes()
                         .Select(p => new VariableSyntaxSymbol(p, null))
                         .Concat(function.Body.DescendantsAndSelf()
                             .OfType<VariableDeclarationStatementSyntax>()

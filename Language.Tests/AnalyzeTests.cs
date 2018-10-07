@@ -30,8 +30,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
             var file = new CodeFile(codePath, code);
             var tokens = new Lexer().Lex(file);
             var parser = new Parser();
-            var syntaxTree = parser.Parse(file, tokens);
-            var packageSyntax = new PackageSyntax(syntaxTree.Yield().ToList());
+            var compilationUnit = parser.Parse(file, tokens);
+            var packageSyntax = new PackageSyntax(compilationUnit.ToSyntaxList());
             var analyzer = new SemanticAnalyzer();
             var package = analyzer.Analyze(packageSyntax).Package;
             AssertSemanticsMatch(testCase.ExpectedSemanticTree, package);

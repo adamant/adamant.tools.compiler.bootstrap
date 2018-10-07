@@ -1,7 +1,5 @@
 using System.IO;
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Tests.Data;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
@@ -23,8 +21,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Tests
             var file = new CodeFile(codePath, code);
             var tokens = new Lexer().Lex(file);
             var parser = new Parser();
-            var syntaxTree = parser.Parse(file, tokens);
-            var packageSyntax = new PackageSyntax(syntaxTree.Yield().ToList());
+            var compilationUnit = parser.Parse(file, tokens);
+            var packageSyntax = new PackageSyntax(compilationUnit.ToSyntaxList());
             var analyzer = new SemanticAnalyzer();
             var il = analyzer.Analyze(packageSyntax).IL;
             Assert.Equal(testCase.ExpectedIL, il.ToString());

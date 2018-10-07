@@ -102,7 +102,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                         AllDiagnostics(function),
                         AccessLevel(function.AccessModifier),
                         function.Name.Value,
-                        function.Parameters.Select(Node),
+                        function.Parameters.Nodes().Select(Node),
                         Node(function.ReturnType),
                         Node(function.Body)); // TODO change this to a list of statements
 
@@ -188,14 +188,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                     return new NewObjectExpression(newObject,
                         AllDiagnostics(newObject),
                         Type(newObject),
-                        newObject.Arguments.Select(Node));
+                        newObject.Arguments.Nodes().Select(Node));
 
                 case InvocationSyntax invocation:
                     return new InvocationExpression(invocation,
                         AllDiagnostics(invocation),
                         Type(invocation),
                         Node(invocation.Callee),
-                        invocation.Arguments.Select(Node));
+                        invocation.Arguments.Nodes().Select(Node));
 
                 case ParenthesizedExpressionSyntax parenthesizedExpression:
                     // Parentheses are dropped from the semantic tree

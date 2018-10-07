@@ -8,7 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core.Tests;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
 {
     public class PsuedoToken
     {

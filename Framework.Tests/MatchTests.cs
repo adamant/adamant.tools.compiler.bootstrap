@@ -3,10 +3,10 @@ using Xunit.Categories;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework.Tests
 {
+    [UnitTest]
     public class MatchTests
     {
         [Fact]
-        [UnitTest]
         public void MatchStatementMatchesRuntimeType()
         {
             Base value = new Derived2();
@@ -24,7 +24,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework.Tests
         }
 
         [Fact]
-        [UnitTest]
         public void MatchExpressionMatchesRuntimeType()
         {
             Base value = new Derived2();
