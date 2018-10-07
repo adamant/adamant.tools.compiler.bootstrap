@@ -2,7 +2,7 @@ using FsCheck;
 using FsCheck.Xunit;
 using Xunit;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tests
+namespace Adamant.Tools
 {
     public class CustomType
     {

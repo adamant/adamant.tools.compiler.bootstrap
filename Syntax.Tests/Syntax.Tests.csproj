@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Syntax.Tests</AssemblyName>
-    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Syntax.Tests</RootNamespace>
+    <AssemblyName>MyTests</AssemblyName>
+    <RootNamespace>MyNamespace</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -12,8 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Fare" Version="2.1.1" />
-    <PackageReference Include="FsCheck.Xunit" Version="2.11.0" />
+    <PackageReference Include="FsCheck.Xunit" Version="2.12.0" />
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.analyzers" Version="0.10.0" />
     <PackageReference Include="xunit.categories" Version="2.0.3" />
@@ -21,11 +20,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Core.Tests\Core.Tests.csproj" />
-    <ProjectReference Include="..\Syntax\Syntax.csproj" />
   </ItemGroup>
 
 </Project>
