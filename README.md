@@ -21,3 +21,8 @@ A rough plan of the next items to get working is:
 9. Interfaces
 10. Overload functions on # params
 11. Overload functions on types
+
+
+## Conventions
+
+Unit tests are in projects named `UnitTests.*`. This way, it is not inconsistent when further namespaces are nested inside them. If `UnitTests` were at the end of the name, then many namespaces would have it at the end, while nested ones would have it in the middle.

@@ -2,9 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+
+    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.UnitTests</AssemblyName>
+
+    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.UnitTests.Framework</RootNamespace>
+
     <LangVersion>latest</LangVersion>
-    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests</AssemblyName>
-    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -12,11 +17,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Fare" Version="2.1.1" />
     <PackageReference Include="FsCheck.Xunit" Version="2.11.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.analyzers" Version="0.10.0" />
-    <PackageReference Include="xunit.categories" Version="2.0.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
@@ -24,13 +28,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Core.Tests\Core.Tests.csproj" />
-    <ProjectReference Include="..\Syntax\Syntax.csproj" />
-    <ProjectReference Include="..\UnitTests.Framework\UnitTests.Framework.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Parsing\" />
+    <Reference Include="FsCheck">
+      <HintPath>..\..\..\..\Users\jwalker\.nuget\packages\fscheck\2.11.0\lib\netstandard1.6\FsCheck.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
