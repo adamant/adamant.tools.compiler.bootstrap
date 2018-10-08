@@ -29,4 +29,8 @@
     <ProjectReference Include="..\UnitTests.Framework\UnitTests.Framework.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Parsing\" />
+  </ItemGroup>
+
 </Project>

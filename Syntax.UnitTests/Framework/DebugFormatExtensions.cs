@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
                     builder.Append("(");
                     function.Parameters.DebugFormat(builder);
                     builder.Append(") -> ");
-                    function.ReturnType.DebugFormat(builder);
+                    function.ReturnTypeExpression.DebugFormat(builder);
                     function.Body.DebugFormat(builder);
                     break;
                 default:

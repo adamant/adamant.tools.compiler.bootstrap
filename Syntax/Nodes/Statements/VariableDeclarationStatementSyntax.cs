@@ -1,5 +1,4 @@
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements
@@ -10,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements
         public SimpleToken Binding { get; }
         public IdentifierToken Name { get; }
         public SimpleToken Colon { get; }
-        public TypeSyntax Type { get; }
+        public ExpressionSyntax TypeExpression { get; }
         public bool HasInitializer => Initializer != null;
         public new SimpleToken? Equals { get; }
         public ExpressionSyntax Initializer { get; }
@@ -20,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements
             SimpleToken binding,
             IdentifierToken name,
             SimpleToken colon,
-            TypeSyntax type,
+            ExpressionSyntax typeExpression,
             SimpleToken? equals,
             ExpressionSyntax initializer,
             SimpleToken semicolon)
@@ -28,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements
             Binding = binding;
             Name = name;
             Colon = colon;
-            Type = type;
+            TypeExpression = typeExpression;
             Equals = @equals;
             Initializer = initializer;
             Semicolon = semicolon;

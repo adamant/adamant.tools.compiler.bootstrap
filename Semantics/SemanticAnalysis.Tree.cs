@@ -49,7 +49,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public Parameter Node(ParameterSyntax s) => Node<Parameter>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Block Node(BlockSyntax s) => Node<Block>(s);
+        public Block Node(BlockStatementSyntax s) => Node<Block>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Statement Node(StatementSyntax s) => Node<Statement>(s);
@@ -103,14 +103,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                         AccessLevel(function.AccessModifier),
                         function.Name.Value,
                         function.Parameters.Nodes().Select(Node),
-                        Node(function.ReturnType),
+                        Node(function.ReturnTypeExpression),
                         Node(function.Body)); // TODO change this to a list of statements
 
                 case ParameterSyntax parameter:
                     return new Parameter(parameter, AllDiagnostics(parameter),
-                        parameter.VarKeyword != null, parameter.Name.Value, Node(parameter.Type));
+                        parameter.VarKeyword != null, parameter.Name.Value, Node(parameter.TypeExpression));
 
-                case BlockSyntax block:
+                case BlockStatementSyntax block:
                     var statements = block.Statements.Select(Node);
                     return new Block(block, AllDiagnostics(block), statements);
 

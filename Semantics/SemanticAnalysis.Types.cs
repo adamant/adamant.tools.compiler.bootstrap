@@ -53,11 +53,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             {
                 case FunctionDeclarationSyntax function:
                     var parameterTypes = function.Parameters.Nodes().Select(Type);
-                    var returnType = Type(function.ReturnType);
+                    var returnType = Type(function.ReturnTypeExpression);
                     return new FunctionType(parameterTypes, returnType);
 
                 case ParameterSyntax parameter:
-                    return Type(parameter.Type);
+                    return Type(parameter.TypeExpression);
 
                 case PrimitiveTypeSyntax primitiveType:
                     switch (primitiveType.Keyword.Kind)
@@ -126,7 +126,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                     return PrimitiveType.Never;
 
                 case VariableDeclarationStatementSyntax variableDeclaration:
-                    return Type(variableDeclaration.Type);
+                    return Type(variableDeclaration.TypeExpression);
 
                 case NewObjectExpressionSyntax newObjectExpression:
                     return Type(newObjectExpression.Type);

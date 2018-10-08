@@ -57,9 +57,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
                 Block(statements));
         }
 
-        public BlockSyntax Block(params StatementSyntax[] statements)
+        public BlockStatementSyntax Block(params StatementSyntax[] statements)
         {
-            return new BlockSyntax(SimpleToken(TokenKind.OpenBrace), statements.ToSyntaxList(), SimpleToken(TokenKind.CloseBrace));
+            return new BlockStatementSyntax(SimpleToken(TokenKind.OpenBrace), statements.ToSyntaxList(), SimpleToken(TokenKind.CloseBrace));
         }
 
         public SimpleToken Public()

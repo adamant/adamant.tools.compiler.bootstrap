@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
@@ -13,8 +13,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
         public SeparatedListSyntax<ParameterSyntax> Parameters { get; }
         public SimpleToken CloseParen { get; }
         public SimpleToken Arrow { get; }
-        public TypeSyntax ReturnType { get; }
-        public BlockSyntax Body { get; }
+        public ExpressionSyntax ReturnTypeExpression { get; }
+        public BlockStatementSyntax Body { get; }
 
         public FunctionDeclarationSyntax(
             SimpleToken accessModifier,
@@ -24,8 +24,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
             SeparatedListSyntax<ParameterSyntax> parameters,
             SimpleToken closeParen,
             SimpleToken arrow,
-            TypeSyntax returnType,
-            BlockSyntax body)
+            ExpressionSyntax returnTypeExpression,
+            BlockStatementSyntax body)
         {
             AccessModifier = accessModifier;
             FunctionKeyword = functionKeyword;
@@ -34,7 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
             Parameters = parameters;
             CloseParen = closeParen;
             Arrow = arrow;
-            ReturnType = returnType;
+            ReturnTypeExpression = returnTypeExpression;
             Body = body;
         }
     }

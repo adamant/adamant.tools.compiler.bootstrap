@@ -8,11 +8,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements
 {
     public class Block : Statement
     {
-        public new BlockSyntax Syntax { get; }
+        public new BlockStatementSyntax Syntax { get; }
         public IReadOnlyList<Statement> Statements { get; }
 
         public Block(
-            BlockSyntax syntax,
+            BlockStatementSyntax syntax,
             IEnumerable<Diagnostic> diagnostics,
             IEnumerable<Statement> statements)
             : base(diagnostics)

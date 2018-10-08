@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
                         nodes.PushRange(classDeclaration.Members.Reverse());
                         break;
                     case ParameterSyntax parameter:
-                        nodes.Push(parameter.Type);
+                        nodes.Push(parameter.TypeExpression);
                         break;
                     default:
                         throw NonExhaustiveMatchException.For(node);

@@ -23,6 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
 
         private static Gen<List<PsuedoToken>> GenPsuedoTokenList()
         {
+            //Gen.ListOf(Gen.Elements("fizz", "buzz", "bazz", "+", " ", "if")).Where(list => ...);
             //Gen.Sized(size =>
             //{
             //    Arb.Generate<int>().Select(length =>

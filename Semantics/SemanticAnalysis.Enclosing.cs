@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                     return function;
                 case VariableDeclarationStatementSyntax _:
                 case ExpressionStatementSyntax _:
-                case BlockSyntax _:
+                case BlockStatementSyntax _:
                     // Inherit
                     return EnclosingFunction(Parent(syntax));
                 default:
