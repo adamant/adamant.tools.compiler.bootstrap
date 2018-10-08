@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         [MustUseReturnValue]
         private CompilationUnitNamespaceSyntax ParseCompilationUnitNamespace(ITokenStream tokens)
         {
-            if (!tokens.CurrentIs(TokenKind.NamespaceKeyword)) return null;
+            if (tokens.Current?.Kind != TokenKind.NamespaceKeyword) return null;
 
             var namespaceKeyword = tokens.ExpectSimple(TokenKind.NamespaceKeyword);
             var name = qualifiedNameParser.Parse(tokens);

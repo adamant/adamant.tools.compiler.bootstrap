@@ -21,5 +21,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         bool IToken.IsMissing => IsMissing;
         TextSpan IToken.Span => Span;
         object IToken.Value => Value;
+
+        public static explicit operator IntegerLiteralToken(Token token)
+        {
+            return new IntegerLiteralToken(token.Kind, token.Span, (BigInteger)token.Value);
+        }
     }
 }

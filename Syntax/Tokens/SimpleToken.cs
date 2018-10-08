@@ -1,3 +1,4 @@
+using System.Diagnostics.Contracts;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
@@ -21,6 +22,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         TokenKind IToken.Kind => Kind;
         TextSpan IToken.Span => Span;
         object IToken.Value => null;
+
+        [Pure]
+        public string Text(CodeText code)
+        {
+            return Span.GetText(code.Text);
+        }
 
         public static explicit operator SimpleToken(Token token)
         {

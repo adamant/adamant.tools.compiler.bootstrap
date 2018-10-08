@@ -63,5 +63,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
             return !(token1 == token2);
         }
         #endregion
+
+        public override string ToString()
+        {
+            return Value == null ? $"Token({Kind}, {Span})" : $"Token({Kind}, {Span}, {Value})";
+        }
     }
 }

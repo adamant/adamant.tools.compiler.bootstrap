@@ -27,6 +27,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
         }
 
         [Pure]
+        public static TextSpan Covering(TextSpan x, TextSpan y)
+        {
+            return FromStartEnd(Math.Min(x.Start, y.Start), Math.Max(x.End, y.End));
+        }
+
+        [Pure]
         public string GetText(string text)
         {
             return text.Substring(Start, Length);
