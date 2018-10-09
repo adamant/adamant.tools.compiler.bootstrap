@@ -5,6 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations
 {
@@ -13,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations
         public new EnumStructDeclarationSyntax Syntax { get; }
         public AccessModifier Access { get; }
         public bool IsMutable { get; }
-        public string Name { get; }
+        [NotNull] public string Name { get; }
         public ObjectType Type { get; }
         public IReadOnlyList<MemberDeclaration> Members { get; }
 

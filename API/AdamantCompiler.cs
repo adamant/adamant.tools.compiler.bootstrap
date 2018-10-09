@@ -7,6 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.API
 {
@@ -41,12 +42,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             throw new NotImplementedException();
         }
 
-        public Package CompilePackage(IEnumerable<ICodeFileSource> fileSources)
+        [NotNull]
+        public Package CompilePackage([NotNull][ItemNotNull] IEnumerable<ICodeFileSource> fileSources)
         {
             return CompilePackage(fileSources.Select(s => s.Load()));
         }
 
-        public Package CompilePackage(IEnumerable<CodeFile> files)
+        [NotNull]
+        public Package CompilePackage([NotNull][ItemNotNull] IEnumerable<CodeFile> files)
         {
             var lexer = new Lexer();
             var parser = new Parser();

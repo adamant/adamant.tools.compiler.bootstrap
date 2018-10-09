@@ -1,5 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.LValues;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IL.Code
 {
@@ -8,12 +9,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Code
         public readonly int Number; // The declaration number is used as its name in the IR
 
         // If this declaration corresponds to an argument or local variable, what it was named. Not guaranteed unique
-        public string Name = null;
+        [CanBeNull] public string Name = null;
         public readonly bool MutableBinding;
-        public readonly DataType Type;
-        public readonly VariableReference Reference;
+        [NotNull] public readonly DataType Type;
+        [NotNull] public readonly VariableReference Reference;
 
-        public LocalVariableDeclaration(bool mutableBinding, DataType type, int number)
+        public LocalVariableDeclaration(bool mutableBinding, [NotNull] DataType type, int number)
         {
             Number = number;
             MutableBinding = mutableBinding;
@@ -21,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Code
             Reference = new VariableReference(number);
         }
 
-        internal void ToString(AsmBuilder builder)
+        internal void ToString([NotNull] AsmBuilder builder)
         {
             var binding = MutableBinding ? "var" : "let";
             builder.BeginLine($"{binding} %{Number}: &{Type}");

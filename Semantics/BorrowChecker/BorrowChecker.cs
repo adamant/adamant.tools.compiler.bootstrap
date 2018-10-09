@@ -4,21 +4,21 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.IL;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.EndStatements;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.LValues;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.RValues;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.Statements;
+using Adamant.Tools.Compiler.Bootstrap.IL.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.IL.Refs;
-using ILFunctionDeclaration = Adamant.Tools.Compiler.Bootstrap.IL.Declarations.FunctionDeclaration;
-using ILPackage = Adamant.Tools.Compiler.Bootstrap.IL.Package;
-using ILTypeDeclaration = Adamant.Tools.Compiler.Bootstrap.IL.Declarations.TypeDeclaration;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BorrowChecker
 {
     public class BorrowChecker
     {
-        public IEnumerable<Diagnostic> Check(ILPackage package)
+        public IEnumerable<Diagnostic> Check([NotNull] ILPackage package)
         {
             var diagnostics = new List<Diagnostic>();
             foreach (var declaration in package.Declarations)
@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BorrowChecker
             // Currently nothing to check
         }
 
-        private static IEnumerable<Diagnostic> Check(ILFunctionDeclaration function)
+        private static IEnumerable<Diagnostic> Check([NotNull] ILFunctionDeclaration function)
         {
             var diagnostics = new List<Diagnostic>();
             // TODO we need to check definite assignment as well

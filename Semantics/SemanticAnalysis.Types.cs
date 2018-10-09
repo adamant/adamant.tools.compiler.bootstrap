@@ -2,6 +2,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
@@ -88,7 +89,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                         && leftOperandType == PrimitiveType.Bool))
                     {
                         // TODO pass correct file and span
-                        AddDiagnostic(binaryOperatorExpression, SemanticError.OperatorCannotBeAppliedToOperandsOfType(null, new TextSpan(0, 0), binaryOperatorExpression.Operator, leftOperandType, rightOperandType));
+                        AddDiagnostic(binaryOperatorExpression, TypeError.OperatorCannotBeAppliedToOperandsOfType(null, new TextSpan(0, 0), binaryOperatorExpression.Operator, leftOperandType, rightOperandType));
                         return DataType.Unknown;
                     }
                     return leftOperandType;

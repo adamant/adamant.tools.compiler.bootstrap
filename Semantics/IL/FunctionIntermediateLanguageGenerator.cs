@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.EndStatements;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.LValues;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.Statements;
+using Adamant.Tools.Compiler.Bootstrap.IL.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions;
@@ -12,23 +14,23 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.Operators;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
-using ILFunctionDeclaration = Adamant.Tools.Compiler.Bootstrap.IL.Declarations.FunctionDeclaration;
+using JetBrains.Annotations;
 using Statement = Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements.Statement;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
 {
     internal class FunctionIntermediateLanguageGenerator
     {
-        private readonly FunctionDeclaration function;
-        private readonly Dictionary<SemanticNode, BasicBlock> blocks;
-        private readonly ILFunctionDeclaration il;
+        [NotNull] private readonly FunctionDeclaration function;
+        [NotNull] [ItemNotNull] private readonly Dictionary<SemanticNode, BasicBlock> blocks = new Dictionary<SemanticNode, BasicBlock>();
+        [NotNull] private readonly ILFunctionDeclaration il;
         private bool converted;
-        private readonly BasicBlock currentBlock;
+        [NotNull] private readonly BasicBlock currentBlock;
 
-        public FunctionIntermediateLanguageGenerator(FunctionDeclaration function)
+        public FunctionIntermediateLanguageGenerator([NotNull] FunctionDeclaration function)
         {
+            Requires.NotNull(nameof(function), function);
             this.function = function;
-            blocks = new Dictionary<SemanticNode, BasicBlock>();
             il = new ILFunctionDeclaration(function.Name, function.Parameters.Count);
 
             // Temp Variable for return
@@ -41,6 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
             currentBlock = entryBlock;
         }
 
+        [NotNull]
         public ILFunctionDeclaration Convert()
         {
             if (!converted)

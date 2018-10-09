@@ -2,15 +2,16 @@ using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.EndStatements;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.Statements;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IL.Code
 {
     public class BasicBlock
     {
         public readonly int Number; // The block number is used as its name in IR
-        public IReadOnlyList<Statement> Statements { get; }
-        private readonly List<Statement> statements = new List<Statement>();
-        public EndStatement EndStatement { get; private set; }
+        [NotNull] [ItemNotNull] public IReadOnlyList<Statement> Statements { get; }
+        [NotNull] [ItemNotNull] private readonly List<Statement> statements = new List<Statement>();
+        [CanBeNull] public EndStatement EndStatement { get; private set; }
 
         public BasicBlock(int number)
         {
@@ -33,7 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Code
             statements.Add(EndStatement);
         }
 
-        internal void ToString(AsmBuilder builder)
+        internal void ToString([NotNull] AsmBuilder builder)
         {
             builder.AppendLine($"bb{Number}:");
             builder.BeginBlock();

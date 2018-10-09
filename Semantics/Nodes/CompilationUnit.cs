@@ -1,24 +1,29 @@
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes
 {
     public class CompilationUnit : SemanticNode
     {
-        public new CompilationUnitSyntax Syntax { get; }
-        public CompilationUnitNamespaceDeclaration Namespace { get; }
-        public IReadOnlyList<Declaration> Declarations { get; }
+        [NotNull] public new CompilationUnitSyntax Syntax { get; }
+        [CanBeNull] public CompilationUnitNamespaceDeclaration Namespace { get; }
+        [NotNull] [ItemNotNull] public IReadOnlyList<Declaration> Declarations { get; }
 
         public CompilationUnit(
-            CompilationUnitSyntax syntax,
-            IEnumerable<Diagnostic> diagnostics,
-            CompilationUnitNamespaceDeclaration @namespace,
-            IEnumerable<Declaration> declarations)
+            [NotNull] CompilationUnitSyntax syntax,
+            [NotNull][ItemNotNull] IEnumerable<Diagnostic> diagnostics,
+            [CanBeNull] CompilationUnitNamespaceDeclaration @namespace,
+            [NotNull][ItemNotNull] IEnumerable<Declaration> declarations)
             : base(diagnostics)
         {
+            Requires.NotNull(nameof(syntax), syntax);
+            Requires.NotNull(nameof(diagnostics), diagnostics);
+            Requires.NotNull(nameof(declarations), declarations);
             Syntax = syntax;
             Namespace = @namespace;
             Declarations = declarations.ToList().AsReadOnly();
@@ -29,11 +34,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes
             return Syntax;
         }
 
-        public override void AllDiagnostics(List<Diagnostic> list)
+        public override void AllDiagnostics([NotNull] List<Diagnostic> list)
         {
             base.AllDiagnostics(list);
             Syntax.AllDiagnostics(list);
-            Namespace.AllDiagnostics(list);
+            Namespace?.AllDiagnostics(list);
             foreach (var declaration in Declarations)
                 declaration.AllDiagnostics(list);
         }

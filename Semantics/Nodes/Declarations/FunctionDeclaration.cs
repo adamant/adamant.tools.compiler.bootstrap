@@ -6,6 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations
 {
@@ -13,9 +14,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations
     {
         public new FunctionDeclarationSyntax Syntax { get; }
         public AccessModifier Access { get; }
-        public string Name { get; }
-        public IReadOnlyList<Parameter> Parameters { get; }
-        public Expression ReturnType { get; }
+        [NotNull] public string Name { get; }
+        [NotNull] [ItemNotNull] public IReadOnlyList<Parameter> Parameters { get; }
+        [NotNull] public Expression ReturnType { get; }
         public Block Body { get; }
 
         public FunctionDeclaration(

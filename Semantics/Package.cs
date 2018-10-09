@@ -4,23 +4,24 @@ using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
     public class Package : SemanticNode
     {
-        public new PackageSyntax Syntax { get; }
-        public IReadOnlyList<CompilationUnit> CompilationUnits { get; }
-        public FunctionDeclaration EntryPoint { get; }
+        [NotNull] public new PackageSyntax Syntax { get; }
+        [NotNull] [ItemNotNull] public IReadOnlyList<CompilationUnit> CompilationUnits { get; }
+        [CanBeNull] public FunctionDeclaration EntryPoint { get; }
         // Name
         // References
         // Symbol
 
         public Package(
-            PackageSyntax syntax,
-            IEnumerable<Diagnostic> diagnostics,
-            IEnumerable<CompilationUnit> compilationUnits,
-            FunctionDeclaration entryPoint)
+            [NotNull] PackageSyntax syntax,
+            [NotNull][ItemNotNull] IEnumerable<Diagnostic> diagnostics,
+            [NotNull][ItemNotNull] IEnumerable<CompilationUnit> compilationUnits,
+            [CanBeNull] FunctionDeclaration entryPoint)
             : base(diagnostics)
         {
             CompilationUnits = compilationUnits.ToList().AsReadOnly();
@@ -28,11 +29,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             EntryPoint = entryPoint;
         }
 
+        [NotNull]
         protected override SyntaxNode GetSyntax()
         {
             return Syntax;
         }
 
+        [NotNull]
         public IList<Diagnostic> AllDiagnostics()
         {
             var diagnostics = new List<Diagnostic>();

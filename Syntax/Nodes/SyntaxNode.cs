@@ -2,7 +2,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
 {
@@ -12,6 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
         public IEnumerable<SyntaxNode> DescendantsAndSelf()
         {
             var nodes = new Stack<SyntaxNode>();
+            nodes.Push(this);
             while (nodes.TryPop(out var node))
             {
                 switch (node)
@@ -28,11 +35,50 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
                         nodes.PushRange(compilationUnit.UsingDirectives.Reverse());
                         nodes.Push(compilationUnit.Namespace);
                         break;
-                    case ClassDeclarationSyntax classDeclaration:
-                        nodes.PushRange(classDeclaration.Members.Reverse());
+                    case ClassDeclarationSyntax @class:
+                        nodes.PushRange(@class.Members.Reverse());
+                        nodes.Push(@class.AccessModifier);
                         break;
                     case ParameterSyntax parameter:
                         nodes.Push(parameter.TypeExpression);
+                        break;
+                    case FunctionDeclarationSyntax function:
+                        nodes.Push(function.Body);
+                        nodes.Push(function.ReturnTypeExpression);
+                        nodes.PushRange(function.Parameters.Nodes().Reverse());
+                        nodes.Push(function.AccessModifier);
+                        break;
+                    case LifetimeTypeSyntax lifetimeType:
+                        nodes.Push(lifetimeType.TypeName);
+                        break;
+                    case BlockStatementSyntax blockStatement:
+                        nodes.PushRange(blockStatement.Statements.Reverse());
+                        break;
+                    case ReturnExpressionSyntax returnExpression:
+                        nodes.Push(returnExpression.Expression);
+                        break;
+                    case ExpressionStatementSyntax expressionStatement:
+                        nodes.Push(expressionStatement.Expression);
+                        break;
+                    case BinaryOperatorExpressionSyntax binaryOperator:
+                        nodes.Push(binaryOperator.RightOperand);
+                        nodes.Push(binaryOperator.LeftOperand);
+                        break;
+                    case VariableDeclarationStatementSyntax variableDeclaration:
+                        nodes.Push(variableDeclaration.Initializer);
+                        nodes.Push(variableDeclaration.TypeExpression);
+                        break;
+                    case UnaryOperatorExpressionSyntax unaryOperator:
+                        nodes.Push(unaryOperator.Operand);
+                        break;
+                    case NewObjectExpressionSyntax newObject:
+                        nodes.PushRange(newObject.Arguments.Nodes().Reverse());
+                        nodes.Push(newObject.Type);
+                        break;
+                    case AccessModifierSyntax _:
+                    case PrimitiveTypeSyntax _:
+                    case IdentifierNameSyntax _:
+                        // No child nodes
                         break;
                     default:
                         throw NonExhaustiveMatchException.For(node);

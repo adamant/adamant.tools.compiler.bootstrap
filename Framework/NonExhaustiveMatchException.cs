@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         [NotNull]
         public static NonExhaustiveMatchException For([CanBeNull] object value)
         {
-            return new NonExhaustiveMatchException($"Matching value of type {value?.GetType()?.FullName}");
+            return new NonExhaustiveMatchException($"Matching value of type {value?.GetType()?.FullName ?? "<null>"}");
         }
     }
 }

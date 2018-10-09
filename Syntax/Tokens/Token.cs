@@ -1,4 +1,3 @@
-using System;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using JetBrains.Annotations;
@@ -33,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
     /// it doesn't really make sense to me to use them.  I'm going to name
     /// things after their single character version, but not follow Unicode
     /// naming when it doesn't make sense
-    public abstract class Token : ISyntaxNodeOrToken, IEquatable<Token>
+    public abstract class Token : ISyntaxNodeOrToken
     {
         public readonly TextSpan Span;
 
@@ -48,37 +47,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         {
             return Span.GetText(code.Text);
         }
-
-        #region Equals
-        public override bool Equals(object obj)
-        {
-            return obj is Token token && Equals(token);
-        }
-
-        public bool Equals(Token other)
-        {
-            return Span.Equals(other.Span);
-        }
-
-        //public override int GetHashCode()
-        //{
-        //    return HashCode.Combine(Kind, Span, Value);
-        //}
-
-        public static bool operator ==(Token token1, Token token2)
-        {
-            return token1.Equals(token2);
-        }
-
-        public static bool operator !=(Token token1, Token token2)
-        {
-            return !(token1 == token2);
-        }
-        #endregion
-
-        //public override string ToString()
-        //{
-        //    return Value == null ? $"Token({Kind}, {Span})" : $"Token({Kind}, {Span}, {Value})";
-        //}
     }
 }

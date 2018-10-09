@@ -1,17 +1,20 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
     internal partial class SemanticAnalysis
     {
-        public PackageSyntax PackageSyntax { get; }
-        private readonly SemanticAttributes attributes;
+        [NotNull] public PackageSyntax PackageSyntax { get; }
+        [NotNull] private readonly SemanticAttributes attributes;
 
-        internal SemanticAnalysis(PackageSyntax packageSyntax)
+        internal SemanticAnalysis([NotNull] PackageSyntax packageSyntax)
         {
+            Requires.NotNull(nameof(packageSyntax), packageSyntax);
             PackageSyntax = packageSyntax;
             attributes = new SemanticAttributes(packageSyntax);
-            AddParentAttributes(packageSyntax);
+            AddParentAttribute(packageSyntax);
         }
     }
 }

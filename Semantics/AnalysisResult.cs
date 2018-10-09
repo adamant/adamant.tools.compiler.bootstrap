@@ -1,5 +1,5 @@
+using Adamant.Tools.Compiler.Bootstrap.IL;
 using JetBrains.Annotations;
-using ILPackage = Adamant.Tools.Compiler.Bootstrap.IL.Package;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
