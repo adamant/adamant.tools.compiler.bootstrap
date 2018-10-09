@@ -40,6 +40,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="..\tests\lex\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\API\API.csproj" />
     <ProjectReference Include="..\Core.Tests\Core.Tests.csproj" />
     <ProjectReference Include="..\Emit.C\Emit.C.csproj" />
