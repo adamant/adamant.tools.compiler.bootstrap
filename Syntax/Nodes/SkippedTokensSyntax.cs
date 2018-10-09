@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
@@ -14,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
         {
             var diagnostics = new List<Diagnostic>();
             if (token is UnexpectedToken)
-                diagnostics.Add(SyntaxError.SkippedToken(file, token.Span));
+                diagnostics.Add(ParseError.SkippedToken(file, token.Span));
 
             Diagnostics = diagnostics.AsReadOnly();
         }

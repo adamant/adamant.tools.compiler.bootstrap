@@ -1,7 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Errors
 {
     /// <summary>
     /// Error Code Ranges:
@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     /// 3001-3999: Type Errors
     /// 4001-4999: Borrow Checking Errors
     /// </summary>
-    public static class SyntaxError
+    internal static class LexError
     {
         public static Diagnostic UnclosedBlockComment(CodeFile file, TextSpan span)
         {
@@ -35,11 +35,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         public static Diagnostic UnexpectedCharacter(CodeFile file, TextSpan span, char character)
         {
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1005, $"Unexpected character `{character}`");
-        }
-
-        public static Diagnostic SkippedToken(CodeFile file, TextSpan span)
-        {
-            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3002, "Unexpected Token");
         }
     }
 }
