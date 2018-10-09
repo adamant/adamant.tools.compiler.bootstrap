@@ -6,31 +6,53 @@ using System.Text.RegularExpressions;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core.Tests;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
 {
     public class PsuedoToken
     {
-        public readonly TokenKind Kind;
+        [NotNull]
+        public readonly Type TokenType;
+
+        [NotNull]
         public readonly string Text;
         public readonly object Value;
 
-        public PsuedoToken(TokenKind kind, string text, object value = null)
+        public PsuedoToken([NotNull] Type tokenType, [NotNull] string text, object value = null)
         {
-            Kind = kind;
+            TokenType = tokenType;
             Text = text;
             Value = value;
         }
 
         public static PsuedoToken EndOfFile()
         {
-            return new PsuedoToken(TokenKind.EndOfFile, "", new List<Diagnostic>().AsReadOnly());
+            return new PsuedoToken(typeof(EndOfFileToken), "", new List<Diagnostic>().AsReadOnly());
         }
 
-        public static PsuedoToken For(Token token, CodeText code)
+        public static PsuedoToken For([NotNull] Token token, [NotNull] CodeText code)
         {
-            return new PsuedoToken(token.Kind, token.Text(code), token.Value);
+            switch (token)
+            {
+                case IdentifierToken identifier:
+                    return new PsuedoToken(token.GetType(), token.Text(code), identifier.Value);
+                case StringLiteralToken stringLiteral:
+                    return new PsuedoToken(token.GetType(), token.Text(code), stringLiteral.Value);
+                case IntegerLiteralToken integerLiteral:
+                    return new PsuedoToken(token.GetType(), token.Text(code), integerLiteral.Value);
+                case EndOfFileToken eof:
+                    return new PsuedoToken(token.GetType(), token.Text(code), eof.Diagnostics);
+                case OperatorToken _:
+                case KeywordToken _:
+                case SymbolToken _:
+                case TriviaToken _:
+                    return new PsuedoToken(token.GetType(), token.Text(code));
+                default:
+                    throw NonExhaustiveMatchException.For(token);
+            }
         }
 
         public CodeFile ToFakeCodeFile()
@@ -41,7 +63,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
         public override bool Equals(object obj)
         {
             if (obj is PsuedoToken token &&
-                Kind == token.Kind &&
+                TokenType == token.TokenType &&
                 Text == token.Text)
             {
                 if (Value is IReadOnlyList<Diagnostic> diagnostics
@@ -56,7 +78,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Kind, Text, Value);
+            return HashCode.Combine(TokenType, Text, Value);
         }
 
         public override string ToString()
@@ -65,15 +87,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
             switch (Value)
             {
                 case null:
-                    return $"{Kind}{textValue}";
+                    return $"{TokenType}{textValue}";
                 case string s:
-                    return $"{Kind}{textValue} 【{Regex.Escape(s)}】";
+                    return $"{TokenType}{textValue} 【{Regex.Escape(s)}】";
                 case BigInteger i:
-                    return $"{Kind}{textValue} {i}";
+                    return $"{TokenType}{textValue} {i}";
                 case IReadOnlyList<Diagnostic> diagnostics:
-                    return $"{Kind}{textValue} [{diagnostics.DebugFormat()}]";
+                    return $"{TokenType}{textValue} [{diagnostics.DebugFormat()}]";
                 default:
-                    return $"{Kind}{textValue} InvalidValue={Value}";
+                    return $"{TokenType}{textValue} InvalidValue={Value}";
             }
         }
     }

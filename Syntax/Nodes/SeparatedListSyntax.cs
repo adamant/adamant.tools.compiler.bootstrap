@@ -3,15 +3,18 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
 {
     public class SeparatedListSyntax<T> : SyntaxNode, IReadOnlyList<ISyntaxNodeOrToken>
         where T : SyntaxNode
     {
+        [NotNull]
+        [ItemNotNull]
         private readonly IReadOnlyList<ISyntaxNodeOrToken> children;
 
-        public SeparatedListSyntax(IEnumerable<ISyntaxNodeOrToken> children)
+        public SeparatedListSyntax([NotNull][ItemNotNull] IEnumerable<ISyntaxNodeOrToken> children)
         {
             this.children = children.ToList().AsReadOnly();
             Validate();
@@ -29,16 +32,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
                 }
                 else
                 {
-                    Debug.Assert(item is Token t && t.Kind.HasValue() && t.Value == null, "Separator token missing or invalid in separated list.");
+                    Debug.Assert(item is SymbolToken, "Separator token missing or invalid in separated list.");
                 }
             }
         }
 
+        [NotNull]
         public IEnumerator<ISyntaxNodeOrToken> GetEnumerator()
         {
             return children.GetEnumerator();
         }
 
+        [NotNull]
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
@@ -46,16 +51,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
 
         public int Count => children.Count;
 
+        [NotNull]
         public ISyntaxNodeOrToken this[int index] => children[index];
 
+        [NotNull]
         public IEnumerable<T> Nodes()
         {
             return children.OfType<T>();
         }
 
-        public IEnumerable<SimpleToken> Separators()
+        [NotNull]
+        public IEnumerable<SymbolToken> Separators()
         {
-            return children.OfType<Token>().Select(t => (SimpleToken)t);
+            return children.OfType<SymbolToken>();
         }
     }
 }

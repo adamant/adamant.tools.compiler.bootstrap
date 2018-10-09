@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
@@ -8,59 +9,65 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 {
     public class StatementParser : IParser<StatementSyntax>, IParser<BlockStatementSyntax>
     {
+        [NotNull]
         private readonly IListParser listParser;
+
+        [NotNull]
         private readonly IParser<ExpressionSyntax> expressionParser;
 
-        public StatementParser(IListParser listParser, IParser<ExpressionSyntax> expressionParser)
+        public StatementParser([NotNull] IListParser listParser, [NotNull] IParser<ExpressionSyntax> expressionParser)
         {
             this.listParser = listParser;
             this.expressionParser = expressionParser;
         }
 
         [MustUseReturnValue]
-        public StatementSyntax Parse(ITokenStream tokens)
+        [NotNull]
+        public StatementSyntax Parse([NotNull] ITokenStream tokens)
         {
-            switch (tokens.Current?.Kind)
+            switch (tokens.Current)
             {
-                case TokenKind.OpenBrace:
+                case OpenBraceToken _:
                     return ParseStatementBlock(tokens);
-                case TokenKind.LetKeyword:
-                case TokenKind.VarKeyword:
+                case LetKeywordToken _:
+                case VarKeywordToken _:
                     {
-                        var binding = tokens.ExpectSimple();
+                        var binding = tokens.ExpectKeyword();
                         var name = tokens.ExpectIdentifier();
-                        var colon = tokens.ExpectSimple(TokenKind.Colon);
+                        var colon = tokens.Expect<ColonToken>();
                         var typeExpression = expressionParser.Parse(tokens);
-                        SimpleToken? equals = null;
+                        EqualsToken equals = null;
                         ExpressionSyntax initializer = null;
-                        if (tokens.Current?.Kind == TokenKind.Equals)
+                        if (tokens.Current is EqualsToken)
                         {
-                            equals = tokens.ExpectSimple(TokenKind.Equals);
+                            equals = tokens.Expect<EqualsToken>();
                             initializer = expressionParser.Parse(tokens);
                         }
-                        var semicolon = tokens.ExpectSimple(TokenKind.Semicolon);
+                        var semicolon = tokens.Expect<SemicolonToken>();
                         return new VariableDeclarationStatementSyntax(binding, name, colon, typeExpression, equals, initializer, semicolon);
                     }
                 default:
                     {
                         var expression = expressionParser.Parse(tokens);
-                        var semicolon = tokens.ExpectSimple(TokenKind.Semicolon);
+                        var semicolon = tokens.Expect<SemicolonToken>();
                         return new ExpressionStatementSyntax(expression, semicolon);
                     }
             }
         }
 
-        BlockStatementSyntax IParser<BlockStatementSyntax>.Parse(ITokenStream tokens)
+        [NotNull]
+        BlockStatementSyntax IParser<BlockStatementSyntax>.Parse([NotNull] ITokenStream tokens)
         {
             return ParseStatementBlock(tokens);
         }
 
         [MustUseReturnValue]
-        private BlockStatementSyntax ParseStatementBlock(ITokenStream tokens)
+        [NotNull]
+        private BlockStatementSyntax ParseStatementBlock([NotNull] ITokenStream tokens)
         {
-            var openBrace = tokens.ExpectSimple(TokenKind.OpenBrace);
-            var statements = listParser.ParseList<StatementSyntax>(tokens, Parse, TokenKind.CloseBrace);
-            var closeBrace = tokens.ExpectSimple(TokenKind.CloseBrace);
+            var openBrace = tokens.Expect<OpenBraceToken>();
+            var statements = listParser.ParseList(tokens, Parse, TypeOf<CloseBraceToken>._);
+            var closeBrace = tokens.Expect<CloseBraceToken>();
             return new BlockStatementSyntax(openBrace, statements, closeBrace);
         }
     }

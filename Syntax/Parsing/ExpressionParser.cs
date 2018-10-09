@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
@@ -13,124 +14,129 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 {
     public class ExpressionParser : IParser<ExpressionSyntax>
     {
+        [NotNull]
         private readonly IListParser listParser;
+
+        [NotNull]
         private readonly IParser<NameSyntax> qualifiedNameParser;
 
-        public ExpressionParser(IListParser listParser, IParser<NameSyntax> qualifiedNameParser)
+        public ExpressionParser([NotNull] IListParser listParser, [NotNull] IParser<NameSyntax> qualifiedNameParser)
         {
             this.listParser = listParser;
             this.qualifiedNameParser = qualifiedNameParser;
         }
 
-        public ExpressionSyntax Parse(ITokenStream tokens)
+        [NotNull]
+        public ExpressionSyntax Parse([NotNull] ITokenStream tokens)
         {
             return ParseExpression(tokens);
         }
 
         [MustUseReturnValue]
-        private ExpressionSyntax ParseExpression(ITokenStream tokens, OperatorPrecedence minPrecedence = OperatorPrecedence.Min)
+        [NotNull]
+        private ExpressionSyntax ParseExpression([NotNull] ITokenStream tokens, OperatorPrecedence minPrecedence = OperatorPrecedence.Min)
         {
             var expression = ParseAtom(tokens);
 
             for (; ; )
             {
-                SimpleToken? @operator = null;
+                OperatorToken @operator = null;
                 OperatorPrecedence? precedence = null;
                 var leftAssociative = true;
-                switch (tokens.Current?.Kind)
+                switch (tokens.Current)
                 {
-                    case TokenKind.Equals:
-                    case TokenKind.PlusEquals:
-                    case TokenKind.MinusEquals:
-                    case TokenKind.AsteriskEquals:
-                    case TokenKind.SlashEquals:
+                    case EqualsToken _:
+                    case PlusEqualsToken _:
+                    case MinusEqualsToken _:
+                    case AsteriskEqualsToken _:
+                    case SlashEqualsToken _:
                         if (minPrecedence <= OperatorPrecedence.Assignment)
                         {
                             precedence = OperatorPrecedence.Assignment;
                             leftAssociative = false;
-                            @operator = tokens.ExpectSimple();
+                            @operator = tokens.ExpectOperator();
                         }
                         break;
-                    case TokenKind.OrKeyword:
-                    case TokenKind.XorKeyword:
+                    case OrKeywordToken _:
+                    case XorKeywordToken _:
                         if (minPrecedence <= OperatorPrecedence.LogicalOr)
                         {
                             precedence = OperatorPrecedence.LogicalOr;
-                            @operator = tokens.ExpectSimple();
+                            @operator = tokens.ExpectOperator();
                         }
                         break;
-                    case TokenKind.AndKeyword:
+                    case AndKeywordToken _:
                         if (minPrecedence <= OperatorPrecedence.LogicalAnd)
                         {
                             precedence = OperatorPrecedence.LogicalAnd;
-                            @operator = tokens.ExpectSimple();
+                            @operator = tokens.ExpectOperator();
                         }
                         break;
-                    case TokenKind.EqualsEquals:
-                    case TokenKind.NotEqual:
+                    case EqualsEqualsToken _:
+                    case NotEqualToken _:
                         if (minPrecedence <= OperatorPrecedence.Equality)
                         {
                             precedence = OperatorPrecedence.Equality;
-                            @operator = tokens.ExpectSimple();
+                            @operator = tokens.ExpectOperator();
                         }
                         break;
-                    case TokenKind.LessThan:
-                    case TokenKind.LessThanOrEqual:
-                    case TokenKind.GreaterThan:
-                    case TokenKind.GreaterThanOrEqual:
+                    case LessThanToken _:
+                    case LessThanOrEqualToken _:
+                    case GreaterThanToken _:
+                    case GreaterThanOrEqualToken _:
                         if (minPrecedence <= OperatorPrecedence.Relational)
                         {
                             precedence = OperatorPrecedence.Relational;
-                            @operator = tokens.ExpectSimple();
+                            @operator = tokens.ExpectOperator();
                         }
                         break;
-                    case TokenKind.DotDot:
+                    case DotDotToken _:
                         if (minPrecedence <= OperatorPrecedence.Range)
                         {
                             precedence = OperatorPrecedence.Range;
-                            @operator = tokens.ExpectSimple();
+                            @operator = tokens.ExpectOperator();
                         }
                         break;
-                    case TokenKind.Plus:
-                    case TokenKind.Minus:
+                    case PlusToken _:
+                    case MinusToken _:
                         if (minPrecedence <= OperatorPrecedence.Additive)
                         {
                             precedence = OperatorPrecedence.Additive;
-                            @operator = tokens.ExpectSimple();
+                            @operator = tokens.ExpectOperator();
                         }
                         break;
-                    case TokenKind.Asterisk:
-                    case TokenKind.Slash:
+                    case AsteriskToken _:
+                    case SlashToken _:
                         if (minPrecedence <= OperatorPrecedence.Multiplicative)
                         {
                             precedence = OperatorPrecedence.Multiplicative;
-                            @operator = tokens.ExpectSimple();
+                            @operator = tokens.ExpectOperator();
                         }
                         break;
-                    case TokenKind.OpenParen:
+                    case OpenParenToken _:
                         if (minPrecedence <= OperatorPrecedence.Primary)
                         {
                             var callee = expression;
-                            var openParen = tokens.ExpectSimple(TokenKind.OpenParen);
+                            var openParen = tokens.Expect<OpenParenToken>();
                             var arguments = ParseArguments(tokens);
-                            var closeParen = tokens.ExpectSimple(TokenKind.CloseParen);
+                            var closeParen = tokens.Expect<CloseParenToken>();
                             expression = new InvocationSyntax(callee, openParen, arguments, closeParen);
                             continue;
                         }
                         break;
-                    case TokenKind.Dot:
+                    case DotToken _:
                         if (minPrecedence <= OperatorPrecedence.Primary)
                         {
                             // Member Access
                             precedence = OperatorPrecedence.Primary;
-                            @operator = tokens.ExpectSimple();
+                            @operator = tokens.ExpectOperator();
                         }
                         break;
                     default:
                         return expression;
                 }
 
-                if (@operator is SimpleToken @operatorToken &&
+                if (@operator is OperatorToken @operatorToken &&
                     precedence is OperatorPrecedence operatorPrecedence)
                 {
                     if (leftAssociative)
@@ -149,62 +155,63 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
         // An atom is the unit of an expression that occurs between infix operators, i.e. an identifier, literal, group, or new
         [MustUseReturnValue]
-        private ExpressionSyntax ParseAtom(ITokenStream tokens)
+        [NotNull]
+        private ExpressionSyntax ParseAtom([NotNull] ITokenStream tokens)
         {
-            switch (tokens.Current?.Kind)
+            switch (tokens.Current)
             {
-                case TokenKind.NewKeyword:
+                case NewKeywordToken _:
                     {
-                        var newKeyword = tokens.ExpectSimple(TokenKind.NewKeyword);
+                        var newKeyword = tokens.Expect<NewKeywordToken>();
                         var type = qualifiedNameParser.Parse(tokens);
-                        var openParen = tokens.ExpectSimple(TokenKind.OpenParen);
+                        var openParen = tokens.Expect<OpenParenToken>();
                         var arguments = ParseArguments(tokens);
-                        var closeParen = tokens.ExpectSimple(TokenKind.CloseParen);
+                        var closeParen = tokens.Expect<CloseParenToken>();
                         return new NewObjectExpressionSyntax(newKeyword, type, openParen, arguments,
                             closeParen);
                     }
-                case TokenKind.ReturnKeyword:
+                case ReturnKeywordToken _:
                     {
-                        var returnKeyword = tokens.ExpectSimple(TokenKind.ReturnKeyword);
-                        var expression = tokens.CurrentIs(TokenKind.Semicolon) ? null : ParseExpression(tokens);
+                        var returnKeyword = tokens.Expect<ReturnKeywordToken>();
+                        var expression = tokens.Current is SemicolonToken ? null : ParseExpression(tokens);
                         return new ReturnExpressionSyntax(returnKeyword, expression);
                     }
-                case TokenKind.OpenParen:
+                case OpenParenToken _:
                     {
-                        var openParen = tokens.ExpectSimple(TokenKind.OpenParen);
+                        var openParen = tokens.Expect<OpenParenToken>();
                         var expression = ParseExpression(tokens);
-                        var closeParen = tokens.ExpectSimple(TokenKind.CloseParen);
+                        var closeParen = tokens.Expect<CloseParenToken>();
                         return new ParenthesizedExpressionSyntax(openParen, expression, closeParen);
                     }
-                case TokenKind.Minus:
-                case TokenKind.Plus:
-                case TokenKind.AtSign:
-                case TokenKind.Caret:
-                    var @operator = tokens.ExpectSimple();
+                case MinusToken _:
+                case PlusToken _:
+                case AtSignToken _:
+                case CaretToken _:
+                    var @operator = tokens.ExpectOperator().AssertNotNull();
                     var operand = ParseExpression(tokens, OperatorPrecedence.Unary);
                     return new UnaryOperatorExpressionSyntax(@operator, operand);
-                case TokenKind.StringLiteral:
+                case StringLiteralToken _:
                     return new StringLiteralExpressionSyntax(tokens.ExpectStringLiteral());
-                case TokenKind.VoidKeyword:
-                case TokenKind.IntKeyword:
-                case TokenKind.UIntKeyword:
-                case TokenKind.BoolKeyword:
-                case TokenKind.ByteKeyword:
-                case TokenKind.StringKeyword:
+                case VoidKeywordToken _:
+                case IntKeywordToken _:
+                case UIntKeywordToken _:
+                case BoolKeywordToken _:
+                case ByteKeywordToken _:
+                case StringKeywordToken _:
                     {
-                        var keyword = tokens.ExpectSimple();
+                        var keyword = tokens.ExpectKeyword().AssertNotNull();
                         return new PrimitiveTypeSyntax(keyword);
                     }
-                case TokenKind.Identifier:
+                case IdentifierToken _:
                     {
                         var identifier = tokens.ExpectIdentifier();
                         var name = new IdentifierNameSyntax(identifier);
-                        if (!tokens.CurrentIs(TokenKind.Dollar)) return name;
+                        if (!(tokens.Current is DollarToken)) return name;
 
-                        var dollar = tokens.ExpectSimple(TokenKind.Dollar);
-                        var lifetime = (tokens.Current?.Kind.IsIdentifier() ?? false)
+                        var dollar = tokens.Expect<DollarToken>();
+                        var lifetime = tokens.Current is IdentifierToken
                             ? (Token)tokens.ExpectIdentifier()
-                            : tokens.ExpectSimple(TokenKind.OwnedKeyword);
+                            : tokens.Expect<OwnedKeywordToken>();
                         return new LifetimeTypeSyntax(name, dollar, lifetime);
                     }
                 default:// If it is something else, we assume it should be an identifier name
@@ -213,10 +220,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         }
 
         [MustUseReturnValue]
-        private SeparatedListSyntax<ExpressionSyntax> ParseArguments(ITokenStream tokens)
+        [NotNull]
+        private SeparatedListSyntax<ExpressionSyntax> ParseArguments([NotNull] ITokenStream tokens)
         {
-            // What if there isn't a current token?
-            var arguments = listParser.ParseSeparatedList(tokens, t => ParseExpression(t), TokenKind.Comma, TokenKind.CloseParen);
+            var arguments = listParser.ParseSeparatedList(tokens, t => ParseExpression(t), TypeOf<CommaToken>._, TypeOf<CloseParenToken>._);
             return new SeparatedListSyntax<ExpressionSyntax>(arguments);
         }
     }

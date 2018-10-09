@@ -1,19 +1,24 @@
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
 {
     public class ParameterSyntax : SyntaxNode
     {
-        public SimpleToken? VarKeyword { get; }
+        [CanBeNull]
+        public VarKeywordToken VarKeyword { get; }
+
         public IdentifierToken Name { get; }
-        public SimpleToken Colon { get; }
+
+        [CanBeNull]
+        public ColonToken Colon { get; }
         public ExpressionSyntax TypeExpression { get; }
 
         public ParameterSyntax(
-            SimpleToken? varKeyword,
+            [CanBeNull] VarKeywordToken varKeyword,
             IdentifierToken name,
-            SimpleToken colon,
+            [CanBeNull] ColonToken colon,
             ExpressionSyntax typeExpression)
         {
             VarKeyword = varKeyword;

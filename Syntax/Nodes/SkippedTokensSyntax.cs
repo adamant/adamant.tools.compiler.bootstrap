@@ -10,10 +10,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
         // TODO remove
         public IReadOnlyList<Diagnostic> Diagnostics;
 
-        public SkippedTokensSyntax(CodeFile file, SimpleToken token)
+        public SkippedTokensSyntax(CodeFile file, Token token)
         {
             var diagnostics = new List<Diagnostic>();
-            if (token.Kind != TokenKind.Unexpected)
+            if (token is UnexpectedToken)
                 diagnostics.Add(SyntaxError.SkippedToken(file, token.Span));
 
             Diagnostics = diagnostics.AsReadOnly();

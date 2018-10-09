@@ -6,6 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Fare;
 using FsCheck;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
 {
@@ -79,27 +80,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
         private static Gen<PsuedoToken> GenWhitespace()
         {
             return GenRegex("[ \t\n\r]")
-                .Select(s => new PsuedoToken(TokenKind.Whitespace, s));
+                .Select(s => new PsuedoToken(typeof(WhitespaceToken), s));
         }
 
         private static Gen<PsuedoToken> GenComment()
         {
             // Covers both block comments and line comments
             return GenRegex(@"/\*(\**[^/])*\*/|//.*")
-                .Select(s => new PsuedoToken(TokenKind.Comment, s));
+                .Select(s => new PsuedoToken(typeof(CommentToken), s));
         }
 
         private static Gen<PsuedoToken> GenIdentifier()
         {
             return GenRegex(@"[a-zA-Z_][a-zA-Z_0-9]*")
                 .Where(s => !Symbols.ContainsKey(s)) // don't emit keywords
-                .Select(s => new PsuedoToken(TokenKind.Identifier, s, s));
+                .Select(s => new PsuedoToken(typeof(IdentifierToken), s, s));
         }
 
         private static Gen<PsuedoToken> GenIntegerLiteral()
         {
             return GenRegex(@"0|[1-9][0-9]*")
-                .Select(s => new PsuedoToken(TokenKind.IntegerLiteral, s, BigInteger.Parse(s)));
+                .Select(s => new PsuedoToken(typeof(IntegerLiteralToken), s, BigInteger.Parse(s)));
         }
 
         private static Gen<PsuedoToken> GenStringLiteral()
@@ -118,85 +119,86 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
                         .Replace(@"\""", "\"")
                         .Replace(@"\b", "\\");
 
-                    return new PsuedoToken(TokenKind.StringLiteral, s, value);
+                    return new PsuedoToken(typeof(StringLiteralToken), s, value);
                 });
         }
 
-        public static IReadOnlyDictionary<string, TokenKind> Symbols = new Dictionary<string, TokenKind>()
+        [NotNull]
+        public static IReadOnlyDictionary<string, Type> Symbols = new Dictionary<string, Type>()
         {
-            { "{", TokenKind.OpenBrace },
-            { "}", TokenKind.CloseBrace },
-            { "(", TokenKind.OpenParen },
-            { ")", TokenKind.CloseParen },
-            { "[", TokenKind.OpenBracket },
-            { "]", TokenKind.CloseBracket },
-            { ";", TokenKind.Semicolon },
-            { ",", TokenKind.Comma },
-            { ".", TokenKind.Dot },
-            { "..", TokenKind.DotDot },
-            { ":", TokenKind.Colon },
-            { "?", TokenKind.Question },
-            { "|", TokenKind.Pipe },
-            { "→", TokenKind.RightArrow },
-            { "->", TokenKind.RightArrow },
-            { "@", TokenKind.AtSign },
-            { "^", TokenKind.Caret },
-            { "+", TokenKind.Plus },
-            { "-", TokenKind.Minus },
-            { "*", TokenKind.Asterisk },
-            { "/", TokenKind.Slash },
-            { "=", TokenKind.Equals },
-            { "==", TokenKind.EqualsEquals },
-            { "≠", TokenKind.NotEqual },
-            { "=/=", TokenKind.NotEqual },
-            { ">", TokenKind.GreaterThan },
-            { "≥", TokenKind.GreaterThanOrEqual },
-            { "⩾", TokenKind.GreaterThanOrEqual },
-            { ">=", TokenKind.GreaterThanOrEqual },
-            { "<", TokenKind.LessThan },
-            { "≤", TokenKind.LessThanOrEqual },
-            { "⩽", TokenKind.LessThanOrEqual },
-            { "<=", TokenKind.LessThanOrEqual },
-            { "+=", TokenKind.PlusEquals },
-            { "-=", TokenKind.MinusEquals },
-            { "*=", TokenKind.AsteriskEquals },
-            { "/=", TokenKind.SlashEquals },
-            { "$", TokenKind.Dollar },
-            { "public", TokenKind.PublicKeyword },
-            { "private", TokenKind.PrivateKeyword },
-            { "let", TokenKind.LetKeyword },
-            { "var", TokenKind.VarKeyword },
-            { "void", TokenKind.VoidKeyword },
-            { "int", TokenKind.IntKeyword },
-            { "uint", TokenKind.UIntKeyword },
-            { "bool", TokenKind.BoolKeyword },
-            { "string", TokenKind.StringKeyword },
-            { "return", TokenKind.ReturnKeyword },
-            { "class", TokenKind.ClassKeyword },
-            { "new", TokenKind.NewKeyword },
-            { "delete", TokenKind.DeleteKeyword },
-            { "namespace", TokenKind.NamespaceKeyword },
-            { "using", TokenKind.UsingKeyword },
-            { "foreach", TokenKind.ForeachKeyword },
-            { "in", TokenKind.InKeyword },
-            { "if", TokenKind.IfKeyword },
-            { "else", TokenKind.ElseKeyword },
-            { "and", TokenKind.AndKeyword },
-            { "or", TokenKind.OrKeyword },
-            { "xor", TokenKind.XorKeyword },
-            { "struct", TokenKind.StructKeyword },
-            { "enum", TokenKind.EnumKeyword },
-            { "byte", TokenKind.ByteKeyword },
-            { "size", TokenKind.SizeKeyword },
-            { "protected", TokenKind.ProtectedKeyword },
-            { "unsafe", TokenKind.UnsafeKeyword },
-            { "safe", TokenKind.SafeKeyword },
-            { "base", TokenKind.BaseKeyword },
-            { "fn", TokenKind.FunctionKeyword },
-            { "Self", TokenKind.SelfTypeKeyword },
-            { "init", TokenKind.InitKeyword },
-            { "owned", TokenKind.OwnedKeyword },
-            { "self", TokenKind.SelfKeyword }
+            { "{", typeof(OpenBraceToken) },
+            { "}", typeof(CloseBraceToken) },
+            { "(", typeof(OpenParenToken) },
+            { ")", typeof(CloseParenToken) },
+            { "[", typeof(OpenBracketToken) },
+            { "]", typeof(CloseBracketToken) },
+            { ";", typeof(SemicolonToken) },
+            { ",", typeof(CommaToken) },
+            { ".", typeof(DotToken) },
+            { "..", typeof(DotDotToken) },
+            { ":", typeof(ColonToken) },
+            { "?", typeof(QuestionToken) },
+            { "|", typeof(PipeToken) },
+            { "→", typeof(RightArrowToken) },
+            { "->", typeof(RightArrowToken) },
+            { "@", typeof(AtSignToken) },
+            { "^", typeof(CaretToken) },
+            { "+", typeof(PlusToken) },
+            { "-", typeof(MinusToken) },
+            { "*", typeof(AsteriskToken) },
+            { "/", typeof(SlashToken) },
+            { "=", typeof(EqualsToken) },
+            { "==", typeof(EqualsEqualsToken) },
+            { "≠", typeof(NotEqualToken) },
+            { "=/=", typeof(NotEqualToken) },
+            { ">", typeof(GreaterThanToken) },
+            { "≥", typeof(GreaterThanOrEqualToken) },
+            { "⩾", typeof(GreaterThanOrEqualToken) },
+            { ">=", typeof(GreaterThanOrEqualToken) },
+            { "<", typeof(LessThanToken) },
+            { "≤", typeof(LessThanOrEqualToken) },
+            { "⩽", typeof(LessThanOrEqualToken) },
+            { "<=", typeof(LessThanOrEqualToken) },
+            { "+=", typeof(PlusEqualsToken) },
+            { "-=", typeof(MinusEqualsToken) },
+            { "*=", typeof(AsteriskEqualsToken) },
+            { "/=", typeof(SlashEqualsToken) },
+            { "$", typeof(DollarToken) },
+            { "public", typeof(PublicKeywordToken) },
+            { "private", typeof(PrivateKeywordToken) },
+            { "let", typeof(LetKeywordToken) },
+            { "var", typeof(VarKeywordToken) },
+            { "void", typeof(VoidKeywordToken) },
+            { "int", typeof(IntKeywordToken) },
+            { "uint", typeof(UIntKeywordToken) },
+            { "bool", typeof(BoolKeywordToken) },
+            { "string", typeof(StringKeywordToken) },
+            { "return", typeof(ReturnKeywordToken) },
+            { "class", typeof(ClassKeywordToken) },
+            { "new", typeof(NewKeywordToken) },
+            { "delete", typeof(DeleteKeywordToken) },
+            { "namespace", typeof(NamespaceKeywordToken) },
+            { "using", typeof(UsingKeywordToken) },
+            { "foreach", typeof(ForeachKeywordToken) },
+            { "in", typeof(InKeywordToken) },
+            { "if", typeof(IfKeywordToken) },
+            { "else", typeof(ElseKeywordToken) },
+            { "and", typeof(AndKeywordToken) },
+            { "or", typeof(OrKeywordToken) },
+            { "xor", typeof(XorKeywordToken) },
+            { "struct", typeof(StructKeywordToken) },
+            { "enum", typeof(EnumKeywordToken) },
+            { "byte", typeof(ByteKeywordToken) },
+            { "size", typeof(SizeKeywordToken) },
+            { "protected", typeof(ProtectedKeywordToken) },
+            { "unsafe", typeof(UnsafeKeywordToken) },
+            { "safe", typeof(SafeKeywordToken) },
+            { "base", typeof(BaseKeywordToken) },
+            { "fn", typeof(FunctionKeywordToken) },
+            { "Self", typeof(SelfTypeKeywordToken) },
+            { "init", typeof(InitKeywordToken) },
+            { "owned", typeof(OwnedKeywordToken) },
+            { "self", typeof(SelfKeywordToken) }
         }.AsReadOnly();
 
         //public static IReadOnlyDictionary<TokenKind, List<Func<PsuedoToken, PsuedoToken, bool>>> PairRestrictions = new ReadOnlyDictionary<TokenKind, List<Func<PsuedoToken, PsuedoToken, bool>>>(

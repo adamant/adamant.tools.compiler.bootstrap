@@ -1,6 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
@@ -36,11 +35,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         public static Diagnostic UnexpectedCharacter(CodeFile file, TextSpan span, char character)
         {
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1005, $"Unexpected character `{character}`");
-        }
-
-        public static Diagnostic MissingToken(CodeFile file, TextSpan span, TokenKind kind)
-        {
-            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 2, $"Missing {kind} token.");
         }
 
         public static Diagnostic SkippedToken(CodeFile file, TextSpan span)

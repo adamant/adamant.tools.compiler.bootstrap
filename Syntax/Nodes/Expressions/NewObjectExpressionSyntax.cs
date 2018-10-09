@@ -1,18 +1,34 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
 {
     public class NewObjectExpressionSyntax : ExpressionSyntax
     {
-        public SimpleToken NewKeyword { get; }
-        public TypeSyntax Type { get; }
-        public SimpleToken OpenParen { get; }
-        public SeparatedListSyntax<ExpressionSyntax> Arguments { get; }
-        public SimpleToken CloseParen { get; }
+        [CanBeNull]
+        public NewKeywordToken NewKeyword { get; }
 
-        public NewObjectExpressionSyntax(SimpleToken newKeyword, TypeSyntax type, SimpleToken openParen, SeparatedListSyntax<ExpressionSyntax> arguments, SimpleToken closeParen)
+        public TypeSyntax Type { get; }
+
+        [CanBeNull]
+        public OpenParenToken OpenParen { get; }
+
+        [NotNull]
+        public SeparatedListSyntax<ExpressionSyntax> Arguments { get; }
+
+        [CanBeNull]
+        public CloseParenToken CloseParen { get; }
+
+        public NewObjectExpressionSyntax(
+            [CanBeNull] NewKeywordToken newKeyword,
+            TypeSyntax type,
+            [CanBeNull] OpenParenToken openParen,
+            [NotNull] SeparatedListSyntax<ExpressionSyntax> arguments,
+            [CanBeNull] CloseParenToken closeParen)
         {
+            Requires.NotNull(nameof(arguments), arguments);
             NewKeyword = newKeyword;
             Type = type;
             OpenParen = openParen;

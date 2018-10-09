@@ -84,8 +84,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                     }
                 case IdentifierNameSyntax identifierName:
                     {
-                        if (identifierName.Name.IsMissing)
-                            return UnknownName.Instance;
                         var nameScope = LexicalScope(identifierName);
                         var symbol = nameScope.LookupName(identifierName.Name.Value);
                         if (symbol == null) // TODO should this be a compiler error?
@@ -98,6 +96,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                         var functionName = Name(EnclosingFunction(variableDeclaration));
                         return new VariableName(functionName, variableDeclaration.Name.Value);
                     }
+                case null:
+                    return UnknownName.Instance;
                 default:
                     throw NonExhaustiveMatchException.For(syntax);
             }

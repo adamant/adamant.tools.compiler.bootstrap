@@ -21,4 +21,41 @@
     <ProjectReference Include="..\Framework\Framework.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Tokens\KeywordTokens.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>KeywordTokens.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Tokens\OperatorTokens.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>OperatorTokens.tt</DependentUpon>
+    </Compile>
+    <Compile Update="Tokens\SymbolTokens.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>SymbolTokens.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Tokens\KeywordTokens.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>KeywordTokens.cs</LastGenOutput>
+    </None>
+    <None Update="Tokens\OperatorTokens.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>OperatorTokens.cs</LastGenOutput>
+    </None>
+    <None Update="Tokens\SymbolTokens.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>SymbolTokens.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
 </Project>

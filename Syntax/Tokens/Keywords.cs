@@ -1,53 +1,50 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+using System.Linq.Expressions;
+using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 {
-    public static class Keywords
+    public static partial class Keywords
     {
-        public static IReadOnlyList<TokenKind> TokenKinds;
-        public static IReadOnlyDictionary<string, TokenKind> Map;
+        [NotNull]
+        public static IReadOnlyDictionary<string, Func<TextSpan, KeywordToken>> Factories;
 
         static Keywords()
         {
-            // Some values have multiple names, to be sure we get the right things, we need to go by names not values
-            var keywordNames = Enum.GetNames(typeof(TokenKind))
-                .Where(n => n.EndsWith("Keyword"))
-                .ToList()
-                ;
-            TokenKinds = keywordNames
-                .Select(Enum.Parse<TokenKind>)
-                .ToList().AsReadOnly();
+            var keywordMap = new Dictionary<string, Func<TextSpan, KeywordToken>>();
 
-            var keywordDictionary = new Dictionary<string, TokenKind>();
-
-            var keywordLength = "Keyword".Length;
-            foreach (var keywordName in keywordNames)
+            var keywordTokenLength = "KeywordToken".Length;
+            foreach (var tokenType in TokenTypes)
             {
-                var tokenKind = Enum.Parse<TokenKind>(keywordName);
                 string keyword;
-                switch (tokenKind)
+                var tokenTypeName = tokenType.Name;
+                switch (tokenTypeName)
                 {
                     // Some exceptions to the normal rule
-                    case TokenKind.FunctionKeyword:
+                    case "FunctionKeywordToken":
                         keyword = "fn";
                         break;
-                    case TokenKind.SelfTypeKeyword:
+                    case "SelfTypeKeywordToken":
                         keyword = "Self";
                         break;
-
                     default:
-                        keyword = keywordName
-                            .Substring(0, keywordName.Length - keywordLength)
+                        keyword = tokenTypeName
+                            .Substring(0, tokenTypeName.Length - keywordTokenLength)
                             .ToLower();
                         break;
                 }
-                keywordDictionary.Add(keyword, tokenKind);
+                var spanParam = Expression.Parameter(typeof(TextSpan), "span");
+                var newExpression = Expression.New(tokenType.GetConstructor(new[] { typeof(TextSpan) }), spanParam);
+                var factory =
+                    Expression.Lambda<Func<TextSpan, KeywordToken>>(
+                        newExpression,
+                        new ParameterExpression[] { spanParam });
+                keywordMap.Add(keyword, factory.Compile());
             }
-
-            Map = new ReadOnlyDictionary<string, TokenKind>(keywordDictionary);
+            Factories = keywordMap.AsReadOnly();
         }
     }
 }

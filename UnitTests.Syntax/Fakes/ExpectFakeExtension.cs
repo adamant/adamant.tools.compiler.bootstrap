@@ -1,18 +1,20 @@
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
-using Xunit;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes
 {
     public static class ExpectFakeExtension
     {
-        public static Token ExpectFake(this ITokenStream tokens)
+        [CanBeNull]
+        public static FakeToken ExpectFake([NotNull] this ITokenStream tokens)
         {
-            Assert.Equal(FakeToken.Kind, tokens.Current?.Kind);
+            if (tokens.Current is FakeToken token)
+            {
+                tokens.MoveNext();
+                return token;
+            }
 
-            var token = tokens.Current.Value;
-            tokens.Next();
-            return token;
+            return null;
         }
     }
 }

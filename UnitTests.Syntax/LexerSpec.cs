@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Tests;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework;
 using FsCheck;
 using FsCheck.Xunit;
+using JetBrains.Annotations;
 using Xunit;
 using Xunit.Categories;
 
@@ -16,18 +18,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
     [UnitTest]
     public class LexerSpec
     {
+        [NotNull]
         private readonly Lexer lexer = new Lexer();
 
         [Theory]
         [InlineData("hello", "hello")]
         [InlineData(@"\class", "class", Skip = "Escaped Identifiers Not Implemented")]
         [InlineData(@"\""Hello World!""", "Hello World!", Skip = "Escaped String Identifiers Not Implemented")]
-        public void Identifier_value(string identifier, string value)
+        public void Identifier_value([NotNull] string identifier, [NotNull] string value)
         {
             var file = identifier.ToFakeCodeFile();
             var output = lexer.Lex(file);
             var token = output.AssertSingleNoErrors();
-            token.AssertIs(TokenKind.Identifier, 0, identifier.Length, value);
+            token.AssertIdentifier(0, identifier.Length, value);
         }
 
         [Theory]
@@ -36,22 +39,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
         [InlineData(@"""\u(2660)""", "\u2660")]
         [InlineData(@""" \u(FFFF) \u(a) """, " \uFFFF \u000A ")]
         [InlineData(@""" \u(10FFFF) """, " \uDBFF\uDFFF ")] // Surrogate Pair
-        public void String_literal_value(string literal, string value)
+        public void String_literal_value([NotNull] string literal, [NotNull] string value)
         {
             var file = literal.ToFakeCodeFile();
             var output = lexer.Lex(file);
             var token = output.AssertSingleNoErrors();
-            token.AssertIs(TokenKind.StringLiteral, 0, literal.Length, value);
+            token.AssertStringLiteral(0, literal.Length, value);
         }
 
         [Theory]
         [MemberData(nameof(SymbolsTheoryData))]
-        public void Symbols(string symbol, TokenKind kind)
+        public void Symbols([NotNull] string symbol, [NotNull] Type tokenType)
         {
             var file = symbol.ToFakeCodeFile();
             var output = lexer.Lex(file);
             var token = output.AssertSingleNoErrors();
-            token.AssertIs(kind, 0, symbol.Length);
+            Assert.IsType(tokenType, token);
+            Assert.Equal(new TextSpan(0, symbol.Length), token.Span);
         }
 
         public static IEnumerable<object[]> SymbolsTheoryData()
@@ -65,9 +69,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
             var file = "x!=y".ToFakeCodeFile();
             var output = lexer.Lex(file);
             var (token, diagnostics) = output.AssertCount(3);
-            token[0].AssertIs(TokenKind.Identifier, 0, 1, "x");
-            token[1].AssertIs(TokenKind.NotEqual, 1, 2);
-            token[2].AssertIs(TokenKind.Identifier, 3, 1, "y");
+            token[0].AssertIdentifier(0, 1, "x");
+            token[1].AssertIs<NotEqualToken>(1, 2);
+            token[2].AssertIdentifier(3, 1, "y");
             diagnostics.AssertCount(1);
             diagnostics[0].AssertError(1004, 1, 2);
         }
@@ -81,12 +85,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
         [InlineData(@"//c")]
         [InlineData(@"//\r")]
         [InlineData(@"// foo")]
-        public void Comments(string comment)
+        public void Comments([NotNull] string comment)
         {
             var file = comment.ToFakeCodeFile();
             var output = lexer.Lex(file);
             var token = output.AssertSingleNoErrors();
-            token.AssertIs(TokenKind.Comment, 0, comment.Length);
+            token.AssertIs<CommentToken>(0, comment.Length);
         }
 
         [Fact]
@@ -95,7 +99,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
             var file = "/*".ToFakeCodeFile();
             var tokens = lexer.Lex(file);
             var (comment, diagnostics) = tokens.AssertSingleWithErrors();
-            comment.AssertIs(TokenKind.Comment, 0, 2);
+            comment.AssertIs<CommentToken>(0, 2);
             var diagnostic = diagnostics.AssertSingle();
             diagnostic.AssertError(1001, 0, 2);
         }
@@ -106,7 +110,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
             var file = @"""Hello".ToFakeCodeFile();
             var tokens = lexer.Lex(file);
             var (token, diagnostics) = tokens.AssertSingleWithErrors();
-            token.AssertIs(TokenKind.StringLiteral, 0, 6, "Hello");
+            token.AssertStringLiteral(0, 6, "Hello");
             var diagnostic = diagnostics.AssertSingle();
             diagnostic.AssertError(1002, 0, 6);
         }
@@ -129,12 +133,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
         [InlineData(@"""\u(1f|""", "\u001f|")]
         [InlineData(@"""\u()""", "u()")]
         [InlineData(@"""\u(110000)""", "u(110000)")] // 1 too high
-        public void Invalid_escape_sequence(string literal, string expectedValue)
+        public void Invalid_escape_sequence([NotNull] string literal, [NotNull] string expectedValue)
         {
             var file = literal.ToFakeCodeFile();
             var tokens = lexer.Lex(file);
             var (token, diagnostics) = tokens.AssertSingleWithErrors();
-            token.AssertIs(TokenKind.StringLiteral, 0, literal.Length, expectedValue);
+            token.AssertStringLiteral(0, literal.Length, expectedValue);
             var completeString = literal.EndsWith("\"");
             var expectedDiagnosticCount = completeString ? 1 : 2;
             var diagnostic = diagnostics.AssertCount(expectedDiagnosticCount);
@@ -155,14 +159,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
         [InlineData(" ~ ")]
         [InlineData(" ` ")]
         [InlineData(" \u0007 ")] // Bell Character
-        public void Unexpected_character(string text)
+        public void Unexpected_character([NotNull] string text)
         {
             var file = text.ToFakeCodeFile();
             var output = lexer.Lex(file);
             var (token, diagnostics) = output.AssertCount(3);
-            token[0].AssertIs(TokenKind.Whitespace, 0, 1);
-            token[1].AssertIs(TokenKind.Unexpected, 1, 1);
-            token[2].AssertIs(TokenKind.Whitespace, 2, 1);
+            token[0].AssertIs<WhitespaceToken>(0, 1);
+            token[1].AssertIs<UnexpectedToken>(1, 1);
+            token[2].AssertIs<WhitespaceToken>(2, 1);
             diagnostics.AssertCount(1);
             diagnostics[0].AssertError(1005, 1, 1);
             Assert.True(diagnostics[0].Message.Contains(text[1]), "Doesn't contain character");
@@ -190,7 +194,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
                 var expectedPsuedoTokens = token.Yield().Append(PsuedoToken.EndOfFile()).ToList();
                 return expectedPsuedoTokens.SequenceEqual(outputAsPsuedoTokens)
                     .Label($"Output: {outputAsPsuedoTokens.DebugFormat()} != Expected: {expectedPsuedoTokens.DebugFormat()}")
-                    .Collect(token.Kind);
+                    .Collect(token.GetType().Name);
             });
         }
 

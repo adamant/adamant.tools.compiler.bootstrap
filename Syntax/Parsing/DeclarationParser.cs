@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
@@ -12,11 +13,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 {
     public class DeclarationParser : IParser<DeclarationSyntax>
     {
+        [NotNull]
         private readonly IListParser listParser;
+
+        [NotNull]
         private readonly IParser<ExpressionSyntax> expressionParser;
+
+        [NotNull]
         private readonly IParser<BlockStatementSyntax> blockStatementParser;
 
-        public DeclarationParser(IListParser listParser, IParser<ExpressionSyntax> expressionParser, IParser<BlockStatementSyntax> blockStatementParser)
+        public DeclarationParser(
+            [NotNull] IListParser listParser,
+            [NotNull] IParser<ExpressionSyntax> expressionParser,
+            [NotNull] IParser<BlockStatementSyntax> blockStatementParser)
         {
             this.listParser = listParser;
             this.expressionParser = expressionParser;
@@ -24,17 +33,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         }
 
         [MustUseReturnValue]
-        public DeclarationSyntax Parse(ITokenStream tokens)
+        [NotNull]
+        public DeclarationSyntax Parse([NotNull] ITokenStream tokens)
         {
             var accessModifier = ParseAccessModifier(tokens);
 
-            switch (tokens.Current?.Kind)
+            switch (tokens.Current)
             {
-                case TokenKind.ClassKeyword:
+                case ClassKeywordToken _:
                     return ParseClass(accessModifier, tokens);
-                case TokenKind.EnumKeyword:
+                case EnumKeywordToken _:
                     return ParseEnum(accessModifier, tokens);
-                case TokenKind.FunctionKeyword:
+                case FunctionKeywordToken _:
                     return ParseFunction(accessModifier, tokens);
                 default:
                     return ParseIncompleteDeclaration(tokens, accessModifier);
@@ -44,44 +54,47 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         }
 
         [MustUseReturnValue]
-        private static SimpleToken ParseAccessModifier(ITokenStream tokens)
+        [CanBeNull]
+        private static KeywordToken ParseAccessModifier([NotNull] ITokenStream tokens)
         {
-            switch (tokens.Current?.Kind)
+            switch (tokens.Current)
             {
-                case TokenKind.PublicKeyword:
-                case TokenKind.ProtectedKeyword:
-                case TokenKind.PrivateKeyword:
-                    return tokens.ExpectSimple();
+                case PublicKeywordToken _:
+                case ProtectedKeywordToken _:
+                case PrivateKeywordToken _:
+                    return tokens.ExpectKeyword();
                 default:
-                    return (SimpleToken)tokens.MissingToken();
+                    return tokens.MissingToken<KeywordToken>();
             }
         }
 
         [MustUseReturnValue]
-        private DeclarationSyntax ParseClass(SimpleToken accessModifier, ITokenStream tokens)
+        [NotNull]
+        private static DeclarationSyntax ParseClass([CanBeNull] KeywordToken accessModifier, [NotNull] ITokenStream tokens)
         {
-            var classKeyword = tokens.ExpectSimple(TokenKind.ClassKeyword);
+            var classKeyword = tokens.Expect<ClassKeywordToken>();
             var name = tokens.ExpectIdentifier();
-            var openBrace = tokens.ExpectSimple(TokenKind.OpenBrace);
-            var closeBrace = tokens.ExpectSimple(TokenKind.CloseBrace);
+            var openBrace = tokens.Expect<OpenBraceToken>();
+            var closeBrace = tokens.Expect<CloseBraceToken>();
             return new ClassDeclarationSyntax(accessModifier, classKeyword, name, openBrace,
                 SyntaxList<MemberDeclarationSyntax>.Empty, closeBrace);
         }
 
         [MustUseReturnValue]
-        private static DeclarationSyntax ParseEnum(SimpleToken accessModifier, ITokenStream tokens)
+        [NotNull]
+        private static DeclarationSyntax ParseEnum([CanBeNull] KeywordToken accessModifier, [NotNull] ITokenStream tokens)
         {
-            var enumKeyword = tokens.ExpectSimple(TokenKind.EnumKeyword);
-            switch (tokens.Current?.Kind)
+            var enumKeyword = tokens.Expect<EnumKeywordToken>();
+            switch (tokens.Current)
             {
-                case TokenKind.StructKeyword:
-                    var structKeyword = tokens.ExpectSimple(TokenKind.StructKeyword);
+                case StructKeywordToken _:
+                    var structKeyword = tokens.Expect<StructKeywordToken>();
                     var name = tokens.ExpectIdentifier();
-                    var openBrace = tokens.ExpectSimple(TokenKind.OpenBrace);
-                    var closeBrace = tokens.ExpectSimple(TokenKind.CloseBrace);
+                    var openBrace = tokens.Expect<OpenBraceToken>();
+                    var closeBrace = tokens.Expect<CloseBraceToken>();
                     return new EnumStructDeclarationSyntax(accessModifier, enumKeyword, structKeyword, name,
                         openBrace, SyntaxList<MemberDeclarationSyntax>.Empty, closeBrace);
-                case TokenKind.ClassKeyword:
+                case ClassKeywordToken _:
                     throw new NotImplementedException(
                         "Parsing enum classes not implemented");
                 default:
@@ -91,16 +104,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
         #region Parse Function
         [MustUseReturnValue]
+        [NotNull]
         public FunctionDeclarationSyntax ParseFunction(
-            SimpleToken accessModifier,
-            ITokenStream tokens)
+            [CanBeNull] KeywordToken accessModifier,
+            [NotNull] ITokenStream tokens)
         {
-            var functionKeyword = tokens.ExpectSimple(TokenKind.FunctionKeyword);
+            var functionKeyword = tokens.Expect<FunctionKeywordToken>();
             var name = tokens.ExpectIdentifier();
-            var openParen = tokens.ExpectSimple(TokenKind.OpenParen);
+            var openParen = tokens.Expect<OpenParenToken>();
             var parameters = ParseParameters(tokens);
-            var closeParen = tokens.ExpectSimple(TokenKind.CloseParen);
-            var arrow = tokens.ExpectSimple(TokenKind.RightArrow);
+            var closeParen = tokens.Expect<CloseParenToken>();
+            var arrow = tokens.Expect<RightArrowToken>();
             var returnTypeExpression = expressionParser.Parse(tokens);
             var body = blockStatementParser.Parse(tokens);
             return new FunctionDeclarationSyntax(accessModifier, functionKeyword, name,
@@ -108,15 +122,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         }
 
         [MustUseReturnValue]
-        private SeparatedListSyntax<ParameterSyntax> ParseParameters(ITokenStream tokens)
+        [NotNull]
+        private SeparatedListSyntax<ParameterSyntax> ParseParameters([NotNull] ITokenStream tokens)
         {
-            return listParser.ParseSeparatedList(tokens, ParseParameter, TokenKind.Comma, TokenKind.CloseParen);
+            return listParser.ParseSeparatedList(tokens, ParseParameter, TypeOf<CommaToken>._, TypeOf<CloseParenToken>._);
         }
 
         [MustUseReturnValue]
-        private ParameterSyntax ParseParameter(ITokenStream tokens)
+        [NotNull]
+        private ParameterSyntax ParseParameter([NotNull] ITokenStream tokens)
         {
-            switch (tokens.Current?.Kind)
+            switch (tokens.Current)
             {
                 //case TokenKind.MutableKeyword:
                 //     `mut self`
@@ -125,9 +141,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 //      `self`
                 //    throw new NotImplementedException();
                 default:
-                    var varKeyword = tokens.AcceptSimple(TokenKind.VarKeyword);
+                    var varKeyword = tokens.Accept<VarKeywordToken>();
                     var name = tokens.ExpectIdentifier();
-                    var colon = tokens.ExpectSimple(TokenKind.Colon);
+                    var colon = tokens.Expect<ColonToken>();
                     var typeExpression = expressionParser.Parse(tokens);
                     return new ParameterSyntax(varKeyword, name, colon, typeExpression);
             }
@@ -135,12 +151,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         #endregion
 
         [MustUseReturnValue]
-        private static IncompleteDeclarationSyntax ParseIncompleteDeclaration(ITokenStream tokens, SimpleToken accessModifier)
+        [NotNull]
+        private static IncompleteDeclarationSyntax ParseIncompleteDeclaration([NotNull] ITokenStream tokens, [CanBeNull] KeywordToken accessModifier)
         {
-            var skipped = new List<ISyntaxNodeOrToken>() { (Token)accessModifier };
+            var skipped = new List<ISyntaxNodeOrToken>() { accessModifier };
             var startToken = tokens.Current;
             var name = tokens.ExpectIdentifier();
-            skipped.Add((Token)name);
+            skipped.Add(name);
             throw new NotImplementedException();
             //if (tokens.Current == start)
             //    // We have not advanced at all when trying to parse a declaration.

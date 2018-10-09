@@ -1,15 +1,18 @@
 using FsCheck;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core.Tests
 {
     public static class TestHelpers
     {
-        public static CodeFile ToFakeCodeFile(this string text)
+        [NotNull]
+        public static CodeFile ToFakeCodeFile([NotNull] this string text)
         {
             return new CodeFile(FakeCodeReference.Instance, new CodeText(text));
         }
 
-        public static CodeFile ToFakeCodeFile(this NonNull<string> text)
+        [NotNull]
+        public static CodeFile ToFakeCodeFile([NotNull] this NonNull<string> text)
         {
             return new CodeFile(FakeCodeReference.Instance, new CodeText(text.Get));
         }

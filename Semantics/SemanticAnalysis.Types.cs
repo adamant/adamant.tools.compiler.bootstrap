@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -60,35 +59,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                     return Type(parameter.TypeExpression);
 
                 case PrimitiveTypeSyntax primitiveType:
-                    switch (primitiveType.Keyword.Kind)
+                    switch (primitiveType.Keyword)
                     {
-                        case TokenKind.IntKeyword:
+                        case IntKeywordToken _:
                             return PrimitiveType.Int;
-                        case TokenKind.UIntKeyword:
+                        case UIntKeywordToken _:
                             return PrimitiveType.UInt;
-                        case TokenKind.ByteKeyword:
+                        case ByteKeywordToken _:
                             return PrimitiveType.Byte;
-                        case TokenKind.SizeKeyword:
+                        case SizeKeywordToken _:
                             return PrimitiveType.Size;
-                        case TokenKind.VoidKeyword:
+                        case VoidKeywordToken _:
                             return PrimitiveType.Void;
-                        case TokenKind.BoolKeyword:
+                        case BoolKeywordToken _:
                             return PrimitiveType.Bool;
-                        case TokenKind.StringKeyword:
+                        case StringKeywordToken _:
                             return PrimitiveType.String;
                         default:
-                            throw new InvalidEnumArgumentException($"Token kind `{primitiveType.Keyword.Kind}` is not a primitive type keyword");
+                            throw NonExhaustiveMatchException.For(primitiveType.Keyword);
                     }
 
                 case BinaryOperatorExpressionSyntax binaryOperatorExpression:
                     var leftOperandType = Type(binaryOperatorExpression.LeftOperand);
                     var rightOperandType = Type(binaryOperatorExpression.RightOperand);
                     if (leftOperandType != rightOperandType
-                        || (binaryOperatorExpression.Operator.Kind == TokenKind.Plus
+                        || (binaryOperatorExpression.Operator is PlusToken
                         && leftOperandType == PrimitiveType.Bool))
                     {
                         // TODO pass correct file and span
-                        AddDiagnostic(binaryOperatorExpression, SemanticError.OperatorCannotBeAppliedToOperandsOfType(null, new TextSpan(0, 0), binaryOperatorExpression.Operator.Kind, leftOperandType, rightOperandType));
+                        AddDiagnostic(binaryOperatorExpression, SemanticError.OperatorCannotBeAppliedToOperandsOfType(null, new TextSpan(0, 0), binaryOperatorExpression.Operator, leftOperandType, rightOperandType));
                         return DataType.Unknown;
                     }
                     return leftOperandType;
@@ -133,10 +132,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
                 case LifetimeTypeSyntax lifetimeType:
                     Lifetime lifetime;
-                    if (lifetimeType.Lifetime.Kind == TokenKind.OwnedKeyword)
-                        lifetime = OwnedLifetime.Instance;
-                    else
-                        lifetime = new NamedLifetime((string)lifetimeType.Lifetime.Value);
+                    switch (lifetimeType.Lifetime)
+                    {
+                        case IdentifierToken identifier:
+                            lifetime = new NamedLifetime(identifier.Value);
+                            break;
+                        case OwnedKeywordToken _:
+                            lifetime = OwnedLifetime.Instance;
+                            break;
+                        default:
+                            throw NonExhaustiveMatchException.For(lifetimeType.Lifetime);
+                    }
                     return new LifetimeType(Type(lifetimeType.TypeName), lifetime);
 
                 default:

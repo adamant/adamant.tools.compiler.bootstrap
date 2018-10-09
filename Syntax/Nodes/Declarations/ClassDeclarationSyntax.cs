@@ -1,24 +1,38 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
 {
     public class ClassDeclarationSyntax : MemberDeclarationSyntax
     {
-        public SimpleToken AccessModifier { get; }
-        public SimpleToken ClassKeyword { get; }
+        [CanBeNull]
+        public KeywordToken AccessModifier { get; }
+
+        [CanBeNull]
+        public ClassKeywordToken ClassKeyword { get; }
+
+        [CanBeNull]
         public override IdentifierToken Name { get; }
-        public SimpleToken OpenBrace { get; }
+
+        [CanBeNull]
+        public OpenBraceToken OpenBrace { get; }
+
+        [NotNull]
         public SyntaxList<MemberDeclarationSyntax> Members { get; }
-        public SimpleToken CloseBrace { get; }
+
+        [CanBeNull]
+        public CloseBraceToken CloseBrace { get; }
 
         public ClassDeclarationSyntax(
-            SimpleToken accessModifier,
-            SimpleToken classKeyword,
-            IdentifierToken name,
-            SimpleToken openBrace,
-            SyntaxList<MemberDeclarationSyntax> members,
-            SimpleToken closeBrace)
+            [CanBeNull] KeywordToken accessModifier,
+            [CanBeNull] ClassKeywordToken classKeyword,
+            [CanBeNull] IdentifierToken name,
+            [CanBeNull] OpenBraceToken openBrace,
+            [NotNull] SyntaxList<MemberDeclarationSyntax> members,
+            [CanBeNull] CloseBraceToken closeBrace)
         {
+            Requires.NotNull(nameof(members), members);
             AccessModifier = accessModifier;
             ClassKeyword = classKeyword;
             Name = name;

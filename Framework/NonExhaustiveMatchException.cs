@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.Serialization;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
@@ -25,15 +26,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         {
         }
 
+        [NotNull]
         public static NonExhaustiveMatchException ForEnum<T>(T value)
             where T : struct, Enum
         {
             return new NonExhaustiveMatchException($"Matching value {typeof(T).Name}.{value}");
         }
 
-        public static NonExhaustiveMatchException For(object value)
+        [NotNull]
+        public static NonExhaustiveMatchException For([CanBeNull] object value)
         {
-            return new NonExhaustiveMatchException($"Matching value of type {value?.GetType().FullName}");
+            return new NonExhaustiveMatchException($"Matching value of type {value?.GetType()?.FullName}");
         }
     }
 }

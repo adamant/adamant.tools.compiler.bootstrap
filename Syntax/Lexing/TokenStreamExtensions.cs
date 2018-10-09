@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
@@ -8,87 +6,111 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing
     public static class TokenStreamExtensions
     {
         [MustUseReturnValue]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool CurrentIs(this ITokenStream tokens, TokenKind kind)
+        [CanBeNull]
+        public static T Accept<T>([NotNull] this ITokenStream tokens)
+            where T : Token
         {
-            return tokens.Current?.Kind == kind;
+            if (tokens.Current is T token)
+            {
+                tokens.MoveNext();
+                return token;
+            }
+
+            return null;
+        }
+
+
+        [MustUseReturnValue]
+        [CanBeNull]
+        public static T Expect<T>([NotNull] this ITokenStream tokens)
+            where T : Token
+        {
+            if (tokens.Current is T token)
+            {
+                tokens.MoveNext();
+                return token;
+            }
+
+            return null;
         }
 
         [MustUseReturnValue]
-        public static SimpleToken? AcceptSimple(this ITokenStream tokens, TokenKind kind)
+        [CanBeNull]
+        public static KeywordToken ExpectKeyword([NotNull] this ITokenStream tokens)
         {
-            if (tokens.Current?.Kind != kind) return null;
+            if (tokens.Current is KeywordToken token)
+            {
+                tokens.MoveNext();
+                return token;
+            }
 
-            var token = (SimpleToken)tokens.Current;
-            tokens.Next();
-            return token;
+            return null;
         }
 
         [MustUseReturnValue]
-        public static SimpleToken ExpectSimple(this ITokenStream tokens, TokenKind kind)
+        [CanBeNull]
+        public static OperatorToken ExpectOperator([NotNull] this ITokenStream tokens)
         {
-            if (tokens.Current?.Kind != kind) return (SimpleToken)tokens.MissingToken();
+            if (tokens.Current is OperatorToken token)
+            {
+                tokens.MoveNext();
+                return token;
+            }
 
-            var token = (SimpleToken)tokens.Current;
-            tokens.Next();
-            return token;
+            return null;
         }
 
         [MustUseReturnValue]
-        public static SimpleToken ExpectSimple(this ITokenStream tokens)
+        [CanBeNull]
+        public static StringLiteralToken ExpectStringLiteral([NotNull] this ITokenStream tokens)
         {
-            if (tokens.Current?.Kind.HasValue() ?? true)
-                return (SimpleToken)tokens.MissingToken();
+            if (tokens.Current is StringLiteralToken token)
+            {
+                tokens.MoveNext();
+                return token;
+            }
 
-            var token = (SimpleToken)tokens.Current;
-            tokens.Next();
-            return token;
+            return null;
         }
 
         [MustUseReturnValue]
-        public static StringLiteralToken ExpectStringLiteral(this ITokenStream tokens)
+        [CanBeNull]
+        public static IdentifierToken ExpectIdentifier([NotNull] this ITokenStream tokens)
         {
-            if (tokens.Current?.Kind != TokenKind.StringLiteral)
-                return (StringLiteralToken)tokens.MissingToken();
+            if (tokens.Current is IdentifierToken token)
+            {
+                tokens.MoveNext();
+                return token;
+            }
 
-            var token = (StringLiteralToken)tokens.Current;
-            tokens.Next();
-            return token;
+            return null;
         }
 
         [MustUseReturnValue]
-        public static IdentifierToken ExpectIdentifier(this ITokenStream tokens)
+        [CanBeNull]
+        public static EndOfFileToken ExpectEndOfFile([NotNull] this ITokenStream tokens)
         {
-            if (!tokens.Current?.Kind.IsIdentifier() ?? true)
-                return (IdentifierToken)tokens.MissingToken();
+            if (tokens.Current is EndOfFileToken token)
+            {
+                tokens.MoveNext();
+                return token;
+            }
 
-            var token = (IdentifierToken)tokens.Current;
-            tokens.Next();
-            return token;
+            return null;
         }
 
         [MustUseReturnValue]
-        public static EndOfFileToken ExpectEndOfFile(this ITokenStream tokens)
+        public static bool AtEndOfFile([NotNull] this ITokenStream tokens)
         {
-            if (tokens.Current?.Kind != TokenKind.EndOfFile)
-                return (EndOfFileToken)tokens.MissingToken();
-
-            var token = (EndOfFileToken)tokens.Current;
-            tokens.Next();
-            return token;
+            return tokens.Current is EndOfFileToken;
         }
 
         [MustUseReturnValue]
-        public static bool AtEndOfFile(this ITokenStream tokens)
+        [CanBeNull]
+        public static T MissingToken<T>([NotNull] this ITokenStream tokens)
+            where T : Token
         {
-            return tokens.Current?.Kind == TokenKind.EndOfFile;
-        }
-
-        [MustUseReturnValue]
-        public static Token MissingToken(this ITokenStream tokens)
-        {
-            var start = tokens.Current?.Span.Start ?? tokens.File.Code.Length;
-            return new Token(TokenKind.Missing, new TextSpan(start, 0));
+            return null;
         }
     }
 }

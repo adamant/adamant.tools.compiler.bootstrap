@@ -15,6 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         /// </summary>
         /// <param name="tokens">A token stream without whitespace or comments</param>
         [MustUseReturnValue]
+        [NotNull]
         T Parse(ITokenStream tokens);
     }
 }

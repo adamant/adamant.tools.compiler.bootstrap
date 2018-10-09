@@ -8,6 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes;
+using JetBrains.Annotations;
 using Xunit;
 using Xunit.Categories;
 
@@ -60,49 +61,49 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
             Assert.Empty(cu.Declarations);
         }
 
-        private static FakeTokenStream FakeTokenStream(FormattableString tokenDescription)
+        [NotNull]
+        private static FakeTokenStream FakeTokenStream([NotNull] FormattableString tokenDescription)
         {
             var file = tokenDescription.Format.ToFakeCodeFile();
             var tokens = CreateFakeTokens(new Lexer().Lex(file), tokenDescription.GetArguments());
             return new FakeTokenStream(file, tokens);
         }
 
+        [NotNull]
         private static IEnumerable<Token> CreateFakeTokens(
-            IEnumerable<Token> tokens,
-            object[] fakeTokenValues)
+            [NotNull][ItemNotNull] IEnumerable<Token> tokens,
+            [NotNull] IReadOnlyList<object> fakeTokenValues)
         {
             using (var enumerator = tokens.GetEnumerator())
                 while (enumerator.MoveNext())
                 {
-                    switch (enumerator.Current.Kind)
+                    switch (enumerator.Current)
                     {
-                        case TokenKind.OpenBrace:
+                        case OpenBraceToken _:
                             var startSpan = enumerator.Current.Span;
                             Assert.True(enumerator.MoveNext());
-                            if (enumerator.Current.Kind == TokenKind.OpenBrace)
+                            if (enumerator.Current is OpenBraceToken)
                             {
                                 // Escaped open brace
                                 yield return enumerator.Current;
                             }
                             else
                             {
-                                Assert.Equal(TokenKind.IntegerLiteral, enumerator.Current.Kind);
-                                var placeholder = (IntegerLiteralToken)enumerator.Current;
+                                var placeholder = (int)Assert.IsType<IntegerLiteralToken>(enumerator.Current).Value;
                                 Assert.True(enumerator.MoveNext());
-                                Assert.Equal(TokenKind.CloseBrace, enumerator.Current.Kind);
-                                yield return new Token(FakeToken.Kind,
-                                    TextSpan.Covering(startSpan, enumerator.Current.Span),
-                                    fakeTokenValues[(int)placeholder.Value]);
+                                Assert.IsType<CloseBraceToken>(enumerator.Current);
+                                var value = (SyntaxNode)fakeTokenValues[placeholder];
+                                yield return new FakeToken(TextSpan.Covering(startSpan, enumerator.Current.Span), value);
                             }
                             break;
-                        case TokenKind.CloseBrace:
+                        case CloseBraceToken _:
                             // Escaped close brace
                             Assert.True(enumerator.MoveNext());
-                            Assert.Equal(TokenKind.CloseBrace, enumerator.Current.Kind);
+                            Assert.IsType<CloseBraceToken>(enumerator.Current);
                             yield return enumerator.Current;
                             break;
-                        case TokenKind.Whitespace:
-                        case TokenKind.Comment:
+                        case WhitespaceToken _:
+                        case CommentToken _:
                             // Skip
                             break;
                         default:
@@ -112,12 +113,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
                 }
         }
 
-        private static CompilationUnitSyntax Parse(ITokenStream tokenStream)
+        [NotNull]
+        private static CompilationUnitSyntax Parse([NotNull] ITokenStream tokenStream)
         {
             var parser = NewCompilationUnitParser();
             return parser.Parse(tokenStream);
         }
 
+        [NotNull]
         private static CompilationUnitParser NewCompilationUnitParser()
         {
             var usingDirectiveParser = new FakeUsingDirectiveParser();
@@ -127,9 +130,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
                 qualifiedNameParser);
         }
 
-        private static Token Token(TokenKind kind, int start, int length, object value = null)
-        {
-            return new Token(kind, new TextSpan(start, length), value);
-        }
+        //private static Token Token(TokenKind kind, int start, int length, object value = null)
+        //{
+        //    return new Token(new TextSpan(start, length));
+        //}
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -141,35 +140,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                     {
                         var leftOperand = Node(binaryOperatorExpression.LeftOperand);
                         var rightOperand = Node(binaryOperatorExpression.RightOperand);
-                        switch (binaryOperatorExpression.Operator.Kind)
+                        switch (binaryOperatorExpression.Operator)
                         {
-                            case TokenKind.Plus:
+                            case PlusToken _:
                                 return new AddExpression(binaryOperatorExpression,
                                     AllDiagnostics(binaryOperatorExpression),
                                     leftOperand, rightOperand, Type(binaryOperatorExpression));
 
-                            case TokenKind.Dot:
+                            case DotToken _:
                                 return new MemberAccessExpression(binaryOperatorExpression,
                                     AllDiagnostics(binaryOperatorExpression),
                                     leftOperand, rightOperand, Type(binaryOperatorExpression));
 
-                            case TokenKind.DotDot:
+                            case DotDotToken _:
                                 return new DotDotExpression(binaryOperatorExpression,
                                     AllDiagnostics(binaryOperatorExpression),
                                     leftOperand, rightOperand, Type(binaryOperatorExpression));
 
-                            case TokenKind.Equals:
+                            case EqualsToken _:
                                 return new AssignExpression(binaryOperatorExpression,
                                     AllDiagnostics(binaryOperatorExpression),
                                     leftOperand, rightOperand, Type(binaryOperatorExpression));
 
-                            case TokenKind.AsteriskEquals:
+                            case AsteriskEqualsToken _:
                                 return new MultiplyAssignExpression(binaryOperatorExpression,
                                     AllDiagnostics(binaryOperatorExpression),
                                     leftOperand, rightOperand, Type(binaryOperatorExpression));
 
                             default:
-                                throw NonExhaustiveMatchException.ForEnum(binaryOperatorExpression.Operator.Kind);
+                                throw NonExhaustiveMatchException.For(binaryOperatorExpression.Operator);
                         }
                     }
 
@@ -179,8 +178,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                 case VariableDeclarationStatementSyntax variableDeclaration:
                     return new VariableDeclarationStatement(variableDeclaration,
                         AllDiagnostics(variableDeclaration),
-                        variableDeclaration.Binding.Kind == TokenKind.VarKeyword,
-                        variableDeclaration.Name.Value,
+                        variableDeclaration.Binding is VarKeywordToken,
+                        variableDeclaration.Name?.Value,
                         Type(variableDeclaration),
                         Node(variableDeclaration.Initializer));
 
@@ -226,14 +225,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         }
 
         // TODO should this be an actual attribute?
-        public AccessLevel AccessLevel(SimpleToken accessModifier)
+        public AccessLevel AccessLevel(KeywordToken accessModifier)
         {
-            switch (accessModifier.Kind)
+            switch (accessModifier)
             {
-                case TokenKind.PublicKeyword:
+                case PublicKeywordToken _:
                     return Nodes.AccessLevel.Public;
                 default:
-                    throw new NotSupportedException(accessModifier.ToString());
+                    throw NonExhaustiveMatchException.For(accessModifier);
             }
         }
     }

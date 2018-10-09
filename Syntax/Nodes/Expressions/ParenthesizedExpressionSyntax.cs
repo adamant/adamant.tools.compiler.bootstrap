@@ -1,15 +1,26 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
 {
     public class ParenthesizedExpressionSyntax : ExpressionSyntax
     {
-        public SimpleToken OpenParen { get; }
-        public ExpressionSyntax Expression { get; }
-        public SimpleToken CloseParen { get; }
+        [CanBeNull]
+        public OpenParenToken OpenParen { get; }
 
-        public ParenthesizedExpressionSyntax(SimpleToken openParen, ExpressionSyntax expression, SimpleToken closeParen)
+        [NotNull]
+        public ExpressionSyntax Expression { get; }
+
+        [CanBeNull]
+        public CloseParenToken CloseParen { get; }
+
+        public ParenthesizedExpressionSyntax(
+            [CanBeNull] OpenParenToken openParen,
+            [NotNull] ExpressionSyntax expression,
+            [CanBeNull] CloseParenToken closeParen)
         {
+            Requires.NotNull(nameof(expression), expression);
             OpenParen = openParen;
             Expression = expression;
             CloseParen = closeParen;

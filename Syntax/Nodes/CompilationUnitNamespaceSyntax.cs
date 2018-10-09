@@ -1,16 +1,25 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
 {
     public class CompilationUnitNamespaceSyntax : SyntaxNode
     {
-        public SimpleToken NamespaceKeyword { get; }
+        [CanBeNull]
+        public NamespaceKeywordToken NamespaceKeyword { get; }
+        [NotNull]
         public NameSyntax Name { get; }
-        public SimpleToken Semicolon { get; }
+        [CanBeNull]
+        public SemicolonToken Semicolon { get; }
 
-        public CompilationUnitNamespaceSyntax(SimpleToken namespaceKeyword, NameSyntax name, SimpleToken semicolon)
+        public CompilationUnitNamespaceSyntax(
+            [CanBeNull] NamespaceKeywordToken namespaceKeyword,
+            [NotNull] NameSyntax name,
+            [CanBeNull] SemicolonToken semicolon)
         {
+            Requires.NotNull(nameof(name), name);
             NamespaceKeyword = namespaceKeyword;
             Name = name;
             Semicolon = semicolon;

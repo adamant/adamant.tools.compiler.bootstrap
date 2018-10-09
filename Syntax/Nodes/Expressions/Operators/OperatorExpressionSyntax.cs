@@ -1,15 +1,17 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators
 {
     public class OperatorExpressionSyntax : ExpressionSyntax
     {
-        public SimpleToken Operator { get; }
+        [NotNull]
+        public OperatorToken Operator { get; }
 
-        public OperatorExpressionSyntax(SimpleToken @operator)
+        public OperatorExpressionSyntax([NotNull] OperatorToken @operator)
         {
-            Requires.That(nameof(@operator), @operator.Kind.IsOperator());
+            Requires.NotNull(nameof(@operator), @operator);
             Operator = @operator;
         }
     }

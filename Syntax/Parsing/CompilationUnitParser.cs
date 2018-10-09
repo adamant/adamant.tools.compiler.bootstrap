@@ -11,14 +11,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 {
     public class CompilationUnitParser : IParser<CompilationUnitSyntax>
     {
+        [NotNull]
         private readonly IParser<UsingDirectiveSyntax> usingDirectiveParser;
+
+        [NotNull]
         private readonly IParser<DeclarationSyntax> declarationParser;
+
+        [NotNull]
         private readonly IParser<NameSyntax> qualifiedNameParser;
 
         public CompilationUnitParser(
-            IParser<UsingDirectiveSyntax> usingDirectiveParser,
-            IParser<DeclarationSyntax> declarationParser,
-            IParser<NameSyntax> qualifiedNameParser)
+            [NotNull] IParser<UsingDirectiveSyntax> usingDirectiveParser,
+            [NotNull] IParser<DeclarationSyntax> declarationParser,
+            [NotNull] IParser<NameSyntax> qualifiedNameParser)
         {
             this.declarationParser = declarationParser;
             this.qualifiedNameParser = qualifiedNameParser;
@@ -26,7 +31,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         }
 
         [MustUseReturnValue]
-        public CompilationUnitSyntax Parse(ITokenStream tokens)
+        [NotNull]
+        public CompilationUnitSyntax Parse([NotNull] ITokenStream tokens)
         {
             var @namespace = ParseCompilationUnitNamespace(tokens);
             var usingDirectives = ParseUsingDirectives(tokens).ToSyntaxList();
@@ -37,27 +43,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         }
 
         [MustUseReturnValue]
-        private CompilationUnitNamespaceSyntax ParseCompilationUnitNamespace(ITokenStream tokens)
+        [CanBeNull]
+        private CompilationUnitNamespaceSyntax ParseCompilationUnitNamespace([NotNull] ITokenStream tokens)
         {
-            if (tokens.Current?.Kind != TokenKind.NamespaceKeyword) return null;
+            if (!(tokens.Current is NamespaceKeywordToken)) return null;
 
-            var namespaceKeyword = tokens.ExpectSimple(TokenKind.NamespaceKeyword);
+            var namespaceKeyword = tokens.Expect<NamespaceKeywordToken>();
             var name = qualifiedNameParser.Parse(tokens);
-            var semicolon = tokens.ExpectSimple(TokenKind.Semicolon);
+            var semicolon = tokens.Expect<SemicolonToken>();
             return new CompilationUnitNamespaceSyntax(namespaceKeyword, name, semicolon);
         }
 
         [MustUseReturnValue]
-        private IEnumerable<UsingDirectiveSyntax> ParseUsingDirectives(ITokenStream tokens)
+        [NotNull]
+        private IEnumerable<UsingDirectiveSyntax> ParseUsingDirectives([NotNull] ITokenStream tokens)
         {
-            while (tokens.CurrentIs(TokenKind.UsingKeyword))
+            while (tokens.Current is UsingKeywordToken)
             {
                 yield return usingDirectiveParser.Parse(tokens);
             }
         }
 
         [MustUseReturnValue]
-        private IEnumerable<DeclarationSyntax> ParseDeclarations(ITokenStream tokens)
+        [NotNull]
+        private IEnumerable<DeclarationSyntax> ParseDeclarations([NotNull] ITokenStream tokens)
         {
             while (!tokens.AtEndOfFile())
             {

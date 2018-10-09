@@ -1,16 +1,25 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives
 {
     public class UsingDirectiveSyntax : SyntaxNode
     {
-        public SimpleToken UsingKeyword { get; }
-        public NameSyntax Name { get; }
-        public SimpleToken Semicolon { get; }
+        [CanBeNull]
+        public UsingKeywordToken UsingKeyword { get; }
 
-        public UsingDirectiveSyntax(SimpleToken usingKeyword, NameSyntax name, SimpleToken semicolon)
+        [NotNull]
+        public NameSyntax Name { get; }
+
+        [CanBeNull]
+        public SemicolonToken Semicolon { get; }
+
+        public UsingDirectiveSyntax(
+            [CanBeNull] UsingKeywordToken usingKeyword,
+            [NotNull] NameSyntax name,
+            [CanBeNull] SemicolonToken semicolon)
         {
             Requires.NotNull(nameof(name), name);
             UsingKeyword = usingKeyword;

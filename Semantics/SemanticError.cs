@@ -14,9 +14,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
     /// </summary>
     public static class SemanticError
     {
-        public static Diagnostic OperatorCannotBeAppliedToOperandsOfType(CodeFile file, TextSpan span, TokenKind @operator, DataType leftOperandType, DataType rightOperandType)
+        public static Diagnostic OperatorCannotBeAppliedToOperandsOfType(CodeFile file, TextSpan span, OperatorToken @operator, DataType leftOperandType, DataType rightOperandType)
         {
-            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3001, $"Operator `{@operator}` cannot be applied to operands of type `{leftOperandType}` and `{rightOperandType}`.");
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3001, $"Operator `{@operator.Text(file.Code)}` cannot be applied to operands of type `{leftOperandType}` and `{rightOperandType}`.");
         }
 
         public static Diagnostic BorrowedValueDoesNotLiveLongEnough(CodeFile file, TextSpan span)

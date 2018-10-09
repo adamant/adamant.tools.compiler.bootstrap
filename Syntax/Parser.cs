@@ -32,10 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         [MustUseReturnValue]
         public CompilationUnitSyntax Parse(ITokenStream tokens)
         {
-            if (tokens is TokenStreamWithoutTrivia noTrivia)
-                return compilationUnitParser.Parse(noTrivia);
-
-            return compilationUnitParser.Parse(new TokenStreamWithoutTrivia(tokens));
+            return compilationUnitParser.Parse(tokens);
         }
     }
 }

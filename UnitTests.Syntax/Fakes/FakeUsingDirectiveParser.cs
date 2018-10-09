@@ -1,20 +1,21 @@
+using System;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
-using Xunit;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes
 {
     public class FakeUsingDirectiveParser : IParser<UsingDirectiveSyntax>
     {
-        public UsingDirectiveSyntax Parse(ITokenStream tokens)
+        [NotNull]
+        public UsingDirectiveSyntax Parse([NotNull] ITokenStream tokens)
         {
-            var usingKeyword = tokens.ExpectSimple(TokenKind.UsingKeyword);
-            Assert.Equal(TokenKind.UsingKeyword, usingKeyword.Kind);
+            var _ = tokens.Expect<UsingKeywordToken>();
 
             var fakeToken = tokens.ExpectFake();
-            return (UsingDirectiveSyntax)fakeToken.Value;
+            return (UsingDirectiveSyntax)fakeToken?.FakeNode ?? throw new InvalidOperationException();
         }
     }
 }

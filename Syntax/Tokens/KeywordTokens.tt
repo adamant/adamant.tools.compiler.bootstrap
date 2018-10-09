@@ -1,0 +1,71 @@
+<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<#
+    var keywords = new List<string>()
+    {
+        "Public",
+        "Protected",
+        "Private",
+        "Let",
+        "Var",
+        "Void",
+        "Int",
+        "UInt",
+        "Byte",
+        "Size",
+        "Bool",
+        "String",
+        "Return",
+        "Class",
+        "Function",
+        "New",
+        "Init",
+        "Delete",
+        "Owned",
+        "Namespace",
+        "Using",
+        "Foreach",
+        "In",
+        "If",
+        "Else",
+        "Struct",
+        "Enum",
+        "Unsafe",
+        "Safe",
+        "Self",
+        "SelfType",
+        "Base",
+    }.AsReadOnly();
+#>
+using System;
+using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Core;
+using JetBrains.Annotations;
+
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
+{
+    public static partial class Keywords
+    {
+        [NotNull][ItemNotNull]
+        public static readonly IReadOnlyList<Type> TokenTypes = new List<Type>()
+        {
+<# foreach(var keyword in keywords) {#>
+            typeof(<#=keyword#>KeywordToken),
+<#}#>
+        }.AsReadOnly();
+    }
+<# foreach(var keyword in keywords) {#>
+
+    public class <#=keyword#>KeywordToken : KeywordToken
+    {
+        public <#=keyword#>KeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+<#}#>
+}

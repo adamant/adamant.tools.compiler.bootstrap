@@ -8,12 +8,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
     public class QualifiedNameParser : IParser<NameSyntax>
     {
         [MustUseReturnValue]
-        public NameSyntax Parse(ITokenStream tokens)
+        [NotNull]
+        public NameSyntax Parse([NotNull] ITokenStream tokens)
         {
             NameSyntax qualifiedName = new IdentifierNameSyntax(tokens.ExpectIdentifier());
-            while (tokens.CurrentIs(TokenKind.Dot))
+            while (tokens.Current is DotToken)
             {
-                var dot = tokens.ExpectSimple(TokenKind.Dot);
+                var dot = tokens.Expect<DotToken>();
                 var name = new IdentifierNameSyntax(tokens.ExpectIdentifier());
                 qualifiedName = new QualifiedNameSyntax(qualifiedName, dot, name);
             }

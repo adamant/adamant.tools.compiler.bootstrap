@@ -17,6 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2018.2.1" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.5" />
   </ItemGroup>
 

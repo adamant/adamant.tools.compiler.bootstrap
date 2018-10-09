@@ -1,0 +1,39 @@
+<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<#
+    var operators = new List<string>()
+    {
+        "OpenBrace", // `{` U+007B
+        "CloseBrace", // `}` U+007D
+        "OpenParen", // `(` U+0028
+        "CloseParen", // `)` U+0029
+        "OpenBracket", // `[` U+005B
+        "CloseBracket", // `]` U+005D
+        "Semicolon", // `;` U+003B
+        "Comma", // `",` U+002C
+        "Dollar", // `$` U+0024
+        "Pipe", // `|` U+007C
+        "Question", // `?` U+003F
+        "Colon", // `:` U+003A
+        "RightArrow", // `→` U+2192", `->` U+002D", U+003E
+    }.AsReadOnly();
+#>
+using Adamant.Tools.Compiler.Bootstrap.Core;
+
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
+{
+<# foreach(var @operator in operators) {#>
+    public class <#=@operator#>Token : SymbolToken
+    {
+        public <#=@operator#>Token(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+<#}#>
+}

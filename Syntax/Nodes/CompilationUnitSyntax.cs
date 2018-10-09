@@ -5,22 +5,31 @@ using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
 {
     public class CompilationUnitSyntax : SyntaxNode, IEquatable<CompilationUnitSyntax>
     {
+        [CanBeNull]
         public CompilationUnitNamespaceSyntax Namespace { get; }
+
+        [NotNull]
         public SyntaxList<UsingDirectiveSyntax> UsingDirectives { get; }
+
+        [NotNull]
         public SyntaxList<DeclarationSyntax> Declarations { get; }
+
+        [NotNull]
         public EndOfFileToken EndOfFile { get; }
-        public IReadOnlyList<Diagnostic> Diagnostics => EndOfFile.Value;
+
+        public IReadOnlyList<Diagnostic> Diagnostics => EndOfFile.Diagnostics;
 
         public CompilationUnitSyntax(
-            CompilationUnitNamespaceSyntax @namespace,
-            SyntaxList<UsingDirectiveSyntax> usingDirectives,
-            SyntaxList<DeclarationSyntax> declarations,
-            EndOfFileToken endOfFile)
+            [CanBeNull] CompilationUnitNamespaceSyntax @namespace,
+            [NotNull] SyntaxList<UsingDirectiveSyntax> usingDirectives,
+            [NotNull] SyntaxList<DeclarationSyntax> declarations,
+            [NotNull] EndOfFileToken endOfFile)
         {
             Requires.NotNull(nameof(usingDirectives), usingDirectives);
             Requires.NotNull(nameof(declarations), declarations);
@@ -30,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
             EndOfFile = endOfFile;
         }
 
-        public void AllDiagnostics(List<Diagnostic> list)
+        public void AllDiagnostics([NotNull] List<Diagnostic> list)
         {
             list.AddRange(Diagnostics);
         }

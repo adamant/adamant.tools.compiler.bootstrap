@@ -1,4 +1,4 @@
-using System;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
@@ -6,21 +6,30 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 {
+    // Delegate needed so we can declare the arg as not null
+    public delegate T ParseFunction<out T>([NotNull] ITokenStream stream)
+        where T : SyntaxNode;
+
     public interface IListParser
     {
         [MustUseReturnValue]
-        SyntaxList<T> ParseList<T>(
-            ITokenStream tokens,
-            Func<ITokenStream, T> parseItem,
-            TokenKind terminator)
-            where T : SyntaxNode;
+        [NotNull]
+        SyntaxList<T> ParseList<T, TTerminator>(
+            [NotNull] ITokenStream tokens,
+            [NotNull] ParseFunction<T> parseItem,
+            TypeOf<TTerminator> terminatorType)
+            where T : SyntaxNode
+            where TTerminator : Token;
 
         [MustUseReturnValue]
-        SeparatedListSyntax<T> ParseSeparatedList<T>(
-            ITokenStream tokens,
-            Func<ITokenStream, T> parseItem,
-            TokenKind separator,
-            TokenKind terminator)
-            where T : SyntaxNode;
+        [NotNull]
+        SeparatedListSyntax<T> ParseSeparatedList<T, TSeparator, TTerminator>(
+            [NotNull] ITokenStream tokens,
+            [NotNull] ParseFunction<T> parseItem,
+            TypeOf<TSeparator> separatorType,
+            TypeOf<TTerminator> terminatorType)
+            where T : SyntaxNode
+            where TSeparator : Token
+            where TTerminator : Token;
     }
 }
