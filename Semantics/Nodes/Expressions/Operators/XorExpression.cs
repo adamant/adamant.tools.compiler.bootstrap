@@ -6,13 +6,9 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.Operators
 {
-    /// <summary>
-    /// This is an actual add between primitive types, a user defined plus operator
-    /// should be a function call
-    /// </summary>
-    public class AddExpression : BinaryOperatorExpression
+    public class XorExpression : BinaryOperatorExpression
     {
-        public AddExpression(
+        public XorExpression(
             [NotNull] BinaryOperatorExpressionSyntax syntax,
             [NotNull][ItemNotNull] IEnumerable<Diagnostic> diagnostics,
             [NotNull] Expression leftOperand,

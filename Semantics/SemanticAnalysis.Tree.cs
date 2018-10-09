@@ -173,6 +173,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                                     AllDiagnostics(binaryOperatorExpression),
                                     leftOperand, rightOperand, Type(binaryOperatorExpression));
 
+                            case AndKeywordToken _:
+                                return new AndExpression(binaryOperatorExpression,
+                                    AllDiagnostics(binaryOperatorExpression),
+                                    leftOperand, rightOperand, Type(binaryOperatorExpression));
+
+                            case OrKeywordToken _:
+                                return new OrExpression(binaryOperatorExpression,
+                                    AllDiagnostics(binaryOperatorExpression),
+                                    leftOperand, rightOperand, Type(binaryOperatorExpression));
+
+                            case XorKeywordToken _:
+                                return new XorExpression(binaryOperatorExpression,
+                                    AllDiagnostics(binaryOperatorExpression),
+                                    leftOperand, rightOperand, Type(binaryOperatorExpression));
+
                             default:
                                 throw NonExhaustiveMatchException.For(binaryOperatorExpression.Operator);
                         }
