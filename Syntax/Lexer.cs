@@ -120,8 +120,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                             case '/':
                                 // it is a line comment `//`
                                 tokenEnd = tokenStart + 2;
-                                while (tokenEnd < text.Length && text[tokenEnd] != '\r' && text[tokenEnd] != '\n')
+                                // Include newline at end
+                                while (tokenEnd < text.Length)
+                                {
+                                    currentChar = text[tokenEnd];
                                     tokenEnd += 1;
+                                    if (currentChar == '\r' || currentChar == '\n')
+                                        break;
+                                }
 
                                 yield return new CommentToken(TokenSpan());
                                 break;
@@ -129,17 +135,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                                 // it is a block comment `/*`
                                 tokenEnd = tokenStart + 2;
                                 var lastCharWasStar = false;
-                                while (tokenEnd < text.Length && !(lastCharWasStar && text[tokenEnd] == '/'))
+                                // Include slash at end
+                                for (; ; )
                                 {
-                                    lastCharWasStar = text[tokenEnd] == '*';
+                                    // If we ran into the end of the file, error
+                                    if (tokenEnd >= text.Length)
+                                    {
+                                        diagnostics.Add(LexError.UnclosedBlockComment(file,
+                                            TextSpan.FromStartEnd(tokenStart, tokenEnd)));
+                                        break;
+                                    }
+                                    currentChar = text[tokenEnd];
                                     tokenEnd += 1;
+                                    if (lastCharWasStar && currentChar == '/')
+                                        break;
+                                    lastCharWasStar = currentChar == '*';
                                 }
-                                // If we didn't run into the end of the file, we need to move past the file '/'
-                                if (tokenEnd < text.Length)
-                                    tokenEnd += 1;
-                                else // Else error
-                                    diagnostics.Add(LexError.UnclosedBlockComment(file,
-                                        TextSpan.FromStartEnd(tokenStart, tokenEnd)));
 
                                 yield return new CommentToken(TokenSpan());
                                 break;
@@ -228,6 +239,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         if (char.IsWhiteSpace(currentChar))
                         {
                             tokenEnd = tokenStart + 1;
+                            // Include whitespace at end
                             while (tokenEnd < text.Length && char.IsWhiteSpace(text[tokenEnd]))
                                 tokenEnd += 1;
 
@@ -259,7 +271,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             }
 
             // The end of file token provides something to attach any final errors to
-            yield return new EndOfFileToken(new TextSpan(tokenStart, 0), diagnostics);
+            yield return new EndOfFileToken(SymbolSpan(0), diagnostics);
             yield break;
 
             TextSpan SymbolSpan(int length = 1)
@@ -277,21 +289,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             {
                 var span = TextSpan.FromStartEnd(tokenStart, tokenEnd);
                 var value = code[span];
-                if (Keywords.Factories.TryGetValue(value, out var factory))
-                    return factory(span);
+                if (Tokens.TokenTypes.KeywordFactories.TryGetValue(value, out var keywordFactory))
+                    return keywordFactory(span);
+                if (Tokens.TokenTypes.BooleanOperatorFactories.TryGetValue(value, out var operatorFactory))
+                    return operatorFactory(span);
 
-                // The keyword operators aren't in the list of keyword factories
-                switch (value)
-                {
-                    case "and":
-                        return new AndKeywordToken(span);
-                    case "or":
-                        return new OrKeywordToken(span);
-                    case "xor":
-                        return new XorKeywordToken(span);
-                    default:
-                        return new BareIdentifierToken(span, value);
-                }
+                return new BareIdentifierToken(span, value);
             }
 
             char? NextChar()
@@ -300,7 +303,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                 return index < text.Length ? text[index] : default;
             }
 
-            // TODO replace all uses of this with `switch(NextChar())`
             bool NextCharIs(char c)
             {
                 var index = tokenStart + 1;

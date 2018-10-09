@@ -1,29 +1,31 @@
 using System;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics
 {
     public class Diagnostic
     {
-        public readonly CodeFile File;
+        [NotNull] public readonly CodeFile File;
         public readonly TextSpan Span;
         public readonly TextPosition StartPosition;
         public readonly TextPosition EndPosition;
         public readonly DiagnosticLevel Level;
         public readonly DiagnosticPhase Phase;
         public readonly int ErrorCode;
-        public readonly string Message;
+        [NotNull] public readonly string Message;
 
         public Diagnostic(
-            CodeFile file,
+            [NotNull] CodeFile file,
             TextSpan span,
             DiagnosticLevel level,
             DiagnosticPhase phase,
             int errorCode,
-            string message)
+            [NotNull] string message)
         {
             if (string.IsNullOrWhiteSpace(message))
                 throw new ArgumentException("message", nameof(message));
 
+            Requires.NotNull(nameof(file), file);
             Requires.ValidEnum(nameof(level), level);
             Requires.ValidEnum(nameof(phase), phase);
 

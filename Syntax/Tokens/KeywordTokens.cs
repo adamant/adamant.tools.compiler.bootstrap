@@ -5,10 +5,10 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 {
-    public static partial class Keywords
+    public static partial class TokenTypes
     {
-        [NotNull]
-        public static readonly IReadOnlyList<Type> TokenTypes = new List<Type>()
+        [NotNull][ItemNotNull]
+        public static readonly IReadOnlyList<Type> Keyword = new List<Type>()
         {
             typeof(PublicKeywordToken),
             typeof(ProtectedKeywordToken),

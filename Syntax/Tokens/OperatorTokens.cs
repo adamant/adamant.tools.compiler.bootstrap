@@ -154,28 +154,4 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public class AndKeywordToken : OperatorToken
-    {
-        public AndKeywordToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
-    public class XorKeywordToken : OperatorToken
-    {
-        public XorKeywordToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
-    public class OrKeywordToken : OperatorToken
-    {
-        public OrKeywordToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
 }

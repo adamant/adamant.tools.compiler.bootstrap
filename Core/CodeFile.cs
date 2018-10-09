@@ -1,5 +1,7 @@
 using System.IO;
 using System.Text;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
@@ -8,21 +10,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
     {
         /// Source code files are encoded with UTF-8 without a BOM. C# UTF-8 include
         /// the BOM by default. So we make our own Encoding object.
+        [NotNull]
         public static readonly Encoding Encoding = new UTF8Encoding(false);
 
+        [NotNull]
         public CodeReference Reference { get; }
+
+        [NotNull]
         public CodeText Code { get; }
 
-        public CodeFile(CodeReference reference, CodeText text)
+        public CodeFile([NotNull] CodeReference reference, [NotNull] CodeText text)
         {
             Code = text;
             Reference = reference;
         }
 
-        public static CodeFile Load(string path)
+        [NotNull]
+        public static CodeFile Load([NotNull]string path)
         {
             var fullPath = Path.GetFullPath(path);
-            return new CodeFile(new CodePath(fullPath), new CodeText(File.ReadAllText(fullPath, Encoding)));
+            return new CodeFile(new CodePath(fullPath), new CodeText(File.ReadAllText(fullPath, Encoding).AssertNotNull()));
         }
     }
 }

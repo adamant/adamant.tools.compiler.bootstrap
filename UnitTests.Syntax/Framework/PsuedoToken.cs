@@ -55,6 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
             }
         }
 
+        [NotNull]
         public CodeFile ToFakeCodeFile()
         {
             return Text.ToFakeCodeFile();
@@ -87,15 +88,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
             switch (Value)
             {
                 case null:
-                    return $"{TokenType}{textValue}";
+                    return $"{TokenType.Name}{textValue}";
                 case string s:
-                    return $"{TokenType}{textValue} 【{Regex.Escape(s)}】";
+                    return $"{TokenType.Name}{textValue} 【{Regex.Escape(s)}】";
                 case BigInteger i:
-                    return $"{TokenType}{textValue} {i}";
+                    return $"{TokenType.Name}{textValue} {i}";
                 case IReadOnlyList<Diagnostic> diagnostics:
-                    return $"{TokenType}{textValue} [{diagnostics.DebugFormat()}]";
+                    return $"{TokenType.Name}{textValue} [{diagnostics.DebugFormat()}]";
                 default:
-                    return $"{TokenType}{textValue} InvalidValue={Value}";
+                    return $"{TokenType.Name}{textValue} InvalidValue={Value}";
             }
         }
     }

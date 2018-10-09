@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using Adamant.Tools.Compiler.Bootstrap.UnitTests.Framework;
 using Fare;
 using FsCheck;
 using JetBrains.Annotations;
@@ -24,54 +26,97 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
 
         private static Gen<List<PsuedoToken>> GenPsuedoTokenList()
         {
-            //Gen.ListOf(Gen.Elements("fizz", "buzz", "bazz", "+", " ", "if")).Where(list => ...);
-            //Gen.Sized(size =>
-            //{
-            //    Arb.Generate<int>().Select(length =>
-            //    {
-            //        var tokens = new List<PsuedoToken>(length);
-            //        for (int i = 0; i < length; i++)
-            //        {
-            //            var lastToken = tokens.LastOrDefault();
-            //            var newToken = GenPsuedoToken().
-            //        }
-
-            //        return tokens;
-            //    });
-            //});
-            //return Gen.ListOf(GenPsuedoToken()).Select(l => l.ToList());
-            throw new NotImplementedException();
+            return Gen.Sized(size => GenPsuedoTokenList(size, size));
         }
 
-        //private static IEnumerable<Gen<PsuedoToken>> GenPsuedoTokens()
-        //{
-        //    var lastToken = null;
+        [NotNull]
+        private static Gen<List<PsuedoToken>> GenPsuedoTokenList(int size, int length)
+        {
+            Requires.Positive(nameof(size), size);
+            Requires.Positive(nameof(length), length);
+            if (length == 0)
+                return Gen.Fresh(() => new List<PsuedoToken>());
 
-        //}
+            return GenPsuedoTokenList(size, length - 1).Select(list => AppendPsuedoToken(size, list));
+        }
 
+        [NotNull]
+        private static List<PsuedoToken> AppendPsuedoToken(
+            int size,
+            [NotNull] List<PsuedoToken> tokens)
+        {
+            var lastToken = tokens.LastOrDefault();
+            // TODO this is a huge hack calling Sample() FIX IT!
+            var token = GenPsuedoToken().Where(t =>
+            {
+                if (lastToken == null) return true;
+
+                return !SeparateTokens(lastToken, t);
+
+            }).Sample(size, 1).Single();
+            tokens.Add(token);
+            return tokens;
+        }
+
+        private static bool SeparateTokens([NotNull] PsuedoToken t1, [NotNull] PsuedoToken t2)
+        {
+            switch (t1.Text)
+            {
+                case ".":
+                    return t2.Text == "." || t2.Text == "..";
+                case "+":
+                case "*":
+                case ">":
+                case "<":
+                    return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=";
+                case "-":
+                    return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == ">" || t2.Text == ">=";
+                case "/":
+                    return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/="
+                        || t2.Text == "*" || t2.Text == "*="
+                        || t2.Text == "/" || t2.Text == "/="
+                        || t2.TokenType == typeof(CommentToken);
+                case "=":
+                    return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == "/=";
+                default:
+                    if (typeof(KeywordToken).IsAssignableFrom(t1.TokenType)
+                        || typeof(IdentifierToken).IsAssignableFrom(t1.TokenType)
+                        || typeof(BooleanOperatorToken).IsAssignableFrom(t1.TokenType))
+                        return typeof(IdentifierToken).IsAssignableFrom(t2.TokenType)
+                            || typeof(KeywordToken).IsAssignableFrom(t2.TokenType)
+                            || typeof(BooleanOperatorToken).IsAssignableFrom(t2.TokenType)
+                            || t2.TokenType == typeof(IntegerLiteralToken);
+                    else if (t1.TokenType == typeof(IntegerLiteralToken))
+                        return t2.TokenType == typeof(IntegerLiteralToken);
+                    else if (t1.TokenType == typeof(WhitespaceToken))
+                        return t2.TokenType == typeof(WhitespaceToken);
+                    else
+                        return false;
+            }
+        }
+
+        [NotNull]
         private static Gen<PsuedoToken> GenPsuedoToken()
         {
             return Gen.Frequency(
-                Weighted(10, GenSymbol()),
-                Weighted(10, GenWhitespace()),
-                Weighted(1, GenComment()),
-                Weighted(10, GenBareIdentifier()),
-                Weighted(5, GenEscapedIdentifier()),
-                Weighted(5, GenIntegerLiteral()),
-                Weighted(5, GenStringLiteral()));
+                GenSymbol().WithWeight(20),
+                GenWhitespace().WithWeight(10),
+                GenComment().WithWeight(5),
+                GenBareIdentifier().WithWeight(10),
+                GenEscapedIdentifier().WithWeight(5),
+                GenIntegerLiteral().WithWeight(5),
+                GenStringLiteral().WithWeight(5))
+                .AssertNotNull();
         }
 
-        private static WeightAndValue<Gen<PsuedoToken>> Weighted(int weight, Gen<PsuedoToken> generator)
-        {
-            return new WeightAndValue<Gen<PsuedoToken>>(weight, generator);
-        }
-
+        [NotNull]
         private static Gen<PsuedoToken> GenSymbol()
         {
             return Gen.Elements(Symbols.AsEnumerable())
                 .Select(item => new PsuedoToken(item.Value, item.Key));
         }
 
+        [NotNull]
         private static Gen<string> GenRegex(string pattern)
         {
             return Gen.Sized(size =>
@@ -83,19 +128,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
             });
         }
 
+        [NotNull]
         private static Gen<PsuedoToken> GenWhitespace()
         {
             return GenRegex("[ \t\n\r]")
                 .Select(s => new PsuedoToken(typeof(WhitespaceToken), s));
         }
 
+        [NotNull]
         private static Gen<PsuedoToken> GenComment()
         {
             // Covers both block comments and line comments
-            return GenRegex(@"/\*(\**[^/])*\*/|//.*")
+            // For line comments, end in newline requires escape sequences
+            return GenRegex(@"(/\*(\**[^/])*\*/)|" + "(//.*[\r\n])")
                 .Select(s => new PsuedoToken(typeof(CommentToken), s));
         }
 
+        [NotNull]
         private static Gen<PsuedoToken> GenBareIdentifier()
         {
             return GenRegex(@"[a-zA-Z_][a-zA-Z_0-9]*")
@@ -103,6 +152,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
                 .Select(s => new PsuedoToken(typeof(BareIdentifierToken), s, s));
         }
 
+        [NotNull]
         private static Gen<PsuedoToken> GenEscapedIdentifier()
         {
             return GenRegex(@"\\[a-zA-Z_0-9]+")
@@ -110,12 +160,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
                 .Select(s => new PsuedoToken(typeof(EscapedIdentifierToken), s, s.Substring(1)));
         }
 
+        [NotNull]
         private static Gen<PsuedoToken> GenIntegerLiteral()
         {
             return GenRegex(@"0|[1-9][0-9]*")
                 .Select(s => new PsuedoToken(typeof(IntegerLiteralToken), s, BigInteger.Parse(s)));
         }
 
+        [NotNull]
         private static Gen<PsuedoToken> GenStringLiteral()
         {
             // @"""([^\\]|\\(r|n|0|t|'|""|\\|u\([0-9a-fA-F]{1,6}\)))*"""
@@ -196,6 +248,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
             { "in", typeof(InKeywordToken) },
             { "if", typeof(IfKeywordToken) },
             { "else", typeof(ElseKeywordToken) },
+            { "not", typeof(NotKeywordToken) },
             { "and", typeof(AndKeywordToken) },
             { "or", typeof(OrKeywordToken) },
             { "xor", typeof(XorKeywordToken) },
@@ -213,11 +266,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
             { "owned", typeof(OwnedKeywordToken) },
             { "self", typeof(SelfKeywordToken) }
         }.AsReadOnly();
-
-        //public static IReadOnlyDictionary<TokenKind, List<Func<PsuedoToken, PsuedoToken, bool>>> PairRestrictions = new ReadOnlyDictionary<TokenKind, List<Func<PsuedoToken, PsuedoToken, bool>>>(
-        //    new Dictionary<TokenKind, List<Func<PsuedoToken, PsuedoToken, bool>>>()
-        //    {
-        //        {TokenKind.Dot, }
-        //    });
     }
 }

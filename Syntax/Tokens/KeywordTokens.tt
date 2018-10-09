@@ -48,10 +48,10 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 {
-    public static partial class Keywords
+    public static partial class TokenTypes
     {
         [NotNull][ItemNotNull]
-        public static readonly IReadOnlyList<Type> TokenTypes = new List<Type>()
+        public static readonly IReadOnlyList<Type> Keyword = new List<Type>()
         {
 <# foreach(var keyword in keywords) {#>
             typeof(<#=keyword#>KeywordToken),

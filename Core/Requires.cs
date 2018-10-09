@@ -11,10 +11,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
     /// </summary>
     public static class Requires
     {
-        internal static void Positive([NotNull] string parameter, int value)
+        public static void Positive([NotNull] string parameter, int value)
         {
             if (value < 0)
-                throw new ArgumentOutOfRangeException(parameter, value, "Must not be greater than or equal to zero");
+                throw new ArgumentOutOfRangeException(parameter, value, "Must be greater than or equal to zero");
         }
 
         public static void InString([NotNull] string inString, [NotNull] string parameter, TextSpan value)

@@ -35,8 +35,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
 
         [Theory]
         [InlineData(@"""Hello World!""", "Hello World!")]
-        [InlineData(@""" \r \n \0 \t \"" \' """, " \r \n \0 \t \" ' ")]
-        [InlineData(@"""\u(2660)""", "\u2660")]
+        [InlineData(@""" \r \n \0 \t \"" \' """, " \r \n \0 \t \" ' ")] // basic escape sequences
+        [InlineData(@"""\u(2660)""", "\u2660")] // basic unicode escape sequences
         [InlineData(@""" \u(FFFF) \u(a) """, " \uFFFF \u000A ")]
         [InlineData(@""" \u(10FFFF) """, " \uDBFF\uDFFF ")] // Surrogate Pair
         public void String_literal_value([NotNull] string literal, [NotNull] string value)
@@ -104,8 +104,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
             diagnostic.AssertError(1001, 0, 2);
         }
 
+        // TODO End of file on line comment
+        // TODO `/*/` ?
+
         [Fact]
-        public void End_of_file_in_string_gives_error()
+        public void End_of_file_in_string()
         {
             var file = @"""Hello".ToFakeCodeFile();
             var tokens = lexer.Lex(file);
@@ -133,6 +136,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
         [InlineData(@"""\u(1f|""", "\u001f|")]
         [InlineData(@"""\u()""", "u()")]
         [InlineData(@"""\u(110000)""", "u(110000)")] // 1 too high
+        // TODO can't put in surrogate pairs
         public void Invalid_escape_sequence([NotNull] string literal, [NotNull] string expectedValue)
         {
             var file = literal.ToFakeCodeFile();
@@ -169,7 +173,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
             token[2].AssertIs<WhitespaceToken>(2, 1);
             diagnostics.AssertCount(1);
             diagnostics[0].AssertError(1005, 1, 1);
-            Assert.True(diagnostics[0].Message.Contains(text[1]), "Doesn't contain character");
+            Assert.True(diagnostics[0]?.Message.Contains(text[1]), "Doesn't contain character");
         }
 
         [Property(MaxTest = 10_000)]
@@ -193,12 +197,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
                 var outputAsPsuedoTokens = output.ToPsuedoTokens(file);
                 var expectedPsuedoTokens = token.Yield().Append(PsuedoToken.EndOfFile()).ToList();
                 return expectedPsuedoTokens.SequenceEqual(outputAsPsuedoTokens)
-                    .Label($"Output: {outputAsPsuedoTokens.DebugFormat()} != Expected: {expectedPsuedoTokens.DebugFormat()}")
-                    .Collect(token.GetType().Name);
+                    .Label($"Actual:   {outputAsPsuedoTokens.DebugFormat()}")
+                    .Label($"Expected: {expectedPsuedoTokens.DebugFormat()}")
+                    .Collect(token.TokenType.Name);
             });
         }
 
-        [Property]
+        [Property(MaxTest = 200)]
         public Property Valid_token_sequence_lexes_back_to_itself()
         {
             return Prop.ForAll(Arbitrary.PsuedoTokenList(), tokens =>
@@ -209,7 +214,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
                 var outputAsPsuedoTokens = output.ToPsuedoTokens(file);
                 var expectedPsuedoTokens = tokens.Append(PsuedoToken.EndOfFile()).ToList();
                 return expectedPsuedoTokens.SequenceEqual(outputAsPsuedoTokens)
-                    .Label($"Output: {outputAsPsuedoTokens.DebugFormat()} != Expected: {expectedPsuedoTokens.DebugFormat()}");
+                    .Label($"Text: „{file.Code.Text}„")
+                    .Label($"Actual:   {outputAsPsuedoTokens.DebugFormat()}")
+                    .Label($"Expected: {expectedPsuedoTokens.DebugFormat()}");
             });
         }
     }

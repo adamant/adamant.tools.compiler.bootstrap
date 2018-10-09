@@ -26,9 +26,6 @@
         "MinusEquals", // `-=` U+002D", U+003D
         "AsteriskEquals", // `*=` U+002A", U+003D
         "SlashEquals", // `/=` U+002F", U+003D
-        "AndKeyword",
-        "XorKeyword",
-        "OrKeyword",
     }.AsReadOnly();
 #>
 using Adamant.Tools.Compiler.Bootstrap.Core;

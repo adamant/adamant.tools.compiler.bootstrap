@@ -74,6 +74,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
             return (tokensList[0], diagnostics);
         }
 
+        [NotNull]
+        [ItemNotNull]
         public static List<Diagnostic> AssertCount(
             [NotNull][ItemNotNull] this IEnumerable<Diagnostic> diagnostics,
             int count)
@@ -90,14 +92,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
             return diagnostics[0];
         }
 
-        public static void AssertError([NotNull] this Diagnostic diagnostic, int errorCode, int start, int length)
+        public static void AssertError([CanBeNull] this Diagnostic diagnostic, int errorCode, int start, int length)
         {
+            Assert.NotNull(diagnostic);
             Assert.Equal(DiagnosticLevel.CompilationError, diagnostic.Level);
             AssertDiagnostic(diagnostic, errorCode, start, length);
         }
 
-        public static void AssertDiagnostic([NotNull] this Diagnostic diagnostic, int errorCode, int start, int length)
+        public static void AssertDiagnostic([CanBeNull] this Diagnostic diagnostic, int errorCode, int start, int length)
         {
+            Assert.NotNull(diagnostic);
             Assert.Equal(DiagnosticPhase.Lexing, diagnostic.Phase);
             Assert.Equal(errorCode, diagnostic.ErrorCode);
             Assert.True(start == diagnostic.Span.Start, $"Expected diagnostic start {start}, was {diagnostic.Span.Start}");
