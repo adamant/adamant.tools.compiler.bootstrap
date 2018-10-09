@@ -3,7 +3,7 @@ using System.IO;
 using Adamant.Tools.Compiler.Bootstrap.UnitTests;
 using Newtonsoft.Json.Linq;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
+namespace Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data
 {
     public class CompileTestCase : TestCase
     {

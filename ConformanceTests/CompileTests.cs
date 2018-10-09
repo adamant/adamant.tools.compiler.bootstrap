@@ -2,15 +2,17 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Adamant.Tools.Compiler.Bootstrap.API;
+using Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data;
 using JetBrains.Annotations;
 using Xunit;
 using Xunit.Categories;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
+namespace Adamant.Tools.Compiler.Bootstrap.ConformanceTests
 {
+    [IntegrationTest]
+    [Category("Conformance")]
     [Category("Compile")]
     public class CompileTests
     {

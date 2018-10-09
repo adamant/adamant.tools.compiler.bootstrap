@@ -1,13 +1,13 @@
 using System;
 using System.IO;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
+namespace Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data
 {
     public static class LangTestsDirectory
     {
         public static string Get()
         {
-            const string dirName = "Language.Tests";
+            const string dirName = "ConformanceTests";
 
             var currentDirectory = Directory.GetCurrentDirectory();
             var workDirectory = currentDirectory;

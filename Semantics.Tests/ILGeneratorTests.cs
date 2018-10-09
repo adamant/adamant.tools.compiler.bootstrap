@@ -1,6 +1,6 @@
 using System.IO;
+using Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Tests.Data;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;

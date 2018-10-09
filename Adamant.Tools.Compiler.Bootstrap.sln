@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "adamantc", "adamantc\adaman
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "forge", "forge\forge.csproj", "{3EC50ACC-86FF-4975-A50C-C5F43F5C2D18}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Language.Tests", "Language.Tests\Language.Tests.csproj", "{E33B6D8B-51F0-4578-9898-7423B122BC04}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Syntax", "Syntax\Syntax.csproj", "{34857CAF-DA85-44C1-A97E-8E7B53013671}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{28A30670-D9C8-4ACF-9EA6-B3A73254AC6B}"
@@ -56,6 +54,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests.Syntax", "UnitTes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests.Framework", "UnitTests.Framework\UnitTests.Framework.csproj", "{23AA4A34-308E-4113-BF0B-7FE62C386123}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConformanceTests", "ConformanceTests\ConformanceTests.csproj", "{FCA32DCC-0EA3-4618-8C43-428745757B91}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -70,10 +70,6 @@ Global
 		{3EC50ACC-86FF-4975-A50C-C5F43F5C2D18}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3EC50ACC-86FF-4975-A50C-C5F43F5C2D18}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3EC50ACC-86FF-4975-A50C-C5F43F5C2D18}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E33B6D8B-51F0-4578-9898-7423B122BC04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E33B6D8B-51F0-4578-9898-7423B122BC04}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E33B6D8B-51F0-4578-9898-7423B122BC04}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E33B6D8B-51F0-4578-9898-7423B122BC04}.Release|Any CPU.Build.0 = Release|Any CPU
 		{34857CAF-DA85-44C1-A97E-8E7B53013671}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{34857CAF-DA85-44C1-A97E-8E7B53013671}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34857CAF-DA85-44C1-A97E-8E7B53013671}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -138,6 +134,10 @@ Global
 		{23AA4A34-308E-4113-BF0B-7FE62C386123}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{23AA4A34-308E-4113-BF0B-7FE62C386123}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{23AA4A34-308E-4113-BF0B-7FE62C386123}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCA32DCC-0EA3-4618-8C43-428745757B91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCA32DCC-0EA3-4618-8C43-428745757B91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCA32DCC-0EA3-4618-8C43-428745757B91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCA32DCC-0EA3-4618-8C43-428745757B91}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

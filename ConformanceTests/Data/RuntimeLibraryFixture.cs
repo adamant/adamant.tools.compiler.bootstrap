@@ -2,7 +2,7 @@ using System.IO;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
+namespace Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data
 {
     public class RuntimeLibraryFixture
     {

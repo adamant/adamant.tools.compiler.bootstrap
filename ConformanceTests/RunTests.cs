@@ -2,17 +2,20 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.API;
+using Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data;
 using JetBrains.Annotations;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
+namespace Adamant.Tools.Compiler.Bootstrap.ConformanceTests
 {
+    [IntegrationTest]
+    [Category("Conformance")]
+    [Category("Run")]
     public class RunTests : IClassFixture<RuntimeLibraryFixture>
     {
         private readonly ITestOutputHelper output;
@@ -23,7 +26,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         }
 
         [Theory]
-        [Category("Run")]
         [MemberData(nameof(GetAllRunTestCases))]
         public void Runs([NotNull] RunTestCase testCase)
         {
@@ -92,7 +94,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         }
 
         [Fact]
-        [Category("Run")]
         public void CanGetAllRunTestCases()
         {
             Assert.NotEmpty(GetAllRunTestCases());
