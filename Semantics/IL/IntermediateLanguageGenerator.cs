@@ -13,17 +13,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
     public class IntermediateLanguageGenerator
     {
         [NotNull]
-        public ILPackage Convert([NotNull] Package package)
+        public PackageIL Convert([NotNull] Package package)
         {
             Requires.NotNull(nameof(package), package);
-            var ilPackage = new ILPackage("default"); // TODO use the real package name
+            var ilPackage = new PackageIL("default"); // TODO use the real package name
             foreach (var declaration in package.CompilationUnits.SelectMany(Convert))
                 ilPackage.Add(declaration);
 
             return ilPackage;
         }
 
-        private static IEnumerable<ILDeclaration> Convert([NotNull] CompilationUnit compilationUnit)
+        private static IEnumerable<DeclarationIL> Convert([NotNull] CompilationUnit compilationUnit)
         {
             Requires.NotNull(nameof(compilationUnit), compilationUnit);
             return compilationUnit.Declarations
@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
                 .Where(d => d != null);
         }
 
-        private static ILDeclaration Convert([NotNull] Declaration declaration)
+        private static DeclarationIL Convert([NotNull] Declaration declaration)
         {
             Requires.NotNull(nameof(declaration), declaration);
             switch (declaration)
@@ -50,20 +50,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
             }
         }
 
-        private static ILTypeDeclaration Convert([NotNull] ClassDeclaration @class)
+        private static TypeDeclarationIL Convert([NotNull] ClassDeclaration @class)
         {
             Requires.NotNull(nameof(@class), @class);
-            return new ILTypeDeclaration(@class.Name, true);
+            return new TypeDeclarationIL(@class.Name, true);
         }
 
-        private static ILTypeDeclaration Convert([NotNull] EnumStructDeclaration enumStruct)
+        private static TypeDeclarationIL Convert([NotNull] EnumStructDeclaration enumStruct)
         {
             Requires.NotNull(nameof(enumStruct), enumStruct);
-            return new ILTypeDeclaration(enumStruct.Name, false);
+            return new TypeDeclarationIL(enumStruct.Name, false);
         }
 
         [NotNull]
-        private static ILFunctionDeclaration Convert([NotNull] FunctionDeclaration function)
+        private static FunctionDeclarationIL Convert([NotNull] FunctionDeclaration function)
         {
             return new FunctionIntermediateLanguageGenerator(function).Convert();
         }

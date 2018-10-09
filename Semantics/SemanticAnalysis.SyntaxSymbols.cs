@@ -6,6 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
@@ -13,10 +14,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
     {
         public const string SyntaxSymbolAttribute = "SyntaxSymbol";
 
-        public PackageSyntaxSymbol PackageSyntaxSymbol => SyntaxSymbol(PackageSyntax);
+        [NotNull] public PackageSyntaxSymbol PackageSyntaxSymbol => SyntaxSymbol(PackageSyntax);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public PackageSyntaxSymbol SyntaxSymbol(PackageSyntax syntax)
+        [NotNull]
+        public PackageSyntaxSymbol SyntaxSymbol([NotNull] PackageSyntax syntax)
         {
             return attributes.GetOrAdd(syntax, SyntaxSymbolAttribute, ComputePackageSyntaxSymbol);
         }
@@ -29,7 +31,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             return new PackageSyntaxSymbol(package, globalNamespace);
         }
 
-        private static IEnumerable<IDeclarationSyntaxSymbol> ComputeDeclarationSyntaxSymbols(IEnumerable<DeclarationSyntax> declarations)
+        [NotNull]
+        [ItemNotNull]
+        private static IEnumerable<IDeclarationSyntaxSymbol> ComputeDeclarationSyntaxSymbols([NotNull][ItemNotNull] IEnumerable<DeclarationSyntax> declarations)
         {
             return declarations
                 .Where(d => !(d is IncompleteDeclarationSyntax))
@@ -41,7 +45,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             //    .Concat(lookup[false].Select(ComputeDeclarationSyntaxSymbol));
         }
 
-        private static IDeclarationSyntaxSymbol ComputeDeclarationSyntaxSymbol(DeclarationSyntax declaration)
+        [NotNull]
+        private static IDeclarationSyntaxSymbol ComputeDeclarationSyntaxSymbol([NotNull] DeclarationSyntax declaration)
         {
             switch (declaration)
             {
@@ -65,12 +70,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ISyntaxSymbol SyntaxSymbol(SyntaxNode syntax)
+        [NotNull]
+        public ISyntaxSymbol SyntaxSymbol([NotNull] SyntaxNode syntax)
         {
             return attributes.GetOrAdd(syntax, SyntaxSymbolAttribute, ComputeSyntaxSymbol);
         }
 
-        private ISyntaxSymbol ComputeSyntaxSymbol(SyntaxNode syntax)
+        [NotNull]
+        private ISyntaxSymbol ComputeSyntaxSymbol([NotNull] SyntaxNode syntax)
         {
             switch (syntax)
             {

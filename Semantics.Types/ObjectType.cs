@@ -1,4 +1,6 @@
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
 {
@@ -10,15 +12,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
     // arguments supplied is *partially bound*.
     public class ObjectType : DataType
     {
-        public ObjectTypeName Name { get; }
+        [NotNull] public ObjectTypeName Name { get; }
         public bool IsMutable { get; }
 
-        public ObjectType(ObjectTypeName name, bool isMutable)
+        public ObjectType([NotNull] ObjectTypeName name, bool isMutable)
         {
+            Requires.NotNull(nameof(name), name);
             Name = name;
             IsMutable = isMutable;
         }
 
+        [NotNull]
         public override string ToString()
         {
             if (IsMutable)

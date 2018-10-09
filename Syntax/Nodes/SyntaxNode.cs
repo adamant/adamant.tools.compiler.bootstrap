@@ -9,12 +9,15 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
 {
     /// Note: Naming this `Syntax` would conflict with the `Syntax` namespace
     public abstract class SyntaxNode : ISyntaxNodeOrToken
     {
+        [NotNull]
+        [ItemNotNull]
         public IEnumerable<SyntaxNode> DescendantsAndSelf()
         {
             var nodes = new Stack<SyntaxNode>();

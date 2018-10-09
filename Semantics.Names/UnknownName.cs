@@ -1,4 +1,6 @@
 using System.Text;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
 {
@@ -8,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
     public class UnknownName : Name
     {
         #region Singleton
-        public static readonly UnknownName Instance = new UnknownName();
+        [NotNull] public static readonly UnknownName Instance = new UnknownName();
 
         private UnknownName()
             : base("⧼Unknown Name⧽")
@@ -16,8 +18,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
         }
         #endregion
 
-        public override void GetFullName(StringBuilder builder)
+        public override void GetFullName([NotNull] StringBuilder builder)
         {
+            Requires.NotNull(nameof(builder), builder);
             builder.Append(EntityName);
         }
     }

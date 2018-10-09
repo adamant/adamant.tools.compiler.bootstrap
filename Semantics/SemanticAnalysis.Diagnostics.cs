@@ -10,6 +10,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
@@ -18,29 +19,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         private const string DiagnosticsAttribute = "Diagnostics";
         private const string AllDiagnosticsAttribute = "AllDiagnostics";
 
-        private readonly IReadOnlyCollection<Diagnostic> noDiagnostics = new ReadOnlyCollectionBuilder<Diagnostic>().ToReadOnlyCollection();
+        [NotNull] private readonly IReadOnlyCollection<Diagnostic> noDiagnostics = new ReadOnlyCollectionBuilder<Diagnostic>().ToReadOnlyCollection();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public IReadOnlyCollection<Diagnostic> IncompleteDiagnostics(SyntaxNode syntax)
+        public IReadOnlyCollection<Diagnostic> IncompleteDiagnostics([NotNull] SyntaxNode syntax)
         {
             return attributes.GetOrAdd(syntax, DiagnosticsAttribute, NewDiagnosticsBag);
         }
 
-        private static ConcurrentBag<Diagnostic> NewDiagnosticsBag(SyntaxNode syntax)
+        private static ConcurrentBag<Diagnostic> NewDiagnosticsBag([NotNull] SyntaxNode syntax)
         {
             return new ConcurrentBag<Diagnostic>();
         }
 
-        private void AddDiagnostic(SyntaxNode syntax, Diagnostic diagnostic)
+        private void AddDiagnostic([NotNull] SyntaxNode syntax, [NotNull] Diagnostic diagnostic)
         {
             attributes.GetOrAdd(syntax, DiagnosticsAttribute, NewDiagnosticsBag).Add(diagnostic);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public IReadOnlyCollection<Diagnostic> AllDiagnostics(SyntaxNode s) =>
+        [NotNull]
+        public IReadOnlyCollection<Diagnostic> AllDiagnostics([NotNull] SyntaxNode s) =>
             attributes.GetOrAdd(s, AllDiagnosticsAttribute, ComputeAllDiagnostics);
 
-        private IReadOnlyCollection<Diagnostic> ComputeAllDiagnostics(SyntaxNode syntax)
+        [NotNull]
+        [ItemNotNull]
+        private IReadOnlyCollection<Diagnostic> ComputeAllDiagnostics([NotNull]SyntaxNode syntax)
         {
             switch (syntax)
             {

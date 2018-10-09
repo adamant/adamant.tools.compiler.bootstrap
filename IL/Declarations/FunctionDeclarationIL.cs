@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code;
 using Adamant.Tools.Compiler.Bootstrap.IL.Refs;
@@ -9,7 +8,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IL.Declarations
 {
-    public class ILFunctionDeclaration : ILDeclaration
+    public class FunctionDeclarationIL : DeclarationIL
     {
         public readonly string Name;
         public readonly int Arity;
@@ -23,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Declarations
         public BasicBlock EntryBlock => basicBlocks.First();
         public BasicBlock ExitBlock => basicBlocks.Last(); // TODO this is likely not right
 
-        public ILFunctionDeclaration([NotNull] string name, int arity)
+        public FunctionDeclarationIL([NotNull] string name, int arity)
         {
             Requires.NotNull(nameof(name), name);
             Name = name;

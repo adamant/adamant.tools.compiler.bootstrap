@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Refs
         [NotNull] private readonly ILookup<BasicBlock, BasicBlock> from;
         [NotNull] private readonly ILookup<BasicBlock, BasicBlock> to;
 
-        public Edges([NotNull] ILFunctionDeclaration function)
+        public Edges([NotNull] FunctionDeclarationIL function)
             : base(function.BasicBlocks.SelectMany(b => b.EndStatement.OutBlocks().Select(e => new Edge(b, function.BasicBlocks[e]))).ToList())
         {
             from = this.ToLookup(e => e.From, e => e.To);

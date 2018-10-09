@@ -7,6 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
@@ -15,41 +16,41 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public const string NameAttribute = "Name";
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public PackageName Name(PackageSyntax s) => Name<PackageName>(s);
+        public PackageName Name([NotNull] PackageSyntax s) => Name<PackageName>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public GlobalNamespaceName Name(CompilationUnitSyntax s) => Name<GlobalNamespaceName>(s);
+        public GlobalNamespaceName Name([NotNull] CompilationUnitSyntax s) => Name<GlobalNamespaceName>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public FunctionName Name(FunctionDeclarationSyntax s) => Name<FunctionName>(s);
+        public FunctionName Name([NotNull] FunctionDeclarationSyntax s) => Name<FunctionName>(s);
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ObjectTypeName Name(ClassDeclarationSyntax s) => Name<ObjectTypeName>(s);
+        public ObjectTypeName Name([NotNull] ClassDeclarationSyntax s) => Name<ObjectTypeName>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ObjectTypeName Name(EnumStructDeclarationSyntax s) => Name<ObjectTypeName>(s);
+        public ObjectTypeName Name([NotNull] EnumStructDeclarationSyntax s) => Name<ObjectTypeName>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public VariableName Name(ParameterSyntax s) => Name<VariableName>(s);
+        public VariableName Name([NotNull] ParameterSyntax s) => Name<VariableName>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Name Name(IdentifierNameSyntax s) => Name<Name>(s);
+        public Name Name([NotNull] IdentifierNameSyntax s) => Name<Name>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Name Name(SyntaxNode syntax)
+        public Name Name([NotNull] SyntaxNode syntax)
         {
             return attributes.GetOrAdd(syntax, NameAttribute, ComputeName);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private TName Name<TName>(SyntaxNode syntax)
+        private TName Name<TName>([NotNull] SyntaxNode syntax)
             where TName : Name
         {
             return (TName)attributes.GetOrAdd(syntax, NameAttribute, ComputeName);
         }
 
-        private Name ComputeName(SyntaxNode syntax)
+        private Name ComputeName([NotNull] SyntaxNode syntax)
         {
             switch (syntax)
             {
@@ -105,9 +106,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public GlobalNamespaceName GlobalNamespaceName(PackageSyntax s) => attributes.GetOrAdd(s, "GlobalNamespaceName", ComputeGlobalNamespaceName);
+        [NotNull]
+        public GlobalNamespaceName GlobalNamespaceName([NotNull] PackageSyntax s) => attributes.GetOrAdd(s, "GlobalNamespaceName", ComputeGlobalNamespaceName);
 
-        private GlobalNamespaceName ComputeGlobalNamespaceName(PackageSyntax package)
+        [NotNull]
+        private GlobalNamespaceName ComputeGlobalNamespaceName([NotNull] PackageSyntax package)
         {
             return new GlobalNamespaceName(Name(package));
         }

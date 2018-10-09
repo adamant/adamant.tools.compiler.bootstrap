@@ -1,20 +1,24 @@
 using System.Text;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
 {
     public class VariableName : Name
     {
-        public FunctionName Function { get; }
+        [NotNull] public FunctionName Function { get; }
         // TODO add declaration number
 
-        public VariableName(FunctionName function, string name)
+        public VariableName([NotNull] FunctionName function, [NotNull] string name)
             : base(name)
         {
+            Requires.NotNull(nameof(function), function);
             Function = function;
         }
 
-        public override void GetFullName(StringBuilder builder)
+        public override void GetFullName([NotNull] StringBuilder builder)
         {
+            Requires.NotNull(nameof(builder), builder);
             Function.GetFullNameScope(builder);
             builder.Append(EntityName);
         }

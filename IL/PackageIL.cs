@@ -1,25 +1,24 @@
 using System.Collections.Generic;
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IL.Declarations;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IL
 {
-    public class ILPackage
+    public class PackageIL
     {
         [NotNull] public readonly string Name;
-        [NotNull] [ItemNotNull] public IReadOnlyList<ILDeclaration> Declarations { get; }
-        [NotNull] [ItemNotNull] private readonly List<ILDeclaration> declarations = new List<ILDeclaration>();
+        [NotNull] [ItemNotNull] public IReadOnlyList<DeclarationIL> Declarations { get; }
+        [NotNull] [ItemNotNull] private readonly List<DeclarationIL> declarations = new List<DeclarationIL>();
 
-        public ILPackage([NotNull] string name)
+        public PackageIL([NotNull] string name)
         {
             Requires.NotNull(nameof(name), name);
             Name = name;
             Declarations = declarations.AsReadOnly().AssertNotNull();
         }
 
-        public void Add([NotNull] ILDeclaration declaration)
+        public void Add([NotNull] DeclarationIL declaration)
         {
             Requires.NotNull(nameof(declaration), declaration);
             declarations.Add(declaration);

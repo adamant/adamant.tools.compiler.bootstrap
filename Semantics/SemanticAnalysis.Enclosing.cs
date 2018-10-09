@@ -3,6 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
@@ -11,12 +12,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         private const string EnclosingFunctionAttribute = "EnclosingFunction";
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public FunctionDeclarationSyntax EnclosingFunction(SyntaxNode s)
+        public FunctionDeclarationSyntax EnclosingFunction([NotNull] SyntaxNode s)
         {
             return attributes.GetOrAdd(s, EnclosingFunctionAttribute, ComputeEnclosingFunction);
         }
 
-        private FunctionDeclarationSyntax ComputeEnclosingFunction(SyntaxNode syntax)
+        [NotNull]
+        private FunctionDeclarationSyntax ComputeEnclosingFunction([NotNull] SyntaxNode syntax)
         {
             switch (syntax)
             {

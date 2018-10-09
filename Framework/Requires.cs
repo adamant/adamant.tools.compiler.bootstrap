@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Core
+namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
     /// <summary>
     /// Note: The parameters for the parameter names are intentionally named
@@ -17,14 +17,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
                 throw new ArgumentOutOfRangeException(parameter, value, "Must be greater than or equal to zero");
         }
 
-        public static void InString([NotNull] string inString, [NotNull] string parameter, TextSpan value)
-        {
-            // Start is allowed to be equal to length to allow for a zero length span after the last character
-            if (value.Start > inString.Length)
-                throw new ArgumentOutOfRangeException(parameter, value, $"Start not in string of length {inString.Length}");
-            if (value.End > inString.Length)
-                throw new ArgumentOutOfRangeException(parameter, value, $"End not in string of length {inString.Length}");
-        }
+        //public static void InString([NotNull] string inString, [NotNull] string parameter, TextSpan value)
+        //{
+        //    // Start is allowed to be equal to length to allow for a zero length span after the last character
+        //    if (value.Start > inString.Length)
+        //        throw new ArgumentOutOfRangeException(parameter, value, $"Start not in string of length {inString.Length}");
+        //    if (value.End > inString.Length)
+        //        throw new ArgumentOutOfRangeException(parameter, value, $"End not in string of length {inString.Length}");
+        //}
 
         public static void InString([NotNull] string inString, [NotNull] string parameter, int value)
         {

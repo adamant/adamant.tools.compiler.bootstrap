@@ -18,17 +18,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BorrowChecker
 {
     public class BorrowChecker
     {
-        public IEnumerable<Diagnostic> Check([NotNull] ILPackage package)
+        public IEnumerable<Diagnostic> Check([NotNull] PackageIL package)
         {
             var diagnostics = new List<Diagnostic>();
             foreach (var declaration in package.Declarations)
                 switch (declaration)
                 {
-                    case ILFunctionDeclaration function:
+                    case FunctionDeclarationIL function:
                         diagnostics.AddRange(Check(function));
                         break;
 
-                    case ILTypeDeclaration typeDeclaration:
+                    case TypeDeclarationIL typeDeclaration:
                         Check(typeDeclaration);
                         break;
                 }
@@ -36,12 +36,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BorrowChecker
             return diagnostics;
         }
 
-        private static void Check(ILTypeDeclaration typeDeclaration)
+        private static void Check(TypeDeclarationIL typeDeclaration)
         {
             // Currently nothing to check
         }
 
-        private static IEnumerable<Diagnostic> Check([NotNull] ILFunctionDeclaration function)
+        private static IEnumerable<Diagnostic> Check([NotNull] FunctionDeclarationIL function)
         {
             var diagnostics = new List<Diagnostic>();
             // TODO we need to check definite assignment as well
@@ -146,7 +146,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BorrowChecker
             return claims.OfType<Title>().Single(t => t.Variable == variable);
         }
 
-        private static LiveVariables ComputeLiveness(ILFunctionDeclaration function, Edges edges)
+        private static LiveVariables ComputeLiveness(FunctionDeclarationIL function, Edges edges)
         {
             var blocks = new Queue<BasicBlock>();
             blocks.Enqueue(function.ExitBlock);

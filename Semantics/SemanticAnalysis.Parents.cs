@@ -23,7 +23,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public PackageSyntax Parent(CompilationUnitSyntax s) => Parent<PackageSyntax>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public CompilationUnitSyntax Parent(FunctionDeclarationSyntax s) => Parent<CompilationUnitSyntax>(s);
+        [NotNull]
+        public CompilationUnitSyntax Parent([NotNull] FunctionDeclarationSyntax s) => Parent<CompilationUnitSyntax>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public CompilationUnitSyntax Parent(ClassDeclarationSyntax s) => Parent<CompilationUnitSyntax>(s);
@@ -32,13 +33,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public CompilationUnitSyntax Parent(EnumStructDeclarationSyntax s) => Parent<CompilationUnitSyntax>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public SyntaxNode Parent(SyntaxNode s)
+        public SyntaxNode Parent([NotNull] SyntaxNode s)
         {
             return attributes.Get<SyntaxNode>(s, ParentAttribute);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private TSyntax Parent<TSyntax>(SyntaxNode syntax)
+        [CanBeNull]
+        private TSyntax Parent<TSyntax>([NotNull] SyntaxNode syntax)
             where TSyntax : SyntaxNode
         {
             return attributes.Get<TSyntax>(syntax, ParentAttribute);
@@ -115,7 +117,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             }
         }
 
-        private void AddAllParentAttributes<T>([NotNull] IEnumerable<T> list, [CanBeNull] SyntaxNode parent)
+        private void AddAllParentAttributes<T>([NotNull][ItemCanBeNull] IEnumerable<T> list, [CanBeNull] SyntaxNode parent)
             where T : SyntaxNode
         {
             foreach (var node in list)

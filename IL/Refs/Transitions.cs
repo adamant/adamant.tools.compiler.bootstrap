@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Refs
         private readonly ILookup<Statement, Statement> from;
         private readonly ILookup<Statement, Statement> to;
 
-        public Transitions(ILFunctionDeclaration function)
+        public Transitions(FunctionDeclarationIL function)
             : base(function.BasicBlocks.SelectMany(b => b.Statements.Zip(b.Statements.Skip(1), (s1, s2) => new Transition(s1, s2)))
                   .Concat(function.Edges().Select(e => new Transition(e.From.EndStatement, e.To.Statements.First())))
                   .ToList())

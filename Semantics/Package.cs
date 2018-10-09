@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
@@ -24,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             [CanBeNull] FunctionDeclaration entryPoint)
             : base(diagnostics)
         {
-            CompilationUnits = compilationUnits.ToList().AsReadOnly();
+            CompilationUnits = compilationUnits.ToList().AsReadOnly().AssertNotNull();
             Syntax = syntax;
             EntryPoint = entryPoint;
         }
@@ -36,6 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         }
 
         [NotNull]
+        [ItemNotNull]
         public IList<Diagnostic> AllDiagnostics()
         {
             var diagnostics = new List<Diagnostic>();

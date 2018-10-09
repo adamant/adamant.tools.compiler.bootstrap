@@ -6,24 +6,27 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
     internal partial class SemanticAnalysis
     {
+        [NotNull]
         public const string LexicalScopeAttribute = "LexicalScope";
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public LexicalScope LexicalScope(SyntaxNode syntax)
+        public LexicalScope LexicalScope([NotNull] SyntaxNode syntax)
         {
             return attributes.GetOrAdd(syntax, LexicalScopeAttribute, ComputeLexicalScope);
         }
 
-        private LexicalScope ComputeLexicalScope(SyntaxNode syntax)
+        [NotNull]
+        private LexicalScope ComputeLexicalScope([NotNull] SyntaxNode syntax)
         {
             switch (syntax)
             {
-                case CompilationUnitSyntax compilationUnit:
+                case CompilationUnitSyntax _:
                     return new LexicalScope(PackageSyntaxSymbol.GlobalNamespace);
 
                 case FunctionDeclarationSyntax function:
@@ -43,7 +46,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                         var enclosingScope = LexicalScope(Parent(syntax));
                         return enclosingScope;
                     }
-
                 default:
                     throw NonExhaustiveMatchException.For(syntax);
             }

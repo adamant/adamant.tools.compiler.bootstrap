@@ -1,14 +1,14 @@
-using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IL.Declarations
 {
-    public class ILTypeDeclaration : ILDeclaration
+    public class TypeDeclarationIL : DeclarationIL
     {
         [NotNull] public readonly string Name;
         public readonly bool IsReference;
 
-        public ILTypeDeclaration([NotNull]string name, bool isReference)
+        public TypeDeclarationIL([NotNull]string name, bool isReference)
         {
             Requires.NotNull(nameof(name), name);
             Name = name;

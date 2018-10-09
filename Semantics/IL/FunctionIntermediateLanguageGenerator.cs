@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
     {
         [NotNull] private readonly FunctionDeclaration function;
         [NotNull] [ItemNotNull] private readonly Dictionary<SemanticNode, BasicBlock> blocks = new Dictionary<SemanticNode, BasicBlock>();
-        [NotNull] private readonly ILFunctionDeclaration il;
+        [NotNull] private readonly FunctionDeclarationIL il;
         private bool converted;
         [NotNull] private readonly BasicBlock currentBlock;
 
@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
         {
             Requires.NotNull(nameof(function), function);
             this.function = function;
-            il = new ILFunctionDeclaration(function.Name, function.Parameters.Count);
+            il = new FunctionDeclarationIL(function.Name, function.Parameters.Count);
 
             // Temp Variable for return
             il.Let(function.ReturnType.Type);
@@ -44,7 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
         }
 
         [NotNull]
-        public ILFunctionDeclaration Convert()
+        public FunctionDeclarationIL Convert()
         {
             if (!converted)
             {

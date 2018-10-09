@@ -8,7 +8,6 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.Operators;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements;
-using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
@@ -20,6 +19,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
@@ -27,13 +27,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
     {
         private const string NodeAttribute = "Node";
 
-        public Package Package => Node<Package>(PackageSyntax);
+        [NotNull] public Package Package => Node<Package>(PackageSyntax);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Package Node(PackageSyntax s) => Node<Package>(s);
+        [NotNull]
+        public Package Node([NotNull] PackageSyntax s) => Node<Package>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public CompilationUnit Node(CompilationUnitSyntax s) => Node<CompilationUnit>(s);
+        [NotNull]
+        public CompilationUnit Node([NotNull] CompilationUnitSyntax s) => Node<CompilationUnit>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public CompilationUnitNamespaceDeclaration Node(CompilationUnitNamespaceSyntax s) => Node<CompilationUnitNamespaceDeclaration>(s);
@@ -63,7 +65,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public Expression Node(TypeSyntax s) => Node<Expression>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private TNode Node<TNode>(SyntaxNode syntax)
+        [CanBeNull]
+        private TNode Node<TNode>([CanBeNull] SyntaxNode syntax)
             where TNode : SemanticNode
         {
             if (syntax == null) return null;

@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
@@ -11,13 +12,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         private const string EntryPointAttribute = "EntryPoint";
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public FunctionDeclaration EntryPoint(PackageSyntax s) => attributes.GetOrAdd(s, EntryPointAttribute, ComputeEntryPoint);
+        [CanBeNull]
+        public FunctionDeclaration EntryPoint([NotNull] PackageSyntax s) => attributes.GetOrAdd(s, EntryPointAttribute, ComputeEntryPoint);
 
-        private FunctionDeclaration ComputeEntryPoint(PackageSyntax package)
+        [CanBeNull]
+        private FunctionDeclaration ComputeEntryPoint([NotNull] PackageSyntax package)
         {
             return Node(package.DescendantsAndSelf()
                 .OfType<FunctionDeclarationSyntax>()
-                .SingleOrDefault(f => f.Name.Value == "main"));
+                .SingleOrDefault(f => f.Name?.Value == "main"));
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BorrowChecker
         public int VariableCount { get; }
         private readonly Dictionary<Statement, BitArray> values = new Dictionary<Statement, BitArray>();
 
-        public LiveVariables(ILFunctionDeclaration function)
+        public LiveVariables(FunctionDeclarationIL function)
         {
             VariableCount = function.VariableDeclarations.Count;
         }
