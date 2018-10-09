@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.EndStatements;
@@ -60,8 +59,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
             return il;
         }
 
-        private VariableReference LookupVariable(string name)
+        [NotNull]
+        private VariableReference LookupVariable([NotNull] string name)
         {
+            Requires.NotNull(nameof(name), name);
             return il.VariableDeclarations.Single(v => v.Name == name).Reference;
         }
 
@@ -96,8 +97,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
             }
         }
 
-        private static bool IsOwned(VariableDeclarationStatement declaration)
+        private static bool IsOwned([NotNull] VariableDeclarationStatement declaration)
         {
+            Requires.NotNull(nameof(declaration), declaration);
             if (declaration.Type is LifetimeType type)
                 return type.IsOwned;
 
@@ -114,7 +116,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
                     break;
 
                 case ReturnExpression returnExpression:
-                    ConvertAssignment(il.ReturnVariable.Reference, returnExpression.Expression);
+                    if (returnExpression.Expression != null)
+                        ConvertAssignment(il.ReturnVariable.Reference, returnExpression.Expression);
                     currentBlock.End(new ReturnStatement());
                     break;
                 default:
@@ -122,8 +125,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
             }
         }
 
-        private void ConvertAssignment(LValue lvalue, Expression value)
+        private void ConvertAssignment([NotNull] LValue lvalue, [NotNull] Expression value)
         {
+            Requires.NotNull(nameof(lvalue), lvalue);
+            Requires.NotNull(nameof(value), value);
             switch (value)
             {
                 case NewObjectExpression newObjectExpression:
@@ -144,8 +149,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
             }
         }
 
-        private LValue ConvertToLValue(Expression value)
+        [NotNull]
+        private LValue ConvertToLValue([NotNull] Expression value)
         {
+            Requires.NotNull(nameof(value), value);
             switch (value)
             {
                 case VariableExpression variableExpression:
