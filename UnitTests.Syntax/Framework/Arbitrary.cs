@@ -51,13 +51,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
 
         private static Gen<PsuedoToken> GenPsuedoToken()
         {
-            return Gen.OneOf(
-                GenSymbol(),
-                GenWhitespace(),
-                GenComment(),
-                GenIdentifier(),
-                GenIntegerLiteral(),
-                GenStringLiteral());
+            return Gen.Frequency(
+                Weighted(10, GenSymbol()),
+                Weighted(10, GenWhitespace()),
+                Weighted(1, GenComment()),
+                Weighted(10, GenBareIdentifier()),
+                Weighted(5, GenEscapedIdentifier()),
+                Weighted(5, GenIntegerLiteral()),
+                Weighted(5, GenStringLiteral()));
+        }
+
+        private static WeightAndValue<Gen<PsuedoToken>> Weighted(int weight, Gen<PsuedoToken> generator)
+        {
+            return new WeightAndValue<Gen<PsuedoToken>>(weight, generator);
         }
 
         private static Gen<PsuedoToken> GenSymbol()
@@ -90,11 +96,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
                 .Select(s => new PsuedoToken(typeof(CommentToken), s));
         }
 
-        private static Gen<PsuedoToken> GenIdentifier()
+        private static Gen<PsuedoToken> GenBareIdentifier()
         {
             return GenRegex(@"[a-zA-Z_][a-zA-Z_0-9]*")
                 .Where(s => !Symbols.ContainsKey(s)) // don't emit keywords
-                .Select(s => new PsuedoToken(typeof(IdentifierToken), s, s));
+                .Select(s => new PsuedoToken(typeof(BareIdentifierToken), s, s));
+        }
+
+        private static Gen<PsuedoToken> GenEscapedIdentifier()
+        {
+            return GenRegex(@"\\[a-zA-Z_0-9]+")
+                .Where(s => !Symbols.ContainsKey(s)) // don't emit keywords
+                .Select(s => new PsuedoToken(typeof(EscapedIdentifierToken), s, s.Substring(1)));
         }
 
         private static Gen<PsuedoToken> GenIntegerLiteral()

@@ -213,6 +213,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                             yield return new IntegerLiteralToken(span, value);
                             break;
                         }
+                    case '\\':
+                        {
+                            tokenEnd = tokenStart + 1;
+                            while (tokenEnd < text.Length && IsIdentifierCharacter(text[tokenEnd]))
+                                tokenEnd += 1;
+
+                            var identifierStart = tokenStart + 1;
+                            yield return new EscapedIdentifierToken(TokenSpan(), text.Substring(identifierStart, tokenEnd - identifierStart));
+                            break;
+                        }
                     default:
                         if (char.IsWhiteSpace(currentChar))
                         {
@@ -279,7 +289,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     case "xor":
                         return new XorKeywordToken(span);
                     default:
-                        return new IdentifierToken(span, value);
+                        return new BareIdentifierToken(span, value);
                 }
             }
 

@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
             string expectedValue)
         {
             Assert.NotNull(token);
-            var identifier = Assert.IsType<IdentifierToken>(token);
+            var identifier = Assert.IsAssignableFrom<IdentifierToken>(token);
             Assert.True(expectedStart == identifier.Span.Start, $"Expected token start {expectedStart}, was {identifier.Span.Start}");
             Assert.True(expectedLength == identifier.Span.Length, $"Expected token length {expectedLength}, was {identifier.Span.Length}");
             Assert.Equal(expectedValue, identifier.Value);
