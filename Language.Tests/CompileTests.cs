@@ -2,7 +2,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Adamant.Tools.Compiler.Bootstrap.API;
-using Adamant.Tools.Compiler.Bootstrap.Core.Tests;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data;
 using JetBrains.Annotations;
@@ -21,12 +21,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         [MemberData(nameof(GetAllCompileTestCases))]
         public void Compiles([NotNull] CompileTestCase testCase)
         {
-            var file = testCase.Code.ToFakeCodeFile();
+            var codePath = new CodePath(testCase.FullCodePath);
+            var codeFile = new CodeFile(codePath, new CodeText(testCase.Code));
             var compiler = new AdamantCompiler();
-            var package = compiler.CompilePackage(file.Yield());
+            var package = compiler.CompilePackage(codeFile.Yield());
 
             var expectedErrorLines = ErrorPattern.Matches(testCase.Code)
-                .Select(match => file.Code.Lines.LineContainingOffset(match.Index)).ToList();
+                .Select(match => codeFile.Code.Lines.LineContainingOffset(match.Index)).ToList();
 
             var diagnostics = package.AllDiagnostics();
 

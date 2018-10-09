@@ -6,6 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data;
+using JetBrains.Annotations;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
@@ -24,13 +25,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         [Theory]
         [Category("Run")]
         [MemberData(nameof(GetAllRunTestCases))]
-        public void Runs(RunTestCase testCase)
+        public void Runs([NotNull] RunTestCase testCase)
         {
             var testsDirectory = LangTestsDirectory.Get();
             var runTestsDirectory = Path.Combine(testsDirectory, "run");
-            var codePath = new CodePath(testCase.RelativeCodePath);
-            var code = new CodeText(testCase.Code);
-            var codeFile = new CodeFile(codePath, code);
+            var codePath = new CodePath(testCase.FullCodePath);
+            var codeFile = new CodeFile(codePath, new CodeText(testCase.Code));
             var cCodeFile = Path.Combine(runTestsDirectory, Path.ChangeExtension(testCase.RelativeCodePath, "c"));
             CompileAdamantToC(codeFile, cCodeFile);
             var executable = CompileCToExecutable(cCodeFile);
