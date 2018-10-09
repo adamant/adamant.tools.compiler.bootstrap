@@ -24,9 +24,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
             var blockStatement = Fake.BlockStatement();
             var tokens = FakeTokenStream.From($"{accessModifer} fn function_name({parameters}) -> {returnExpression} {blockStatement}");
 
-            var e = Parse(tokens);
+            var d = Parse(tokens);
 
-            var f = Assert.IsType<FunctionDeclarationSyntax>(e);
+            var f = Assert.IsType<FunctionDeclarationSyntax>(d);
             Assert.Equal(accessModifer, f.AccessModifier);
             Assert.Equal(tokens[1], f.FunctionKeyword);
             Assert.Equal(tokens[2], f.Name);
@@ -37,6 +37,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
             Assert.Equal(returnExpression, f.ReturnTypeExpression);
             Assert.Equal(blockStatement, f.Body);
         }
+
+        [Fact]
+        public void Class_declaration()
+        {
+            var accessModifer = Fake.AccessModifier();
+            var tokens = FakeTokenStream.From($"{accessModifer} class Class_Name {{}}");
+
+            var d = Parse(tokens);
+
+            var c = Assert.IsType<ClassDeclarationSyntax>(d);
+            Assert.Equal(accessModifer, c.AccessModifier);
+            Assert.Equal(tokens[1], c.ClassKeyword);
+            Assert.Equal(tokens[2], c.Name);
+            Assert.Equal(tokens[3], c.OpenBrace);
+            Assert.Equal(tokens[4], c.CloseBrace);
+        }
+
 
         [NotNull]
         private static DeclarationSyntax Parse([NotNull] ITokenStream tokenStream)

@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
     {
         [Theory]
         [MemberData(nameof(GetAllAnalyzerTestCases))]
-        public void Analyzes([NotNull] CompileTestCase testCase)
+        public void Compiles([NotNull] CompileTestCase testCase)
         {
             var file = testCase.Code.ToFakeCodeFile();
             var tokens = new Lexer().Lex(file);

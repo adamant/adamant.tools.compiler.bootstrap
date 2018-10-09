@@ -27,6 +27,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
             Assert.Null(r.Expression);
         }
 
+        [Fact]
+        public void Owned_lifetime_type()
+        {
+            var tokens = FakeTokenStream.From($"Test$owned");
+
+            var e = Parse(tokens);
+
+            var t = Assert.IsType<LifetimeTypeSyntax>(e);
+            var identifierName = Assert.IsType<IdentifierNameSyntax>(t.TypeName);
+            Assert.Equal(tokens[0], identifierName.Name);
+            Assert.Equal(tokens[1], t.Dollar);
+            Assert.Equal(tokens[2], t.Lifetime);
+        }
+
         [Theory]
         [InlineData("int")]
         [InlineData("void")]
