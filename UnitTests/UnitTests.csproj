@@ -30,6 +30,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="FsCheck">
       <HintPath>..\..\..\..\Users\jwalker\.nuget\packages\fscheck\2.11.0\lib\netstandard1.6\FsCheck.dll</HintPath>
     </Reference>

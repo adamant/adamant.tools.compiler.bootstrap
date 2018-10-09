@@ -5,8 +5,9 @@ using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Framework.Tests
+namespace Adamant.Tools.Compiler.Bootstrap.UnitTests.Framework
 {
+    [UnitTest]
     public class DotNetTests
     {
         private readonly ITestOutputHelper output;

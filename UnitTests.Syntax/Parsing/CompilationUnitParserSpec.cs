@@ -129,10 +129,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
             return new CompilationUnitParser(usingDirectiveParser, declarationParser,
                 qualifiedNameParser);
         }
-
-        //private static Token Token(TokenKind kind, int start, int length, object value = null)
-        //{
-        //    return new Token(new TextSpan(start, length));
-        //}
     }
 }

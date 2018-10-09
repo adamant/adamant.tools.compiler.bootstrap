@@ -1,9 +1,10 @@
 using System;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Xunit;
 using Xunit.Categories;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Framework.Tests
+namespace Adamant.Tools.Compiler.Bootstrap.UnitTests.Framework
 {
     [UnitTest]
     public class EnumerableExtensionTests

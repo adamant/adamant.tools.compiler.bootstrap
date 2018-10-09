@@ -3,7 +3,7 @@ using System.IO;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Xunit.Abstractions;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Framework.Tests.Data
+namespace Adamant.Tools.Compiler.Bootstrap.UnitTests.Framework
 {
     /// <summary>
     /// An abstract test case. The visual studio runner serializes tests cases

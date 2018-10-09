@@ -5,9 +5,9 @@
 
     <IsPackable>false</IsPackable>
 
-    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Framework.Tests</AssemblyName>
+    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.UnitTests.Framework</AssemblyName>
 
-    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Framework.Tests</RootNamespace>
+    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.UnitTests.Framework</RootNamespace>
 
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
@@ -28,6 +28,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Framework\Framework.csproj" />
+    <ProjectReference Include="..\UnitTests\UnitTests.csproj" />
   </ItemGroup>
 
 </Project>

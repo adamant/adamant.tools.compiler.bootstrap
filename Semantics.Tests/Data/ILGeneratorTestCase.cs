@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Adamant.Tools.Compiler.Bootstrap.Framework.Tests.Data;
+using Adamant.Tools.Compiler.Bootstrap.UnitTests.Framework;
 using Xunit.Abstractions;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Tests.Data
