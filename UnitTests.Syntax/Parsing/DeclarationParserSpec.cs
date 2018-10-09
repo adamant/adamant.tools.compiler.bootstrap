@@ -12,6 +12,7 @@ using Xunit.Categories;
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
 {
     [UnitTest]
+    [Category("Parse")]
     public class DeclarationParserSpec
     {
         [Fact]

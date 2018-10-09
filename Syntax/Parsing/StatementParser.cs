@@ -63,7 +63,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        private BlockStatementSyntax ParseStatementBlock([NotNull] ITokenStream tokens)
+        public BlockStatementSyntax ParseStatementBlock([NotNull] ITokenStream tokens)
         {
             var openBrace = tokens.Expect<OpenBraceToken>();
             var statements = listParser.ParseList(tokens, Parse, TypeOf<CloseBraceToken>._);

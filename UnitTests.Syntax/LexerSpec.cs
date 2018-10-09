@@ -14,8 +14,8 @@ using Xunit.Categories;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
 {
-    [Category("Lex")]
     [UnitTest]
+    [Category("Lex")]
     public class LexerSpec
     {
         [NotNull]

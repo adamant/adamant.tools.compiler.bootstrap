@@ -8,11 +8,11 @@ using Xunit.Categories;
 namespace Adamant.Tools.Compiler.Bootstrap.UnitTests
 {
     [UnitTest]
-    public class DotNetTests
+    public class DotNetFrameworkTests
     {
         private readonly ITestOutputHelper output;
 
-        public DotNetTests(ITestOutputHelper output)
+        public DotNetFrameworkTests(ITestOutputHelper output)
         {
             this.output = output;
         }
