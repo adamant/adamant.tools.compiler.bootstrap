@@ -5,6 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
@@ -13,35 +14,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 {
     public class DeclarationParser : IParser<DeclarationSyntax>
     {
-        [NotNull]
-        private readonly IListParser listParser;
-
-        [NotNull]
-        private readonly IParser<ExpressionSyntax> expressionParser;
-
-        [NotNull]
-        private readonly IParser<BlockStatementSyntax> blockStatementParser;
-
-        [NotNull]
-        private readonly IParser<ParameterSyntax> parameterParser;
+        [NotNull] private readonly IListParser listParser;
+        [NotNull] private readonly IParser<ExpressionSyntax> expressionParser;
+        [NotNull] private readonly IParser<BlockStatementSyntax> blockStatementParser;
+        [NotNull] private readonly IParser<ParameterSyntax> parameterParser;
+        [NotNull] private readonly IParser<AccessModifierSyntax> accessModifierParser;
 
         public DeclarationParser(
             [NotNull] IListParser listParser,
             [NotNull] IParser<ExpressionSyntax> expressionParser,
             [NotNull] IParser<BlockStatementSyntax> blockStatementParser,
-            [NotNull] IParser<ParameterSyntax> parameterParser)
+            [NotNull] IParser<ParameterSyntax> parameterParser,
+            [NotNull] IParser<AccessModifierSyntax> accessModifierParser)
         {
             this.listParser = listParser;
             this.expressionParser = expressionParser;
             this.blockStatementParser = blockStatementParser;
             this.parameterParser = parameterParser;
+            this.accessModifierParser = accessModifierParser;
         }
 
         [MustUseReturnValue]
         [NotNull]
         public DeclarationSyntax Parse([NotNull] ITokenStream tokens)
         {
-            var accessModifier = ParseAccessModifier(tokens);
+            var accessModifier = accessModifierParser.Parse(tokens);
 
             switch (tokens.Current)
             {
@@ -59,23 +56,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         }
 
         [MustUseReturnValue]
-        [CanBeNull]
-        private static KeywordToken ParseAccessModifier([NotNull] ITokenStream tokens)
-        {
-            switch (tokens.Current)
-            {
-                case PublicKeywordToken _:
-                case ProtectedKeywordToken _:
-                case PrivateKeywordToken _:
-                    return tokens.ExpectKeyword();
-                default:
-                    return tokens.MissingToken<KeywordToken>();
-            }
-        }
-
-        [MustUseReturnValue]
         [NotNull]
-        private static DeclarationSyntax ParseClass([CanBeNull] KeywordToken accessModifier, [NotNull] ITokenStream tokens)
+        private static DeclarationSyntax ParseClass([NotNull] AccessModifierSyntax accessModifier, [NotNull] ITokenStream tokens)
         {
             var classKeyword = tokens.Expect<ClassKeywordToken>();
             var name = tokens.ExpectIdentifier();
@@ -87,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        private static DeclarationSyntax ParseEnum([CanBeNull] KeywordToken accessModifier, [NotNull] ITokenStream tokens)
+        private static DeclarationSyntax ParseEnum([NotNull] AccessModifierSyntax accessModifier, [NotNull] ITokenStream tokens)
         {
             var enumKeyword = tokens.Expect<EnumKeywordToken>();
             switch (tokens.Current)
@@ -111,7 +93,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         [MustUseReturnValue]
         [NotNull]
         public FunctionDeclarationSyntax ParseFunction(
-            [CanBeNull] KeywordToken accessModifier,
+            [NotNull] AccessModifierSyntax accessModifier,
             [NotNull] ITokenStream tokens)
         {
             var functionKeyword = tokens.Expect<FunctionKeywordToken>();
@@ -136,7 +118,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        private static IncompleteDeclarationSyntax ParseIncompleteDeclaration([NotNull] ITokenStream tokens, [CanBeNull] KeywordToken accessModifier)
+        private static IncompleteDeclarationSyntax ParseIncompleteDeclaration([NotNull] ITokenStream tokens, [CanBeNull] AccessModifierSyntax accessModifier)
         {
             var skipped = new List<ISyntaxNodeOrToken>() { accessModifier };
             var startToken = tokens.Current;

@@ -8,13 +8,16 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.Operators;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements;
+using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 
@@ -99,7 +102,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                     return new FunctionDeclaration(
                         function,
                         AllDiagnostics(function),
-                        AccessLevel(function.AccessModifier),
+                        function.AccessModifier.Modifier,
                         function.Name.Value,
                         function.Parameters.Nodes().Select(Node),
                         Node(function.ReturnTypeExpression),
@@ -204,7 +207,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                     return new ClassDeclaration(
                         classDeclaration,
                         AllDiagnostics(classDeclaration),
-                        AccessLevel(classDeclaration.AccessModifier),
+                        classDeclaration.AccessModifier.Modifier,
                         Type(classDeclaration),
                         classDeclaration.Members.Select(Node));
 
@@ -212,7 +215,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                     return new EnumStructDeclaration(
                         enumDeclaration,
                         AllDiagnostics(enumDeclaration),
-                        AccessLevel(enumDeclaration.AccessModifier),
+                        enumDeclaration.AccessModifier.Modifier,
                         Type(enumDeclaration),
                         enumDeclaration.Members.Select(Node));
 
@@ -221,18 +224,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
                 default:
                     throw NonExhaustiveMatchException.For(syntax);
-            }
-        }
-
-        // TODO should this be an actual attribute?
-        public AccessLevel AccessLevel(KeywordToken accessModifier)
-        {
-            switch (accessModifier)
-            {
-                case PublicKeywordToken _:
-                    return Nodes.AccessLevel.Public;
-                default:
-                    throw NonExhaustiveMatchException.For(accessModifier);
             }
         }
     }

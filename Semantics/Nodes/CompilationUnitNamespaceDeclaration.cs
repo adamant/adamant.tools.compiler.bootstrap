@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes
 {

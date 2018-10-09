@@ -1,5 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
@@ -8,8 +9,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
 {
     public class FunctionDeclarationSyntax : MemberDeclarationSyntax
     {
-        [CanBeNull]
-        public KeywordToken AccessModifier { get; }
+        [NotNull]
+        public AccessModifierSyntax AccessModifier { get; }
 
         [CanBeNull]
         public FunctionKeywordToken FunctionKeyword { get; }
@@ -34,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
         public BlockStatementSyntax Body { get; }
 
         public FunctionDeclarationSyntax(
-            [CanBeNull] KeywordToken accessModifier,
+            [NotNull] AccessModifierSyntax accessModifier,
             [CanBeNull] FunctionKeywordToken functionKeyword,
             [CanBeNull] IdentifierToken name,
             [CanBeNull] OpenParenToken openParen,
@@ -44,6 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
             ExpressionSyntax returnTypeExpression,
             BlockStatementSyntax body)
         {
+            Requires.NotNull(nameof(accessModifier), accessModifier);
             Requires.NotNull(nameof(parameters), parameters);
             AccessModifier = accessModifier;
             FunctionKeyword = functionKeyword;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
 {

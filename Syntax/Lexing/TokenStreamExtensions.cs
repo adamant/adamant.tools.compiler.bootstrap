@@ -100,6 +100,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing
         }
 
         [MustUseReturnValue]
+        public static bool AtTerminator<T>([NotNull] this ITokenStream tokens)
+            where T : Token
+        {
+            return tokens.Current is T || tokens.Current is EndOfFileToken;
+        }
+
+        [MustUseReturnValue]
         public static bool AtEndOfFile([NotNull] this ITokenStream tokens)
         {
             return tokens.Current is EndOfFileToken;

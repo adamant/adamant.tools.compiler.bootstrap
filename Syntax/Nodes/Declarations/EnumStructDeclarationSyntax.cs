@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
@@ -6,8 +7,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
 {
     public class EnumStructDeclarationSyntax : DeclarationSyntax
     {
-        [CanBeNull]
-        public KeywordToken AccessModifier { get; }
+        [NotNull]
+        public AccessModifierSyntax AccessModifier { get; }
 
         [CanBeNull]
         public EnumKeywordToken EnumKeyword { get; }
@@ -28,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
         public CloseBraceToken CloseBrace { get; }
 
         public EnumStructDeclarationSyntax(
-            [CanBeNull] KeywordToken accessModifier,
+            [NotNull] AccessModifierSyntax accessModifier,
             [CanBeNull] EnumKeywordToken enumKeyword,
             [CanBeNull] StructKeywordToken structKeyword,
             [CanBeNull] IdentifierToken name,
@@ -36,6 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
             [NotNull] SyntaxList<MemberDeclarationSyntax> members,
             [CanBeNull] CloseBraceToken closeBrace)
         {
+            Requires.NotNull(nameof(accessModifier), accessModifier);
             Requires.NotNull(nameof(members), members);
             AccessModifier = accessModifier;
             EnumKeyword = enumKeyword;

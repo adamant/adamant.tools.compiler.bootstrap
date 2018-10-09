@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Adamant.Tools.Compiler.Bootstrap.UnitTests.Framework;
+using Adamant.Tools.Compiler.Bootstrap.UnitTests;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C.Tests.Data
 {

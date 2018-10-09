@@ -7,7 +7,7 @@
 
     <AssemblyName>Adamant.Tools.Compiler.Bootstrap.UnitTests</AssemblyName>
 
-    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.UnitTests.Framework</RootNamespace>
+    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.UnitTests</RootNamespace>
 
     <LangVersion>latest</LangVersion>
   </PropertyGroup>

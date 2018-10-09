@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class Parser : IParser<CompilationUnitSyntax>
     {
-        private readonly IParser<CompilationUnitSyntax> compilationUnitParser;
+        [NotNull] private readonly IParser<CompilationUnitSyntax> compilationUnitParser;
 
         public Parser()
         {
@@ -20,18 +20,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             var expressionParser = new ExpressionParser(listParser, nameParser);
             var parameterParser = new ParameterParser(expressionParser);
             var statementParser = new StatementParser(listParser, expressionParser);
-            var declarationParser = new DeclarationParser(listParser, expressionParser, statementParser, parameterParser);
+            var accessModifierParser = new AccessModifierParser();
+            var declarationParser = new DeclarationParser(listParser, expressionParser, statementParser, parameterParser, accessModifierParser);
             compilationUnitParser = new CompilationUnitParser(usingDirectiveParser, declarationParser, nameParser);
         }
 
         [MustUseReturnValue]
-        public CompilationUnitSyntax Parse(CodeFile file, IEnumerable<Token> tokens)
+        public CompilationUnitSyntax Parse([NotNull] CodeFile file, [NotNull]  IEnumerable<Token> tokens)
         {
             return Parse(new TokenStream(file, tokens));
         }
 
         [MustUseReturnValue]
-        public CompilationUnitSyntax Parse(ITokenStream tokens)
+        public CompilationUnitSyntax Parse([NotNull] ITokenStream tokens)
         {
             return compilationUnitParser.Parse(tokens);
         }

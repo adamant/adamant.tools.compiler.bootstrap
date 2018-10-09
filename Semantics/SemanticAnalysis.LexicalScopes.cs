@@ -4,6 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics

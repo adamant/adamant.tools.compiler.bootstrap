@@ -1,7 +1,7 @@
 using FsCheck;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.UnitTests.Framework
+namespace Adamant.Tools.Compiler.Bootstrap.UnitTests
 {
     public static class GeneratorExtensions
     {

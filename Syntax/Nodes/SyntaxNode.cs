@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
 {

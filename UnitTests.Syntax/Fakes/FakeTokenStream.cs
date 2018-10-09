@@ -1,10 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Core.Tests;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
+using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes
 {
@@ -28,6 +32,59 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes
 
         public Token this[int index] => Tokens[index];
 
+        [NotNull]
+        public static FakeTokenStream From([NotNull] FormattableString tokenDescription)
+        {
+            var file = tokenDescription.Format.ToFakeCodeFile();
+            var tokens = CreateFakeTokens(new Lexer().Lex(file), tokenDescription.GetArguments());
+            return new FakeTokenStream(file, tokens);
+        }
+
+        [NotNull]
+        public static IEnumerable<Token> CreateFakeTokens(
+            [NotNull][ItemNotNull] IEnumerable<Token> tokens,
+            [NotNull] IReadOnlyList<object> fakeTokenValues)
+        {
+            using (var enumerator = tokens.GetEnumerator())
+                while (enumerator.MoveNext())
+                {
+                    switch (enumerator.Current)
+                    {
+                        case OpenBraceToken _:
+                            var startSpan = enumerator.Current.Span;
+                            Assert.True(enumerator.MoveNext());
+                            if (enumerator.Current is OpenBraceToken)
+                            {
+                                // Escaped open brace
+                                yield return enumerator.Current;
+                            }
+                            else
+                            {
+                                var placeholder = (int)Assert.IsType<IntegerLiteralToken>(enumerator.Current).Value;
+                                Assert.True(enumerator.MoveNext());
+                                Assert.IsType<CloseBraceToken>(enumerator.Current);
+                                var value = (SyntaxNode)fakeTokenValues[placeholder];
+                                yield return new FakeToken(TextSpan.Covering(startSpan, enumerator.Current.Span), value);
+                            }
+                            break;
+                        case CloseBraceToken _:
+                            // Escaped close brace
+                            Assert.True(enumerator.MoveNext());
+                            Assert.IsType<CloseBraceToken>(enumerator.Current);
+                            yield return enumerator.Current;
+                            break;
+                        case WhitespaceToken _:
+                        case CommentToken _:
+                            // Skip
+                            break;
+                        default:
+                            yield return enumerator.Current;
+                            break;
+                    }
+                }
+        }
+
+        #region Forwards
         public bool MoveNext()
         {
             return stream.MoveNext();
@@ -46,5 +103,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes
         {
             stream.Dispose();
         }
+        #endregion
     }
 }

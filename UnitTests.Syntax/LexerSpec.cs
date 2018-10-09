@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Tests;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Helpers;
 using FsCheck;
 using FsCheck.Xunit;
 using JetBrains.Annotations;

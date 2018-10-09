@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 using Xunit;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Helpers
 {
     public static class AssertExtensions
     {

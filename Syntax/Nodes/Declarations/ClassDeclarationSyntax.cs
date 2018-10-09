@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
@@ -6,8 +7,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
 {
     public class ClassDeclarationSyntax : MemberDeclarationSyntax
     {
-        [CanBeNull]
-        public KeywordToken AccessModifier { get; }
+        [NotNull]
+        public AccessModifierSyntax AccessModifier { get; }
 
         [CanBeNull]
         public ClassKeywordToken ClassKeyword { get; }
@@ -25,13 +26,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
         public CloseBraceToken CloseBrace { get; }
 
         public ClassDeclarationSyntax(
-            [CanBeNull] KeywordToken accessModifier,
+            [NotNull] AccessModifierSyntax accessModifier,
             [CanBeNull] ClassKeywordToken classKeyword,
             [CanBeNull] IdentifierToken name,
             [CanBeNull] OpenBraceToken openBrace,
             [NotNull] SyntaxList<MemberDeclarationSyntax> members,
             [CanBeNull] CloseBraceToken closeBrace)
         {
+            Requires.NotNull(nameof(accessModifier), accessModifier);
             Requires.NotNull(nameof(members), members);
             AccessModifier = accessModifier;
             ClassKeyword = classKeyword;

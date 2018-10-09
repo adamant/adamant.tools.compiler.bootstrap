@@ -1,7 +1,8 @@
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Helpers
 {
     public static class ExpectFakeExtension
     {

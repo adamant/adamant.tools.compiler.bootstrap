@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
-using Adamant.Tools.Compiler.Bootstrap.UnitTests.Framework;
+using Adamant.Tools.Compiler.Bootstrap.UnitTests;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
 {

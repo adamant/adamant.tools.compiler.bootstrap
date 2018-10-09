@@ -4,7 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Helpers
 {
     public static class ConversionExtensions
     {

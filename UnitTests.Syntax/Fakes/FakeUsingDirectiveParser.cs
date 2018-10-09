@@ -3,6 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Helpers;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes

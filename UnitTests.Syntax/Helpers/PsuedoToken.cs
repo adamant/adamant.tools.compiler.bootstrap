@@ -10,7 +10,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Helpers
 {
     public class PsuedoToken
     {

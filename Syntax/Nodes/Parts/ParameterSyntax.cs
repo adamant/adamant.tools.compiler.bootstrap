@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts
 {
     public class ParameterSyntax : SyntaxNode
     {

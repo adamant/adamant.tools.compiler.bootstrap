@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using Adamant.Tools.Compiler.Bootstrap.UnitTests.Framework;
+using Adamant.Tools.Compiler.Bootstrap.UnitTests;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
 {

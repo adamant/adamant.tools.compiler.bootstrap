@@ -5,12 +5,12 @@ using System.Numerics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
-using Adamant.Tools.Compiler.Bootstrap.UnitTests.Framework;
+using Adamant.Tools.Compiler.Bootstrap.UnitTests;
 using Fare;
 using FsCheck;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Framework
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Helpers
 {
     public class Arbitrary
     {

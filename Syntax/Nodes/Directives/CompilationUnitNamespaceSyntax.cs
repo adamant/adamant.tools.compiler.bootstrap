@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives
 {
     public class CompilationUnitNamespaceSyntax : SyntaxNode
     {

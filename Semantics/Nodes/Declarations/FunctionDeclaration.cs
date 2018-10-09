@@ -3,6 +3,7 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements;
+using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 
@@ -11,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations
     public class FunctionDeclaration : MemberDeclaration
     {
         public new FunctionDeclarationSyntax Syntax { get; }
-        public AccessLevel Access { get; }
+        public AccessModifier Access { get; }
         public string Name { get; }
         public IReadOnlyList<Parameter> Parameters { get; }
         public Expression ReturnType { get; }
@@ -20,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations
         public FunctionDeclaration(
             FunctionDeclarationSyntax syntax,
             IEnumerable<Diagnostic> diagnostics,
-            AccessLevel access,
+            AccessModifier access,
             string name,
             IEnumerable<Parameter> parameters,
             Expression returnType,

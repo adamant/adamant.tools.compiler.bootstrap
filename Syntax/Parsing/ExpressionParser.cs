@@ -173,7 +173,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 case ReturnKeywordToken _:
                     {
                         var returnKeyword = tokens.Expect<ReturnKeywordToken>();
-                        var expression = tokens.Current is SemicolonToken ? null : ParseExpression(tokens);
+                        var expression = tokens.AtTerminator<SemicolonToken>() ? null : ParseExpression(tokens);
                         return new ReturnExpressionSyntax(returnKeyword, expression);
                     }
                 case OpenParenToken _:
@@ -206,13 +206,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     {
                         var identifier = tokens.ExpectIdentifier();
                         var name = new IdentifierNameSyntax(identifier);
-                        if (!(tokens.Current is DollarToken)) return name;
+                        if (tokens.Current is DollarToken)
+                        {
+                            var dollar = tokens.Expect<DollarToken>();
+                            var lifetime = tokens.Current is IdentifierToken
+                                ? (Token)tokens.ExpectIdentifier()
+                                : tokens.Expect<OwnedKeywordToken>();
+                            return new LifetimeTypeSyntax(name, dollar, lifetime);
+                        }
 
-                        var dollar = tokens.Expect<DollarToken>();
-                        var lifetime = tokens.Current is IdentifierToken
-                            ? (Token)tokens.ExpectIdentifier()
-                            : tokens.Expect<OwnedKeywordToken>();
-                        return new LifetimeTypeSyntax(name, dollar, lifetime);
+                        return name;
                     }
                 default:// If it is something else, we assume it should be an identifier name
                     return new IdentifierNameSyntax(tokens.ExpectIdentifier());
