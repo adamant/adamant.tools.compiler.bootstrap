@@ -1,6 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
@@ -58,6 +59,59 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
 
             var p = Assert.IsType<PrimitiveTypeSyntax>(e);
             Assert.Equal(tokens[0], p.Keyword);
+        }
+
+        [Theory]
+        [InlineData("-")]
+        [InlineData("+")]
+        [InlineData("@")]
+        [InlineData("^")]
+        [InlineData("not")]
+        public void Unary_prefix_operators([NotNull] string text)
+        {
+            var tokens = FakeTokenStream.FromString(text + " x");
+
+            var e = Parse(tokens);
+
+            var op = Assert.IsType<UnaryOperatorExpressionSyntax>(e);
+            Assert.Equal(tokens[0], op.Operator);
+            var operand = Assert.IsType<IdentifierNameSyntax>(op.Operand);
+            Assert.Equal(tokens[1], operand.Name);
+        }
+
+        [Theory]
+        [InlineData("and")]
+        [InlineData("or")]
+        [InlineData("xor")]
+        [InlineData("+")]
+        [InlineData("-")]
+        [InlineData("*")]
+        [InlineData("/")]
+        [InlineData("=")]
+        [InlineData("+=")]
+        [InlineData("-=")]
+        [InlineData("*=")]
+        [InlineData("/=")]
+        [InlineData("==")]
+        [InlineData("=/=")]
+        [InlineData("<")]
+        [InlineData("<=")]
+        [InlineData(">")]
+        [InlineData(">=")]
+        [InlineData("..")]
+        [InlineData(".")]
+        public void Binary_operators([NotNull] string text)
+        {
+            var tokens = FakeTokenStream.FromString("x " + text + " y");
+
+            var e = Parse(tokens);
+
+            var op = Assert.IsType<BinaryOperatorExpressionSyntax>(e);
+            var leftOperand = Assert.IsType<IdentifierNameSyntax>(op.LeftOperand);
+            Assert.Equal(tokens[0], leftOperand.Name);
+            Assert.Equal(tokens[1], op.Operator);
+            var rightOperand = Assert.IsType<IdentifierNameSyntax>(op.RightOperand);
+            Assert.Equal(tokens[2], rightOperand.Name);
         }
 
         [NotNull]
