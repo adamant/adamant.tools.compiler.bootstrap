@@ -22,6 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
             typeof(SizeKeywordToken),
             typeof(BoolKeywordToken),
             typeof(StringKeywordToken),
+            typeof(NeverKeywordToken),
             typeof(ReturnKeywordToken),
             typeof(ClassKeywordToken),
             typeof(FunctionKeywordToken),
@@ -136,6 +137,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
     public class StringKeywordToken : KeywordToken
     {
         public StringKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public class NeverKeywordToken : KeywordToken
+    {
+        public NeverKeywordToken(TextSpan span)
             : base(span)
         {
         }

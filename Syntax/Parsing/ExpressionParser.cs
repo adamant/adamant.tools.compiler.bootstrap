@@ -198,6 +198,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 case BoolKeywordToken _:
                 case ByteKeywordToken _:
                 case StringKeywordToken _:
+                case NeverKeywordToken _:
+                case SizeKeywordToken _:
                     {
                         var keyword = tokens.ExpectKeyword().AssertNotNull();
                         return new PrimitiveTypeSyntax(keyword);

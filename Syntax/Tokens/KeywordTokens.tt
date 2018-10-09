@@ -19,6 +19,7 @@
         "Size",
         "Bool",
         "String",
+        "Never",
         "Return",
         "Class",
         "Function",

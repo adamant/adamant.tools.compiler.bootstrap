@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
+using Adamant.Tools.Compiler.Bootstrap.Core.Tests;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
@@ -12,22 +12,21 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
+using JetBrains.Annotations;
 using Newtonsoft.Json.Linq;
 using Xunit;
 using Xunit.Categories;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
 {
-    public class AnalyzeTests
+    [Category("Compile")]
+    public class CompileTests
     {
         [Theory]
-        [Category("Analyze")]
         [MemberData(nameof(GetAllAnalyzerTestCases))]
-        public void Analyzes(AnalyzeTestCase testCase)
+        public void Analyzes([NotNull] CompileTestCase testCase)
         {
-            var codePath = new CodePath(testCase.RelativeCodePath);
-            var code = new CodeText(testCase.Code);
-            var file = new CodeFile(codePath, code);
+            var file = testCase.Code.ToFakeCodeFile();
             var tokens = new Lexer().Lex(file);
             var parser = new Parser();
             var compilationUnit = parser.Parse(file, tokens);
@@ -38,7 +37,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         }
 
         [Fact]
-        [Category("Analyze")]
         public void CanGetAllAnalyzerTestCases()
         {
             Assert.NotEmpty(GetAllAnalyzerTestCases());
@@ -108,16 +106,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests
         }
 
         /// Loads all *.xml test cases for the analyzer.
-        public static TheoryData<AnalyzeTestCase> GetAllAnalyzerTestCases()
+        public static TheoryData<CompileTestCase> GetAllAnalyzerTestCases()
         {
-            var testCases = new TheoryData<AnalyzeTestCase>();
+            var testCases = new TheoryData<CompileTestCase>();
             var testsDirectory = LangTestsDirectory.Get();
-            var analyzeTestsDirectory = Path.Combine(testsDirectory, "analyze");
+            var analyzeTestsDirectory = Path.Combine(testsDirectory, "compile");
             foreach (string testFile in Directory.EnumerateFiles(analyzeTestsDirectory, "*.json", SearchOption.AllDirectories))
             {
                 var fullCodePath = Path.ChangeExtension(testFile, "ad");
                 var relativeCodePath = Path.GetRelativePath(analyzeTestsDirectory, fullCodePath);
-                testCases.Add(new AnalyzeTestCase(fullCodePath, relativeCodePath));
+                testCases.Add(new CompileTestCase(fullCodePath, relativeCodePath));
             }
             return testCases;
         }

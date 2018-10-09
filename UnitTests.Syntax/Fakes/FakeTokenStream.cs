@@ -41,6 +41,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes
         }
 
         [NotNull]
+        public static FakeTokenStream FromString([NotNull] string tokenDescription)
+        {
+            var file = tokenDescription.ToFakeCodeFile();
+            var tokens = new Lexer().Lex(file).Where(t => !(t is TriviaToken));
+            return new FakeTokenStream(file, tokens);
+        }
+
+        [NotNull]
         public static IEnumerable<Token> CreateFakeTokens(
             [NotNull][ItemNotNull] IEnumerable<Token> tokens,
             [NotNull] IReadOnlyList<object> fakeTokenValues)
@@ -73,8 +81,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes
                             Assert.IsType<CloseBraceToken>(enumerator.Current);
                             yield return enumerator.Current;
                             break;
-                        case WhitespaceToken _:
-                        case CommentToken _:
+                        case TriviaToken _:
                             // Skip
                             break;
                         default:

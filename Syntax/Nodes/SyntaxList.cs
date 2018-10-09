@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
     /// overhead.
     /// </summary>
     /// <typeparam name="TNode">Type of <see cref="SyntaxNode"/>s in the list</typeparam>
-    public class SyntaxList<TNode> : IReadOnlyList<TNode>
+    public class SyntaxList<TNode> : SyntaxNode, IReadOnlyList<TNode>
         where TNode : SyntaxNode
     {
         [NotNull]

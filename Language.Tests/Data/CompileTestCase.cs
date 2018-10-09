@@ -5,18 +5,18 @@ using Newtonsoft.Json.Linq;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Language.Tests.Data
 {
-    public class AnalyzeTestCase : TestCase
+    public class CompileTestCase : TestCase
     {
         private readonly Lazy<JObject> expectedSemanticTree;
         public JObject ExpectedSemanticTree => expectedSemanticTree.Value;
 
         [Obsolete("Required by IXunitSerializable", true)]
-        public AnalyzeTestCase()
+        public CompileTestCase()
         {
             expectedSemanticTree = new Lazy<JObject>(GetExpected);
         }
 
-        public AnalyzeTestCase(string fullCodePath, string relativeCodePath)
+        public CompileTestCase(string fullCodePath, string relativeCodePath)
             : base(fullCodePath, relativeCodePath)
         {
             expectedSemanticTree = new Lazy<JObject>(GetExpected);

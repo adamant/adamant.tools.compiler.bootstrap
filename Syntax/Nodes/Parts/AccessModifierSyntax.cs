@@ -13,11 +13,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts
 
         public AccessModifierSyntax([CanBeNull] KeywordToken keyword)
         {
-            Requires.That(nameof(keyword),
-                keyword == null
-                || keyword is PublicKeywordToken
-                || keyword is ProtectedKeywordToken
-                || keyword is PrivateKeywordToken);
             Keyword = keyword;
             switch (Keyword)
             {

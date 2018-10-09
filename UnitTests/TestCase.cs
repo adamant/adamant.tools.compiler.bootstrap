@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using JetBrains.Annotations;
 using Xunit.Abstractions;
 
 namespace Adamant.Tools.Compiler.Bootstrap.UnitTests
@@ -16,7 +17,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.UnitTests
         public string FullCodePath { get; private set; }
         public string RelativeCodePath { get; private set; }
 
+        [NotNull]
         private readonly Lazy<string> code;
+        [NotNull]
         public string Code => code.Value;
 
         [Obsolete("Required by IXunitSerializable", true)]
