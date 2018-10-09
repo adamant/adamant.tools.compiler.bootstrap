@@ -22,14 +22,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         [NotNull]
         private readonly IParser<BlockStatementSyntax> blockStatementParser;
 
+        [NotNull]
+        private readonly IParser<ParameterSyntax> parameterParser;
+
         public DeclarationParser(
             [NotNull] IListParser listParser,
             [NotNull] IParser<ExpressionSyntax> expressionParser,
-            [NotNull] IParser<BlockStatementSyntax> blockStatementParser)
+            [NotNull] IParser<BlockStatementSyntax> blockStatementParser,
+            [NotNull] IParser<ParameterSyntax> parameterParser)
         {
             this.listParser = listParser;
             this.expressionParser = expressionParser;
             this.blockStatementParser = blockStatementParser;
+            this.parameterParser = parameterParser;
         }
 
         [MustUseReturnValue]
@@ -125,28 +130,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         [NotNull]
         private SeparatedListSyntax<ParameterSyntax> ParseParameters([NotNull] ITokenStream tokens)
         {
-            return listParser.ParseSeparatedList(tokens, ParseParameter, TypeOf<CommaToken>._, TypeOf<CloseParenToken>._);
-        }
-
-        [MustUseReturnValue]
-        [NotNull]
-        private ParameterSyntax ParseParameter([NotNull] ITokenStream tokens)
-        {
-            switch (tokens.Current)
-            {
-                //case TokenKind.MutableKeyword:
-                //     `mut self`
-                //    throw new NotImplementedException();
-                //case TokenKind.SelfKeyword:
-                //      `self`
-                //    throw new NotImplementedException();
-                default:
-                    var varKeyword = tokens.Accept<VarKeywordToken>();
-                    var name = tokens.ExpectIdentifier();
-                    var colon = tokens.Expect<ColonToken>();
-                    var typeExpression = expressionParser.Parse(tokens);
-                    return new ParameterSyntax(varKeyword, name, colon, typeExpression);
-            }
+            return listParser.ParseSeparatedList(tokens, parameterParser.Parse, TypeOf<CommaToken>._, TypeOf<CloseParenToken>._);
         }
         #endregion
 

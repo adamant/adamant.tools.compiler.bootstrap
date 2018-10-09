@@ -12,6 +12,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Symbols\**" />
+    <EmbeddedResource Remove="Symbols\**" />
+    <None Remove="Symbols\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="SemanticAnalysis.*.cs">
       <DependentUpon>SemanticAnalysis.cs</DependentUpon>
     </Compile>
@@ -21,10 +27,6 @@
     <ProjectReference Include="..\IL\IL.csproj" />
     <ProjectReference Include="..\Semantics.Names\Semantics.Names.csproj" />
     <ProjectReference Include="..\Syntax\Syntax.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Symbols\" />
   </ItemGroup>
 
   <ItemGroup>
