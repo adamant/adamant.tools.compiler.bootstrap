@@ -2,10 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+
     <IsPackable>false</IsPackable>
+
+    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.UnitTests.Semantics</AssemblyName>
+
+    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.UnitTests.Semantics</RootNamespace>
+
     <LangVersion>latest</LangVersion>
-    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.UnitTests.Syntax</AssemblyName>
-    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -13,13 +17,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Fare" Version="2.1.1" />
-    <PackageReference Include="FsCheck.Xunit" Version="2.12.0" />
-    <PackageReference Include="JetBrains.Annotations" Version="2018.2.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
     <PackageReference Include="xunit" Version="2.4.0" />
-    <PackageReference Include="xunit.analyzers" Version="0.10.0" />
-    <PackageReference Include="xunit.categories" Version="2.0.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
@@ -27,10 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Core.Tests\Core.Tests.csproj" />
-    <ProjectReference Include="..\Framework\Framework.csproj" />
-    <ProjectReference Include="..\Syntax\Syntax.csproj" />
-    <ProjectReference Include="..\UnitTests\UnitTests.csproj" />
+    <ProjectReference Include="..\Semantics\Semantics.csproj" />
   </ItemGroup>
 
 </Project>
