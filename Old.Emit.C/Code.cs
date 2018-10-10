@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Emit;
+using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Old.Emit.C
 {

@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Emit.C\Emit.C.csproj" />
     <ProjectReference Include="..\Emit\Emit.csproj" />
     <ProjectReference Include="..\Old.Semantics.Names\Old.Semantics.Names.csproj" />
     <ProjectReference Include="..\Old.Semantics.Types\Old.Semantics.Types.csproj" />

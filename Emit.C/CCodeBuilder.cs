@@ -1,6 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Emit
+namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
     public class CCodeBuilder : CodeBuilder
     {
@@ -12,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit
         /// Whether we need a blank separator line before the next statement
         public bool NeedsStatementSeparatorLine { get; private set; }
 
-        public CCodeBuilder(string indentCharacters = "    ")
+        public CCodeBuilder([NotNull] string indentCharacters = "    ")
             : base(indentCharacters, LineTerminator)
         {
         }
