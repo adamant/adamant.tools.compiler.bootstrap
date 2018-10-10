@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
-    <ProjectReference Include="..\Semantics.Types\Old.Semantics.Types.csproj" />
+    <ProjectReference Include="..\Old.Semantics.Types\Old.Semantics.Types.csproj" />
   </ItemGroup>
 
 </Project>

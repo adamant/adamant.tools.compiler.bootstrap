@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\API\API.csproj" />
-    <ProjectReference Include="..\Emit.C\Old.Emit.C.csproj" />
+    <ProjectReference Include="..\Old.Emit.C\Old.Emit.C.csproj" />
     <ProjectReference Include="..\UnitTests\UnitTests.csproj" />
   </ItemGroup>
 

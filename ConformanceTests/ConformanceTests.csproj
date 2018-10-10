@@ -41,8 +41,7 @@
   <ItemGroup>
     <ProjectReference Include="..\API\API.csproj" />
     <ProjectReference Include="..\Core.Tests\Core.Tests.csproj" />
-    <ProjectReference Include="..\Emit.C\Old.Emit.C.csproj" />
-    <ProjectReference Include="..\Semantics\Old.Semantics.csproj" />
+    <ProjectReference Include="..\Old.Emit.C\Old.Emit.C.csproj" />
     <ProjectReference Include="..\Syntax\Syntax.csproj" />
     <ProjectReference Include="..\UnitTests\UnitTests.csproj" />
   </ItemGroup>

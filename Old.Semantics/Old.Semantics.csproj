@@ -24,8 +24,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\IL\IL.csproj" />
-    <ProjectReference Include="..\Semantics.Names\Old.Semantics.Names.csproj" />
+    <ProjectReference Include="..\Old.Semantics.Names\Old.Semantics.Names.csproj" />
     <ProjectReference Include="..\Syntax\Syntax.csproj" />
   </ItemGroup>
 
