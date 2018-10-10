@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.EndStatements;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.Statements;
@@ -30,7 +29,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IL.Code
 
         public void End(EndStatement endStatement)
         {
-            Requires.That(nameof(EndStatement), EndStatement == null);
+            // Can only set an end statement if there isn't already one
+            Requires.Null(nameof(EndStatement), EndStatement);
             EndStatement = endStatement;
             statements.Add(EndStatement);
         }

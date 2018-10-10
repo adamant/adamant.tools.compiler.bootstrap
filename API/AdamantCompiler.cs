@@ -13,12 +13,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
 {
     public class AdamantCompiler
     {
-        public Task<Package> CompilePackageAsync(IEnumerable<ICodeFileSource> files)
+        public Task<Package> CompilePackageAsync([NotNull][ItemNotNull] IEnumerable<ICodeFileSource> files)
         {
             return CompilePackageAsync(files, TaskScheduler.Default);
         }
 
-        public Task<Package> CompilePackageAsync(IEnumerable<ICodeFileSource> fileSources, TaskScheduler taskScheduler)
+        public Task<Package> CompilePackageAsync([NotNull][ItemNotNull] IEnumerable<ICodeFileSource> fileSources, [CanBeNull] TaskScheduler taskScheduler)
         {
             var lexer = new Lexer();
             var parser = new Parser();

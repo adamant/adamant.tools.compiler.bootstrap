@@ -1,14 +1,19 @@
 using System.Text;
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
     public static class StringExtensions
     {
+        [NotNull]
         private static readonly Regex LineEndings = new Regex(@"\r\n|\n\r|\n|\r", RegexOptions.Compiled);
 
-        public static string Repeat(this string input, int count)
+        [NotNull]
+        public static string Repeat([NotNull] this string input, int count)
         {
+            Requires.NotNull(nameof(input), input);
+
             if (string.IsNullOrEmpty(input) || count == 0)
                 return string.Empty;
 
@@ -17,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
                 .ToString();
         }
 
-        public static string NormalizeLineEndings(this string input, string lineEnding)
+        public static string NormalizeLineEndings([NotNull] this string input, [NotNull] string lineEnding)
         {
             return LineEndings.Replace(input, lineEnding);
         }

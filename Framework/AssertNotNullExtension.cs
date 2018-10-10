@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
-    public static class NotNullExtension
+    public static class AssertNotNullExtension
     {
         /// <summary>
         /// Sometimes the system can't figure out that something isn't null.

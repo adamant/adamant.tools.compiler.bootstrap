@@ -22,7 +22,11 @@ A rough plan of the next items to get working is:
 10. Overload functions on # params
 11. Overload functions on types
 
+## Cleanup Tasks
+
+* Remove the deprecated `Match` and `MatchInto` classes.
 
 ## Conventions
 
-Unit tests are in projects named `UnitTests.*`. This way, it is not inconsistent when further namespaces are nested inside them. If `UnitTests` were at the end of the name, then many namespaces would have it at the end, while nested ones would have it in the middle.
+* Unit tests are in projects named `UnitTests.*`. This way, it is not inconsistent when further namespaces are nested inside them. If `UnitTests` were at the end of the name, then many namespaces would have it at the end, while nested ones would have it in the middle.
+* Reshaper nullability attributes are used to help find issues with null handling. Occasionally, the inference is incorrect because framework calls aren't correctly annotated. In such cases, the `AssertNotNull()` extension method is used. All methods taking non-null arguments should use `Requires.NotNull()` to enforce this. This is not necessary on values passed only to the base class constructor as the base constructor is responsible for checking. This null handling helps to support correct by construction and to flag errors as close to their source as possible.

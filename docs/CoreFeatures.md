@@ -1,6 +1,6 @@
 # Core Features
 
-This is a list of core features that need to ne implemented or at least accounted for in the design of the compiler.
+This is a list of core features that need to be implemented or at least accounted for in the design of the compiler.
 
 * Borrow Checking (lifetimes)
 * Rebinding of local variables (for `let` and in separate scopes for `var`)

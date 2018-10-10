@@ -1,7 +1,9 @@
+using System;
 using System.Diagnostics;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
+    [Obsolete("Use C# pattern matching instead")]
     public static class Match
     {
         [DebuggerStepThrough]
@@ -11,6 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         }
     }
 
+    [Obsolete("Use C# pattern matching instead")]
     public static class MatchInto<R>
     {
         [DebuggerStepThrough]

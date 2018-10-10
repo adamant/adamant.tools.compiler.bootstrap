@@ -7,17 +7,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
     [Serializable]
     public class NonExhaustiveMatchException : Exception
     {
-        internal NonExhaustiveMatchException()
-        {
-        }
-
-        internal NonExhaustiveMatchException(string message)
+        private NonExhaustiveMatchException(string message)
             : base(message)
-        {
-        }
-
-        internal NonExhaustiveMatchException(string message, Exception innerException)
-            : base(message, innerException)
         {
         }
 

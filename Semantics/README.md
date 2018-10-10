@@ -1,25 +1,34 @@
 # Adamant.Tools.Compiler.Bootstrap.Semantics
 
-The semantic model is designed with a number of constraints in mind. While it is currently implemented in C# for a subset of the language, we are trying to plan for reimplementation in Adamant for the full language and support of incremental compilation. It is likely that a full design for these can't be anticipated, but we are still going to try to avoid designs that will be problematic later. The design tries to account for:
+There have been several approaches to the semantic analysis portion of the compiler.
 
-* Borrow checking and reference counting means that cycles need to be avoided. In particular, links across the tree are an issue. Consequently, links across the tree are stored as `Name` or `DataType` objects that can be used to look up the relevant nodes in the symbol tree.
-* Incremental Compilation means that references to parent nodes are a problem because child nodes may be reused in the tree of a later compilation. Beyond this, no particular design for incremental compilation is being done. Note that while parent links can't be stored in the tree permanently, they are needed and useful on a temporary basis to allow things like lookup of names in lexical scopes.
-* Arbitrary code execution at runtime will mean that there could be arbitrarily complex connections between which parts of the semantic tree must be evaluated before other parts. For example, the ability to declare the return type of a function to be the result of a meta-function and the ability of pure functions to be used in constant and generic argument contexts means that some functions will have to be fully analyzed and interpreted before other functions can even be typed.
-* Parallel compilation will need to be supported to allow compilation to take full advantage of modern hardware. This means it must be possible to break the work into chunks while not producing undo contention.
-* Strong typing is desired to avoid bugs involving missing values or values of incorrect types.
+## Original Approach
+
+At first, it was thought that this compiler should be designed to plan for reimplementation in Adamant. Doing so imposed a number of constraints:
+
+1. Avoid Reference Cycles - borrow checking and reference counting in Adamant make reference cycles problematic. In particular, there was concern about links across the tree. To avoid those, the plan had been to store them as name or data type objects that could be used to look up the relevant nodes in a symbol tree.
+2. Incremental Compilation - prevented the use of references to parent nodes even though these might be ok in Adamant because it was expected nodes would be shared between different versions of the tree. Also, it pushed for immutable data structures for all phases of the compiler. It was not planned that this compiler would actually implement incremental compilation though.
+3. Arbitrary Compile Time Code Execution - means that there could be arbitrarily complex connections between which parts of the semantic tree must be evaluated before other parts. For example, the ability to declare the return type of a function to be the result of a meta-function and the ability of pure functions to be used in constant and generic argument contexts means that some functions will have to be fully analyzed and interpreted before other functions can even be typed.
+4. Parallel Compilation - it must be possible to break the work into chunks while not producing undo contention.
+5. Strong Typing - to avoid bugs involving missing values or values of incorrect types.
+
+Trying to support all of these while creating a compiler that could be rapidly developed and changed was challenging. C# seemed to make everything very verbose. A series of approaches were tried. Eventually a system allowing for a fairly direct expression of attribute grammars over the syntax tree was adopted. However, this makes strong typing challenging. Worse than that, because everything is computed on demand it makes order of execution and debugging very confusing. To simplify the implementation of the borrow checker an intermediate language (IL) was introduced. This was helpful, however, it was added as a later phase to semantic analysis which then became an issue because it couldn't be used for compile time code execution because it could only be generated after all semantic analysis was complete.
 
 ## Current Plan
 
-To support the above design goals, the current plan is to analyze compilation units in parallel utilizing the `Lazy<T>` type to avoid duplicate work. Thus, if a task is analyzing a function and needs information about some other type, it will try to access the lazy property and if that value has not been evaluated yet, it will be evaluated. Then when the task for that compilation unit gets to it, it will already be evaluated and won't be computed again. The steps will thus be:
+Of the above constraints, all but arbitrary compile time code execution and strong typing have been dropped. It is hoped this will make development quicker, easier and more testable. To make things clear and easy, the plan to to have a series of clearly defined steps. Of the below list, only steps 2 through 4 are part of semantic the semantic analysis in this project. Steps 1 and 5 are included for context.
 
-1. Build a tree of syntax symbols for all compilation units. Doing this synchronously eliminates the need for concurrency here, the tree becomes read-only after this point.
-2. Build name scopes for each compilation unit in parallel. These are fully independent so no coordination is needed besides that they are all writing to the same annotation collection. By building them together, later steps do not have to worry about coordinating their construction. Note that because they are built from the top down but read from the bottom up, if we tried to build them as part of later steps, we would access some node but then need to search up the tree from the point to begin creating name scopes from.
-3. Analyze each compilation unit it parallel. This allows the relatively independent creation of the semantic tree for each compilation unit. Partial types could be an issue with this that will have to be dealt with when we reach it.
+1. Lexing and Parsing produce a concrete syntax tree. Each compilation unit can be done in parallel.
+2. Build a simplified tree of declarations and members for the package. (Consider including simplified statements and expressions too)
+3. Build lexical scopes (i.e. name tables) for name resolution. Each compilation unit can be done in parallel.
+4. Analyze the semantics. This must mix name binding, type checking, IL generation and compile time code execution because they are interdependent. To simplify this as much as possible, this will be single threaded and will be free to mutate the tree as needed. The `Lazy<T>` type may or may not be used to make cycle detection easier.
+5. Emit C code from the generated IL.
 
-Note that due to the complexity of the issues of dealing with cycles in evaluation, we are not currently attempting to handle this. Instead, we will rely on `Lazy<T>` to throw exceptions when cycles occur. This will not provide friendly error messages, but once the errors cycles can lead to are understood, we can develop a better strategy for handling them.
+### Semantic/IL Tree
 
-## Simplifications for Semantic Tree
+The current plan is that the tree generated for the semantic analysis and IL generation would be something roughly consistent with what could be used in an IL representation of an Adamant package. However, it may include additional data or optional data structures that wouldn't be used if parsing and generating IL. In order to try to keep this structure as simple as possible, it is planned the following abstractions relative to the concrete syntax trees will be made:
 
+* Unify namespaces and partial classes within the package
 * Don't include parenthesized expressions
 * Unify the different kinds of blocks
 * All loops as `loop`?
