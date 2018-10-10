@@ -23,7 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\API\API.csproj" />
-    <ProjectReference Include="..\Old.Emit.C\Old.Emit.C.csproj" />
+    <ProjectReference Include="..\Emit.C\Emit.C.csproj" />
   </ItemGroup>
 
 </Project>

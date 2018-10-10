@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Emit;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Old.Emit.C.Properties;
 using Adamant.Tools.Compiler.Bootstrap.Old.Semantics;
@@ -13,11 +12,11 @@ using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Old.Emit.C
 {
-    public class CEmitter : Emitter
+    public class CEmitter
     {
         private readonly NameMangler nameMangler = new NameMangler();
 
-        public override string Emit(Package package)
+        public string Emit(Package package)
         {
             var code = new Code();
 

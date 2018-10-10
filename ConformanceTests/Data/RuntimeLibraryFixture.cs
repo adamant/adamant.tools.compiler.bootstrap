@@ -1,6 +1,5 @@
+using System;
 using System.IO;
-using System.Text;
-using Adamant.Tools.Compiler.Bootstrap.Old.Emit.C;
 
 namespace Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data
 {
@@ -10,9 +9,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data
         {
             Directory.CreateDirectory(GetRuntimeDirectory());
 
-            File.WriteAllText(GetRuntimeLibraryPath(), CEmitter.RuntimeLibraryCode, Encoding.ASCII);
+            // TODO File.WriteAllText(GetRuntimeLibraryPath(), CEmitter.RuntimeLibraryCode, Encoding.ASCII);
 
-            File.WriteAllText(GetRuntimeLibraryHeaderPath(), CEmitter.RuntimeLibraryHeader, Encoding.ASCII);
+            // TODO File.WriteAllText(GetRuntimeLibraryHeaderPath(), CEmitter.RuntimeLibraryHeader, Encoding.ASCII);
         }
 
         public static string GetRuntimeDirectory()
@@ -22,11 +21,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data
         }
         public static string GetRuntimeLibraryPath()
         {
-            return Path.Combine(GetRuntimeDirectory(), CEmitter.RuntimeLibraryCodeFileName);
+            // TODO return Path.Combine(GetRuntimeDirectory(), CEmitter.RuntimeLibraryCodeFileName);
+            throw new NotImplementedException();
         }
         public static string GetRuntimeLibraryHeaderPath()
         {
-            return Path.Combine(GetRuntimeDirectory(), CEmitter.RuntimeLibraryHeaderFileName);
+            // TODO return Path.Combine(GetRuntimeDirectory(), CEmitter.RuntimeLibraryHeaderFileName);
+            throw new NotImplementedException();
         }
     }
 }

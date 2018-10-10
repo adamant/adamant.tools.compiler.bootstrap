@@ -21,14 +21,15 @@ Of the above constraints, all but arbitrary compile time code execution and stro
 1. Lexing and Parsing produce a concrete syntax tree. Each compilation unit can be done in parallel.
 2. Build a simplified tree of declarations and members for the package. (Consider including simplified statements and expressions too)
 3. Build lexical scopes (i.e. name tables) for name resolution. Each compilation unit can be done in parallel.
-4. Analyze the semantics. This must mix name binding, type checking, IL generation and compile time code execution because they are interdependent. To simplify this as much as possible, this will be single threaded and will be free to mutate the tree as needed. The `Lazy<T>` type may or may not be used to make cycle detection easier.
+4. Analyze the semantics. This must mix name binding, type checking, IL generation and compile time code execution because they are interdependent. To simplify this as much as possible, this will be single threaded and will be free to mutate the tree as needed. All mutator method/properties will be `internal` to other phases can't mutate the tree. The `Lazy<T>` type may or may not be used to make cycle detection easier.
 5. Emit C code from the generated IL.
 
 ### Semantic/IL Tree
 
 The current plan is that the tree generated for the semantic analysis and IL generation would be something roughly consistent with what could be used in an IL representation of an Adamant package. However, it may include additional data or optional data structures that wouldn't be used if parsing and generating IL. In order to try to keep this structure as simple as possible, it is planned the following abstractions relative to the concrete syntax trees will be made:
 
-* Unify namespaces and partial classes within the package
+* Unify partial classes
+* Don't represent namespaces hierarchically, each declaration is fully qualified
 * Don't include parenthesized expressions
 * Unify the different kinds of blocks
 * All loops as `loop`?

@@ -18,6 +18,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Emit\Emit.csproj" />
     <ProjectReference Include="..\Old.Semantics.Names\Old.Semantics.Names.csproj" />
+    <ProjectReference Include="..\Old.Semantics.Types\Old.Semantics.Types.csproj" />
+    <ProjectReference Include="..\Old.Semantics\Old.Semantics.csproj" />
   </ItemGroup>
 
   <ItemGroup>

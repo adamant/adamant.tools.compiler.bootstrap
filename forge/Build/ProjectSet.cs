@@ -8,10 +8,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Adamant.Tools.Compiler.Bootstrap.API;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using Adamant.Tools.Compiler.Bootstrap.Forge.Config;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Old.Emit.C;
-using Adamant.Tools.Compiler.Bootstrap.Old.Semantics;
+using Adamant.Tools.Compiler.Bootstrap.Semantics;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
 {
@@ -85,8 +85,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             //var codeFiles = sourcePaths.Select(p => new CodePath(p)).ToList();
             //var package = await compiler.CompilePackageAsync(codeFiles);
             var codeFiles = sourcePaths.Select(CodeFile.Load).ToList();
-            var package = compiler.CompilePackage(codeFiles);
-            var diagnostics = package.AllDiagnostics();
+            var package = compiler.CompilePackage(project.Name, codeFiles);
+            var diagnostics = package.Diagnostics;
             if (diagnostics.Any())
             {
                 lock (consoleLock)
@@ -102,7 +102,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
                 }
                 return package;
             }
-            var cCode = new CEmitter().Emit(package);
+            var cCode = new CodeEmitter().Emit(package);
             var cacheDir = Path.Combine(project.Path, ".forge-cache");
             Directory.CreateDirectory(cacheDir); // Ensure the cache directory exists
             var outputPath = Path.Combine(cacheDir, "program.c");

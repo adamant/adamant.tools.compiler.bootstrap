@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Tests
             var tokens = new Lexer().Lex(file);
             var parser = new Parser();
             var compilationUnit = parser.Parse(file, tokens);
-            var packageSyntax = new PackageSyntax(compilationUnit.ToSyntaxList());
+            var packageSyntax = new PackageSyntax("test.package", compilationUnit.ToSyntaxList());
             var analyzer = new SemanticAnalyzer();
             var il = analyzer.Analyze(packageSyntax).IL;
             Assert.Equal(testCase.ExpectedIL, il.ToString());

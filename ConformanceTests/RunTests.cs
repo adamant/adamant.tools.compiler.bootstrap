@@ -4,8 +4,8 @@ using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.API;
 using Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Old.Emit.C;
 using JetBrains.Annotations;
 using Xunit;
 using Xunit.Abstractions;
@@ -41,9 +41,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.ConformanceTests
 
         private static void CompileAdamantToC(CodeFile code, string outputPath)
         {
-            var package = new AdamantCompiler().CompilePackage(code.Yield());
+            var package = new AdamantCompiler().CompilePackage("test.package", code.Yield());
             // TODO Assert.Empty(package.GetDiagnostics().Where(d=>d.IsError);
-            var cCode = new CEmitter().Emit(package);
+            var cCode = new CodeEmitter().Emit(package);
             File.WriteAllText(outputPath, cCode, Encoding.ASCII);
         }
 

@@ -18,8 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
-    <ProjectReference Include="..\Old.Semantics.Names\Old.Semantics.Names.csproj" />
-    <ProjectReference Include="..\Old.Semantics\Old.Semantics.csproj" />
+    <ProjectReference Include="..\Semantics\Semantics.csproj" />
     <ProjectReference Include="..\Syntax\Syntax.csproj" />
   </ItemGroup>
 

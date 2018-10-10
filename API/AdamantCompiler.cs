@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Old.Semantics;
+using Adamant.Tools.Compiler.Bootstrap.Semantics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using JetBrains.Annotations;
@@ -13,12 +13,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
 {
     public class AdamantCompiler
     {
-        public Task<Package> CompilePackageAsync([NotNull][ItemNotNull] IEnumerable<ICodeFileSource> files)
+        public Task<Package> CompilePackageAsync([NotNull] string name, [NotNull][ItemNotNull] IEnumerable<ICodeFileSource> files)
         {
-            return CompilePackageAsync(files, TaskScheduler.Default);
+            return CompilePackageAsync(name, files, TaskScheduler.Default);
         }
 
-        public Task<Package> CompilePackageAsync([NotNull][ItemNotNull] IEnumerable<ICodeFileSource> fileSources, [CanBeNull] TaskScheduler taskScheduler)
+        public Task<Package> CompilePackageAsync([NotNull] string name, [NotNull][ItemNotNull] IEnumerable<ICodeFileSource> fileSources, [CanBeNull] TaskScheduler taskScheduler)
         {
             var lexer = new Lexer();
             var parser = new Parser();
@@ -43,13 +43,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         }
 
         [NotNull]
-        public Package CompilePackage([NotNull][ItemNotNull] IEnumerable<ICodeFileSource> fileSources)
+        public Package CompilePackage([NotNull] string name, [NotNull][ItemNotNull] IEnumerable<ICodeFileSource> fileSources)
         {
-            return CompilePackage(fileSources.Select(s => s.Load()));
+            return CompilePackage(name, fileSources.Select(s => s.Load()));
         }
 
         [NotNull]
-        public Package CompilePackage([NotNull][ItemNotNull] IEnumerable<CodeFile> files)
+        public Package CompilePackage([NotNull] string name, [NotNull][ItemNotNull] IEnumerable<CodeFile> files)
         {
             var lexer = new Lexer();
             var parser = new Parser();
@@ -61,12 +61,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                     return parser.Parse(file, tokens);
                 })
                 .ToSyntaxList();
-            var packageSyntax = new PackageSyntax(compilationUnits);
+            var packageSyntax = new PackageSyntax(name, compilationUnits);
 
             var analyzer = new SemanticAnalyzer();
-            var analysis = analyzer.Analyze(packageSyntax);
+            var package = analyzer.Analyze(packageSyntax);
 
-            return analysis.Package;
+            return package;
         }
     }
 }

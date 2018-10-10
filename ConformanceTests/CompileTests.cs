@@ -26,12 +26,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.ConformanceTests
             var codePath = new CodePath(testCase.FullCodePath);
             var codeFile = new CodeFile(codePath, new CodeText(testCase.Code));
             var compiler = new AdamantCompiler();
-            var package = compiler.CompilePackage(codeFile.Yield());
+            var package = compiler.CompilePackage("test.package", codeFile.Yield());
 
             var expectedErrorLines = ErrorPattern.Matches(testCase.Code)
                 .Select(match => codeFile.Code.Lines.LineContainingOffset(match.Index)).ToList();
 
-            var diagnostics = package.AllDiagnostics();
+            var diagnostics = package.Diagnostics;
 
             if (expectedErrorLines.Count == 0)
                 Assert.Empty(diagnostics);
