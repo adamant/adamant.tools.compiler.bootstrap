@@ -1,6 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
+namespace Adamant.Tools.Compiler.Bootstrap.Emit
 {
     public class CCodeBuilder : CodeBuilder
     {

@@ -22,15 +22,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Semantics", "Semantics\Semantics.csproj", "{A043AAA8-3F0C-4251-9DCB-70FC70ED5E3C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Old.Semantics", "Semantics\Old.Semantics.csproj", "{A043AAA8-3F0C-4251-9DCB-70FC70ED5E3C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "API\API.csproj", "{51A803B9-C590-4AEA-B74F-E40038CD029C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Emit", "Emit\Emit.csproj", "{94598655-2653-4BEA-B973-09A11932C86A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Emit.C", "Emit.C\Emit.C.csproj", "{6EB02F9D-5FBA-4B4D-A4FC-5403826C6C8A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Old.Emit.C", "Emit.C\Old.Emit.C.csproj", "{6EB02F9D-5FBA-4B4D-A4FC-5403826C6C8A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Emit.C.Tests", "Emit.C.Tests\Emit.C.Tests.csproj", "{13C542B6-37C0-4EE0-A411-CA73000EAE5B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Old.Emit.C.Tests", "Emit.C.Tests\Old.Emit.C.Tests.csproj", "{13C542B6-37C0-4EE0-A411-CA73000EAE5B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{8D74A93C-CA04-4283-9FBD-31C8D9B08F34}"
 	ProjectSection(SolutionItems) = preProject
@@ -38,13 +38,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{8D74A93C-C
 		docs\Implemented.md = docs\Implemented.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Semantics.Names", "Semantics.Names\Semantics.Names.csproj", "{73B6E2FE-401C-419F-AA6D-0B0745CD71D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Old.Semantics.Names", "Semantics.Names\Old.Semantics.Names.csproj", "{73B6E2FE-401C-419F-AA6D-0B0745CD71D3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Semantics.Types", "Semantics.Types\Semantics.Types.csproj", "{E4E6E6BD-0FDC-4323-97CF-9D72CCB6350A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Old.Semantics.Types", "Semantics.Types\Old.Semantics.Types.csproj", "{E4E6E6BD-0FDC-4323-97CF-9D72CCB6350A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IL", "IL\IL.csproj", "{40562F85-7C7B-4E87-A307-229D57EB74C1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Semantics.Tests", "Semantics.Tests\Semantics.Tests.csproj", "{84D37D24-C01A-4BD8-A9F6-36DD13FE812C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Old.Semantics.Tests", "Semantics.Tests\Old.Semantics.Tests.csproj", "{84D37D24-C01A-4BD8-A9F6-36DD13FE812C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Tests", "Core.Tests\Core.Tests.csproj", "{B0A6716D-04CB-4B9E-B6AD-6D96FF4F0823}"
 EndProject
