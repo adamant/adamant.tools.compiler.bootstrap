@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing
             Requires.NotNull(nameof(file), file);
             Requires.NotNull(nameof(tokens), tokens);
             File = file;
-            this.tokens = tokens.Where(t => !(t is TriviaToken)).GetEnumerator();
+            this.tokens = tokens.Where(t => !(t is TriviaToken)).GetEnumerator().AssertNotNull();
             this.tokens.MoveNext();
         }
 

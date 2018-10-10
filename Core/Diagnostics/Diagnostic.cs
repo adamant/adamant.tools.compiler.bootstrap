@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics
 {
-    public class Diagnostic
+    public class Diagnostic : IComparable<Diagnostic>
     {
         [NotNull] public readonly CodeFile File;
         public readonly TextSpan Span;
@@ -38,6 +38,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics
             Phase = phase;
             ErrorCode = errorCode;
             Message = message;
+        }
+
+        public int CompareTo(Diagnostic other)
+        {
+            if (ReferenceEquals(this, other)) return 0;
+            if (ReferenceEquals(null, other)) return 1;
+            var startPositionComparison = StartPosition.CompareTo(other.StartPosition);
+            if (startPositionComparison != 0) return startPositionComparison;
+            var endPositionComparison = EndPosition.CompareTo(other.EndPosition);
+            if (endPositionComparison != 0) return endPositionComparison;
+            return ErrorCode.CompareTo(other.ErrorCode);
         }
     }
 }

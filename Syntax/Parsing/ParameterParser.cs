@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
@@ -19,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        public ParameterSyntax Parse([NotNull] ITokenStream tokens)
+        public ParameterSyntax Parse([NotNull] ITokenStream tokens, IDiagnosticsCollector diagnostics)
         {
             switch (tokens.Current)
             {
@@ -33,7 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     var varKeyword = tokens.Accept<VarKeywordToken>();
                     var name = tokens.ExpectIdentifier();
                     var colon = tokens.Expect<ColonToken>();
-                    var typeExpression = expressionParser.Parse(tokens);
+                    var typeExpression = expressionParser.Parse(tokens, diagnostics);
                     return new ParameterSyntax(varKeyword, name, colon, typeExpression);
             }
         }

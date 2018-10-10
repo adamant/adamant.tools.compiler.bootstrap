@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
@@ -20,17 +21,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
         {
             var tokens = FakeTokenStream.FromString(text);
 
-            var e = Parse(tokens);
+            var e = ParseWithoutError(tokens);
 
             var p = Assert.IsType<AccessModifierSyntax>(e);
             Assert.Equal(tokens[0], p.Keyword);
         }
 
         [NotNull]
-        private static AccessModifierSyntax Parse([NotNull] ITokenStream tokenStream)
+        private static AccessModifierSyntax ParseWithoutError([NotNull] ITokenStream tokenStream)
         {
             var parser = NewAccessModifierParser();
-            return parser.Parse(tokenStream);
+            var diagnostics = new DiagnosticsBuilder();
+            var accessModifierSyntax = parser.Parse(tokenStream, diagnostics);
+            Assert.Empty(diagnostics.Build());
+            return accessModifierSyntax;
         }
 
         [NotNull]

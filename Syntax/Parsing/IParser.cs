@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using JetBrains.Annotations;
@@ -14,8 +15,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         /// token stream.
         /// </summary>
         /// <param name="tokens">A token stream without whitespace or comments</param>
+        /// <param name="diagnostics"></param>
         [MustUseReturnValue]
         [NotNull]
-        T Parse([NotNull] ITokenStream tokens);
+        T Parse([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics);
     }
 }

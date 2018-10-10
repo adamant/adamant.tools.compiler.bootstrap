@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
@@ -88,7 +89,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes
         private class FakeParser<T> : IParser<T>
             where T : SyntaxNode
         {
-            public T Parse(ITokenStream tokens)
+            public T Parse([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
             {
                 var fakeToken = tokens.ExpectFake();
                 return (T)fakeToken?.FakeNode ?? throw new Exception($"Expected fake '{typeof(T).Name}' not found");
@@ -120,7 +121,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes
         private class FakeUsingDirectiveParser : IParser<UsingDirectiveSyntax>
         {
             [NotNull]
-            public UsingDirectiveSyntax Parse([NotNull] ITokenStream tokens)
+            public UsingDirectiveSyntax Parse(
+                [NotNull] ITokenStream tokens,
+                IDiagnosticsCollector diagnostics)
             {
                 var _ = tokens.Expect<UsingKeywordToken>();
 

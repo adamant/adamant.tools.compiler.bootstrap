@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             var text = code.Text;
             var tokenStart = 0;
             var tokenEnd = -1; // One past the end position to allow for zero length spans
-            var diagnostics = new List<Diagnostic>();
+            var diagnostics = new DiagnosticsBuilder();
             while (tokenStart < text.Length)
             {
                 var currentChar = text[tokenStart];
@@ -141,7 +141,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                                     // If we ran into the end of the file, error
                                     if (tokenEnd >= text.Length)
                                     {
-                                        diagnostics.Add(LexError.UnclosedBlockComment(file,
+                                        diagnostics.Publish(LexError.UnclosedBlockComment(file,
                                             TextSpan.FromStartEnd(tokenStart, tokenEnd)));
                                         break;
                                     }
@@ -256,13 +256,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         else if (currentChar == '!' && NextCharIs('='))
                         {
                             var span = SymbolSpan(2);
-                            diagnostics.Add(LexError.CStyleNotEquals(file, span));
+                            diagnostics.Publish(LexError.CStyleNotEquals(file, span));
                             yield return new NotEqualToken(span);
                         }
                         else
                         {
                             var span = SymbolSpan();
-                            diagnostics.Add(LexError.UnexpectedCharacter(file, span, currentChar));
+                            diagnostics.Publish(LexError.UnexpectedCharacter(file, span, currentChar));
                             yield return new UnexpectedToken(span);
                         }
                         break;
@@ -271,7 +271,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             }
 
             // The end of file token provides something to attach any final errors to
-            yield return new EndOfFileToken(SymbolSpan(0), diagnostics);
+            yield return new EndOfFileToken(SymbolSpan(0), diagnostics.Build());
             yield break;
 
             TextSpan SymbolSpan(int length = 1)
@@ -337,7 +337,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     {
                         // Just the slash is invalid
                         var errorSpan = TextSpan.FromStartEnd(tokenEnd - 1, tokenEnd);
-                        diagnostics.Add(LexError.InvalidEscapeSequence(file, errorSpan));
+                        diagnostics.Publish(LexError.InvalidEscapeSequence(file, errorSpan));
                         break; // we hit the end of file and need to not add to tokenEnd any more
                     }
 
@@ -372,7 +372,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                                 {
                                     content.Append('u');
                                     var errorSpan = TextSpan.FromStartEnd(escapeStart, tokenEnd);
-                                    diagnostics.Add(LexError.InvalidEscapeSequence(file, errorSpan));
+                                    diagnostics.Publish(LexError.InvalidEscapeSequence(file, errorSpan));
                                     break;
                                 }
 
@@ -403,7 +403,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                                         tokenEnd += 1;
                                     }
                                     var errorSpan = TextSpan.FromStartEnd(escapeStart, tokenEnd);
-                                    diagnostics.Add(LexError.InvalidEscapeSequence(file, errorSpan));
+                                    diagnostics.Publish(LexError.InvalidEscapeSequence(file, errorSpan));
                                     break;
                                 }
 
@@ -412,7 +412,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                                 else
                                 {
                                     var errorSpan = TextSpan.FromStartEnd(escapeStart, tokenEnd);
-                                    diagnostics.Add(LexError.InvalidEscapeSequence(file, errorSpan));
+                                    diagnostics.Publish(LexError.InvalidEscapeSequence(file, errorSpan));
                                 }
                                 break;
                             }
@@ -420,7 +420,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                             {
                                 // Last two chars form the invalid sequence
                                 var errorSpan = TextSpan.FromStartEnd(tokenEnd - 2, tokenEnd);
-                                diagnostics.Add(LexError.InvalidEscapeSequence(file, errorSpan));
+                                diagnostics.Publish(LexError.InvalidEscapeSequence(file, errorSpan));
                                 // drop the `/` keep the character after
                                 content.Append(currentChar);
                                 break;
@@ -434,7 +434,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     if (text[tokenEnd] == '"') tokenEnd += 1;
                 }
                 else
-                    diagnostics.Add(LexError.UnclosedStringLiteral(file,
+                    diagnostics.Publish(LexError.UnclosedStringLiteral(file,
                         TextSpan.FromStartEnd(tokenStart, tokenEnd)));
 
                 return new StringLiteralToken(TextSpan.FromStartEnd(tokenStart, tokenEnd), content.ToString());

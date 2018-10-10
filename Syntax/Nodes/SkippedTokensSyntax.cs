@@ -3,6 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
 {
@@ -11,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
         // TODO remove
         public IReadOnlyList<Diagnostic> Diagnostics;
 
-        public SkippedTokensSyntax(CodeFile file, Token token)
+        public SkippedTokensSyntax([NotNull] CodeFile file, Token token)
         {
             var diagnostics = new List<Diagnostic>();
             if (token is UnexpectedToken)

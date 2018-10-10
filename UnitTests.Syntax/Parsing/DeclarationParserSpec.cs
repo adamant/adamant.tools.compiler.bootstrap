@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
@@ -24,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
             var blockStatement = Fake.BlockStatement();
             var tokens = FakeTokenStream.From($"{accessModifer} fn function_name({parameters}) -> {returnExpression} {blockStatement}");
 
-            var d = Parse(tokens);
+            var d = ParseWithoutError(tokens);
 
             var f = Assert.IsType<FunctionDeclarationSyntax>(d);
             Assert.Equal(accessModifer, f.AccessModifier);
@@ -44,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
             var accessModifer = Fake.AccessModifier();
             var tokens = FakeTokenStream.From($"{accessModifer} class Class_Name {{}}");
 
-            var d = Parse(tokens);
+            var d = ParseWithoutError(tokens);
 
             var c = Assert.IsType<ClassDeclarationSyntax>(d);
             Assert.Equal(accessModifer, c.AccessModifier);
@@ -56,10 +57,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
 
 
         [NotNull]
-        private static DeclarationSyntax Parse([NotNull] ITokenStream tokenStream)
+        private static DeclarationSyntax ParseWithoutError([NotNull] ITokenStream tokenStream)
         {
             var parser = NewDeclarationParser();
-            return parser.Parse(tokenStream);
+            var diagnostics = new DiagnosticsBuilder();
+            var declarationSyntax = parser.Parse(tokenStream, diagnostics);
+            Assert.Empty(diagnostics.Build());
+            return declarationSyntax;
         }
 
         [NotNull]

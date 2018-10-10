@@ -9,6 +9,9 @@
 //------------------------------------------------------------------------------
 
 namespace Adamant.Tools.Compiler.Bootstrap.Old.Emit.C.Properties {
+    using System;
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -36,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Old.Emit.C.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Adamant.Tools.Compiler.Bootstrap.Emit.C.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Adamant.Tools.Compiler.Bootstrap.Old.Emit.C.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -58,7 +61,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Old.Emit.C.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to #include &quot;RuntimeLibrary.h&quot;
+        ///.
         /// </summary>
         internal static string RuntimeLibraryCode {
             get {
@@ -67,7 +71,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Old.Emit.C.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to #include &lt;stdint.h&gt;
+        ///.
         /// </summary>
         internal static string RuntimeLibraryHeader {
             get {

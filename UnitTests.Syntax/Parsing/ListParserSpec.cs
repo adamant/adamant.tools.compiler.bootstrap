@@ -1,4 +1,5 @@
 using System;
+using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
@@ -32,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
             var item1 = Fake.Expression();
             var tokens = FakeTokenStream.From($"{item1}");
 
-            var l = new ListParser().ParseList(tokens, Fake.Parser<ExpressionSyntax>().Parse, TypeOf<CloseParenToken>._);
+            var l = ParseListWithoutError<CloseParenToken>(tokens);
 
             Assert.Collection(l, i => Assert.Equal(item1, i));
         }
@@ -44,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
             var item2 = Fake.Expression();
             var tokens = FakeTokenStream.From($"{item1}{item2}");
 
-            var l = new ListParser().ParseList(tokens, Fake.Parser<ExpressionSyntax>().Parse, TypeOf<CloseParenToken>._);
+            var l = ParseListWithoutError<CloseParenToken>(tokens);
 
             Assert.Collection(l,
                 i => Assert.Equal(item1, i),
@@ -59,7 +60,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
             var item3 = Fake.Expression();
             var tokens = FakeTokenStream.From($"{item1}{item2}{item3}");
 
-            var l = new ListParser().ParseList(tokens, Fake.Parser<ExpressionSyntax>().Parse, TypeOf<CloseParenToken>._);
+            var l = ParseListWithoutError<CloseParenToken>(tokens);
 
             Assert.Collection(l,
                 i => Assert.Equal(item1, i),
@@ -83,7 +84,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
             var item1 = Fake.Expression();
             var tokens = FakeTokenStream.From($"{item1}");
 
-            var l = new ListParser().ParseSeparatedList(tokens, Fake.Parser<ExpressionSyntax>().Parse, TypeOf<CommaToken>._, TypeOf<CloseParenToken>._);
+            var l = ParseSeparatedListWithoutError<CommaToken, CloseParenToken>(tokens);
 
             Assert.Collection(l, i => Assert.Equal(item1, i));
         }
@@ -95,7 +96,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
             var item2 = Fake.Expression();
             var tokens = FakeTokenStream.From($"{item1},{item2}");
 
-            var l = new ListParser().ParseSeparatedList(tokens, Fake.Parser<ExpressionSyntax>().Parse, TypeOf<CommaToken>._, TypeOf<CloseParenToken>._);
+            var l = ParseSeparatedListWithoutError<CommaToken, CloseParenToken>(tokens);
 
             Assert.Collection(l,
                 i => Assert.Equal(item1, i),
@@ -111,7 +112,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
             var item3 = Fake.Expression();
             var tokens = FakeTokenStream.From($"{item1},{item2},{item3}");
 
-            var l = new ListParser().ParseSeparatedList(tokens, Fake.Parser<ExpressionSyntax>().Parse, TypeOf<CommaToken>._, TypeOf<CloseParenToken>._);
+            var l = ParseSeparatedListWithoutError<CommaToken, CloseParenToken>(tokens);
 
             Assert.Collection(l,
                 i => Assert.Equal(item1, i),
@@ -125,6 +126,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
         {
             Assert.True(false, "ParseFunction<T> called when it wasn't supposed to be");
             throw new Exception("Unreachable");
+        }
+
+        [NotNull]
+        private static SyntaxList<ExpressionSyntax> ParseListWithoutError<TTerminator>([NotNull] ITokenStream tokens)
+            where TTerminator : Token
+        {
+            var diagnostics = new DiagnosticsBuilder();
+            var syntaxList = new ListParser().ParseList(tokens, t => Fake.Parser<ExpressionSyntax>().Parse(t, diagnostics), TypeOf<TTerminator>._);
+            Assert.Empty(diagnostics.Build());
+            return syntaxList;
+        }
+
+        [NotNull]
+        private static SeparatedListSyntax<ExpressionSyntax> ParseSeparatedListWithoutError<TSeparator, TTerminator>([NotNull] ITokenStream tokens)
+            where TSeparator : Token
+            where TTerminator : Token
+        {
+            var diagnostics = new DiagnosticsBuilder();
+            var l = new ListParser().ParseSeparatedList(tokens,
+                t => Fake.Parser<ExpressionSyntax>().Parse(t, diagnostics),
+                TypeOf<TSeparator>._,
+                TypeOf<TTerminator>._);
+            Assert.Empty(diagnostics.Build());
+            return l;
         }
     }
 }

@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
@@ -9,16 +11,15 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 {
-    public class CompilationUnitParser : IParser<CompilationUnitSyntax>
+    /// <summary>
+    /// Doesn't implement IParser{CompilationUnitSyntax} because it doesn't take
+    /// an <see cref="IDiagnosticsCollector"/>
+    /// </summary>
+    public class CompilationUnitParser
     {
-        [NotNull]
-        private readonly IParser<UsingDirectiveSyntax> usingDirectiveParser;
-
-        [NotNull]
-        private readonly IParser<DeclarationSyntax> declarationParser;
-
-        [NotNull]
-        private readonly IParser<NameSyntax> qualifiedNameParser;
+        [NotNull] private readonly IParser<UsingDirectiveSyntax> usingDirectiveParser;
+        [NotNull] private readonly IParser<DeclarationSyntax> declarationParser;
+        [NotNull] private readonly IParser<NameSyntax> qualifiedNameParser;
 
         public CompilationUnitParser(
             [NotNull] IParser<UsingDirectiveSyntax> usingDirectiveParser,
@@ -34,43 +35,46 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         [NotNull]
         public CompilationUnitSyntax Parse([NotNull] ITokenStream tokens)
         {
-            var @namespace = ParseCompilationUnitNamespace(tokens);
-            var usingDirectives = ParseUsingDirectives(tokens).ToSyntaxList();
-            var declarations = ParseDeclarations(tokens).ToSyntaxList();
-            var endOfFile = tokens.ExpectEndOfFile();
+            var diagnosticsBuilder = new DiagnosticsBuilder();
+            var @namespace = ParseCompilationUnitNamespace(tokens, diagnosticsBuilder);
+            var usingDirectives = ParseUsingDirectives(tokens, diagnosticsBuilder).ToSyntaxList();
+            var declarations = ParseDeclarations(tokens, diagnosticsBuilder).ToSyntaxList();
+            var endOfFile = tokens.ExpectEndOfFile().AssertNotNull();
 
-            return new CompilationUnitSyntax(@namespace, usingDirectives, declarations, endOfFile);
+            diagnosticsBuilder.Publish(endOfFile.Diagnostics);
+
+            return new CompilationUnitSyntax(tokens.File, @namespace, usingDirectives, declarations, endOfFile, diagnosticsBuilder.Build());
         }
 
         [MustUseReturnValue]
         [CanBeNull]
-        private CompilationUnitNamespaceSyntax ParseCompilationUnitNamespace([NotNull] ITokenStream tokens)
+        private CompilationUnitNamespaceSyntax ParseCompilationUnitNamespace([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
         {
             if (!(tokens.Current is NamespaceKeywordToken)) return null;
 
             var namespaceKeyword = tokens.Expect<NamespaceKeywordToken>();
-            var name = qualifiedNameParser.Parse(tokens);
+            var name = qualifiedNameParser.Parse(tokens, diagnostics);
             var semicolon = tokens.Expect<SemicolonToken>();
             return new CompilationUnitNamespaceSyntax(namespaceKeyword, name, semicolon);
         }
 
         [MustUseReturnValue]
         [NotNull]
-        private IEnumerable<UsingDirectiveSyntax> ParseUsingDirectives([NotNull] ITokenStream tokens)
+        private IEnumerable<UsingDirectiveSyntax> ParseUsingDirectives([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
         {
             while (tokens.Current is UsingKeywordToken)
             {
-                yield return usingDirectiveParser.Parse(tokens);
+                yield return usingDirectiveParser.Parse(tokens, diagnostics);
             }
         }
 
         [MustUseReturnValue]
         [NotNull]
-        private IEnumerable<DeclarationSyntax> ParseDeclarations([NotNull] ITokenStream tokens)
+        private IEnumerable<DeclarationSyntax> ParseDeclarations([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
         {
             while (!tokens.AtEndOfFile())
             {
-                yield return declarationParser.Parse(tokens);
+                yield return declarationParser.Parse(tokens, diagnostics);
             }
         }
     }

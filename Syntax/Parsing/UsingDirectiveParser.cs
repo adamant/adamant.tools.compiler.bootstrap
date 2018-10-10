@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
@@ -17,10 +18,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         }
 
         [NotNull]
-        public UsingDirectiveSyntax Parse([NotNull] ITokenStream tokens)
+        public UsingDirectiveSyntax Parse([NotNull] ITokenStream tokens, IDiagnosticsCollector diagnostics)
         {
             var usingKeyword = tokens.Expect<UsingKeywordToken>();
-            var name = qualifiedNameParser.Parse(tokens);
+            var name = qualifiedNameParser.Parse(tokens, diagnostics);
             var semicolon = tokens.Expect<SemicolonToken>();
             return new UsingDirectiveSyntax(usingKeyword, name, semicolon);
         }

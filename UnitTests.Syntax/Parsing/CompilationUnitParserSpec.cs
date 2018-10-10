@@ -21,11 +21,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
         {
             var tokens = FakeTokenStream.From($"");
 
-            var cu = Parse(tokens);
+            var cu = ParseWithoutError(tokens);
 
             Assert.Null(cu.Namespace);
             Assert.Empty(cu.UsingDirectives);
             Assert.Empty(cu.Declarations);
+            Assert.Empty(cu.Diagnostics);
         }
 
         [Fact]
@@ -34,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
             var name = Fake.Name();
             var tokens = FakeTokenStream.From($"namespace {name};");
 
-            var cu = Parse(tokens);
+            var cu = ParseWithoutError(tokens);
 
             var ns = cu.Namespace;
             Assert.NotNull(ns);
@@ -44,6 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
 
             Assert.Empty(cu.UsingDirectives);
             Assert.Empty(cu.Declarations);
+            Assert.Empty(cu.Diagnostics);
         }
 
         [Fact]
@@ -52,15 +54,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
             var @using = Fake.UsingDirective();
             var tokens = FakeTokenStream.From($"using {@using}");
 
-            var cu = Parse(tokens);
+            var cu = ParseWithoutError(tokens);
 
             Assert.Null(cu.Namespace);
             Assert.Equal(@using, cu.UsingDirectives.Single());
             Assert.Empty(cu.Declarations);
+            Assert.Empty(cu.Diagnostics);
         }
 
         [NotNull]
-        private static CompilationUnitSyntax Parse([NotNull] ITokenStream tokenStream)
+        private static CompilationUnitSyntax ParseWithoutError([NotNull] ITokenStream tokenStream)
         {
             var parser = NewCompilationUnitParser();
             return parser.Parse(tokenStream);

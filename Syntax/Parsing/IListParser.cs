@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 {
     // Delegate needed so we can declare the arg as not null
+    [NotNull]
     public delegate T ParseFunction<out T>([NotNull] ITokenStream stream)
         where T : SyntaxNode;
 

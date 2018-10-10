@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
@@ -19,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
             var statements = Fake.SyntaxList<StatementSyntax>();
             var tokens = FakeTokenStream.From($"{{{statements}}}");
 
-            var b = ParseBlock(tokens);
+            var b = ParseBlockWithoutError(tokens);
 
             Assert.Equal(tokens[0], b.OpenBrace);
             Assert.Equal(statements, b.Statements);
@@ -27,17 +28,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
         }
 
         [NotNull]
-        private static StatementSyntax Parse([NotNull] ITokenStream tokenStream)
+        private static StatementSyntax ParseWithoutError([NotNull] ITokenStream tokenStream)
         {
             var parser = NewStatementParser();
-            return parser.Parse(tokenStream);
+            var diagnostics = new DiagnosticsBuilder();
+            var statementSyntax = parser.Parse(tokenStream, diagnostics);
+            Assert.Empty(diagnostics.Build());
+            return statementSyntax;
         }
 
         [NotNull]
-        private static BlockStatementSyntax ParseBlock([NotNull] ITokenStream tokenStream)
+        private static BlockStatementSyntax ParseBlockWithoutError([NotNull] ITokenStream tokenStream)
         {
             var parser = NewStatementParser();
-            return parser.ParseStatementBlock(tokenStream);
+            var diagnostics = new DiagnosticsBuilder();
+            var blockStatementSyntax = parser.ParseStatementBlock(tokenStream, diagnostics);
+            Assert.Empty(diagnostics.Build());
+            return blockStatementSyntax;
         }
 
         [NotNull]

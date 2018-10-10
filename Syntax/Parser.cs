@@ -8,9 +8,9 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class Parser : IParser<CompilationUnitSyntax>
+    public class Parser
     {
-        [NotNull] private readonly IParser<CompilationUnitSyntax> compilationUnitParser;
+        [NotNull] private readonly CompilationUnitParser compilationUnitParser;
 
         public Parser()
         {

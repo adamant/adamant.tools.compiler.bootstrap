@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
@@ -9,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
     {
         [MustUseReturnValue]
         [NotNull]
-        public NameSyntax Parse([NotNull] ITokenStream tokens)
+        public NameSyntax Parse([NotNull] ITokenStream tokens, IDiagnosticsCollector diagnostics)
         {
             NameSyntax qualifiedName = new IdentifierNameSyntax(tokens.ExpectIdentifier());
             while (tokens.Current is DotToken)

@@ -1,5 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Errors
 {
@@ -12,7 +13,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Errors
     /// </summary>
     internal static class ParseError
     {
-        public static Diagnostic SkippedToken(CodeFile file, TextSpan span)
+        [NotNull]
+        public static Diagnostic SkippedToken([NotNull] CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3002, "Unexpected Token");
         }

@@ -37,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes
         public override void AllDiagnostics([NotNull] List<Diagnostic> list)
         {
             base.AllDiagnostics(list);
-            Syntax.AllDiagnostics(list);
+            list.AddRange(Syntax.Diagnostics);
             Namespace?.AllDiagnostics(list);
             foreach (var declaration in Declarations)
                 declaration.AllDiagnostics(list);

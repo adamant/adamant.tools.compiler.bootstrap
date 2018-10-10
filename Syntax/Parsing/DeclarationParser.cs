@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
@@ -36,20 +37,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        public DeclarationSyntax Parse([NotNull] ITokenStream tokens)
+        public DeclarationSyntax Parse([NotNull] ITokenStream tokens, IDiagnosticsCollector diagnostics)
         {
-            var accessModifier = accessModifierParser.Parse(tokens);
+            var accessModifier = accessModifierParser.Parse(tokens, diagnostics);
 
             switch (tokens.Current)
             {
                 case ClassKeywordToken _:
                     return ParseClass(accessModifier, tokens);
                 case EnumKeywordToken _:
-                    return ParseEnum(accessModifier, tokens);
+                    return ParseEnum(accessModifier, tokens, diagnostics);
                 case FunctionKeywordToken _:
-                    return ParseFunction(accessModifier, tokens);
+                    return ParseFunction(accessModifier, tokens, diagnostics);
                 default:
-                    return ParseIncompleteDeclaration(tokens, accessModifier);
+                    return ParseIncompleteDeclaration(accessModifier, tokens, diagnostics);
                 case null:
                     throw new InvalidOperationException("Can't parse past end of file");
             }
@@ -69,7 +70,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        private static DeclarationSyntax ParseEnum([NotNull] AccessModifierSyntax accessModifier, [NotNull] ITokenStream tokens)
+        private static DeclarationSyntax ParseEnum([NotNull] AccessModifierSyntax accessModifier, [NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
         {
             var enumKeyword = tokens.Expect<EnumKeywordToken>();
             switch (tokens.Current)
@@ -85,7 +86,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     throw new NotImplementedException(
                         "Parsing enum classes not implemented");
                 default:
-                    return ParseIncompleteDeclaration(tokens, accessModifier);
+                    return ParseIncompleteDeclaration(accessModifier, tokens, diagnostics);
             }
         }
 
@@ -94,31 +95,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         [NotNull]
         public FunctionDeclarationSyntax ParseFunction(
             [NotNull] AccessModifierSyntax accessModifier,
-            [NotNull] ITokenStream tokens)
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
         {
             var functionKeyword = tokens.Expect<FunctionKeywordToken>();
             var name = tokens.ExpectIdentifier();
             var openParen = tokens.Expect<OpenParenToken>();
-            var parameters = ParseParameters(tokens);
+            var parameters = ParseParameters(tokens, diagnostics);
             var closeParen = tokens.Expect<CloseParenToken>();
             var arrow = tokens.Expect<RightArrowToken>();
-            var returnTypeExpression = expressionParser.Parse(tokens);
-            var body = blockStatementParser.Parse(tokens);
+            var returnTypeExpression = expressionParser.Parse(tokens, diagnostics);
+            var body = blockStatementParser.Parse(tokens, diagnostics);
             return new FunctionDeclarationSyntax(accessModifier, functionKeyword, name,
                 openParen, parameters, closeParen, arrow, returnTypeExpression, body);
         }
 
         [MustUseReturnValue]
         [NotNull]
-        private SeparatedListSyntax<ParameterSyntax> ParseParameters([NotNull] ITokenStream tokens)
+        private SeparatedListSyntax<ParameterSyntax> ParseParameters([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
         {
-            return listParser.ParseSeparatedList(tokens, parameterParser.Parse, TypeOf<CommaToken>._, TypeOf<CloseParenToken>._);
+            return listParser.ParseSeparatedList(tokens, t => parameterParser.Parse(t, diagnostics), TypeOf<CommaToken>._, TypeOf<CloseParenToken>._);
         }
         #endregion
 
         [MustUseReturnValue]
         [NotNull]
-        private static IncompleteDeclarationSyntax ParseIncompleteDeclaration([NotNull] ITokenStream tokens, [CanBeNull] AccessModifierSyntax accessModifier)
+        private static IncompleteDeclarationSyntax ParseIncompleteDeclaration(
+            [CanBeNull] AccessModifierSyntax accessModifier,
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
         {
             var skipped = new List<ISyntaxNodeOrToken>() { accessModifier };
             var startToken = tokens.Current;

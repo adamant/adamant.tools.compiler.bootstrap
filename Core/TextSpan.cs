@@ -80,8 +80,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
 
         public int CompareTo(TextSpan other)
         {
-            var startComparison = Start.CompareTo(other.Start);
-            return startComparison != 0 ? startComparison : Length.CompareTo(other.Length);
+            var comparison = Start.CompareTo(other.Start);
+            return comparison != 0 ? comparison : Length.CompareTo(other.Length);
         }
     }
 }
