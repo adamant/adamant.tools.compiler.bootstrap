@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics
 {
     internal partial class SemanticAnalysis
     {

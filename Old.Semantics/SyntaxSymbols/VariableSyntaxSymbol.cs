@@ -2,11 +2,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.SyntaxSymbols
 {
     public class VariableSyntaxSymbol : ISyntaxSymbol
     {

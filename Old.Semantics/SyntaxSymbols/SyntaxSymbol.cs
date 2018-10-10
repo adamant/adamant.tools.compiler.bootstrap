@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.SyntaxSymbols
 {
     public interface ISyntaxSymbol
     {

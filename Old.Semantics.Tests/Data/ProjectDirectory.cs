@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Tests.Data
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Tests.Data
 {
     public static class ProjectDirectory
     {

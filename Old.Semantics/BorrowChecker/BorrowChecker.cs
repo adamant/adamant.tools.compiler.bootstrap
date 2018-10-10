@@ -14,7 +14,7 @@ using Adamant.Tools.Compiler.Bootstrap.IL.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.IL.Refs;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BorrowChecker
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.BorrowChecker
 {
     public class BorrowChecker
     {

@@ -1,8 +1,8 @@
-using Adamant.Tools.Compiler.Bootstrap.Semantics.IL;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.IL;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics
 {
     public class SemanticAnalyzer
     {

@@ -1,13 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes
 {
     public class CompilationUnit : SemanticNode
     {

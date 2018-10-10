@@ -2,7 +2,7 @@ using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Names
 {
     /// <summary>
     /// Represents the situation when the name of something is not known

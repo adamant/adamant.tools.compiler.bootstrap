@@ -3,14 +3,15 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Emit.C.Tests.Data;
-using Adamant.Tools.Compiler.Bootstrap.Semantics;
+using Adamant.Tools.Compiler.Bootstrap.Emit;
+using Adamant.Tools.Compiler.Bootstrap.Old.Emit.C.Tests.Data;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Xunit;
 using Xunit.Categories;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Emit.C.Tests
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Emit.C.Tests
 {
     public class EmitterTests
     {

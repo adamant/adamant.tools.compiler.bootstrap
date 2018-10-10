@@ -1,13 +1,13 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.ControlFlow;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.Operators;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Names;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes.Expressions;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes.Expressions.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes.Expressions.Operators;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
@@ -21,7 +21,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics
 {
     internal partial class SemanticAnalysis
     {

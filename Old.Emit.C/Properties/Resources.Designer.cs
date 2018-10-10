@@ -8,10 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Adamant.Tools.Compiler.Bootstrap.Emit.C.Properties {
-    using System;
-    
-    
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Emit.C.Properties {
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>

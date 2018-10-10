@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes.Statements
 {
     public class ExpressionStatement : Statement
     {

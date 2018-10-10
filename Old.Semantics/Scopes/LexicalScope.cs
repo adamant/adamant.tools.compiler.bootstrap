@@ -1,7 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.SyntaxSymbols;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Scopes
 {
     public class LexicalScope
     {

@@ -3,7 +3,7 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code;
 using Adamant.Tools.Compiler.Bootstrap.IL.Refs;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Types;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IL.Declarations

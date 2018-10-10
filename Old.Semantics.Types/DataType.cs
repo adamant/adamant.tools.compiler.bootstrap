@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Types
 {
     public abstract class DataType
     {

@@ -6,17 +6,17 @@ using Adamant.Tools.Compiler.Bootstrap.IL.Code.EndStatements;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.LValues;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.Statements;
 using Adamant.Tools.Compiler.Bootstrap.IL.Declarations;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.ControlFlow;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions.Operators;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes.Expressions;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes.Expressions.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes.Expressions.Operators;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes.Statements;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Types;
 using JetBrains.Annotations;
-using Statement = Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements.Statement;
+using Statement = Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes.Statements.Statement;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IL
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.IL
 {
     internal class FunctionIntermediateLanguageGenerator
     {

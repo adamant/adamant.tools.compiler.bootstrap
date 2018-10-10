@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes
 {
     public abstract class SemanticNode
     {

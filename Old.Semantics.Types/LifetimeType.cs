@@ -1,7 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Types
 {
     public class LifetimeType : DataType
     {

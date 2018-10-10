@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Expressions
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes.Expressions
 {
     public class TypeNameExpression : Expression
     {

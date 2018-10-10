@@ -1,10 +1,11 @@
 using Adamant.Tools.Compiler.Bootstrap.API;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Emit;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Xunit;
 using Xunit.Categories;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Emit.C.Tests
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Emit.C.Tests
 {
     public class BasicEmitTests
     {

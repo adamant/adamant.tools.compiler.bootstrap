@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Emit.C.Properties;
+using Adamant.Tools.Compiler.Bootstrap.Emit;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
+using Adamant.Tools.Compiler.Bootstrap.Old.Emit.C.Properties;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Names;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes.Statements;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Types;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Emit.C
 {
     public class CEmitter : Emitter
     {

@@ -1,4 +1,6 @@
-namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
+using Adamant.Tools.Compiler.Bootstrap.Emit;
+
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Emit.C
 {
     internal class Code
     {

@@ -1,5 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.LValues;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Types;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IL.Code

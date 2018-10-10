@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Emit.C</AssemblyName>
-    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Emit.C</RootNamespace>
+    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Old.Emit.C</AssemblyName>
+    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Old.Emit.C</RootNamespace>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 

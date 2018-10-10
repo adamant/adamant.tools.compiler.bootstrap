@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.SyntaxSymbols
 {
     public class GlobalNamespaceSyntaxSymbol : ISyntaxSymbol
     {

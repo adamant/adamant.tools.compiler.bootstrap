@@ -1,4 +1,5 @@
 using System;
+using Adamant.Tools.Compiler.Bootstrap.IL.Code;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.Statements;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IL.Refs

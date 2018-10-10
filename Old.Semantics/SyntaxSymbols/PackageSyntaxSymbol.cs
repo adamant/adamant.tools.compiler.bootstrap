@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.SyntaxSymbols
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.SyntaxSymbols
 {
     public class PackageSyntaxSymbol : ISyntaxSymbol
     {

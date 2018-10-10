@@ -1,8 +1,8 @@
 using System.Text;
 using System.Text.RegularExpressions;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes.Declarations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Emit.C
 {
     public class NameMangler
     {

@@ -8,10 +8,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Adamant.Tools.Compiler.Bootstrap.API;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using Adamant.Tools.Compiler.Bootstrap.Forge.Config;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics;
+using Adamant.Tools.Compiler.Bootstrap.Old.Emit.C;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
 {

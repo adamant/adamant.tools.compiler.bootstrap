@@ -1,8 +1,8 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Names;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Types
 {
     // Object types are the types created with class and struct declarations. The
     // primitive types are also object types. An object type may have generic parameters

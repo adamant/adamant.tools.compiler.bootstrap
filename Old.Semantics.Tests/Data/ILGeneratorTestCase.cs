@@ -3,7 +3,7 @@ using System.IO;
 using Adamant.Tools.Compiler.Bootstrap.UnitTests;
 using Xunit.Abstractions;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Tests.Data
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Tests.Data
 {
     public class ILGeneratorTestCase : TestCase
     {

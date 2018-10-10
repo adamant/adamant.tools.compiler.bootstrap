@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.LValues;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IL.Code.Statements
 {

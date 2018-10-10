@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Statements
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes.Statements
 {
     public class Block : Statement
     {

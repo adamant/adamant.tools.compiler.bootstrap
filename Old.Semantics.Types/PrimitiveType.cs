@@ -1,7 +1,7 @@
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
+using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Names;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Types
 {
     public class PrimitiveType : ObjectType
     {

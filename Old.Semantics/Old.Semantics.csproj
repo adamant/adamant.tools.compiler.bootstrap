@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Old.Semantics</AssemblyName>
-    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Semantics</RootNamespace>
+    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Old.Semantics</RootNamespace>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 

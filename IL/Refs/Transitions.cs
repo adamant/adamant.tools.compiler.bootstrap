@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.IL.Code;
 using Adamant.Tools.Compiler.Bootstrap.IL.Code.Statements;
 using Adamant.Tools.Compiler.Bootstrap.IL.Declarations;
 
