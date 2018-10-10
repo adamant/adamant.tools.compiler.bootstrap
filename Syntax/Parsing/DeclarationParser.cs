@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
@@ -125,18 +128,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var skipped = new List<ISyntaxNodeOrToken>() { accessModifier };
-            var startToken = tokens.Current;
-            var name = tokens.ExpectIdentifier();
-            skipped.Add(name);
-            throw new NotImplementedException();
-            //if (tokens.Current == start)
-            //    // We have not advanced at all when trying to parse a declaration.
-            //    // Skip a token to try to see if we can find the start of a declaration.
-            //    children.Add(new SkippedTokensSyntax(tokens.ConsumeAny()));
-            //EnsureAdvance(tokens, startToken, children);
+            var skipped = new List<Token>
+            {
+                accessModifier?.Keyword,
+                tokens.ExpectIdentifier() // The name we are expecting
+            };
 
-            //return new IncompleteDeclarationSyntax(accessModifier, name, );
+            if (skipped.All(s => s == null))
+            {
+                // We haven't consumed any tokens, we need to consume a token so
+                // we make progress.
+                skipped.Add(tokens.Current);
+                tokens.MoveNext();
+            }
+
+            var span = TextSpan.Covering(
+                skipped.First(s => s != null).AssertNotNull().Span,
+                skipped.Last(s => s != null).AssertNotNull().Span);
+
+            diagnostics.Publish(ParseError.IncompleteDeclaration(tokens.File, span));
+            return new IncompleteDeclarationSyntax(skipped);
         }
     }
 }
