@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
@@ -71,7 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             NeedsStatementSeparatorLine = false;
         }
 
-        public virtual void BeginBlockWith(string value)
+        public virtual void BeginBlockWith([NotNull] string value)
         // ensures CurrentIndentDepth == old(CurrentIndentDepth) + 1
         {
             base.AppendLine(value);
@@ -81,9 +82,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         }
 
         public override void EndBlock()
-        // requires CurrentIndentDepth > 0
         // ensures CurrentIndentDepth == old(CurrentIndentDepth) - 1
         {
+            Requires.That(nameof(CurrentIndent), CurrentIndentDepth > 0);
             base.EndBlock();
             base.AppendLine("}");
             NeedsDeclarationSeparatorLine = true;
@@ -91,19 +92,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         }
 
         public virtual void EndBlockWithSemicolon()
-        // requires CurrentIndentDepth > 0
         // ensures CurrentIndentDepth == old(CurrentIndentDepth) - 1
         {
+            Requires.That(nameof(CurrentIndent), CurrentIndentDepth > 0);
             base.EndBlock();
             base.AppendLine("};");
             NeedsDeclarationSeparatorLine = true; // These end classes and things that need a separator
             NeedsStatementSeparatorLine = false; // Statements shouldn't come after blocks with semicolons
         }
 
-        public virtual void EndBlockWith(string value)
-        // requires CurrentIndentDepth > 0
+        public virtual void EndBlockWith([NotNull] string value)
         // ensures CurrentIndentDepth == old(CurrentIndentDepth) - 1
         {
+            Requires.That(nameof(CurrentIndent), CurrentIndentDepth > 0);
             base.EndBlock();
             base.AppendLine(value);
             NeedsDeclarationSeparatorLine = true;
