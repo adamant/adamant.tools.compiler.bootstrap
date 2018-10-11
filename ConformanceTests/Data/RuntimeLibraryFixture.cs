@@ -1,5 +1,6 @@
-using System;
 using System.IO;
+using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 
 namespace Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data
 {
@@ -9,9 +10,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data
         {
             Directory.CreateDirectory(GetRuntimeDirectory());
 
-            // TODO File.WriteAllText(GetRuntimeLibraryPath(), CEmitter.RuntimeLibraryCode, Encoding.ASCII);
+            // The `CodeFile.Encoding` is UTF-8 without BOM. The default C# one has a BOM.
+            File.WriteAllText(GetRuntimeLibraryPath(), CodeEmitter.RuntimeLibraryCode, CodeFile.Encoding);
 
-            // TODO File.WriteAllText(GetRuntimeLibraryHeaderPath(), CEmitter.RuntimeLibraryHeader, Encoding.ASCII);
+            File.WriteAllText(GetRuntimeLibraryHeaderPath(), CodeEmitter.RuntimeLibraryHeader, CodeFile.Encoding);
         }
 
         public static string GetRuntimeDirectory()
@@ -21,13 +23,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data
         }
         public static string GetRuntimeLibraryPath()
         {
-            // TODO return Path.Combine(GetRuntimeDirectory(), CEmitter.RuntimeLibraryCodeFileName);
-            throw new NotImplementedException();
+            return Path.Combine(GetRuntimeDirectory(), CodeEmitter.RuntimeLibraryCodeFileName);
+
         }
         public static string GetRuntimeLibraryHeaderPath()
         {
-            // TODO return Path.Combine(GetRuntimeDirectory(), CEmitter.RuntimeLibraryHeaderFileName);
-            throw new NotImplementedException();
+            return Path.Combine(GetRuntimeDirectory(), CodeEmitter.RuntimeLibraryHeaderFileName);
         }
     }
 }
