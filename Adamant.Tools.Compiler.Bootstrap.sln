@@ -44,10 +44,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests.Framework", "Unit
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConformanceTests", "ConformanceTests\ConformanceTests.csproj", "{FCA32DCC-0EA3-4618-8C43-428745757B91}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Old.Emit.C", "Old.Emit.C\Old.Emit.C.csproj", "{6B4B0E9B-F0C8-42FF-86B1-945B47A82CBA}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Old.Emit.C.Tests", "Old.Emit.C.Tests\Old.Emit.C.Tests.csproj", "{7D0D20B2-607E-42CF-8F76-5C27E42E6B13}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Old.Semantics.Types", "Old.Semantics.Types\Old.Semantics.Types.csproj", "{0BA2E26C-779B-4D74-B157-FCCB624BEBC1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Old.Semantics.Tests", "Old.Semantics.Tests\Old.Semantics.Tests.csproj", "{ACE95A82-0D39-4D77-AFF5-02E00DA6CB96}"
@@ -122,14 +118,6 @@ Global
 		{FCA32DCC-0EA3-4618-8C43-428745757B91}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FCA32DCC-0EA3-4618-8C43-428745757B91}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FCA32DCC-0EA3-4618-8C43-428745757B91}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6B4B0E9B-F0C8-42FF-86B1-945B47A82CBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6B4B0E9B-F0C8-42FF-86B1-945B47A82CBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6B4B0E9B-F0C8-42FF-86B1-945B47A82CBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6B4B0E9B-F0C8-42FF-86B1-945B47A82CBA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7D0D20B2-607E-42CF-8F76-5C27E42E6B13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7D0D20B2-607E-42CF-8F76-5C27E42E6B13}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7D0D20B2-607E-42CF-8F76-5C27E42E6B13}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7D0D20B2-607E-42CF-8F76-5C27E42E6B13}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0BA2E26C-779B-4D74-B157-FCCB624BEBC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0BA2E26C-779B-4D74-B157-FCCB624BEBC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0BA2E26C-779B-4D74-B157-FCCB624BEBC1}.Release|Any CPU.ActiveCfg = Release|Any CPU

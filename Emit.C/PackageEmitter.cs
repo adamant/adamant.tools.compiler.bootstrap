@@ -24,21 +24,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             foreach (var declaration in package.Declarations)
                 declarationEmitter.Emit(declaration, code);
 
-            EmitEntryPointAdapter(package, code);
+            EmitEntryPointAdapter(package.EntryPoint, code);
 
             EmitPostamble(code);
         }
 
-        private static void EmitPreamble([NotNull] Code code)
+        public void EmitPreamble([NotNull] Code code)
         {
             // Setup the beginning of each section
             code.Includes.AppendLine($"#include \"{CodeEmitter.RuntimeLibraryHeaderFileName}\"");
 
             code.TypeIdDeclaration.AppendLine("// Type ID Declarations");
             // Type ID Enum
-            //code.TypeIdDeclaration.AppendLine("enum Type_ID");
-            //code.TypeIdDeclaration.BeginBlock();
-            //code.TypeIdDeclaration.AppendLine("never__0__0TypeID = 0,");
+            code.TypeIdDeclaration.AppendLine("enum Type_ID");
+            code.TypeIdDeclaration.BeginBlock();
+            code.TypeIdDeclaration.AppendLine("ₐnever·ₐTypeID = 0,");
             // TODO setup primitive types?
 
             code.TypeDeclarations.AppendLine("// Type Declarations");
@@ -48,11 +48,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.Definitions.AppendLine("// Definitions");
         }
 
-        private void EmitEntryPointAdapter([NotNull] Package package, [NotNull] Code code)
+        public void EmitEntryPointAdapter([CanBeNull] FunctionDeclaration entryPoint, [NotNull] Code code)
         {
-            if (package.EntryPoint == null) return;
+            if (entryPoint == null) return;
 
-            var entryPoint = package.EntryPoint;
             code.Definitions.DeclarationSeparatorLine();
             code.Definitions.AppendLine("// Entry Point Adapter");
             code.Definitions.AppendLine("int32_t main(const int argc, char const * const * const argv)");
@@ -62,11 +61,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.Definitions.EndBlock();
         }
 
-        private static void EmitPostamble([NotNull] Code code)
+        public void EmitPostamble([NotNull] Code code)
         {
             // Close the Type_ID enum
-            //code.TypeIdDeclaration.EndBlockWithSemicolon();
-            //code.TypeIdDeclaration.AppendLine("typedef enum Type_ID Type_ID;");
+            code.TypeIdDeclaration.EndBlockWithSemicolon();
+            code.TypeIdDeclaration.AppendLine("typedef enum Type_ID Type_ID;");
         }
     }
 }

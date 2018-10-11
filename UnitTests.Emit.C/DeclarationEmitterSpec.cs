@@ -9,9 +9,12 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using JetBrains.Annotations;
 using UnitTests.Emit.C.Fakes;
 using Xunit;
+using Xunit.Categories;
 
 namespace UnitTests.Emit.C
 {
+    [UnitTest]
+    [Category("Emitter")]
     public class DeclarationEmitterSpec
     {
         [Theory]
@@ -38,7 +41,7 @@ namespace UnitTests.Emit.C
 $@"{returnType} ᵢfunc´{parameterCount}({parametersString})
 {{
 }}
-".NormalizeLineEndings("\n");
+".NormalizeLineEndings(CCodeBuilder.LineTerminator);
 
             Assert.Equal("", code.Includes.Code);
             Assert.Equal("", code.TypeIdDeclaration.Code);
