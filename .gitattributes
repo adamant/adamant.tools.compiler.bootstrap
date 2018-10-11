@@ -15,4 +15,6 @@
 *.sln       text eol=crlf
 *.csproj    text eol=crlf
 
-
+# These files must be UTF-8 w/ BOM to work, so treat them as binary
+RuntimeLibrary.c binary
+RuntimeLibrary.h binary

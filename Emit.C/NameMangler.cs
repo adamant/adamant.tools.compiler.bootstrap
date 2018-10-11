@@ -1,4 +1,3 @@
-using System;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -51,7 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         [NotNull]
         private static readonly Regex StandardIdentifierPattern = new Regex(@"^[_0-9a-zA-Z]+$", RegexOptions.Compiled);
 
-        public string FunctionName([NotNull] FunctionDeclaration function)
+        public string Mangle([NotNull] FunctionDeclaration function)
         {
             return "";
             //var builder = new StringBuilder(UnderscoreRuns.Replace(function.Name, "_$0"));
@@ -61,29 +60,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         }
 
         // TODO test this
-        public string NamePart([NotNull] string part)
+        /// <summary>
+        /// Mangle an individual part of a name.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public string ManglePart([NotNull] string name)
         {
             // Fast path no need to escape anything
-            if (StandardIdentifierPattern.IsMatch(part))
-                return part;
+            if (StandardIdentifierPattern.IsMatch(name))
+                return name;
 
             // We separate the handling of characters in the Basic Multilingual
             // Plan (BMP) from those outside it
             var builder = new StringBuilder();
-            for (var i = 0; i < part.Length; i++)
+            for (var i = 0; i < name.Length; i++)
             {
-                var c = part[i];
+                var c = name[i];
                 int codePoint;
-                if (char.IsHighSurrogate(c))
+                // If a high surrogate ends the string, we just encode it
+                if (char.IsHighSurrogate(c) && i + 1 < name.Length)
                 {
+                    i += 1; // we move on to the low surrogate
                     var high = c;
-                    var low = part[i + 1];
+                    var low = name[i];
                     codePoint = char.ConvertToUtf32(high, low);
                     if (IsValidSupplementaryPlaneIdentifierCharacter(codePoint))
                     {
                         builder.Append(high);
                         builder.Append(low);
-                        break;
+                        continue;
                     }
                 }
                 else
@@ -91,13 +97,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     if (c == ' ')
                     {
                         builder.Append('˽');
-                        break;
+                        continue;
                     }
                     if (IsValidBasicMultilingualPlaneIdentifierCharacter(c)
                         && !IsEscapeCharacter(c))
                     {
                         builder.Append(c);
-                        break;
+                        continue;
                     }
 
                     codePoint = c;
@@ -149,12 +155,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool IsValidSupplementaryPlaneIdentifierCharacter(int c)
         {
-            // C Spec Annex D
-            // Line 8
-            //10000−1FFFD, 20000−2FFFD, 30000−3FFFD, 40000−4FFFD, 50000−5FFFD,
-            //60000−6FFFD, 70000−7FFFD, 80000−8FFFD, 90000−9FFFD, A0000−AFFFD,
-            //B0000−BFFFD, C0000−CFFFD, D0000−DFFFD, E0000−EFFFD
-            throw new NotImplementedException();
+            return
+                // C Spec Annex D
+                // Line 8
+                (c >= 0x10000 && c <= 0x1FFFD)
+                || (c >= 0x20000 && c <= 0x2FFFD)
+                || (c >= 0x30000 && c <= 0x3FFFD)
+                || (c >= 0x40000 && c <= 0x4FFFD)
+                || (c >= 0x50000 && c <= 0x5FFFD)
+                || (c >= 0x60000 && c <= 0x6FFFD)
+                || (c >= 0x70000 && c <= 0x7FFFD)
+                || (c >= 0x80000 && c <= 0x8FFFD)
+                || (c >= 0x90000 && c <= 0x9FFFD)
+                || (c >= 0xA0000 && c <= 0xAFFFD)
+                || (c >= 0xB0000 && c <= 0xBFFFD)
+                || (c >= 0xC0000 && c <= 0xCFFFD)
+                || (c >= 0xD0000 && c <= 0xDFFFD)
+                || (c >= 0xE0000 && c <= 0xEFFFD)
+                ;
         }
     }
 }
