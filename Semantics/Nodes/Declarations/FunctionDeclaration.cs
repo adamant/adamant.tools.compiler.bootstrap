@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
@@ -20,6 +21,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations
         {
             Parameters = parameters.AsReadOnly().AssertNotNull();
             ReturnType = DataType.Unknown;
+        }
+
+        // Full constructor needed for testing etc.
+        public FunctionDeclaration(
+            [NotNull] CodeFile file,
+            [NotNull] QualifiedName qualifiedName,
+            [NotNull][ItemNotNull] IEnumerable<Parameter> parameters,
+            [NotNull] DataType returnType)
+            : base(file, qualifiedName)
+        {
+            Parameters = parameters.ToList();
+            ReturnType = returnType;
         }
     }
 }

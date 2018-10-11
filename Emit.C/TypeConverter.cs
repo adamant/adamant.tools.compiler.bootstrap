@@ -8,6 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
     {
         public string Convert([NotNull] DataType type)
         {
+            Requires.NotNull(nameof(type), type);
             switch (type)
             {
                 // TODO perhaps the name mangler should be used on primitives
