@@ -1,7 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C.Properties;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
@@ -24,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             foreach (var declaration in package.Declarations)
                 Emit(declaration, code);
 
-            EmitEntryPointAdapter(code, package);
+            EmitEntryPointAdapter(package, code);
 
             EmitPostamble(code);
 
@@ -64,11 +69,62 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
         private void Emit([NotNull] FunctionDeclaration function, [NotNull] Code code)
         {
+            var name = nameMangler.MangleName(function);
+            var parameters = Convert(function.Parameters);
+            var returnType = Convert(function.ReturnType);
 
+            // Write out the function declaration for C so we can call functions defined after others
+            code.FunctionDeclarations.AppendLine($"{returnType} {name}({parameters});");
+
+            code.Definitions.DeclarationSeparatorLine();
+            code.Definitions.AppendLine($"{returnType} {name}({parameters})");
+            //Emit(code, function.Body);
+            code.Definitions.BeginBlock();
+            code.Definitions.EndBlock();
         }
 
-        private void EmitEntryPointAdapter([NotNull] Code code, [NotNull] Package package)
+        #region Convert
+        private static string Convert(DataType type)
         {
+            switch (type)
+            {
+                // TODO perhaps the name mangler should be used on primitives
+                case var t when t == ObjectType.Void:
+                    return "void";
+                case var t when t == ObjectType.Int:
+                    return "ₐint";
+                default:
+                    throw NonExhaustiveMatchException.For(type);
+            }
+        }
+
+        private string Convert([NotNull][ItemNotNull] IEnumerable<Parameter> parameters)
+        {
+            return string.Join(", ", parameters.Select(Convert));
+        }
+
+        private string Convert([NotNull] Parameter parameter)
+        {
+            throw new NotImplementedException();
+            //if (parameter.MutableBinding)
+            //    return $"{Convert(parameter.Type.Type)} {parameter.Name}";
+            //else
+            //    return $"const {Convert(parameter.Type.Type)} {parameter.Name}";
+        }
+        #endregion
+
+        private void EmitEntryPointAdapter([NotNull] Package package, [NotNull] Code code)
+        {
+            if (package.EntryPoint == null) return;
+
+            var entryPoint = package.EntryPoint;
+            code.Definitions.DeclarationSeparatorLine();
+            code.Definitions.AppendLine("// Entry Point Adapter");
+            code.Definitions.AppendLine("int32_t main(const int argc, char const * const * const argv)");
+            code.Definitions.BeginBlock();
+            code.Definitions.AppendLine($"{nameMangler.MangleName(entryPoint)}();");
+            code.Definitions.AppendLine("return 0;");
+            code.Definitions.EndBlock();
         }
 
         private void EmitPostamble([NotNull] Code code)

@@ -1,9 +1,11 @@
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.API;
 using Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
@@ -42,9 +44,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.ConformanceTests
         private static void CompileAdamantToC(CodeFile code, string outputPath)
         {
             var package = new AdamantCompiler().CompilePackage("test.package", code.Yield());
-            // TODO Assert.Empty(package.GetDiagnostics().Where(d=>d.IsError);
+            Assert.Empty(package.Diagnostics.Where(d => d.Level >= DiagnosticLevel.CompilationError));
             var cCode = new CodeEmitter().Emit(package);
-            File.WriteAllText(outputPath, cCode, Encoding.ASCII);
+            File.WriteAllText(outputPath, cCode, Encoding.UTF8);
         }
 
         private string CompileCToExecutable(string cCodeFile)

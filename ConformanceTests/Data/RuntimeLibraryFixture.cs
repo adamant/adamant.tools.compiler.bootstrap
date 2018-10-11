@@ -1,5 +1,5 @@
 using System.IO;
-using Adamant.Tools.Compiler.Bootstrap.Core;
+using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 
 namespace Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data
@@ -10,10 +10,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data
         {
             Directory.CreateDirectory(GetRuntimeDirectory());
 
-            // The `CodeFile.Encoding` is UTF-8 without BOM. The default C# one has a BOM.
-            File.WriteAllText(GetRuntimeLibraryPath(), CodeEmitter.RuntimeLibraryCode, CodeFile.Encoding);
+            File.WriteAllText(GetRuntimeLibraryPath(), CodeEmitter.RuntimeLibraryCode, Encoding.UTF8);
 
-            File.WriteAllText(GetRuntimeLibraryHeaderPath(), CodeEmitter.RuntimeLibraryHeader, CodeFile.Encoding);
+            File.WriteAllText(GetRuntimeLibraryHeaderPath(), CodeEmitter.RuntimeLibraryHeader, Encoding.UTF8);
         }
 
         public static string GetRuntimeDirectory()

@@ -1,6 +1,9 @@
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
 using JetBrains.Annotations;
 
@@ -22,8 +25,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
     /// `ᵢ` U+1D62 prefixes all user identifiers to avoid name conflicts and issues
     ///             with what is a legal identifier start character.
     ///             Abbreviation for identifier. Occurs only once at the beginning.
-    /// `ₓ` U+2093 prefixes all keyword/built in names. May occur in the middle
-    ///             of a fully qualified name, for example `My_Class·ₓnew`
+    /// `ₐ` U+2090 prefixes all keyword/built in names. May occur in the middle
+    ///             of a fully qualified name, for example `My_Class·ₐnew`.
+    ///             'a' is for "Adamant"
     /// `˽` U+02FD replaces all spaces
     /// `·` U+00B7 is used to separate name parts, as `myNamespace·My_Class`
     /// `´` U+00B4 separates arity from the name
@@ -50,21 +54,41 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         [NotNull]
         private static readonly Regex StandardIdentifierPattern = new Regex(@"^[_0-9a-zA-Z]+$", RegexOptions.Compiled);
 
-        public string Mangle([NotNull] FunctionDeclaration function)
+        [NotNull]
+        public string MangleName([NotNull] FunctionDeclaration function)
         {
-            return "";
-            //var builder = new StringBuilder(UnderscoreRuns.Replace(function.Name, "_$0"));
-            //builder.Append("__");
-            //builder.Append(function.Parameters.Count);
-            //return builder.ToString();
+            var mangledName = Mangle(function.QualifiedName);
+            // builder with room for the characters we are likely to add
+            var builder = new StringBuilder(mangledName, mangledName.Length + 5);
+            builder.Append('´');
+            builder.Append(function.Arity);
+            return builder.ToString().AssertNotNull();
         }
 
-        // TODO test this
+        [NotNull]
+        private string Mangle([NotNull] QualifiedName qualifiedName)
+        {
+            if (qualifiedName.Qualifier.Any())
+                return 'ᵢ' + string.Join('·', qualifiedName.FullName.Select(Mangle)).AssertNotNull();
+
+            // An unqualified name could be a special name in which case, don't add 'ᵢ'
+            var mangled = Mangle(qualifiedName.Name);
+            return qualifiedName.Name.IsSpecial ? mangled : 'ᵢ' + mangled;
+        }
+
+        [NotNull]
+        public string Mangle([NotNull] SimpleName name)
+        {
+            var mangled = ManglePart(name.Text);
+            return name.IsSpecial ? 'ₐ' + mangled : mangled;
+        }
+
         /// <summary>
         /// Mangle an individual part of a name.
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
+        [NotNull]
         public string ManglePart([NotNull] string name)
         {
             // Fast path no need to escape anything
@@ -117,7 +141,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             return builder.ToString();
         }
 
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool IsValidBasicMultilingualPlaneIdentifierCharacter(char c)
         {
@@ -149,7 +172,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool IsEscapeCharacter(char c)
         {
-            return c == 'ᵢ' || c == 'ₓ' || c == '˽' || c == '·' || c == '´' || c == 'µ' || c == 'ǂ';
+            return c == 'ᵢ' || c == 'ₐ' || c == '˽' || c == '·' || c == '´' || c == 'µ' || c == 'ǂ';
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

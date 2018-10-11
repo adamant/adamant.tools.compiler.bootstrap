@@ -17,7 +17,7 @@ namespace UnitTests.Emit.C
         [InlineData("_059amzAMZ", "_059amzAMZ")] // Basic ASCII range
         [InlineData("Hello World", "Hello˽World")]
         [InlineData("do_it!", "do_itµ21ǂ")] // Encode other chars
-        [InlineData("ᵢₓ˽·´µǂ", "µ1D62ǂµ2093ǂµ2FDǂµB7ǂµB4ǂµB5ǂµ1C2ǂ")] // Encode chars used for escaping
+        [InlineData("ᵢₐ˽·´µǂ", "µ1D62ǂµ2090ǂµ2FDǂµB7ǂµB4ǂµB5ǂµ1C2ǂ")] // Encode chars used for escaping
         [InlineData("\xF8\u1681\uD7FF\uF900\uFFFD", "\xF8\u1681\uD7FF\uF900\uFFFD")] // Already Valid
         [InlineData("\x0F\xAB\u1680", "µFǂµABǂµ1680ǂ")] // Not Valid, all lengths in BMP
         // Supplementary Planes

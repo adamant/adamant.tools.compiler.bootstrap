@@ -12,6 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public Diagnostics Diagnostics { get; internal set; }
         [NotNull] [ItemNotNull] public IReadOnlyList<Declaration> Declarations { get; }
         [NotNull] [ItemNotNull] private readonly List<Declaration> declarations = new List<Declaration>();
+        [CanBeNull] public FunctionDeclaration EntryPoint { get; internal set; }
 
         public Package([NotNull] string name)
         {

@@ -12,6 +12,7 @@ using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using Adamant.Tools.Compiler.Bootstrap.Forge.Config;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
 {
@@ -20,18 +21,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
     /// </summary>
     internal class ProjectSet : IEnumerable<Project>
     {
-        private readonly HashSet<Project> projects = new HashSet<Project>();
+        [NotNull] [ItemNotNull] private readonly HashSet<Project> projects = new HashSet<Project>();
 
-        public bool Add(Project project)
+        public bool Add([NotNull] Project project)
         {
             return projects.Add(project);
         }
 
+        [NotNull]
         public IEnumerator<Project> GetEnumerator()
         {
             return projects.GetEnumerator();
         }
 
+        [NotNull]
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
@@ -46,6 +49,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             }
         }
 
+        [NotNull]
         public async Task Build(TaskScheduler taskScheduler, bool verbose)
         {
             var taskFactory = new TaskFactory(taskScheduler);
@@ -72,6 +76,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             await Task.WhenAll(projectBuilds.Values);
         }
 
+        [NotNull]
         private static async Task<Package> Build(
             AdamantCompiler compiler,
             Project project,
@@ -106,7 +111,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             var cacheDir = Path.Combine(project.Path, ".forge-cache");
             Directory.CreateDirectory(cacheDir); // Ensure the cache directory exists
             var outputPath = Path.Combine(cacheDir, "program.c");
-            File.WriteAllText(outputPath, cCode, Encoding.ASCII);
+            File.WriteAllText(outputPath, cCode, Encoding.UTF8);
             lock (consoleLock)
             {
                 Console.WriteLine($"Build SUCCEEDED {project.Name} ({project.Path})");
@@ -114,6 +119,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             return package;
         }
 
+        [NotNull]
+        [ItemNotNull]
         private List<Project> TopologicalSort()
         {
             var projectAlive = projects.ToDictionary(p => p, p => SortState.Alive);
@@ -124,7 +131,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             return sorted;
         }
 
-        private static void TopologicalSortVisit(Project project, Dictionary<Project, SortState> state, List<Project> sorted)
+        private static void TopologicalSortVisit([NotNull] Project project, [NotNull] Dictionary<Project, SortState> state, [NotNull][ItemNotNull] List<Project> sorted)
         {
             switch (state[project])
             {

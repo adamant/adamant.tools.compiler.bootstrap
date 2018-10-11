@@ -6,8 +6,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations
 {
     public class TypeDeclaration : Declaration
     {
-        public TypeDeclaration([NotNull] CodeFile file, [NotNull] FullyQualifiedName fullyQualifiedName)
-            : base(file, fullyQualifiedName)
+        public TypeDeclaration([NotNull] CodeFile file, [NotNull] QualifiedName qualifiedName)
+            : base(file, qualifiedName)
         {
         }
     }
