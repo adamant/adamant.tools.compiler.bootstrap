@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
@@ -11,12 +12,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
         where T : SyntaxNode
     {
         [NotNull]
-        [ItemNotNull]
-        private readonly IReadOnlyList<ISyntaxNodeOrToken> children;
+        public static readonly SeparatedListSyntax<T> Empty = new SeparatedListSyntax<T>(Enumerable.Empty<ISyntaxNodeOrToken>());
+
+        [NotNull] [ItemNotNull] private readonly IReadOnlyList<ISyntaxNodeOrToken> children;
 
         public SeparatedListSyntax([NotNull][ItemNotNull] IEnumerable<ISyntaxNodeOrToken> children)
         {
-            this.children = children.ToList().AsReadOnly();
+            this.children = children.ToList().AsReadOnly().AssertNotNull();
             Validate();
         }
 

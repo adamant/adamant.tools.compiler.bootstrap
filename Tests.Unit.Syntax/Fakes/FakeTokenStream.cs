@@ -5,7 +5,6 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes;
 using JetBrains.Annotations;
@@ -72,7 +71,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
                                 var placeholder = (int)Assert.IsType<IntegerLiteralToken>(enumerator.Current).Value;
                                 Assert.True(enumerator.MoveNext());
                                 Assert.IsType<CloseBraceToken>(enumerator.Current);
-                                var value = (SyntaxNode)fakeTokenValues[placeholder];
+                                var value = fakeTokenValues[placeholder];
                                 yield return new FakeToken(TextSpan.Covering(startSpan, enumerator.Current.Span), value);
                             }
                             break;

@@ -1,7 +1,7 @@
-
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
@@ -56,6 +56,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         }
 
         [NotNull]
+        public static NameSyntax Name([NotNull] string name)
+        {
+            var parts = name.Split('.').AssertNotNull();
+
+            NameSyntax nameSyntax = null;
+            foreach (var part in parts)
+            {
+                var partSyntax = new IdentifierNameSyntax(Identifier(part));
+                if (nameSyntax == null)
+                    nameSyntax = partSyntax;
+                else
+                    nameSyntax = new QualifiedNameSyntax(nameSyntax, null, partSyntax);
+            }
+
+            return nameSyntax;
+        }
+
+        [NotNull]
         public static UsingDirectiveSyntax UsingDirective()
         {
             return new UsingDirectiveSyntax(null, Name(), null);
@@ -81,11 +99,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         }
 
         [NotNull]
-        public static CompilationUnitSyntax CompilationUnit([NotNull] params DeclarationSyntax[] declarations)
+        public static CompilationUnitSyntax CompilationUnit(
+            [NotNull] params DeclarationSyntax[] declarations)
         {
+            return CompilationUnit(null, declarations);
+        }
+
+        [NotNull]
+        public static CompilationUnitSyntax CompilationUnit(
+            [CanBeNull] NameSyntax @namespace,
+            [NotNull] params DeclarationSyntax[] declarations)
+        {
+            var namespaceSyntax = @namespace != null
+                ? new CompilationUnitNamespaceSyntax(null, @namespace, null)
+                : null;
             return new CompilationUnitSyntax(
                 "".ToFakeCodeFile(),
-                null,
+                namespaceSyntax,
                 SyntaxList<UsingDirectiveSyntax>.Empty,
                 new SyntaxList<DeclarationSyntax>(declarations),
                 new EndOfFileToken(new TextSpan(0, 0), Diagnostics.Empty),
@@ -96,6 +126,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         public static PackageSyntax Package([NotNull]params CompilationUnitSyntax[] compilationUnits)
         {
             return new PackageSyntax("Test", new SyntaxList<CompilationUnitSyntax>(compilationUnits));
+        }
+
+        [NotNull]
+        public static FunctionDeclarationSyntax FunctionDeclaration([NotNull] string name)
+        {
+
+            return new FunctionDeclarationSyntax(
+                AccessModifier(),
+                null,
+                Identifier(name),
+                null,
+                SeparatedListSyntax<ParameterSyntax>.Empty,
+                null,
+                null,
+                Expression(),
+                BlockStatement());
+        }
+
+        [NotNull]
+        public static IdentifierToken Identifier(string name)
+        {
+            return new BareIdentifierToken(new TextSpan(0, 0), name);
         }
     }
 }

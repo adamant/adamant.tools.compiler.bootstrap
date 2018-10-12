@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
             public T Parse([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
             {
                 var fakeToken = tokens.ExpectFake();
-                return (T)fakeToken?.FakeNode ?? throw new Exception($"Expected fake '{typeof(T).Name}' not found");
+                return (T)fakeToken?.FakeValue ?? throw new Exception($"Expected fake '{typeof(T).Name}' not found");
             }
         }
 
@@ -72,7 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
                 IDiagnosticsCollector diagnostics) where T : SyntaxNode where TTerminator : Token
             {
                 var fakeToken = tokens.ExpectFake();
-                return (SyntaxList<T>)fakeToken?.FakeNode ?? throw new InvalidOperationException();
+                return (SyntaxList<T>)fakeToken?.FakeValue ?? throw new InvalidOperationException();
             }
 
             public SeparatedListSyntax<T> ParseSeparatedList<T, TSeparator, TTerminator>(
@@ -83,7 +83,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
                 IDiagnosticsCollector diagnostics) where T : SyntaxNode where TSeparator : Token where TTerminator : Token
             {
                 var fakeToken = tokens.ExpectFake();
-                return (SeparatedListSyntax<T>)fakeToken?.FakeNode ?? throw new InvalidOperationException();
+                return (SeparatedListSyntax<T>)fakeToken?.FakeValue ?? throw new InvalidOperationException();
             }
         }
 
@@ -97,7 +97,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
                 var _ = tokens.Expect<UsingKeywordToken>();
 
                 var fakeToken = tokens.ExpectFake();
-                return (UsingDirectiveSyntax)fakeToken?.FakeNode ?? throw new InvalidOperationException();
+                return (UsingDirectiveSyntax)fakeToken?.FakeValue ?? throw new InvalidOperationException();
             }
         }
     }
