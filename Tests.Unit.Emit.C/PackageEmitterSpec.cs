@@ -35,7 +35,7 @@ enum Type_ID
 
 // Function Declarations
 
-// Class Declarations
+// Struct Declarations
 
 // Global Definitions
 

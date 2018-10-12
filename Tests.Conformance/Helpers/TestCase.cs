@@ -14,8 +14,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Helpers
     /// </summary>
     public class TestCase : IXunitSerializable
     {
-        public string FullCodePath { get; private set; }
-        public string RelativeCodePath { get; private set; }
+        [NotNull] public string FullCodePath { get; private set; }
+        [NotNull] public string RelativeCodePath { get; private set; }
 
         [NotNull] private readonly Lazy<string> code;
         [NotNull] public string Code => code.Value;
@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Helpers
             code = new Lazy<string>(GetCode);
         }
 
-        public TestCase(string fullCodePath, string relativeCodePath)
+        public TestCase([NotNull] string fullCodePath, [NotNull] string relativeCodePath)
         {
             FullCodePath = fullCodePath;
             RelativeCodePath = relativeCodePath;
