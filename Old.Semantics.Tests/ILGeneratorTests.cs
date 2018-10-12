@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Tests
 {
     public class ILGeneratorTests
     {
-        [Theory]
+        //[Theory]
         [Category("Analyze")]
         [MemberData(nameof(GetAllILGeneratorTestCases))]
         public void Analyzes(ILGeneratorTestCase testCase)
@@ -28,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Tests
             Assert.Equal(testCase.ExpectedIL, il.ToString());
         }
 
-        [Fact]
+        //[Fact]
         [Category("Analyze")]
         public void CanGetAllILGeneratorTestCases()
         {

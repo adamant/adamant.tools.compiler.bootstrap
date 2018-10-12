@@ -31,6 +31,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
+    <ProjectReference Include="..\Syntax\Syntax.csproj" />
   </ItemGroup>
 
   <ItemGroup>

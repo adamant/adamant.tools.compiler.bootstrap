@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics
     /// </summary>
     public class Diagnostics : IReadOnlyList<Diagnostic>
     {
-        public static readonly Diagnostics Empty = new Diagnostics(Enumerable.Empty<Diagnostic>());
+        [NotNull] public static readonly Diagnostics Empty = new Diagnostics(Enumerable.Empty<Diagnostic>());
 
         [NotNull] [ItemNotNull] private readonly List<Diagnostic> items;
 

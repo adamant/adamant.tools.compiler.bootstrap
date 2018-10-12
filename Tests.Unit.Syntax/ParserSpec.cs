@@ -1,6 +1,6 @@
 using Xunit.Categories;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
+namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax
 {
     [UnitTest]
     [Category("Parse")]

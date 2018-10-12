@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Helpers;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes;
+using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers;
 using FsCheck;
 using FsCheck.Xunit;
 using JetBrains.Annotations;
 using Xunit;
 using Xunit.Categories;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
+namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax
 {
     [UnitTest]
     [Category("Lex")]

@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes
+namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
 {
     public class FakeToken : Token
     {

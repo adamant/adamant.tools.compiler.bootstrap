@@ -6,10 +6,10 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Helpers;
+using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes
+namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
 {
     public static class FakeParser
     {

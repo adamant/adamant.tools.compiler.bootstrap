@@ -31,6 +31,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Semantics\Semantics.csproj" />
+    <ProjectReference Include="..\Tests.Unit\Tests.Unit.csproj" />
   </ItemGroup>
 
 </Project>

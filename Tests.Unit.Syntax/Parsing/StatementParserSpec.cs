@@ -3,12 +3,13 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes;
+using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes;
+using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes;
 using JetBrains.Annotations;
 using Xunit;
 using Xunit.Categories;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
+namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
 {
     [UnitTest]
     [Category("Parse")]
@@ -17,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
         [Fact]
         public void Parse_statement_block()
         {
-            var statements = FakeSyntax.SyntaxList<StatementSyntax>();
+            var statements = FakeSyntax.List<StatementSyntax>();
             var tokens = FakeTokenStream.From($"{{{statements}}}");
 
             var b = ParseBlockWithoutError(tokens);

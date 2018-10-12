@@ -5,7 +5,6 @@ using Adamant.Tools.Compiler.Bootstrap.API;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Helpers;
-using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
 using JetBrains.Annotations;
 using Xunit;
 using Xunit.Categories;

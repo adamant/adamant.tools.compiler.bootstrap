@@ -6,12 +6,12 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes;
+using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes;
 using JetBrains.Annotations;
 using Xunit;
 using Xunit.Categories;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
+namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
 {
     [UnitTest]
     [Category("Parse")]
