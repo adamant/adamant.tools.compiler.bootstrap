@@ -1,9 +1,8 @@
 using System.IO;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
-using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Data
+namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Helpers
 {
     public class RuntimeLibraryFixture
     {
@@ -18,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Data
 
         public static string GetRuntimeDirectory()
         {
-            var testsDirectory = LangTestsDirectory.Get();
+            var testsDirectory = ConformanceTestsDirectory.Get();
             return Path.Combine(testsDirectory, "runtime");
         }
         public static string GetRuntimeLibraryPath()

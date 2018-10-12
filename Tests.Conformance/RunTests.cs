@@ -7,8 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Data;
-using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
+using Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Helpers;
 using JetBrains.Annotations;
 using Xunit;
 using Xunit.Abstractions;
@@ -21,9 +20,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
     [Category("Run")]
     public class RunTests : IClassFixture<RuntimeLibraryFixture>
     {
-        private readonly ITestOutputHelper output;
+        [NotNull] private readonly ITestOutputHelper output;
 
-        public RunTests(ITestOutputHelper output)
+        public RunTests([NotNull] ITestOutputHelper output)
         {
             this.output = output;
         }
@@ -32,31 +31,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
         [MemberData(nameof(GetAllRunTestCases))]
         public void Runs([NotNull] RunTestCase testCase)
         {
-            var testsDirectory = LangTestsDirectory.Get();
+            var testsDirectory = ConformanceTestsDirectory.Get();
             var runTestsDirectory = Path.Combine(testsDirectory, "run");
             var codePath = new CodePath(testCase.FullCodePath);
             var codeFile = new CodeFile(codePath, new CodeText(testCase.Code));
-            var cCodeFile = Path.Combine(runTestsDirectory, Path.ChangeExtension(testCase.RelativeCodePath, "c"));
+            var cCodeFile = Path.Combine(runTestsDirectory, Path.ChangeExtension(testCase.RelativeCodePath, "c")).AssertNotNull();
             CompileAdamantToC(codeFile, cCodeFile);
             var executable = CompileCToExecutable(cCodeFile);
             AssertRuns(testCase, executable);
         }
 
-        private static void CompileAdamantToC(CodeFile code, string outputPath)
+        private static void CompileAdamantToC([NotNull] CodeFile code, [NotNull] string outputPath)
         {
             var package = new AdamantCompiler().CompilePackage("test.package", code.Yield());
-            Assert.Empty(package.Diagnostics.Where(d => d.Level >= DiagnosticLevel.CompilationError));
+            Assert.Empty(package.Diagnostics?.Where(d => d.Level >= DiagnosticLevel.CompilationError));
             var cCode = new CodeEmitter().Emit(package);
             File.WriteAllText(outputPath, cCode, Encoding.UTF8);
         }
 
-        private string CompileCToExecutable(string cCodeFile)
+        [NotNull]
+        private string CompileCToExecutable([NotNull] string cCodeFile)
         {
             var options = "-std=c11 -fsanitize=undefined -fsanitize=integer -fsanitize=nullability -Wall -Wno-incompatible-pointer-types";
             // Next thing is needed for windows
             options += " -Xclang -flto-visibility-public-std";
             var sources = string.Join(" ", cCodeFile, RuntimeLibraryFixture.GetRuntimeLibraryPath());
-            var outputPath = Path.ChangeExtension(cCodeFile, "exe");
+            var outputPath = Path.ChangeExtension(cCodeFile, "exe").AssertNotNull();
             var arguments = $"{sources} -o {outputPath} --include-directory {RuntimeLibraryFixture.GetRuntimeDirectory()} {options}";
             output.WriteLine("clang arguments:");
             output.WriteLine(arguments);
@@ -68,7 +68,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
                 CreateNoWindow = true,
                 UseShellExecute = false,
             };
-            var process = Process.Start(startInfo);
+            var process = Process.Start(startInfo).AssertNotNull();
             process.WaitForExit();
             output.WriteLine("clang stdout:");
             output.WriteLine(process.StandardOutput.ReadToEnd());
@@ -78,7 +78,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             return outputPath;
         }
 
-        private static void AssertRuns(RunTestCase testCase, string executable)
+        private static void AssertRuns([NotNull] RunTestCase testCase, [NotNull] string executable)
         {
             var startInfo = new ProcessStartInfo(executable)
             {
@@ -89,7 +89,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
                 UseShellExecute = false,
             };
 
-            var process = Process.Start(startInfo);
+            var process = Process.Start(startInfo).AssertNotNull();
             process.WaitForExit();
             Assert.Equal(testCase.Stdout ?? "", process.StandardOutput.ReadToEnd());
             Assert.Equal(testCase.Stderr ?? "", process.StandardError.ReadToEnd());
@@ -102,12 +102,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             Assert.NotEmpty(GetAllRunTestCases());
         }
 
+        [NotNull]
         public static TheoryData<RunTestCase> GetAllRunTestCases()
         {
             var testCases = new TheoryData<RunTestCase>();
-            var testsDirectory = LangTestsDirectory.Get();
+            var testsDirectory = ConformanceTestsDirectory.Get();
             var runTestsDirectory = Path.Combine(testsDirectory, "run");
-            foreach (var fullCodePath in Directory.EnumerateFiles(runTestsDirectory, "*.ad", SearchOption.AllDirectories))
+            foreach (var fullCodePath in Directory.EnumerateFiles(runTestsDirectory, "*.ad", SearchOption.AllDirectories).AssertNotNull())
             {
                 var relativeCodePath = Path.GetRelativePath(runTestsDirectory, fullCodePath);
                 testCases.Add(new RunTestCase(fullCodePath, relativeCodePath));

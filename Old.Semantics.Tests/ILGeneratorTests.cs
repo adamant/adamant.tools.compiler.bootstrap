@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Tests.Data;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
-using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
+using Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Helpers;
 using Xunit;
 using Xunit.Categories;
 
@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Tests
             var testCases = new TheoryData<ILGeneratorTestCase>();
             var projectDirectory = ProjectDirectory.Get();
             var testsDirectory = Path.Combine(projectDirectory, "IL", "langTests");
-            var langTestsDirectory = LangTestsDirectory.Get();
+            var langTestsDirectory = ConformanceTestsDirectory.Get();
             foreach (var expectedILFile in Directory.EnumerateFiles(testsDirectory, "*.ail", SearchOption.AllDirectories))
             {
                 var relativeCodePath = Path.GetRelativePath(testsDirectory, Path.ChangeExtension(expectedILFile, "ad"));

@@ -2,20 +2,24 @@ using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
+using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Data
+namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Helpers
 {
+    // TODO move standard in and standard error expected values into comments in the code file
     public class RunTestCase : TestCase
     {
-        private readonly Lazy<string> stdout;
-        public string Stdout => stdout.Value;
-        private readonly Lazy<string> stderr;
-        public string Stderr => stderr.Value;
+        [NotNull] private static readonly Regex ExitCodePattern = new Regex(@"// exit code: (?<exitCode>\d+)", RegexOptions.Compiled);
+
+        [NotNull] private readonly Lazy<string> stdout;
+        [CanBeNull] public string Stdout => stdout.Value;
+        [NotNull] private readonly Lazy<string> stderr;
+        [CanBeNull] public string Stderr => stderr.Value;
         public int ExitCode
         {
             get
             {
-                var exitCode = Regex.Match(Code, @"// exit code: (?<exitCode>\d+)").Groups["exitCode"].Value;
+                var exitCode = ExitCodePattern.Match(Code).Groups["exitCode"]?.Value;
                 return int.Parse(exitCode);
             }
         }
@@ -34,12 +38,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Data
             stderr = new Lazy<string>(GetStderr);
         }
 
+        [CanBeNull]
         private string GetStdout()
         {
             var stdoutFile = Path.ChangeExtension(FullCodePath, "stdout");
             return File.Exists(stdoutFile) ? File.ReadAllText(stdoutFile) : null;
         }
 
+        [CanBeNull]
         private string GetStderr()
         {
             var stderrFile = Path.ChangeExtension(FullCodePath, "stderr");

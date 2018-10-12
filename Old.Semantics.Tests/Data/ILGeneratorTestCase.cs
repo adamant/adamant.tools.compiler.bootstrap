@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Helpers;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
 using Xunit.Abstractions;
 

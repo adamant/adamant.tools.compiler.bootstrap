@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using Adamant.Tools.Compiler.Bootstrap.API;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Data;
+using Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Helpers;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
 using JetBrains.Annotations;
 using Xunit;
@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
 
         [Theory]
         [MemberData(nameof(GetAllCompileTestCases))]
-        public void Compiles([NotNull] CompileTestCase testCase)
+        public void Compiles([NotNull] TestCase testCase)
         {
             var codePath = new CodePath(testCase.FullCodePath);
             var codeFile = new CodeFile(codePath, new CodeText(testCase.Code));
@@ -54,16 +54,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
         }
 
         /// Loads all *.ad test cases to compile
-        public static TheoryData<CompileTestCase> GetAllCompileTestCases()
+        public static TheoryData<TestCase> GetAllCompileTestCases()
         {
-            var testCases = new TheoryData<CompileTestCase>();
-            var testsDirectory = LangTestsDirectory.Get();
+            var testCases = new TheoryData<TestCase>();
+            var testsDirectory = ConformanceTestsDirectory.Get();
             var analyzeTestsDirectory = Path.Combine(testsDirectory, "compile");
             foreach (var codeFile in Directory.EnumerateFiles(analyzeTestsDirectory, "*.ad", SearchOption.AllDirectories))
             {
                 var fullCodePath = Path.ChangeExtension(codeFile, "ad");
                 var relativeCodePath = Path.GetRelativePath(analyzeTestsDirectory, fullCodePath);
-                testCases.Add(new CompileTestCase(fullCodePath, relativeCodePath));
+                testCases.Add(new TestCase(fullCodePath, relativeCodePath));
             }
             return testCases;
         }
