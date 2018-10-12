@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
         [Fact]
         public void Parse_statement_block()
         {
-            var statements = Fake.SyntaxList<StatementSyntax>();
+            var statements = FakeSyntax.SyntaxList<StatementSyntax>();
             var tokens = FakeTokenStream.From($"{{{statements}}}");
 
             var b = ParseBlockWithoutError(tokens);
@@ -50,8 +50,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
         [NotNull]
         private static StatementParser NewStatementParser()
         {
-            var listParser = Fake.ListParser();
-            var expressionParser = Fake.Parser<ExpressionSyntax>();
+            var listParser = FakeParser.ForLists();
+            var expressionParser = FakeParser.For<ExpressionSyntax>();
             return new StatementParser(listParser, expressionParser);
         }
     }

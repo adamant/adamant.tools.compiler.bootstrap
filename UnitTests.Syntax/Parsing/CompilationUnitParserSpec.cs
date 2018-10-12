@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
         [Fact]
         public void Namespace_only()
         {
-            var name = Fake.Name();
+            var name = FakeSyntax.Name();
             var tokens = FakeTokenStream.From($"namespace {name};");
 
             var cu = ParseWithoutError(tokens);
@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
         [Fact]
         public void Using_only()
         {
-            var @using = Fake.UsingDirective();
+            var @using = FakeSyntax.UsingDirective();
             var tokens = FakeTokenStream.From($"using {@using}");
 
             var cu = ParseWithoutError(tokens);
@@ -72,9 +72,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
         [NotNull]
         private static CompilationUnitParser NewCompilationUnitParser()
         {
-            var usingDirectiveParser = Fake.Parser<UsingDirectiveSyntax>();
-            var declarationParser = Fake.Parser<DeclarationSyntax>();
-            var qualifiedNameParser = Fake.Parser<NameSyntax>();
+            var usingDirectiveParser = FakeParser.For<UsingDirectiveSyntax>();
+            var declarationParser = FakeParser.For<DeclarationSyntax>();
+            var qualifiedNameParser = FakeParser.For<NameSyntax>();
             return new CompilationUnitParser(
                 usingDirectiveParser,
                 declarationParser,

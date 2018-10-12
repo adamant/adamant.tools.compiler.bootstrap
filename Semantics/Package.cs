@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
@@ -19,6 +20,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             Requires.NotNull(nameof(name), name);
             Name = name;
             Declarations = declarations.AsReadOnly().AssertNotNull();
+        }
+
+        // Full constructor needed for testing etc.
+        public Package(
+            [NotNull] string name,
+            [NotNull] Diagnostics diagnostics,
+            [NotNull] [ItemNotNull]  IEnumerable<Declaration> declarations,
+            [CanBeNull] FunctionDeclaration entryPoint)
+        {
+            Name = name;
+            Diagnostics = diagnostics;
+            EntryPoint = entryPoint;
+            this.declarations = declarations.ToList();
         }
 
         internal void Add([NotNull] Declaration declaration)

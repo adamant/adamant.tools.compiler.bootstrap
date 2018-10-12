@@ -128,8 +128,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
         [NotNull]
         private static ExpressionParser NewExpressionParser()
         {
-            var listParser = Fake.ListParser();
-            var qualifiedNameParser = Fake.Parser<NameSyntax>();
+            var listParser = FakeParser.ForLists();
+            var qualifiedNameParser = FakeParser.For<NameSyntax>();
             return new ExpressionParser(listParser, qualifiedNameParser);
         }
     }

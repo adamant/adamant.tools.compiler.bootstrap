@@ -40,7 +40,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\API\API.csproj" />
-    <ProjectReference Include="..\Core.Tests\Core.Tests.csproj" />
     <ProjectReference Include="..\Emit.C\Emit.C.csproj" />
     <ProjectReference Include="..\Syntax\Syntax.csproj" />
     <ProjectReference Include="..\UnitTests\UnitTests.csproj" />

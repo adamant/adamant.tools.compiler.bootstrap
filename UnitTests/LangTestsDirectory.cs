@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data
+namespace Adamant.Tools.Compiler.Bootstrap.UnitTests
 {
     public static class LangTestsDirectory
     {

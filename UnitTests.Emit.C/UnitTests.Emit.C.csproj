@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ConformanceTests\ConformanceTests.csproj" />
     <ProjectReference Include="..\Emit.C\Emit.C.csproj" />
+    <ProjectReference Include="..\UnitTests\UnitTests.csproj" />
   </ItemGroup>
 
 </Project>

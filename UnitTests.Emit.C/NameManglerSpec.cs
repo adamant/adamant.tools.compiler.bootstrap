@@ -6,7 +6,7 @@ using Xunit.Categories;
 namespace UnitTests.Emit.C
 {
     [UnitTest]
-    [Category("Emitter")]
+    [Category("Emit")]
     public class NameManglerSpec
     {
         [Theory]

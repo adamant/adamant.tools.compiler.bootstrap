@@ -1,14 +1,9 @@
 using System;
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Helpers;
@@ -16,84 +11,31 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes
 {
-    // A factory for fakes
-    public static class Fake
+    public static class FakeParser
     {
         [NotNull]
-        public static AccessModifierSyntax AccessModifier()
+        public static IListParser ForLists()
         {
-            return new AccessModifierSyntax(null);
+            return new ListParser();
         }
 
         [NotNull]
-        public static BlockStatementSyntax BlockStatement()
-        {
-            return new BlockStatementSyntax(null, SyntaxList<StatementSyntax>(), null);
-        }
-
-        [NotNull]
-        public static SyntaxList<T> SyntaxList<T>()
-            where T : SyntaxNode
-        {
-            return new SyntaxList<T>(Enumerable.Empty<T>());
-        }
-
-        [NotNull]
-        public static ExpressionSyntax Expression()
-        {
-            return new FakeExpressionSyntax();
-        }
-
-        [NotNull]
-        public static SeparatedListSyntax<T> SeparatedList<T>()
-            where T : SyntaxNode
-        {
-            return new SeparatedListSyntax<T>(Enumerable.Empty<T>());
-        }
-
-        [NotNull]
-        public static IListParser ListParser()
-        {
-            return new FakeListParser();
-        }
-
-        [NotNull]
-        public static IParser<T> Parser<T>()
+        public static IParser<T> For<T>()
             where T : SyntaxNode
         {
             if (typeof(T) == typeof(UsingDirectiveSyntax))
-                return (IParser<T>)new FakeUsingDirectiveParser();
-            return new FakeParser<T>();
+                return (IParser<T>)new UsingDirectiveParser();
+            return new FakeTokenParser<T>();
         }
 
         [NotNull]
-        public static IParser<T> SkipParser<T>(T value)
+        public static IParser<T> Skip<T>(T value)
             where T : SyntaxNode
         {
-            return new FakeSkippedParser<T>(value);
+            return new SkipParser<T>(value);
         }
 
-        [NotNull]
-        public static NameSyntax Name()
-        {
-            return new FakeNameSyntax();
-        }
-
-        [NotNull]
-        public static UsingDirectiveSyntax UsingDirective()
-        {
-            return new UsingDirectiveSyntax(null, Name(), null);
-        }
-
-        private class FakeExpressionSyntax : ExpressionSyntax
-        {
-        }
-
-        private class FakeNameSyntax : NameSyntax
-        {
-        }
-
-        private class FakeParser<T> : IParser<T>
+        private class FakeTokenParser<T> : IParser<T>
             where T : SyntaxNode
         {
             public T Parse([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
@@ -103,12 +45,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes
             }
         }
 
-        private class FakeSkippedParser<T> : IParser<T>
+        private class SkipParser<T> : IParser<T>
             where T : SyntaxNode
         {
             private T value;
 
-            public FakeSkippedParser(T value)
+            public SkipParser(T value)
             {
                 this.value = value;
             }
@@ -121,7 +63,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes
             }
         }
 
-        private class FakeListParser : IListParser
+        private class ListParser : IListParser
         {
             public SyntaxList<T> ParseList<T, TTerminator>(
                 ITokenStream tokens,
@@ -145,7 +87,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes
             }
         }
 
-        private class FakeUsingDirectiveParser : IParser<UsingDirectiveSyntax>
+        private class UsingDirectiveParser : IParser<UsingDirectiveSyntax>
         {
             [NotNull]
             public UsingDirectiveSyntax Parse(
@@ -157,11 +99,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes
                 var fakeToken = tokens.ExpectFake();
                 return (UsingDirectiveSyntax)fakeToken?.FakeNode ?? throw new InvalidOperationException();
             }
-        }
-
-        public static ParameterSyntax Parameter()
-        {
-            return new ParameterSyntax(null, null, null, Fake.Expression());
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
         [Fact]
         public void Unused_parameter()
         {
-            var type = Fake.Name();
+            var type = FakeSyntax.Name();
             var tokens = FakeTokenStream.From($"_: {type};");
 
             var p = ParseWithoutError(tokens);
@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
         [NotNull]
         private static ParameterParser NewAccessModifierParser()
         {
-            var expressionParser = Fake.Parser<ExpressionSyntax>();
+            var expressionParser = FakeParser.For<ExpressionSyntax>();
             return new ParameterParser(expressionParser);
         }
     }

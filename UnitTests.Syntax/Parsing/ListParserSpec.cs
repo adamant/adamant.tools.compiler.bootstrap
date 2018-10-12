@@ -33,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
         [Fact]
         public void One_item_list()
         {
-            var item1 = Fake.Expression();
+            var item1 = FakeSyntax.Expression();
             var tokens = FakeTokenStream.From($"{item1}");
 
             var l = ParseListWithoutError<CloseParenToken>(tokens);
@@ -44,8 +44,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
         [Fact]
         public void Two_item_list()
         {
-            var item1 = Fake.Expression();
-            var item2 = Fake.Expression();
+            var item1 = FakeSyntax.Expression();
+            var item2 = FakeSyntax.Expression();
             var tokens = FakeTokenStream.From($"{item1}{item2}");
 
             var l = ParseListWithoutError<CloseParenToken>(tokens);
@@ -58,9 +58,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
         [Fact]
         public void Three_item_list()
         {
-            var item1 = Fake.Expression();
-            var item2 = Fake.Expression();
-            var item3 = Fake.Expression();
+            var item1 = FakeSyntax.Expression();
+            var item2 = FakeSyntax.Expression();
+            var item3 = FakeSyntax.Expression();
             var tokens = FakeTokenStream.From($"{item1}{item2}{item3}");
 
             var l = ParseListWithoutError<CloseParenToken>(tokens);
@@ -75,8 +75,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
         public void Unexpected_token_in_list()
         {
             var tokens = FakeTokenStream.From($"self");
-            var parameter = Fake.Parameter();
-            var expressionParser = Fake.SkipParser(parameter);
+            var parameter = FakeSyntax.Parameter();
+            var expressionParser = FakeParser.Skip(parameter);
             var diagnostics = new DiagnosticsBuilder();
 
             var l = new ListParser().ParseList(tokens, t => expressionParser.Parse(t, diagnostics), TypeOf<CloseParenToken>._, diagnostics);
@@ -100,7 +100,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
         [Fact]
         public void One_item_separated_list()
         {
-            var item1 = Fake.Expression();
+            var item1 = FakeSyntax.Expression();
             var tokens = FakeTokenStream.From($"{item1}");
 
             var l = ParseSeparatedListWithoutError<CommaToken, CloseParenToken>(tokens);
@@ -111,8 +111,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
         [Fact]
         public void Two_item_separated_list()
         {
-            var item1 = Fake.Expression();
-            var item2 = Fake.Expression();
+            var item1 = FakeSyntax.Expression();
+            var item2 = FakeSyntax.Expression();
             var tokens = FakeTokenStream.From($"{item1},{item2}");
 
             var l = ParseSeparatedListWithoutError<CommaToken, CloseParenToken>(tokens);
@@ -126,9 +126,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
         [Fact]
         public void Three_item_separated_list()
         {
-            var item1 = Fake.Expression();
-            var item2 = Fake.Expression();
-            var item3 = Fake.Expression();
+            var item1 = FakeSyntax.Expression();
+            var item2 = FakeSyntax.Expression();
+            var item3 = FakeSyntax.Expression();
             var tokens = FakeTokenStream.From($"{item1},{item2},{item3}");
 
             var l = ParseSeparatedListWithoutError<CommaToken, CloseParenToken>(tokens);
@@ -145,8 +145,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
         public void Unexpected_token_in_separated_list()
         {
             var tokens = FakeTokenStream.From($"self");
-            var parameter = Fake.Parameter();
-            var expressionParser = Fake.SkipParser(parameter);
+            var parameter = FakeSyntax.Parameter();
+            var expressionParser = FakeParser.Skip(parameter);
             var diagnostics = new DiagnosticsBuilder();
 
             var l = new ListParser().ParseSeparatedList(tokens, t => expressionParser.Parse(t, diagnostics), TypeOf<CommaToken>._, TypeOf<CloseParenToken>._, diagnostics);
@@ -166,7 +166,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
             where TTerminator : Token
         {
             var diagnostics = new DiagnosticsBuilder();
-            var expressionParser = Fake.Parser<ExpressionSyntax>();
+            var expressionParser = FakeParser.For<ExpressionSyntax>();
             var syntaxList = new ListParser().ParseList(tokens, t => expressionParser.Parse(t, diagnostics), TypeOf<TTerminator>._, diagnostics);
             Assert.Empty(diagnostics.Build());
             return syntaxList;
@@ -178,7 +178,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
             where TTerminator : Token
         {
             var diagnostics = new DiagnosticsBuilder();
-            var expressionParser = Fake.Parser<ExpressionSyntax>();
+            var expressionParser = FakeParser.For<ExpressionSyntax>();
             var l = new ListParser().ParseSeparatedList(tokens, t => expressionParser.Parse(t, diagnostics), TypeOf<TSeparator>._, TypeOf<TTerminator>._, diagnostics);
             Assert.Empty(diagnostics.Build());
             return l;

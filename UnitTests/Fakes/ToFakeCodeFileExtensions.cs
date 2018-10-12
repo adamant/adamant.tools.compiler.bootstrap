@@ -1,9 +1,10 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using FsCheck;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Core.Tests
+namespace Adamant.Tools.Compiler.Bootstrap.UnitTests.Fakes
 {
-    public static class TestHelpers
+    public static class ToFakeCodeFileExtensions
     {
         [NotNull]
         public static CodeFile ToFakeCodeFile([NotNull] this string text)

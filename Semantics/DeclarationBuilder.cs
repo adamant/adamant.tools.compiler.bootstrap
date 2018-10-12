@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
     public class DeclarationBuilder
     {
-        public static void GatherDeclarations(
+        public void GatherDeclarations(
             [NotNull] Package package,
             [NotNull] PackageSyntax packageSyntax)
         {
@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             }
         }
 
-        public static void GatherDeclarations(
+        private static void GatherDeclarations(
             [NotNull] Package package,
             [NotNull] CodeFile codeFile,
             [NotNull] DeclarationSyntax declaration)

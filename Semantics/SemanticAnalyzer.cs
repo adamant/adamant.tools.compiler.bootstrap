@@ -13,7 +13,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         {
             var diagnostics = new DiagnosticsBuilder();
             var package = new Package(packageSyntax.Name);
-            DeclarationBuilder.GatherDeclarations(package, packageSyntax);
+            var declarationBuilder = new DeclarationBuilder();
+            declarationBuilder.GatherDeclarations(package, packageSyntax);
 
             // Hack for now
             foreach (var function in package.Declarations.OfType<FunctionDeclaration>())

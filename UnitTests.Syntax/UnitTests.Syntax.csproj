@@ -27,7 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Core.Tests\Core.Tests.csproj" />
     <ProjectReference Include="..\Framework\Framework.csproj" />
     <ProjectReference Include="..\Syntax\Syntax.csproj" />
     <ProjectReference Include="..\UnitTests\UnitTests.csproj" />

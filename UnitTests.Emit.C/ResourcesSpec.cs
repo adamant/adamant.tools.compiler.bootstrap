@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
+using Adamant.Tools.Compiler.Bootstrap.UnitTests;
 using JetBrains.Annotations;
 using Xunit;
 using Xunit.Categories;
@@ -11,7 +11,7 @@ using Xunit.Categories;
 namespace UnitTests.Emit.C
 {
     [UnitTest]
-    [Category("Emitter")]
+    [Category("Emit")]
     public class ResourcesSpec
     {
         [NotNull]

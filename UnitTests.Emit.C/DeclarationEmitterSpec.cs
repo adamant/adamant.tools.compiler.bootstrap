@@ -1,11 +1,12 @@
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Core.Tests;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
+using Adamant.Tools.Compiler.Bootstrap.UnitTests;
+using Adamant.Tools.Compiler.Bootstrap.UnitTests.Fakes;
 using JetBrains.Annotations;
 using UnitTests.Emit.C.Fakes;
 using Xunit;
@@ -14,7 +15,7 @@ using Xunit.Categories;
 namespace UnitTests.Emit.C
 {
     [UnitTest]
-    [Category("Emitter")]
+    [Category("Emit")]
     public class DeclarationEmitterSpec
     {
         [Theory]

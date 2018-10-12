@@ -1,6 +1,7 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Core.Tests
+namespace Adamant.Tools.Compiler.Bootstrap.UnitTests.Fakes
 {
     public class FakeCodeReference : CodeReference
     {
