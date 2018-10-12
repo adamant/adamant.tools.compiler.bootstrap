@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Core.Tests</AssemblyName>
-    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Core.Tests</RootNamespace>
+    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Core</AssemblyName>
+    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Core</RootNamespace>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 

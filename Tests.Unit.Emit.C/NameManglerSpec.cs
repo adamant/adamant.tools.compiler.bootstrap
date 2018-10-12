@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 using Xunit;
 using Xunit.Categories;
 
-namespace UnitTests.Emit.C
+namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C
 {
     [UnitTest]
     [Category("Emit")]

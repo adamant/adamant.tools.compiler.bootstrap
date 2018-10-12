@@ -1,7 +1,7 @@
 using System;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
 
-namespace UnitTests.Emit.C.Fakes
+namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C.Fakes
 {
     public class FakeParameter : Parameter
     {

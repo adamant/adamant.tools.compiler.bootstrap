@@ -1,9 +1,9 @@
 using System.IO;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
-using Adamant.Tools.Compiler.Bootstrap.UnitTests.Helpers;
+using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
 
-namespace Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data
+namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Data
 {
     public class RuntimeLibraryFixture
     {

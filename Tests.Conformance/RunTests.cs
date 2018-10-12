@@ -3,19 +3,18 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.API;
-using Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.UnitTests;
-using Adamant.Tools.Compiler.Bootstrap.UnitTests.Helpers;
+using Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Data;
+using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
 using JetBrains.Annotations;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
 
-namespace Adamant.Tools.Compiler.Bootstrap.ConformanceTests
+namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
 {
     [IntegrationTest]
     [Category("Conformance")]

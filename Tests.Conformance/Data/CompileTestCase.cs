@@ -1,10 +1,9 @@
 using System;
 using System.IO;
-using Adamant.Tools.Compiler.Bootstrap.UnitTests;
-using Adamant.Tools.Compiler.Bootstrap.UnitTests.Helpers;
+using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
 using Newtonsoft.Json.Linq;
 
-namespace Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data
+namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Data
 {
     public class CompileTestCase : TestCase
     {

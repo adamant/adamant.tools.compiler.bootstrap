@@ -1,7 +1,7 @@
 using System.IO;
 using System.Linq;
 
-namespace Adamant.Tools.Compiler.Bootstrap.UnitTests.Helpers
+namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers
 {
     public static class SolutionDirectory
     {

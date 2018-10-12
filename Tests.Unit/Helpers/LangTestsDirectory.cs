@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace Adamant.Tools.Compiler.Bootstrap.UnitTests.Helpers
+namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers
 {
     public static class LangTestsDirectory
     {

@@ -5,14 +5,13 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
-using Adamant.Tools.Compiler.Bootstrap.UnitTests;
-using Adamant.Tools.Compiler.Bootstrap.UnitTests.Fakes;
+using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C.Fakes;
+using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes;
 using JetBrains.Annotations;
-using UnitTests.Emit.C.Fakes;
 using Xunit;
 using Xunit.Categories;
 
-namespace UnitTests.Emit.C
+namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C
 {
     [UnitTest]
     [Category("Emit")]

@@ -1,7 +1,7 @@
 using Xunit;
 using Xunit.Categories;
 
-namespace Adamant.Tools.Compiler.Bootstrap.UnitTests.Semantics
+namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics
 {
     [UnitTest]
     [Category("Analyze")]

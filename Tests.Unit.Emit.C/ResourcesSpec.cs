@@ -3,12 +3,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
-using Adamant.Tools.Compiler.Bootstrap.UnitTests.Helpers;
+using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
 using JetBrains.Annotations;
 using Xunit;
 using Xunit.Categories;
 
-namespace UnitTests.Emit.C
+namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C
 {
     [UnitTest]
     [Category("Emit")]

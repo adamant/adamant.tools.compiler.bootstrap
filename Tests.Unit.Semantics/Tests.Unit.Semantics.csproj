@@ -5,9 +5,9 @@
 
     <IsPackable>false</IsPackable>
 
-    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.UnitTests.Semantics</AssemblyName>
+    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics</AssemblyName>
 
-    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.UnitTests.Semantics</RootNamespace>
+    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics</RootNamespace>
 
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
