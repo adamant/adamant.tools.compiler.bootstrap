@@ -60,6 +60,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics
             });
         }
 
+        [Fact]
+        public void Enum_struct()
+        {
+            var functionDeclaration = FakeSyntax.EnumStructDeclaration("My_Struct");
+            var compilationUnitSyntax = FakeSyntax.CompilationUnit(functionDeclaration);
+            var packageSyntax = FakeSyntax.Package(compilationUnitSyntax);
+            var package = new Package("Test");
+
+            GatherDeclarations(package, packageSyntax);
+
+            Assert.Collection(package.Declarations, d =>
+            {
+                var f = Assert.IsType<TypeDeclaration>(d);
+                Assert.Equal("My_Struct", f.QualifiedName.ToString());
+            });
+        }
+
         private static void GatherDeclarations(
             [NotNull] Package package,
             [NotNull] PackageSyntax packageSyntax)

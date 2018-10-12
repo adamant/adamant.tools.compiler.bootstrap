@@ -45,6 +45,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                 case IncompleteDeclarationSyntax _:
                     // Since it is incomplete, we can't do any analysis on it
                     break;
+                case EnumStructDeclarationSyntax enumStruct:
+                    BuildEnumStruct(package, codeFile, @namespace, enumStruct);
+                    break;
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
             }
@@ -70,8 +73,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             [NotNull] Name @namespace,
             [NotNull] ClassDeclarationSyntax @class)
         {
-            // Skip any function that doesn't have a name
+            // Skip any class that doesn't have a name
             if (@class.Name?.Value is string name)
+            {
+                var fullName = @namespace.Qualify(name);
+                package.Add(new TypeDeclaration(codeFile, fullName));
+            }
+        }
+
+        private static void BuildEnumStruct(
+            [NotNull] Package package,
+            [NotNull] CodeFile codeFile,
+            [NotNull] Name @namespace,
+            [NotNull] EnumStructDeclarationSyntax enumStruct)
+        {
+            // Skip any struct that doesn't have a name
+            if (enumStruct.Name?.Value is string name)
             {
                 var fullName = @namespace.Qualify(name);
                 package.Add(new TypeDeclaration(codeFile, fullName));

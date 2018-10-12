@@ -131,7 +131,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         [NotNull]
         public static FunctionDeclarationSyntax FunctionDeclaration([NotNull] string name)
         {
-
             return new FunctionDeclarationSyntax(
                 AccessModifier(),
                 null,
@@ -148,6 +147,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         public static IdentifierToken Identifier(string name)
         {
             return new BareIdentifierToken(new TextSpan(0, 0), name);
+        }
+
+        public static EnumStructDeclarationSyntax EnumStructDeclaration(string name)
+        {
+            return new EnumStructDeclarationSyntax(
+                AccessModifier(),
+                null,
+                null,
+                Identifier(name),
+                null,
+                SyntaxList<MemberDeclarationSyntax>.Empty,
+                null);
         }
     }
 }
