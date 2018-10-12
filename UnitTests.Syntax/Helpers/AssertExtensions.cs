@@ -96,13 +96,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Helpers
         {
             Assert.NotNull(diagnostic);
             Assert.Equal(DiagnosticLevel.CompilationError, diagnostic.Level);
-            AssertDiagnostic(diagnostic, errorCode, start, length);
+            AssertLexingDiagnostic(diagnostic, errorCode, start, length);
         }
 
-        public static void AssertDiagnostic([CanBeNull] this Diagnostic diagnostic, int errorCode, int start, int length)
+        public static void AssertLexingDiagnostic([CanBeNull] this Diagnostic diagnostic, int errorCode, int start, int length)
+        {
+            diagnostic.AssertDiagnostic(DiagnosticPhase.Lexing, errorCode, start, length);
+        }
+
+        public static void AssertParsingDiagnostic([CanBeNull] this Diagnostic diagnostic, int errorCode, int start, int length)
+        {
+            diagnostic.AssertDiagnostic(DiagnosticPhase.Parsing, errorCode, start, length);
+        }
+
+        public static void AssertDiagnostic(
+            [CanBeNull] this Diagnostic diagnostic,
+            DiagnosticPhase phase,
+            int errorCode,
+            int start,
+            int length)
         {
             Assert.NotNull(diagnostic);
-            Assert.Equal(DiagnosticPhase.Lexing, diagnostic.Phase);
+            Assert.Equal(phase, diagnostic.Phase);
             Assert.Equal(errorCode, diagnostic.ErrorCode);
             Assert.True(start == diagnostic.Span.Start, $"Expected diagnostic start {start}, was {diagnostic.Span.Start}");
             Assert.True(length == diagnostic.Span.Length, $"Expected diagnostic length {length}, was {diagnostic.Span.Length}");

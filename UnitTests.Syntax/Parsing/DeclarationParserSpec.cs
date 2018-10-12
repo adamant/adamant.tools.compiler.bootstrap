@@ -55,7 +55,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Parsing
             Assert.Equal(tokens[4], c.CloseBrace);
         }
 
-
         [NotNull]
         private static DeclarationSyntax ParseWithoutError([NotNull] ITokenStream tokenStream)
         {

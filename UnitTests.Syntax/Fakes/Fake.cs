@@ -67,6 +67,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes
         }
 
         [NotNull]
+        public static IParser<T> SkipParser<T>(T value)
+            where T : SyntaxNode
+        {
+            return new FakeSkippedParser<T>(value);
+        }
+
+        [NotNull]
         public static NameSyntax Name()
         {
             return new FakeNameSyntax();
@@ -96,12 +103,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes
             }
         }
 
+        private class FakeSkippedParser<T> : IParser<T>
+            where T : SyntaxNode
+        {
+            private T value;
+
+            public FakeSkippedParser(T value)
+            {
+                this.value = value;
+            }
+
+            public T Parse([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+            {
+                var v = value;
+                value = null;
+                return v;
+            }
+        }
+
         private class FakeListParser : IListParser
         {
             public SyntaxList<T> ParseList<T, TTerminator>(
                 ITokenStream tokens,
                 ParseFunction<T> parseItem,
-                TypeOf<TTerminator> terminatorType) where T : SyntaxNode where TTerminator : Token
+                TypeOf<TTerminator> terminatorType,
+                IDiagnosticsCollector diagnostics) where T : SyntaxNode where TTerminator : Token
             {
                 var fakeToken = tokens.ExpectFake();
                 return (SyntaxList<T>)fakeToken?.FakeNode ?? throw new InvalidOperationException();
@@ -111,7 +137,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes
                 ITokenStream tokens,
                 ParseFunction<T> parseItem,
                 TypeOf<TSeparator> separatorType,
-                TypeOf<TTerminator> terminatorType) where T : SyntaxNode where TSeparator : Token where TTerminator : Token
+                TypeOf<TTerminator> terminatorType,
+                IDiagnosticsCollector diagnostics) where T : SyntaxNode where TSeparator : Token where TTerminator : Token
             {
                 var fakeToken = tokens.ExpectFake();
                 return (SeparatedListSyntax<T>)fakeToken?.FakeNode ?? throw new InvalidOperationException();
@@ -130,6 +157,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Fakes
                 var fakeToken = tokens.ExpectFake();
                 return (UsingDirectiveSyntax)fakeToken?.FakeNode ?? throw new InvalidOperationException();
             }
+        }
+
+        public static ParameterSyntax Parameter()
+        {
+            return new ParameterSyntax(null, null, null, Fake.Expression());
         }
     }
 }

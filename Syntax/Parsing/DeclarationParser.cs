@@ -117,7 +117,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         [NotNull]
         private SeparatedListSyntax<ParameterSyntax> ParseParameters([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
         {
-            return listParser.ParseSeparatedList(tokens, t => parameterParser.Parse(t, diagnostics), TypeOf<CommaToken>._, TypeOf<CloseParenToken>._);
+            return listParser.ParseSeparatedList(tokens, t => parameterParser.Parse(t, diagnostics), TypeOf<CommaToken>._, TypeOf<CloseParenToken>._, diagnostics);
         }
         #endregion
 

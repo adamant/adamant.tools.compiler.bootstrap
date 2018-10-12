@@ -18,5 +18,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Errors
         {
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3001, "Incomplete declaration");
         }
+
+        [NotNull]
+        public static Diagnostic UnexpectedToken([NotNull] CodeFile file, TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3002, $"Unexpected token `{file.Code[span]}`");
+        }
     }
 }

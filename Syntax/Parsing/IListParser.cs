@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
@@ -18,7 +19,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         SyntaxList<T> ParseList<T, TTerminator>(
             [NotNull] ITokenStream tokens,
             [NotNull] ParseFunction<T> parseItem,
-            TypeOf<TTerminator> terminatorType)
+            TypeOf<TTerminator> terminatorType,
+            [NotNull] IDiagnosticsCollector diagnostics)
             where T : SyntaxNode
             where TTerminator : Token;
 
@@ -28,7 +30,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             [NotNull] ITokenStream tokens,
             [NotNull] ParseFunction<T> parseItem,
             TypeOf<TSeparator> separatorType,
-            TypeOf<TTerminator> terminatorType)
+            TypeOf<TTerminator> terminatorType,
+            [NotNull] IDiagnosticsCollector diagnostics)
             where T : SyntaxNode
             where TSeparator : Token
             where TTerminator : Token;
