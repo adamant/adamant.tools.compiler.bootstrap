@@ -46,7 +46,6 @@ enum Type_ID
         }
 
         [Fact]
-        [Category("Emitter")]
         public void PostambleClosesTypeIdEnum()
         {
             var code = new Code();
@@ -61,7 +60,6 @@ typedef enum Type_ID Type_ID;
         }
 
         [Fact]
-        [Category("Emitter")]
         public void EmitsEntryPointAdapterForNoArgVoidReturnMain()
         {
             var main = new FunctionDeclaration("".ToFakeCodeFile(),

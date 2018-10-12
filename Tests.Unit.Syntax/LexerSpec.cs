@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax
 
         [Theory]
         [InlineData("hello", "hello")]
-        [InlineData(@"\class", "class", Skip = "Escaped Identifiers Not Implemented")]
+        [InlineData(@"\class", "class")]
         // TODO [InlineData(@"\""Hello World!""", "Hello World!", Skip = "Escaped String Identifiers Not Implemented")]
         public void Identifier_value([NotNull] string identifier, [NotNull] string value)
         {
