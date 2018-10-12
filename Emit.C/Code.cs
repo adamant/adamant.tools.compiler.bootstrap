@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         [NotNull] public readonly CCodeBuilder TypeIdDeclaration = new CCodeBuilder();
         [NotNull] public readonly CCodeBuilder TypeDeclarations = new CCodeBuilder();
         [NotNull] public readonly CCodeBuilder FunctionDeclarations = new CCodeBuilder();
-        [NotNull] public readonly CCodeBuilder ClassDeclarations = new CCodeBuilder();
+        [NotNull] public readonly CCodeBuilder StructDeclarations = new CCodeBuilder();
         [NotNull] public readonly CCodeBuilder GlobalDefinitions = new CCodeBuilder();
         [NotNull] public readonly CCodeBuilder Definitions = new CCodeBuilder();
 
@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 CCodeBuilder.LineTerminator,
                 FunctionDeclarations.Code,
                 CCodeBuilder.LineTerminator,
-                ClassDeclarations.Code,
+                StructDeclarations.Code,
                 CCodeBuilder.LineTerminator,
                 GlobalDefinitions.Code,
                 CCodeBuilder.LineTerminator,

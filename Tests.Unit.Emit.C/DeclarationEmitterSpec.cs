@@ -28,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C
                 .Select(_ => new FakeParameter()).ToList();
             var returnType = new FakeDataType();
             var function = new FunctionDeclaration("".ToFakeCodeFile(),
-                new QualifiedName(new SimpleName("func")),
+                GlobalNamespaceName.Instance.Qualify("func"),
                 parameters,
                 returnType);
 
@@ -47,9 +47,39 @@ $@"{returnType} ᵢfunc´{parameterCount}({parametersString})
             Assert.Equal("", code.TypeIdDeclaration.Code);
             Assert.Equal("", code.TypeDeclarations.Code);
             Assert.Equal(declarations, code.FunctionDeclarations.Code);
-            Assert.Equal("", code.ClassDeclarations.Code);
+            Assert.Equal("", code.StructDeclarations.Code);
             Assert.Equal("", code.GlobalDefinitions.Code);
             Assert.Equal(definitions, code.Definitions.Code);
+        }
+
+        [Fact]
+        public void Type()
+        {
+            var typeName = GlobalNamespaceName.Instance.Qualify("My_Type");
+            var type = new TypeDeclaration("".ToFakeCodeFile(), typeName);
+
+            var code = new Code();
+            NewDeclarationEmitter().Emit(type, code);
+
+            var declarations =
+@"typedef struct ᵢMy_Type´0·ₐSelf ᵢMy_Type´0·ₐSelf;
+typedef struct ᵢMy_Type´0·ₐV_Table ᵢMy_Type´0·ₐV_Table;
+typedef struct { ᵢMy_Type´0·ₐV_Table const*_Nonnull restrict ₐvtable; ᵢMy_Type´0·ₐSelf const*_Nonnull restrict ₐself; } ᵢMy_Type´0;
+typedef struct { ᵢMy_Type´0·ₐV_Table const*_Nonnull restrict ₐvtable; ᵢMy_Type´0·ₐSelf *_Nonnull restrict ₐself; } mut˽ᵢMy_Type´0;
+"
+.NormalizeLineEndings(CCodeBuilder.LineTerminator);
+            var structDeclarations =
+@"struct ᵢMy_Type´0·ₐSelf
+{
+};
+".NormalizeLineEndings(CCodeBuilder.LineTerminator);
+            Assert.Equal("", code.Includes.Code);
+            Assert.Equal("", code.TypeIdDeclaration.Code);
+            Assert.Equal(declarations, code.TypeDeclarations.Code);
+            Assert.Equal("", code.FunctionDeclarations.Code);
+            Assert.Equal(structDeclarations, code.StructDeclarations.Code);
+            Assert.Equal("", code.GlobalDefinitions.Code);
+            Assert.Equal("", code.Definitions.Code);
         }
 
         [NotNull]

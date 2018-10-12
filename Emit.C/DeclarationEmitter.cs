@@ -31,6 +31,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 case FunctionDeclaration function:
                     Emit(function, code);
                     break;
+                case TypeDeclaration type:
+                    Emit(type, code);
+                    break;
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
             }
@@ -55,6 +58,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         private string Convert([NotNull][ItemNotNull] IEnumerable<Parameter> parameters)
         {
             return string.Join(", ", parameters.Select(parameterConverter.Convert));
+        }
+
+        private void Emit([NotNull] TypeDeclaration type, [NotNull] Code code)
+        {
+            var typeName = nameMangler.MangleName(type);
+
+            // Struct Declarations
+            var selfType = $"{typeName}·ₐSelf";
+            var vtableType = $"{typeName}·ₐV_Table";
+            code.TypeDeclarations.AppendLine($"typedef struct {selfType} {selfType};");
+            code.TypeDeclarations.AppendLine($"typedef struct {vtableType} {vtableType};");
+            code.TypeDeclarations.AppendLine($"typedef struct {{ {vtableType} const*_Nonnull restrict ₐvtable; {selfType} const*_Nonnull restrict ₐself; }} {typeName};");
+            code.TypeDeclarations.AppendLine($"typedef struct {{ {vtableType} const*_Nonnull restrict ₐvtable; {selfType} *_Nonnull restrict ₐself; }} mut˽{typeName};");
+
+            code.StructDeclarations.AppendLine($"struct {selfType}");
+            code.StructDeclarations.BeginBlock();
+            code.StructDeclarations.EndBlockWithSemicolon();
         }
     }
 }

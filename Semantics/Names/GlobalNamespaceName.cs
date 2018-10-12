@@ -6,7 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
     public class GlobalNamespaceName : Name
     {
         #region Singleton
-        public static readonly GlobalNamespaceName Instance = new GlobalNamespaceName();
+        [NotNull] public static readonly GlobalNamespaceName Instance = new GlobalNamespaceName();
 
         private GlobalNamespaceName() { }
         #endregion

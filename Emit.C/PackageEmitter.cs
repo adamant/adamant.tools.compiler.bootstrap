@@ -43,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
             code.TypeDeclarations.AppendLine("// Type Declarations");
             code.FunctionDeclarations.AppendLine("// Function Declarations");
-            code.ClassDeclarations.AppendLine("// Class Declarations");
+            code.StructDeclarations.AppendLine("// Struct Declarations");
             code.GlobalDefinitions.AppendLine("// Global Definitions");
             code.Definitions.AppendLine("// Definitions");
         }

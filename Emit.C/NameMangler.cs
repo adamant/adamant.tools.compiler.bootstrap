@@ -66,6 +66,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         }
 
         [NotNull]
+        public string MangleName([NotNull] TypeDeclaration type)
+        {
+            var mangledName = Mangle(type.QualifiedName);
+            // builder with room for the characters we are likely to add
+            var builder = new StringBuilder(mangledName, mangledName.Length + 5);
+            builder.Append('´');
+            builder.Append("0"); // TODO actual number of generic parameters
+            return builder.ToString().AssertNotNull();
+        }
+
+        [NotNull]
         private string Mangle([NotNull] QualifiedName qualifiedName)
         {
             if (qualifiedName.Qualifier.Any())
