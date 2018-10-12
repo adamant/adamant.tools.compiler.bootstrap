@@ -40,6 +40,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                 case ClassDeclarationSyntax @class:
                     BuildClass(package, codeFile, @class);
                     break;
+                case IncompleteDeclarationSyntax _:
+                    // Since it is incomplete, we can't do any analysis on it
+                    break;
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
             }
