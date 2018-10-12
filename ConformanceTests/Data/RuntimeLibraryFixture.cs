@@ -1,7 +1,7 @@
 using System.IO;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
-using Adamant.Tools.Compiler.Bootstrap.UnitTests;
+using Adamant.Tools.Compiler.Bootstrap.UnitTests.Helpers;
 
 namespace Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data
 {

@@ -40,7 +40,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests.Syntax", "UnitTes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests.Framework", "UnitTests.Framework\UnitTests.Framework.csproj", "{23AA4A34-308E-4113-BF0B-7FE62C386123}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConformanceTests", "ConformanceTests\ConformanceTests.csproj", "{FCA32DCC-0EA3-4618-8C43-428745757B91}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Conformance", "ConformanceTests\Tests.Conformance.csproj", "{FCA32DCC-0EA3-4618-8C43-428745757B91}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Old.Semantics.Types", "Old.Semantics.Types\Old.Semantics.Types.csproj", "{0BA2E26C-779B-4D74-B157-FCCB624BEBC1}"
 EndProject

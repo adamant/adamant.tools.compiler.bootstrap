@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ConformanceTests\ConformanceTests.csproj" />
+    <ProjectReference Include="..\ConformanceTests\Tests.Conformance.csproj" />
     <ProjectReference Include="..\Old.Semantics\Old.Semantics.csproj" />
     <ProjectReference Include="..\Syntax\Syntax.csproj" />
     <ProjectReference Include="..\UnitTests\UnitTests.csproj" />

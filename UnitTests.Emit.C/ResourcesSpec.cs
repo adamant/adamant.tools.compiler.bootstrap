@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
-using Adamant.Tools.Compiler.Bootstrap.UnitTests;
+using Adamant.Tools.Compiler.Bootstrap.UnitTests.Helpers;
 using JetBrains.Annotations;
 using Xunit;
 using Xunit.Categories;
@@ -26,7 +26,7 @@ namespace UnitTests.Emit.C
         [InlineData(CodeEmitter.RuntimeLibraryHeaderFileName)]
         public void Resources_start_with_BOM([NotNull] string filename)
         {
-            var projectDir = Path.Combine(Path.GetDirectoryName(LangTestsDirectory.Get()), "Emit.C");
+            var projectDir = Path.Combine(SolutionDirectory.Get(), "Emit.C");
 
             var codeFileBytes = File.ReadAllBytes(Path.Combine(projectDir, filename));
             AssertStartsWithUtf8Bom(codeFileBytes);

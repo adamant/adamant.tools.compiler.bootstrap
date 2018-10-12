@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Adamant.Tools.Compiler.Bootstrap.UnitTests;
+using Adamant.Tools.Compiler.Bootstrap.UnitTests.Helpers;
 using Newtonsoft.Json.Linq;
 
 namespace Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data

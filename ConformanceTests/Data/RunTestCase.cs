@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using Adamant.Tools.Compiler.Bootstrap.UnitTests;
+using Adamant.Tools.Compiler.Bootstrap.UnitTests.Helpers;
 
 namespace Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data
 {

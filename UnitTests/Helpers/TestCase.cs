@@ -4,7 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using JetBrains.Annotations;
 using Xunit.Abstractions;
 
-namespace Adamant.Tools.Compiler.Bootstrap.UnitTests
+namespace Adamant.Tools.Compiler.Bootstrap.UnitTests.Helpers
 {
     /// <summary>
     /// An abstract test case. The visual studio runner serializes tests cases
