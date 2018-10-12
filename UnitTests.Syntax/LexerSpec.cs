@@ -136,7 +136,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests
         [InlineData(@"""\u(1f|""", "\u001f|")]
         [InlineData(@"""\u()""", "u()")]
         [InlineData(@"""\u(110000)""", "u(110000)")] // 1 too high
-        // TODO can't put in surrogate pairs
+        // TODO can't put use a surrogate pair as a unicode escape, they must be unicode scalars
         public void Invalid_escape_sequence([NotNull] string literal, [NotNull] string expectedValue)
         {
             var file = literal.ToFakeCodeFile();

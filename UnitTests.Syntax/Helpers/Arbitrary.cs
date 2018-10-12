@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.UnitTests;
@@ -264,7 +263,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.UnitTests.Helpers
             { "Self", typeof(SelfTypeKeywordToken) },
             { "init", typeof(InitKeywordToken) },
             { "owned", typeof(OwnedKeywordToken) },
-            { "self", typeof(SelfKeywordToken) }
+            { "self", typeof(SelfKeywordToken) },
+            { "extend", typeof(ExtendKeywordToken) },
         }.AsReadOnly();
     }
 }

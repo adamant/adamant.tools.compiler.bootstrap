@@ -43,6 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
             typeof(SelfKeywordToken),
             typeof(SelfTypeKeywordToken),
             typeof(BaseKeywordToken),
+            typeof(ExtendKeywordToken),
         }.AsReadOnly();
     }
 
@@ -305,6 +306,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
     public class BaseKeywordToken : KeywordToken
     {
         public BaseKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public class ExtendKeywordToken : KeywordToken
+    {
+        public ExtendKeywordToken(TextSpan span)
             : base(span)
         {
         }
