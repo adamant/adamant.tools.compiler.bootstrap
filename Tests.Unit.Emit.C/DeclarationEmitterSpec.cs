@@ -5,7 +5,6 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
-using Adamant.Tools.Compiler.Bootstrap.UnitTests;
 using Adamant.Tools.Compiler.Bootstrap.UnitTests.Fakes;
 using JetBrains.Annotations;
 using UnitTests.Emit.C.Fakes;

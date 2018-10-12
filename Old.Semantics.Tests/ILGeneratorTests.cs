@@ -1,10 +1,8 @@
 using System.IO;
-using Adamant.Tools.Compiler.Bootstrap.ConformanceTests.Data;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Tests.Data;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
-using Adamant.Tools.Compiler.Bootstrap.UnitTests;
 using Adamant.Tools.Compiler.Bootstrap.UnitTests.Helpers;
 using Xunit;
 using Xunit.Categories;

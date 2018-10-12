@@ -29,7 +29,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Framework\Framework.csproj" />
     <ProjectReference Include="..\Syntax\Syntax.csproj" />
-    <ProjectReference Include="..\UnitTests\UnitTests.csproj" />
+    <ProjectReference Include="..\Tests.Unit\Tests.Unit.csproj" />
   </ItemGroup>
 
 </Project>
