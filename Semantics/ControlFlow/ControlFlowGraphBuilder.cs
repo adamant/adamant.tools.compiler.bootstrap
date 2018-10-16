@@ -4,6 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements.LValues;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow;
@@ -107,11 +108,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
             switch (expression)
             {
-                //                case AssignExpression assignment:
-                //                    var lvalue = ConvertToLValue(assignment.LeftOperand);
-                //                    ConvertAssignment(lvalue, assignment.RightOperand);
-                //                    break;
-
+                case IdentifierNameSyntax _:
+                    // Ignore, reading from variable does nothing.
+                    break;
+                case BinaryOperatorExpressionSyntax _:
+                    // Could be side effects possibly.
+                    var temp = cfg.Let(DataType.Unknown);
+                    ConvertAssignment(cfg, temp.Reference, expression, currentBlock);
+                    break;
                 case ReturnExpressionSyntax returnExpression:
                     if (returnExpression.Expression != null)
                         ConvertAssignment(cfg, cfg.ReturnVariable.Reference, returnExpression.Expression, currentBlock);
@@ -139,11 +143,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 //                    var args = newObjectExpression.Arguments.Select(ConvertToLValue);
                 //                    currentBlock.Add(new NewObjectStatement(lvalue, newObjectExpression.Type, args));
                 //                    break;
-
-                //                case VariableExpression variableExpression:
-                //                    currentBlock.Add(new AssignmentStatement(lvalue, LookupVariable(variableExpression.Name)));
-                //                    break;
-
+                case IdentifierNameSyntax identifier:
+                    currentBlock.Add(new AssignmentStatement(lvalue, LookupVariable(cfg, identifier.Name?.Value)));
+                    break;
                 case BinaryOperatorExpressionSyntax binaryOperator:
                     ConvertOperator(cfg, lvalue, binaryOperator, currentBlock);
                     break;
