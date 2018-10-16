@@ -55,6 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
 
             // Check for compiler errors
             var expectedCompileErrorLines = ExpectedCompileErrorLines(codeFile, code);
+            Assert.NotNull(package.Diagnostics);
             var diagnostics = package.Diagnostics;
 
             if (expectedCompileErrorLines.Any())

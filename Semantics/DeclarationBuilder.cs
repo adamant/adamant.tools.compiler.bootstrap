@@ -1,30 +1,41 @@
+using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
     public class DeclarationBuilder
     {
-        public void GatherDeclarations(
+        [NotNull] private readonly NameBuilder nameBuilder;
+
+        public DeclarationBuilder([NotNull] NameBuilder nameBuilder)
+        {
+            this.nameBuilder = nameBuilder;
+        }
+
+        [NotNull]
+        [ItemNotNull]
+        public IEnumerable<CompilationUnitScope> GatherDeclarations(
             [NotNull] Package package,
             [NotNull] PackageSyntax packageSyntax)
         {
             foreach (var compilationUnit in packageSyntax.CompilationUnits)
             {
+                var globalScope = new CompilationUnitScope();
                 Name @namespace = GlobalNamespaceName.Instance;
                 if (compilationUnit.Namespace != null)
-                {
-                    @namespace = BuildName(compilationUnit.Namespace.Name) ?? @namespace;
-                }
+                    @namespace = nameBuilder.BuildName(compilationUnit.Namespace.Name) ?? @namespace;
 
                 foreach (var declaration in compilationUnit.Declarations)
                     GatherDeclarations(package, compilationUnit.CodeFile, @namespace, declaration);
+
+                yield return globalScope;
             }
         }
 
@@ -92,27 +103,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             {
                 var fullName = @namespace.Qualify(name);
                 package.Add(new TypeDeclaration(codeFile, fullName));
-            }
-        }
-
-        [CanBeNull]
-        private static Name BuildName([NotNull] NameSyntax nameSyntax)
-        {
-            switch (nameSyntax)
-            {
-                case QualifiedNameSyntax qualifiedNameSyntax:
-                    {
-                        var qualifier = BuildName(qualifiedNameSyntax.Qualifier);
-                        var name = qualifiedNameSyntax.Name.Name?.Value;
-                        return name != null ? qualifier?.Qualify(name) ?? (Name)new SimpleName(name) : null;
-                    }
-                case IdentifierNameSyntax identifierNameSyntax:
-                    {
-                        var name = identifierNameSyntax.Name?.Value;
-                        return name != null ? new SimpleName(name) : null;
-                    }
-                default:
-                    throw NonExhaustiveMatchException.For(nameSyntax);
             }
         }
     }

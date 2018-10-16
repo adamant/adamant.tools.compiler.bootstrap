@@ -81,7 +81,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics
             [NotNull] Package package,
             [NotNull] PackageSyntax packageSyntax)
         {
-            new DeclarationBuilder().GatherDeclarations(package, packageSyntax);
+            new DeclarationBuilder(new NameBuilder()).GatherDeclarations(package, packageSyntax);
         }
     }
 }
