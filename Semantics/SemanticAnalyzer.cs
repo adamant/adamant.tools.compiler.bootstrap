@@ -1,7 +1,11 @@
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using JetBrains.Annotations;
@@ -21,14 +25,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             new NamespaceBuilder(nameBuilder).GatherNamespaces(package, packageSyntax);
 
             // Gather all the declarations and simultaneously build up trees of lexical scopes
-            var scopes = new DeclarationBuilder(nameBuilder).GatherDeclarations(package, packageSyntax).ToList();
+            var scopes = new DeclarationBuilder(nameBuilder).GatherDeclarations(package, packageSyntax);
 
             // Check lexical namespaces and attach to entities etc.
             var scopeBinder = new ScopeBinder();
             foreach (var scope in scopes)
                 scopeBinder.Bind(scope);
 
-            // TODO do name binding, type checking, IL generation and compile time code execution
+            // Do name binding, type checking, IL statement generation and compile time code execution
+            // They are all interdependent to some degree
+            var nameBinder = new NameBinder();
+            var typeChecker = new TypeChecker(nameBinder);
+            typeChecker.CheckTypes(package);
+
+            // At this point, some but not all of the functions will have IL statements generated
+            var statementBuilder = new StatementBuilder();
+            statementBuilder.BuildStatements(package);
+
+            // Only borrow checking left
+            var borrowChecker = new BorrowChecker();
+            borrowChecker.Check(package);
 
             // Hack for now
             foreach (var function in package.Declarations.OfType<FunctionDeclaration>())

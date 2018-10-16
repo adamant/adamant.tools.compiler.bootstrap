@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
@@ -8,7 +9,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes
 {
     public class DeclarationBuilder
     {
@@ -21,7 +22,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
         [NotNull]
         [ItemNotNull]
-        public IEnumerable<CompilationUnitScope> GatherDeclarations(
+        public IList<CompilationUnitScope> GatherDeclarations(
+            [NotNull] Package package,
+            [NotNull] PackageSyntax packageSyntax)
+        {
+            return GatherDeclarationsEnumerable(package, packageSyntax).ToList();
+        }
+
+        [NotNull]
+        [ItemNotNull]
+        private IEnumerable<CompilationUnitScope> GatherDeclarationsEnumerable(
             [NotNull] Package package,
             [NotNull] PackageSyntax packageSyntax)
         {
