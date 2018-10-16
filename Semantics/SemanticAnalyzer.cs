@@ -2,10 +2,10 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using JetBrains.Annotations;
@@ -39,8 +39,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             typeChecker.CheckTypes(analyses);
 
             // At this point, some but not all of the functions will have IL statements generated
-            var statementBuilder = new StatementBuilder();
-            statementBuilder.BuildStatements(package);
+            var cfgBuilder = new ControlFlowGraphBuilder();
+            cfgBuilder.Build(analyses.OfType<FunctionAnalysis>());
 
             // Only borrow checking left
             var borrowChecker = new BorrowChecker();

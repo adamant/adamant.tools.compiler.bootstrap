@@ -20,8 +20,4 @@
     <ProjectReference Include="..\Syntax\Syntax.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="ControlFlow\" />
-  </ItemGroup>
-
 </Project>

@@ -1,5 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
@@ -56,8 +57,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.Definitions.AppendLine("// Entry Point Adapter");
             code.Definitions.AppendLine("int32_t main(const int argc, char const * const * const argv)");
             code.Definitions.BeginBlock();
-            code.Definitions.AppendLine($"{nameMangler.MangleName(entryPoint)}();");
-            code.Definitions.AppendLine("return 0;");
+            if (entryPoint.ReturnType == ObjectType.Void)
+            {
+                code.Definitions.AppendLine($"{nameMangler.MangleName(entryPoint)}();");
+                code.Definitions.AppendLine("return 0;");
+            }
+            else
+            {
+                code.Definitions.AppendLine($"return {nameMangler.MangleName(entryPoint)}();");
+            }
             code.Definitions.EndBlock();
         }
 
