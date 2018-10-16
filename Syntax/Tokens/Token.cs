@@ -43,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 
         [System.Diagnostics.Contracts.Pure]
         [NotNull]
-        public string Text([NotNull]CodeText code)
+        public string Text([NotNull] CodeText code)
         {
             return Span.GetText(code.Text);
         }

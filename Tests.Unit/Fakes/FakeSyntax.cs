@@ -24,9 +24,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         }
 
         [NotNull]
-        public static BlockStatementSyntax BlockStatement()
+        public static BlockExpressionSyntax Block()
         {
-            return new BlockStatementSyntax(null, List<StatementSyntax>(), null);
+            return new BlockExpressionSyntax(null, List<StatementSyntax>(), null);
         }
 
         [NotNull]
@@ -140,7 +140,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
                 null,
                 null,
                 Expression(),
-                BlockStatement());
+                Block());
         }
 
         [NotNull]

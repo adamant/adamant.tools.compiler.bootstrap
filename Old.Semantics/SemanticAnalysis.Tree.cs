@@ -53,7 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics
         public Parameter Node(ParameterSyntax s) => Node<Parameter>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Block Node(BlockStatementSyntax s) => Node<Block>(s);
+        public Block Node(BlockExpressionSyntax s) => Node<Block>(s);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Statement Node(StatementSyntax s) => Node<Statement>(s);
@@ -115,7 +115,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics
                     return new Parameter(parameter, AllDiagnostics(parameter),
                         parameter.VarKeyword != null, parameter.Name.Value, Node(parameter.TypeExpression));
 
-                case BlockStatementSyntax block:
+                case BlockExpressionSyntax block:
                     var statements = block.Statements.Select(Node);
                     return new Block(block, AllDiagnostics(block), statements);
 

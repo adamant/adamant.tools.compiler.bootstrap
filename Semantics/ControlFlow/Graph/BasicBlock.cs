@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Graph
 {
     public class BasicBlock
     {

@@ -1,4 +1,5 @@
 using System;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Graph;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Refs
 {

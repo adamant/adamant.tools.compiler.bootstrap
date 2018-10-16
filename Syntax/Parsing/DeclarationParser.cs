@@ -10,7 +10,6 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
@@ -20,20 +19,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
     {
         [NotNull] private readonly IListParser listParser;
         [NotNull] private readonly IParser<ExpressionSyntax> expressionParser;
-        [NotNull] private readonly IParser<BlockStatementSyntax> blockStatementParser;
+        [NotNull] private readonly IParser<BlockExpressionSyntax> blockParser;
         [NotNull] private readonly IParser<ParameterSyntax> parameterParser;
         [NotNull] private readonly IParser<AccessModifierSyntax> accessModifierParser;
 
         public DeclarationParser(
             [NotNull] IListParser listParser,
             [NotNull] IParser<ExpressionSyntax> expressionParser,
-            [NotNull] IParser<BlockStatementSyntax> blockStatementParser,
+            [NotNull] IParser<BlockExpressionSyntax> blockParser,
             [NotNull] IParser<ParameterSyntax> parameterParser,
             [NotNull] IParser<AccessModifierSyntax> accessModifierParser)
         {
             this.listParser = listParser;
             this.expressionParser = expressionParser;
-            this.blockStatementParser = blockStatementParser;
+            this.blockParser = blockParser;
             this.parameterParser = parameterParser;
             this.accessModifierParser = accessModifierParser;
         }
@@ -108,7 +107,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             var closeParen = tokens.Expect<CloseParenToken>();
             var arrow = tokens.Expect<RightArrowToken>();
             var returnTypeExpression = expressionParser.Parse(tokens, diagnostics);
-            var body = blockStatementParser.Parse(tokens, diagnostics);
+            var body = blockParser.Parse(tokens, diagnostics);
             return new FunctionDeclarationSyntax(accessModifier, functionKeyword, name,
                 openParen, parameters, closeParen, arrow, returnTypeExpression, body);
         }

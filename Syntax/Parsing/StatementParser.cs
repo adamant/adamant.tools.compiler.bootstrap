@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 {
-    public class StatementParser : IParser<StatementSyntax>, IParser<BlockStatementSyntax>
+    public class StatementParser : IParser<StatementSyntax>, IParser<BlockExpressionSyntax>
     {
         [NotNull]
         private readonly IListParser listParser;
@@ -29,7 +29,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             switch (tokens.Current)
             {
                 case OpenBraceToken _:
-                    return ParseBlockStatement(tokens, diagnostics);
+                    // To simplfy things later, we wrap blocks in an expression statement syntax w/o a semicolon
+                    return new ExpressionStatementSyntax(ParseBlock(tokens, diagnostics), null);
                 case LetKeywordToken _:
                 case VarKeywordToken _:
                     {
@@ -57,21 +58,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         }
 
         [NotNull]
-        BlockStatementSyntax IParser<BlockStatementSyntax>.Parse(
+        BlockExpressionSyntax IParser<BlockExpressionSyntax>.Parse(
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
-            return ParseBlockStatement(tokens, diagnostics);
+            return ParseBlock(tokens, diagnostics);
         }
 
         [MustUseReturnValue]
         [NotNull]
-        public BlockStatementSyntax ParseBlockStatement([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+        public BlockExpressionSyntax ParseBlock([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
         {
             var openBrace = tokens.Expect<OpenBraceToken>();
             var statements = listParser.ParseList(tokens, t => Parse(t, diagnostics), TypeOf<CloseBraceToken>._, diagnostics);
             var closeBrace = tokens.Expect<CloseBraceToken>();
-            return new BlockStatementSyntax(openBrace, statements, closeBrace);
+            return new BlockExpressionSyntax(openBrace, statements, closeBrace);
         }
     }
 }

@@ -265,6 +265,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             { "owned", typeof(OwnedKeywordToken) },
             { "self", typeof(SelfKeywordToken) },
             { "extend", typeof(ExtendKeywordToken) },
+            { "type", typeof(TypeKeywordToken) },
         }.AsReadOnly();
     }
 }

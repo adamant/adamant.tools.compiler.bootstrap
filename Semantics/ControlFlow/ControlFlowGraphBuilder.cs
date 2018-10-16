@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Graph;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements.LValues;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
@@ -19,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 {
     public class ControlFlowGraphBuilder
     {
-        public void BuildGraph([NotNull][ItemNotNull] IEnumerable<FunctionAnalysis> functions)
+        public void BuildGraph([NotNull][ItemNotNull] IEnumerable<FunctionDeclarationAnalysis> functions)
         {
             Requires.NotNull(nameof(functions), functions);
 
@@ -27,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 BuildGraph(function);
         }
 
-        private void BuildGraph([NotNull] FunctionAnalysis function)
+        private void BuildGraph([NotNull] FunctionDeclarationAnalysis function)
         {
             Requires.NotNull(nameof(function), function);
 

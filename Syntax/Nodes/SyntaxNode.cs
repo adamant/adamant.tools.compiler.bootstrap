@@ -54,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
                     case LifetimeTypeSyntax lifetimeType:
                         nodes.Push(lifetimeType.TypeName);
                         break;
-                    case BlockStatementSyntax blockStatement:
+                    case BlockExpressionSyntax blockStatement:
                         nodes.PushRange(blockStatement.Statements.Reverse());
                         break;
                     case ReturnExpressionSyntax returnExpression:

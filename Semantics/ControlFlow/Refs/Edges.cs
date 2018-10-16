@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Graph;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Refs

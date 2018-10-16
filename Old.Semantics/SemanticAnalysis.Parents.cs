@@ -83,7 +83,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics
                 case LifetimeTypeSyntax lifetimeType:
                     AddParentAttribute(lifetimeType.TypeName, syntax);
                     break;
-                case BlockStatementSyntax blockStatement:
+                case BlockExpressionSyntax blockStatement:
                     AddAllParentAttributes(blockStatement.Statements, syntax);
                     break;
                 case ReturnExpressionSyntax returnExpression:

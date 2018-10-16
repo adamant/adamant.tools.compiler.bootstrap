@@ -1,6 +1,7 @@
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
@@ -25,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             new NamespaceBuilder(nameBuilder).GatherNamespaces(package, packageSyntax);
 
             // Gather all the declarations and simultaneously build up trees of lexical scopes
-            var (scopes, analyses) = new AnalysisBuilder(nameBuilder).PrepareForAnalysis(packageSyntax);
+            var (scopes, analyses) = new DeclarationAnalysisBuilder(nameBuilder).PrepareForAnalysis(packageSyntax);
 
             // Check lexical namespaces and attach to entities etc.
             var scopeBinder = new ScopeBinder();
@@ -34,13 +35,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             // Do name binding, type checking, IL statement generation and compile time code execution
             // They are all interdependent to some degree
+            var expressionAnalysisBuilder = new ExpressionAnalysisBuilder();
             var nameBinder = new NameBinder();
-            var typeChecker = new TypeChecker(nameBinder);
-            typeChecker.CheckTypes(analyses);
+            var typeChecker = new TypeChecker(nameBinder, expressionAnalysisBuilder);
+            typeChecker.CheckTypes(analyses, diagnostics);
 
             // At this point, some but not all of the functions will have IL statements generated
             var cfgBuilder = new ControlFlowGraphBuilder();
-            cfgBuilder.BuildGraph(analyses.OfType<FunctionAnalysis>());
+            cfgBuilder.BuildGraph(analyses.OfType<FunctionDeclarationAnalysis>());
 
             // Only borrow checking left
             var borrowChecker = new BorrowChecker();

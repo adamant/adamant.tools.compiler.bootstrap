@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using JetBrains.Annotations;
 
@@ -26,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics
                     return function;
                 case VariableDeclarationStatementSyntax _:
                 case ExpressionStatementSyntax _:
-                case BlockStatementSyntax _:
+                case BlockExpressionSyntax _:
                     // Inherit
                     return EnclosingFunction(Parent(syntax));
                 default:

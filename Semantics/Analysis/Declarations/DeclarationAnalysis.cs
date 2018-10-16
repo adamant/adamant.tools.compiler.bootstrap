@@ -4,12 +4,12 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
 {
     public abstract class DeclarationAnalysis
     {
-        [NotNull] public LexicalScope Scope { get; }
         [NotNull] public CodeFile File { get; }
+        [NotNull] public LexicalScope Scope { get; }
         [NotNull] public Declaration Semantics { get; }
 
         protected DeclarationAnalysis(

@@ -3,7 +3,6 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes;
@@ -23,8 +22,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
             var accessModifer = FakeSyntax.AccessModifier();
             var returnExpression = FakeSyntax.Expression();
             var parameters = FakeSyntax.SeparatedList<ParameterSyntax>();
-            var blockStatement = FakeSyntax.BlockStatement();
-            var tokens = FakeTokenStream.From($"{accessModifer} fn function_name({parameters}) -> {returnExpression} {blockStatement}");
+            var block = FakeSyntax.Block();
+            var tokens = FakeTokenStream.From($"{accessModifer} fn function_name({parameters}) -> {returnExpression} {block}");
 
             var d = ParseWithoutError(tokens);
 
@@ -37,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
             Assert.Equal(tokens[5], f.CloseParen);
             Assert.Equal(tokens[6], f.Arrow);
             Assert.Equal(returnExpression, f.ReturnTypeExpression);
-            Assert.Equal(blockStatement, f.Body);
+            Assert.Equal(block, f.Body);
         }
 
         [Fact]
@@ -71,13 +70,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         {
             var listParser = FakeParser.ForLists();
             var expressionParser = FakeParser.For<ExpressionSyntax>();
-            var blockStatementParser = FakeParser.For<BlockStatementSyntax>();
+            var blockParser = FakeParser.For<BlockExpressionSyntax>();
             var parameterParser = FakeParser.For<ParameterSyntax>();
             var accessModifierParser = FakeParser.For<AccessModifierSyntax>();
             return new DeclarationParser(
                 listParser,
                 expressionParser,
-                blockStatementParser,
+                blockParser,
                 parameterParser,
                 accessModifierParser);
         }

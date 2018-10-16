@@ -41,6 +41,7 @@
         "SelfType",
         "Base",
         "Extend",
+        "Type",
     }.AsReadOnly();
 #>
 using System;

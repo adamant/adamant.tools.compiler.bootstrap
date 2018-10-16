@@ -1,11 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
@@ -14,22 +19,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
     public class TypeChecker
     {
         [NotNull] private readonly NameBinder nameBinder;
+        [NotNull] private readonly ExpressionAnalysisBuilder expressionAnalysisBuilder;
 
-        public TypeChecker([NotNull] NameBinder nameBinder)
+        public TypeChecker(
+            [NotNull] NameBinder nameBinder,
+            [NotNull] ExpressionAnalysisBuilder expressionAnalysisBuilder)
         {
+            Requires.NotNull(nameof(nameBinder), nameBinder);
+            Requires.NotNull(nameof(expressionAnalysisBuilder), expressionAnalysisBuilder);
             this.nameBinder = nameBinder;
+            this.expressionAnalysisBuilder = expressionAnalysisBuilder;
         }
 
-        public void CheckTypes([NotNull] IList<DeclarationAnalysis> analyses)
+        public void CheckTypes(
+            [NotNull] IList<DeclarationAnalysis> analyses,
+            [NotNull] DiagnosticsBuilder diagnostics)
         {
             foreach (var analysis in analyses)
             {
                 switch (analysis)
                 {
-                    case FunctionAnalysis f:
-                        CheckTypes(f);
+                    case FunctionDeclarationAnalysis f:
+                        CheckTypes(f, diagnostics);
                         break;
-                    case TypeAnalysis t:
+                    case TypeDeclarationAnalysis t:
                         CheckTypes(t);
                         break;
                     default:
@@ -38,25 +51,58 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             }
         }
 
-        private void CheckTypes([NotNull] FunctionAnalysis function)
+        private void CheckTypes(
+            [NotNull] FunctionDeclarationAnalysis function,
+            [NotNull] DiagnosticsBuilder diagnostics)
         {
             var parameterTypes = function.Syntax.Parameters.Nodes().Select(n => n.TypeExpression);
             foreach (var (parameter, type) in function.Semantics.Parameters.Zip(parameterTypes))
-                parameter.Type = ResolveType(type);
+            {
+                var analysis = expressionAnalysisBuilder.PrepareForAnalysis(function, type);
+                CheckTypeExpression(analysis, diagnostics);
+                parameter.Type = ResolveType(type, function.Scope);
+            }
 
-            function.Semantics.ReturnType = ResolveType(function.Syntax.ReturnTypeExpression);
+            var returnType = function.Syntax.ReturnTypeExpression;
+            var returnTypeAnalysis = expressionAnalysisBuilder.PrepareForAnalysis(function, returnType);
+            CheckTypeExpression(returnTypeAnalysis, diagnostics);
+            function.Semantics.ReturnType = ResolveType(returnType, function.Scope);
         }
 
-        private static void CheckTypes(TypeAnalysis type)
+
+        private static void CheckTypes([NotNull] TypeDeclarationAnalysis typeDeclaration)
         {
             // TODO
         }
 
+        // Checks the expression is well typed, and that the type of the expression is `type`
+        private void CheckTypeExpression(
+            [NotNull] ExpressionAnalysis expression,
+            [NotNull] DiagnosticsBuilder diagnostics)
+        {
+            CheckTypes(expression);
+            if (expression.Type != ObjectType.Type)
+            {
+                //diagnostics.Publish(TypeError.MustBeATypeExpression(expression.File, expression.Syntax.Span));
+                // TODO report error
+            }
+        }
+
+        private void CheckTypes(ExpressionAnalysis expression)
+        {
+            // TODO check types in expression
+        }
+
         [NotNull]
-        private static DataType ResolveType([NotNull] ExpressionSyntax typeExpression)
+        private static DataType ResolveType(
+            [NotNull] ExpressionSyntax typeExpression,
+            [NotNull] LexicalScope scope)
         {
             switch (typeExpression)
             {
+                case IdentifierNameSyntax identifier:
+                    throw new NotImplementedException();
+                    break;
                 case PrimitiveTypeSyntax primitive:
                     switch (primitive.Keyword)
                     {
@@ -76,9 +122,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                             return ObjectType.String;
                         case NeverKeywordToken _:
                             return ObjectType.Never;
+                        case TypeKeywordToken _:
+                            return ObjectType.Type;
                         default:
                             throw NonExhaustiveMatchException.For(primitive.Keyword);
                     }
+                case LifetimeTypeSyntax lifetimeType:
+                    return ResolveType(lifetimeType.TypeName, scope);
                 default:
                     throw NonExhaustiveMatchException.For(typeExpression);
             }

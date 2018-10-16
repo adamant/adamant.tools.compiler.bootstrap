@@ -20,6 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
         [NotNull] public static readonly ObjectType Size = new ObjectType(new QualifiedName(new SimpleName("size", true)), false);
         [NotNull] public static readonly ObjectType Bool = new ObjectType(new QualifiedName(new SimpleName("bool", true)), false);
         [NotNull] public static readonly ObjectType String = new ObjectType(new QualifiedName(new SimpleName("string", true)), false);
+        [NotNull] public static readonly ObjectType Type = new ObjectType(new QualifiedName(new SimpleName("type", true)), false);
 
         [NotNull] public QualifiedName Name { get; }
         public bool IsMutable { get; }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
@@ -39,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics
 
             Assert.Collection(analyses, a =>
             {
-                var f = Assert.IsType<FunctionAnalysis>(a);
+                var f = Assert.IsType<FunctionDeclarationAnalysis>(a);
                 Assert.Equal("function_name", f.Semantics.QualifiedName.ToString());
             });
         }
@@ -56,7 +57,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics
 
             Assert.Collection(analyses, a =>
             {
-                var f = Assert.IsType<FunctionAnalysis>(a);
+                var f = Assert.IsType<FunctionDeclarationAnalysis>(a);
                 Assert.Equal("myNamespace.name.function_name", f.Semantics.QualifiedName.ToString());
             });
         }
@@ -72,7 +73,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics
 
             Assert.Collection(analyses, a =>
             {
-                var t = Assert.IsType<TypeAnalysis>(a);
+                var t = Assert.IsType<TypeDeclarationAnalysis>(a);
                 Assert.Equal("My_Struct", t.Semantics.QualifiedName.ToString());
             });
         }
@@ -80,7 +81,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics
         private static (IList<CompilationUnitScope>, IList<DeclarationAnalysis>) PrepareForAnalysis(
             [NotNull] PackageSyntax packageSyntax)
         {
-            return new AnalysisBuilder(new NameBuilder()).PrepareForAnalysis(packageSyntax);
+            return new DeclarationAnalysisBuilder(new NameBuilder()).PrepareForAnalysis(packageSyntax);
         }
     }
 }

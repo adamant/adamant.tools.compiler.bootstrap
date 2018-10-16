@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Refs;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Graph
 {
     public class ControlFlowGraph
     {

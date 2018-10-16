@@ -1,7 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
@@ -17,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
         [CanBeNull] public CloseParenToken CloseParen { get; }
         [CanBeNull] public RightArrowToken Arrow { get; }
         [NotNull] public ExpressionSyntax ReturnTypeExpression { get; }
-        [NotNull] public BlockStatementSyntax Body { get; }
+        [NotNull] public BlockExpressionSyntax Body { get; }
 
         public FunctionDeclarationSyntax(
             [NotNull] AccessModifierSyntax accessModifier,
@@ -28,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
             [CanBeNull] CloseParenToken closeParen,
             [CanBeNull] RightArrowToken arrow,
             [NotNull] ExpressionSyntax returnTypeExpression,
-            [NotNull] BlockStatementSyntax body)
+            [NotNull] BlockExpressionSyntax body)
         {
             Requires.NotNull(nameof(accessModifier), accessModifier);
             Requires.NotNull(nameof(parameters), parameters);

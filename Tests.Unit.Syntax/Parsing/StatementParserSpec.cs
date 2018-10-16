@@ -39,13 +39,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         }
 
         [NotNull]
-        private static BlockStatementSyntax ParseBlockWithoutError([NotNull] ITokenStream tokenStream)
+        private static BlockExpressionSyntax ParseBlockWithoutError([NotNull] ITokenStream tokenStream)
         {
             var parser = NewStatementParser();
             var diagnostics = new DiagnosticsBuilder();
-            var blockStatementSyntax = parser.ParseBlockStatement(tokenStream, diagnostics);
+            var blockSyntax = parser.ParseBlock(tokenStream, diagnostics);
             Assert.Empty(diagnostics.Build());
-            return blockStatementSyntax;
+            return blockSyntax;
         }
 
         [NotNull]

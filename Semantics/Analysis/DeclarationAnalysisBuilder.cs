@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
@@ -12,11 +13,11 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
 {
-    public class AnalysisBuilder
+    public class DeclarationAnalysisBuilder
     {
         [NotNull] private readonly NameBuilder nameBuilder;
 
-        public AnalysisBuilder([NotNull] NameBuilder nameBuilder)
+        public DeclarationAnalysisBuilder([NotNull] NameBuilder nameBuilder)
         {
             this.nameBuilder = nameBuilder;
         }
@@ -81,7 +82,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             }
         }
 
-        private static FunctionAnalysis PrepareForAnalysis(
+        private static FunctionDeclarationAnalysis PrepareForAnalysis(
             [NotNull] CodeFile codeFile,
             [NotNull] LexicalScope scope,
             [NotNull] Name @namespace,
@@ -93,7 +94,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             var fullName = @namespace.Qualify(name);
             var parameters = syntax.Parameters.Nodes().Select(Build);
             var semantics = new FunctionDeclaration(codeFile, fullName, parameters);
-            return new FunctionAnalysis(codeFile, scope, syntax, semantics);
+            return new FunctionDeclarationAnalysis(codeFile, scope, syntax, semantics);
         }
 
         [NotNull]
@@ -102,7 +103,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             return new Parameter(parameter.VarKeyword != null, parameter.Name?.Value);
         }
 
-        private static TypeAnalysis PrepareForAnalysis(
+        private static TypeDeclarationAnalysis PrepareForAnalysis(
             [NotNull] CodeFile codeFile,
             [NotNull] LexicalScope scope,
             [NotNull] Name @namespace,
@@ -113,10 +114,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
 
             var fullName = @namespace.Qualify(name);
             var semantics = new TypeDeclaration(codeFile, fullName);
-            return new TypeAnalysis(codeFile, scope, syntax, semantics);
+            return new TypeDeclarationAnalysis(codeFile, scope, syntax, semantics);
         }
 
-        private static TypeAnalysis PrepareForAnalysis(
+        private static TypeDeclarationAnalysis PrepareForAnalysis(
             [NotNull] CodeFile codeFile,
             [NotNull] LexicalScope scope,
             [NotNull] Name @namespace,
@@ -127,7 +128,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
 
             var fullName = @namespace.Qualify(name);
             var semantics = new TypeDeclaration(codeFile, fullName);
-            return new TypeAnalysis(codeFile, scope, syntax, semantics);
+            return new TypeDeclarationAnalysis(codeFile, scope, syntax, semantics);
         }
     }
 }

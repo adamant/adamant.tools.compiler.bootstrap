@@ -5,14 +5,14 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
 {
-    public class TypeAnalysis : DeclarationAnalysis
+    public class TypeDeclarationAnalysis : DeclarationAnalysis
     {
         [NotNull] public DeclarationSyntax Syntax { get; }
         [NotNull] public new TypeDeclaration Semantics { get; }
 
-        public TypeAnalysis(
+        public TypeDeclarationAnalysis(
             [NotNull] CodeFile file,
             [NotNull] LexicalScope scope,
             [NotNull] DeclarationSyntax syntax,
