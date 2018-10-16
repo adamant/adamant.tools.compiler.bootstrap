@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             switch (tokens.Current)
             {
                 case OpenBraceToken _:
-                    return ParseStatementBlock(tokens, diagnostics);
+                    return ParseBlockStatement(tokens, diagnostics);
                 case LetKeywordToken _:
                 case VarKeywordToken _:
                     {
@@ -61,12 +61,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
-            return ParseStatementBlock(tokens, diagnostics);
+            return ParseBlockStatement(tokens, diagnostics);
         }
 
         [MustUseReturnValue]
         [NotNull]
-        public BlockStatementSyntax ParseStatementBlock([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+        public BlockStatementSyntax ParseBlockStatement([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
         {
             var openBrace = tokens.Expect<OpenBraceToken>();
             var statements = listParser.ParseList(tokens, t => Parse(t, diagnostics), TypeOf<CloseBraceToken>._, diagnostics);

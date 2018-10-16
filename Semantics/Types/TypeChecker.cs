@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
@@ -38,10 +40,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
 
         private void CheckTypes([NotNull] FunctionAnalysis function)
         {
-            //foreach (var parameter in function.Parameters)
-            //{
-            //    throw new NotImplementedException();
-            //}
+            var parameterTypes = function.Syntax.Parameters.Nodes().Select(n => n.TypeExpression);
+            foreach (var (parameter, type) in function.Semantics.Parameters.Zip(parameterTypes))
+                parameter.Type = ResolveType(type);
 
             function.Semantics.ReturnType = ResolveType(function.Syntax.ReturnTypeExpression);
         }

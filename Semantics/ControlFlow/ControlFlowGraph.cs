@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         //[NotNull] [ItemNotNull] public IEnumerable<LocalVariableDeclaration> Parameters => variableDeclarations.Skip(1).Take(Arity);
         [NotNull] [ItemNotNull] public IReadOnlyList<BasicBlock> BasicBlocks { get; }
         [NotNull] [ItemNotNull] private readonly List<BasicBlock> basicBlocks = new List<BasicBlock>();
-        public BasicBlock EntryBlock => basicBlocks.First();
+        [NotNull] public BasicBlock EntryBlock => basicBlocks.First().AssertNotNull();
         public BasicBlock ExitBlock => basicBlocks.Last(); // TODO this is likely not right
 
         public ControlFlowGraph()

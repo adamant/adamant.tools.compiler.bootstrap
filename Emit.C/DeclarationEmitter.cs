@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using JetBrains.Annotations;
@@ -12,15 +13,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         [NotNull] private readonly NameMangler nameMangler;
         [NotNull] private readonly IConverter<Parameter> parameterConverter;
         [NotNull] private readonly IConverter<DataType> typeConverter;
+        [NotNull] private readonly IEmitter<ControlFlowGraph> controlFlowEmitter;
 
         public DeclarationEmitter(
             [NotNull] NameMangler nameMangler,
             [NotNull] IConverter<Parameter> parameterConverter,
-            [NotNull] IConverter<DataType> typeConverter)
+            [NotNull] IConverter<DataType> typeConverter,
+            [NotNull] IEmitter<ControlFlowGraph> controlFlowEmitter)
         {
+            Requires.NotNull(nameof(nameMangler), nameMangler);
+            Requires.NotNull(nameof(parameterConverter), parameterConverter);
+            Requires.NotNull(nameof(typeConverter), typeConverter);
+            Requires.NotNull(nameof(controlFlowEmitter), controlFlowEmitter);
             this.nameMangler = nameMangler;
             this.parameterConverter = parameterConverter;
             this.typeConverter = typeConverter;
+            this.controlFlowEmitter = controlFlowEmitter;
         }
 
         public void Emit([NotNull] Declaration declaration, [NotNull] Code code)
@@ -49,8 +57,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
             code.Definitions.DeclarationSeparatorLine();
             code.Definitions.AppendLine($"{returnType} {name}({parameters})");
-            //Emit(code, function.Body);
             code.Definitions.BeginBlock();
+            controlFlowEmitter.Emit(function.ControlFlow, code);
             code.Definitions.EndBlock();
         }
 

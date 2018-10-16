@@ -12,15 +12,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations
     public class FunctionDeclaration : Declaration
     {
         [NotNull] [ItemNotNull] public IReadOnlyList<Parameter> Parameters { get; }
-        [NotNull] [ItemNotNull] private readonly List<Parameter> parameters = new List<Parameter>();
         public int Arity => Parameters.Count;
         [NotNull] public DataType ReturnType { get; internal set; }
         [NotNull] public ControlFlowGraph ControlFlow { get; internal set; } = new ControlFlowGraph();
 
-        public FunctionDeclaration([NotNull] CodeFile file, [NotNull] QualifiedName qualifiedName)
+        public FunctionDeclaration(
+            [NotNull] CodeFile file,
+            [NotNull] QualifiedName qualifiedName,
+            [NotNull][ItemNotNull] IEnumerable<Parameter> parameters)
             : base(file, qualifiedName)
         {
-            Parameters = parameters.AsReadOnly().AssertNotNull();
+            Parameters = parameters.ToList();
             ReturnType = DataType.Unknown;
         }
 

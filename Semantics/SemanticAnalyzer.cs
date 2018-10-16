@@ -40,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             // At this point, some but not all of the functions will have IL statements generated
             var cfgBuilder = new ControlFlowGraphBuilder();
-            cfgBuilder.Build(analyses.OfType<FunctionAnalysis>());
+            cfgBuilder.BuildGraph(analyses.OfType<FunctionAnalysis>());
 
             // Only borrow checking left
             var borrowChecker = new BorrowChecker();

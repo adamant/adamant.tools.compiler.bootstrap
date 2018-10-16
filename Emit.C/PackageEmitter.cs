@@ -64,7 +64,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             }
             else
             {
-                code.Definitions.AppendLine($"return {nameMangler.MangleName(entryPoint)}();");
+                code.Definitions.AppendLine($"return {nameMangler.MangleName(entryPoint)}().ₐvalue;");
             }
             code.Definitions.EndBlock();
         }

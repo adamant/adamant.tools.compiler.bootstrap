@@ -43,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         {
             var parser = NewStatementParser();
             var diagnostics = new DiagnosticsBuilder();
-            var blockStatementSyntax = parser.ParseStatementBlock(tokenStream, diagnostics);
+            var blockStatementSyntax = parser.ParseBlockStatement(tokenStream, diagnostics);
             Assert.Empty(diagnostics.Build());
             return blockStatementSyntax;
         }

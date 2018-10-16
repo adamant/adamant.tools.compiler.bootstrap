@@ -195,8 +195,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     var @operator = tokens.ExpectOperator().AssertNotNull();
                     var operand = ParseExpression(tokens, diagnostics, OperatorPrecedence.Unary);
                     return new UnaryOperatorExpressionSyntax(@operator, operand);
-                case StringLiteralToken _:
-                    return new StringLiteralExpressionSyntax(tokens.ExpectStringLiteral());
+                case IntegerLiteralToken literal:
+                    {
+                        tokens.MoveNext();
+                        return new IntegerLiteralExpressionSyntax(literal);
+                    }
+                case StringLiteralToken literal:
+                    {
+                        tokens.MoveNext();
+                        return new StringLiteralExpressionSyntax(literal);
+                    }
                 case VoidKeywordToken _:
                 case IntKeywordToken _:
                 case UIntKeywordToken _:
@@ -224,8 +232,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
                         return name;
                     }
-                default:// If it is something else, we assume it should be an identifier name
+                case AsteriskToken _:
+                case SlashToken _:
+                    // If it is one of these, we assume there is a missing identifier
                     return new IdentifierNameSyntax(tokens.ExpectIdentifier());
+                default:
+                    throw NonExhaustiveMatchException.For(tokens.Current);
             }
         }
 

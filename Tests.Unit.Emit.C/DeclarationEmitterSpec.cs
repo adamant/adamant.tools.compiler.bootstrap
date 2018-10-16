@@ -1,6 +1,7 @@
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
@@ -87,7 +88,8 @@ typedef struct { ᵢMy_Type´0·ₐV_Table const*_Nonnull restrict ₐvtable; �
             var nameMangler = new NameMangler();
             var parameterConverter = new FakeConverter<Parameter>();
             var typeConvert = new FakeConverter<DataType>();
-            return new DeclarationEmitter(nameMangler, parameterConverter, typeConvert);
+            var controlFlowEmitter = new FakeEmitter<ControlFlowGraph>();
+            return new DeclarationEmitter(nameMangler, parameterConverter, typeConvert, controlFlowEmitter);
         }
     }
 }

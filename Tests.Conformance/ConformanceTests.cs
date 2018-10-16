@@ -107,7 +107,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
         [NotNull]
         private string CompileToExecutable([NotNull] string codePath)
         {
-            var options = "-std=c11 -fsanitize=undefined -fsanitize=integer -fsanitize=nullability -Wall -Wno-incompatible-pointer-types";
+            // used to have: -Wno-incompatible-pointer-types
+            var options = "-std=c11 -fsanitize=undefined -fsanitize=integer -fsanitize=nullability -Wall  -Wno-unused-label";
             // Next thing is needed for windows
             options += " -Xclang -flto-visibility-public-std";
             var sources = string.Join(" ", codePath, RuntimeLibraryFixture.GetRuntimeLibraryPath());

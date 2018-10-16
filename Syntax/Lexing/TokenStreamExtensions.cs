@@ -75,6 +75,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing
 
         [MustUseReturnValue]
         [CanBeNull]
+        public static IntegerLiteralToken ExpectIntegerLiteral([NotNull] this ITokenStream tokens)
+        {
+            if (tokens.Current is IntegerLiteralToken token)
+            {
+                tokens.MoveNext();
+                return token;
+            }
+
+            return null;
+        }
+
+        [MustUseReturnValue]
+        [CanBeNull]
         public static IdentifierToken ExpectIdentifier([NotNull] this ITokenStream tokens)
         {
             if (tokens.Current is IdentifierToken token)
