@@ -1,4 +1,10 @@
+using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
@@ -12,9 +18,69 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             this.nameBinder = nameBinder;
         }
 
-        public void CheckTypes([NotNull] Package package)
+        public void CheckTypes([NotNull] IList<DeclarationAnalysis> analyses)
         {
+            foreach (var analysis in analyses)
+            {
+                switch (analysis)
+                {
+                    case FunctionAnalysis f:
+                        CheckTypes(f);
+                        break;
+                    case TypeAnalysis t:
+                        CheckTypes(t);
+                        break;
+                    default:
+                        throw NonExhaustiveMatchException.For(analysis);
+                }
+            }
+        }
 
+        private void CheckTypes([NotNull] FunctionAnalysis function)
+        {
+            //foreach (var parameter in function.Parameters)
+            //{
+            //    throw new NotImplementedException();
+            //}
+
+            function.Semantics.ReturnType = ResolveType(function.Syntax.ReturnTypeExpression);
+        }
+
+        private static void CheckTypes(TypeAnalysis type)
+        {
+            // TODO
+        }
+
+        [NotNull]
+        private static DataType ResolveType([NotNull] ExpressionSyntax typeExpression)
+        {
+            switch (typeExpression)
+            {
+                case PrimitiveTypeSyntax primitive:
+                    switch (primitive.Keyword)
+                    {
+                        case IntKeywordToken _:
+                            return ObjectType.Int;
+                        case UIntKeywordToken _:
+                            return ObjectType.UInt;
+                        case ByteKeywordToken _:
+                            return ObjectType.Byte;
+                        case SizeKeywordToken _:
+                            return ObjectType.Size;
+                        case VoidKeywordToken _:
+                            return ObjectType.Void;
+                        case BoolKeywordToken _:
+                            return ObjectType.Bool;
+                        case StringKeywordToken _:
+                            return ObjectType.String;
+                        case NeverKeywordToken _:
+                            return ObjectType.Never;
+                        default:
+                            throw NonExhaustiveMatchException.For(primitive.Keyword);
+                    }
+                default:
+                    throw NonExhaustiveMatchException.For(typeExpression);
+            }
         }
     }
 }

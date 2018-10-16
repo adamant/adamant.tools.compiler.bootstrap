@@ -1,5 +1,5 @@
 using System;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C.Fakes
 {

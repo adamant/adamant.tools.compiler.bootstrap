@@ -1,9 +1,9 @@
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             new NamespaceBuilder(nameBuilder).GatherNamespaces(package, packageSyntax);
 
             // Gather all the declarations and simultaneously build up trees of lexical scopes
-            var scopes = new DeclarationBuilder(nameBuilder).GatherDeclarations(package, packageSyntax);
+            var (scopes, analyses) = new AnalysisBuilder(nameBuilder).PrepareForAnalysis(packageSyntax);
 
             // Check lexical namespaces and attach to entities etc.
             var scopeBinder = new ScopeBinder();
@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // They are all interdependent to some degree
             var nameBinder = new NameBinder();
             var typeChecker = new TypeChecker(nameBinder);
-            typeChecker.CheckTypes(package);
+            typeChecker.CheckTypes(analyses);
 
             // At this point, some but not all of the functions will have IL statements generated
             var statementBuilder = new StatementBuilder();
@@ -46,9 +46,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             var borrowChecker = new BorrowChecker();
             borrowChecker.Check(package);
 
-            // Hack for now
-            foreach (var function in package.Declarations.OfType<FunctionDeclaration>())
-                function.ReturnType = ObjectType.Void;
+            foreach (var declaration in analyses.Select(a => a.Semantics))
+                package.Add(declaration);
 
             DetermineEntryPoint(package, diagnostics);
             package.Diagnostics = diagnostics.Build();

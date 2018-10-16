@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using JetBrains.Annotations;
 
@@ -24,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             this.typeConverter = typeConverter;
         }
 
-        public void Emit([NotNull] Declaration declaration, [NotNull]  Code code)
+        public void Emit([NotNull] Declaration declaration, [NotNull] Code code)
         {
             switch (declaration)
             {

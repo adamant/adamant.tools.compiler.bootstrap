@@ -1,5 +1,5 @@
 using System;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C

@@ -1,7 +1,8 @@
+using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes;
 using JetBrains.Annotations;
@@ -12,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics
 {
     [UnitTest]
     [Category("Analyze")]
-    public class DeclarationBuilderSpec
+    public class AnalysisBuilderSpec
     {
         [Fact]
         public void Ignores_incomplete_declarations()
@@ -22,9 +23,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics
             var packageSyntax = FakeSyntax.Package(compilationUnitSyntax);
             var package = new Package("Test");
 
-            GatherDeclarations(package, packageSyntax);
+            var (scopes, analyses) = PrepareForAnalysis(packageSyntax);
 
-            Assert.Empty(package.Declarations);
+            Assert.Empty(analyses);
         }
 
         [Fact]
@@ -33,14 +34,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics
             var functionDeclaration = FakeSyntax.FunctionDeclaration("function_name");
             var compilationUnitSyntax = FakeSyntax.CompilationUnit(functionDeclaration);
             var packageSyntax = FakeSyntax.Package(compilationUnitSyntax);
-            var package = new Package("Test");
 
-            GatherDeclarations(package, packageSyntax);
+            var (scopes, analyses) = PrepareForAnalysis(packageSyntax);
 
-            Assert.Collection(package.Declarations, d =>
+            Assert.Collection(analyses, a =>
             {
-                var f = Assert.IsType<FunctionDeclaration>(d);
-                Assert.Equal("function_name", f.QualifiedName.ToString());
+                var f = Assert.IsType<FunctionAnalysis>(a);
+                Assert.Equal("function_name", f.Semantics.QualifiedName.ToString());
             });
         }
 
@@ -51,14 +51,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics
             var @namespace = FakeSyntax.Name("myNamespace.name");
             var compilationUnitSyntax = FakeSyntax.CompilationUnit(@namespace, functionDeclaration);
             var packageSyntax = FakeSyntax.Package(compilationUnitSyntax);
-            var package = new Package("Test");
 
-            GatherDeclarations(package, packageSyntax);
+            var (scopes, analyses) = PrepareForAnalysis(packageSyntax);
 
-            Assert.Collection(package.Declarations, d =>
+            Assert.Collection(analyses, a =>
             {
-                var f = Assert.IsType<FunctionDeclaration>(d);
-                Assert.Equal("myNamespace.name.function_name", f.QualifiedName.ToString());
+                var f = Assert.IsType<FunctionAnalysis>(a);
+                Assert.Equal("myNamespace.name.function_name", f.Semantics.QualifiedName.ToString());
             });
         }
 
@@ -68,22 +67,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics
             var functionDeclaration = FakeSyntax.EnumStructDeclaration("My_Struct");
             var compilationUnitSyntax = FakeSyntax.CompilationUnit(functionDeclaration);
             var packageSyntax = FakeSyntax.Package(compilationUnitSyntax);
-            var package = new Package("Test");
 
-            GatherDeclarations(package, packageSyntax);
+            var (scopes, analyses) = PrepareForAnalysis(packageSyntax);
 
-            Assert.Collection(package.Declarations, d =>
+            Assert.Collection(analyses, a =>
             {
-                var f = Assert.IsType<TypeDeclaration>(d);
-                Assert.Equal("My_Struct", f.QualifiedName.ToString());
+                var t = Assert.IsType<TypeAnalysis>(a);
+                Assert.Equal("My_Struct", t.Semantics.QualifiedName.ToString());
             });
         }
 
-        private static void GatherDeclarations(
-            [NotNull] Package package,
+        private static (IList<CompilationUnitScope>, IList<DeclarationAnalysis>) PrepareForAnalysis(
             [NotNull] PackageSyntax packageSyntax)
         {
-            new DeclarationBuilder(new NameBuilder()).GatherDeclarations(package, packageSyntax);
+            return new AnalysisBuilder(new NameBuilder()).PrepareForAnalysis(packageSyntax);
         }
     }
 }

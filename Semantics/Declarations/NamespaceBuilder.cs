@@ -7,7 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Nodes
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations
 {
     public class NamespaceBuilder
     {
