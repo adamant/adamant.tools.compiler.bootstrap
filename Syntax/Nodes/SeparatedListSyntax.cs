@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
 
         public SeparatedListSyntax([NotNull][ItemNotNull] IEnumerable<ISyntaxNodeOrToken> children)
         {
-            this.children = children.ToList().AsReadOnly().AssertNotNull();
+            this.children = children.ToReadOnlyList();
             Validate();
         }
 

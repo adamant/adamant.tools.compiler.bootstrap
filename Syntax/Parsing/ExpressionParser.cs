@@ -193,7 +193,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 case AtSignToken _:
                 case CaretToken _:
                 case NotKeywordToken _:
-                    var @operator = tokens.TakeOperator().AssertNotNull();
+                    var @operator = tokens.TakeOperator();
                     var operand = ParseExpression(tokens, diagnostics, OperatorPrecedence.Unary);
                     return new UnaryOperatorExpressionSyntax(@operator, operand);
                 case IntegerLiteralToken literal:

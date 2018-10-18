@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes.Expressions
             Requires.NotNull(nameof(syntax), syntax);
             Requires.NotNull(nameof(arguments), arguments);
             Syntax = syntax;
-            Arguments = arguments.ToList().AsReadOnly().AssertNotNull();
+            Arguments = arguments.ToReadOnlyList();
         }
 
         [NotNull]

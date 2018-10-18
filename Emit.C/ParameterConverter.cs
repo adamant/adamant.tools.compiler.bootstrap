@@ -1,4 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using JetBrains.Annotations;
@@ -20,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
         public string Convert([NotNull] Parameter parameter)
         {
-            var type = typeConverter.Convert(parameter.Type.AssertNotNull());
+            var type = typeConverter.Convert(parameter.Type);
             var name = nameMangler.Mangle(parameter.Name);
             return parameter.MutableBinding ? $"{type} ᵢ{name}" : $"const {type} ᵢ{name}";
         }

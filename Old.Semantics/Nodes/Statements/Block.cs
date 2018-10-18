@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes.Statements
             Requires.NotNull(nameof(syntax), syntax);
             Requires.NotNull(nameof(statements), statements);
             Syntax = syntax;
-            Statements = statements.ToList().AsReadOnly().AssertNotNull();
+            Statements = statements.ToReadOnlyList();
         }
 
         [NotNull]

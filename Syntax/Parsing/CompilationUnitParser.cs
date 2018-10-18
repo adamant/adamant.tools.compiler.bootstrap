@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
@@ -39,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             var @namespace = ParseCompilationUnitNamespace(tokens, diagnosticsBuilder);
             var usingDirectives = ParseUsingDirectives(tokens, diagnosticsBuilder).ToSyntaxList();
             var declarations = ParseDeclarations(tokens, diagnosticsBuilder).ToSyntaxList();
-            var endOfFile = tokens.TakeEndOfFile().AssertNotNull();
+            var endOfFile = tokens.TakeEndOfFile();
 
             diagnosticsBuilder.Publish(endOfFile.Diagnostics);
 

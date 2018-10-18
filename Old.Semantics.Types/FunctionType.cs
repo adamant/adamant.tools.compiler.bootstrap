@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Types
         {
             Requires.NotNull(nameof(parameterTypes), parameterTypes);
             Requires.NotNull(nameof(returnType), returnType);
-            ParameterTypes = parameterTypes.ToList().AsReadOnly().AssertNotNull();
+            ParameterTypes = parameterTypes.ToReadOnlyList();
             ReturnType = returnType;
         }
 

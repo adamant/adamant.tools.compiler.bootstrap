@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
 
         public IncompleteDeclarationSyntax([NotNull][ItemNotNull] IEnumerable<IToken> tokens)
         {
-            Tokens = tokens.ToList().AsReadOnly().AssertNotNull();
+            Tokens = tokens.ToReadOnlyList();
         }
     }
 }

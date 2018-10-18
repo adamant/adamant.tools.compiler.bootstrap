@@ -38,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Nodes.Declarations
             Syntax = syntax;
             Access = access;
             Name = name;
-            Parameters = parameters.ToList().AsReadOnly().AssertNotNull();
+            Parameters = parameters.ToReadOnlyList();
             ReturnType = returnType;
             Body = body;
         }

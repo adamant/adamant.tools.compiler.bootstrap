@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C.Fakes
         private readonly Guid instance = Guid.NewGuid();
 
         public FakeParameter()
-            : base(false, "fake")
+            : base(false, "fake", new FakeDataType())
         {
         }
 

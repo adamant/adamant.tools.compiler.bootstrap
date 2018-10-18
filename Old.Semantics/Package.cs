@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics
             [CanBeNull] FunctionDeclaration entryPoint)
             : base(diagnostics)
         {
-            CompilationUnits = compilationUnits.ToList().AsReadOnly().AssertNotNull();
+            CompilationUnits = compilationUnits.ToReadOnlyList();
             Syntax = syntax;
             EntryPoint = entryPoint;
         }

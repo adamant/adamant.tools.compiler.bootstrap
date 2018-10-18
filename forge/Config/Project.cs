@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
@@ -17,9 +16,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Config
         public Project([NotNull] ProjectFile file)
         {
             Requires.NotNull(nameof(file), file);
-            Path = System.IO.Path.GetDirectoryName(file.FullPath);
+            Path = System.IO.Path.GetDirectoryName(file.FullPath).AssertNotNull();
             Name = file.Name ?? throw new InvalidOperationException();
-            Authors = (file.Authors ?? throw new InvalidOperationException()).ToList().AsReadOnly().AssertNotNull();
+            Authors = (file.Authors ?? throw new InvalidOperationException()).ToReadOnlyList();
             Template = file.Template;
             ReferencedProjects = new List<Project>().AsReadOnly().AssertNotNull();
         }

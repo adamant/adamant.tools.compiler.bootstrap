@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
         public FakeTokenStream([NotNull] CodeFile file, [NotNull][ItemNotNull] IEnumerable<Token> tokens)
         {
             File = file;
-            Tokens = tokens.ToList().AsReadOnly().AssertNotNull();
+            Tokens = tokens.ToReadOnlyList();
             stream = new TokenStream(file, Tokens);
         }
 

@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
             Requires.NotNull(nameof(qualifiers), qualifiers);
             Requires.NotNull(nameof(name), name);
             Name = name;
-            Qualifier = qualifiers.ToList().AsReadOnly().AssertNotNull();
+            Qualifier = qualifiers.ToReadOnlyList();
         }
 
         public QualifiedName(
