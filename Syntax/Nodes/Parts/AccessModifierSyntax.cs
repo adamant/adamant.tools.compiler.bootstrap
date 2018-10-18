@@ -6,17 +6,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts
 {
     public class AccessModifierSyntax : SyntaxNode
     {
-        [CanBeNull]
-        public KeywordToken Keyword { get; }
-
+        [NotNull] public IAccessModifierToken Token { get; }
         public AccessModifier Modifier { get; }
 
-        public AccessModifierSyntax([CanBeNull] KeywordToken keyword)
+        public AccessModifierSyntax([NotNull] IAccessModifierToken token)
         {
-            Keyword = keyword;
-            switch (Keyword)
+            Requires.NotNull(nameof(token), token);
+            Token = token;
+            switch (Token)
             {
-                case null: // To avoid later errors, if the modifer is missing, we treat it as public
+                case MissingToken _: // To avoid later errors, if the modifer is missing, we treat it as public
                 case PublicKeywordToken _:
                     Modifier = AccessModifier.Public;
                     break;
@@ -28,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts
                     break;
                 default:
                     // must be of those type
-                    Requires.That(nameof(keyword), false);
+                    Requires.That(nameof(token), false);
                     break;
             }
         }

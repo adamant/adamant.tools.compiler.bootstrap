@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
@@ -6,37 +7,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements
 {
     public class VariableDeclarationStatementSyntax : StatementSyntax
     {
-        [CanBeNull]
-        public KeywordToken Binding { get; }
-
-        [CanBeNull]
-        public IdentifierToken Name { get; }
-
-        [CanBeNull]
-        public ColonToken Colon { get; }
-
-        public ExpressionSyntax TypeExpression { get; }
-
+        [NotNull] public IBindingKeywordToken Binding { get; }
+        [NotNull] public IIdentifierToken Name { get; }
+        [CanBeNull] public IColonToken Colon { get; }
+        [CanBeNull] public ExpressionSyntax TypeExpression { get; }
         public bool HasInitializer => Initializer != null;
-
-        [CanBeNull]
-        public new EqualsToken Equals { get; }
-
-        [CanBeNull]
-        public ExpressionSyntax Initializer { get; }
-
-        [CanBeNull]
-        public SemicolonToken Semicolon { get; }
+        [CanBeNull] public new EqualsToken Equals { get; }
+        [CanBeNull] public ExpressionSyntax Initializer { get; }
+        [NotNull] public ISemicolonToken Semicolon { get; }
 
         public VariableDeclarationStatementSyntax(
-            [CanBeNull] KeywordToken binding,
-            [CanBeNull] IdentifierToken name,
-            [CanBeNull] ColonToken colon,
-            ExpressionSyntax typeExpression,
+            [NotNull] IBindingKeywordToken binding,
+            [NotNull] IIdentifierToken name,
+            [CanBeNull] IColonToken colon,
+            [CanBeNull] ExpressionSyntax typeExpression,
             [CanBeNull] EqualsToken equals,
             [CanBeNull] ExpressionSyntax initializer,
-            [CanBeNull] SemicolonToken semicolon)
+            [NotNull] ISemicolonToken semicolon)
         {
+            Requires.NotNull(nameof(binding), binding);
             Binding = binding;
             Name = name;
             Colon = colon;

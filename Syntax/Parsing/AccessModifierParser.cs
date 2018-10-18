@@ -9,17 +9,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
     public class AccessModifierParser : IParser<AccessModifierSyntax>
     {
         [NotNull]
-        public AccessModifierSyntax Parse([NotNull] ITokenStream tokens, IDiagnosticsCollector diagnostics)
+        public AccessModifierSyntax Parse([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
         {
-            switch (tokens.Current)
-            {
-                case PublicKeywordToken _:
-                case ProtectedKeywordToken _:
-                case PrivateKeywordToken _:
-                    return new AccessModifierSyntax(tokens.ExpectKeyword());
-                default:
-                    return new AccessModifierSyntax(tokens.MissingToken<KeywordToken>());
-            }
+            return new AccessModifierSyntax(tokens.Expect<IAccessModifierToken>());
         }
     }
 }

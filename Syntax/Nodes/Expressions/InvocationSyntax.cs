@@ -1,4 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
@@ -7,19 +6,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
 {
     public class InvocationSyntax : ExpressionSyntax
     {
-        public ExpressionSyntax Callee { get; set; }
-        [CanBeNull]
-        public OpenParenToken OpenParen { get; }
-        [NotNull]
-        public SeparatedListSyntax<ExpressionSyntax> Arguments { get; }
-        [CanBeNull]
-        public CloseParenToken CloseParen { get; }
+        [NotNull] public ExpressionSyntax Callee { get; set; }
+        [NotNull] public IOpenParenToken OpenParen { get; }
+        [NotNull] public SeparatedListSyntax<ExpressionSyntax> Arguments { get; }
+        [NotNull] public ICloseParenToken CloseParen { get; }
 
         public InvocationSyntax(
-            ExpressionSyntax callee,
-            [CanBeNull] OpenParenToken openParen,
+            [NotNull] ExpressionSyntax callee,
+            [NotNull] IOpenParenToken openParen,
             [NotNull] SeparatedListSyntax<ExpressionSyntax> arguments,
-            [CanBeNull]CloseParenToken closeParen)
+            [NotNull] ICloseParenToken closeParen)
         {
             Requires.NotNull(nameof(arguments), arguments);
             Callee = callee;

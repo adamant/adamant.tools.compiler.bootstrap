@@ -1,4 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
@@ -8,17 +7,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives
 {
     public class CompilationUnitNamespaceSyntax : SyntaxNode
     {
-        [CanBeNull]
-        public NamespaceKeywordToken NamespaceKeyword { get; }
-        [NotNull]
-        public NameSyntax Name { get; }
-        [CanBeNull]
-        public SemicolonToken Semicolon { get; }
+        [NotNull] public INamespaceKeywordToken NamespaceKeyword { get; }
+        [NotNull] public NameSyntax Name { get; }
+        [NotNull] public ISemicolonToken Semicolon { get; }
 
         public CompilationUnitNamespaceSyntax(
-            [CanBeNull] NamespaceKeywordToken namespaceKeyword,
+            [NotNull] INamespaceKeywordToken namespaceKeyword,
             [NotNull] NameSyntax name,
-            [CanBeNull] SemicolonToken semicolon)
+            [NotNull] ISemicolonToken semicolon)
         {
             Requires.NotNull(nameof(name), name);
             NamespaceKeyword = namespaceKeyword;

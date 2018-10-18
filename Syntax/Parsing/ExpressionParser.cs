@@ -59,7 +59,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         {
                             precedence = OperatorPrecedence.Assignment;
                             leftAssociative = false;
-                            @operator = tokens.ExpectOperator();
+                            @operator = tokens.TakeOperator();
                         }
                         break;
                     case OrKeywordToken _:
@@ -67,14 +67,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         if (minPrecedence <= OperatorPrecedence.LogicalOr)
                         {
                             precedence = OperatorPrecedence.LogicalOr;
-                            @operator = tokens.ExpectOperator();
+                            @operator = tokens.TakeOperator();
                         }
                         break;
                     case AndKeywordToken _:
                         if (minPrecedence <= OperatorPrecedence.LogicalAnd)
                         {
                             precedence = OperatorPrecedence.LogicalAnd;
-                            @operator = tokens.ExpectOperator();
+                            @operator = tokens.TakeOperator();
                         }
                         break;
                     case EqualsEqualsToken _:
@@ -82,7 +82,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         if (minPrecedence <= OperatorPrecedence.Equality)
                         {
                             precedence = OperatorPrecedence.Equality;
-                            @operator = tokens.ExpectOperator();
+                            @operator = tokens.TakeOperator();
                         }
                         break;
                     case LessThanToken _:
@@ -92,14 +92,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         if (minPrecedence <= OperatorPrecedence.Relational)
                         {
                             precedence = OperatorPrecedence.Relational;
-                            @operator = tokens.ExpectOperator();
+                            @operator = tokens.TakeOperator();
                         }
                         break;
                     case DotDotToken _:
                         if (minPrecedence <= OperatorPrecedence.Range)
                         {
                             precedence = OperatorPrecedence.Range;
-                            @operator = tokens.ExpectOperator();
+                            @operator = tokens.TakeOperator();
                         }
                         break;
                     case PlusToken _:
@@ -107,7 +107,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         if (minPrecedence <= OperatorPrecedence.Additive)
                         {
                             precedence = OperatorPrecedence.Additive;
-                            @operator = tokens.ExpectOperator();
+                            @operator = tokens.TakeOperator();
                         }
                         break;
                     case AsteriskToken _:
@@ -115,16 +115,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         if (minPrecedence <= OperatorPrecedence.Multiplicative)
                         {
                             precedence = OperatorPrecedence.Multiplicative;
-                            @operator = tokens.ExpectOperator();
+                            @operator = tokens.TakeOperator();
                         }
                         break;
                     case OpenParenToken _:
                         if (minPrecedence <= OperatorPrecedence.Primary)
                         {
                             var callee = expression;
-                            var openParen = tokens.Expect<OpenParenToken>();
+                            var openParen = tokens.Expect<IOpenParenToken>();
                             var arguments = ParseArguments(tokens, diagnostics);
-                            var closeParen = tokens.Expect<CloseParenToken>();
+                            var closeParen = tokens.Expect<ICloseParenToken>();
                             expression = new InvocationSyntax(callee, openParen, arguments, closeParen);
                             continue;
                         }
@@ -134,7 +134,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         {
                             // Member Access
                             precedence = OperatorPrecedence.Primary;
-                            @operator = tokens.ExpectOperator();
+                            @operator = tokens.TakeOperator();
                         }
                         break;
                     default:
@@ -167,25 +167,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             {
                 case NewKeywordToken _:
                     {
-                        var newKeyword = tokens.Expect<NewKeywordToken>();
+                        var newKeyword = tokens.Expect<INewKeywordToken>();
                         var type = qualifiedNameParser.Parse(tokens, diagnostics);
-                        var openParen = tokens.Expect<OpenParenToken>();
+                        var openParen = tokens.Expect<IOpenParenToken>();
                         var arguments = ParseArguments(tokens, diagnostics);
-                        var closeParen = tokens.Expect<CloseParenToken>();
+                        var closeParen = tokens.Expect<ICloseParenToken>();
                         return new NewObjectExpressionSyntax(newKeyword, type, openParen, arguments,
                             closeParen);
                     }
                 case ReturnKeywordToken _:
                     {
-                        var returnKeyword = tokens.Expect<ReturnKeywordToken>();
+                        var returnKeyword = tokens.Expect<IReturnKeywordToken>();
                         var expression = tokens.AtTerminator<SemicolonToken>() ? null : ParseExpression(tokens, diagnostics);
                         return new ReturnExpressionSyntax(returnKeyword, expression);
                     }
                 case OpenParenToken _:
                     {
-                        var openParen = tokens.Expect<OpenParenToken>();
+                        var openParen = tokens.Expect<IOpenParenToken>();
                         var expression = ParseExpression(tokens, diagnostics);
-                        var closeParen = tokens.Expect<CloseParenToken>();
+                        var closeParen = tokens.Expect<ICloseParenToken>();
                         return new ParenthesizedExpressionSyntax(openParen, expression, closeParen);
                     }
                 case MinusToken _:
@@ -193,7 +193,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 case AtSignToken _:
                 case CaretToken _:
                 case NotKeywordToken _:
-                    var @operator = tokens.ExpectOperator().AssertNotNull();
+                    var @operator = tokens.TakeOperator().AssertNotNull();
                     var operand = ParseExpression(tokens, diagnostics, OperatorPrecedence.Unary);
                     return new UnaryOperatorExpressionSyntax(@operator, operand);
                 case IntegerLiteralToken literal:
@@ -216,7 +216,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 case SizeKeywordToken _:
                 case TypeKeywordToken _:
                     {
-                        var keyword = tokens.ExpectKeyword().AssertNotNull();
+                        var keyword = tokens.Take<IPrimitiveTypeToken>();
                         return new PrimitiveTypeSyntax(keyword);
                     }
                 case IdentifierToken _:
@@ -225,10 +225,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         var name = new IdentifierNameSyntax(identifier);
                         if (tokens.Current is DollarToken)
                         {
-                            var dollar = tokens.Expect<DollarToken>();
+                            var dollar = tokens.Take<DollarToken>();
                             var lifetime = tokens.Current is IdentifierToken
-                                ? (Token)tokens.ExpectIdentifier()
-                                : tokens.Expect<OwnedKeywordToken>();
+                                ? (IToken)tokens.ExpectIdentifier()
+                                : tokens.Expect<IOwnedKeywordToken>();
                             return new LifetimeTypeSyntax(name, dollar, lifetime);
                         }
 

@@ -4,6 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
+using VarKeywordToken = Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens.VarKeywordToken;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 {
@@ -32,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 default:
                     var varKeyword = tokens.Accept<VarKeywordToken>();
                     var name = tokens.ExpectIdentifier();
-                    var colon = tokens.Expect<ColonToken>();
+                    var colon = tokens.Expect<IColonToken>();
                     var typeExpression = expressionParser.Parse(tokens, diagnostics);
                     return new ParameterSyntax(varKeyword, name, colon, typeExpression);
             }

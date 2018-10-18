@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
             var e = ParseWithoutError(tokens);
 
             var p = Assert.IsType<AccessModifierSyntax>(e);
-            Assert.Equal(tokens[0], p.Keyword);
+            Assert.Equal(tokens[0], p.Token);
         }
 
         [NotNull]

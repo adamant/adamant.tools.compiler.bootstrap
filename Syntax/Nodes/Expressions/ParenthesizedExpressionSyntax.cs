@@ -1,4 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
@@ -7,19 +6,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
 {
     public class ParenthesizedExpressionSyntax : ExpressionSyntax
     {
-        [CanBeNull]
-        public OpenParenToken OpenParen { get; }
-
-        [NotNull]
-        public ExpressionSyntax Expression { get; }
-
-        [CanBeNull]
-        public CloseParenToken CloseParen { get; }
+        [NotNull] public IOpenParenToken OpenParen { get; }
+        [NotNull] public ExpressionSyntax Expression { get; }
+        [NotNull] public ICloseParenToken CloseParen { get; }
 
         public ParenthesizedExpressionSyntax(
-            [CanBeNull] OpenParenToken openParen,
+            [NotNull] IOpenParenToken openParen,
             [NotNull] ExpressionSyntax expression,
-            [CanBeNull] CloseParenToken closeParen)
+            [NotNull] ICloseParenToken closeParen)
         {
             Requires.NotNull(nameof(expression), expression);
             OpenParen = openParen;

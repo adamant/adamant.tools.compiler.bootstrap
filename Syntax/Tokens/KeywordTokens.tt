@@ -47,6 +47,7 @@
 using System;
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
@@ -59,11 +60,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 <# foreach(var keyword in keywords) {#>
             typeof(<#=keyword#>KeywordToken),
 <#}#>
-        }.AsReadOnly();
+        }.AsReadOnly().AssertNotNull();
     }
 <# foreach(var keyword in keywords) {#>
 
-    public class <#=keyword#>KeywordToken : KeywordToken
+    public partial interface I<#=keyword#>KeywordToken : IKeywordToken { }
+    public class <#=keyword#>KeywordToken : KeywordToken, I<#=keyword#>KeywordToken
     {
         public <#=keyword#>KeywordToken(TextSpan span)
             : base(span)
@@ -71,4 +73,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 <#}#>
+    public partial class MissingToken :
+<# foreach(var keyword in keywords) {#>
+        I<#=keyword#>KeywordToken,
+<#}#>
+        IKeywordToken // Implied, but saves issues with commas
+    { }
 }

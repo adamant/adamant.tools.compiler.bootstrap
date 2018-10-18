@@ -14,12 +14,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
                 case QualifiedNameSyntax qualifiedNameSyntax:
                     {
                         var qualifier = BuildName(qualifiedNameSyntax.Qualifier);
-                        var name = qualifiedNameSyntax.Name.Name?.Value;
+                        var name = qualifiedNameSyntax.Name.Name.Value;
                         return name != null ? qualifier?.Qualify(name) ?? (Name)new SimpleName(name) : null;
                     }
                 case IdentifierNameSyntax identifierNameSyntax:
                     {
-                        var name = identifierNameSyntax.Name?.Value;
+                        var name = identifierNameSyntax.Name.Value;
                         return name != null ? new SimpleName(name) : null;
                     }
                 default:

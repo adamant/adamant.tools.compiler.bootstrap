@@ -18,15 +18,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
     public static class FakeSyntax
     {
         [NotNull]
+        private static T Missing<T>()
+            where T : IToken
+        {
+            return (T)(object)new MissingToken(new TextSpan(0, 0));
+        }
+
+        [NotNull]
         public static AccessModifierSyntax AccessModifier()
         {
-            return new AccessModifierSyntax(null);
+            return new AccessModifierSyntax(Missing<IAccessModifierToken>());
         }
 
         [NotNull]
         public static BlockExpressionSyntax Block()
         {
-            return new BlockExpressionSyntax(null, List<StatementSyntax>(), null);
+            return new BlockExpressionSyntax(Missing<IOpenBraceToken>(), List<StatementSyntax>(), Missing<ICloseBraceToken>());
         }
 
         [NotNull]
@@ -76,12 +83,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         [NotNull]
         public static UsingDirectiveSyntax UsingDirective()
         {
-            return new UsingDirectiveSyntax(null, Name(), null);
+            return new UsingDirectiveSyntax(Missing<IUsingKeywordToken>(), Name(), Missing<ISemicolonToken>());
         }
 
         public static ParameterSyntax Parameter()
         {
-            return new ParameterSyntax(null, null, null, FakeSyntax.Expression());
+            return new ParameterSyntax(null, Missing<IIdentifierToken>(), Missing<IColonToken>(), Expression());
         }
 
         private class FakeExpressionSyntax : ExpressionSyntax
@@ -153,12 +160,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         {
             return new EnumStructDeclarationSyntax(
                 AccessModifier(),
-                null,
-                null,
+                Missing<IEnumKeywordToken>(),
+                Missing<IStructKeywordToken>(),
                 Identifier(name),
-                null,
+                Missing<IOpenBraceToken>(),
                 SyntaxList<MemberDeclarationSyntax>.Empty,
-                null);
+                Missing<ICloseBraceToken>());
         }
     }
 }

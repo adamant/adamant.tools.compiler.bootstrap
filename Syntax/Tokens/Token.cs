@@ -32,16 +32,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
     /// it doesn't really make sense to me to use them.  I'm going to name
     /// things after their single character version, but not follow Unicode
     /// naming when it doesn't make sense
-    public abstract class Token : ISyntaxNodeOrToken
+    public abstract partial class Token : ISyntaxNodeOrToken, IToken
     {
-        public readonly TextSpan Span;
+        public TextSpan Span { get; }
 
         protected Token(TextSpan span)
         {
             Span = span;
         }
 
-        [System.Diagnostics.Contracts.Pure]
+        [Pure]
         [NotNull]
         public string Text([NotNull] CodeText code)
         {

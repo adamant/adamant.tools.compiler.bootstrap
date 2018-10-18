@@ -29,29 +29,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             switch (tokens.Current)
             {
                 case OpenBraceToken _:
-                    // To simplfy things later, we wrap blocks in an expression statement syntax w/o a semicolon
+                    // To simplify things later, we wrap blocks in an expression statement syntax w/o a semicolon
                     return new ExpressionStatementSyntax(ParseBlock(tokens, diagnostics), null);
                 case LetKeywordToken _:
                 case VarKeywordToken _:
                     {
-                        var binding = tokens.ExpectKeyword();
+                        var binding = tokens.Take<IBindingKeywordToken>();
                         var name = tokens.ExpectIdentifier();
-                        var colon = tokens.Expect<ColonToken>();
+                        var colon = tokens.Expect<IColonToken>();
                         var typeExpression = expressionParser.Parse(tokens, diagnostics);
                         EqualsToken equals = null;
                         ExpressionSyntax initializer = null;
                         if (tokens.Current is EqualsToken)
                         {
-                            equals = tokens.Expect<EqualsToken>();
+                            equals = tokens.Take<EqualsToken>();
                             initializer = expressionParser.Parse(tokens, diagnostics);
                         }
-                        var semicolon = tokens.Expect<SemicolonToken>();
+                        var semicolon = tokens.Expect<ISemicolonToken>();
                         return new VariableDeclarationStatementSyntax(binding, name, colon, typeExpression, equals, initializer, semicolon);
                     }
                 default:
                     {
                         var expression = expressionParser.Parse(tokens, diagnostics);
-                        var semicolon = tokens.Expect<SemicolonToken>();
+                        var semicolon = tokens.Expect<ISemicolonToken>();
                         return new ExpressionStatementSyntax(expression, semicolon);
                     }
             }
@@ -69,9 +69,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         [NotNull]
         public BlockExpressionSyntax ParseBlock([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var openBrace = tokens.Expect<OpenBraceToken>();
+            var openBrace = tokens.Expect<IOpenBraceToken>();
             var statements = listParser.ParseList(tokens, t => Parse(t, diagnostics), TypeOf<CloseBraceToken>(), diagnostics);
-            var closeBrace = tokens.Expect<CloseBraceToken>();
+            var closeBrace = tokens.Expect<ICloseBraceToken>();
             return new BlockExpressionSyntax(openBrace, statements, closeBrace);
         }
     }

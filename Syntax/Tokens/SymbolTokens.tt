@@ -27,7 +27,8 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 {
 <# foreach(var @operator in operators) {#>
-    public class <#=@operator#>Token : SymbolToken
+    public interface I<#=@operator#>Token : ISymbolToken { }
+    public class <#=@operator#>Token : SymbolToken, I<#=@operator#>Token
     {
         public <#=@operator#>Token(TextSpan span)
             : base(span)
@@ -36,4 +37,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
     }
 
 <#}#>
+    public partial class MissingToken :
+<# foreach(var @operator in operators) {#>
+        I<#=@operator#>Token,
+<#}#>
+        ISymbolToken // Implied, but saves issues with commas
+    { }
 }

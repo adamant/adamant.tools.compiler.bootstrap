@@ -9,23 +9,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
     public class FunctionDeclarationSyntax : MemberDeclarationSyntax
     {
         [NotNull] public AccessModifierSyntax AccessModifier { get; }
-        [CanBeNull] public FunctionKeywordToken FunctionKeyword { get; }
-        [CanBeNull] public override IdentifierToken Name { get; }
-        [CanBeNull] public OpenParenToken OpenParen { get; }
+        [NotNull] public IFunctionKeywordToken FunctionKeyword { get; }
+        [NotNull] public override IIdentifierToken Name { get; }
+        [NotNull] public IOpenParenToken OpenParen { get; }
         [NotNull] public SeparatedListSyntax<ParameterSyntax> Parameters { get; }
-        [CanBeNull] public CloseParenToken CloseParen { get; }
-        [CanBeNull] public RightArrowToken Arrow { get; }
+        [NotNull] public ICloseParenToken CloseParen { get; }
+        [NotNull] public IRightArrowToken Arrow { get; }
         [NotNull] public ExpressionSyntax ReturnTypeExpression { get; }
         [NotNull] public BlockExpressionSyntax Body { get; }
 
         public FunctionDeclarationSyntax(
             [NotNull] AccessModifierSyntax accessModifier,
-            [CanBeNull] FunctionKeywordToken functionKeyword,
-            [CanBeNull] IdentifierToken name,
-            [CanBeNull] OpenParenToken openParen,
+            [NotNull] IFunctionKeywordToken functionKeyword,
+            [NotNull] IIdentifierToken name,
+            [NotNull] IOpenParenToken openParen,
             [NotNull] SeparatedListSyntax<ParameterSyntax> parameters,
-            [CanBeNull] CloseParenToken closeParen,
-            [CanBeNull] RightArrowToken arrow,
+            [NotNull] ICloseParenToken closeParen,
+            [NotNull] IRightArrowToken arrow,
             [NotNull] ExpressionSyntax returnTypeExpression,
             [NotNull] BlockExpressionSyntax body)
         {

@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             var @namespace = ParseCompilationUnitNamespace(tokens, diagnosticsBuilder);
             var usingDirectives = ParseUsingDirectives(tokens, diagnosticsBuilder).ToSyntaxList();
             var declarations = ParseDeclarations(tokens, diagnosticsBuilder).ToSyntaxList();
-            var endOfFile = tokens.ExpectEndOfFile().AssertNotNull();
+            var endOfFile = tokens.TakeEndOfFile().AssertNotNull();
 
             diagnosticsBuilder.Publish(endOfFile.Diagnostics);
 
@@ -52,9 +52,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         {
             if (!(tokens.Current is NamespaceKeywordToken)) return null;
 
-            var namespaceKeyword = tokens.Expect<NamespaceKeywordToken>();
+            var namespaceKeyword = tokens.Expect<INamespaceKeywordToken>();
             var name = qualifiedNameParser.Parse(tokens, diagnostics);
-            var semicolon = tokens.Expect<SemicolonToken>();
+            var semicolon = tokens.Expect<ISemicolonToken>();
             return new CompilationUnitNamespaceSyntax(namespaceKeyword, name, semicolon);
         }
 

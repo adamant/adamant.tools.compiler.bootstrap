@@ -94,7 +94,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
                 [NotNull] ITokenStream tokens,
                 IDiagnosticsCollector diagnostics)
             {
-                var _ = tokens.Expect<UsingKeywordToken>();
+                var _ = tokens.Take<UsingKeywordToken>();
 
                 var fakeToken = tokens.ExpectFake();
                 return (UsingDirectiveSyntax)fakeToken?.FakeValue ?? throw new InvalidOperationException();

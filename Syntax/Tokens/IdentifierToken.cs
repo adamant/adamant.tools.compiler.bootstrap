@@ -1,14 +1,22 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 {
-    public abstract class IdentifierToken : Token
+    public interface IIdentifierToken : IToken
     {
-        public string Value { get; }
+        [CanBeNull] string Value { get; }
+    }
 
-        protected IdentifierToken(TextSpan span, string value)
+    public abstract class IdentifierToken : Token, IIdentifierToken
+    {
+        [NotNull] public string Value { get; }
+
+        protected IdentifierToken(TextSpan span, [NotNull] string value)
             : base(span)
         {
+            Requires.NotNull(nameof(value), value);
             Value = value;
         }
     }

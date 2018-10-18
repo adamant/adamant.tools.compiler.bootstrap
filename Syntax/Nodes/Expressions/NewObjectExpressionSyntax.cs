@@ -1,4 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
@@ -8,26 +7,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
 {
     public class NewObjectExpressionSyntax : ExpressionSyntax
     {
-        [CanBeNull]
-        public NewKeywordToken NewKeyword { get; }
-
-        public TypeSyntax Type { get; }
-
-        [CanBeNull]
-        public OpenParenToken OpenParen { get; }
-
-        [NotNull]
-        public SeparatedListSyntax<ExpressionSyntax> Arguments { get; }
-
-        [CanBeNull]
-        public CloseParenToken CloseParen { get; }
+        [NotNull] public INewKeywordToken NewKeyword { get; }
+        [NotNull] public TypeSyntax Type { get; }
+        [NotNull] public IOpenParenToken OpenParen { get; }
+        [NotNull] public SeparatedListSyntax<ExpressionSyntax> Arguments { get; }
+        [NotNull] public ICloseParenToken CloseParen { get; }
 
         public NewObjectExpressionSyntax(
-            [CanBeNull] NewKeywordToken newKeyword,
-            TypeSyntax type,
-            [CanBeNull] OpenParenToken openParen,
+            [NotNull] INewKeywordToken newKeyword,
+            [NotNull] TypeSyntax type,
+            [NotNull] IOpenParenToken openParen,
             [NotNull] SeparatedListSyntax<ExpressionSyntax> arguments,
-            [CanBeNull] CloseParenToken closeParen)
+            [NotNull] ICloseParenToken closeParen)
         {
             Requires.NotNull(nameof(arguments), arguments);
             NewKeyword = newKeyword;

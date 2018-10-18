@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
@@ -26,17 +27,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
         public FakeTokenStream([NotNull] CodeFile file, [NotNull][ItemNotNull] IEnumerable<Token> tokens)
         {
             File = file;
-            Tokens = tokens.ToList().AsReadOnly();
+            Tokens = tokens.ToList().AsReadOnly().AssertNotNull();
             stream = new TokenStream(file, Tokens);
         }
 
-        public Token this[int index] => Tokens[index];
+        public IToken this[int index] => Tokens[index];
 
         [NotNull]
         public static FakeTokenStream From([NotNull] FormattableString tokenDescription)
         {
-            var file = tokenDescription.Format.ToFakeCodeFile();
-            var tokens = CreateFakeTokens(new Lexer().Lex(file), tokenDescription.GetArguments());
+            var file = tokenDescription.Format.AssertNotNull().ToFakeCodeFile();
+            var tokens = CreateFakeTokens(new Lexer().Lex(file), tokenDescription.GetArguments().AssertNotNull());
             return new FakeTokenStream(file, tokens);
         }
 
@@ -53,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
             [NotNull][ItemNotNull] IEnumerable<Token> tokens,
             [NotNull] IReadOnlyList<object> fakeTokenValues)
         {
-            using (var enumerator = tokens.GetEnumerator())
+            using (var enumerator = tokens.GetEnumerator().AssertNotNull())
                 while (enumerator.MoveNext())
                 {
                     switch (enumerator.Current)

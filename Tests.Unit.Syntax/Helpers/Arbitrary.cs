@@ -8,6 +8,8 @@ using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
 using Fare;
 using FsCheck;
 using JetBrains.Annotations;
+using LetKeywordToken = Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens.LetKeywordToken;
+using VarKeywordToken = Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens.VarKeywordToken;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
 {

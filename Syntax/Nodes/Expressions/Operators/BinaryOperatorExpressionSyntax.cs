@@ -1,4 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
@@ -7,10 +6,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators
 {
     public class BinaryOperatorExpressionSyntax : OperatorExpressionSyntax
     {
-        [NotNull]
-        public ExpressionSyntax LeftOperand { get; }
-        [NotNull]
-        public ExpressionSyntax RightOperand { get; }
+        [NotNull] public ExpressionSyntax LeftOperand { get; }
+        [NotNull] public ExpressionSyntax RightOperand { get; }
 
         public BinaryOperatorExpressionSyntax(
             [NotNull] ExpressionSyntax leftOperand,

@@ -3,20 +3,22 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 {
-    public class MissingToken
+    public partial class MissingToken : IToken, IIdentifierToken
     {
-        public readonly TextSpan Span;
+        public TextSpan Span { get; }
 
         public MissingToken(TextSpan span)
         {
             Span = span;
         }
 
-        [System.Diagnostics.Contracts.Pure]
+        [Pure]
         [NotNull]
         public string Text([NotNull] CodeText code)
         {
             return Span.GetText(code.Text);
         }
+
+        [CanBeNull] string IIdentifierToken.Value => null;
     }
 }

@@ -63,10 +63,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         [NotNull]
         private static DeclarationSyntax ParseClass([NotNull] AccessModifierSyntax accessModifier, [NotNull] ITokenStream tokens)
         {
-            var classKeyword = tokens.Expect<ClassKeywordToken>();
+            var classKeyword = tokens.Expect<IClassKeywordToken>();
             var name = tokens.ExpectIdentifier();
-            var openBrace = tokens.Expect<OpenBraceToken>();
-            var closeBrace = tokens.Expect<CloseBraceToken>();
+            var openBrace = tokens.Expect<IOpenBraceToken>();
+            var closeBrace = tokens.Expect<ICloseBraceToken>();
             return new ClassDeclarationSyntax(accessModifier, classKeyword, name, openBrace,
                 SyntaxList<MemberDeclarationSyntax>.Empty, closeBrace);
         }
@@ -75,14 +75,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         [NotNull]
         private static DeclarationSyntax ParseEnum([NotNull] AccessModifierSyntax accessModifier, [NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var enumKeyword = tokens.Expect<EnumKeywordToken>();
+            var enumKeyword = tokens.Expect<IEnumKeywordToken>();
             switch (tokens.Current)
             {
                 case StructKeywordToken _:
-                    var structKeyword = tokens.Expect<StructKeywordToken>();
+                    var structKeyword = tokens.Expect<IStructKeywordToken>();
                     var name = tokens.ExpectIdentifier();
-                    var openBrace = tokens.Expect<OpenBraceToken>();
-                    var closeBrace = tokens.Expect<CloseBraceToken>();
+                    var openBrace = tokens.Expect<IOpenBraceToken>();
+                    var closeBrace = tokens.Expect<ICloseBraceToken>();
                     return new EnumStructDeclarationSyntax(accessModifier, enumKeyword, structKeyword, name,
                         openBrace, SyntaxList<MemberDeclarationSyntax>.Empty, closeBrace);
                 case ClassKeywordToken _:
@@ -101,12 +101,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var functionKeyword = tokens.Expect<FunctionKeywordToken>();
+            var functionKeyword = tokens.Expect<IFunctionKeywordToken>();
             var name = tokens.ExpectIdentifier();
-            var openParen = tokens.Expect<OpenParenToken>();
+            var openParen = tokens.Expect<IOpenParenToken>();
             var parameters = ParseParameters(tokens, diagnostics);
-            var closeParen = tokens.Expect<CloseParenToken>();
-            var arrow = tokens.Expect<RightArrowToken>();
+            var closeParen = tokens.Expect<ICloseParenToken>();
+            var arrow = tokens.Expect<IRightArrowToken>();
             var returnTypeExpression = expressionParser.Parse(tokens, diagnostics);
             var body = blockParser.Parse(tokens, diagnostics);
             return new FunctionDeclarationSyntax(accessModifier, functionKeyword, name,
@@ -124,13 +124,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         [MustUseReturnValue]
         [NotNull]
         private static IncompleteDeclarationSyntax ParseIncompleteDeclaration(
-            [CanBeNull] AccessModifierSyntax accessModifier,
+            [NotNull] AccessModifierSyntax accessModifier,
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var skipped = new List<Token>
+            var skipped = new List<IToken>
             {
-                accessModifier?.Keyword,
+                accessModifier.Token,
                 tokens.ExpectIdentifier() // The name we are expecting
             };
 

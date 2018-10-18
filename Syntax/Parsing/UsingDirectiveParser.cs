@@ -20,9 +20,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         [NotNull]
         public UsingDirectiveSyntax Parse([NotNull] ITokenStream tokens, IDiagnosticsCollector diagnostics)
         {
-            var usingKeyword = tokens.Expect<UsingKeywordToken>();
+            var usingKeyword = tokens.Expect<IUsingKeywordToken>();
             var name = qualifiedNameParser.Parse(tokens, diagnostics);
-            var semicolon = tokens.Expect<SemicolonToken>();
+            var semicolon = tokens.Expect<ISemicolonToken>();
             return new UsingDirectiveSyntax(usingKeyword, name, semicolon);
         }
     }

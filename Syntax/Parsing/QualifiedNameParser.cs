@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             NameSyntax qualifiedName = new IdentifierNameSyntax(tokens.ExpectIdentifier());
             while (tokens.Current is DotToken)
             {
-                var dot = tokens.Expect<DotToken>();
+                var dot = tokens.Take<DotToken>();
                 var name = new IdentifierNameSyntax(tokens.ExpectIdentifier());
                 qualifiedName = new QualifiedNameSyntax(qualifiedName, dot, name);
             }

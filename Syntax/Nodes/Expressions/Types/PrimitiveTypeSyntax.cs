@@ -6,10 +6,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types
 {
     public class PrimitiveTypeSyntax : TypeSyntax
     {
-        [NotNull]
-        public KeywordToken Keyword { get; }
+        [NotNull] public IPrimitiveTypeToken Keyword { get; }
 
-        public PrimitiveTypeSyntax([NotNull] KeywordToken keyword)
+        public PrimitiveTypeSyntax([NotNull] IPrimitiveTypeToken keyword)
         {
             Requires.NotNull(nameof(keyword), keyword);
             Keyword = keyword;
