@@ -6,6 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
@@ -33,7 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
 
         public void CheckTypes(
             [NotNull] IList<DeclarationAnalysis> analyses,
-            [NotNull] DiagnosticsBuilder diagnostics)
+            [NotNull] IDiagnosticsCollector diagnostics)
         {
             foreach (var analysis in analyses)
             {
@@ -53,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
 
         private void CheckTypes(
             [NotNull] FunctionDeclarationAnalysis function,
-            [NotNull] DiagnosticsBuilder diagnostics)
+            [NotNull] IDiagnosticsCollector diagnostics)
         {
             var parameterTypes = function.Syntax.Parameters.Nodes().Select(n => n.TypeExpression);
             foreach (var (parameter, type) in function.Semantics.Parameters.Zip(parameterTypes))
@@ -76,21 +77,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
         }
 
         // Checks the expression is well typed, and that the type of the expression is `type`
-        private void CheckTypeExpression(
+        private static void CheckTypeExpression(
             [NotNull] ExpressionAnalysis expression,
-            [NotNull] DiagnosticsBuilder diagnostics)
+            [NotNull] IDiagnosticsCollector diagnostics)
         {
             CheckTypes(expression);
             if (expression.Type != ObjectType.Type)
-            {
-                //diagnostics.Publish(TypeError.MustBeATypeExpression(expression.File, expression.Syntax.Span));
-                // TODO report error
-            }
+                diagnostics.Publish(TypeError.MustBeATypeExpression(expression.File, expression.Syntax.Span));
         }
 
-        private void CheckTypes(ExpressionAnalysis expression)
+        private static void CheckTypes([NotNull] ExpressionAnalysis expression)
         {
-            // TODO check types in expression
+            switch (expression.Syntax)
+            {
+                case PrimitiveTypeSyntax _:
+                    expression.Type = ObjectType.Type;
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.For(expression.Syntax);
+            }
         }
 
         [NotNull]
@@ -102,7 +107,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             {
                 case IdentifierNameSyntax identifier:
                     throw new NotImplementedException();
-                    break;
                 case PrimitiveTypeSyntax primitive:
                     switch (primitive.Keyword)
                     {

@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
@@ -15,8 +16,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
             [NotNull] IOpenBraceToken openBrace,
             [NotNull] SyntaxList<StatementSyntax> statements,
             [NotNull] ICloseBraceToken closeBrace)
+            : base(TextSpan.Covering(openBrace.Span, closeBrace.Span))
         {
+            Requires.NotNull(nameof(openBrace), openBrace);
             Requires.NotNull(nameof(statements), statements);
+            Requires.NotNull(nameof(closeBrace), closeBrace);
             OpenBrace = openBrace;
             Statements = statements;
             CloseBrace = closeBrace;

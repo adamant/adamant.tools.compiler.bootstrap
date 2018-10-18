@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Graph;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements;
@@ -184,7 +183,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             switch (value)
             {
                 case IdentifierNameSyntax identifier:
-                    return LookupVariable(cfg, identifier.Name?.Value);
+                    return LookupVariable(cfg, identifier.Name.Value);
                 //case VariableExpression variableExpression:
                 //    return LookupVariable(variableExpression.Name);
                 default:

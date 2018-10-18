@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
@@ -19,6 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
             [NotNull] IOpenParenToken openParen,
             [NotNull] SeparatedListSyntax<ExpressionSyntax> arguments,
             [NotNull] ICloseParenToken closeParen)
+            : base(TextSpan.Covering(newKeyword.Span, closeParen.Span))
         {
             Requires.NotNull(nameof(arguments), arguments);
             NewKeyword = newKeyword;

@@ -9,6 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types
         [NotNull] public IPrimitiveTypeToken Keyword { get; }
 
         public PrimitiveTypeSyntax([NotNull] IPrimitiveTypeToken keyword)
+            : base(keyword.Span)
         {
             Requires.NotNull(nameof(keyword), keyword);
             Keyword = keyword;

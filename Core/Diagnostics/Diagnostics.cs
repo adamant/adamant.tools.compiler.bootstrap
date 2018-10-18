@@ -33,14 +33,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics
         }
 
         [NotNull]
-        [ItemNotNull]
         public IEnumerator<Diagnostic> GetEnumerator()
         {
             return items.GetEnumerator();
         }
 
         [NotNull]
-        [ItemNotNull]
         IEnumerator IEnumerable.GetEnumerator()
         {
             return items.GetEnumerator();

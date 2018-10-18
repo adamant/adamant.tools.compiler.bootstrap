@@ -18,6 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
         //    return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3001, $"Operator `{@operator.Text(file.Code)}` cannot be applied to operands of type `{leftOperandType}` and `{rightOperandType}`.");
         //}
 
+        [NotNull]
         public static Diagnostic MustBeATypeExpression([NotNull] CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3002, "Expression must be of type `type` (i.e. it must evaluate to a type)");

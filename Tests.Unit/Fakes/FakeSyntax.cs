@@ -74,10 +74,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
                 if (nameSyntax == null)
                     nameSyntax = partSyntax;
                 else
-                    nameSyntax = new QualifiedNameSyntax(nameSyntax, null, partSyntax);
+                    nameSyntax = new QualifiedNameSyntax(nameSyntax, new DotToken(new TextSpan(0, 1)), partSyntax);
             }
 
-            return nameSyntax;
+            return nameSyntax.AssertNotNull();
         }
 
         [NotNull]
@@ -93,10 +93,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
 
         private class FakeExpressionSyntax : ExpressionSyntax
         {
+            public FakeExpressionSyntax()
+                : base(new TextSpan(0, 0))
+            {
+            }
         }
 
         private class FakeNameSyntax : NameSyntax
         {
+            public FakeNameSyntax()
+                : base(new TextSpan(0, 0))
+            {
+            }
         }
 
         [NotNull]

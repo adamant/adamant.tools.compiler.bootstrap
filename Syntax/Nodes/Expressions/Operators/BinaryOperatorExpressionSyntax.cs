@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
@@ -13,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators
             [NotNull] ExpressionSyntax leftOperand,
             [NotNull] OperatorToken @operator,
             [NotNull] ExpressionSyntax rightOperand)
-            : base(@operator)
+            : base(@operator, TextSpan.Covering(leftOperand.Span, rightOperand.Span))
         {
             Requires.NotNull(nameof(leftOperand), leftOperand);
             Requires.NotNull(nameof(rightOperand), rightOperand);

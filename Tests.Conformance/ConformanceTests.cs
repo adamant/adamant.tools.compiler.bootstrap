@@ -91,7 +91,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
         [NotNull]
         private static List<int> ExpectedCompileErrorLines([NotNull] CodeFile codeFile, [NotNull] string code)
         {
-            return ErrorPattern.Matches(code)
+            return ErrorPattern.Matches(code).AssertItemNotNull()
                 .Select(match => codeFile.Code.Lines.LineContainingOffset(match.Index))
                 .ToList();
         }
@@ -151,15 +151,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
 
         private static int ExpectedExitCode([NotNull] string code)
         {
-            var exitCode = ExitCodePattern.Match(code).Groups["exitCode"].Captures.SingleOrDefault()?.Value ?? "0";
+            var exitCode = ExitCodePattern.Match(code).Groups["exitCode"]?.Captures.SingleOrDefault()?.Value ?? "0";
             return int.Parse(exitCode);
         }
 
         [NotNull]
         private static string ExpectedOutput([NotNull] string code, [NotNull] string channel)
         {
-            var regex = new Regex(string.Format(ExpectedOutputFormat, channel));
-            return regex.Match(code).Groups["output"].Captures.SingleOrDefault()?.Value ?? "";
+            var regex = new Regex(string.Format(ExpectedOutputFormat, channel).AssertNotNull());
+            return regex.Match(code).Groups["output"]?.Captures.SingleOrDefault()?.Value ?? "";
         }
 
         [NotNull]
@@ -167,7 +167,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
         {
             var testCases = new TheoryData<TestCase>();
             var testsDirectory = Path.Combine(SolutionDirectory.Get(), "tests");
-            foreach (var fullPath in Directory.EnumerateFiles(testsDirectory, "*.ad", SearchOption.AllDirectories))
+            foreach (var fullPath in Directory.EnumerateFiles(testsDirectory, "*.ad", SearchOption.AllDirectories).AssertNotNull())
             {
                 var relativePath = Path.GetRelativePath(testsDirectory, fullPath);
                 testCases.Add(new TestCase(fullPath, relativePath));

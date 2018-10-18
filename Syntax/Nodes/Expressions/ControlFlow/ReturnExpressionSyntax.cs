@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
@@ -12,6 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow
         public ReturnExpressionSyntax(
             [NotNull] IReturnKeywordToken returnKeyword,
             [CanBeNull] ExpressionSyntax expression)
+            : base(expression == null ? returnKeyword.Span : TextSpan.Covering(returnKeyword.Span, expression.Span))
         {
             Requires.NotNull(nameof(returnKeyword), returnKeyword);
             ReturnKeyword = returnKeyword;

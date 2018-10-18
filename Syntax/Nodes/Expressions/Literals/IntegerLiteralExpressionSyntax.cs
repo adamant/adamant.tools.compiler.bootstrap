@@ -9,6 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Literals
         [NotNull] public IntegerLiteralToken IntegerLiteral { get; }
 
         public IntegerLiteralExpressionSyntax([NotNull] IntegerLiteralToken integerLiteral)
+            : base(integerLiteral.Span)
         {
             Requires.NotNull(nameof(integerLiteral), integerLiteral);
             IntegerLiteral = integerLiteral;
