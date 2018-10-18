@@ -1,6 +1,5 @@
 using System;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
@@ -12,6 +11,7 @@ using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers;
 using JetBrains.Annotations;
 using Xunit;
 using Xunit.Categories;
+using static Adamant.Tools.Compiler.Bootstrap.Framework.TypeOperations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
 {
@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
             var tokens = FakeTokenStream.From($"");
             var diagnostics = new DiagnosticsBuilder();
 
-            var l = new ListParser().ParseList(tokens, NotCalled, TypeOf<CloseParenToken>._, diagnostics);
+            var l = new ListParser().ParseList(tokens, NotCalled, TypeOf<CloseParenToken>(), diagnostics);
 
             Assert.Empty(diagnostics.Build());
             Assert.Empty(l);
@@ -80,7 +80,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
             var expressionParser = FakeParser.Skip(parameter);
             var diagnostics = new DiagnosticsBuilder();
 
-            var l = new ListParser().ParseList(tokens, t => expressionParser.Parse(t, diagnostics), TypeOf<CloseParenToken>._, diagnostics);
+            var l = new ListParser().ParseList(tokens, t => expressionParser.Parse(t, diagnostics), TypeOf<CloseParenToken>(), diagnostics);
 
             Assert.Collection(l, i => Assert.Equal(parameter, i));
             Assert.Collection(diagnostics.Build(), d => { d.AssertParsingDiagnostic(3002, 0, 4); });
@@ -92,7 +92,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
             var tokens = FakeTokenStream.From($"");
             var diagnostics = new DiagnosticsBuilder();
 
-            var l = new ListParser().ParseSeparatedList(tokens, NotCalled, TypeOf<CommaToken>._, TypeOf<CloseParenToken>._, diagnostics);
+            var l = new ListParser().ParseSeparatedList(tokens, NotCalled, TypeOf<CommaToken>(), TypeOf<CloseParenToken>(), diagnostics);
 
             Assert.Empty(diagnostics.Build());
             Assert.Empty(l);
@@ -150,7 +150,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
             var expressionParser = FakeParser.Skip(parameter);
             var diagnostics = new DiagnosticsBuilder();
 
-            var l = new ListParser().ParseSeparatedList(tokens, t => expressionParser.Parse(t, diagnostics), TypeOf<CommaToken>._, TypeOf<CloseParenToken>._, diagnostics);
+            var l = new ListParser().ParseSeparatedList(tokens, t => expressionParser.Parse(t, diagnostics), TypeOf<CommaToken>(), TypeOf<CloseParenToken>(), diagnostics);
 
             Assert.Collection(l, i => Assert.Equal(parameter, i));
             Assert.Collection(diagnostics.Build(), d => { d.AssertParsingDiagnostic(3002, 0, 4); });
@@ -168,7 +168,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         {
             var diagnostics = new DiagnosticsBuilder();
             var expressionParser = FakeParser.For<ExpressionSyntax>();
-            var syntaxList = new ListParser().ParseList(tokens, t => expressionParser.Parse(t, diagnostics), TypeOf<TTerminator>._, diagnostics);
+            var syntaxList = new ListParser().ParseList(tokens, t => expressionParser.Parse(t, diagnostics), TypeOf<TTerminator>(), diagnostics);
             Assert.Empty(diagnostics.Build());
             return syntaxList;
         }
@@ -180,7 +180,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         {
             var diagnostics = new DiagnosticsBuilder();
             var expressionParser = FakeParser.For<ExpressionSyntax>();
-            var l = new ListParser().ParseSeparatedList(tokens, t => expressionParser.Parse(t, diagnostics), TypeOf<TSeparator>._, TypeOf<TTerminator>._, diagnostics);
+            var l = new ListParser().ParseSeparatedList(tokens, t => expressionParser.Parse(t, diagnostics), TypeOf<TSeparator>(), TypeOf<TTerminator>(), diagnostics);
             Assert.Empty(diagnostics.Build());
             return l;
         }

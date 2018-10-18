@@ -18,8 +18,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
                 return string.Empty;
 
             return new StringBuilder(input.Length * count)
-                .Insert(0, input, count)
-                .ToString();
+                .Insert(0, input, count).AssertNotNull()
+                .ToString().AssertNotNull();
         }
 
         public static string NormalizeLineEndings([NotNull] this string input, [NotNull] string lineEnding)

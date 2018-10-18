@@ -68,7 +68,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
             public SyntaxList<T> ParseList<T, TTerminator>(
                 ITokenStream tokens,
                 ParseFunction<T> parseItem,
-                TypeOf<TTerminator> terminatorType,
+                Type<TTerminator> terminatorType,
                 IDiagnosticsCollector diagnostics) where T : SyntaxNode where TTerminator : Token
             {
                 var fakeToken = tokens.ExpectFake();
@@ -78,8 +78,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
             public SeparatedListSyntax<T> ParseSeparatedList<T, TSeparator, TTerminator>(
                 ITokenStream tokens,
                 ParseFunction<T> parseItem,
-                TypeOf<TSeparator> separatorType,
-                TypeOf<TTerminator> terminatorType,
+                Type<TSeparator> separatorType,
+                Type<TTerminator> terminatorType,
                 IDiagnosticsCollector diagnostics) where T : SyntaxNode where TSeparator : Token where TTerminator : Token
             {
                 var fakeToken = tokens.ExpectFake();

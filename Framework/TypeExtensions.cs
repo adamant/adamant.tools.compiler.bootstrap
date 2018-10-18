@@ -1,19 +1,20 @@
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
     public static class TypeExtensions
     {
-        public static string GetFriendlyName(this Type type)
+        public static string GetFriendlyName([NotNull] this Type type)
         {
             if (type.IsGenericParameter || !type.IsGenericType)
                 return type.Name;
 
-            var name = type.Name;
+            var name = type.Name.AssertNotNull();
             var index = name.IndexOf("`", StringComparison.Ordinal);
             name = name.Substring(0, index);
-            var genericArguments = string.Join(',', type.GetGenericArguments().Select(GetFriendlyName));
+            var genericArguments = string.Join(',', type.GetGenericArguments().AssertNotNull().Select(GetFriendlyName));
             return $"{name}<{genericArguments}>";
         }
     }

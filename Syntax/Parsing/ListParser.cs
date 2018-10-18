@@ -16,8 +16,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         public SeparatedListSyntax<T> ParseSeparatedList<T, TSeparator, TTerminator>(
             [NotNull] ITokenStream tokens,
             [NotNull] ParseFunction<T> parseItem,
-            TypeOf<TSeparator> separatorType,
-            TypeOf<TTerminator> terminatorType,
+            Type<TSeparator> separatorType,
+            Type<TTerminator> terminatorType,
             [NotNull] IDiagnosticsCollector diagnostics)
             where T : SyntaxNode
             where TSeparator : Token
@@ -31,8 +31,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         private static IEnumerable<ISyntaxNodeOrToken> ParseSeparatedSyntaxEnumerable<TSeparator, TTerminator>(
             [NotNull] ITokenStream tokens,
             [NotNull] ParseFunction<SyntaxNode> parseItem,
-            TypeOf<TSeparator> separatorType,
-            TypeOf<TTerminator> terminatorType,
+            Type<TSeparator> separatorType,
+            Type<TTerminator> terminatorType,
             [NotNull] IDiagnosticsCollector diagnostics)
             where TSeparator : Token
             where TTerminator : Token
@@ -59,7 +59,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         public SyntaxList<T> ParseList<T, TTerminator>(
             [NotNull] ITokenStream tokens,
             [NotNull] ParseFunction<T> parseItem,
-            TypeOf<TTerminator> terminatorType,
+            Type<TTerminator> terminatorType,
             [NotNull] IDiagnosticsCollector diagnostics)
             where T : SyntaxNode
             where TTerminator : Token
@@ -72,7 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         private static IEnumerable<T> ParseSyntaxEnumerable<T, TTerminator>(
             [NotNull] ITokenStream tokens,
             [NotNull] ParseFunction<T> parseItem,
-            TypeOf<TTerminator> terminatorType,
+            Type<TTerminator> terminatorType,
             [NotNull] IDiagnosticsCollector diagnostics)
             where T : SyntaxNode
             where TTerminator : Token
