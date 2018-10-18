@@ -5,7 +5,6 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Graph;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements.LValues;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow;
@@ -114,7 +113,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     break;
                 case BinaryOperatorExpressionSyntax _:
                     // Could be side effects possibly.
-                    var temp = cfg.Let(DataType.Unknown);
+                    var temp = cfg.Let(null);
                     ConvertAssignment(cfg, temp.Reference, expression, currentBlock);
                     break;
                 case ReturnExpressionSyntax returnExpression:

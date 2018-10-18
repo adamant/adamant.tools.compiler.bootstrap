@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
         [NotNull] public FunctionDeclarationSyntax Syntax { get; }
         [NotNull] [ItemNotNull] public IReadOnlyList<ParameterAnalysis> Parameters { get; }
         public int Arity => Parameters.Count;
-        [NotNull] public DataType ReturnType { get; set; }
+        [CanBeNull] public DataType ReturnType { get; set; }
         [NotNull] public ControlFlowGraph ControlFlow { get; } = new ControlFlowGraph();
 
         public FunctionDeclarationAnalysis(
@@ -30,13 +30,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
             Requires.NotNull(nameof(syntax), syntax);
             Syntax = syntax;
             Parameters = syntax.Parameters.Select(p => new ParameterAnalysis(p)).ToReadOnlyList();
-            ReturnType = DataType.Unknown;
         }
 
         [NotNull]
         public override Declaration Complete()
         {
-            return new FunctionDeclaration(File, QualifiedName, Parameters.Select(p => p.Complete()), ReturnType, ControlFlow);
+            return new FunctionDeclaration(File,
+                QualifiedName,
+                Parameters.Select(p => p.Complete()),
+                ReturnType.AssertNotNull(),
+                ControlFlow);
         }
     }
 }
