@@ -1,7 +1,6 @@
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Graph;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
@@ -31,7 +30,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C
             var function = new FunctionDeclaration("".ToFakeCodeFile(),
                 GlobalNamespaceName.Instance.Qualify("func"),
                 parameters,
-                returnType);
+                returnType,
+                new ControlFlowGraph());
 
             var code = new Code();
             NewDeclarationEmitter().Emit(function, code);

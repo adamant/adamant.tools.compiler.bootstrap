@@ -31,6 +31,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         }
 
         [NotNull]
+        public static IReadOnlyList<T> ToReadOnlyList<T>([NotNull] this IEnumerable<T> values)
+        {
+            Requires.NotNull(nameof(values), values);
+            return values.ToList().AsReadOnly().AssertNotNull();
+        }
+
+        [NotNull]
         public static IEnumerable<Tuple<TFirst, TSecond>> Zip<TFirst, TSecond>(
             [NotNull] this IEnumerable<TFirst> first,
             [NotNull] IEnumerable<TSecond> second)

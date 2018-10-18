@@ -1,6 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using JetBrains.Annotations;
@@ -10,19 +11,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
     public class TypeDeclarationAnalysis : DeclarationAnalysis
     {
         [NotNull] public DeclarationSyntax Syntax { get; }
-        [NotNull] public new TypeDeclaration Semantics { get; }
 
         public TypeDeclarationAnalysis(
             [NotNull] CodeFile file,
             [NotNull] LexicalScope scope,
             [NotNull] DeclarationSyntax syntax,
-            [NotNull] TypeDeclaration semantics)
-            : base(file, scope, semantics)
+            [NotNull] QualifiedName qualifiedName)
+            : base(file, scope, qualifiedName)
         {
             Requires.NotNull(nameof(syntax), syntax);
-            Requires.NotNull(nameof(semantics), semantics);
             Syntax = syntax;
-            Semantics = semantics;
+        }
+
+        [NotNull]
+        public override Declaration Complete()
+        {
+            return new TypeDeclaration(File, QualifiedName);
         }
     }
 }

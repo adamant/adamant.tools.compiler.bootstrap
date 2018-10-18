@@ -48,7 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
                     case FunctionDeclarationSyntax function:
                         nodes.Push(function.Body);
                         nodes.Push(function.ReturnTypeExpression);
-                        nodes.PushRange(function.Parameters.Nodes().Reverse());
+                        nodes.PushRange(function.ParametersList.Nodes().Reverse());
                         nodes.Push(function.AccessModifier);
                         break;
                     case LifetimeTypeSyntax lifetimeType:

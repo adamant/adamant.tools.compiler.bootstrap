@@ -76,7 +76,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics
                     break;
                 case FunctionDeclarationSyntax functionDeclaration:
                     AddParentAttribute(functionDeclaration.AccessModifier, syntax);
-                    AddAllParentAttributes(functionDeclaration.Parameters.Nodes(), syntax);
+                    AddAllParentAttributes(functionDeclaration.ParametersList.Nodes(), syntax);
                     AddParentAttribute(functionDeclaration.ReturnTypeExpression, syntax);
                     AddParentAttribute(functionDeclaration.Body, syntax);
                     break;

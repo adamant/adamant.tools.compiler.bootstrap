@@ -48,7 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             var borrowChecker = new BorrowChecker();
             borrowChecker.Check(package);
 
-            foreach (var declaration in analyses.Select(a => a.Semantics))
+            foreach (var declaration in analyses.Select(a => a.Complete()))
                 package.Add(declaration);
 
             DetermineEntryPoint(package, diagnostics);

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts;
@@ -12,7 +13,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
         [NotNull] public IFunctionKeywordToken FunctionKeyword { get; }
         [NotNull] public override IIdentifierToken Name { get; }
         [NotNull] public IOpenParenToken OpenParen { get; }
-        [NotNull] public SeparatedListSyntax<ParameterSyntax> Parameters { get; }
+        [NotNull] public SeparatedListSyntax<ParameterSyntax> ParametersList { get; }
+        [NotNull] [ItemNotNull] public IEnumerable<ParameterSyntax> Parameters => ParametersList.Nodes();
         [NotNull] public ICloseParenToken CloseParen { get; }
         [NotNull] public IRightArrowToken Arrow { get; }
         [NotNull] public ExpressionSyntax ReturnTypeExpression { get; }
@@ -23,21 +25,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
             [NotNull] IFunctionKeywordToken functionKeyword,
             [NotNull] IIdentifierToken name,
             [NotNull] IOpenParenToken openParen,
-            [NotNull] SeparatedListSyntax<ParameterSyntax> parameters,
+            [NotNull] SeparatedListSyntax<ParameterSyntax> parametersList,
             [NotNull] ICloseParenToken closeParen,
             [NotNull] IRightArrowToken arrow,
             [NotNull] ExpressionSyntax returnTypeExpression,
             [NotNull] BlockExpressionSyntax body)
         {
             Requires.NotNull(nameof(accessModifier), accessModifier);
-            Requires.NotNull(nameof(parameters), parameters);
+            Requires.NotNull(nameof(parametersList), parametersList);
             Requires.NotNull(nameof(returnTypeExpression), returnTypeExpression);
             Requires.NotNull(nameof(body), body);
             AccessModifier = accessModifier;
             FunctionKeyword = functionKeyword;
             Name = name;
             OpenParen = openParen;
-            Parameters = parameters;
+            ParametersList = parametersList;
             CloseParen = closeParen;
             Arrow = arrow;
             ReturnTypeExpression = returnTypeExpression;

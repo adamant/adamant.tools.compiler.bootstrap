@@ -107,7 +107,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics
                         AllDiagnostics(function),
                         function.AccessModifier.Modifier,
                         function.Name.Value,
-                        function.Parameters.Nodes().Select(Node),
+                        function.ParametersList.Nodes().Select(Node),
                         Node(function.ReturnTypeExpression),
                         Node(function.Body)); // TODO change this to a list of statements
 

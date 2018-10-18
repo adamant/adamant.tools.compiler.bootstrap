@@ -32,11 +32,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         {
             Requires.NotNull(nameof(function), function);
 
-            var cfg = function.Semantics.ControlFlow;
+            var cfg = function.ControlFlow;
 
             // Temp Variable for return
-            cfg.Let(function.Semantics.ReturnType);
-            foreach (var parameter in function.Semantics.Parameters)
+            cfg.Let(function.ReturnType);
+            foreach (var parameter in function.Parameters)
                 cfg.AddVariable(parameter.MutableBinding, parameter.Type, parameter.Name);
 
             var blocks = new Dictionary<SyntaxNode, BasicBlock>();

@@ -1,6 +1,7 @@
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Graph;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
@@ -64,7 +65,8 @@ typedef enum Type_ID Type_ID;
             var main = new FunctionDeclaration("".ToFakeCodeFile(),
                 new QualifiedName(new SimpleName("main")),
                 Enumerable.Empty<Parameter>(),
-                ObjectType.Void);
+                ObjectType.Void,
+                new ControlFlowGraph());
 
             var code = new Code();
             NewPackageEmitter().EmitEntryPointAdapter(main, code);

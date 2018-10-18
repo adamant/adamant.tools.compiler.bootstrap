@@ -56,8 +56,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             [NotNull] FunctionDeclarationAnalysis function,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var parameterTypes = function.Syntax.Parameters.Nodes().Select(n => n.TypeExpression);
-            foreach (var (parameter, type) in function.Semantics.Parameters.Zip(parameterTypes))
+            var parameterTypes = function.Syntax.ParametersList.Nodes().Select(n => n.TypeExpression);
+            foreach (var (parameter, type) in function.Parameters.Zip(parameterTypes))
             {
                 var analysis = expressionAnalysisBuilder.PrepareForAnalysis(function, type);
                 CheckTypeExpression(analysis, diagnostics);
@@ -67,9 +67,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             var returnType = function.Syntax.ReturnTypeExpression;
             var returnTypeAnalysis = expressionAnalysisBuilder.PrepareForAnalysis(function, returnType);
             CheckTypeExpression(returnTypeAnalysis, diagnostics);
-            function.Semantics.ReturnType = ResolveType(returnType, function.Scope);
+            function.ReturnType = ResolveType(returnType, function.Scope);
         }
-
 
         private static void CheckTypes([NotNull] TypeDeclarationAnalysis typeDeclaration)
         {

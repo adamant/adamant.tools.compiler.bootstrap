@@ -75,7 +75,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics
                     {
                         var parentName = Name(Parent(functionDeclaration));
                         return new FunctionName(parentName, functionDeclaration.Name.Value,
-                            functionDeclaration.Parameters.Count());
+                            functionDeclaration.ParametersList.Count());
                     }
                 case ParameterSyntax parameter:
                     {

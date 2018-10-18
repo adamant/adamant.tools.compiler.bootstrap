@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
             Assert.Equal(tokens[1], f.FunctionKeyword);
             Assert.Equal(tokens[2], f.Name);
             Assert.Equal(tokens[3], f.OpenParen);
-            Assert.Equal(parameters, f.Parameters);
+            Assert.Equal(parameters, f.ParametersList);
             Assert.Equal(tokens[5], f.CloseParen);
             Assert.Equal(tokens[6], f.Arrow);
             Assert.Equal(returnExpression, f.ReturnTypeExpression);

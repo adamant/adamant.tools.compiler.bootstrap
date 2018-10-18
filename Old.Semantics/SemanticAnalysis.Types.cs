@@ -52,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics
             switch (syntax)
             {
                 case FunctionDeclarationSyntax function:
-                    var parameterTypes = function.Parameters.Nodes().Select(Type);
+                    var parameterTypes = function.ParametersList.Nodes().Select(Type);
                     var returnType = Type(function.ReturnTypeExpression);
                     return new FunctionType(parameterTypes, returnType);
 

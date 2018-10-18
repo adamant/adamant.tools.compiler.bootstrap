@@ -1,6 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using JetBrains.Annotations;
 
@@ -10,19 +11,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
     {
         [NotNull] public CodeFile File { get; }
         [NotNull] public LexicalScope Scope { get; }
-        [NotNull] public Declaration Semantics { get; }
+        [NotNull] public QualifiedName QualifiedName { get; }
 
         protected DeclarationAnalysis(
             [NotNull] CodeFile file,
             [NotNull] LexicalScope scope,
-            [NotNull] Declaration semantics)
+            [NotNull] QualifiedName qualifiedName)
         {
             Requires.NotNull(nameof(file), file);
             Requires.NotNull(nameof(scope), scope);
-            Requires.NotNull(nameof(semantics), semantics);
+            Requires.NotNull(nameof(qualifiedName), qualifiedName);
             File = file;
             Scope = scope;
-            Semantics = semantics;
+            QualifiedName = qualifiedName;
         }
+
+        [NotNull]
+        public abstract Declaration Complete();
     }
 }

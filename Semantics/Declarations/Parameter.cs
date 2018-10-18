@@ -16,5 +16,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations
             MutableBinding = mutableBinding;
             Name = name;
         }
+
+        public Parameter(
+            bool mutableBinding,
+            [NotNull] string name,
+            [NotNull] DataType type)
+        {
+            Requires.NotNull(nameof(name), name);
+            Requires.NotNull(nameof(type), type);
+            MutableBinding = mutableBinding;
+            Name = name;
+            Type = type;
+        }
     }
 }

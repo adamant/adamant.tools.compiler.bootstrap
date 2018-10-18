@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics
             Assert.Collection(analyses, a =>
             {
                 var f = Assert.IsType<FunctionDeclarationAnalysis>(a);
-                Assert.Equal("function_name", f.Semantics.QualifiedName.ToString());
+                Assert.Equal("function_name", f.QualifiedName.ToString());
             });
         }
 
@@ -58,7 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics
             Assert.Collection(analyses, a =>
             {
                 var f = Assert.IsType<FunctionDeclarationAnalysis>(a);
-                Assert.Equal("myNamespace.name.function_name", f.Semantics.QualifiedName.ToString());
+                Assert.Equal("myNamespace.name.function_name", f.QualifiedName.ToString());
             });
         }
 
@@ -74,7 +74,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics
             Assert.Collection(analyses, a =>
             {
                 var t = Assert.IsType<TypeDeclarationAnalysis>(a);
-                Assert.Equal("My_Struct", t.Semantics.QualifiedName.ToString());
+                Assert.Equal("My_Struct", t.QualifiedName.ToString());
             });
         }
 
