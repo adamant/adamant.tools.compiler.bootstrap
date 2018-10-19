@@ -146,8 +146,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                 case UnaryOperatorExpressionAnalysis unaryOperatorExpression:
                     CheckTypes(unaryOperatorExpression, diagnostics);
                     break;
+                case LifetimeTypeAnalysis lifetimeType:
+                    CheckTypes(lifetimeType.TypeName, diagnostics);
+                    if (lifetimeType.TypeName.Type != ObjectType.Type)
+                        diagnostics.Publish(TypeError.MustBeATypeExpression(expression.Context.File, lifetimeType.TypeName.Syntax.Span));
+                    break;
                 default:
-                    throw NonExhaustiveMatchException.For(expression.Syntax);
+                    throw NonExhaustiveMatchException.For(expression);
             }
         }
 

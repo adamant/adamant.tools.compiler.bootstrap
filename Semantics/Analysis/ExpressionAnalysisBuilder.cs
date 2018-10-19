@@ -1,4 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.ControlFlow;
@@ -6,7 +5,6 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Literals;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Operators;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Types.Names;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Literals;
@@ -44,6 +42,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                     return new UnaryOperatorExpressionAnalysis(context, unaryOperatorExpression, operand);
                 case IdentifierNameSyntax identifierName:
                     return new IdentifierNameAnalysis(context, identifierName);
+                case LifetimeTypeSyntax lifetimeType:
+                    var typeName = Build(context, lifetimeType.TypeName);
+                    return new LifetimeTypeAnalysis(context, lifetimeType, typeName);
+                case BlockExpressionSyntax blockExpression:
+                    return new BlockExpressionAnalysis(context, blockExpression);
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
