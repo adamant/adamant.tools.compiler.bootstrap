@@ -113,9 +113,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     // Ignore, reading from variable does nothing.
                     break;
                 case BinaryOperatorExpressionAnalysis binaryOperatorExpression:
-                    // Could be side effects possibly.
-                    var temp = cfg.Let(binaryOperatorExpression.Type.AssertNotNull());
-                    ConvertAssignment(cfg, temp.Reference, expression, currentBlock);
+                    switch (binaryOperatorExpression.Operator)
+                    {
+                        case EqualsToken _:
+                            var lvalue = ConvertToLValue(cfg, binaryOperatorExpression.LeftOperand);
+                            ConvertAssignment(cfg, lvalue, expression, currentBlock);
+                            break;
+                        default:
+                            // Could be side effects possibly.
+                            var temp = cfg.Let(binaryOperatorExpression.Type.AssertNotNull());
+                            ConvertAssignment(cfg, temp.Reference, expression, currentBlock);
+                            break;
+                    }
                     break;
                 case ReturnExpressionAnalysis returnExpression:
                     if (returnExpression.ReturnExpression != null)
