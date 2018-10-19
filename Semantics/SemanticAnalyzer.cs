@@ -48,7 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             // Only borrow checking left
             var borrowChecker = new BorrowChecker();
-            borrowChecker.Check(package);
+            borrowChecker.Check(declarations);
 
             var diagnostics = new DiagnosticsBuilder();
             foreach (var declaration in declarations)

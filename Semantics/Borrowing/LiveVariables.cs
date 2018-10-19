@@ -1,21 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
-using Adamant.Tools.Compiler.Bootstrap.IL.Code;
-using Adamant.Tools.Compiler.Bootstrap.IL.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Statements;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Graph;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.BorrowChecker
 {
     public class LiveVariables
     {
         public int VariableCount { get; }
-        private readonly Dictionary<Statement, BitArray> values = new Dictionary<Statement, BitArray>();
+        private readonly Dictionary<StatementAnalysis, BitArray> values = new Dictionary<StatementAnalysis, BitArray>();
 
-        public LiveVariables(FunctionDeclarationIL function)
+        public LiveVariables(ControlFlowGraph function)
         {
             VariableCount = function.VariableDeclarations.Count;
         }
 
-        public BitArray Before(Statement statement)
+        public BitArray Before(StatementAnalysis statement)
         {
             if (values.TryGetValue(statement, out var existingValue))
                 return existingValue;

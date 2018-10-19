@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.IL.Code.LValues;
-using Adamant.Tools.Compiler.Bootstrap.IL.Code.RValues;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements.LValues;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements.RValues;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.BorrowChecker
 {
