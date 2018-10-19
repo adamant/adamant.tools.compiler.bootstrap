@@ -1,4 +1,4 @@
-namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.BorrowChecker
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 {
     public class Restriction
     {

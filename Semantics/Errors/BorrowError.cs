@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Errors
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
 {
     /// <summary>
     /// Error Code Ranges:

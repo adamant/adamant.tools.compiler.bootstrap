@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements.LValues;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements.RValues;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.BorrowChecker
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 {
     public class Loan : Claim
     {
