@@ -8,16 +8,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow
     public class ReturnExpressionSyntax : ExpressionSyntax
     {
         [NotNull] public IReturnKeywordToken ReturnKeyword { get; }
-        [CanBeNull] public ExpressionSyntax Expression { get; }
+        [CanBeNull] public ExpressionSyntax ReturnValue { get; }
 
         public ReturnExpressionSyntax(
             [NotNull] IReturnKeywordToken returnKeyword,
-            [CanBeNull] ExpressionSyntax expression)
-            : base(expression == null ? returnKeyword.Span : TextSpan.Covering(returnKeyword.Span, expression.Span))
+            [CanBeNull] ExpressionSyntax returnValue)
+            : base(returnValue == null ? returnKeyword.Span : TextSpan.Covering(returnKeyword.Span, returnValue.Span))
         {
             Requires.NotNull(nameof(returnKeyword), returnKeyword);
             ReturnKeyword = returnKeyword;
-            Expression = expression;
+            ReturnValue = returnValue;
         }
     }
 }

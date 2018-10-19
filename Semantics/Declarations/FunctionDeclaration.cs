@@ -13,14 +13,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations
         [NotNull] [ItemNotNull] public IReadOnlyList<Parameter> Parameters { get; }
         public int Arity => Parameters.Count;
         [NotNull] public DataType ReturnType { get; }
-        [NotNull] public ControlFlowGraph ControlFlow { get; }
+        [CanBeNull] public ControlFlowGraph ControlFlow { get; }
 
         public FunctionDeclaration(
             [NotNull] CodeFile file,
             [NotNull] QualifiedName qualifiedName,
             [NotNull][ItemNotNull] IEnumerable<Parameter> parameters,
             [NotNull] DataType returnType,
-            [NotNull] ControlFlowGraph controlFlow)
+            [CanBeNull] ControlFlowGraph controlFlow)
             : base(file, qualifiedName)
         {
             Requires.NotNull(nameof(parameters), parameters);

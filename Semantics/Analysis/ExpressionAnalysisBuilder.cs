@@ -1,6 +1,18 @@
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Literals;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Operators;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Types;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Types.Names;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Literals;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
@@ -8,11 +20,33 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
     public class ExpressionAnalysisBuilder
     {
         [NotNull]
-        public ExpressionAnalysis PrepareForAnalysis(
-            [NotNull] FunctionDeclarationAnalysis function,
+        public ExpressionAnalysis Build(
+            [NotNull] AnalysisContext context,
             [NotNull] ExpressionSyntax expression)
         {
-            return new ExpressionAnalysis(function.File, function.Scope, expression);
+            switch (expression)
+            {
+                case ReturnExpressionSyntax returnExpression:
+                    ExpressionAnalysis returnValue = null;
+                    if (returnExpression.ReturnValue != null)
+                        returnValue = Build(context, returnExpression.ReturnValue);
+                    return new ReturnExpressionAnalysis(context, returnExpression, returnValue);
+                case PrimitiveTypeSyntax primitiveType:
+                    return new PrimitiveTypeAnalysis(context, primitiveType);
+                case IntegerLiteralExpressionSyntax integerLiteral:
+                    return new IntegerLiteralExpressionAnalysis(context, integerLiteral);
+                case BinaryOperatorExpressionSyntax binaryOperatorExpression:
+                    var leftOperand = Build(context, binaryOperatorExpression.LeftOperand);
+                    var rightOperand = Build(context, binaryOperatorExpression.LeftOperand);
+                    return new BinaryOperatorExpressionAnalysis(context, binaryOperatorExpression, leftOperand, rightOperand);
+                case UnaryOperatorExpressionSyntax unaryOperatorExpression:
+                    var operand = Build(context, unaryOperatorExpression.Operand);
+                    return new UnaryOperatorExpressionAnalysis(context, unaryOperatorExpression, operand);
+                case IdentifierNameSyntax identifierName:
+                    return new IdentifierNameAnalysis(context, identifierName);
+                default:
+                    throw NonExhaustiveMatchException.For(expression);
+            }
         }
     }
 }

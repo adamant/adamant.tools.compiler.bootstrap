@@ -1,12 +1,13 @@
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics
 {
-    public class DiagnosticsBuilder : IDiagnosticsCollector
+    public class DiagnosticsBuilder : IDiagnosticsCollector, IEnumerable<Diagnostic>
     {
-        [CanBeNull]
-        private List<Diagnostic> items;
+        [CanBeNull] private List<Diagnostic> items;
 
         public void Publish([NotNull] Diagnostic diagnostic)
         {
@@ -35,6 +36,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics
 
             // Uses an internal constructor for efficiency
             return new Diagnostics(currentDiagnostics);
+        }
+
+        public IEnumerator<Diagnostic> GetEnumerator()
+        {
+            return (items ?? Enumerable.Empty<Diagnostic>()).GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

@@ -1,8 +1,6 @@
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using JetBrains.Annotations;
 
@@ -13,11 +11,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
         [NotNull] public DeclarationSyntax Syntax { get; }
 
         public TypeDeclarationAnalysis(
-            [NotNull] CodeFile file,
-            [NotNull] LexicalScope scope,
+            [NotNull] AnalysisContext context,
             [NotNull] DeclarationSyntax syntax,
             [NotNull] QualifiedName qualifiedName)
-            : base(file, scope, qualifiedName)
+            : base(context, qualifiedName)
         {
             Requires.NotNull(nameof(syntax), syntax);
             Syntax = syntax;
@@ -26,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
         [NotNull]
         public override Declaration Complete()
         {
-            return new TypeDeclaration(File, QualifiedName);
+            return new TypeDeclaration(Context.File, QualifiedName);
         }
     }
 }

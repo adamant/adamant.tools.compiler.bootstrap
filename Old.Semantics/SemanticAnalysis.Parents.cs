@@ -87,7 +87,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics
                     AddAllParentAttributes(blockStatement.Statements, syntax);
                     break;
                 case ReturnExpressionSyntax returnExpression:
-                    AddParentAttribute(returnExpression.Expression, syntax);
+                    AddParentAttribute(returnExpression.ReturnValue, syntax);
                     break;
                 case ExpressionStatementSyntax expressionStatement:
                     AddParentAttribute(expressionStatement.Expression, syntax);

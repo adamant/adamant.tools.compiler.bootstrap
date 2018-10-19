@@ -1,10 +1,7 @@
-using System.Collections.Generic;
-using Adamant.Tools.Compiler.Bootstrap.Core;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using JetBrains.Annotations;
 
@@ -13,88 +10,59 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
     public class DeclarationAnalysisBuilder
     {
         [NotNull] private readonly NameBuilder nameBuilder;
+        [NotNull] private readonly ExpressionAnalysisBuilder expressionBuilder;
+        [NotNull] private readonly StatementAnalysisBuilder statementBuilder;
 
-        public DeclarationAnalysisBuilder([NotNull] NameBuilder nameBuilder)
+        public DeclarationAnalysisBuilder(
+            [NotNull] NameBuilder nameBuilder,
+            [NotNull] ExpressionAnalysisBuilder expressionBuilder,
+            [NotNull] StatementAnalysisBuilder statementBuilder)
         {
             this.nameBuilder = nameBuilder;
-        }
-
-        public (IList<CompilationUnitScope>, IList<DeclarationAnalysis>) PrepareForAnalysis(
-            [NotNull] PackageSyntax packageSyntax)
-        {
-            var scopes = new List<CompilationUnitScope>();
-            var analyses = new List<DeclarationAnalysis>();
-            foreach (var compilationUnit in packageSyntax.CompilationUnits)
-            {
-                var globalScope = new CompilationUnitScope();
-                scopes.Add(globalScope);
-                analyses.AddRange(PrepareForAnalysis(compilationUnit, globalScope));
-            }
-
-            return (scopes, analyses);
-        }
-
-        [NotNull]
-        [ItemNotNull]
-        private IEnumerable<DeclarationAnalysis> PrepareForAnalysis(
-            [NotNull] CompilationUnitSyntax compilationUnit,
-            [NotNull] CompilationUnitScope globalScope)
-        {
-            Name @namespace = GlobalNamespaceName.Instance;
-            LexicalScope scope = globalScope;
-            if (compilationUnit.Namespace != null)
-            {
-                @namespace = nameBuilder.BuildName(compilationUnit.Namespace.Name) ?? @namespace;
-                scope = new NamespaceScope(scope);
-            }
-
-            foreach (var declaration in compilationUnit.Declarations)
-            {
-                var analysis = PrepareForAnalysis(compilationUnit.CodeFile, scope, @namespace, declaration);
-                if (analysis != null)
-                    yield return analysis;
-            }
+            this.statementBuilder = statementBuilder;
+            this.expressionBuilder = expressionBuilder;
         }
 
         [CanBeNull]
-        private static DeclarationAnalysis PrepareForAnalysis(
-            [NotNull] CodeFile codeFile,
-            [NotNull] LexicalScope scope,
+        public DeclarationAnalysis Build(
+            [NotNull] AnalysisContext context,
             [NotNull] Name @namespace,
             [NotNull] DeclarationSyntax declaration)
         {
             switch (declaration)
             {
                 case FunctionDeclarationSyntax function:
-                    return PrepareForAnalysis(codeFile, scope, @namespace, function);
+                    return Build(context, @namespace, function);
                 case ClassDeclarationSyntax @class:
-                    return PrepareForAnalysis(codeFile, scope, @namespace, @class);
+                    return Build(context, @namespace, @class);
                 case IncompleteDeclarationSyntax _:
                     // Since it is incomplete, we can't do any analysis on it
                     return null;
                 case EnumStructDeclarationSyntax enumStruct:
-                    return PrepareForAnalysis(codeFile, scope, @namespace, enumStruct);
+                    return Build(context, @namespace, enumStruct);
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
             }
         }
 
-        private static FunctionDeclarationAnalysis PrepareForAnalysis(
-            [NotNull] CodeFile codeFile,
-            [NotNull] LexicalScope scope,
+        private FunctionDeclarationAnalysis Build(
+            [NotNull] AnalysisContext context,
             [NotNull] Name @namespace,
             [NotNull] FunctionDeclarationSyntax syntax)
         {
             // Skip any function that doesn't have a name
-            if (!(syntax.Name?.Value is string name)) return null;
+            if (!(syntax.Name.Value is string name)) return null;
 
             var fullName = @namespace.Qualify(name);
-            return new FunctionDeclarationAnalysis(codeFile, scope, syntax, fullName);
+            return new FunctionDeclarationAnalysis(
+                context, syntax, fullName,
+                syntax.Parameters.Select(p => new ParameterAnalysis(p, expressionBuilder.Build(context, p.TypeExpression))),
+                expressionBuilder.Build(context, syntax.ReturnTypeExpression),
+                syntax.Body.Statements.Select(statementSyntax => statementBuilder.Build(context, statementSyntax)));
         }
 
-        private static TypeDeclarationAnalysis PrepareForAnalysis(
-            [NotNull] CodeFile codeFile,
-            [NotNull] LexicalScope scope,
+        private static TypeDeclarationAnalysis Build(
+            [NotNull] AnalysisContext context,
             [NotNull] Name @namespace,
             [NotNull] ClassDeclarationSyntax syntax)
         {
@@ -102,12 +70,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             if (!(syntax.Name.Value is string name)) return null;
 
             var fullName = @namespace.Qualify(name);
-            return new TypeDeclarationAnalysis(codeFile, scope, syntax, fullName);
+            return new TypeDeclarationAnalysis(context, syntax, fullName);
         }
 
-        private static TypeDeclarationAnalysis PrepareForAnalysis(
-            [NotNull] CodeFile codeFile,
-            [NotNull] LexicalScope scope,
+        private static TypeDeclarationAnalysis Build(
+            [NotNull] AnalysisContext context,
             [NotNull] Name @namespace,
             [NotNull] EnumStructDeclarationSyntax syntax)
         {
@@ -115,7 +82,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             if (!(syntax.Name.Value is string name)) return null;
 
             var fullName = @namespace.Qualify(name);
-            return new TypeDeclarationAnalysis(codeFile, scope, syntax, fullName);
+            return new TypeDeclarationAnalysis(context, syntax, fullName);
         }
     }
 }

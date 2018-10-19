@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
 
             var r = Assert.IsType<ReturnExpressionSyntax>(e);
             Assert.Equal(tokens[0], r.ReturnKeyword);
-            Assert.Null(r.Expression);
+            Assert.Null(r.ReturnValue);
         }
 
         [Fact]

@@ -9,12 +9,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
     public class BlockExpressionSyntax : ExpressionSyntax
     {
         [NotNull] public IOpenBraceToken OpenBrace { get; }
-        [NotNull] public SyntaxList<StatementSyntax> Statements { get; }
+        [NotNull] [ItemNotNull] public SyntaxList<StatementSyntax> Statements { get; }
         [NotNull] public ICloseBraceToken CloseBrace { get; }
 
         public BlockExpressionSyntax(
             [NotNull] IOpenBraceToken openBrace,
-            [NotNull] SyntaxList<StatementSyntax> statements,
+            [NotNull][ItemNotNull] SyntaxList<StatementSyntax> statements,
             [NotNull] ICloseBraceToken closeBrace)
             : base(TextSpan.Covering(openBrace.Span, closeBrace.Span))
         {

@@ -140,7 +140,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics
 
                 case ReturnExpressionSyntax returnExpression:
                     return new ReturnExpression(returnExpression, AllDiagnostics(returnExpression),
-                        Node(returnExpression.Expression));
+                        Node(returnExpression.ReturnValue));
 
                 case BinaryOperatorExpressionSyntax binaryOperatorExpression:
                     {

@@ -2,16 +2,16 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Literals;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Operators;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Types.Names;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Graph;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements.LValues;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Literals;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         {
             Requires.NotNull(nameof(functions), functions);
 
-            foreach (var function in functions)
+            foreach (var function in functions.Where(f => !f.Diagnostics.Any()))
                 BuildGraph(function);
         }
 
@@ -31,18 +31,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         {
             Requires.NotNull(nameof(function), function);
 
-            var cfg = function.ControlFlow;
+            var cfg = new ControlFlowGraph();
+            function.ControlFlow = cfg;
 
             // Temp Variable for return
-            cfg.Let(function.ReturnType);
+            cfg.Let(function.ReturnType.AssertNotNull());
             foreach (var parameter in function.Parameters)
-                cfg.AddVariable(parameter.MutableBinding, parameter.Type, parameter.Name);
+                cfg.AddVariable(parameter.MutableBinding, parameter.Type.AssertNotNull(), parameter.Name);
 
             var blocks = new Dictionary<SyntaxNode, BasicBlock>();
             var entryBlock = cfg.EntryBlock;
             blocks.Add(function.Syntax.Body, entryBlock);
             var currentBlock = entryBlock;
-            foreach (var statement in function.Syntax.Body.Statements)
+            foreach (var statement in function.Statements)
                 Convert(cfg, statement, currentBlock);
 
             if (!function.Syntax.Body.Statements.Any())
@@ -56,7 +57,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             return cfg.VariableDeclarations.Single(v => v.Name == name).AssertNotNull().Reference;
         }
 
-        private void Convert([NotNull] ControlFlowGraph cfg, [NotNull] StatementSyntax statement, [NotNull] BasicBlock currentBlock)
+        private void Convert([NotNull] ControlFlowGraph cfg, [NotNull] StatementAnalysis statement, [NotNull] BasicBlock currentBlock)
         {
             Requires.NotNull(nameof(cfg), cfg);
             Requires.NotNull(nameof(statement), statement);
@@ -64,7 +65,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
             switch (statement)
             {
-                case VariableDeclarationStatementSyntax variableDeclaration:
+                case VariableDeclarationStatementAnalysis variableDeclaration:
                     //                    var variable = il.AddVariable(variableDeclaration.MutableBinding,
                     //                        variableDeclaration.Type,
                     //                        variableDeclaration.Name);
@@ -72,7 +73,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     //                        ConvertAssignment(variable.Reference, variableDeclaration.Initializer);
                     break;
 
-                case ExpressionStatementSyntax expressionStatement:
+                case ExpressionStatementAnalysis expressionStatement:
                     Convert(cfg, expressionStatement.Expression, currentBlock);
                     break;
 
@@ -100,7 +101,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         //            return false;
         //        }
 
-        private void Convert([NotNull] ControlFlowGraph cfg, [NotNull] ExpressionSyntax expression, [NotNull] BasicBlock currentBlock)
+        private void Convert([NotNull] ControlFlowGraph cfg, [NotNull] ExpressionAnalysis expression, [NotNull] BasicBlock currentBlock)
         {
             Requires.NotNull(nameof(cfg), cfg);
             Requires.NotNull(nameof(expression), expression);
@@ -108,17 +109,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
             switch (expression)
             {
-                case IdentifierNameSyntax _:
+                case IdentifierNameAnalysis _:
                     // Ignore, reading from variable does nothing.
                     break;
-                case BinaryOperatorExpressionSyntax _:
+                case BinaryOperatorExpressionAnalysis binaryOperatorExpression:
                     // Could be side effects possibly.
-                    var temp = cfg.Let(null);
+                    var temp = cfg.Let(binaryOperatorExpression.Type.AssertNotNull());
                     ConvertAssignment(cfg, temp.Reference, expression, currentBlock);
                     break;
-                case ReturnExpressionSyntax returnExpression:
-                    if (returnExpression.Expression != null)
-                        ConvertAssignment(cfg, cfg.ReturnVariable.Reference, returnExpression.Expression, currentBlock);
+                case ReturnExpressionAnalysis returnExpression:
+                    if (returnExpression.ReturnExpression != null)
+                        ConvertAssignment(cfg, cfg.ReturnVariable.Reference, returnExpression.ReturnExpression, currentBlock);
                     currentBlock.End(new ReturnStatement());
                     break;
                 default:
@@ -129,7 +130,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private void ConvertAssignment(
             [NotNull] ControlFlowGraph cfg,
             [NotNull] LValue lvalue,
-            [NotNull] ExpressionSyntax value,
+            [NotNull] ExpressionAnalysis value,
             [NotNull] BasicBlock currentBlock)
         {
             Requires.NotNull(nameof(cfg), cfg);
@@ -143,14 +144,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 //                    var args = newObjectExpression.Arguments.Select(ConvertToLValue);
                 //                    currentBlock.Add(new NewObjectStatement(lvalue, newObjectExpression.Type, args));
                 //                    break;
-                case IdentifierNameSyntax identifier:
-                    currentBlock.Add(new AssignmentStatement(lvalue, LookupVariable(cfg, identifier.Name?.Value)));
+                case IdentifierNameAnalysis identifier:
+                    currentBlock.Add(new AssignmentStatement(lvalue, LookupVariable(cfg, identifier.Name.AssertNotNull())));
                     break;
-                case BinaryOperatorExpressionSyntax binaryOperator:
+                case BinaryOperatorExpressionAnalysis binaryOperator:
                     ConvertOperator(cfg, lvalue, binaryOperator, currentBlock);
                     break;
-                case IntegerLiteralExpressionSyntax v:
-                    currentBlock.Add(new IntegerLiteralStatement(lvalue, v.IntegerLiteral.Value));
+                case IntegerLiteralExpressionAnalysis v:
+                    currentBlock.Add(new IntegerLiteralStatement(lvalue, v.Value));
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(value);
@@ -160,7 +161,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private void ConvertOperator(
             [NotNull] ControlFlowGraph cfg,
             [NotNull] LValue lvalue,
-            [NotNull] BinaryOperatorExpressionSyntax binaryOperator,
+            [NotNull] BinaryOperatorExpressionAnalysis binaryOperator,
             [NotNull] BasicBlock currentBlock)
         {
             switch (binaryOperator.Operator)
@@ -176,13 +177,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         }
 
         [NotNull]
-        private LValue ConvertToLValue([NotNull] ControlFlowGraph cfg, [NotNull] ExpressionSyntax value)
+        private LValue ConvertToLValue([NotNull] ControlFlowGraph cfg, [NotNull] ExpressionAnalysis value)
         {
             Requires.NotNull(nameof(value), value);
             switch (value)
             {
-                case IdentifierNameSyntax identifier:
-                    return LookupVariable(cfg, identifier.Name.Value);
+                case IdentifierNameAnalysis identifier:
+                    return LookupVariable(cfg, identifier.Name.AssertNotNull());
                 //case VariableExpression variableExpression:
                 //    return LookupVariable(variableExpression.Name);
                 default:

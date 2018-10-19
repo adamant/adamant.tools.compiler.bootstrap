@@ -58,7 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
                         nodes.PushRange(blockStatement.Statements.Reverse());
                         break;
                     case ReturnExpressionSyntax returnExpression:
-                        nodes.Push(returnExpression.Expression);
+                        nodes.Push(returnExpression.ReturnValue);
                         break;
                     case ExpressionStatementSyntax expressionStatement:
                         nodes.Push(expressionStatement.Expression);
