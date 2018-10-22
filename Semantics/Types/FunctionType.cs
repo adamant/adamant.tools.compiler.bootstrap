@@ -1,9 +1,8 @@
 using System.Collections.Generic;
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Old.Semantics.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
 {
     // A function type is the type of a declared function, method or constructor.
     // A function type may be generic and have generic parameters
