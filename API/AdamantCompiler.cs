@@ -64,9 +64,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             var packageSyntax = new PackageSyntax(name, compilationUnits);
 
             var analyzer = new SemanticAnalyzer();
-            var package = analyzer.Analyze(packageSyntax);
 
-            return package;
+            return analyzer.Analyze(packageSyntax);
         }
     }
 }

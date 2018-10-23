@@ -16,6 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
     public class SemanticAnalyzer
     {
+        [NotNull]
         public Package Analyze([NotNull] PackageSyntax packageSyntax)
         {
             var nameBuilder = new NameBuilder();
@@ -54,7 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             var diagnostics = new DiagnosticsBuilder();
             var declarations = declarationAnalyses.Select(d => d.Complete(diagnostics)).ToList();
             var entryPoint = DetermineEntryPoint(declarations, diagnostics);
-            return new Package(packageSyntax.Name, diagnostics.Build(), declarations, entryPoint);
+            return new Package(packageSyntax.Name, diagnostics.Build(), namespaces, declarations, entryPoint);
         }
 
         [CanBeNull]
