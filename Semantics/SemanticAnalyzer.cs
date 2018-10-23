@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
@@ -17,16 +18,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
     {
         public Package Analyze([NotNull] PackageSyntax packageSyntax)
         {
-            // TODO change the below code so it isn't dependent on the package. Create package at end.
-            var package = new Package(packageSyntax.Name);
-
             var nameBuilder = new NameBuilder();
 
             // Gather a list of all the namespaces for validating using statements
-            new NamespaceBuilder(nameBuilder).GatherNamespaces(package, packageSyntax);
+            var namespaces = new NamespaceBuilder(nameBuilder).GatherNamespaces(packageSyntax).ToList();
 
             // Gather all the declarations and simultaneously build up trees of lexical scopes
-            var compilationUnits = new AnalysisBuilder(nameBuilder).Build(packageSyntax);
+            var compilationUnits = new AnalysisBuilder(nameBuilder).Build(packageSyntax).ToList();
 
             // Check lexical scopes and attach to entities etc.
             var scopeBinder = new ScopeBinder();
@@ -34,40 +32,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                 scopeBinder.Bind(scope);
 
             // Make a list of tall the declarations now that they have proper scopes etc.
-            var declarations = compilationUnits.SelectMany(cu => cu.Declarations).ToList();
+            var declarationAnalyses = compilationUnits.SelectMany(cu => cu.Declarations).ToList();
 
             // Do name binding, type checking, IL statement generation and compile time code execution
             // They are all interdependent to some degree
             var expressionAnalysisBuilder = new ExpressionAnalysisBuilder();
             var nameBinder = new NameBinder();
             var typeChecker = new TypeChecker(nameBinder, expressionAnalysisBuilder);
-            typeChecker.CheckTypes(declarations);
+            typeChecker.CheckTypes(declarationAnalyses);
 
             // At this point, some but not all of the functions will have IL statements generated,
             // now generate the rest
             var cfgBuilder = new ControlFlowGraphBuilder();
-            cfgBuilder.BuildGraph(declarations.OfType<FunctionDeclarationAnalysis>());
+            cfgBuilder.BuildGraph(declarationAnalyses.OfType<FunctionDeclarationAnalysis>());
 
             // Only borrow checking left
             var borrowChecker = new BorrowChecker();
-            borrowChecker.Check(declarations);
+            borrowChecker.Check(declarationAnalyses);
 
             // Gather the diagnostics and declarations into a package
             var diagnostics = new DiagnosticsBuilder();
-            foreach (var declaration in declarations)
-            {
-                package.Add(declaration.Complete());
-                diagnostics.Publish(declaration.Diagnostics.Build());
-            }
-
-            DetermineEntryPoint(package, diagnostics);
-            package.Diagnostics = diagnostics.Build();
-            return package;
+            var declarations = declarationAnalyses.Select(d => d.Complete(diagnostics)).ToList();
+            var entryPoint = DetermineEntryPoint(declarations, diagnostics);
+            return new Package(packageSyntax.Name, diagnostics.Build(), declarations, entryPoint);
         }
 
-        private static void DetermineEntryPoint([NotNull] Package package, [NotNull] DiagnosticsBuilder diagnostics)
+        [CanBeNull]
+        private static FunctionDeclaration DetermineEntryPoint([NotNull] List<Declaration> declarations, [NotNull] DiagnosticsBuilder diagnostics)
         {
-            var mainFunctions = package.Declarations.OfType<FunctionDeclaration>()
+            var mainFunctions = declarations.OfType<FunctionDeclaration>()
                 // TODO make an easy way to construct and compare qualified names
                 .Where(f => !f.QualifiedName.Qualifier.Any()
                             && f.QualifiedName.Name.Text == "main")
@@ -77,7 +70,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             // TODO compiler error on multiple main functions
 
-            package.EntryPoint = mainFunctions.SingleOrDefault();
+            return mainFunctions.SingleOrDefault();
         }
     }
 }

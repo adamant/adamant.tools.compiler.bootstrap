@@ -24,6 +24,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
         }
 
         [NotNull]
-        public abstract Declaration Complete();
+        public abstract Declaration Complete([NotNull] DiagnosticsBuilder diagnostics);
+
+        protected void CompleteDiagnostics([NotNull] DiagnosticsBuilder diagnostics)
+        {
+            diagnostics.Publish(Diagnostics.Build());
+        }
     }
 }

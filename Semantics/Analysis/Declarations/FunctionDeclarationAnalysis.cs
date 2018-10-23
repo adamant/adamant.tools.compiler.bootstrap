@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Statements;
@@ -40,8 +41,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
         }
 
         [NotNull]
-        public override Declaration Complete()
+        public override Declaration Complete([NotNull] DiagnosticsBuilder diagnostics)
         {
+            CompleteDiagnostics(diagnostics);
             return new FunctionDeclaration(
                 Context.File,
                 QualifiedName,

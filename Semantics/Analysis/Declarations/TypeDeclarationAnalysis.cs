@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
@@ -21,8 +22,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
         }
 
         [NotNull]
-        public override Declaration Complete()
+        public override Declaration Complete([NotNull] DiagnosticsBuilder diagnostics)
         {
+            CompleteDiagnostics(diagnostics);
             return new TypeDeclaration(Context.File, QualifiedName);
         }
     }

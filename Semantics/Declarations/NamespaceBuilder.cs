@@ -18,9 +18,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations
             this.nameBuilder = nameBuilder;
         }
 
-        public void GatherNamespaces(
-            [NotNull] Package package,
-            [NotNull] PackageSyntax packageSyntax)
+        [NotNull]
+        [ItemNotNull]
+        public IEnumerable<Namespace> GatherNamespaces([NotNull] PackageSyntax packageSyntax)
         {
             var namespaces = new HashSet<Name>();
 
@@ -34,16 +34,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations
                 namespaces.Add(@namespace);
 
                 foreach (var declaration in compilationUnit.Declarations.OfType<NamespaceDeclarationSyntax>())
-                    GatherNamespaces(package, compilationUnit.CodeFile, @namespace, declaration);
+                    GatherNamespaces(compilationUnit.CodeFile, @namespace, declaration);
             }
 
             foreach (var @namespace in namespaces)
             {
-                package.Add(new Namespace(@namespace));
+                yield return new Namespace(@namespace);
             }
         }
 
-        private void GatherNamespaces(Package package, CodeFile codeFile, Name @namespace, NamespaceDeclarationSyntax declaration)
+        private void GatherNamespaces(
+            CodeFile codeFile,
+            Name @namespace,
+            NamespaceDeclarationSyntax declaration)
         {
             throw new NotImplementedException();
         }

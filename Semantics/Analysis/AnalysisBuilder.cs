@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using JetBrains.Annotations;
@@ -20,9 +19,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
 
         [NotNull]
         [ItemNotNull]
-        public List<CompilationUnitAnalysis> Build([NotNull] PackageSyntax packageSyntax)
+        public IEnumerable<CompilationUnitAnalysis> Build([NotNull] PackageSyntax packageSyntax)
         {
-            return compilationUnitAnalysisBuilder.Build(packageSyntax).ToList();
+            return compilationUnitAnalysisBuilder.Build(packageSyntax);
         }
     }
 }

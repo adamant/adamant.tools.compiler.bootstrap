@@ -17,16 +17,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         [NotNull] [ItemNotNull] private readonly List<Declaration> declarations = new List<Declaration>();
         [CanBeNull] public FunctionDeclaration EntryPoint { get; internal set; }
 
-        public Package([NotNull] string name)
-        {
-            Requires.NotNull(nameof(name), name);
-            Name = name;
-            Diagnostics = Diagnostics.Empty;
-            Declarations = declarations.AsReadOnly().AssertNotNull();
-            Namespaces = namespaces.AsReadOnly().AssertNotNull();
-        }
-
-        // Full constructor needed for testing etc.
         public Package(
             [NotNull] string name,
             [NotNull] Diagnostics diagnostics,
