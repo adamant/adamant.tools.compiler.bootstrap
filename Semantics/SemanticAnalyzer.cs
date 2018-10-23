@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
@@ -18,6 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
     {
         public Package Analyze([NotNull] PackageSyntax packageSyntax)
         {
+            // TODO change the below code so it isn't dependent on the package. Create package at end.
             var package = new Package(packageSyntax.Name);
 
             var nameBuilder = new NameBuilder();
@@ -26,13 +26,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             new NamespaceBuilder(nameBuilder).GatherNamespaces(package, packageSyntax);
 
             // Gather all the declarations and simultaneously build up trees of lexical scopes
-            var compilationUnits = BuildCompilationUnits(packageSyntax, nameBuilder);
+            var compilationUnits = new AnalysisBuilder(nameBuilder).Build(packageSyntax);
 
-            // Check lexical namespaces and attach to entities etc.
+            // Check lexical scopes and attach to entities etc.
             var scopeBinder = new ScopeBinder();
             foreach (var scope in compilationUnits.Select(cu => cu.GlobalScope))
                 scopeBinder.Bind(scope);
 
+            // Make a list of tall the declarations now that they have proper scopes etc.
             var declarations = compilationUnits.SelectMany(cu => cu.Declarations).ToList();
 
             // Do name binding, type checking, IL statement generation and compile time code execution
@@ -42,7 +43,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             var typeChecker = new TypeChecker(nameBinder, expressionAnalysisBuilder);
             typeChecker.CheckTypes(declarations);
 
-            // At this point, some but not all of the functions will have IL statements generated
+            // At this point, some but not all of the functions will have IL statements generated,
+            // now generate the rest
             var cfgBuilder = new ControlFlowGraphBuilder();
             cfgBuilder.BuildGraph(declarations.OfType<FunctionDeclarationAnalysis>());
 
@@ -50,6 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             var borrowChecker = new BorrowChecker();
             borrowChecker.Check(declarations);
 
+            // Gather the diagnostics and declarations into a package
             var diagnostics = new DiagnosticsBuilder();
             foreach (var declaration in declarations)
             {
@@ -60,19 +63,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             DetermineEntryPoint(package, diagnostics);
             package.Diagnostics = diagnostics.Build();
             return package;
-        }
-
-        [NotNull]
-        [ItemNotNull]
-        private static List<CompilationUnitAnalysis> BuildCompilationUnits(
-            [NotNull] PackageSyntax packageSyntax,
-            [NotNull] NameBuilder nameBuilder)
-        {
-            var expressionBuilder = new ExpressionAnalysisBuilder();
-            var statementBuilder = new StatementAnalysisBuilder(expressionBuilder);
-            var declarationBuilder = new DeclarationAnalysisBuilder(nameBuilder, expressionBuilder, statementBuilder);
-            var compilationUnitBuilder = new CompilationUnitAnalysisBuilder(nameBuilder, declarationBuilder);
-            return compilationUnitBuilder.Build(packageSyntax).ToList();
         }
 
         private static void DetermineEntryPoint([NotNull] Package package, [NotNull] DiagnosticsBuilder diagnostics)
