@@ -15,19 +15,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Graph
         public BasicBlock(int number)
         {
             Number = number;
-            Statements = statements.AsReadOnly();
+            Statements = statements.AsReadOnly().AssertNotNull();
         }
 
-        public void Add(SimpleStatement statement)
+        public void Add([NotNull] SimpleStatement statement)
         {
+            Requires.NotNull(nameof(statement), statement);
             if (EndStatement == null)
                 statements.Add(statement);
             else
                 statements.Insert(statements.Count - 2, statement);
         }
 
-        public void End(EndStatement endStatement)
+        public void End([NotNull] EndStatement endStatement)
         {
+            Requires.NotNull(nameof(endStatement), endStatement);
             // Can only set an end statement if there isn't already one
             Requires.Null(nameof(EndStatement), EndStatement);
             EndStatement = endStatement;

@@ -46,7 +46,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             foreach (var statement in function.Statements)
                 Convert(cfg, statement, currentBlock);
 
-            if (!function.Syntax.Body.Statements.Any())
+            // Generate the implicit return statement
+            if (currentBlock.Number == 0 && currentBlock.EndStatement == null)
                 currentBlock.End(new ReturnStatement());
         }
 

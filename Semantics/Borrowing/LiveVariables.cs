@@ -1,21 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Statements;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Graph;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 {
     public class LiveVariables
     {
         public int VariableCount { get; }
-        private readonly Dictionary<StatementAnalysis, BitArray> values = new Dictionary<StatementAnalysis, BitArray>();
+        [NotNull] private readonly Dictionary<Statement, BitArray> values = new Dictionary<Statement, BitArray>();
 
-        public LiveVariables(ControlFlowGraph function)
+        public LiveVariables([NotNull] ControlFlowGraph graph)
         {
-            VariableCount = function.VariableDeclarations.Count;
+            Requires.NotNull(nameof(graph), graph);
+            VariableCount = graph.VariableDeclarations.Count;
         }
 
-        public BitArray Before(StatementAnalysis statement)
+        [NotNull]
+        public BitArray Before([NotNull] Statement statement)
         {
             if (values.TryGetValue(statement, out var existingValue))
                 return existingValue;

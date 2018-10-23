@@ -1,11 +1,15 @@
+using Adamant.Tools.Compiler.Bootstrap.Framework;
+using JetBrains.Annotations;
+
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Statements.LValues
 {
     public class Dereference : LValue
     {
-        public readonly LValue DereferencedValue;
+        [NotNull] public readonly LValue DereferencedValue;
 
-        public Dereference(LValue dereferencedValue)
+        public Dereference([NotNull] LValue dereferencedValue)
         {
+            Requires.NotNull(nameof(dereferencedValue), dereferencedValue);
             DereferencedValue = dereferencedValue;
         }
 

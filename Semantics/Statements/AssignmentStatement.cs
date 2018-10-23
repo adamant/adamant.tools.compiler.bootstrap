@@ -1,15 +1,19 @@
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements.LValues;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements.RValues;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Statements
 {
     public class AssignmentStatement : SimpleStatement
     {
-        public LValue LValue { get; }
-        public RValue RValue { get; }
+        [NotNull] public LValue LValue { get; }
+        [NotNull] public RValue RValue { get; }
 
-        public AssignmentStatement(LValue lValue, RValue rValue)
+        public AssignmentStatement([NotNull] LValue lValue, [NotNull] RValue rValue)
         {
+            Requires.NotNull(nameof(lValue), lValue);
+            Requires.NotNull(nameof(rValue), rValue);
             LValue = lValue;
             RValue = rValue;
         }
