@@ -26,13 +26,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // Gather all the declarations and simultaneously build up trees of lexical scopes
             var compilationUnits = new AnalysisBuilder(nameBuilder).Build(packageSyntax).ToList();
 
+            // Make a list of tall the declarations
+            var declarationAnalyses = compilationUnits.SelectMany(cu => cu.Declarations).ToList();
+
             // Check lexical scopes and attach to entities etc.
-            var scopeBinder = new ScopeBinder();
+            var scopeBinder = new ScopeBinder(declarationAnalyses);
             foreach (var scope in compilationUnits.Select(cu => cu.GlobalScope))
                 scopeBinder.Bind(scope);
-
-            // Make a list of tall the declarations now that they have proper scopes etc.
-            var declarationAnalyses = compilationUnits.SelectMany(cu => cu.Declarations).ToList();
 
             // Do name binding, type checking, IL statement generation and compile time code execution
             // They are all interdependent to some degree

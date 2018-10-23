@@ -1,3 +1,4 @@
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.ControlFlow;
@@ -17,6 +18,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
 {
     public class ExpressionAnalysisBuilder
     {
+        public StatementAnalysisBuilder StatementBuilder { get; internal set; }
+
         [NotNull]
         public ExpressionAnalysis Build(
             [NotNull] AnalysisContext context,
@@ -46,10 +49,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                     var typeName = Build(context, lifetimeType.TypeName);
                     return new LifetimeTypeAnalysis(context, lifetimeType, typeName);
                 case BlockExpressionSyntax blockExpression:
-                    return new BlockExpressionAnalysis(context, blockExpression);
+                    return new BlockExpressionAnalysis(context, blockExpression,
+                        blockExpression.Statements.Select(s => StatementBuilder.Build(context, s)));
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
         }
+
+
     }
 }

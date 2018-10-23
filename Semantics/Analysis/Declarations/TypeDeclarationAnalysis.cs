@@ -2,6 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using JetBrains.Annotations;
 
@@ -10,6 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
     public class TypeDeclarationAnalysis : DeclarationAnalysis
     {
         [NotNull] public DeclarationSyntax Syntax { get; }
+        [NotNull] public ObjectType DeclaredType { get; }
 
         public TypeDeclarationAnalysis(
             [NotNull] AnalysisContext context,
@@ -19,6 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
         {
             Requires.NotNull(nameof(syntax), syntax);
             Syntax = syntax;
+            DeclaredType = new ObjectType(qualifiedName, false); // TODO correctly read is mutable
         }
 
         [NotNull]

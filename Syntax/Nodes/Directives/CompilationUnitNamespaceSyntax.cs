@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives
 {
-    public class CompilationUnitNamespaceSyntax : SyntaxNode
+    public class CompilationUnitNamespaceSyntax : SyntaxNode, INamespaceSyntax
     {
         [NotNull] public INamespaceKeywordToken NamespaceKeyword { get; }
         [NotNull] public NameSyntax Name { get; }
@@ -21,5 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives
             Name = name;
             Semicolon = semicolon;
         }
+
+        [NotNull] SyntaxNode INamespaceSyntax.AsSyntaxNode => this;
     }
 }

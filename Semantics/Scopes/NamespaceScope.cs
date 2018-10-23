@@ -1,16 +1,25 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 {
-    public class NamespaceScope : LexicalScope
+    public class NamespaceScope : DeclarationScope
     {
-        [NotNull] public LexicalScope ContainingScope { get; }
+        [NotNull] public new INamespaceSyntax Syntax { get; }
 
-        public NamespaceScope([NotNull] LexicalScope containingScope)
+        public NamespaceScope(
+            [NotNull] LexicalScope containingScope,
+            [NotNull] INamespaceSyntax @namespace)
+            : base(containingScope, @namespace.AsSyntaxNode)
         {
-            Requires.NotNull(nameof(containingScope), containingScope);
-            ContainingScope = containingScope;
+            Syntax = @namespace;
+        }
+
+        [CanBeNull]
+        public override DeclarationAnalysis Lookup([NotNull] string name)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

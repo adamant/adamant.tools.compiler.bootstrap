@@ -41,5 +41,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3003, "Expression must be of type `type` (i.e. it must evaluate to a type)");
         }
+
+        [NotNull]
+        public static Diagnostic NameRefersToFunctionNotType([NotNull] CodeFile file, TextSpan span, string name)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3004, $"The name `{name}` refers to a function not a type.");
+        }
     }
 }

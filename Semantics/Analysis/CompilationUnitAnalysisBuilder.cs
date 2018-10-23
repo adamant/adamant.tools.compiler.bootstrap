@@ -26,9 +26,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         {
             foreach (var compilationUnit in packageSyntax.CompilationUnits)
             {
-                var globalScope = new CompilationUnitScope();
-                var declarations = Build(compilationUnit, globalScope);
-                yield return new CompilationUnitAnalysis(globalScope, declarations);
+                var scope = new CompilationUnitScope(compilationUnit);
+                var declarations = Build(compilationUnit, scope);
+                yield return new CompilationUnitAnalysis(scope, declarations);
             }
         }
 
@@ -36,19 +36,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         [ItemNotNull]
         private IEnumerable<DeclarationAnalysis> Build(
             [NotNull] CompilationUnitSyntax compilationUnit,
-            [NotNull] CompilationUnitScope globalScope)
+            [NotNull] CompilationUnitScope compilationUnitScope)
         {
             Name @namespace = GlobalNamespaceName.Instance;
-            LexicalScope scope = globalScope;
+            LexicalScope scope = compilationUnitScope;
             if (compilationUnit.Namespace != null)
             {
                 @namespace = nameBuilder.BuildName(compilationUnit.Namespace.Name) ?? @namespace;
-                scope = new NamespaceScope(scope);
+                scope = new NamespaceScope(scope, compilationUnit.Namespace);
             }
 
+            var context = new AnalysisContext(compilationUnit.CodeFile, scope);
             foreach (var declaration in compilationUnit.Declarations)
             {
-                var context = new AnalysisContext(compilationUnit.CodeFile, scope);
                 var analysis = declarationBuilder.Build(context, @namespace, declaration);
                 if (analysis != null)
                     yield return analysis;
