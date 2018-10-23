@@ -60,6 +60,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
 
             if (expectedCompileErrorLines.Any())
             {
+                testOutput.WriteLine("Compiler Errors:");
+                foreach (var diagnostic in diagnostics)
+                {
+                    testOutput.WriteLine($"{testCase.RelativeCodePath}:{diagnostic.StartPosition.Line}:{diagnostic.StartPosition.Column} {diagnostic.Level} {diagnostic.ErrorCode}");
+                    testOutput.WriteLine(diagnostic.Message);
+                }
                 foreach (var expectedCompileErrorLine in expectedCompileErrorLines)
                 {
                     // Assert a single error on the given line
