@@ -9,11 +9,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
     public class CompilationUnitAnalysis
     {
         [NotNull] public CompilationUnitScope GlobalScope { get; }
-        [NotNull] [ItemNotNull] public IReadOnlyList<DeclarationAnalysis> Declarations { get; }
+        [NotNull] [ItemNotNull] public IReadOnlyList<MemberDeclarationAnalysis> Declarations { get; }
 
         public CompilationUnitAnalysis(
             [NotNull] CompilationUnitScope globalScope,
-            [NotNull][ItemNotNull] IEnumerable<DeclarationAnalysis> declarations)
+            [NotNull][ItemNotNull] IEnumerable<MemberDeclarationAnalysis> declarations)
         {
             GlobalScope = globalScope;
             Declarations = declarations.ToReadOnlyList();

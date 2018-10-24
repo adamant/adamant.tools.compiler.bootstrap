@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         public string Convert([NotNull] Parameter parameter)
         {
             var type = typeConverter.Convert(parameter.Type);
-            var name = nameMangler.Mangle(parameter.Name);
+            var name = nameMangler.Mangle(parameter.Name.Name.Text);
             return parameter.MutableBinding ? $"{type} ᵢ{name}" : $"const {type} ᵢ{name}";
         }
     }

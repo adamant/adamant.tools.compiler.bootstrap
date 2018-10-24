@@ -58,7 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             Assert.NotNull(package.Diagnostics);
             var diagnostics = package.Diagnostics;
 
-            if (expectedCompileErrorLines.Any())
+            if (diagnostics.Any())
             {
                 testOutput.WriteLine("Compiler Errors:");
                 foreach (var diagnostic in diagnostics)
@@ -66,6 +66,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
                     testOutput.WriteLine($"{testCase.RelativeCodePath}:{diagnostic.StartPosition.Line}:{diagnostic.StartPosition.Column} {diagnostic.Level} {diagnostic.ErrorCode}");
                     testOutput.WriteLine(diagnostic.Message);
                 }
+            }
+
+            if (expectedCompileErrorLines.Any())
+            {
                 foreach (var expectedCompileErrorLine in expectedCompileErrorLines)
                 {
                     // Assert a single error on the given line

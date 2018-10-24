@@ -16,13 +16,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 {
     public class BorrowChecker
     {
-        public void Check([NotNull][ItemNotNull] IEnumerable<DeclarationAnalysis> declarations)
+        public void Check([NotNull][ItemNotNull] IEnumerable<MemberDeclarationAnalysis> declarations)
         {
             foreach (var declaration in declarations)
                 Check(declaration);
         }
 
-        public void Check([NotNull] DeclarationAnalysis declaration)
+        public void Check([NotNull] MemberDeclarationAnalysis declaration)
         {
             switch (declaration)
             {

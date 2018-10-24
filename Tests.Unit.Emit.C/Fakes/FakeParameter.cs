@@ -1,5 +1,6 @@
 using System;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C.Fakes
 {
@@ -8,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C.Fakes
         private readonly Guid instance = Guid.NewGuid();
 
         public FakeParameter()
-            : base(false, "fake", new FakeDataType())
+            : base(false, new QualifiedName("fake"), new FakeDataType())
         {
         }
 

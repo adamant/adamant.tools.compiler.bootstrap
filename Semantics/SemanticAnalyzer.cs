@@ -37,9 +37,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             // Do name binding, type checking, IL statement generation and compile time code execution
             // They are all interdependent to some degree
-            var expressionAnalysisBuilder = new ExpressionAnalysisBuilder();
             var nameBinder = new NameBinder();
-            var typeChecker = new TypeChecker(nameBinder, expressionAnalysisBuilder);
+            var typeChecker = new TypeChecker(nameBinder);
             typeChecker.CheckTypes(declarationAnalyses);
 
             // At this point, some but not all of the functions will have IL statements generated,

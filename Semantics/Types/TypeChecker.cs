@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.ControlFlow;
@@ -12,7 +11,6 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Types.Name
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
@@ -21,20 +19,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
     public class TypeChecker
     {
         [NotNull] private readonly NameBinder nameBinder;
-        [NotNull] private readonly ExpressionAnalysisBuilder expressionAnalysisBuilder;
 
-        public TypeChecker(
-            [NotNull] NameBinder nameBinder,
-            [NotNull] ExpressionAnalysisBuilder expressionAnalysisBuilder)
+        public TypeChecker([NotNull] NameBinder nameBinder)
         {
             Requires.NotNull(nameof(nameBinder), nameBinder);
-            Requires.NotNull(nameof(expressionAnalysisBuilder), expressionAnalysisBuilder);
             this.nameBinder = nameBinder;
-            this.expressionAnalysisBuilder = expressionAnalysisBuilder;
         }
 
         public void CheckTypes(
-            [NotNull] IList<DeclarationAnalysis> analyses)
+            [NotNull] IList<MemberDeclarationAnalysis> analyses)
         {
             foreach (var analysis in analyses)
             {
@@ -59,12 +52,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             foreach (var parameter in function.Parameters)
             {
                 CheckTypeExpression(parameter.TypeExpression, function.Diagnostics);
-                parameter.Type = ResolveType(parameter.TypeExpression, function.Context.Scope, diagnostics);
+                parameter.Type = EvaluateType(parameter.TypeExpression, diagnostics);
             }
 
             var returnType = function.ReturnTypeExpression;
             CheckTypeExpression(returnType, function.Diagnostics);
-            function.ReturnType = ResolveType(returnType, function.Context.Scope, diagnostics);
+            function.ReturnType = EvaluateType(returnType, diagnostics);
             foreach (var statement in function.Statements)
                 CheckTypes(statement, function.Diagnostics);
         }
@@ -137,8 +130,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                     CheckTypes(binaryOperatorExpression, diagnostics);
                     break;
                 case IdentifierNameAnalysis identifierName:
-                    // TODO lookup correct type
-                    expression.Type = ObjectType.Int;
+                    var name = identifierName.Name;
+                    if (name == null)
+                    {
+                        // Missing name, just use unknown
+                        expression.Type = null;
+                    }
+                    else
+                    {
+                        var declaration = expression.Context.Scope.Lookup(name);
+                        switch (declaration)
+                        {
+                            case TypeDeclarationAnalysis _:
+                                expression.Type = ObjectType.Type;
+                                break;
+                            case ParameterAnalysis parameter:
+                                expression.Type = parameter.Type.AssertNotNull(); // TODO how can we be sure that type is resolved?
+                                break;
+                            case null:
+                                diagnostics.Publish(NameBindingError.CouldNotBindName(expression.Context.File, identifierName.Syntax.Span, name));
+                                expression.Type = null; // unknown
+                                break;
+                            default:
+                                throw NonExhaustiveMatchException.For(declaration);
+                        }
+                    }
                     break;
                 case UnaryOperatorExpressionAnalysis unaryOperatorExpression:
                     CheckTypes(unaryOperatorExpression, diagnostics);
@@ -226,9 +242,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
         /// Evaluates a type expression to the type it identifies
         /// </summary>
         [CanBeNull]
-        private static DataType ResolveType(
+        private static DataType EvaluateType(
             [NotNull] ExpressionAnalysis typeExpression,
-            [NotNull] LexicalScope scope,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
             switch (typeExpression)
@@ -242,11 +257,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                     }
                     else
                     {
-                        var declaration = scope.Lookup(name);
+                        var declaration = typeExpression.Context.Scope.Lookup(name);
                         switch (declaration)
                         {
                             case TypeDeclarationAnalysis typeDeclaration:
-                                return typeDeclaration.DeclaredType;
+                                return typeDeclaration.Type.Instance;
                             case FunctionDeclarationAnalysis _: // The name doesn't match the name of a type
                                 diagnostics.Publish(TypeError.NameRefersToFunctionNotType(typeExpression.Context.File, identifier.Syntax.Span, name));
                                 return null;
@@ -278,11 +293,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                             return ObjectType.Never;
                         case TypeKeywordToken _:
                             return ObjectType.Type;
+                        case MetatypeKeywordToken _:
+                            return ObjectType.Metatype;
                         default:
                             throw NonExhaustiveMatchException.For(primitive.Syntax.Keyword);
                     }
                 case LifetimeTypeAnalysis lifetimeType:
-                    return ResolveType(lifetimeType.TypeName, scope, diagnostics);
+                    return EvaluateType(lifetimeType.TypeName, diagnostics);
                 default:
                     throw NonExhaustiveMatchException.For(typeExpression);
             }

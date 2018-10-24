@@ -73,12 +73,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics
         //    });
         //}
 
-        private static DeclarationAnalysis PrepareForAnalysis(
+        private static MemberDeclarationAnalysis PrepareForAnalysis(
             [NotNull] DeclarationSyntax declaration)
         {
             var nameBuilder = new NameBuilder();
-            var expressionBuilder = new ExpressionAnalysisBuilder();
-            var statementBuilder = new StatementAnalysisBuilder(expressionBuilder);
+            StatementAnalysisBuilder statementBuilder = null;
+            var expressionBuilder = new ExpressionAnalysisBuilder(() => statementBuilder);
+            statementBuilder = new StatementAnalysisBuilder(expressionBuilder);
             var declarationBuilder = new DeclarationAnalysisBuilder(nameBuilder, expressionBuilder, statementBuilder);
             var context = new AnalysisContext("".ToFakeCodeFile(), new FakeLexicalScope());
             return declarationBuilder.Build(context, null, declaration);

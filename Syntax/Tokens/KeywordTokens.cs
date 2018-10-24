@@ -46,6 +46,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
             typeof(BaseKeywordToken),
             typeof(ExtendKeywordToken),
             typeof(TypeKeywordToken),
+            typeof(MetatypeKeywordToken),
         }.AsReadOnly().AssertNotNull();
     }
 
@@ -363,6 +364,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         {
         }
     }
+
+    public partial interface IMetatypeKeywordToken : IKeywordToken { }
+    public class MetatypeKeywordToken : KeywordToken, IMetatypeKeywordToken
+    {
+        public MetatypeKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
     public partial class MissingToken :
         IPublicKeywordToken,
         IProtectedKeywordToken,
@@ -399,6 +409,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         IBaseKeywordToken,
         IExtendKeywordToken,
         ITypeKeywordToken,
+        IMetatypeKeywordToken,
         IKeywordToken // Implied, but saves issues with commas
     { }
 }

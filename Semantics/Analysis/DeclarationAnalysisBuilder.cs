@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         }
 
         [CanBeNull]
-        public DeclarationAnalysis Build(
+        public MemberDeclarationAnalysis Build(
             [NotNull] AnalysisContext context,
             [NotNull] Name @namespace,
             [NotNull] DeclarationSyntax declaration)
@@ -54,11 +54,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             if (!(syntax.Name.Value is string name)) return null;
 
             var fullName = @namespace.Qualify(name);
+            var bodyContext = context.InFunction(syntax);
+            // For missing parameter names, use `_` to ignore them
             return new FunctionDeclarationAnalysis(
                 context, syntax, fullName,
-                syntax.Parameters.Select(p => new ParameterAnalysis(p, expressionBuilder.Build(context, p.TypeExpression))),
+                syntax.Parameters.Select(p => new ParameterAnalysis(p, fullName.Qualify(p.Name.Value ?? "_"), expressionBuilder.Build(context, p.TypeExpression))),
                 expressionBuilder.Build(context, syntax.ReturnTypeExpression),
-                syntax.Body.Statements.Select(statementSyntax => statementBuilder.Build(context, statementSyntax)));
+                syntax.Body.Statements.Select(statementSyntax => statementBuilder.Build(bodyContext, statementSyntax)));
         }
 
         private static TypeDeclarationAnalysis Build(

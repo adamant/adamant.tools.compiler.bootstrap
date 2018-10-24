@@ -34,7 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
 
         [NotNull]
         [ItemNotNull]
-        private IEnumerable<DeclarationAnalysis> Build(
+        private IEnumerable<MemberDeclarationAnalysis> Build(
             [NotNull] CompilationUnitSyntax compilationUnit,
             [NotNull] CompilationUnitScope compilationUnitScope)
         {

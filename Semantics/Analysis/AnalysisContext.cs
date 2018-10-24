@@ -1,6 +1,8 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
@@ -16,6 +18,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             Requires.NotNull(nameof(scope), scope);
             File = file;
             Scope = scope;
+        }
+
+        [NotNull]
+        public AnalysisContext InFunction([NotNull] FunctionDeclarationSyntax syntax)
+        {
+            Requires.NotNull(nameof(syntax), syntax);
+            return new AnalysisContext(File, new FunctionScope(Scope, syntax));
+        }
+
+        [NotNull]
+        public AnalysisContext InBlock([NotNull] BlockExpressionSyntax syntax)
+        {
+            Requires.NotNull(nameof(syntax), syntax);
+            return new AnalysisContext(File, new BlockScope(Scope, syntax));
         }
     }
 }

@@ -1,10 +1,10 @@
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 {
-    public class NamespaceScope : DeclarationScope
+    public class NamespaceScope : NestedScope
     {
         [NotNull] public new INamespaceSyntax Syntax { get; }
 
@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
         }
 
         [CanBeNull]
-        public override DeclarationAnalysis Lookup([NotNull] string name)
+        public override IDeclarationAnalysis Lookup([NotNull] string name)
         {
             throw new System.NotImplementedException();
         }

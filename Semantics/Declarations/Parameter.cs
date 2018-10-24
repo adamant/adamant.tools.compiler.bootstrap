@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using JetBrains.Annotations;
 
@@ -7,12 +8,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations
     public class Parameter
     {
         public bool MutableBinding { get; }
-        [NotNull] public string Name { get; }
+        [NotNull] public QualifiedName Name { get; }
         [NotNull] public DataType Type { get; internal set; }
 
         public Parameter(
             bool mutableBinding,
-            [NotNull] string name,
+            [NotNull] QualifiedName name,
             [NotNull] DataType type)
         {
             Requires.NotNull(nameof(name), name);

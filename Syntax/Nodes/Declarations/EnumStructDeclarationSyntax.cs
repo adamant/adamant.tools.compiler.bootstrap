@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
 {
-    public class EnumStructDeclarationSyntax : DeclarationSyntax
+    public class EnumStructDeclarationSyntax : MemberDeclarationSyntax
     {
         [NotNull] public AccessModifierSyntax AccessModifier { get; }
         [NotNull] public IEnumKeywordToken EnumKeyword { get; }

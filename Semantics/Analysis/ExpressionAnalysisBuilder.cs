@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions;
@@ -18,7 +19,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
 {
     public class ExpressionAnalysisBuilder
     {
-        public StatementAnalysisBuilder StatementBuilder { get; internal set; }
+        [NotNull]
+        private StatementAnalysisBuilder StatementBuilder
+        {
+            get
+            {
+                if (statementBuilder != null) return statementBuilder;
+
+                statementBuilder = statementBuilderProvider.AssertNotNull()();
+                statementBuilderProvider = null;
+                return statementBuilder.AssertNotNull();
+            }
+        }
+        [CanBeNull] private StatementAnalysisBuilder statementBuilder;
+        [CanBeNull] private Func<StatementAnalysisBuilder> statementBuilderProvider;
+
+        /// <summary>
+        /// Because of a circular dependency, we don't take a <see cref="StatementAnalysisBuilder"/>
+        /// but a function we can call later to get it.
+        /// </summary>
+        /// <param name="statementBuilderProvider"></param>
+        public ExpressionAnalysisBuilder(
+            [NotNull] Func<StatementAnalysisBuilder> statementBuilderProvider)
+        {
+            this.statementBuilderProvider = statementBuilderProvider;
+        }
 
         [NotNull]
         public ExpressionAnalysis Build(
@@ -38,7 +63,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                     return new IntegerLiteralExpressionAnalysis(context, integerLiteral);
                 case BinaryOperatorExpressionSyntax binaryOperatorExpression:
                     var leftOperand = Build(context, binaryOperatorExpression.LeftOperand);
-                    var rightOperand = Build(context, binaryOperatorExpression.LeftOperand);
+                    var rightOperand = Build(context, binaryOperatorExpression.RightOperand);
                     return new BinaryOperatorExpressionAnalysis(context, binaryOperatorExpression, leftOperand, rightOperand);
                 case UnaryOperatorExpressionSyntax unaryOperatorExpression:
                     var operand = Build(context, unaryOperatorExpression.Operand);
@@ -49,8 +74,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                     var typeName = Build(context, lifetimeType.TypeName);
                     return new LifetimeTypeAnalysis(context, lifetimeType, typeName);
                 case BlockExpressionSyntax blockExpression:
+                    var blockContext = context.InBlock(blockExpression);
                     return new BlockExpressionAnalysis(context, blockExpression,
-                        blockExpression.Statements.Select(s => StatementBuilder.Build(context, s)));
+                        blockExpression.Statements.Select(s => StatementBuilder.Build(blockContext, s)));
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }

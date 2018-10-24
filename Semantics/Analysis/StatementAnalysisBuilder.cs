@@ -12,7 +12,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         public StatementAnalysisBuilder([NotNull] ExpressionAnalysisBuilder expressionBuilder)
         {
             this.expressionBuilder = expressionBuilder;
-            this.expressionBuilder.StatementBuilder = this;
         }
 
         [NotNull]

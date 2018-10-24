@@ -37,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             // Temp Variable for return
             cfg.Let(function.ReturnType.AssertNotNull());
             foreach (var parameter in function.Parameters)
-                cfg.AddVariable(parameter.MutableBinding, parameter.Type.AssertNotNull(), parameter.Name);
+                cfg.AddVariable(parameter.MutableBinding, parameter.Type.AssertNotNull(), parameter.Name.Name.Text);
 
             var blocks = new Dictionary<SyntaxNode, BasicBlock>();
             var entryBlock = cfg.EntryBlock;

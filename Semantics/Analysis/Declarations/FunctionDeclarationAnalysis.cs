@@ -13,9 +13,10 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
 {
-    public class FunctionDeclarationAnalysis : DeclarationAnalysis
+    public class FunctionDeclarationAnalysis : MemberDeclarationAnalysis
     {
-        [NotNull] public FunctionDeclarationSyntax Syntax { get; }
+        [CanBeNull] public new FunctionType Type { get; set; }
+        [NotNull] public new FunctionDeclarationSyntax Syntax { get; }
         [NotNull] [ItemNotNull] public IReadOnlyList<ParameterAnalysis> Parameters { get; }
         public int Arity => Parameters.Count;
         [NotNull] public ExpressionAnalysis ReturnTypeExpression { get; }
@@ -23,21 +24,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
         [NotNull] [ItemNotNull] public IReadOnlyList<StatementAnalysis> Statements { get; }
         [CanBeNull] public ControlFlowGraph ControlFlow { get; set; }
 
+
         public FunctionDeclarationAnalysis(
             [NotNull] AnalysisContext context,
             [NotNull] FunctionDeclarationSyntax syntax,
-            [NotNull] QualifiedName qualifiedName,
+            [NotNull] QualifiedName name,
             [NotNull] [ItemNotNull] IEnumerable<ParameterAnalysis> parameters,
             [NotNull] ExpressionAnalysis returnTypeExpression,
             [NotNull] [ItemNotNull] IEnumerable<StatementAnalysis> statements)
-            : base(context, qualifiedName)
+            : base(context, syntax, name)
         {
             Requires.NotNull(nameof(syntax), syntax);
             Requires.NotNull(nameof(returnTypeExpression), returnTypeExpression);
+            Type = (FunctionType)base.Type;
             Syntax = syntax;
             Parameters = parameters.ToReadOnlyList();
             ReturnTypeExpression = returnTypeExpression;
             Statements = statements.ToReadOnlyList();
+        }
+
+        [CanBeNull]
+        protected override DataType GetDataType()
+        {
+            return Type;
         }
 
         [NotNull]
@@ -46,7 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
             CompleteDiagnostics(diagnostics);
             return new FunctionDeclaration(
                 Context.File,
-                QualifiedName,
+                Name,
                 Parameters.Select(p => p.Complete()),
                 ReturnType.AssertNotNull(),
                 ControlFlow);

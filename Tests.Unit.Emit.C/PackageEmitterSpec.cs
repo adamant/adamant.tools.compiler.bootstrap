@@ -63,7 +63,7 @@ typedef enum Type_ID Type_ID;
         public void EmitsEntryPointAdapterForNoArgVoidReturnMain()
         {
             var main = new FunctionDeclaration("".ToFakeCodeFile(),
-                new QualifiedName(new SimpleName("main")),
+                new QualifiedName("main"),
                 Enumerable.Empty<Parameter>(),
                 ObjectType.Void,
                 new ControlFlowGraph());

@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes;
 using JetBrains.Annotations;
@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Fakes
         }
 
         [CanBeNull]
-        public override DeclarationAnalysis Lookup([NotNull] string name)
+        public override IDeclarationAnalysis Lookup([NotNull] string name)
         {
             throw new System.NotImplementedException();
         }

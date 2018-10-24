@@ -8,27 +8,33 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
 {
-    public class TypeDeclarationAnalysis : DeclarationAnalysis
+    public class TypeDeclarationAnalysis : MemberDeclarationAnalysis
     {
-        [NotNull] public DeclarationSyntax Syntax { get; }
-        [NotNull] public ObjectType DeclaredType { get; }
+        [NotNull] public new Metatype Type { get; }
+        [NotNull] public new MemberDeclarationSyntax Syntax { get; }
 
         public TypeDeclarationAnalysis(
             [NotNull] AnalysisContext context,
-            [NotNull] DeclarationSyntax syntax,
-            [NotNull] QualifiedName qualifiedName)
-            : base(context, qualifiedName)
+            [NotNull] MemberDeclarationSyntax syntax,
+            [NotNull] QualifiedName name)
+            : base(context, syntax, name)
         {
             Requires.NotNull(nameof(syntax), syntax);
             Syntax = syntax;
-            DeclaredType = new ObjectType(qualifiedName, false); // TODO correctly read is mutable
+            Type = new Metatype(name);
+        }
+
+        [CanBeNull]
+        protected override DataType GetDataType()
+        {
+            return Type;
         }
 
         [NotNull]
         public override Declaration Complete([NotNull] DiagnosticsBuilder diagnostics)
         {
             CompleteDiagnostics(diagnostics);
-            return new TypeDeclaration(Context.File, QualifiedName);
+            return new TypeDeclaration(Context.File, Name);
         }
     }
 }
