@@ -58,9 +58,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             // For missing parameter names, use `_` to ignore them
             return new FunctionDeclarationAnalysis(
                 context, syntax, fullName,
-                syntax.Parameters.Select(p => new ParameterAnalysis(p, fullName.Qualify(p.Name.Value ?? "_"), expressionBuilder.Build(context, p.TypeExpression))),
-                expressionBuilder.Build(context, syntax.ReturnTypeExpression),
-                syntax.Body.Statements.Select(statementSyntax => statementBuilder.Build(bodyContext, statementSyntax)));
+                syntax.Parameters.Select(p => new ParameterAnalysis(p, fullName.Qualify(p.Name.Value ?? "_"), expressionBuilder.Build(context, fullName, p.TypeExpression))),
+                expressionBuilder.Build(context, fullName, syntax.ReturnTypeExpression),
+                syntax.Body.Statements.Select(statementSyntax => statementBuilder.Build(bodyContext, fullName, statementSyntax)));
         }
 
         private static TypeDeclarationAnalysis Build(

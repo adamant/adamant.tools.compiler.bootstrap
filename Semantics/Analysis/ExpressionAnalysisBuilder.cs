@@ -7,6 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Literals;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Operators;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Types.Names;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Literals;
@@ -48,6 +49,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         [NotNull]
         public ExpressionAnalysis Build(
             [NotNull] AnalysisContext context,
+            [NotNull] QualifiedName functionName,
             [NotNull] ExpressionSyntax expression)
         {
             switch (expression)
@@ -55,33 +57,33 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                 case ReturnExpressionSyntax returnExpression:
                     ExpressionAnalysis returnValue = null;
                     if (returnExpression.ReturnValue != null)
-                        returnValue = Build(context, returnExpression.ReturnValue);
+                        returnValue = Build(context, functionName, returnExpression.ReturnValue);
                     return new ReturnExpressionAnalysis(context, returnExpression, returnValue);
                 case PrimitiveTypeSyntax primitiveType:
                     return new PrimitiveTypeAnalysis(context, primitiveType);
                 case IntegerLiteralExpressionSyntax integerLiteral:
                     return new IntegerLiteralExpressionAnalysis(context, integerLiteral);
                 case BinaryOperatorExpressionSyntax binaryOperatorExpression:
-                    var leftOperand = Build(context, binaryOperatorExpression.LeftOperand);
-                    var rightOperand = Build(context, binaryOperatorExpression.RightOperand);
+                    var leftOperand = Build(context, functionName, binaryOperatorExpression.LeftOperand);
+                    var rightOperand = Build(context, functionName, binaryOperatorExpression.RightOperand);
                     return new BinaryOperatorExpressionAnalysis(context, binaryOperatorExpression, leftOperand, rightOperand);
                 case UnaryOperatorExpressionSyntax unaryOperatorExpression:
-                    var operand = Build(context, unaryOperatorExpression.Operand);
+                    var operand = Build(context, functionName, unaryOperatorExpression.Operand);
                     return new UnaryOperatorExpressionAnalysis(context, unaryOperatorExpression, operand);
                 case IdentifierNameSyntax identifierName:
                     return new IdentifierNameAnalysis(context, identifierName);
                 case LifetimeTypeSyntax lifetimeType:
-                    var typeName = Build(context, lifetimeType.TypeName);
+                    var typeName = Build(context, functionName, lifetimeType.TypeName);
                     return new LifetimeTypeAnalysis(context, lifetimeType, typeName);
                 case BlockExpressionSyntax blockExpression:
                     var blockContext = context.InBlock(blockExpression);
                     return new BlockExpressionAnalysis(context, blockExpression,
-                        blockExpression.Statements.Select(s => StatementBuilder.Build(blockContext, s)));
+                        blockExpression.Statements.Select(s => StatementBuilder.Build(blockContext, functionName, s)));
+                case NewObjectExpressionSyntax newObjectExpression:
+                    return new NewObjectExpressionAnalysis(context, newObjectExpression);
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
         }
-
-
     }
 }

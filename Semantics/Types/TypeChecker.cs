@@ -145,7 +145,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                                 expression.Type = ObjectType.Type;
                                 break;
                             case ParameterAnalysis parameter:
-                                expression.Type = parameter.Type.AssertNotNull(); // TODO how can we be sure that type is resolved?
+                                expression.Type = parameter.Type; // TODO how can we be sure that type is resolved?
+                                break;
+                            case VariableDeclarationStatementAnalysis variableDeclaration:
+                                expression.Type = variableDeclaration.Type; // TODO how can we be sure that type is resolved?
                                 break;
                             case null:
                                 diagnostics.Publish(NameBindingError.CouldNotBindName(expression.Context.File, identifierName.Syntax.Span, name));
@@ -158,11 +161,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                     break;
                 case UnaryOperatorExpressionAnalysis unaryOperatorExpression:
                     CheckTypes(unaryOperatorExpression, diagnostics);
+                    // TODO assign a type to this expression
                     break;
                 case LifetimeTypeAnalysis lifetimeType:
                     CheckTypes(lifetimeType.TypeName, diagnostics);
                     if (lifetimeType.TypeName.Type != ObjectType.Type)
                         diagnostics.Publish(TypeError.MustBeATypeExpression(expression.Context.File, lifetimeType.TypeName.Syntax.Span));
+                    lifetimeType.Type = ObjectType.Type;
                     break;
                 case BlockExpressionAnalysis blockExpression:
                     foreach (var statement in blockExpression.Statements)

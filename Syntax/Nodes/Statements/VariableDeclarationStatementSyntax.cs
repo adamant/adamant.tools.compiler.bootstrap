@@ -11,7 +11,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements
         [NotNull] public IIdentifierToken Name { get; }
         [CanBeNull] public IColonToken Colon { get; }
         [CanBeNull] public ExpressionSyntax TypeExpression { get; }
-        public bool HasInitializer => Initializer != null;
         [CanBeNull] public new EqualsToken Equals { get; }
         [CanBeNull] public ExpressionSyntax Initializer { get; }
         [NotNull] public ISemicolonToken Semicolon { get; }
