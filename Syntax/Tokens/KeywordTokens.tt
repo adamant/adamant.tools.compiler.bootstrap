@@ -44,6 +44,7 @@
         "Type",
         "Metatype",
         "Mutable",
+        "Params",
     }.AsReadOnly();
 #>
 using System;

@@ -34,11 +34,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     tokens.MoveNext();
                     return new SelfParameterSyntax(selfKeyword);
                 default:
+                    var paramsKeyword = tokens.Accept<ParamsKeywordToken>();
                     var varKeyword = tokens.Accept<VarKeywordToken>();
                     var name = tokens.ExpectIdentifier();
                     var colon = tokens.Expect<IColonToken>();
                     var typeExpression = expressionParser.Parse(tokens, diagnostics);
-                    return new NamedParameterSyntax(varKeyword, name, colon, typeExpression);
+                    return new NamedParameterSyntax(paramsKeyword, varKeyword, name, colon, typeExpression);
             }
         }
     }

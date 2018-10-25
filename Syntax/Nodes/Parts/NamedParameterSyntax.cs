@@ -7,18 +7,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts
 {
     public class NamedParameterSyntax : ParameterSyntax
     {
+        [CanBeNull] public ParamsKeywordToken ParamsKeyword { get; }
         [CanBeNull] public VarKeywordToken VarKeyword { get; }
         [NotNull] public IIdentifierToken Name { get; }
         [NotNull] public IColonToken Colon { get; }
         [NotNull] public ExpressionSyntax TypeExpression { get; }
 
         public NamedParameterSyntax(
+            [CanBeNull] ParamsKeywordToken paramsKeyword,
             [CanBeNull] VarKeywordToken varKeyword,
             [NotNull] IIdentifierToken name,
             [NotNull] IColonToken colon,
             [NotNull] ExpressionSyntax typeExpression)
         {
             Requires.NotNull(nameof(typeExpression), typeExpression);
+            ParamsKeyword = paramsKeyword;
             VarKeyword = varKeyword;
             Name = name;
             Colon = colon;

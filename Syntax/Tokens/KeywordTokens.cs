@@ -48,6 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
             typeof(TypeKeywordToken),
             typeof(MetatypeKeywordToken),
             typeof(MutableKeywordToken),
+            typeof(ParamsKeywordToken),
         }.AsReadOnly().AssertNotNull();
     }
 
@@ -383,6 +384,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         {
         }
     }
+
+    public partial interface IParamsKeywordToken : IKeywordToken { }
+    public class ParamsKeywordToken : KeywordToken, IParamsKeywordToken
+    {
+        public ParamsKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
     public partial class MissingToken :
         IPublicKeywordToken,
         IProtectedKeywordToken,
@@ -421,6 +431,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         ITypeKeywordToken,
         IMetatypeKeywordToken,
         IMutableKeywordToken,
+        IParamsKeywordToken,
         IKeywordToken // Implied, but saves issues with commas
     { }
 }
