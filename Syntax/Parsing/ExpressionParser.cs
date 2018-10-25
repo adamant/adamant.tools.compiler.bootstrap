@@ -4,6 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Instance;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Literals;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
@@ -166,6 +167,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         {
             switch (tokens.Current)
             {
+                case SelfKeywordToken selfKeyword:
+                    return new SelfExpressionSyntax(selfKeyword);
+                case BaseKeywordToken baseKeyword:
+                    return new BaseExpressionSyntax(baseKeyword);
                 case NewKeywordToken _:
                     {
                         var newKeyword = tokens.Expect<INewKeywordToken>();
@@ -173,8 +178,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         var openParen = tokens.Expect<IOpenParenToken>();
                         var arguments = ParseArguments(tokens, diagnostics);
                         var closeParen = tokens.Expect<ICloseParenToken>();
-                        return new NewObjectExpressionSyntax(newKeyword, type, openParen, arguments,
-                            closeParen);
+                        return new NewObjectExpressionSyntax(newKeyword, type, openParen, arguments, closeParen);
                     }
                 case ReturnKeywordToken _:
                     {

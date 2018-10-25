@@ -60,7 +60,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics
 
         private static MemberDeclarationAnalysis Build(
             [NotNull] DeclarationSyntax declaration,
-            [NotNull] Name @namespace = null)
+            [CanBeNull] Name @namespace = null)
         {
             var nameBuilder = new NameBuilder();
             var expressionBuilder = new FakeExpressionAnalysisBuilder();

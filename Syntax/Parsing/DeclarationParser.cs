@@ -134,7 +134,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 tokens.ExpectIdentifier() // The name we are expecting
             };
 
-            if (skipped.All(s => s == null))
+            if (skipped.All(s => s is MissingToken))
             {
                 // We haven't consumed any tokens, we need to consume a token so
                 // we make progress.
