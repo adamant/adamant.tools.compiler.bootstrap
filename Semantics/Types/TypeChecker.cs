@@ -131,11 +131,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                         CheckTypes(returnExpression.ReturnExpression, diagnostics);
                     expression.Type = ObjectType.Never;
                     break;
-                case IntegerLiteralExpressionAnalysis integerLiteral:
-                    // TODO do proper type checking
+                case IntegerLiteralExpressionAnalysis _:
+                    // TODO do proper type inference
                     expression.Type = ObjectType.Int;
                     break;
-                case BooleanLiteralExpressionAnalysis booleanLiteral:
+                case BooleanLiteralExpressionAnalysis _:
                     expression.Type = ObjectType.Bool;
                     break;
                 case BinaryOperatorExpressionAnalysis binaryOperatorExpression:
@@ -191,8 +191,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                     foreach (var argument in newObjectExpression.Arguments)
                         CheckTypes(argument, diagnostics);
 
+                    CheckTypeExpression(newObjectExpression.ConstructorExpression, diagnostics);
+                    newObjectExpression.Type = EvaluateType(newObjectExpression.ConstructorExpression, diagnostics);
+
                     // TODO verify argument types against called function
-                    // TODO look up type and assign to expression
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(expression);

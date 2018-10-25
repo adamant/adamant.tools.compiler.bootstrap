@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
     public class NewObjectExpressionSyntax : ExpressionSyntax
     {
         [NotNull] public INewKeywordToken NewKeyword { get; }
-        [NotNull] public TypeSyntax Type { get; }
+        [NotNull] public TypeSyntax Constructor { get; }
         [NotNull] public IOpenParenToken OpenParen { get; }
         [NotNull] public SeparatedListSyntax<ExpressionSyntax> ArgumentList { get; }
         [NotNull] [ItemNotNull] public IEnumerable<ExpressionSyntax> Arguments => ArgumentList.Nodes();
@@ -18,15 +18,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
 
         public NewObjectExpressionSyntax(
             [NotNull] INewKeywordToken newKeyword,
-            [NotNull] TypeSyntax type,
+            [NotNull] TypeSyntax constructor,
             [NotNull] IOpenParenToken openParen,
             [NotNull] SeparatedListSyntax<ExpressionSyntax> argumentList,
             [NotNull] ICloseParenToken closeParen)
             : base(TextSpan.Covering(newKeyword.Span, closeParen.Span))
         {
+            Requires.NotNull(nameof(newKeyword), newKeyword);
+            Requires.NotNull(nameof(constructor), constructor);
+            Requires.NotNull(nameof(openParen), openParen);
             Requires.NotNull(nameof(argumentList), argumentList);
+            Requires.NotNull(nameof(closeParen), closeParen);
             NewKeyword = newKeyword;
-            Type = type;
+            Constructor = constructor;
             OpenParen = openParen;
             ArgumentList = argumentList;
             CloseParen = closeParen;

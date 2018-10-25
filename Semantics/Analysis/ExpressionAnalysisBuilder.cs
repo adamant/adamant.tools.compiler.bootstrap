@@ -34,6 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         }
         [CanBeNull] private StatementAnalysisBuilder statementBuilder;
         [CanBeNull] private Func<StatementAnalysisBuilder> statementBuilderProvider;
+        [NotNull] private readonly NameBuilder nameBuilder;
 
         /// <summary>
         /// Because of a circular dependency, we don't take a <see cref="StatementAnalysisBuilder"/>
@@ -41,9 +42,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         /// </summary>
         /// <param name="statementBuilderProvider"></param>
         public ExpressionAnalysisBuilder(
-            [NotNull] Func<StatementAnalysisBuilder> statementBuilderProvider)
+            [NotNull] Func<StatementAnalysisBuilder> statementBuilderProvider,
+            [NotNull] NameBuilder nameBuilder)
         {
             this.statementBuilderProvider = statementBuilderProvider;
+            this.nameBuilder = nameBuilder;
         }
 
         [NotNull]
@@ -81,6 +84,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                         blockExpression.Statements.Select(s => StatementBuilder.Build(blockContext, functionName, s)));
                 case NewObjectExpressionSyntax newObjectExpression:
                     return new NewObjectExpressionAnalysis(context, newObjectExpression,
+                        Build(context, functionName, newObjectExpression.Constructor),
                         newObjectExpression.Arguments.Select(a => Build(context, functionName, a)));
                 case BooleanLiteralExpressionSyntax booleanLiteralExpression:
                     return new BooleanLiteralExpressionAnalysis(context, booleanLiteralExpression);

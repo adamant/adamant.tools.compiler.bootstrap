@@ -150,10 +150,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
             switch (value)
             {
-                //                case NewObjectExpression newObjectExpression:
-                //                    var args = newObjectExpression.Arguments.Select(ConvertToLValue);
-                //                    currentBlock.Add(new NewObjectStatement(lvalue, newObjectExpression.Type, args));
-                //                    break;
+                case NewObjectExpressionAnalysis newObjectExpression:
+                    var args = newObjectExpression.Arguments.Select(a => ConvertToLValue(cfg, a));
+                    currentBlock.Add(new NewObjectStatement(lvalue, newObjectExpression.Type.AssertNotNull(), args));
+                    break;
                 case IdentifierNameAnalysis identifier:
                     currentBlock.Add(new AssignmentStatement(lvalue, LookupVariable(cfg, identifier.Name.AssertNotNull())));
                     break;
