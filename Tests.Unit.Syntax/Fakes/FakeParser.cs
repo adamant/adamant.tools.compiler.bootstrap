@@ -4,6 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers;
@@ -18,6 +19,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
         {
             return new ListParser();
         }
+
+        [NotNull]
+        public static IExpressionParser ForExpressions()
+        {
+            return new ExpressionParser();
+        }
+
 
         [NotNull]
         public static IParser<T> For<T>()
@@ -84,6 +92,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
             {
                 var fakeToken = tokens.ExpectFake();
                 return (SeparatedListSyntax<T>)fakeToken?.FakeValue ?? throw new InvalidOperationException();
+            }
+        }
+
+        private class ExpressionParser : IExpressionParser
+        {
+            [NotNull]
+            private readonly FakeTokenParser<ExpressionSyntax> fakeParser = new FakeTokenParser<ExpressionSyntax>();
+
+            public ExpressionSyntax Parse(ITokenStream tokens, IDiagnosticsCollector diagnostics)
+            {
+                return fakeParser.Parse(tokens, diagnostics);
+            }
+
+            public ExpressionSyntax Parse(
+                ITokenStream tokens,
+                IDiagnosticsCollector diagnostics,
+                OperatorPrecedence minPrecedence)
+            {
+                return fakeParser.Parse(tokens, diagnostics);
             }
         }
 

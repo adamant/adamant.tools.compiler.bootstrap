@@ -14,7 +14,7 @@ using static Adamant.Tools.Compiler.Bootstrap.Framework.TypeOperations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 {
-    public class ExpressionParser : IParser<ExpressionSyntax>
+    public class ExpressionParser : IExpressionParser
     {
         [NotNull]
         private readonly IListParser listParser;
@@ -29,17 +29,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         }
 
         [NotNull]
+        [MustUseReturnValue]
         public ExpressionSyntax Parse([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
         {
-            return ParseExpression(tokens, diagnostics);
+            return Parse(tokens, diagnostics, OperatorPrecedence.Min);
         }
 
         [MustUseReturnValue]
         [NotNull]
-        private ExpressionSyntax ParseExpression(
+        public ExpressionSyntax Parse(
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics,
-            OperatorPrecedence minPrecedence = OperatorPrecedence.Min)
+            OperatorPrecedence minPrecedence)
         {
             var expression = ParseAtom(tokens, diagnostics);
 
@@ -147,7 +148,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     if (leftAssociative)
                         operatorPrecedence += 1;
 
-                    var rightOperand = ParseExpression(tokens, diagnostics, operatorPrecedence);
+                    var rightOperand = Parse(tokens, diagnostics, operatorPrecedence);
                     expression = new BinaryOperatorExpressionSyntax(expression, @operatorToken, rightOperand);
                 }
                 else
@@ -178,13 +179,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 case ReturnKeywordToken _:
                     {
                         var returnKeyword = tokens.Expect<IReturnKeywordToken>();
-                        var expression = tokens.AtTerminator<SemicolonToken>() ? null : ParseExpression(tokens, diagnostics);
+                        var expression = tokens.AtTerminator<SemicolonToken>() ? null : Parse(tokens, diagnostics);
                         return new ReturnExpressionSyntax(returnKeyword, expression);
                     }
                 case OpenParenToken _:
                     {
                         var openParen = tokens.Expect<IOpenParenToken>();
-                        var expression = ParseExpression(tokens, diagnostics);
+                        var expression = Parse(tokens, diagnostics);
                         var closeParen = tokens.Expect<ICloseParenToken>();
                         return new ParenthesizedExpressionSyntax(openParen, expression, closeParen);
                     }
@@ -194,7 +195,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 case CaretToken _:
                 case NotKeywordToken _:
                     var @operator = tokens.TakeOperator();
-                    var operand = ParseExpression(tokens, diagnostics, OperatorPrecedence.Unary);
+                    var operand = Parse(tokens, diagnostics, OperatorPrecedence.Unary);
                     return new UnaryOperatorExpressionSyntax(@operator, operand);
                 case IntegerLiteralToken literal:
                     {
@@ -252,7 +253,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         [NotNull]
         private SeparatedListSyntax<ExpressionSyntax> ParseArguments([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var arguments = listParser.ParseSeparatedList(tokens, t => ParseExpression(t, diagnostics), TypeOf<CommaToken>(), TypeOf<CloseParenToken>(), diagnostics);
+            var arguments = listParser.ParseSeparatedList(tokens, t => Parse(t, diagnostics), TypeOf<CommaToken>(), TypeOf<CloseParenToken>(), diagnostics);
             return new SeparatedListSyntax<ExpressionSyntax>(arguments);
         }
     }

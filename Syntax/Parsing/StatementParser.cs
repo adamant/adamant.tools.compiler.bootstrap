@@ -14,9 +14,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         private readonly IListParser listParser;
 
         [NotNull]
-        private readonly IParser<ExpressionSyntax> expressionParser;
+        private readonly IExpressionParser expressionParser;
 
-        public StatementParser([NotNull] IListParser listParser, [NotNull] IParser<ExpressionSyntax> expressionParser)
+        public StatementParser([NotNull] IListParser listParser, [NotNull] IExpressionParser expressionParser)
         {
             this.listParser = listParser;
             this.expressionParser = expressionParser;
@@ -37,7 +37,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         var binding = tokens.Take<IBindingKeywordToken>();
                         var name = tokens.ExpectIdentifier();
                         var colon = tokens.Expect<IColonToken>();
-                        var typeExpression = expressionParser.Parse(tokens, diagnostics);
+                        // Need to not consume the assignment that separates the type from the initializer,
+                        // hence the min operator precedence.
+                        var typeExpression = expressionParser.Parse(tokens, diagnostics, OperatorPrecedence.LogicalOr);
                         EqualsToken equals = null;
                         ExpressionSyntax initializer = null;
                         if (tokens.Current is EqualsToken)

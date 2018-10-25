@@ -52,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         private static StatementParser NewStatementParser()
         {
             var listParser = FakeParser.ForLists();
-            var expressionParser = FakeParser.For<ExpressionSyntax>();
+            var expressionParser = FakeParser.ForExpressions();
             return new StatementParser(listParser, expressionParser);
         }
     }
