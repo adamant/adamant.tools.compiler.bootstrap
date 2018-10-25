@@ -206,6 +206,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         tokens.MoveNext();
                         return new StringLiteralExpressionSyntax(literal);
                     }
+                case BooleanLiteralToken literal:
+                    {
+                        tokens.MoveNext();
+                        return new BooleanLiteralExpressionSyntax(literal);
+                    }
                 case VoidKeywordToken _:
                 case IntKeywordToken _:
                 case UIntKeywordToken _:

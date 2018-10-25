@@ -6,14 +6,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Literals
 {
     public class StringLiteralExpressionSyntax : LiteralExpressionSyntax
     {
-        [NotNull] public StringLiteralToken StringLiteral { get; }
-        [NotNull] public string Value => StringLiteral.Value;
+        [NotNull] public StringLiteralToken Literal { get; }
+        [NotNull] public string Value => Literal.Value;
 
-        public StringLiteralExpressionSyntax([NotNull] StringLiteralToken stringLiteral)
-            : base(stringLiteral.Span)
+        public StringLiteralExpressionSyntax([NotNull] StringLiteralToken literal)
+            : base(literal.Span)
         {
-            Requires.NotNull(nameof(stringLiteral), stringLiteral);
-            StringLiteral = stringLiteral;
+            Requires.NotNull(nameof(literal), literal);
+            Literal = literal;
         }
     }
 }

@@ -269,6 +269,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             { "extend", typeof(ExtendKeywordToken) },
             { "type", typeof(TypeKeywordToken) },
             { "metatype", typeof(MetatypeKeywordToken) },
+            { "true", typeof(TrueKeywordToken) },
+            { "false", typeof(FalseKeywordToken) },
         }.AsReadOnly();
     }
 }

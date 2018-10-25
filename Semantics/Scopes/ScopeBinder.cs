@@ -115,6 +115,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
                     break;
                 case IntegerLiteralExpressionAnalysis _:
                 case IdentifierNameAnalysis _:
+                case BooleanLiteralExpressionAnalysis _:
                     // Do nothing
                     break;
                 default:

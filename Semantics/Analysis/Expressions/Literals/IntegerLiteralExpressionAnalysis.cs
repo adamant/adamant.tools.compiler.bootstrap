@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Litera
     public class IntegerLiteralExpressionAnalysis : LiteralExpressionAnalysis
     {
         [NotNull] public new IntegerLiteralExpressionSyntax Syntax { get; }
-        public BigInteger Value => Syntax.IntegerLiteral.Value;
+        public BigInteger Value => Syntax.Literal.Value;
 
         public IntegerLiteralExpressionAnalysis(
             [NotNull] AnalysisContext context,

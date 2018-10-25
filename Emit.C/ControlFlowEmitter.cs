@@ -1,6 +1,5 @@
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Graph;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements.LValues;
@@ -44,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             // Skip void variables
             if (variable.Type == ObjectType.Void) return;
 
-            var initializer = variable.Name != null ? $" = ᵢ{nameMangler.Mangle(variable.Name)}" : "";
+            var initializer = variable.IsParameter ? $" = ᵢ{nameMangler.Mangle(variable.Name.AssertNotNull())}" : "";
             code.AppendLine($"{typeConverter.Convert(variable.Type)} ₜ{NameOf(variable.Reference)}{initializer};");
         }
 

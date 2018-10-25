@@ -83,6 +83,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             [NotNull] VariableDeclarationStatementAnalysis variableDeclaration,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
+            if (variableDeclaration.TypeExpression != null)
+            {
+                CheckTypeExpression(variableDeclaration.TypeExpression, diagnostics);
+                variableDeclaration.Type = EvaluateType(variableDeclaration.TypeExpression, diagnostics);
+            }
+
+            if (variableDeclaration.Initializer != null)
+                CheckTypes(variableDeclaration.Initializer, diagnostics);
+            // TODO check that the initializer type is compatible with the variable type
         }
 
         private void CheckTypes(
@@ -125,6 +134,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                 case IntegerLiteralExpressionAnalysis integerLiteral:
                     // TODO do proper type checking
                     expression.Type = ObjectType.Int;
+                    break;
+                case BooleanLiteralExpressionAnalysis booleanLiteral:
+                    expression.Type = ObjectType.Bool;
                     break;
                 case BinaryOperatorExpressionAnalysis binaryOperatorExpression:
                     CheckTypes(binaryOperatorExpression, diagnostics);

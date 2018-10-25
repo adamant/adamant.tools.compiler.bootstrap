@@ -27,10 +27,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Graph
         }
 
         [NotNull]
+        public LocalVariableDeclaration AddParameter(bool mutableBinding, [NotNull] DataType type, [CanBeNull] string name)
+        {
+            Requires.NotNull(nameof(type), type);
+            var variable = new LocalVariableDeclaration(true, mutableBinding, type, variableDeclarations.Count)
+            {
+                Name = name
+            };
+            variableDeclarations.Add(variable);
+            return variable;
+        }
+
+        [NotNull]
         public LocalVariableDeclaration AddVariable(bool mutableBinding, [NotNull] DataType type, [CanBeNull] string name = null)
         {
             Requires.NotNull(nameof(type), type);
-            var variable = new LocalVariableDeclaration(mutableBinding, type, variableDeclarations.Count)
+            var variable = new LocalVariableDeclaration(false, mutableBinding, type, variableDeclarations.Count)
             {
                 Name = name
             };

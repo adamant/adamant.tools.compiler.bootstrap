@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         public CodeEmitter()
         {
             var nameMangler = new NameMangler();
-            var typeConverter = new TypeConverter();
+            var typeConverter = new TypeConverter(nameMangler);
             var parameterConverter = new ParameterConverter(nameMangler, typeConverter);
             var controlFlowEmitter = new ControlFlowEmitter(nameMangler, typeConverter);
             var declarationEmitter = new DeclarationEmitter(nameMangler, parameterConverter, typeConverter, controlFlowEmitter);

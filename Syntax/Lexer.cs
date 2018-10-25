@@ -289,9 +289,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             {
                 var span = TextSpan.FromStartEnd(tokenStart, tokenEnd);
                 var value = code[span];
-                if (Tokens.TokenTypes.KeywordFactories.TryGetValue(value, out var keywordFactory))
+                if (TokenTypes.KeywordFactories.TryGetValue(value, out var keywordFactory))
                     return keywordFactory(span);
-                if (Tokens.TokenTypes.BooleanOperatorFactories.TryGetValue(value, out var operatorFactory))
+                if (TokenTypes.BooleanKeywordFactories.TryGetValue(value, out var operatorFactory))
                     return operatorFactory(span);
 
                 return new BareIdentifierToken(span, value);

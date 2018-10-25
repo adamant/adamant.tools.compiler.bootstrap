@@ -8,11 +8,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements
     public class ExpressionStatementSyntax : StatementSyntax
     {
         [NotNull] public ExpressionSyntax Expression { get; }
-        [NotNull] public ISemicolonToken Semicolon { get; }
+        // Block statements are expression statements without a semicolon
+        [CanBeNull] public ISemicolonToken Semicolon { get; }
 
         public ExpressionStatementSyntax(
             [NotNull] ExpressionSyntax expression,
-            [NotNull] ISemicolonToken semicolon)
+            [CanBeNull] ISemicolonToken semicolon)
         {
             Requires.NotNull(nameof(expression), expression);
             Expression = expression;

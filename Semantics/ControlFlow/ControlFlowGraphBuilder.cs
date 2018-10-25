@@ -11,6 +11,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Graph;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements.LValues;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
@@ -37,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             // Temp Variable for return
             cfg.Let(function.ReturnType.AssertNotNull());
             foreach (var parameter in function.Parameters)
-                cfg.AddVariable(parameter.MutableBinding, parameter.Type.AssertNotNull(), parameter.Name.Name.Text);
+                cfg.AddParameter(parameter.MutableBinding, parameter.Type.AssertNotNull(), parameter.Name.Name.Text);
 
             var blocks = new Dictionary<SyntaxNode, BasicBlock>();
             var entryBlock = cfg.EntryBlock;
@@ -67,40 +68,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             switch (statement)
             {
                 case VariableDeclarationStatementAnalysis variableDeclaration:
-                    //                    var variable = il.AddVariable(variableDeclaration.MutableBinding,
-                    //                        variableDeclaration.Type,
-                    //                        variableDeclaration.Name);
-                    //                    if (variableDeclaration.Initializer != null)
-                    //                        ConvertAssignment(variable.Reference, variableDeclaration.Initializer);
+                    var variable = cfg.AddVariable(variableDeclaration.MutableBinding,
+                        variableDeclaration.Type.AssertNotNull(),
+                        variableDeclaration.Name.Name.Text);
+                    if (variableDeclaration.Initializer != null)
+                        ConvertAssignment(cfg, variable.Reference, variableDeclaration.Initializer, currentBlock);
                     break;
 
                 case ExpressionStatementAnalysis expressionStatement:
                     Convert(cfg, expressionStatement.Expression, currentBlock);
                     break;
 
-                //                case Block block:
-                //                    foreach (var statementInBlock in block.Statements)
-                //                        Convert(statementInBlock);
-
-                //                    // Now we need to delete any owned variables
-                //                    foreach (var variableDeclaration in block.Statements.OfType<VariableDeclarationStatement>().Where(IsOwned))
-                //                        currentBlock.Add(new DeleteStatement(LookupVariable(variableDeclaration.Name).VariableNumber));
-
-                //                    break;
-
                 default:
                     throw NonExhaustiveMatchException.For(statement);
             }
         }
 
-        //private static bool IsOwned([NotNull] VariableDeclarationStatement declaration)
-        //        {
-        //            Requires.NotNull(nameof(declaration), declaration);
-        //            if (declaration.Type is LifetimeType type)
-        //                return type.IsOwned;
+        private static bool IsOwned([NotNull] VariableDeclarationStatementAnalysis declaration)
+        {
+            Requires.NotNull(nameof(declaration), declaration);
+            if (declaration.Type is LifetimeType type)
+                return type.IsOwned;
 
-        //            return false;
-        //        }
+            return false;
+        }
 
         private void Convert([NotNull] ControlFlowGraph cfg, [NotNull] ExpressionAnalysis expression, [NotNull] BasicBlock currentBlock)
         {
@@ -131,6 +122,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     if (returnExpression.ReturnExpression != null)
                         ConvertAssignment(cfg, cfg.ReturnVariable.Reference, returnExpression.ReturnExpression, currentBlock);
                     currentBlock.End(new ReturnStatement());
+                    break;
+                case BlockExpressionAnalysis block:
+                    foreach (var statementInBlock in block.Statements)
+                        Convert(cfg, statementInBlock, currentBlock);
+
+                    // Now we need to delete any owned variables
+                    foreach (var variableDeclaration in block.Statements.OfType<VariableDeclarationStatementAnalysis>().Where(IsOwned))
+                        currentBlock.Add(new DeleteStatement(LookupVariable(cfg, variableDeclaration.Name.Name.Text).VariableNumber));
+
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(expression);

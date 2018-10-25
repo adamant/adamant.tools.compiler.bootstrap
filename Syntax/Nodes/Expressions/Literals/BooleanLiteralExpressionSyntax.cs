@@ -4,11 +4,12 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Literals
 {
-    public class IntegerLiteralExpressionSyntax : LiteralExpressionSyntax
+    public class BooleanLiteralExpressionSyntax : LiteralExpressionSyntax
     {
-        [NotNull] public IntegerLiteralToken Literal { get; }
+        [NotNull] public BooleanLiteralToken Literal { get; }
+        [NotNull] public bool Value => Literal.Value;
 
-        public IntegerLiteralExpressionSyntax([NotNull] IntegerLiteralToken literal)
+        public BooleanLiteralExpressionSyntax([NotNull] BooleanLiteralToken literal)
             : base(literal.Span)
         {
             Requires.NotNull(nameof(literal), literal);

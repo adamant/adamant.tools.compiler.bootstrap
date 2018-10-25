@@ -81,6 +81,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                         blockExpression.Statements.Select(s => StatementBuilder.Build(blockContext, functionName, s)));
                 case NewObjectExpressionSyntax newObjectExpression:
                     return new NewObjectExpressionAnalysis(context, newObjectExpression);
+                case BooleanLiteralExpressionSyntax booleanLiteralExpression:
+                    return new BooleanLiteralExpressionAnalysis(context, booleanLiteralExpression);
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }

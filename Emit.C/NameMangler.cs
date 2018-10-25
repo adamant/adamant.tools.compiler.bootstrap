@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
@@ -77,7 +78,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         }
 
         [NotNull]
-        private string Mangle([NotNull] QualifiedName qualifiedName)
+        public string Mangle([NotNull] ObjectType type)
+        {
+            var mangledName = Mangle(type.Name);
+            var builder = new StringBuilder(mangledName, mangledName.Length + 5);
+            builder.Append('´');
+            builder.Append("0"); // TODO actual number of generic parameters
+            return builder.ToString().AssertNotNull();
+        }
+
+        [NotNull]
+        public string Mangle([NotNull] QualifiedName qualifiedName)
         {
             if (qualifiedName.Qualifier.Any())
                 return 'ᵢ' + string.Join('·', qualifiedName.FullName.Select(Mangle)).AssertNotNull();
@@ -149,7 +160,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 builder.Append('ǂ');
             }
 
-            return builder.ToString();
+            return builder.ToString().AssertNotNull();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

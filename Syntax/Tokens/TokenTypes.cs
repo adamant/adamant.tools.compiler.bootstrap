@@ -14,29 +14,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 
         [NotNull]
         [ItemNotNull]
-        public static readonly IReadOnlyList<Type> BooleanOperator = new List<Type>()
+        public static readonly IReadOnlyList<Type> BooleanKeywords = new List<Type>()
         {
             typeof(NotKeywordToken),
             typeof(AndKeywordToken),
             typeof(OrKeywordToken),
             typeof(XorKeywordToken),
-        }.AsReadOnly();
+            typeof(TrueKeywordToken),
+            typeof(FalseKeywordToken),
+        }.AsReadOnly().AssertNotNull();
 
         [NotNull]
-        public static IReadOnlyDictionary<string, Func<TextSpan, BooleanOperatorToken>> BooleanOperatorFactories;
+        public static IReadOnlyDictionary<string, Func<TextSpan, Token>> BooleanKeywordFactories;
 
         private static readonly int KeywordTokenLength = "KeywordToken".Length;
 
         static TokenTypes()
         {
             KeywordFactories = BuildKeywordFactories();
-            BooleanOperatorFactories = BuildBooleanOperatorFactories();
+            BooleanKeywordFactories = BuildBooleanKeywordFactories();
         }
 
         [NotNull]
         private static IReadOnlyDictionary<string, Func<TextSpan, KeywordToken>> BuildKeywordFactories()
         {
-            var keywordFactories = new Dictionary<string, Func<TextSpan, KeywordToken>>();
+            var factories = new Dictionary<string, Func<TextSpan, KeywordToken>>();
 
             foreach (var tokenType in Keyword)
             {
@@ -58,28 +60,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
                         break;
                 }
                 var factory = CompileFactory<KeywordToken>(tokenType);
-                keywordFactories.Add(keyword, factory);
+                factories.Add(keyword, factory);
             }
-            return keywordFactories.AsReadOnly();
+            return factories.AsReadOnly();
         }
 
         [NotNull]
-        private static IReadOnlyDictionary<string, Func<TextSpan, BooleanOperatorToken>> BuildBooleanOperatorFactories()
+        private static IReadOnlyDictionary<string, Func<TextSpan, Token>> BuildBooleanKeywordFactories()
         {
-            var operatorFactories = new Dictionary<string, Func<TextSpan, BooleanOperatorToken>>();
+            var factories = new Dictionary<string, Func<TextSpan, Token>>();
 
-            foreach (var tokenType in BooleanOperator)
+            foreach (var tokenType in BooleanKeywords)
             {
                 var tokenTypeName = tokenType.Name;
                 var keyword = tokenTypeName
                     .Substring(0, tokenTypeName.Length - KeywordTokenLength)
                     .ToLower();
 
-                var factory = CompileFactory<BooleanOperatorToken>(tokenType);
-                operatorFactories.Add(keyword, factory);
+                var factory = CompileFactory<Token>(tokenType);
+                factories.Add(keyword, factory);
             }
 
-            var booleanOperatorFactories = operatorFactories.AsReadOnly();
+            var booleanOperatorFactories = factories.AsReadOnly();
             return booleanOperatorFactories;
         }
 
