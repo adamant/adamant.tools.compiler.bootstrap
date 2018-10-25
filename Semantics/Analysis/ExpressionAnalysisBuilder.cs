@@ -18,7 +18,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
 {
-    public class ExpressionAnalysisBuilder
+    public class ExpressionAnalysisBuilder : IExpressionAnalysisBuilder
     {
         [NotNull]
         private StatementAnalysisBuilder StatementBuilder
@@ -34,7 +34,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         }
         [CanBeNull] private StatementAnalysisBuilder statementBuilder;
         [CanBeNull] private Func<StatementAnalysisBuilder> statementBuilderProvider;
-        [NotNull] private readonly NameBuilder nameBuilder;
 
         /// <summary>
         /// Because of a circular dependency, we don't take a <see cref="StatementAnalysisBuilder"/>
@@ -42,11 +41,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         /// </summary>
         /// <param name="statementBuilderProvider"></param>
         public ExpressionAnalysisBuilder(
-            [NotNull] Func<StatementAnalysisBuilder> statementBuilderProvider,
-            [NotNull] NameBuilder nameBuilder)
+            [NotNull] Func<StatementAnalysisBuilder> statementBuilderProvider)
         {
             this.statementBuilderProvider = statementBuilderProvider;
-            this.nameBuilder = nameBuilder;
         }
 
         [NotNull]

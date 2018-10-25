@@ -10,13 +10,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
     public class DeclarationAnalysisBuilder
     {
         [NotNull] private readonly NameBuilder nameBuilder;
-        [NotNull] private readonly ExpressionAnalysisBuilder expressionBuilder;
-        [NotNull] private readonly StatementAnalysisBuilder statementBuilder;
+        [NotNull] private readonly IExpressionAnalysisBuilder expressionBuilder;
+        [NotNull] private readonly IStatementAnalysisBuilder statementBuilder;
 
         public DeclarationAnalysisBuilder(
             [NotNull] NameBuilder nameBuilder,
-            [NotNull] ExpressionAnalysisBuilder expressionBuilder,
-            [NotNull] StatementAnalysisBuilder statementBuilder)
+            [NotNull] IExpressionAnalysisBuilder expressionBuilder,
+            [NotNull] IStatementAnalysisBuilder statementBuilder)
         {
             this.nameBuilder = nameBuilder;
             this.statementBuilder = statementBuilder;

@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Framework
     public class YieldTests
     {
         [Fact]
-        public void YeildIsSingleItem()
+        public void YieldIsSingleItem()
         {
             var x = new object();
             Assert.Single(x.Yield(), x);

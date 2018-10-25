@@ -6,11 +6,11 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
 {
-    public class StatementAnalysisBuilder
+    public class StatementAnalysisBuilder : IStatementAnalysisBuilder
     {
-        [NotNull] private readonly ExpressionAnalysisBuilder expressionBuilder;
+        [NotNull] private readonly IExpressionAnalysisBuilder expressionBuilder;
 
-        public StatementAnalysisBuilder([NotNull] ExpressionAnalysisBuilder expressionBuilder)
+        public StatementAnalysisBuilder([NotNull] IExpressionAnalysisBuilder expressionBuilder)
         {
             this.expressionBuilder = expressionBuilder;
         }

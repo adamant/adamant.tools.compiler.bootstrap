@@ -1,6 +1,8 @@
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
+using JetBrains.Annotations;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
@@ -10,10 +12,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
     [UnitTest]
     public class DotNetFrameworkTests
     {
+        [NotNull]
         private readonly ITestOutputHelper output;
 
-        public DotNetFrameworkTests(ITestOutputHelper output)
+        public DotNetFrameworkTests([NotNull] ITestOutputHelper output)
         {
+            Requires.NotNull(nameof(output), output);
             this.output = output;
         }
 
@@ -29,9 +33,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
             Assert.NotEqual(lambda1, lambda2);
         }
 
-        private static MethodInfo GetMethodInfo(Func<int, int> f)
+        [NotNull]
+        private static MethodInfo GetMethodInfo([NotNull] Func<int, int> f)
         {
-            return f.Method;
+            return f.Method.AssertNotNull();
         }
 
         [Fact]
@@ -69,7 +74,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
             Assert.Equal(delayTask, completedTask);
         }
 
-        private static async Task<int> GetValueAsync(Func<Task<int>> task)
+        private static async Task<int> GetValueAsync([NotNull] Func<Task<int>> task)
         {
             await Task.Yield();
             return await task();
