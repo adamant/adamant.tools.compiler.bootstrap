@@ -1,3 +1,4 @@
+using System;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
@@ -17,16 +18,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 {
     public class ExpressionParser : IExpressionParser
     {
+        [NotNull] private readonly IListParser listParser;
+        [NotNull] private readonly IParser<NameSyntax> qualifiedNameParser;
         [NotNull]
-        private readonly IListParser listParser;
+        private IParser<BlockExpressionSyntax> BlockParser
+        {
+            get
+            {
+                if (blockParser != null) return blockParser;
 
-        [NotNull]
-        private readonly IParser<NameSyntax> qualifiedNameParser;
+                blockParser = blockParserProvider.AssertNotNull()();
+                blockParserProvider = null;
+                return blockParser.AssertNotNull();
+            }
+        }
+        [CanBeNull] private IParser<BlockExpressionSyntax> blockParser;
+        [CanBeNull] private Func<IParser<BlockExpressionSyntax>> blockParserProvider;
 
-        public ExpressionParser([NotNull] IListParser listParser, [NotNull] IParser<NameSyntax> qualifiedNameParser)
+        public ExpressionParser(
+            [NotNull] IListParser listParser,
+            [NotNull] IParser<NameSyntax> qualifiedNameParser,
+            [NotNull] Func<IParser<BlockExpressionSyntax>> blockParserProvider)
         {
             this.listParser = listParser;
             this.qualifiedNameParser = qualifiedNameParser;
+            this.blockParserProvider = blockParserProvider;
         }
 
         [NotNull]
@@ -244,8 +260,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
                         return name;
                     }
+                case ForeachKeywordToken _:
+                    {
+                        var foreachKeyword = tokens.Expect<ForeachKeywordToken>();
+                        var varKeyword = tokens.Accept<VarKeywordToken>();
+                        var identifier = tokens.ExpectIdentifier();
+                        var inKeyword = tokens.Expect<InKeywordToken>();
+                        var expression = Parse(tokens, diagnostics);
+                        var block = BlockParser.Parse(tokens, diagnostics);
+                        return new ForeachExpressionSyntax(foreachKeyword, varKeyword, identifier, inKeyword, expression, block);
+                    }
                 case AsteriskToken _:
                 case SlashToken _:
+                case QuestionToken _:
+                case SemicolonToken _:
                     // If it is one of these, we assume there is a missing identifier
                     return new IdentifierNameSyntax(tokens.ExpectIdentifier());
                 default:

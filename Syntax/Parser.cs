@@ -17,9 +17,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             var nameParser = new QualifiedNameParser();
             var listParser = new ListParser();
             var usingDirectiveParser = new UsingDirectiveParser(nameParser);
-            var expressionParser = new ExpressionParser(listParser, nameParser);
+            StatementParser statementParser = null;
+            var expressionParser = new ExpressionParser(listParser, nameParser, () => statementParser);
             var parameterParser = new ParameterParser(expressionParser);
-            var statementParser = new StatementParser(listParser, expressionParser);
+            statementParser = new StatementParser(listParser, expressionParser);
             var accessModifierParser = new AccessModifierParser();
             var declarationParser = new DeclarationParser(listParser, expressionParser, statementParser, parameterParser, accessModifierParser);
             compilationUnitParser = new CompilationUnitParser(usingDirectiveParser, declarationParser, nameParser);

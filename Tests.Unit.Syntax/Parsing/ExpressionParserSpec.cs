@@ -130,7 +130,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         {
             var listParser = FakeParser.ForLists();
             var qualifiedNameParser = FakeParser.For<NameSyntax>();
-            return new ExpressionParser(listParser, qualifiedNameParser);
+            return new ExpressionParser(listParser, qualifiedNameParser, FakeParser.For<BlockExpressionSyntax>);
         }
     }
 }
