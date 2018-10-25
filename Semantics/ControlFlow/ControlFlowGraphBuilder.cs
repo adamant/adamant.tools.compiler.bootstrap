@@ -109,7 +109,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     {
                         case EqualsToken _:
                             var lvalue = ConvertToLValue(cfg, binaryOperatorExpression.LeftOperand);
-                            ConvertAssignment(cfg, lvalue, expression, currentBlock);
+                            ConvertAssignment(cfg, lvalue, binaryOperatorExpression.RightOperand, currentBlock);
                             break;
                         default:
                             // Could be side effects possibly.
