@@ -75,7 +75,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
                         nodes.Push(unaryOperator.Operand);
                         break;
                     case NewObjectExpressionSyntax newObject:
-                        nodes.PushRange(newObject.Arguments.Nodes().Reverse());
+                        nodes.PushRange(newObject.ArgumentList.Nodes().Reverse());
                         nodes.Push(newObject.Type);
                         break;
                     case AccessModifierSyntax _:

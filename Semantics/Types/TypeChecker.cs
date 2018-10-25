@@ -187,6 +187,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
 
                     expression.Type = ObjectType.Void;// TODO assign the correct type to the block
                     break;
+                case NewObjectExpressionAnalysis newObjectExpression:
+                    foreach (var argument in newObjectExpression.Arguments)
+                        CheckTypes(argument, diagnostics);
+
+                    // TODO verify argument types against called function
+                    // TODO look up type and assign to expression
+                    break;
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }

@@ -80,7 +80,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                     return new BlockExpressionAnalysis(context, blockExpression,
                         blockExpression.Statements.Select(s => StatementBuilder.Build(blockContext, functionName, s)));
                 case NewObjectExpressionSyntax newObjectExpression:
-                    return new NewObjectExpressionAnalysis(context, newObjectExpression);
+                    return new NewObjectExpressionAnalysis(context, newObjectExpression,
+                        newObjectExpression.Arguments.Select(a => Build(context, functionName, a)));
                 case BooleanLiteralExpressionSyntax booleanLiteralExpression:
                     return new BooleanLiteralExpressionAnalysis(context, booleanLiteralExpression);
                 default:
