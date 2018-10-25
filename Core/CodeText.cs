@@ -50,8 +50,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
 
         private TextPosition PositionOf(int charOffset)
         {
-            var lineNumber = Lines.LineContainingOffset(charOffset);
-            var lineStart = Lines.StartOfLine[lineNumber];
+            var lineIndex = Lines.LineIndexContainingOffset(charOffset);
+            var lineStart = Lines.StartOfLine[lineIndex];
 
             // TODO handle Unicode
             var column = charOffset - lineStart + 1; // column is one based
@@ -66,7 +66,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
             }
 
             // The line number is one based while the variable was zero based
-            return new TextPosition(charOffset, lineNumber + 1, column);
+            return new TextPosition(charOffset, lineIndex + 1, column);
         }
     }
 }

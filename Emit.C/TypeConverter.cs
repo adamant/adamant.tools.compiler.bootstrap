@@ -25,6 +25,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     return "ₐint";
                 case ObjectType t:
                     return nameMangler.Mangle(t);
+                case LifetimeType lifetimeType:
+                    return Convert(lifetimeType.Type);
                 default:
                     throw NonExhaustiveMatchException.For(type);
             }

@@ -2,11 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Graph;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Refs;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements.LValues;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements.RValues;
@@ -62,7 +64,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 
             while (blocks.Any())
             {
-                var block = blocks.Dequeue();
+                var block = blocks.Dequeue().AssertNotNull();
 
                 var claimsBeforeStatement = new HashSet<Claim>();
                 foreach (var predecessor in edges.To(block).Select(b => b.EndStatement))
@@ -97,7 +99,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             {
                                 var title = GetTitle(deleteStatement.VariableNumber,
                                     claimsBeforeStatement);
-                                CheckCanMove(title.Object, claimsBeforeStatement, diagnostics);
+                                CheckCanMove(title.Object, claimsBeforeStatement, function, deleteStatement.Span, diagnostics);
                                 claimsAfterStatement.RemoveWhere(c => c.Variable == title.Variable);
                                 break;
                             }
@@ -120,21 +122,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         private static void CheckCanMove(
             int @object,
             [NotNull] HashSet<Claim> claims,
+            [NotNull] FunctionDeclarationAnalysis function,
+            [NotNull] TextSpan span,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
             var canTake = claims.OfType<Loan>().SelectMany(l => l.Restrictions)
                 .Any(r => r.Place == @object && !r.CanTake);
+
             if (!canTake)
-            {
-                //diagnostics.Add(SemanticError.BorrowedValueDoesNotLiveLongEnough());
-                throw new NotImplementedException();
-            }
+                diagnostics.Publish(BorrowError.BorrowedValueDoesNotLiveLongEnough(function.Context.File, span));
         }
 
-        private static Claim GetClaim([NotNull] RValue rvalue, [NotNull] HashSet<Claim> claims)
+        [NotNull]
+        private static Claim GetClaim([NotNull] RValue rvalue, [NotNull][ItemNotNull] HashSet<Claim> claims)
         {
             var coreVariable = rvalue.CoreVariable();
-            return claims.Single(t => t.Variable == coreVariable);
+            return claims.Single(t => t.Variable == coreVariable).AssertNotNull();
         }
 
         private static Title GetTitle([NotNull] RValue rvalue, [NotNull] HashSet<Claim> claims)
@@ -143,9 +146,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             return GetTitle(coreVariable, claims);
         }
 
+        [NotNull]
         private static Title GetTitle([NotNull] int variable, [NotNull] HashSet<Claim> claims)
         {
-            return claims.OfType<Title>().Single(t => t.Variable == variable);
+            return claims.OfType<Title>().Single(t => t.Variable == variable).AssertNotNull();
         }
 
         private static LiveVariables ComputeLiveness([NotNull] ControlFlowGraph function, [NotNull] Edges edges)

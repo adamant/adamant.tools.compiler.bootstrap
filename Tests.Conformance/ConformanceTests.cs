@@ -102,7 +102,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
         private static List<int> ExpectedCompileErrorLines([NotNull] CodeFile codeFile, [NotNull] string code)
         {
             return ErrorPattern.Matches(code).AssertItemNotNull()
-                .Select(match => codeFile.Code.Lines.LineContainingOffset(match.Index))
+                .Select(match => codeFile.Code.Lines.LineIndexContainingOffset(match.Index) + 1)
                 .ToList();
         }
 

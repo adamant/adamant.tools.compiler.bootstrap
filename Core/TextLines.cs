@@ -1,23 +1,26 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
     public class TextLines
     {
-        public readonly string Text;
+        [NotNull] public readonly string Text;
         public int Count => startOfLine.Count;
-        public readonly IReadOnlyList<int> StartOfLine;
-        private readonly List<int> startOfLine;
+        [NotNull] public readonly IReadOnlyList<int> StartOfLine;
+        [NotNull] private readonly List<int> startOfLine;
 
-        public TextLines(string text)
+        public TextLines([NotNull] string text)
         {
+            Requires.NotNull(nameof(text), text);
             Text = text;
             startOfLine = LineStarts(text);
-            StartOfLine = startOfLine.AsReadOnly();
+            StartOfLine = startOfLine.AsReadOnly().AssertNotNull();
         }
 
-        private static List<int> LineStarts(string text)
+        [NotNull]
+        private static List<int> LineStarts([NotNull] string text)
         {
             var length = text.Length;
             var startOfLine = new List<int> { 0 }; // there is always a first line
@@ -56,7 +59,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
             return startOfLine;
         }
 
-        public int LineContainingOffset(int charOffset)
+        /// <summary>
+        /// Returns zero based line index
+        /// </summary>
+        public int LineIndexContainingOffset(int charOffset)
         {
             Requires.InString(Text, nameof(charOffset), charOffset);
             var searchResult = startOfLine.BinarySearch(charOffset);

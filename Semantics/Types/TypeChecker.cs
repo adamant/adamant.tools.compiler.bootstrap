@@ -207,9 +207,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
         {
             CheckTypes(binaryOperatorExpression.LeftOperand, diagnostics);
             var leftOperand = binaryOperatorExpression.LeftOperand.Type;
+            var leftOperandCore = leftOperand is LifetimeType l ? l.Type : leftOperand;
             var @operator = binaryOperatorExpression.Syntax.Operator;
             CheckTypes(binaryOperatorExpression.RightOperand, diagnostics);
             var rightOperand = binaryOperatorExpression.RightOperand.Type;
+            var rightOperandCore = rightOperand is LifetimeType r ? r.Type : rightOperand;
 
             bool typeError;
 
@@ -221,7 +223,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                         binaryOperatorExpression.Type = leftOperand;
                     break;
                 case EqualsToken _:
-                    typeError = leftOperand != rightOperand;
+                    typeError = leftOperandCore != rightOperandCore;
                     if (!typeError)
                         binaryOperatorExpression.Type = leftOperand;
                     break;
@@ -325,7 +327,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                             throw NonExhaustiveMatchException.For(primitive.Syntax.Keyword);
                     }
                 case LifetimeTypeAnalysis lifetimeType:
-                    return EvaluateType(lifetimeType.TypeName, diagnostics);
+                    var type = EvaluateType(lifetimeType.TypeName, diagnostics);
+                    var lifetimeToken = lifetimeType.Syntax.Lifetime;
+                    Lifetime lifetime;
+                    switch (lifetimeToken)
+                    {
+                        case OwnedKeywordToken _:
+                            lifetime = OwnedLifetime.Instance;
+                            break;
+                        case IdentifierToken identifier:
+                            lifetime = new NamedLifetime(identifier.Value);
+                            break;
+                        default:
+                            throw NonExhaustiveMatchException.For(lifetimeToken);
+                    }
+                    return new LifetimeType(type, lifetime);
                 default:
                     throw NonExhaustiveMatchException.For(typeExpression);
             }

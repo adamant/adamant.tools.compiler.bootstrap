@@ -129,7 +129,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
                     // Now we need to delete any owned variables
                     foreach (var variableDeclaration in block.Statements.OfType<VariableDeclarationStatementAnalysis>().Where(IsOwned))
-                        currentBlock.Add(new DeleteStatement(LookupVariable(cfg, variableDeclaration.Name.Name.Text).VariableNumber));
+                        currentBlock.Add(new DeleteStatement(LookupVariable(cfg, variableDeclaration.Name.Name.Text).VariableNumber, block.Syntax.CloseBrace.Span));
 
                     break;
                 default:
