@@ -24,18 +24,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         {
             switch (tokens.Current)
             {
-                //case TokenKind.MutableKeyword:
-                //     `mut self`
-                //    throw new NotImplementedException();
-                //case TokenKind.SelfKeyword:
-                //      `self`
-                //    throw new NotImplementedException();
+                case MutableKeywordToken mutableKeyword:
+                    {
+                        tokens.MoveNext();
+                        var selfKeyword = tokens.Expect<SelfKeywordToken>();
+                        return new SelfParameterSyntax(selfKeyword);
+                    }
+                case SelfKeywordToken selfKeyword:
+                    tokens.MoveNext();
+                    return new SelfParameterSyntax(selfKeyword);
                 default:
                     var varKeyword = tokens.Accept<VarKeywordToken>();
                     var name = tokens.ExpectIdentifier();
                     var colon = tokens.Expect<IColonToken>();
                     var typeExpression = expressionParser.Parse(tokens, diagnostics);
-                    return new ParameterSyntax(varKeyword, name, colon, typeExpression);
+                    return new NamedParameterSyntax(varKeyword, name, colon, typeExpression);
             }
         }
     }

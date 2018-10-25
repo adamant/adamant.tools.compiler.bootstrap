@@ -23,10 +23,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
 
             var p = ParseWithoutError(tokens);
 
-            Assert.Null(p.VarKeyword);
-            Assert.Equal(tokens[0], p.Name);
-            Assert.Equal(tokens[1], p.Colon);
-            Assert.Equal(type, p.TypeExpression);
+            var np = Assert.IsType<NamedParameterSyntax>(p);
+            Assert.Null(np.VarKeyword);
+            Assert.Equal(tokens[0], np.Name);
+            Assert.Equal(tokens[1], np.Colon);
+            Assert.Equal(type, np.TypeExpression);
         }
 
         [NotNull]

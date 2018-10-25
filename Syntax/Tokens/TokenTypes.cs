@@ -53,6 +53,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
                     case "SelfTypeKeywordToken":
                         keyword = "Self";
                         break;
+                    case "MutableKeywordToken":
+                        keyword = "mut";
+                        break;
                     default:
                         keyword = tokenTypeName
                             .Substring(0, tokenTypeName.Length - KeywordTokenLength)

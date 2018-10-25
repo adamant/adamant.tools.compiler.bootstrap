@@ -3,6 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Parts;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
@@ -58,9 +59,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             // For missing parameter names, use `_` to ignore them
             return new FunctionDeclarationAnalysis(
                 context, syntax, fullName,
-                syntax.Parameters.Select(p => new ParameterAnalysis(p, fullName.Qualify(p.Name.Value ?? "_"), expressionBuilder.Build(context, fullName, p.TypeExpression))),
+                syntax.Parameters.Select(p => Build(context, fullName, p)),
                 expressionBuilder.Build(context, fullName, syntax.ReturnTypeExpression),
                 syntax.Body.Statements.Select(statementSyntax => statementBuilder.Build(bodyContext, fullName, statementSyntax)));
+        }
+
+        private ParameterAnalysis Build(
+            [NotNull] AnalysisContext context,
+            [NotNull] QualifiedName functionName,
+            [NotNull] ParameterSyntax parameter)
+        {
+            switch (parameter)
+            {
+                case NamedParameterSyntax namedParameter:
+                    return new ParameterAnalysis(namedParameter, functionName.Qualify(namedParameter.Name.Value ?? "_"), expressionBuilder.Build(context, functionName, namedParameter.TypeExpression));
+                default:
+                    throw NonExhaustiveMatchException.For(parameter);
+            }
         }
 
         private static TypeDeclarationAnalysis Build(

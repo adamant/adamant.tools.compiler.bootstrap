@@ -88,7 +88,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
 
         public static ParameterSyntax Parameter()
         {
-            return new ParameterSyntax(null, Missing<IIdentifierToken>(), Missing<IColonToken>(), Expression());
+            return new NamedParameterSyntax(null, Missing<IIdentifierToken>(), Missing<IColonToken>(), Expression());
         }
 
         private class FakeExpressionSyntax : ExpressionSyntax

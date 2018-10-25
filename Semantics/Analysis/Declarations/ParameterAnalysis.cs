@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
             Syntax = syntax;
             Name = name;
             TypeExpression = typeExpression;
-            MutableBinding = syntax.VarKeyword != null;
+            MutableBinding = syntax is NamedParameterSyntax np && np.VarKeyword != null;
         }
 
         [NotNull]

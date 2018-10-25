@@ -271,6 +271,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             { "metatype", typeof(MetatypeKeywordToken) },
             { "true", typeof(TrueKeywordToken) },
             { "false", typeof(FalseKeywordToken) },
+            { "mut", typeof(MutableKeywordToken) },
         }.AsReadOnly();
     }
 }

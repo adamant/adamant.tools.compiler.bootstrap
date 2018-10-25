@@ -43,6 +43,7 @@
         "Extend",
         "Type",
         "Metatype",
+        "Mutable",
     }.AsReadOnly();
 #>
 using System;
