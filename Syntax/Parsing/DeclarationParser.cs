@@ -9,6 +9,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Function;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
@@ -48,9 +49,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             switch (tokens.Current)
             {
                 case ClassKeywordToken _:
-                    return ParseClass(modifiers, tokens);
+                    return ParseClass(modifiers, tokens, diagnostics);
                 case TypeKeywordToken _:
-                    return ParseType(modifiers, tokens);
+                    return ParseType(modifiers, tokens, diagnostics);
                 case EnumKeywordToken _:
                     return ParseEnum(modifiers, tokens, diagnostics);
                 case FunctionKeywordToken _:
@@ -76,26 +77,61 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         }
 
         [MustUseReturnValue]
+        [CanBeNull]
+        private GenericParametersSyntax ParseGenericParameters(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var openBracket = tokens.Accept<OpenBracketToken>();
+            if (openBracket == null) return null;
+            var parameters = listParser.ParseSeparatedList(tokens, ParseGenericParameter,
+                TypeOf<CommaToken>(), TypeOf<CloseBracketToken>(), diagnostics);
+            var closeBracket = tokens.Expect<ICloseBracketToken>();
+            return new GenericParametersSyntax(openBracket, parameters, closeBracket);
+        }
+
+        [MustUseReturnValue]
         [NotNull]
-        private static DeclarationSyntax ParseClass([NotNull] SyntaxList<ModifierSyntax> modifiers, [NotNull] ITokenStream tokens)
+        private GenericParameterSyntax ParseGenericParameter(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var paramsKeyword = tokens.Accept<ParamsKeywordToken>();
+            var name = tokens.ExpectIdentifier();
+            var colon = tokens.Accept<ColonToken>();
+            var typeExpression = colon != null ? expressionParser.Parse(tokens, diagnostics) : null;
+            return new GenericParameterSyntax(paramsKeyword, name, colon, typeExpression);
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
+        private DeclarationSyntax ParseClass(
+            [NotNull] SyntaxList<ModifierSyntax> modifiers,
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
         {
             var classKeyword = tokens.Take<ClassKeywordToken>();
             var name = tokens.ExpectIdentifier();
+            var genericParameters = ParseGenericParameters(tokens, diagnostics);
             var openBrace = tokens.Expect<IOpenBraceToken>();
             var closeBrace = tokens.Expect<ICloseBraceToken>();
-            return new ClassDeclarationSyntax(modifiers, classKeyword, name, openBrace,
+            return new ClassDeclarationSyntax(modifiers, classKeyword, name, genericParameters, openBrace,
                 SyntaxList<MemberDeclarationSyntax>.Empty, closeBrace);
         }
 
         [MustUseReturnValue]
         [NotNull]
-        private static DeclarationSyntax ParseType([NotNull] SyntaxList<ModifierSyntax> modifiers, [NotNull] ITokenStream tokens)
+        private DeclarationSyntax ParseType(
+            [NotNull] SyntaxList<ModifierSyntax> modifiers,
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
         {
             var typeKeyword = tokens.Take<TypeKeywordToken>();
             var name = tokens.ExpectIdentifier();
+            var genericParameters = ParseGenericParameters(tokens, diagnostics);
             var openBrace = tokens.Expect<IOpenBraceToken>();
             var closeBrace = tokens.Expect<ICloseBraceToken>();
-            return new TypeDeclarationSyntax(modifiers, typeKeyword, name, openBrace,
+            return new TypeDeclarationSyntax(modifiers, typeKeyword, name, genericParameters, openBrace,
                 SyntaxList<MemberDeclarationSyntax>.Empty, closeBrace);
         }
 
