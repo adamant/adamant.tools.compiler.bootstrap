@@ -279,6 +279,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             { "may", typeof(MayKeywordToken) },
             { "no", typeof(NoKeywordToken) },
             { "throw", typeof(ThrowKeywordToken) },
+            { "ref", typeof(RefKeywordToken) },
         }.AsReadOnly();
     }
 }

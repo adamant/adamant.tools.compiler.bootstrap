@@ -48,6 +48,7 @@
         "May",
         "No",
         "Throw",
+        "Ref",
     }.AsReadOnly();
 #>
 using System;

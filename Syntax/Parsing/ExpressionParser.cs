@@ -286,6 +286,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
                         return new UnsafeExpression(unsafeKeyword, expression);
                     }
+                case RefKeywordToken refKeyword:
+                    {
+                        tokens.MoveNext();
+                        var varKeyword = tokens.Accept<VarKeywordToken>();
+                        var referencedType = Parse(tokens, diagnostics);
+                        return new RefTypeSyntax(refKeyword, varKeyword, referencedType);
+                    }
                 case AsteriskToken _:
                 case SlashToken _:
                 case QuestionToken _:
