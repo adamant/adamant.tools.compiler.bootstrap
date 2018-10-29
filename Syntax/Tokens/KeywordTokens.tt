@@ -49,6 +49,7 @@
         "No",
         "Throw",
         "Ref",
+        "Abstract",
     }.AsReadOnly();
 #>
 using System;

@@ -16,6 +16,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 case UnsafeKeywordToken unsafeKeyword:
                     tokens.MoveNext();
                     return new UnsafeModifierSyntax(unsafeKeyword);
+                case AbstractKeywordToken abstractKeyword:
+                    tokens.MoveNext();
+                    return new AbstractModifierSyntax(abstractKeyword);
                 case PublicKeywordToken _:
                 case ProtectedKeywordToken _:
                 case PrivateKeywordToken _:
