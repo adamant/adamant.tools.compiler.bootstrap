@@ -147,6 +147,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                             continue;
                         }
                         break;
+                    case OpenBracketToken _:
+                        if (minPrecedence <= OperatorPrecedence.Primary)
+                        {
+                            var callee = expression;
+                            var openBracket = tokens.Expect<IOpenBracketToken>();
+                            var arguments = ParseArguments(tokens, diagnostics);
+                            var closeBracket = tokens.Expect<ICloseBracketToken>();
+                            expression = new GenericsInvocationSyntax(callee, openBracket, arguments, closeBracket);
+                            continue;
+                        }
+                        break;
                     case DotToken _:
                         if (minPrecedence <= OperatorPrecedence.Primary)
                         {
