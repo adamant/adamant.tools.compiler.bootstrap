@@ -84,7 +84,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
 
         public override string ToString()
         {
-            var textValue = string.IsNullOrEmpty(Text) ? "" : $":„{Text}„";
+            var textValue = string.IsNullOrEmpty(Text) ? "" : $":„{Regex.Escape(Text)}„";
             switch (Value)
             {
                 case null:

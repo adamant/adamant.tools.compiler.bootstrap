@@ -65,6 +65,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             {
                 case ".":
                     return t2.Text == "." || t2.Text == "..";
+                case "^":
+                    return t2.Text == ".";
                 case "+":
                 case "*":
                 case ">":
@@ -209,6 +211,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             { "->", typeof(RightArrowToken) },
             { "@", typeof(AtSignToken) },
             { "^", typeof(CaretToken) },
+            { "^.", typeof(CaretDotToken) },
             { "+", typeof(PlusToken) },
             { "-", typeof(MinusToken) },
             { "*", typeof(AsteriskToken) },

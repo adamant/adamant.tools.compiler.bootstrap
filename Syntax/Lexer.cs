@@ -79,7 +79,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         yield return new AtSignToken(SymbolSpan());
                         break;
                     case '^':
-                        yield return new CaretToken(SymbolSpan());
+                        if (NextCharIs('.'))
+                            // it is `^.`
+                            yield return new CaretDotToken(SymbolSpan(2));
+                        else
+                            // it is `^`
+                            yield return new CaretToken(SymbolSpan());
                         break;
                     case '+':
                         if (NextCharIs('='))

@@ -8,9 +8,10 @@
     var operators = new List<string>()
     {
         "Dot", // `.` U+002E
-        "DotDot", // `..` U+002E", U+002E
+        "DotDot", // `..` U+002E, U+002E
         "AtSign", // `@` U+0040 (named at sign to distinguish it from the word "at")
         "Caret", // `^` U+005E
+        "CaretDot", // `^.` U+005E, U+002E
         "Plus", // `+` U+002B
         "Minus", // `-` U+002D
         "Asterisk", // `*` U+002A

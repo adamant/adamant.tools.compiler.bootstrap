@@ -38,6 +38,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
+    public interface ICaretDotToken : IOperatorToken { }
+    public class CaretDotToken : OperatorToken, ICaretDotToken
+    {
+        public CaretDotToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
     public interface IPlusToken : IOperatorToken { }
     public class PlusToken : OperatorToken, IPlusToken
     {
@@ -178,6 +187,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         IDotDotToken,
         IAtSignToken,
         ICaretToken,
+        ICaretDotToken,
         IPlusToken,
         IMinusToken,
         IAsteriskToken,
