@@ -80,6 +80,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                             @operator = tokens.TakeOperator();
                         }
                         break;
+                    case DollarToken _:
+                    case DollarLessThanToken _:
+                    case DollarLessThanNotEqualToken _:
+                    case DollarGreaterThanToken _:
+                    case DollarGreaterThanNotEqualToken _:
+                        if (minPrecedence <= OperatorPrecedence.Lifetime)
+                        {
+                            precedence = OperatorPrecedence.Lifetime;
+                            var leftOperand = expression;
+                            @operator = tokens.TakeOperator();
+                            var identifier = tokens.ExpectIdentifier();
+                            expression = new BinaryOperatorExpressionSyntax(leftOperand, @operator, new IdentifierNameSyntax(identifier));
+                            continue;
+                        }
+                        break;
                     case OrKeywordToken _:
                     case XorKeywordToken _:
                         if (minPrecedence <= OperatorPrecedence.LogicalOr)
