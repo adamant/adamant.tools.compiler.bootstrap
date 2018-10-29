@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
 {
-    public class IncompleteDeclarationSyntax : DeclarationSyntax
+    public class IncompleteDeclarationSyntax : MemberDeclarationSyntax
     {
         [NotNull] public override IIdentifierToken Name => throw new NotImplementedException();
 

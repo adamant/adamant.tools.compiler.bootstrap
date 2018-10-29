@@ -42,7 +42,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        public DeclarationSyntax Parse([NotNull] ITokenStream tokens, IDiagnosticsCollector diagnostics)
+        public DeclarationSyntax Parse(
+            [NotNull] ITokenStream tokens,
+            IDiagnosticsCollector diagnostics)
         {
             var modifiers = ParseModifiers(tokens, diagnostics);
 
@@ -62,6 +64,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     throw new InvalidOperationException("Can't parse past end of file");
             }
         }
+
+        [MustUseReturnValue]
+        [NotNull]
+        public MemberDeclarationSyntax ParseMemberDeclaration(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var modifiers = ParseModifiers(tokens, diagnostics);
+
+            switch (tokens.Current)
+            {
+                case ClassKeywordToken _:
+                    return ParseClass(modifiers, tokens, diagnostics);
+                case TypeKeywordToken _:
+                    return ParseType(modifiers, tokens, diagnostics);
+                case EnumKeywordToken _:
+                    return ParseEnum(modifiers, tokens, diagnostics);
+                case FunctionKeywordToken _:
+                    return ParseFunction(modifiers, tokens, diagnostics);
+                default:
+                    return ParseIncompleteDeclaration(modifiers, tokens, diagnostics);
+                case null:
+                    throw new InvalidOperationException("Can't parse past end of file");
+            }
+        }
+
 
         [MustUseReturnValue]
         [NotNull]
@@ -105,7 +133,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        private DeclarationSyntax ParseClass(
+        private ClassDeclarationSyntax ParseClass(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
@@ -114,14 +142,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             var name = tokens.ExpectIdentifier();
             var genericParameters = ParseGenericParameters(tokens, diagnostics);
             var openBrace = tokens.Expect<IOpenBraceToken>();
+            var members = listParser.ParseList(tokens, ParseMemberDeclaration, TypeOf<CloseBraceToken>(), diagnostics);
             var closeBrace = tokens.Expect<ICloseBraceToken>();
             return new ClassDeclarationSyntax(modifiers, classKeyword, name, genericParameters, openBrace,
-                SyntaxList<MemberDeclarationSyntax>.Empty, closeBrace);
+                members, closeBrace);
         }
 
         [MustUseReturnValue]
         [NotNull]
-        private DeclarationSyntax ParseType(
+        private TypeDeclarationSyntax ParseType(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
@@ -130,14 +159,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             var name = tokens.ExpectIdentifier();
             var genericParameters = ParseGenericParameters(tokens, diagnostics);
             var openBrace = tokens.Expect<IOpenBraceToken>();
+            var members = listParser.ParseList(tokens, ParseMemberDeclaration, TypeOf<CloseBraceToken>(), diagnostics);
             var closeBrace = tokens.Expect<ICloseBraceToken>();
             return new TypeDeclarationSyntax(modifiers, typeKeyword, name, genericParameters, openBrace,
-                SyntaxList<MemberDeclarationSyntax>.Empty, closeBrace);
+                members, closeBrace);
         }
 
         [MustUseReturnValue]
         [NotNull]
-        private static DeclarationSyntax ParseEnum([NotNull] SyntaxList<ModifierSyntax> modifiers, [NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+        private MemberDeclarationSyntax ParseEnum(
+            [NotNull] SyntaxList<ModifierSyntax> modifiers,
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
         {
             var enumKeyword = tokens.Take<EnumKeywordToken>();
             switch (tokens.Current)
@@ -146,9 +179,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     var structKeyword = tokens.Expect<IStructKeywordToken>();
                     var name = tokens.ExpectIdentifier();
                     var openBrace = tokens.Expect<IOpenBraceToken>();
+                    var members = listParser.ParseList(tokens, ParseMemberDeclaration, TypeOf<CloseBraceToken>(), diagnostics);
                     var closeBrace = tokens.Expect<ICloseBraceToken>();
                     return new EnumStructDeclarationSyntax(modifiers, enumKeyword, structKeyword, name,
-                        openBrace, SyntaxList<MemberDeclarationSyntax>.Empty, closeBrace);
+                        openBrace, members, closeBrace);
                 case ClassKeywordToken _:
                     throw new NotImplementedException(
                         "Parsing enum classes not implemented");

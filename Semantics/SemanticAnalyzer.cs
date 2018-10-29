@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // Gather all the declarations and simultaneously build up trees of lexical scopes
             var compilationUnits = new AnalysisBuilder(nameBuilder).Build(packageSyntax).ToList();
 
-            // Make a list of tall the declarations
+            // Make a list of all the declarations
             var declarationAnalyses = compilationUnits.SelectMany(cu => cu.Declarations).ToList();
 
             // Check lexical scopes and attach to entities etc.
@@ -52,6 +52,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             // Gather the diagnostics and declarations into a package
             var diagnostics = new DiagnosticsBuilder();
+            // First pull over all the lexer and parser errors from the compilation units
+            foreach (var compilationUnit in packageSyntax.CompilationUnits)
+                diagnostics.Publish(compilationUnit.Diagnostics);
+
             var declarations = declarationAnalyses.Select(d => d.Complete(diagnostics)).Where(d => d != null).ToList();
             var entryPoint = DetermineEntryPoint(declarations, diagnostics);
             return new Package(packageSyntax.Name, diagnostics.Build(), namespaces, declarations, entryPoint);

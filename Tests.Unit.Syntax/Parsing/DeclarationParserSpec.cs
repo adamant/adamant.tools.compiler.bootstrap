@@ -44,7 +44,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         public void Class_declaration()
         {
             var accessModifer = FakeSyntax.AccessModifier();
-            var tokens = FakeTokenStream.From($"{accessModifer} class Class_Name {{}}");
+            var members = FakeSyntax.List<MemberDeclarationSyntax>();
+            var tokens = FakeTokenStream.From($"{accessModifer} class Class_Name {{{members}}}");
 
             var d = ParseWithoutError(tokens);
 
@@ -53,7 +54,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
             Assert.Equal(tokens[1], c.ClassKeyword);
             Assert.Equal(tokens[2], c.Name);
             Assert.Equal(tokens[3], c.OpenBrace);
-            Assert.Equal(tokens[4], c.CloseBrace);
+            Assert.Equal(members, c.Members);
+            Assert.Equal(tokens[5], c.CloseBrace);
         }
 
         [NotNull]
