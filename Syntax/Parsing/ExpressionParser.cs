@@ -293,6 +293,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         var referencedType = Parse(tokens, diagnostics);
                         return new RefTypeSyntax(refKeyword, varKeyword, referencedType);
                     }
+                case MutableKeywordToken mutableKeyword:
+                    {
+                        tokens.MoveNext();
+                        var referencedType = Parse(tokens, diagnostics);
+                        return new MutableTypeSyntax(mutableKeyword, referencedType);
+                    }
                 case AsteriskToken _:
                 case SlashToken _:
                 case QuestionToken _:
