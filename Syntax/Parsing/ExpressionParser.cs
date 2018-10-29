@@ -223,6 +223,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         var closeParen = tokens.Expect<ICloseParenToken>();
                         return new NewObjectExpressionSyntax(newKeyword, type, openParen, arguments, closeParen);
                     }
+                case InitKeywordToken _:
+                    {
+                        var initKeyword = tokens.Expect<IInitKeywordToken>();
+                        var type = qualifiedNameParser.Parse(tokens, diagnostics);
+                        var openParen = tokens.Expect<IOpenParenToken>();
+                        var arguments = ParseArguments(tokens, diagnostics);
+                        var closeParen = tokens.Expect<ICloseParenToken>();
+                        return new InitStructExpression(initKeyword, type, openParen, arguments, closeParen);
+                    }
                 case ReturnKeywordToken _:
                     {
                         var returnKeyword = tokens.Expect<IReturnKeywordToken>();
