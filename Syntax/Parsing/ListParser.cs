@@ -40,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             while (!(tokens.Current is TTerminator || tokens.Current is EndOfFileToken))
             {
                 var start = tokens.Current;
-                yield return parseItem(tokens);
+                yield return parseItem(tokens, diagnostics);
                 if (tokens.Current == start)
                 {
                     diagnostics.Publish(ParseError.UnexpectedToken(tokens.File, tokens.Current.Span));
@@ -80,7 +80,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             while (!(tokens.Current is TTerminator || tokens.Current is EndOfFileToken))
             {
                 var start = tokens.Current;
-                yield return parseItem(tokens);
+                yield return parseItem(tokens, diagnostics);
                 if (tokens.Current == start)
                 {
                     diagnostics.Publish(ParseError.UnexpectedToken(tokens.File, tokens.Current.Span));

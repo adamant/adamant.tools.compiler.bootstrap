@@ -45,6 +45,9 @@
         "Metatype",
         "Mutable",
         "Params",
+        "May",
+        "No",
+        "Throw",
     }.AsReadOnly();
 #>
 using System;

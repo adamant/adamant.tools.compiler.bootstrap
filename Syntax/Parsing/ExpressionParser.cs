@@ -285,7 +285,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         [NotNull]
         private SeparatedListSyntax<ExpressionSyntax> ParseArguments([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var arguments = listParser.ParseSeparatedList(tokens, t => Parse(t, diagnostics), TypeOf<CommaToken>(), TypeOf<CloseParenToken>(), diagnostics);
+            var arguments = listParser.ParseSeparatedList(tokens, Parse, TypeOf<CommaToken>(), TypeOf<CloseParenToken>(), diagnostics);
             return new SeparatedListSyntax<ExpressionSyntax>(arguments);
         }
     }

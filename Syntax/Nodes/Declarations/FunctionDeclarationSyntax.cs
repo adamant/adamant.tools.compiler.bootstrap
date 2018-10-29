@@ -18,6 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
         [NotNull] public ICloseParenToken CloseParen { get; }
         [NotNull] public IRightArrowToken Arrow { get; }
         [NotNull] public ExpressionSyntax ReturnTypeExpression { get; }
+        [CanBeNull] public EffectsSyntax Effects { get; }
         [NotNull] public BlockExpressionSyntax Body { get; }
 
         public FunctionDeclarationSyntax(
@@ -29,6 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
             [NotNull] ICloseParenToken closeParen,
             [NotNull] IRightArrowToken arrow,
             [NotNull] ExpressionSyntax returnTypeExpression,
+            [CanBeNull] EffectsSyntax effects,
             [NotNull] BlockExpressionSyntax body)
         {
             Requires.NotNull(nameof(accessModifier), accessModifier);
@@ -43,6 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
             CloseParen = closeParen;
             Arrow = arrow;
             ReturnTypeExpression = returnTypeExpression;
+            Effects = effects;
             Body = body;
         }
     }

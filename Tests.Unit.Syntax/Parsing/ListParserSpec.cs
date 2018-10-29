@@ -80,7 +80,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
             var expressionParser = FakeParser.Skip(parameter);
             var diagnostics = new DiagnosticsBuilder();
 
-            var l = new ListParser().ParseList(tokens, t => expressionParser.Parse(t, diagnostics), TypeOf<CloseParenToken>(), diagnostics);
+            var l = new ListParser().ParseList(tokens, expressionParser.Parse, TypeOf<CloseParenToken>(), diagnostics);
 
             Assert.Collection(l, i => Assert.Equal(parameter, i));
             Assert.Collection(diagnostics.Build(), d => { d.AssertParsingDiagnostic(3002, 0, 4); });
@@ -150,13 +150,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
             var expressionParser = FakeParser.Skip(parameter);
             var diagnostics = new DiagnosticsBuilder();
 
-            var l = new ListParser().ParseSeparatedList(tokens, t => expressionParser.Parse(t, diagnostics), TypeOf<CommaToken>(), TypeOf<CloseParenToken>(), diagnostics);
+            var l = new ListParser().ParseSeparatedList(tokens, expressionParser.Parse, TypeOf<CommaToken>(), TypeOf<CloseParenToken>(), diagnostics);
 
             Assert.Collection(l, i => Assert.Equal(parameter, i));
             Assert.Collection(diagnostics.Build(), d => { d.AssertParsingDiagnostic(3002, 0, 4); });
         }
 
-        private static SyntaxNode NotCalled([NotNull] ITokenStream tokens)
+        private static SyntaxNode NotCalled([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
         {
             Assert.True(false, "ParseFunction<T> called when it wasn't supposed to be");
             throw new Exception("Unreachable");
@@ -168,7 +168,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         {
             var diagnostics = new DiagnosticsBuilder();
             var expressionParser = FakeParser.For<ExpressionSyntax>();
-            var syntaxList = new ListParser().ParseList(tokens, t => expressionParser.Parse(t, diagnostics), TypeOf<TTerminator>(), diagnostics);
+            var syntaxList = new ListParser().ParseList(tokens, expressionParser.Parse, TypeOf<TTerminator>(), diagnostics);
             Assert.Empty(diagnostics.Build());
             return syntaxList;
         }
@@ -180,7 +180,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         {
             var diagnostics = new DiagnosticsBuilder();
             var expressionParser = FakeParser.For<ExpressionSyntax>();
-            var l = new ListParser().ParseSeparatedList(tokens, t => expressionParser.Parse(t, diagnostics), TypeOf<TSeparator>(), TypeOf<TTerminator>(), diagnostics);
+            var l = new ListParser().ParseSeparatedList(tokens, expressionParser.Parse, TypeOf<TSeparator>(), TypeOf<TTerminator>(), diagnostics);
             Assert.Empty(diagnostics.Build());
             return l;
         }

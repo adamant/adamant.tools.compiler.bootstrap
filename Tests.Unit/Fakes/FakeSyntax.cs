@@ -154,8 +154,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
                 SeparatedListSyntax<ParameterSyntax>.Empty,
                 null,
                 null,
-                Expression(),
-                Block());
+                Expression(), null, Block());
         }
 
         [NotNull]

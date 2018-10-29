@@ -108,16 +108,52 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             var closeParen = tokens.Expect<ICloseParenToken>();
             var arrow = tokens.Expect<IRightArrowToken>();
             var returnTypeExpression = expressionParser.Parse(tokens, diagnostics);
+            EffectsSyntax effects = null;
+            if (tokens.Current is NoKeywordToken || tokens.Current is MayKeywordToken)
+            {
+                var mayKeyword = tokens.Expect<IMayKeywordToken>();
+                var allowedEffects = listParser.ParseSeparatedList(tokens, ParseEffect, TypeOf<CommaToken>(), TypeOf<OpenBraceToken>(), diagnostics);
+                var noKeyword = tokens.Expect<INoKeywordToken>();
+                var disallowedEffects = listParser.ParseSeparatedList(tokens, ParseEffect, TypeOf<CommaToken>(), TypeOf<OpenBraceToken>(), diagnostics);
+                effects = new EffectsSyntax(mayKeyword, allowedEffects, noKeyword, disallowedEffects);
+            }
             var body = blockParser.Parse(tokens, diagnostics);
             return new FunctionDeclarationSyntax(accessModifier, functionKeyword, name,
-                openParen, parameters, closeParen, arrow, returnTypeExpression, body);
+                openParen, parameters, closeParen, arrow, returnTypeExpression, effects, body);
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
+        public EffectSyntax ParseEffect([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            switch (tokens.Current)
+            {
+                case ThrowKeywordToken throwKeyword:
+                    tokens.MoveNext();
+                    var exceptions = listParser.ParseSeparatedList(tokens, ParseThrowEffectEntry, TypeOf<CommaToken>(), TypeOf<OpenBraceToken>(), diagnostics);
+                    return new ThrowEffectSyntax(throwKeyword, exceptions);
+                case IdentifierToken identifier:
+                    tokens.MoveNext();
+                    return new SimpleEffectSyntax(identifier);
+                default:
+                    throw NonExhaustiveMatchException.For(tokens.Current);
+            }
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
+        private ThrowEffectEntrySyntax ParseThrowEffectEntry([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var paramsKeyword = tokens.Accept<ParamsKeywordToken>();
+            var exceptionType = expressionParser.Parse(tokens, diagnostics);
+            return new ThrowEffectEntrySyntax(paramsKeyword, exceptionType);
         }
 
         [MustUseReturnValue]
         [NotNull]
         private SeparatedListSyntax<ParameterSyntax> ParseParameters([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
         {
-            return listParser.ParseSeparatedList(tokens, t => parameterParser.Parse(t, diagnostics), TypeOf<CommaToken>(), TypeOf<CloseParenToken>(), diagnostics);
+            return listParser.ParseSeparatedList(tokens, parameterParser.Parse, TypeOf<CommaToken>(), TypeOf<CloseParenToken>(), diagnostics);
         }
         #endregion
 

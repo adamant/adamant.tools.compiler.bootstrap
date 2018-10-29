@@ -273,6 +273,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             { "false", typeof(FalseKeywordToken) },
             { "mut", typeof(MutableKeywordToken) },
             { "params", typeof(ParamsKeywordToken) },
+            { "may", typeof(MayKeywordToken) },
+            { "no", typeof(NoKeywordToken) },
+            { "throw", typeof(ThrowKeywordToken) },
         }.AsReadOnly();
     }
 }
