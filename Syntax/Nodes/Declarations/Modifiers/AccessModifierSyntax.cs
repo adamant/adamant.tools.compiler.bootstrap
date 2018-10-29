@@ -1,10 +1,11 @@
+using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers
 {
-    public class AccessModifierSyntax : SyntaxNode
+    public class AccessModifierSyntax : ModifierSyntax
     {
         [NotNull] public IAccessModifierToken Token { get; }
         public AccessModifier Modifier { get; }
@@ -30,6 +31,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
                     Requires.That(nameof(token), false);
                     break;
             }
+        }
+
+        public override IEnumerable<IToken> Tokens()
+        {
+            yield return Token;
         }
     }
 }

@@ -3,6 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
@@ -33,6 +34,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
         {
             if (typeof(T) == typeof(UsingDirectiveSyntax))
                 return (IParser<T>)new UsingDirectiveParser();
+            if (typeof(T) == typeof(ModifierSyntax))
+                return (IParser<T>)new ModifierParser();
             return new FakeTokenParser<T>();
         }
 
@@ -130,6 +133,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
 
                 var fakeToken = tokens.ExpectFake();
                 return (UsingDirectiveSyntax)fakeToken?.FakeValue ?? throw new InvalidOperationException();
+            }
+        }
+
+        private class ModifierParser : IParser<ModifierSyntax>
+        {
+            public ModifierSyntax Parse(ITokenStream tokens, IDiagnosticsCollector diagnostics)
+            {
+                if (tokens.Current is FakeToken fake && fake.FakeValue is ModifierSyntax syntax)
+                {
+                    tokens.MoveNext();
+                    return syntax;
+                }
+
+                return null;
             }
         }
     }

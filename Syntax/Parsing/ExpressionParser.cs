@@ -159,6 +159,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         }
                         break;
                     case DotToken _:
+                    case CaretDotToken _:
                         if (minPrecedence <= OperatorPrecedence.Primary)
                         {
                             // Member Access
@@ -289,6 +290,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 case SlashToken _:
                 case QuestionToken _:
                 case SemicolonToken _:
+                case CloseParenToken _:
                     // If it is one of these, we assume there is a missing identifier
                     return new IdentifierNameSyntax(tokens.ExpectIdentifier());
                 default:

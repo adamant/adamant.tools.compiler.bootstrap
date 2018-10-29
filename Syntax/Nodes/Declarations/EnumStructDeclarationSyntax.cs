@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
@@ -6,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
 {
     public class EnumStructDeclarationSyntax : MemberDeclarationSyntax
     {
-        [NotNull] public AccessModifierSyntax AccessModifier { get; }
+        [NotNull] public SyntaxList<ModifierSyntax> Modifiers { get; }
         [NotNull] public IEnumKeywordToken EnumKeyword { get; }
         [NotNull] public IStructKeywordToken StructKeyword { get; }
         [NotNull] public override IIdentifierToken Name { get; }
@@ -15,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
         [NotNull] public ICloseBraceToken CloseBrace { get; }
 
         public EnumStructDeclarationSyntax(
-            [NotNull] AccessModifierSyntax accessModifier,
+            [NotNull] SyntaxList<ModifierSyntax> modifiers,
             [NotNull] IEnumKeywordToken enumKeyword,
             [NotNull] IStructKeywordToken structKeyword,
             [NotNull] IIdentifierToken name,
@@ -23,14 +24,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
             [NotNull] SyntaxList<MemberDeclarationSyntax> members,
             [NotNull] ICloseBraceToken closeBrace)
         {
-            Requires.NotNull(nameof(accessModifier), accessModifier);
+            Requires.NotNull(nameof(modifiers), modifiers);
             Requires.NotNull(nameof(enumKeyword), enumKeyword);
             Requires.NotNull(nameof(structKeyword), structKeyword);
             Requires.NotNull(nameof(name), name);
             Requires.NotNull(nameof(openBrace), openBrace);
             Requires.NotNull(nameof(members), members);
             Requires.NotNull(nameof(closeBrace), closeBrace);
-            AccessModifier = accessModifier;
+            Modifiers = modifiers;
             EnumKeyword = enumKeyword;
             StructKeyword = structKeyword;
             Name = name;

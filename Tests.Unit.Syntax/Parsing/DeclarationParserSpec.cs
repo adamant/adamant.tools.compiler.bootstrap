@@ -2,6 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Function;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes;
@@ -28,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
             var d = ParseWithoutError(tokens);
 
             var f = Assert.IsType<FunctionDeclarationSyntax>(d);
-            Assert.Equal(accessModifer, f.AccessModifier);
+            Assert.Single(f.Modifiers, accessModifer);
             Assert.Equal(tokens[1], f.FunctionKeyword);
             Assert.Equal(tokens[2], f.Name);
             Assert.Equal(tokens[3], f.OpenParen);
@@ -48,7 +49,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
             var d = ParseWithoutError(tokens);
 
             var c = Assert.IsType<ClassDeclarationSyntax>(d);
-            Assert.Equal(accessModifer, c.AccessModifier);
+            Assert.Single(c.Modifiers, accessModifer);
             Assert.Equal(tokens[1], c.ClassKeyword);
             Assert.Equal(tokens[2], c.Name);
             Assert.Equal(tokens[3], c.OpenBrace);
@@ -72,13 +73,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
             var expressionParser = FakeParser.For<ExpressionSyntax>();
             var blockParser = FakeParser.For<BlockExpressionSyntax>();
             var parameterParser = FakeParser.For<ParameterSyntax>();
-            var accessModifierParser = FakeParser.For<AccessModifierSyntax>();
+            var modifierParser = FakeParser.For<ModifierSyntax>();
             return new DeclarationParser(
                 listParser,
                 expressionParser,
                 blockParser,
                 parameterParser,
-                accessModifierParser);
+                modifierParser);
         }
     }
 }

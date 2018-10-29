@@ -1,6 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes;
 using JetBrains.Annotations;
@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
 {
     [UnitTest]
     [Category("Parse")]
-    public class AccessModiferParserSpec
+    public class ModiferParserSpec
     {
         [Theory]
         [InlineData("public")]
@@ -28,19 +28,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         }
 
         [NotNull]
-        private static AccessModifierSyntax ParseWithoutError([NotNull] ITokenStream tokenStream)
+        private static ModifierSyntax ParseWithoutError([NotNull] ITokenStream tokenStream)
         {
             var parser = NewAccessModifierParser();
             var diagnostics = new DiagnosticsBuilder();
-            var accessModifierSyntax = parser.Parse(tokenStream, diagnostics);
+            var modifierSyntax = parser.Parse(tokenStream, diagnostics);
             Assert.Empty(diagnostics.Build());
-            return accessModifierSyntax;
+            return modifierSyntax;
         }
 
         [NotNull]
-        private static AccessModifierParser NewAccessModifierParser()
+        private static ModifierParser NewAccessModifierParser()
         {
-            return new AccessModifierParser();
+            return new ModifierParser();
         }
     }
 }

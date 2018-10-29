@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             expressionParserSource.SetResult(expressionParser);
             var parameterParser = new ParameterParser(expressionParser);
             statementParser = new StatementParser(listParser, expressionParser);
-            var accessModifierParser = new AccessModifierParser();
+            var accessModifierParser = new ModifierParser();
             var declarationParser = new DeclarationParser(listParser, expressionParser, statementParser, parameterParser, accessModifierParser);
             compilationUnitParser = new CompilationUnitParser(usingDirectiveParser, declarationParser, nameParser);
         }

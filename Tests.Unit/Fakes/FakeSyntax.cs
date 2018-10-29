@@ -5,6 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Function;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
@@ -147,7 +148,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         public static FunctionDeclarationSyntax FunctionDeclaration([NotNull] string name)
         {
             return new FunctionDeclarationSyntax(
-                AccessModifier(),
+                AccessModifier().ToSyntaxList<ModifierSyntax>(),
                 null,
                 Identifier(name),
                 null,
@@ -167,7 +168,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         public static EnumStructDeclarationSyntax EnumStructDeclaration(string name)
         {
             return new EnumStructDeclarationSyntax(
-                AccessModifier(),
+                AccessModifier().ToSyntaxList<ModifierSyntax>(),
                 Missing<IEnumKeywordToken>(),
                 Missing<IStructKeywordToken>(),
                 Identifier(name),
