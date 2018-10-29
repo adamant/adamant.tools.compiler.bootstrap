@@ -5,15 +5,15 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions
 {
-    public class GenericInvocationAnalysis : ExpressionAnalysis
+    public class InvocationAnalysis : ExpressionAnalysis
     {
-        [NotNull] public new GenericsInvocationSyntax Syntax { get; }
+        [NotNull] public new InvocationSyntax Syntax { get; }
         [NotNull] public ExpressionAnalysis Callee { get; }
         [NotNull] [ItemNotNull] public IReadOnlyList<ArgumentAnalysis> Arguments { get; }
 
-        public GenericInvocationAnalysis(
+        public InvocationAnalysis(
             [NotNull] AnalysisContext context,
-            [NotNull] GenericsInvocationSyntax syntax,
+            [NotNull] InvocationSyntax syntax,
             [NotNull] ExpressionAnalysis callee,
             [NotNull] [ItemNotNull] IEnumerable<ArgumentAnalysis> arguments)
             : base(context, syntax)

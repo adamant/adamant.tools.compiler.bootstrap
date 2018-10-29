@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow
         [CanBeNull] public VarKeywordToken VarKeyword { get; }
         [NotNull] public IIdentifierToken Identifier { get; }
         [NotNull] public IInKeywordToken InKeyword { get; }
-        [NotNull] public ExpressionSyntax Expression { get; }
+        [NotNull] public ExpressionSyntax InExpression { get; }
         [NotNull] public BlockExpressionSyntax Block { get; }
 
         public ForeachExpressionSyntax(
@@ -19,20 +19,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow
             [CanBeNull] VarKeywordToken varKeyword,
             [NotNull] IIdentifierToken identifier,
             [NotNull] IInKeywordToken inKeyword,
-            [NotNull] ExpressionSyntax expression,
+            [NotNull] ExpressionSyntax inExpression,
             [NotNull] BlockExpressionSyntax block)
             : base(TextSpan.Covering(foreachKeyword.Span, block.Span))
         {
             Requires.NotNull(nameof(foreachKeyword), foreachKeyword);
             Requires.NotNull(nameof(identifier), identifier);
             Requires.NotNull(nameof(inKeyword), inKeyword);
-            Requires.NotNull(nameof(expression), expression);
+            Requires.NotNull(nameof(inExpression), inExpression);
             Requires.NotNull(nameof(block), block);
             ForeachKeyword = foreachKeyword;
             VarKeyword = varKeyword;
             Identifier = identifier;
             InKeyword = inKeyword;
-            Expression = expression;
+            InExpression = inExpression;
             Block = block;
         }
     }

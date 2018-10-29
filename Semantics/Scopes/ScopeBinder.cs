@@ -7,6 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Literals;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Operators;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
@@ -66,8 +67,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 
                     var blocks = new Dictionary<BlockExpressionSyntax, BlockExpressionAnalysis>();
                     GetAllBlocks(function, blocks);
-                    foreach (var nestedScope in scope.NestedScopes.Cast<BlockScope>())
+                    foreach (var nestedScope in functionScope.NestedScopes.Cast<BlockScope>())
                         BindBlock(nestedScope, blocks);
+                    break;
+                case NamespaceScope namespaceScope:
+                    // TODO bind correct names in the namespace
+                    namespaceScope.Bind(new Dictionary<string, IDeclarationAnalysis>());
+                    foreach (var nestedScope in namespaceScope.NestedScopes)
+                        BindDeclaration(nestedScope);
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(scope);
@@ -112,6 +119,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
                     break;
                 case UnaryOperatorExpressionAnalysis unaryOperatorExpression:
                     GetAllBlocks(unaryOperatorExpression.Operand, blocks);
+                    break;
+                case ForeachExpressionAnalysis foreachExpression:
+                    GetAllBlocks(foreachExpression.Block, blocks);
+                    break;
+                case InvocationAnalysis invocation:
+                    foreach (var argument in invocation.Arguments)
+                        GetAllBlocks(argument.Value, blocks);
+                    break;
+                case GenericInvocationAnalysis genericInvocation:
+                    foreach (var argument in genericInvocation.Arguments)
+                        GetAllBlocks(argument.Value, blocks);
+                    break;
+                case NewObjectExpressionAnalysis newObjectExpression:
+                    foreach (var argument in newObjectExpression.Arguments)
+                        GetAllBlocks(argument.Value, blocks);
+                    break;
+                case InitStructExpressionAnalysis initStructExpression:
+                    foreach (var argument in initStructExpression.Arguments)
+                        GetAllBlocks(argument.Value, blocks);
+                    break;
+                case UnsafeExpressionAnalysis unsafeExpression:
+                    GetAllBlocks(unsafeExpression.Expression, blocks);
+                    break;
+                case RefTypeAnalysis refType:
+                    GetAllBlocks(refType.ReferencedType, blocks);
                     break;
                 case IntegerLiteralExpressionAnalysis _:
                 case IdentifierNameAnalysis _:

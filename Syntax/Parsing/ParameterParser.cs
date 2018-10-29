@@ -28,11 +28,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     {
                         tokens.MoveNext();
                         var selfKeyword = tokens.Expect<SelfKeywordToken>();
-                        return new SelfParameterSyntax(selfKeyword);
+                        return new SelfParameterSyntax(mutableKeyword, selfKeyword);
                     }
                 case SelfKeywordToken selfKeyword:
                     tokens.MoveNext();
-                    return new SelfParameterSyntax(selfKeyword);
+                    return new SelfParameterSyntax(null, selfKeyword);
                 default:
                     var paramsKeyword = tokens.Accept<ParamsKeywordToken>();
                     var varKeyword = tokens.Accept<VarKeywordToken>();

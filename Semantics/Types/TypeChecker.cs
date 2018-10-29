@@ -53,7 +53,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             foreach (var parameter in function.Parameters)
             {
                 CheckTypeExpression(parameter.TypeExpression, function.Diagnostics);
-                parameter.Type = EvaluateType(parameter.TypeExpression, diagnostics);
+                if (parameter.TypeExpression != null)
+                    parameter.Type = EvaluateType(parameter.TypeExpression, diagnostics);
+                else
+                    diagnostics.Publish(TypeError.NotImplemented(parameter.Context.File,
+                        parameter.Syntax.Span, "Self parameters not implemented"));
             }
 
             var returnType = function.ReturnTypeExpression;
@@ -110,16 +114,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
 
         // Checks the expression is well typed, and that the type of the expression is `type`
         private void CheckTypeExpression(
-            [NotNull] ExpressionAnalysis expression,
+            [CanBeNull] ExpressionAnalysis expression,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
+            // Omitted types don't need further type checking
+            if (expression == null) return;
             CheckTypes(expression, diagnostics);
             if (expression.Type != ObjectType.Type)
                 diagnostics.Publish(TypeError.MustBeATypeExpression(expression.Context.File, expression.Syntax.Span));
         }
 
         private void CheckTypes(
-            [NotNull] ExpressionAnalysis expression,
+            [CanBeNull] ExpressionAnalysis expression,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
             switch (expression)
@@ -197,6 +203,48 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
 
                     // TODO verify argument types against called function
                     break;
+                case InitStructExpressionAnalysis initStructExpression:
+                    foreach (var argument in initStructExpression.Arguments)
+                        CheckTypes(argument, diagnostics);
+
+                    CheckTypeExpression(initStructExpression.ConstructorExpression, diagnostics);
+                    initStructExpression.Type = EvaluateType(initStructExpression.ConstructorExpression, diagnostics);
+
+                    // TODO verify argument types against called function
+                    break;
+                case ForeachExpressionAnalysis foreachExpression:
+                    CheckTypes(foreachExpression.InExpression, diagnostics);
+                    // TODO check the break types
+                    CheckTypes(foreachExpression.Block, diagnostics);
+                    break;
+                case InvocationAnalysis invocation:
+                    CheckTypes(invocation.Callee, diagnostics);
+                    // TODO the callee needs to be something callable
+                    foreach (var argument in invocation.Arguments)
+                        CheckTypeExpression(argument.Value, diagnostics);
+                    break;
+                case GenericInvocationAnalysis genericInvocation:
+                    foreach (var argument in genericInvocation.Arguments)
+                        CheckTypeExpression(argument.Value, diagnostics);
+                    break;
+                case GenericNameAnalysis genericName:
+                    foreach (var argument in genericName.Arguments)
+                        CheckTypeExpression(argument.Value, diagnostics);
+                    break;
+                case RefTypeAnalysis refType:
+                    CheckTypeExpression(refType.ReferencedType, diagnostics);
+                    break;
+                case UnsafeExpressionAnalysis unsafeExpression:
+                    CheckTypes(unsafeExpression.Expression, diagnostics);
+                    unsafeExpression.Type = unsafeExpression.Expression.Type;
+                    break;
+                case MutableTypeAnalysis mutableType:
+                    CheckTypeExpression(mutableType.ReferencedType, diagnostics);
+                    mutableType.Type = EvaluateType(mutableType.ReferencedType, diagnostics);// TODO make that type mutable
+                    break;
+                case null:
+                    // Omitted expressions don't need any checking
+                    break;
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
@@ -226,6 +274,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             switch (@operator)
             {
                 case PlusToken _:
+                case AsteriskEqualsToken _:
                     typeError = leftOperand != rightOperand || leftOperand == ObjectType.Bool;
                     if (!typeError)
                         binaryOperatorExpression.Type = leftOperand;
@@ -241,6 +290,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                     typeError = leftOperand != ObjectType.Bool || rightOperand != ObjectType.Bool;
 
                     binaryOperatorExpression.Type = ObjectType.Bool;
+                    break;
+                case DotDotToken _:
+                case DotToken _:
+                case CaretDotToken _:
+                    // TODO type check this
+                    typeError = false;
+                    break;
+                case DollarToken _:
+                case DollarLessThanToken _:
+                case DollarLessThanNotEqualToken _:
+                case DollarGreaterThanToken _:
+                case DollarGreaterThanNotEqualToken _:
+                    typeError = leftOperand != ObjectType.Type;
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(@operator);
@@ -350,6 +412,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                             throw NonExhaustiveMatchException.For(lifetimeToken);
                     }
                     return new LifetimeType(type, lifetime);
+                case RefTypeAnalysis refType:
+                    return new RefType(refType.VariableBinding,
+                        EvaluateType(refType.ReferencedType, diagnostics));
+                case GenericInvocationAnalysis _:
+                case GenericNameAnalysis _:
+                case BinaryOperatorExpressionAnalysis _:
+                    // TODO evaluate to type
+                    return null;
+                case MutableTypeAnalysis mutableType:
+                    return EvaluateType(mutableType.ReferencedType, diagnostics); // TODO make the type mutable
+                case null:
+                    // Can't determine type
+                    // TODO should this generate an error?
+                    return null;
                 default:
                     throw NonExhaustiveMatchException.For(typeExpression);
             }

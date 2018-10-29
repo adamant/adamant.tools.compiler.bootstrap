@@ -79,9 +79,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                     var typeName = Build(context, functionName, lifetimeType.TypeName);
                     return new LifetimeTypeAnalysis(context, lifetimeType, typeName);
                 case BlockExpressionSyntax blockExpression:
-                    var blockContext = context.InBlock(blockExpression);
-                    return new BlockExpressionAnalysis(context, blockExpression,
-                        blockExpression.Statements.Select(s => StatementBuilder.Build(blockContext, functionName, s)));
+                    return BuildBlock(context, functionName, blockExpression);
                 case NewObjectExpressionSyntax newObjectExpression:
                     return new NewObjectExpressionAnalysis(context, newObjectExpression,
                         Build(context, functionName, newObjectExpression.Constructor),
@@ -93,7 +91,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                 case BooleanLiteralExpressionSyntax booleanLiteralExpression:
                     return new BooleanLiteralExpressionAnalysis(context, booleanLiteralExpression);
                 case ForeachExpressionSyntax foreachExpression:
-                    return new ForeachExpressionAnalysis(context, foreachExpression);
+                    return new ForeachExpressionAnalysis(context, foreachExpression,
+                        Build(context, functionName, foreachExpression.InExpression),
+                        BuildBlock(context, functionName, foreachExpression.Block));
+                case InvocationSyntax invocation:
+                    return new InvocationAnalysis(context, invocation,
+                        Build(context, functionName, invocation.Callee),
+                        invocation.Arguments.Select(a => Build(context, functionName, a)));
                 case GenericsInvocationSyntax genericsInvocation:
                     return new GenericInvocationAnalysis(context, genericsInvocation,
                         Build(context, functionName, genericsInvocation.Callee),
@@ -110,6 +114,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
+        }
+
+        [NotNull]
+        private BlockExpressionAnalysis BuildBlock(
+            [NotNull] AnalysisContext context,
+            [NotNull] QualifiedName functionName,
+            [NotNull] BlockExpressionSyntax blockExpression)
+        {
+            var blockContext = context.InBlock(blockExpression);
+            return new BlockExpressionAnalysis(context, blockExpression,
+                blockExpression.Statements.Select(
+                    s => StatementBuilder.Build(blockContext, functionName, s)));
         }
 
         [NotNull]

@@ -8,9 +8,9 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations.Function
 {
-    public class ParameterAnalysis : IDeclarationAnalysis
+    public class ParameterAnalysis : AnalysisNode, IDeclarationAnalysis
     {
-        [NotNull] public ParameterSyntax Syntax { get; }
+        [NotNull] public new ParameterSyntax Syntax { get; }
         public bool MutableBinding { get; }
         [NotNull] public QualifiedName Name { get; }
         // TypeExpression can be null for self parameters
@@ -18,9 +18,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations.Funct
         [CanBeNull] public DataType Type { get; set; }
 
         public ParameterAnalysis(
+            [NotNull] AnalysisContext context,
             [NotNull] ParameterSyntax syntax,
             [NotNull] QualifiedName name,
             [CanBeNull] ExpressionAnalysis typeExpression)
+            : base(context, syntax)
         {
             Requires.NotNull(nameof(syntax), syntax);
             Syntax = syntax;

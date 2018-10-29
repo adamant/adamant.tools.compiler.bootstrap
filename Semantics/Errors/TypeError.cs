@@ -47,5 +47,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3004, $"The name `{name}` refers to a function not a type.");
         }
+
+        [NotNull]
+        public static Diagnostic NotImplemented([NotNull] CodeFile file, TextSpan span, string message)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3000, message);
+        }
     }
 }

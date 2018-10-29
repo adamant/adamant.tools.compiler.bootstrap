@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
@@ -31,6 +32,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
         public static TextSpan Covering(TextSpan x, TextSpan y)
         {
             return FromStartEnd(Math.Min(x.Start, y.Start), Math.Max(x.End, y.End));
+        }
+
+        [System.Diagnostics.Contracts.Pure]
+        public static TextSpan Covering([NotNull] params TextSpan?[] spans)
+        {
+            return spans.Where(s => s != null).Select(s => s.Value).Aggregate(Covering);
         }
 
         [System.Diagnostics.Contracts.Pure]
