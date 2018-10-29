@@ -214,12 +214,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         return new ReturnExpressionSyntax(returnKeyword, expression);
                     }
                 case OpenParenToken _:
-                    {
-                        var openParen = tokens.Expect<IOpenParenToken>();
-                        var expression = Parse(tokens, diagnostics);
-                        var closeParen = tokens.Expect<ICloseParenToken>();
-                        return new ParenthesizedExpressionSyntax(openParen, expression, closeParen);
-                    }
+                    return ParseParenthesizedExpression(tokens, diagnostics);
                 case MinusToken _:
                 case PlusToken _:
                 case AtSignToken _:
@@ -281,6 +276,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         var block = BlockParser.Parse(tokens, diagnostics);
                         return new ForeachExpressionSyntax(foreachKeyword, varKeyword, identifier, inKeyword, expression, block);
                     }
+                case UnsafeKeywordToken unsafeKeyword:
+                    {
+                        tokens.MoveNext();
+                        var expression = tokens.Current is OpenBraceToken ?
+                            BlockParser.Parse(tokens, diagnostics)
+                            : ParseParenthesizedExpression(tokens, diagnostics);
+
+                        return new UnsafeExpression(unsafeKeyword, expression);
+                    }
                 case AsteriskToken _:
                 case SlashToken _:
                 case QuestionToken _:
@@ -290,6 +294,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 default:
                     throw NonExhaustiveMatchException.For(tokens.Current);
             }
+        }
+
+        [NotNull]
+        private ExpressionSyntax ParseParenthesizedExpression(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var openParen = tokens.Expect<IOpenParenToken>();
+            var expression = Parse(tokens, diagnostics);
+            var closeParen = tokens.Expect<ICloseParenToken>();
+            return new ParenthesizedExpressionSyntax(openParen, expression, closeParen);
         }
 
         [MustUseReturnValue]
