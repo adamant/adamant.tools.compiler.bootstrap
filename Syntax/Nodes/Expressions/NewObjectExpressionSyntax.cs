@@ -12,15 +12,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
         [NotNull] public INewKeywordToken NewKeyword { get; }
         [NotNull] public TypeSyntax Constructor { get; }
         [NotNull] public IOpenParenToken OpenParen { get; }
-        [NotNull] public SeparatedListSyntax<ExpressionSyntax> ArgumentList { get; }
-        [NotNull] [ItemNotNull] public IEnumerable<ExpressionSyntax> Arguments => ArgumentList.Nodes();
+        [NotNull] public SeparatedListSyntax<ArgumentSyntax> ArgumentList { get; }
+        [NotNull] [ItemNotNull] public IEnumerable<ArgumentSyntax> Arguments => ArgumentList.Nodes();
         [NotNull] public ICloseParenToken CloseParen { get; }
 
         public NewObjectExpressionSyntax(
             [NotNull] INewKeywordToken newKeyword,
             [NotNull] TypeSyntax constructor,
             [NotNull] IOpenParenToken openParen,
-            [NotNull] SeparatedListSyntax<ExpressionSyntax> argumentList,
+            [NotNull] SeparatedListSyntax<ArgumentSyntax> argumentList,
             [NotNull] ICloseParenToken closeParen)
             : base(TextSpan.Covering(newKeyword.Span, closeParen.Span))
         {

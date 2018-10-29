@@ -89,5 +89,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                     throw NonExhaustiveMatchException.For(expression);
             }
         }
+
+        [NotNull]
+        public ArgumentAnalysis Build(
+            [NotNull] AnalysisContext context,
+            [NotNull] QualifiedName functionName,
+            [NotNull] ArgumentSyntax argument)
+        {
+            return new ArgumentAnalysis(context, argument, Build(context, functionName, argument.Value));
+        }
     }
 }

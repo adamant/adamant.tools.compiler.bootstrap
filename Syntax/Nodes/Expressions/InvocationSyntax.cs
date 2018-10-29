@@ -9,13 +9,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
     {
         [NotNull] public ExpressionSyntax Callee { get; set; }
         [NotNull] public IOpenParenToken OpenParen { get; }
-        [NotNull] public SeparatedListSyntax<ExpressionSyntax> Arguments { get; }
+        [NotNull] public SeparatedListSyntax<ArgumentSyntax> Arguments { get; }
         [NotNull] public ICloseParenToken CloseParen { get; }
 
         public InvocationSyntax(
             [NotNull] ExpressionSyntax callee,
             [NotNull] IOpenParenToken openParen,
-            [NotNull] SeparatedListSyntax<ExpressionSyntax> arguments,
+            [NotNull] SeparatedListSyntax<ArgumentSyntax> arguments,
             [NotNull] ICloseParenToken closeParen)
             : base(TextSpan.Covering(callee.Span, closeParen.Span))
         {

@@ -1,16 +1,18 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Statements
 {
-    public abstract class StatementAnalysis
+    public abstract class StatementAnalysis : AnalysisNode
     {
-        [NotNull] public AnalysisContext Context { get; }
+        [NotNull] public new StatementSyntax Syntax { get; }
 
-        protected StatementAnalysis([NotNull] AnalysisContext context)
+        protected StatementAnalysis(
+            [NotNull] AnalysisContext context,
+            [NotNull] StatementSyntax syntax)
+            : base(context, syntax)
         {
-            Requires.NotNull(nameof(context), context);
-            Context = context;
+            Syntax = syntax;
         }
     }
 }

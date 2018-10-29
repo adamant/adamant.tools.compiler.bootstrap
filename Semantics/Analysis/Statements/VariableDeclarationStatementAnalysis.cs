@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Statements
 {
     public class VariableDeclarationStatementAnalysis : StatementAnalysis, IDeclarationAnalysis
     {
-        [NotNull] public VariableDeclarationStatementSyntax Syntax { get; }
+        [NotNull] public new VariableDeclarationStatementSyntax Syntax { get; }
         public bool MutableBinding => Syntax.Binding is VarKeywordToken;
         [NotNull] public QualifiedName Name { get; }
         [CanBeNull] public ExpressionAnalysis TypeExpression { get; }
@@ -23,9 +23,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Statements
             [NotNull] QualifiedName name,
             [CanBeNull] ExpressionAnalysis typeExpression,
             [CanBeNull] ExpressionAnalysis initializer)
-            : base(context)
+            : base(context, syntax)
         {
-            Requires.NotNull(nameof(syntax), syntax);
             Requires.NotNull(nameof(name), name);
             Syntax = syntax;
             Name = name;

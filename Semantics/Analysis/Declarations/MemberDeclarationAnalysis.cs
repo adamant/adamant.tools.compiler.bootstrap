@@ -8,10 +8,9 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
 {
-    public abstract class MemberDeclarationAnalysis : IDeclarationAnalysis
+    public abstract class MemberDeclarationAnalysis : AnalysisNode, IDeclarationAnalysis
     {
-        [NotNull] public AnalysisContext Context { get; }
-        [NotNull] public MemberDeclarationSyntax Syntax { get; }
+        [NotNull] public new MemberDeclarationSyntax Syntax { get; }
         [NotNull] public DiagnosticsBuilder Diagnostics { get; }
         [NotNull] public QualifiedName Name { get; }
         // This is the type of the value provided by using the name. So for
@@ -22,11 +21,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
             [NotNull] AnalysisContext context,
             [NotNull] MemberDeclarationSyntax syntax,
             [NotNull] QualifiedName name)
+            : base(context, syntax)
         {
-            Requires.NotNull(nameof(context), context);
-            Requires.NotNull(nameof(syntax), syntax);
             Requires.NotNull(nameof(name), name);
-            Context = context;
             Syntax = syntax;
             Diagnostics = new DiagnosticsBuilder();
             Name = name;

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations.Function;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Literals;
@@ -199,6 +200,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
+        }
+
+        private void CheckTypes(
+            [NotNull] ArgumentAnalysis argument,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            CheckTypes(argument.Value, diagnostics);
         }
 
         private void CheckTypes(

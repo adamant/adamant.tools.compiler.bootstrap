@@ -283,10 +283,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        private SeparatedListSyntax<ExpressionSyntax> ParseArguments([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+        private SeparatedListSyntax<ArgumentSyntax> ParseArguments([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var arguments = listParser.ParseSeparatedList(tokens, Parse, TypeOf<CommaToken>(), TypeOf<CloseParenToken>(), diagnostics);
-            return new SeparatedListSyntax<ExpressionSyntax>(arguments);
+            var arguments = listParser.ParseSeparatedList(tokens, ParseArgument, TypeOf<CommaToken>(), TypeOf<CloseParenToken>(), diagnostics);
+            return new SeparatedListSyntax<ArgumentSyntax>(arguments);
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
+        private ArgumentSyntax ParseArgument(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var paramsKeyword = tokens.Accept<ParamsKeywordToken>();
+            var exceptionType = Parse(tokens, diagnostics);
+            return new ArgumentSyntax(paramsKeyword, exceptionType);
         }
     }
 }

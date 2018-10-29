@@ -151,7 +151,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             switch (value)
             {
                 case NewObjectExpressionAnalysis newObjectExpression:
-                    var args = newObjectExpression.Arguments.Select(a => ConvertToLValue(cfg, a));
+                    var args = newObjectExpression.Arguments.Select(a => ConvertToLValue(cfg, a.Value));
                     currentBlock.Add(new NewObjectStatement(lvalue, newObjectExpression.Type.AssertNotNull(), args));
                     break;
                 case IdentifierNameAnalysis identifier:
