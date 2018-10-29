@@ -230,7 +230,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         var openParen = tokens.Expect<IOpenParenToken>();
                         var arguments = ParseArguments(tokens, diagnostics);
                         var closeParen = tokens.Expect<ICloseParenToken>();
-                        return new InitStructExpression(initKeyword, type, openParen, arguments, closeParen);
+                        return new InitStructExpressionSyntax(initKeyword, type, openParen, arguments, closeParen);
                     }
                 case ReturnKeywordToken _:
                     {
@@ -308,7 +308,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                             BlockParser.Parse(tokens, diagnostics)
                             : ParseParenthesizedExpression(tokens, diagnostics);
 
-                        return new UnsafeExpression(unsafeKeyword, expression);
+                        return new UnsafeExpressionSyntax(unsafeKeyword, expression);
                     }
                 case RefKeywordToken refKeyword:
                     {

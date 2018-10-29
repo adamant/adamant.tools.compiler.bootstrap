@@ -5,12 +5,12 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
 {
-    public class UnsafeExpression : ExpressionSyntax
+    public class UnsafeExpressionSyntax : ExpressionSyntax
     {
         [NotNull] public UnsafeKeywordToken UnsafeKeyword { get; }
         [NotNull] public ExpressionSyntax Expression { get; }
 
-        public UnsafeExpression(
+        public UnsafeExpressionSyntax(
             [NotNull] UnsafeKeywordToken unsafeKeyword,
             [NotNull] ExpressionSyntax expression)
             : base(TextSpan.Covering(unsafeKeyword.Span, expression.Span))

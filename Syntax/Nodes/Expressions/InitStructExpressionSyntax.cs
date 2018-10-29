@@ -7,7 +7,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
 {
-    public class InitStructExpression : ExpressionSyntax
+    public class InitStructExpressionSyntax : ExpressionSyntax
     {
         [NotNull] public IInitKeywordToken InitKeyword { get; }
         [NotNull] public TypeSyntax Constructor { get; }
@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
         [NotNull] [ItemNotNull] public IEnumerable<ArgumentSyntax> Arguments => ArgumentList.Nodes();
         [NotNull] public ICloseParenToken CloseParen { get; }
 
-        public InitStructExpression(
+        public InitStructExpressionSyntax(
             [NotNull] IInitKeywordToken initKeyword,
             [NotNull] TypeSyntax constructor,
             [NotNull] IOpenParenToken openParen,

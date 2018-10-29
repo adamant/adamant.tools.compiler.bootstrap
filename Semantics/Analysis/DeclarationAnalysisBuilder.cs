@@ -74,6 +74,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             {
                 case NamedParameterSyntax namedParameter:
                     return new ParameterAnalysis(namedParameter, functionName.Qualify(namedParameter.Name.Value ?? "_"), expressionBuilder.Build(context, functionName, namedParameter.TypeExpression));
+                case SelfParameterSyntax selfParameter:
+                    return new ParameterAnalysis(selfParameter, functionName.Qualify(new SimpleName("self", true)), null);
                 default:
                     throw NonExhaustiveMatchException.For(parameter);
             }

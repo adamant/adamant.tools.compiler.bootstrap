@@ -13,16 +13,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations.Funct
         [NotNull] public ParameterSyntax Syntax { get; }
         public bool MutableBinding { get; }
         [NotNull] public QualifiedName Name { get; }
-        [NotNull] public ExpressionAnalysis TypeExpression { get; }
+        // TypeExpression can be null for self parameters
+        [CanBeNull] public ExpressionAnalysis TypeExpression { get; }
         [CanBeNull] public DataType Type { get; set; }
 
         public ParameterAnalysis(
             [NotNull] ParameterSyntax syntax,
             [NotNull] QualifiedName name,
-            [NotNull] ExpressionAnalysis typeExpression)
+            [CanBeNull] ExpressionAnalysis typeExpression)
         {
             Requires.NotNull(nameof(syntax), syntax);
-            Requires.NotNull(nameof(typeExpression), typeExpression);
             Syntax = syntax;
             Name = name;
             TypeExpression = typeExpression;

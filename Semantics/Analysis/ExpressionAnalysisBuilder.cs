@@ -72,6 +72,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                     return new UnaryOperatorExpressionAnalysis(context, unaryOperatorExpression, operand);
                 case IdentifierNameSyntax identifierName:
                     return new IdentifierNameAnalysis(context, identifierName);
+                case GenericNameSyntax genericName:
+                    return new GenericNameAnalysis(context, genericName,
+                        genericName.Arguments.Select(a => Build(context, functionName, a)));
                 case LifetimeTypeSyntax lifetimeType:
                     var typeName = Build(context, functionName, lifetimeType.TypeName);
                     return new LifetimeTypeAnalysis(context, lifetimeType, typeName);
@@ -83,8 +86,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                     return new NewObjectExpressionAnalysis(context, newObjectExpression,
                         Build(context, functionName, newObjectExpression.Constructor),
                         newObjectExpression.Arguments.Select(a => Build(context, functionName, a)));
+                case InitStructExpressionSyntax initStructExpression:
+                    return new InitStructExpressionAnalysis(context, initStructExpression,
+                        Build(context, functionName, initStructExpression.Constructor),
+                        initStructExpression.Arguments.Select(a => Build(context, functionName, a)));
                 case BooleanLiteralExpressionSyntax booleanLiteralExpression:
                     return new BooleanLiteralExpressionAnalysis(context, booleanLiteralExpression);
+                case ForeachExpressionSyntax foreachExpression:
+                    return new ForeachExpressionAnalysis(context, foreachExpression);
+                case GenericsInvocationSyntax genericsInvocation:
+                    return new GenericInvocationAnalysis(context, genericsInvocation,
+                        Build(context, functionName, genericsInvocation.Callee),
+                        genericsInvocation.Arguments.Select(a => Build(context, functionName, a)));
+                case RefTypeSyntax refType:
+                    return new RefTypeAnalysis(context, refType, Build(context, functionName, refType.ReferencedType));
+                case UnsafeExpressionSyntax unsafeExpression:
+                    return new UnsafeExpressionAnalysis(context, unsafeExpression,
+                        Build(context, functionName, unsafeExpression.Expression));
+                case ParenthesizedExpressionSyntax parenthesizedExpression:
+                    return Build(context, functionName, parenthesizedExpression.Expression);
+                case MutableTypeSyntax mutableType:
+                    return new MutableTypeAnalysis(context, mutableType, Build(context, functionName, mutableType.ReferencedType));
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }

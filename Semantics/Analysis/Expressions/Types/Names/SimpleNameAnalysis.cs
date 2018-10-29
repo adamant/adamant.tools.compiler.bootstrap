@@ -3,13 +3,14 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Types.Names
 {
-    public class IdentifierNameAnalysis : SimpleNameAnalysis
+    public abstract class SimpleNameAnalysis : ExpressionAnalysis
     {
-        [NotNull] public new IdentifierNameSyntax Syntax { get; }
+        [NotNull] public new SimpleNameSyntax Syntax { get; }
+        [CanBeNull] public string Name => Syntax.Name.Value;
 
-        public IdentifierNameAnalysis(
+        protected SimpleNameAnalysis(
             [NotNull] AnalysisContext context,
-            [NotNull] IdentifierNameSyntax syntax)
+            [NotNull] SimpleNameSyntax syntax)
             : base(context, syntax)
         {
             Syntax = syntax;
