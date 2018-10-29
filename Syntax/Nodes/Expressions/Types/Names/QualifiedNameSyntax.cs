@@ -9,12 +9,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names
     {
         [NotNull] public NameSyntax Qualifier { get; }
         [NotNull] public DotToken Dot { get; }
-        [NotNull] public IdentifierNameSyntax Name { get; }
+        [NotNull] public SimpleNameSyntax Name { get; }
 
         public QualifiedNameSyntax(
             [NotNull] NameSyntax qualifier,
             [NotNull] DotToken dot,
-            [NotNull] IdentifierNameSyntax name)
+            [NotNull] SimpleNameSyntax name)
             : base(TextSpan.Covering(qualifier.Span, name.Span))
         {
             Requires.NotNull(nameof(qualifier), qualifier);

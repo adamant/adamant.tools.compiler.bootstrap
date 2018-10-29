@@ -4,28 +4,25 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names
 {
-    public class GenericsInvocationSyntax : ExpressionSyntax
+    public class GenericNameSyntax : SimpleNameSyntax
     {
-        [NotNull] public ExpressionSyntax Callee { get; set; }
         [NotNull] public IOpenBracketToken OpenBracket { get; }
         [NotNull] public SeparatedListSyntax<ArgumentSyntax> ArgumentList { get; }
         [NotNull] public IEnumerable<ArgumentSyntax> Arguments => ArgumentList.Nodes();
         [NotNull] public ICloseBracketToken CloseBracket { get; }
 
-        public GenericsInvocationSyntax(
-            [NotNull] ExpressionSyntax callee,
+        public GenericNameSyntax(
+            [NotNull] IIdentifierToken name,
             [NotNull] IOpenBracketToken openBracket,
             [NotNull] SeparatedListSyntax<ArgumentSyntax> argumentList,
             [NotNull] ICloseBracketToken closeBracket)
-            : base(TextSpan.Covering(callee.Span, closeBracket.Span))
+            : base(name, TextSpan.Covering(name.Span, closeBracket.Span))
         {
-            Requires.NotNull(nameof(callee), callee);
             Requires.NotNull(nameof(openBracket), openBracket);
             Requires.NotNull(nameof(argumentList), argumentList);
             Requires.NotNull(nameof(closeBracket), closeBracket);
-            Callee = callee;
             OpenBracket = openBracket;
             ArgumentList = argumentList;
             CloseBracket = closeBracket;

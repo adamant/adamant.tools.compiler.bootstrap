@@ -112,6 +112,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
             {
                 return fakeParser.Parse(tokens, diagnostics);
             }
+
+            public SeparatedListSyntax<ArgumentSyntax> ParseArguments(ITokenStream tokens, IDiagnosticsCollector diagnostics)
+            {
+                return SeparatedListSyntax<ArgumentSyntax>.Empty;
+            }
         }
 
         private class UsingDirectiveParser : IParser<UsingDirectiveSyntax>
