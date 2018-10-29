@@ -15,7 +15,6 @@
         "CloseBracket", // `]` U+005D
         "Semicolon", // `;` U+003B
         "Comma", // `",` U+002C
-        "Dollar", // `$` U+0024
         "Pipe", // `|` U+007C
         "Question", // `?` U+003F
         "Colon", // `:` U+003A

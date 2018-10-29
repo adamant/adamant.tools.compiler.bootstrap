@@ -18,7 +18,7 @@
         "Slash", // `/` U+002F
         "Equals", // `=` U+003D
         "EqualsEquals", // `==` U+003D", U+003D
-        "NotEqual", // `≠` U+2260", `=/=` U+003D", U+002F", U+003D
+        "NotEqual", // `≠` U+2260, `=/=` U+003D, U+002F, U+003D
         "GreaterThan", // `>` U+003E
         "GreaterThanOrEqual", // `≥` U+2265", `⩾` U+2A7E", `>=` U+003E", U+003D
         "LessThan", // `<` U+003C
@@ -27,6 +27,11 @@
         "MinusEquals", // `-=` U+002D", U+003D
         "AsteriskEquals", // `*=` U+002A", U+003D
         "SlashEquals", // `/=` U+002F", U+003D
+        "Dollar", // `$` U+0024
+        "DollarLessThan", // `$<≠` U+0024, U+003C, U+2260, `$</=` U+0024, U+003C, U+002F, U+003D
+        "DollarLessThanNotEqual", // `$<` U+0024, U+003C
+        "DollarGreaterThan", // `$>` U+0024, U+003E
+        "DollarGreaterThanNotEqual", // `$>≠` U+0024, U+003E, U+2260, `$>/=` U+0024, U+003E, U+002F, U+003D
     }.AsReadOnly();
 #>
 using Adamant.Tools.Compiler.Bootstrap.Core;

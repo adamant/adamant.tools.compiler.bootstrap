@@ -182,6 +182,51 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
+    public interface IDollarToken : IOperatorToken { }
+    public class DollarToken : OperatorToken, IDollarToken
+    {
+        public DollarToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public interface IDollarLessThanToken : IOperatorToken { }
+    public class DollarLessThanToken : OperatorToken, IDollarLessThanToken
+    {
+        public DollarLessThanToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public interface IDollarLessThanNotEqualToken : IOperatorToken { }
+    public class DollarLessThanNotEqualToken : OperatorToken, IDollarLessThanNotEqualToken
+    {
+        public DollarLessThanNotEqualToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public interface IDollarGreaterThanToken : IOperatorToken { }
+    public class DollarGreaterThanToken : OperatorToken, IDollarGreaterThanToken
+    {
+        public DollarGreaterThanToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public interface IDollarGreaterThanNotEqualToken : IOperatorToken { }
+    public class DollarGreaterThanNotEqualToken : OperatorToken, IDollarGreaterThanNotEqualToken
+    {
+        public DollarGreaterThanNotEqualToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
     public partial class MissingToken :
         IDotToken,
         IDotDotToken,
@@ -203,6 +248,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         IMinusEqualsToken,
         IAsteriskEqualsToken,
         ISlashEqualsToken,
+        IDollarToken,
+        IDollarLessThanToken,
+        IDollarLessThanNotEqualToken,
+        IDollarGreaterThanToken,
+        IDollarGreaterThanNotEqualToken,
         IOperatorToken // Implied, but saves issues with commas
     { }
 }

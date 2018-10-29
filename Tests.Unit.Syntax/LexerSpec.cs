@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
@@ -216,7 +215,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax
                 var outputAsPsuedoTokens = output.ToPsuedoTokens(file);
                 var expectedPsuedoTokens = tokens.Append(PsuedoToken.EndOfFile()).ToList();
                 return expectedPsuedoTokens.SequenceEqual(outputAsPsuedoTokens)
-                    .Label($"Text: „{Regex.Escape(file.Code.Text)}„")
+                    .Label($"Text: „{file.Code.Text.Escape()}„")
                     .Label($"Actual:   {outputAsPsuedoTokens.DebugFormat()}")
                     .Label($"Expected: {expectedPsuedoTokens.DebugFormat()}");
             });

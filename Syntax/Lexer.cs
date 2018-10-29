@@ -70,7 +70,55 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         yield return new PipeToken(SymbolSpan());
                         break;
                     case '$':
-                        yield return new DollarToken(SymbolSpan());
+                        switch (NextChar())
+                        {
+                            case '<':
+                                switch (CharAt(2))
+                                {
+                                    case '≠':
+                                        // it is `$<≠`
+                                        yield return new DollarLessThanNotEqualToken(SymbolSpan(3));
+                                        break;
+                                    case '/':
+                                        if (CharAtIs(3, '='))
+                                            // it is `$</=`
+                                            yield return new DollarLessThanNotEqualToken(
+                                                SymbolSpan(4));
+                                        else
+                                            goto default;
+                                        break;
+                                    default:
+                                        // it is `$<`
+                                        yield return new DollarLessThanToken(SymbolSpan(2));
+                                        break;
+                                }
+                                break;
+                            case '>':
+                                switch (CharAt(2))
+                                {
+                                    case '≠':
+                                        // it is `$>≠`
+                                        yield return new DollarGreaterThanNotEqualToken(SymbolSpan(3));
+                                        break;
+                                    case '/':
+                                        if (CharAtIs(3, '='))
+                                            // it is `$>/=`
+                                            yield return new DollarGreaterThanNotEqualToken(
+                                                SymbolSpan(4));
+                                        else
+                                            goto default;
+                                        break;
+                                    default:
+                                        // it is `$>`
+                                        yield return new DollarGreaterThanToken(SymbolSpan(2));
+                                        break;
+                                }
+                                break;
+                            default:
+                                // it is `=`
+                                yield return new DollarToken(SymbolSpan());
+                                break;
+                        }
                         break;
                     case '→':
                         yield return new RightArrowToken(SymbolSpan());
@@ -173,7 +221,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         if (NextCharIs('='))
                             // it is `==`
                             yield return new EqualsEqualsToken(SymbolSpan(2));
-                        else if (NextCharIs('/') && CharIs(2, '='))
+                        else if (NextCharIs('/') && CharAtIs(2, '='))
                             // it is `=/=`
                             yield return new NotEqualToken(SymbolSpan(3));
                         else
@@ -308,13 +356,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                 return index < text.Length ? text[index] : default;
             }
 
+            char? CharAt(int offset)
+            {
+                var index = tokenStart + offset;
+                return index < text.Length ? text[index] : default;
+            }
+
             bool NextCharIs(char c)
             {
                 var index = tokenStart + 1;
                 return index < text.Length && text[index] == c;
             }
 
-            bool CharIs(int i, char c)
+            bool CharAtIs(int i, char c)
             {
                 var index = tokenStart + i;
                 return index < text.Length && text[index] == c;

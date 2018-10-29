@@ -64,9 +64,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             switch (t1.Text)
             {
                 case ".":
-                    return t2.Text == "." || t2.Text == "..";
                 case "^":
-                    return t2.Text == ".";
+                    return t2.Text == "." || t2.Text == "..";
                 case "+":
                 case "*":
                 case ">":
@@ -81,6 +80,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
                         || t2.TokenType == typeof(CommentToken);
                 case "=":
                     return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == "/=";
+                case "$":
+                    return t2.Text == ">" || t2.Text == ">=" || t2.Text == "<" || t2.Text == "<=";
+                case "$>":
+                case "$<":
+                    return t2.Text == "≠" || t2.Text == "/=";
                 default:
                     if (typeof(KeywordToken).IsAssignableFrom(t1.TokenType)
                         || typeof(IdentifierToken).IsAssignableFrom(t1.TokenType)
@@ -233,6 +237,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             { "*=", typeof(AsteriskEqualsToken) },
             { "/=", typeof(SlashEqualsToken) },
             { "$", typeof(DollarToken) },
+            { "$<", typeof(DollarLessThanToken) },
+            { "$<≠", typeof(DollarLessThanNotEqualToken) },
+            { "$</=", typeof(DollarLessThanNotEqualToken) },
+            { "$>", typeof(DollarGreaterThanToken) },
+            { "$>≠", typeof(DollarGreaterThanNotEqualToken) },
+            { "$>/=", typeof(DollarGreaterThanNotEqualToken) },
             { "public", typeof(PublicKeywordToken) },
             { "private", typeof(PrivateKeywordToken) },
             { "let", typeof(LetKeywordToken) },

@@ -74,15 +74,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface IDollarToken : ISymbolToken { }
-    public class DollarToken : SymbolToken, IDollarToken
-    {
-        public DollarToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
     public interface IPipeToken : ISymbolToken { }
     public class PipeToken : SymbolToken, IPipeToken
     {
@@ -128,7 +119,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         ICloseBracketToken,
         ISemicolonToken,
         ICommaToken,
-        IDollarToken,
         IPipeToken,
         IQuestionToken,
         IColonToken,

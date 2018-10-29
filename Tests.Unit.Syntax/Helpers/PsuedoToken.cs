@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Text.RegularExpressions;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -84,13 +83,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
 
         public override string ToString()
         {
-            var textValue = string.IsNullOrEmpty(Text) ? "" : $":„{Regex.Escape(Text)}„";
+            var textValue = string.IsNullOrEmpty(Text) ? "" : $":„{Text.Escape()}„";
             switch (Value)
             {
                 case null:
                     return $"{TokenType.Name}{textValue}";
                 case string s:
-                    return $"{TokenType.Name}{textValue} 【{Regex.Escape(s)}】";
+                    return $"{TokenType.Name}{textValue} 【{s.Escape()}】";
                 case BigInteger i:
                     return $"{TokenType.Name}{textValue} {i}";
                 case IReadOnlyList<Diagnostic> diagnostics:
