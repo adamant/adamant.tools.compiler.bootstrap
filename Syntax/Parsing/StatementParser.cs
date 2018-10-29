@@ -36,10 +36,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     {
                         var binding = tokens.Take<IBindingKeywordToken>();
                         var name = tokens.ExpectIdentifier();
-                        var colon = tokens.Expect<IColonToken>();
-                        // Need to not consume the assignment that separates the type from the initializer,
-                        // hence the min operator precedence.
-                        var typeExpression = expressionParser.Parse(tokens, diagnostics, OperatorPrecedence.LogicalOr);
+                        IColonToken colon = null;
+                        ExpressionSyntax typeExpression = null;
+                        if (tokens.Current is ColonToken)
+                        {
+                            colon = tokens.Expect<IColonToken>();
+                            // Need to not consume the assignment that separates the type from the initializer,
+                            // hence the min operator precedence.
+                            typeExpression = expressionParser.Parse(tokens, diagnostics, OperatorPrecedence.LogicalOr);
+                        }
                         EqualsToken equals = null;
                         ExpressionSyntax initializer = null;
                         if (tokens.Current is EqualsToken)
