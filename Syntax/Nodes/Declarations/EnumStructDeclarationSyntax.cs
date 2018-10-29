@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
     public class EnumStructDeclarationSyntax : MemberDeclarationSyntax
     {
         [NotNull] public SyntaxList<ModifierSyntax> Modifiers { get; }
-        [NotNull] public IEnumKeywordToken EnumKeyword { get; }
+        [NotNull] public EnumKeywordToken EnumKeyword { get; }
         [NotNull] public IStructKeywordToken StructKeyword { get; }
         [NotNull] public override IIdentifierToken Name { get; }
         [NotNull] public IOpenBraceToken OpenBrace { get; }
@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
 
         public EnumStructDeclarationSyntax(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] IEnumKeywordToken enumKeyword,
+            [NotNull] EnumKeywordToken enumKeyword,
             [NotNull] IStructKeywordToken structKeyword,
             [NotNull] IIdentifierToken name,
             [NotNull] IOpenBraceToken openBrace,

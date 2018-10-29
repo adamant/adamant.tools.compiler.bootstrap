@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
     public class FunctionDeclarationSyntax : MemberDeclarationSyntax
     {
         [NotNull] public SyntaxList<ModifierSyntax> Modifiers { get; }
-        [NotNull] public IFunctionKeywordToken FunctionKeyword { get; }
+        [NotNull] public FunctionKeywordToken FunctionKeyword { get; }
         [NotNull] public override IIdentifierToken Name { get; }
         [NotNull] public IOpenParenToken OpenParen { get; }
         [NotNull] public SeparatedListSyntax<ParameterSyntax> ParametersList { get; }
@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
 
         public FunctionDeclarationSyntax(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] IFunctionKeywordToken functionKeyword,
+            [NotNull] FunctionKeywordToken functionKeyword,
             [NotNull] IIdentifierToken name,
             [NotNull] IOpenParenToken openParen,
             [NotNull] SeparatedListSyntax<ParameterSyntax> parametersList,
@@ -35,7 +35,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
             [NotNull] BlockExpressionSyntax body)
         {
             Requires.NotNull(nameof(modifiers), modifiers);
+            Requires.NotNull(nameof(functionKeyword), functionKeyword);
+            Requires.NotNull(nameof(name), name);
+            Requires.NotNull(nameof(openParen), openParen);
             Requires.NotNull(nameof(parametersList), parametersList);
+            Requires.NotNull(nameof(closeParen), closeParen);
+            Requires.NotNull(nameof(arrow), arrow);
             Requires.NotNull(nameof(returnTypeExpression), returnTypeExpression);
             Requires.NotNull(nameof(body), body);
             Modifiers = modifiers;

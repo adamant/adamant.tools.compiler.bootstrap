@@ -34,20 +34,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             switch (declaration)
             {
                 case FunctionDeclarationSyntax function:
-                    return Build(context, @namespace, function);
+                    return BuildFunction(context, @namespace, function);
                 case ClassDeclarationSyntax @class:
-                    return Build(context, @namespace, @class);
+                    return BuildClass(context, @namespace, @class);
+                case TypeDeclarationSyntax type:
+                    return BuildType(context, @namespace, type);
                 case IncompleteDeclarationSyntax _:
                     // Since it is incomplete, we can't do any analysis on it
                     return null;
                 case EnumStructDeclarationSyntax enumStruct:
-                    return Build(context, @namespace, enumStruct);
+                    return BuildEnumStruct(context, @namespace, enumStruct);
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
             }
         }
 
-        private FunctionDeclarationAnalysis Build(
+        private FunctionDeclarationAnalysis BuildFunction(
             [NotNull] AnalysisContext context,
             [NotNull] Name @namespace,
             [NotNull] FunctionDeclarationSyntax syntax)
@@ -60,12 +62,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             // For missing parameter names, use `_` to ignore them
             return new FunctionDeclarationAnalysis(
                 context, syntax, fullName,
-                syntax.Parameters.Select(p => Build(context, fullName, p)),
+                syntax.Parameters.Select(p => BuildParameter(context, fullName, p)),
                 expressionBuilder.Build(context, fullName, syntax.ReturnTypeExpression),
                 syntax.Body.Statements.Select(statementSyntax => statementBuilder.Build(bodyContext, fullName, statementSyntax)));
         }
 
-        private ParameterAnalysis Build(
+        private ParameterAnalysis BuildParameter(
             [NotNull] AnalysisContext context,
             [NotNull] QualifiedName functionName,
             [NotNull] ParameterSyntax parameter)
@@ -81,7 +83,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             }
         }
 
-        private static TypeDeclarationAnalysis Build(
+        private static TypeDeclarationAnalysis BuildClass(
             [NotNull] AnalysisContext context,
             [NotNull] Name @namespace,
             [NotNull] ClassDeclarationSyntax syntax)
@@ -93,7 +95,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             return new TypeDeclarationAnalysis(context, syntax, fullName);
         }
 
-        private static TypeDeclarationAnalysis Build(
+        private static TypeDeclarationAnalysis BuildType(
+            [NotNull] AnalysisContext context,
+            [NotNull] Name @namespace,
+            [NotNull] TypeDeclarationSyntax syntax)
+        {
+            // Skip any class that doesn't have a name
+            if (!(syntax.Name.Value is string name)) return null;
+
+            var fullName = @namespace.Qualify(name);
+            return new TypeDeclarationAnalysis(context, syntax, fullName);
+        }
+
+        private static TypeDeclarationAnalysis BuildEnumStruct(
             [NotNull] AnalysisContext context,
             [NotNull] Name @namespace,
             [NotNull] EnumStructDeclarationSyntax syntax)

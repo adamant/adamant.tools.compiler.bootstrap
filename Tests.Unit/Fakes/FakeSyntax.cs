@@ -18,11 +18,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
     // A factory for fakes
     public static class FakeSyntax
     {
+        private static readonly TextSpan FakeSpan = new TextSpan(0, 0);
+
         [NotNull]
         private static T Missing<T>()
             where T : IToken
         {
-            return (T)(object)new MissingToken(new TextSpan(0, 0));
+            return (T)(object)new MissingToken(FakeSpan);
         }
 
         [NotNull]
@@ -95,7 +97,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         private class FakeExpressionSyntax : ExpressionSyntax
         {
             public FakeExpressionSyntax()
-                : base(new TextSpan(0, 0))
+                : base(FakeSpan)
             {
             }
         }
@@ -103,7 +105,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         private class FakeNameSyntax : NameSyntax
         {
             public FakeNameSyntax()
-                : base(new TextSpan(0, 0))
+                : base(FakeSpan)
             {
             }
         }
@@ -134,7 +136,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
                 namespaceSyntax,
                 SyntaxList<UsingDirectiveSyntax>.Empty,
                 new SyntaxList<DeclarationSyntax>(declarations),
-                new EndOfFileToken(new TextSpan(0, 0), Diagnostics.Empty),
+                new EndOfFileToken(FakeSpan, Diagnostics.Empty),
                 Diagnostics.Empty);
         }
 
@@ -149,19 +151,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         {
             return new FunctionDeclarationSyntax(
                 AccessModifier().ToSyntaxList<ModifierSyntax>(),
-                null,
+                new FunctionKeywordToken(FakeSpan),
                 Identifier(name),
-                null,
+                Missing<IOpenParenToken>(),
                 SeparatedListSyntax<ParameterSyntax>.Empty,
-                null,
-                null,
+                Missing<ICloseParenToken>(),
+                Missing<IRightArrowToken>(),
                 Expression(), null, Block());
         }
+
 
         [NotNull]
         public static IdentifierToken Identifier(string name)
         {
-            return new BareIdentifierToken(new TextSpan(0, 0), name);
+            return new BareIdentifierToken(FakeSpan, name);
         }
 
         [NotNull]
@@ -169,7 +172,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         {
             return new EnumStructDeclarationSyntax(
                 AccessModifier().ToSyntaxList<ModifierSyntax>(),
-                Missing<IEnumKeywordToken>(),
+                new EnumKeywordToken(FakeSpan),
                 Missing<IStructKeywordToken>(),
                 Identifier(name),
                 Missing<IOpenBraceToken>(),

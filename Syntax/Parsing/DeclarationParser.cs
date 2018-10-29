@@ -49,6 +49,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             {
                 case ClassKeywordToken _:
                     return ParseClass(modifiers, tokens);
+                case TypeKeywordToken _:
+                    return ParseType(modifiers, tokens);
                 case EnumKeywordToken _:
                     return ParseEnum(modifiers, tokens, diagnostics);
                 case FunctionKeywordToken _:
@@ -77,7 +79,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         [NotNull]
         private static DeclarationSyntax ParseClass([NotNull] SyntaxList<ModifierSyntax> modifiers, [NotNull] ITokenStream tokens)
         {
-            var classKeyword = tokens.Expect<IClassKeywordToken>();
+            var classKeyword = tokens.Take<ClassKeywordToken>();
             var name = tokens.ExpectIdentifier();
             var openBrace = tokens.Expect<IOpenBraceToken>();
             var closeBrace = tokens.Expect<ICloseBraceToken>();
@@ -87,9 +89,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
         [MustUseReturnValue]
         [NotNull]
+        private static DeclarationSyntax ParseType([NotNull] SyntaxList<ModifierSyntax> modifiers, [NotNull] ITokenStream tokens)
+        {
+            var typeKeyword = tokens.Take<TypeKeywordToken>();
+            var name = tokens.ExpectIdentifier();
+            var openBrace = tokens.Expect<IOpenBraceToken>();
+            var closeBrace = tokens.Expect<ICloseBraceToken>();
+            return new TypeDeclarationSyntax(modifiers, typeKeyword, name, openBrace,
+                SyntaxList<MemberDeclarationSyntax>.Empty, closeBrace);
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
         private static DeclarationSyntax ParseEnum([NotNull] SyntaxList<ModifierSyntax> modifiers, [NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var enumKeyword = tokens.Expect<IEnumKeywordToken>();
+            var enumKeyword = tokens.Take<EnumKeywordToken>();
             switch (tokens.Current)
             {
                 case StructKeywordToken _:
@@ -115,7 +129,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var functionKeyword = tokens.Expect<IFunctionKeywordToken>();
+            var functionKeyword = tokens.Take<FunctionKeywordToken>();
             var name = tokens.ExpectIdentifier();
             var openParen = tokens.Expect<IOpenParenToken>();
             var parameters = ParseParameters(tokens, diagnostics);
