@@ -28,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             {
                 var scope = new CompilationUnitScope(compilationUnit);
                 var declarations = Build(compilationUnit, scope);
-                yield return new CompilationUnitAnalysis(scope, declarations);
+                yield return new CompilationUnitAnalysis(scope, compilationUnit, declarations);
             }
         }
 
