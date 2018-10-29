@@ -96,13 +96,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             {
                 lock (consoleLock)
                 {
-                    Console.WriteLine($"Build FAILED {project.Name} ({project.Path})");
+                    Console.WriteLine($@"Build FAILED {project.Name} ({project.Path})");
                     foreach (var diagnostic in diagnostics
                         .OrderBy(d => d.File.Reference.ToString())
                         .ThenBy(d => d.StartPosition))
                     {
-                        Console.WriteLine($"{diagnostic.File.Reference}:{diagnostic.StartPosition.Line}:{diagnostic.StartPosition.Column} {diagnostic.Level} {diagnostic.ErrorCode}");
-                        Console.WriteLine(diagnostic.Message);
+                        Console.WriteLine($@"{diagnostic.File.Reference}:{diagnostic.StartPosition.Line}:{diagnostic.StartPosition.Column} {diagnostic.Level} {diagnostic.ErrorCode}");
+                        Console.WriteLine(@"    " + diagnostic.Message);
                     }
                 }
                 return package;

@@ -60,14 +60,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             var blocks = new Queue<BasicBlock>();
             blocks.Enqueue(function.ControlFlow.EntryBlock);
             var claims = new Claims();
-            var nextObject = function.ControlFlow.VariableDeclarations.Count + 1;
+            var nextObject = 1;
 
             while (blocks.Any())
             {
                 var block = blocks.Dequeue().AssertNotNull();
-
                 var claimsBeforeStatement = new HashSet<Claim>();
-                foreach (var predecessor in edges.To(block).Select(b => b.EndStatement))
+
+                if (block == function.ControlFlow.EntryBlock)
+                {
+                    foreach (var parameter in function.ControlFlow.VariableDeclarations.Where(v => v.IsParameter))
+                    {
+                        claimsBeforeStatement.Add(new Loan(parameter.Number, nextObject));
+                        nextObject += 1;
+                    }
+                }
+
+                foreach (var predecessor in edges.To(block).Select(b => b.EndStatement.AssertNotNull()))
                     claimsBeforeStatement.UnionWith(claims.After(predecessor));
 
                 foreach (var statement in block.Statements)
@@ -80,8 +89,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     {
                         case NewObjectStatement newObjectStatement:
                             {
-                                var title = new Title(newObjectStatement.ResultInto.CoreVariable(),
-                                    nextObject);
+                                var title = new Title(newObjectStatement.ResultInto.CoreVariable(), nextObject);
                                 nextObject += 1;
                                 claimsAfterStatement.Add(title);
                                 break;

@@ -1,3 +1,4 @@
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
@@ -32,12 +33,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
         [CanBeNull]
         protected abstract DataType GetDataType();
 
-        [NotNull]
+        [CanBeNull]
         public abstract Declaration Complete([NotNull] DiagnosticsBuilder diagnostics);
 
-        protected void CompleteDiagnostics([NotNull] DiagnosticsBuilder diagnostics)
+        protected bool CompleteDiagnostics([NotNull] DiagnosticsBuilder diagnostics)
         {
+            var errors = Diagnostics.Any(d => d.Level >= DiagnosticLevel.CompilationError);
             diagnostics.Publish(Diagnostics.Build());
+            return errors;
         }
     }
 }

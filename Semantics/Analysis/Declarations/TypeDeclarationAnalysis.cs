@@ -30,10 +30,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
             return Type;
         }
 
-        [NotNull]
+        [CanBeNull]
         public override Declaration Complete([NotNull] DiagnosticsBuilder diagnostics)
         {
-            CompleteDiagnostics(diagnostics);
+            if (CompleteDiagnostics(diagnostics)) return null;
             return new TypeDeclaration(Context.File, Name);
         }
     }

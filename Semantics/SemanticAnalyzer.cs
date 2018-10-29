@@ -52,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             // Gather the diagnostics and declarations into a package
             var diagnostics = new DiagnosticsBuilder();
-            var declarations = declarationAnalyses.Select(d => d.Complete(diagnostics)).ToList();
+            var declarations = declarationAnalyses.Select(d => d.Complete(diagnostics)).Where(d => d != null).ToList();
             var entryPoint = DetermineEntryPoint(declarations, diagnostics);
             return new Package(packageSyntax.Name, diagnostics.Build(), namespaces, declarations, entryPoint);
         }
