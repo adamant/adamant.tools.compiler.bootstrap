@@ -226,9 +226,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         {
             switch (tokens.Current)
             {
+                case UninitializedKeywordToken uninitializedKeyword:
+                    tokens.MoveNext();
+                    return new UninitializedExpressionSyntax(uninitializedKeyword);
+                case NoneKeywordToken noneKeyword:
+                    tokens.MoveNext();
+                    return new NoneExpressionSyntax(noneKeyword);
                 case SelfKeywordToken selfKeyword:
+                    tokens.MoveNext();
                     return new SelfExpressionSyntax(selfKeyword);
                 case BaseKeywordToken baseKeyword:
+                    tokens.MoveNext();
                     return new BaseExpressionSyntax(baseKeyword);
                 case NewKeywordToken _:
                     {

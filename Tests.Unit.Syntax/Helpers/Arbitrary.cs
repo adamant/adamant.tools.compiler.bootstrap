@@ -309,6 +309,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             { "const", typeof(ConstKeywordToken) },
             { "alias", typeof(AliasKeywordToken) },
             { "uninitialized", typeof(UninitializedKeywordToken) },
+            { "none", typeof(NoneKeywordToken) },
         }.AsReadOnly();
     }
 }

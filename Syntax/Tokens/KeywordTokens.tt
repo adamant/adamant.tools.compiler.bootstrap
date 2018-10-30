@@ -59,6 +59,7 @@
         "Const",
         "Alias",
         "Uninitialized",
+        "None",
     }.AsReadOnly();
 #>
 using System;
