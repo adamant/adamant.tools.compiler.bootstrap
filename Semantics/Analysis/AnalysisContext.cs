@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         }
 
         [NotNull]
-        public AnalysisContext InFunction([NotNull] FunctionDeclarationSyntax syntax)
+        public AnalysisContext InFunction([NotNull] NamedFunctionDeclarationSyntax syntax)
         {
             Requires.NotNull(nameof(syntax), syntax);
             return new AnalysisContext(File, new FunctionScope(Scope, syntax));

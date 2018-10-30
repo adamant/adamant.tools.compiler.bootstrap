@@ -33,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         {
             switch (declaration)
             {
-                case FunctionDeclarationSyntax function:
+                case NamedFunctionDeclarationSyntax function:
                     return BuildFunction(context, @namespace, function);
                 case ClassDeclarationSyntax @class:
                     return BuildClass(context, @namespace, @class);
@@ -52,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         private FunctionDeclarationAnalysis BuildFunction(
             [NotNull] AnalysisContext context,
             [NotNull] Name @namespace,
-            [NotNull] FunctionDeclarationSyntax syntax)
+            [NotNull] NamedFunctionDeclarationSyntax syntax)
         {
             // Skip any function that doesn't have a name
             if (!(syntax.Name.Value is string name)) return null;

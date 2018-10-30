@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Function;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
@@ -8,35 +7,39 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
 {
-    public abstract class FunctionDeclarationSyntax : MemberDeclarationSyntax
+    public class GetterFunctionDeclarationSyntax : FunctionDeclarationSyntax
     {
-        [NotNull] public SyntaxList<ModifierSyntax> Modifiers { get; }
-        [NotNull] public IOpenParenToken OpenParen { get; }
-        [NotNull] public SeparatedListSyntax<ParameterSyntax> ParameterList { get; }
-        [NotNull] [ItemNotNull] public IEnumerable<ParameterSyntax> Parameters => ParameterList.Nodes();
-        [NotNull] public ICloseParenToken CloseParen { get; }
-        [CanBeNull] public EffectsSyntax Effects { get; }
-        [NotNull] public BlockExpressionSyntax Body { get; }
+        [NotNull] public GetKeywordToken GetKeyword { get; }
+        [NotNull] public override IIdentifierToken Name { get; }
+        [NotNull] public IRightArrowToken Arrow { get; }
+        [NotNull] public ExpressionSyntax ReturnTypeExpression { get; }
 
-        protected FunctionDeclarationSyntax(
+        public GetterFunctionDeclarationSyntax(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
+            [NotNull] GetKeywordToken getKeyword,
+            [NotNull] IIdentifierToken name,
             [NotNull] IOpenParenToken openParen,
             [NotNull] SeparatedListSyntax<ParameterSyntax> parameterList,
             [NotNull] ICloseParenToken closeParen,
+            [NotNull] IRightArrowToken arrow,
+            [NotNull] ExpressionSyntax returnTypeExpression,
             [CanBeNull] EffectsSyntax effects,
             [NotNull] BlockExpressionSyntax body)
+            : base(modifiers, openParen, parameterList, closeParen, effects, body)
         {
             Requires.NotNull(nameof(modifiers), modifiers);
+            Requires.NotNull(nameof(getKeyword), getKeyword);
+            Requires.NotNull(nameof(name), name);
             Requires.NotNull(nameof(openParen), openParen);
             Requires.NotNull(nameof(parameterList), parameterList);
             Requires.NotNull(nameof(closeParen), closeParen);
+            Requires.NotNull(nameof(arrow), arrow);
+            Requires.NotNull(nameof(returnTypeExpression), returnTypeExpression);
             Requires.NotNull(nameof(body), body);
-            Modifiers = modifiers;
-            OpenParen = openParen;
-            ParameterList = parameterList;
-            CloseParen = closeParen;
-            Effects = effects;
-            Body = body;
+            GetKeyword = getKeyword;
+            Name = name;
+            Arrow = arrow;
+            ReturnTypeExpression = returnTypeExpression;
         }
     }
 }

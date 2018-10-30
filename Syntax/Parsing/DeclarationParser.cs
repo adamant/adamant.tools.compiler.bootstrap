@@ -58,7 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 case EnumKeywordToken _:
                     return ParseEnum(modifiers, tokens, diagnostics);
                 case FunctionKeywordToken _:
-                    return ParseFunction(modifiers, tokens, diagnostics);
+                    return ParseNamedFunction(modifiers, tokens, diagnostics);
                 default:
                     return ParseIncompleteDeclaration(modifiers, tokens, diagnostics);
                 case null:
@@ -83,14 +83,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 case EnumKeywordToken _:
                     return ParseEnum(modifiers, tokens, diagnostics);
                 case FunctionKeywordToken _:
-                    return ParseFunction(modifiers, tokens, diagnostics);
+                    return ParseNamedFunction(modifiers, tokens, diagnostics);
+                case GetKeywordToken _:
+                    return ParseGetterFunction(modifiers, tokens, diagnostics);
+                case SetKeywordToken _:
+                    return ParseSetterFunction(modifiers, tokens, diagnostics);
                 default:
                     return ParseIncompleteDeclaration(modifiers, tokens, diagnostics);
                 case null:
                     throw new InvalidOperationException("Can't parse past end of file");
             }
         }
-
 
         [MustUseReturnValue]
         [NotNull]
@@ -223,7 +226,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         #region Parse Function
         [MustUseReturnValue]
         [NotNull]
-        public FunctionDeclarationSyntax ParseFunction(
+        public NamedFunctionDeclarationSyntax ParseNamedFunction(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
@@ -245,7 +248,63 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 effects = new EffectsSyntax(mayKeyword, allowedEffects, noKeyword, disallowedEffects);
             }
             var body = blockParser.Parse(tokens, diagnostics);
-            return new FunctionDeclarationSyntax(modifiers, functionKeyword, name,
+            return new NamedFunctionDeclarationSyntax(modifiers, functionKeyword, name,
+                openParen, parameters, closeParen, arrow, returnTypeExpression, effects, body);
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
+        private MemberDeclarationSyntax ParseGetterFunction(
+            [NotNull] SyntaxList<ModifierSyntax> modifiers,
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var getKeyword = tokens.Take<GetKeywordToken>();
+            var name = tokens.ExpectIdentifier();
+            var openParen = tokens.Expect<IOpenParenToken>();
+            var parameters = ParseParameters(tokens, diagnostics);
+            var closeParen = tokens.Expect<ICloseParenToken>();
+            var arrow = tokens.Expect<IRightArrowToken>();
+            var returnTypeExpression = expressionParser.Parse(tokens, diagnostics);
+            EffectsSyntax effects = null;
+            if (tokens.Current is NoKeywordToken || tokens.Current is MayKeywordToken)
+            {
+                var mayKeyword = tokens.Expect<IMayKeywordToken>();
+                var allowedEffects = listParser.ParseSeparatedList(tokens, ParseEffect, TypeOf<CommaToken>(), TypeOf<OpenBraceToken>(), diagnostics);
+                var noKeyword = tokens.Expect<INoKeywordToken>();
+                var disallowedEffects = listParser.ParseSeparatedList(tokens, ParseEffect, TypeOf<CommaToken>(), TypeOf<OpenBraceToken>(), diagnostics);
+                effects = new EffectsSyntax(mayKeyword, allowedEffects, noKeyword, disallowedEffects);
+            }
+            var body = blockParser.Parse(tokens, diagnostics);
+            return new GetterFunctionDeclarationSyntax(modifiers, getKeyword, name,
+                openParen, parameters, closeParen, arrow, returnTypeExpression, effects, body);
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
+        private MemberDeclarationSyntax ParseSetterFunction(
+            [NotNull] SyntaxList<ModifierSyntax> modifiers,
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var setKeyword = tokens.Take<SetKeywordToken>();
+            var name = tokens.ExpectIdentifier();
+            var openParen = tokens.Expect<IOpenParenToken>();
+            var parameters = ParseParameters(tokens, diagnostics);
+            var closeParen = tokens.Expect<ICloseParenToken>();
+            var arrow = tokens.Expect<IRightArrowToken>();
+            var returnTypeExpression = expressionParser.Parse(tokens, diagnostics);
+            EffectsSyntax effects = null;
+            if (tokens.Current is NoKeywordToken || tokens.Current is MayKeywordToken)
+            {
+                var mayKeyword = tokens.Expect<IMayKeywordToken>();
+                var allowedEffects = listParser.ParseSeparatedList(tokens, ParseEffect, TypeOf<CommaToken>(), TypeOf<OpenBraceToken>(), diagnostics);
+                var noKeyword = tokens.Expect<INoKeywordToken>();
+                var disallowedEffects = listParser.ParseSeparatedList(tokens, ParseEffect, TypeOf<CommaToken>(), TypeOf<OpenBraceToken>(), diagnostics);
+                effects = new EffectsSyntax(mayKeyword, allowedEffects, noKeyword, disallowedEffects);
+            }
+            var body = blockParser.Parse(tokens, diagnostics);
+            return new SetterFunctionDeclarationSyntax(modifiers, setKeyword, name,
                 openParen, parameters, closeParen, arrow, returnTypeExpression, effects, body);
         }
 

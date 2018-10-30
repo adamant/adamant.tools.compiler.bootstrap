@@ -298,6 +298,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             { "throw", typeof(ThrowKeywordToken) },
             { "ref", typeof(RefKeywordToken) },
             { "abstract", typeof(AbstractKeywordToken) },
+            { "get", typeof(GetKeywordToken) },
+            { "set", typeof(SetKeywordToken) },
         }.AsReadOnly();
     }
 }

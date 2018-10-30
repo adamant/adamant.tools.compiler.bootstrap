@@ -5,11 +5,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 {
     public class FunctionScope : NestedScope
     {
-        [NotNull] public new FunctionDeclarationSyntax Syntax { get; }
+        [NotNull] public new NamedFunctionDeclarationSyntax Syntax { get; }
 
         public FunctionScope(
             [NotNull] LexicalScope containingScope,
-            [NotNull] FunctionDeclarationSyntax syntax)
+            [NotNull] NamedFunctionDeclarationSyntax syntax)
             : base(containingScope, syntax)
         {
             Syntax = syntax;

@@ -50,6 +50,8 @@
         "Throw",
         "Ref",
         "Abstract",
+        "Get",
+        "Set",
     }.AsReadOnly();
 #>
 using System;

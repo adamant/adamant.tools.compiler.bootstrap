@@ -147,9 +147,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         }
 
         [NotNull]
-        public static FunctionDeclarationSyntax FunctionDeclaration([NotNull] string name)
+        public static NamedFunctionDeclarationSyntax FunctionDeclaration([NotNull] string name)
         {
-            return new FunctionDeclarationSyntax(
+            return new NamedFunctionDeclarationSyntax(
                 AccessModifier().ToSyntaxList<ModifierSyntax>(),
                 new FunctionKeywordToken(FakeSpan),
                 Identifier(name),

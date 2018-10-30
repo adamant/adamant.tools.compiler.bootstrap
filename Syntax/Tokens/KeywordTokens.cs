@@ -54,6 +54,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
             typeof(ThrowKeywordToken),
             typeof(RefKeywordToken),
             typeof(AbstractKeywordToken),
+            typeof(GetKeywordToken),
+            typeof(SetKeywordToken),
         }.AsReadOnly().AssertNotNull();
     }
 
@@ -443,6 +445,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         {
         }
     }
+
+    public partial interface IGetKeywordToken : IKeywordToken { }
+    public class GetKeywordToken : KeywordToken, IGetKeywordToken
+    {
+        public GetKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface ISetKeywordToken : IKeywordToken { }
+    public class SetKeywordToken : KeywordToken, ISetKeywordToken
+    {
+        public SetKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
     public partial class MissingToken :
         IPublicKeywordToken,
         IProtectedKeywordToken,
@@ -487,6 +507,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         IThrowKeywordToken,
         IRefKeywordToken,
         IAbstractKeywordToken,
+        IGetKeywordToken,
+        ISetKeywordToken,
         IKeywordToken // Implied, but saves issues with commas
     { }
 }
