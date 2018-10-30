@@ -227,7 +227,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             [NotNull] IDiagnosticsCollector diagnostics)
         {
             var structKeyword = tokens.Take<StructKeywordToken>();
-            var name = tokens.ExpectIdentifier();
+            var name = tokens.Expect<IIdentifierOrPrimitiveToken>();
             var genericParameters = ParseGenericParameters(tokens, diagnostics);
             var baseTypes = ParseBaseTypes(tokens, diagnostics);
             var openBrace = tokens.Expect<IOpenBraceToken>();

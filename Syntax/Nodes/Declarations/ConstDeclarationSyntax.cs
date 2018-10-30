@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
     {
         [NotNull] [ItemNotNull] public SyntaxList<ModifierSyntax> Modifiers { get; }
         [NotNull] public ConstKeywordToken ConstKeyword { get; }
-        [NotNull] public override IIdentifierToken Name { get; }
+        [NotNull] public IIdentifierToken Name { get; }
         [CanBeNull] public IColonToken Colon { get; }
         [CanBeNull] public ExpressionSyntax TypeExpression { get; }
         [CanBeNull] public new EqualsToken Equals { get; }

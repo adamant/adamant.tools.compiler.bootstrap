@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types
     {
         [NotNull] public SyntaxList<ModifierSyntax> Modifiers { get; }
         [NotNull] public TypeKeywordToken TypeKeyword { get; }
-        [NotNull] public override IIdentifierToken Name { get; }
+        [NotNull] public IIdentifierToken Name { get; }
         [CanBeNull] public GenericParametersSyntax GenericParameters { get; }
         [CanBeNull] public BaseTypesSyntax BaseTypes { get; }
         [NotNull] public IOpenBraceToken OpenBrace { get; }

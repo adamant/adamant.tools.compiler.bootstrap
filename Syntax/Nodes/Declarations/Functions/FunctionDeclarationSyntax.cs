@@ -20,6 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
         [CanBeNull] public EffectsSyntax Effects { get; }
         [NotNull] public SyntaxList<ContractSyntax> Contracts { get; }
         [NotNull] public BlockExpressionSyntax Body { get; }
+        [NotNull] public abstract IIdentifierToken Name { get; }
 
         protected FunctionDeclarationSyntax(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,

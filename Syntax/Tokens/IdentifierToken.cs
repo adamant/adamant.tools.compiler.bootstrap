@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 {
-    public interface IIdentifierToken : IToken
+    public interface IIdentifierToken : IIdentifierOrPrimitiveToken
     {
         [CanBeNull] string Value { get; }
     }

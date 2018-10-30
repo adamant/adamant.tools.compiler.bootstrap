@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Field
         [NotNull] [ItemNotNull] public SyntaxList<ModifierSyntax> Modifiers { get; }
         [NotNull] public IBindingKeywordToken Binding { get; }
         [CanBeNull] public FieldGetterSyntax Getter { get; }
-        [NotNull] public override IIdentifierToken Name { get; }
+        [NotNull] public IIdentifierToken Name { get; }
         [CanBeNull] public IColonToken Colon { get; }
         [CanBeNull] public ExpressionSyntax TypeExpression { get; }
         [CanBeNull] public new EqualsToken Equals { get; }

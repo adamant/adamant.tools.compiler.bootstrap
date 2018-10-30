@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
@@ -8,8 +7,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
 {
     public class IncompleteDeclarationSyntax : MemberDeclarationSyntax
     {
-        [NotNull] public override IIdentifierToken Name => throw new NotImplementedException();
-
         [NotNull] [ItemNotNull] public IReadOnlyList<IToken> Tokens { get; }
 
         public IncompleteDeclarationSyntax([NotNull][ItemNotNull] IEnumerable<IToken> tokens)

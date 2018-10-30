@@ -61,6 +61,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
             typeof(InvariantKeywordToken),
             typeof(WhereKeywordToken),
             typeof(ConstKeywordToken),
+            typeof(AliasKeywordToken),
         }.AsReadOnly().AssertNotNull();
     }
 
@@ -513,6 +514,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         {
         }
     }
+
+    public partial interface IAliasKeywordToken : IKeywordToken { }
+    public class AliasKeywordToken : KeywordToken, IAliasKeywordToken
+    {
+        public AliasKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
     public partial class MissingToken :
         IPublicKeywordToken,
         IProtectedKeywordToken,
@@ -564,6 +574,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         IInvariantKeywordToken,
         IWhereKeywordToken,
         IConstKeywordToken,
+        IAliasKeywordToken,
         IKeywordToken // Implied, but saves issues with commas
     { }
 }

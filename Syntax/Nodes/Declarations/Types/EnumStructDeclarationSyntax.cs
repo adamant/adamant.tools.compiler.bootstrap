@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types
         [NotNull] public SyntaxList<ModifierSyntax> Modifiers { get; }
         [NotNull] public EnumKeywordToken EnumKeyword { get; }
         [NotNull] public IStructKeywordToken StructKeyword { get; }
-        [NotNull] public override IIdentifierToken Name { get; }
+        [NotNull] public IIdentifierToken Name { get; }
         [NotNull] public IOpenBraceToken OpenBrace { get; }
         [NotNull] public SyntaxList<MemberDeclarationSyntax> Members { get; }
         [NotNull] public ICloseBraceToken CloseBrace { get; }

@@ -57,6 +57,7 @@
         "Invariant",
         "Where",
         "Const",
+        "Alias",
     }.AsReadOnly();
 #>
 using System;

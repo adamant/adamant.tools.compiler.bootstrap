@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types
     {
         [NotNull] public SyntaxList<ModifierSyntax> Modifiers { get; }
         [NotNull] public StructKeywordToken StructKeyword { get; }
-        [NotNull] public override IIdentifierToken Name { get; }
+        [NotNull] public IIdentifierOrPrimitiveToken Name { get; }
         [CanBeNull] public GenericParametersSyntax GenericParameters { get; }
         [CanBeNull] public BaseTypesSyntax BaseTypes { get; }
         [NotNull] public IOpenBraceToken OpenBrace { get; }
@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types
         public StructDeclarationSyntax(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
             [NotNull] StructKeywordToken structKeyword,
-            [NotNull] IIdentifierToken name,
+            [NotNull] IIdentifierOrPrimitiveToken name,
             [CanBeNull] GenericParametersSyntax genericParameters,
             [CanBeNull] BaseTypesSyntax baseTypes,
             [NotNull] IOpenBraceToken openBrace,
