@@ -1,22 +1,22 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Function;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Clauses;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
 {
-    public class NamedFunctionDeclarationSyntax : FunctionDeclarationSyntax
+    public class GetterFunctionDeclarationSyntax : FunctionDeclarationSyntax
     {
-        [NotNull] public FunctionKeywordToken FunctionKeyword { get; }
+        [NotNull] public GetKeywordToken GetKeyword { get; }
         [NotNull] public override IIdentifierToken Name { get; }
         [NotNull] public IRightArrowToken Arrow { get; }
         [NotNull] public ExpressionSyntax ReturnTypeExpression { get; }
 
-        public NamedFunctionDeclarationSyntax(
+        public GetterFunctionDeclarationSyntax(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] FunctionKeywordToken functionKeyword,
+            [NotNull] GetKeywordToken getKeyword,
             [NotNull] IIdentifierToken name,
             [NotNull] IOpenParenToken openParen,
             [NotNull] SeparatedListSyntax<ParameterSyntax> parameterList,
@@ -28,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
             : base(modifiers, openParen, parameterList, closeParen, effects, body)
         {
             Requires.NotNull(nameof(modifiers), modifiers);
-            Requires.NotNull(nameof(functionKeyword), functionKeyword);
+            Requires.NotNull(nameof(getKeyword), getKeyword);
             Requires.NotNull(nameof(name), name);
             Requires.NotNull(nameof(openParen), openParen);
             Requires.NotNull(nameof(parameterList), parameterList);
@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
             Requires.NotNull(nameof(arrow), arrow);
             Requires.NotNull(nameof(returnTypeExpression), returnTypeExpression);
             Requires.NotNull(nameof(body), body);
-            FunctionKeyword = functionKeyword;
+            GetKeyword = getKeyword;
             Name = name;
             Arrow = arrow;
             ReturnTypeExpression = returnTypeExpression;

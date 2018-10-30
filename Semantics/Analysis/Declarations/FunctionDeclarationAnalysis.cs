@@ -9,7 +9,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Graph;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations

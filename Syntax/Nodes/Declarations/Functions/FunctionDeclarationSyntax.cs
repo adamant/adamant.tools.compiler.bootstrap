@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Function;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Clauses;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
 {
     public abstract class FunctionDeclarationSyntax : MemberDeclarationSyntax
     {

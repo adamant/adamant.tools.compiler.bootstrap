@@ -1,8 +1,10 @@
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Function;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Clauses;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes;
@@ -72,7 +74,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         private static DeclarationParser NewDeclarationParser()
         {
             var listParser = FakeParser.ForLists();
-            var expressionParser = FakeParser.For<ExpressionSyntax>();
+            var expressionParser = FakeParser.ForExpressions();
             var blockParser = FakeParser.For<BlockExpressionSyntax>();
             var parameterParser = FakeParser.For<ParameterSyntax>();
             var modifierParser = FakeParser.For<ModifierSyntax>();

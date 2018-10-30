@@ -8,10 +8,13 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Function;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Field;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Clauses;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Generic;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Inheritance;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types.Inheritance;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
@@ -22,14 +25,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
     public class DeclarationParser : IParser<DeclarationSyntax>
     {
         [NotNull] private readonly IListParser listParser;
-        [NotNull] private readonly IParser<ExpressionSyntax> expressionParser;
+        [NotNull] private readonly IExpressionParser expressionParser;
         [NotNull] private readonly IParser<BlockExpressionSyntax> blockParser;
         [NotNull] private readonly IParser<ParameterSyntax> parameterParser;
         [NotNull] private readonly IParser<ModifierSyntax> modifierParser;
 
         public DeclarationParser(
             [NotNull] IListParser listParser,
-            [NotNull] IParser<ExpressionSyntax> expressionParser,
+            [NotNull] IExpressionParser expressionParser,
             [NotNull] IParser<BlockExpressionSyntax> blockParser,
             [NotNull] IParser<ParameterSyntax> parameterParser,
             [NotNull] IParser<ModifierSyntax> modifierParser)
@@ -92,6 +95,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     return ParseGetterFunction(modifiers, tokens, diagnostics);
                 case SetKeywordToken _:
                     return ParseSetterFunction(modifiers, tokens, diagnostics);
+                case VarKeywordToken _:
+                case LetKeywordToken _:
+                    return ParseField(modifiers, tokens, diagnostics);
                 default:
                     return ParseIncompleteDeclaration(modifiers, tokens, diagnostics);
                 case null:
@@ -99,6 +105,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             }
         }
 
+        #region Parse Type Parts
         [MustUseReturnValue]
         [NotNull]
         private SyntaxList<ModifierSyntax> ParseModifiers(
@@ -163,13 +170,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 TypeOf<CommaToken>(), TypeOf<OpenBraceToken>(), diagnostics);
             return new BaseTypesSyntax(lessThanColon, typeExpressions);
         }
+        #endregion
 
+        #region Parse Type Declarations
         [MustUseReturnValue]
         [NotNull]
         private ClassDeclarationSyntax ParseClass(
-            [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+          [NotNull] SyntaxList<ModifierSyntax> modifiers,
+          [NotNull] ITokenStream tokens,
+          [NotNull] IDiagnosticsCollector diagnostics)
         {
             var classKeyword = tokens.Take<ClassKeywordToken>();
             var name = tokens.ExpectIdentifier();
@@ -245,8 +254,55 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     return ParseIncompleteDeclaration(modifiers, tokens, diagnostics);
             }
         }
+        #endregion
 
-        #region Parse Function
+        #region Parse Type Member Declarations
+        [MustUseReturnValue]
+        [NotNull]
+        private FieldDeclarationSyntax ParseField(
+            [NotNull] SyntaxList<ModifierSyntax> modifiers,
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var binding = tokens.Take<IBindingKeywordToken>();
+            var getter = ParseFieldGetter(tokens, diagnostics);
+            var name = tokens.ExpectIdentifier();
+            IColonToken colon = null;
+            ExpressionSyntax typeExpression = null;
+            if (tokens.Current is ColonToken)
+            {
+                colon = tokens.Expect<IColonToken>();
+                // Need to not consume the assignment that separates the type from the initializer,
+                // hence the min operator precedence.
+                typeExpression = expressionParser.Parse(tokens, diagnostics, OperatorPrecedence.LogicalOr);
+            }
+            EqualsToken equals = null;
+            ExpressionSyntax initializer = null;
+            if (tokens.Current is EqualsToken)
+            {
+                equals = tokens.Take<EqualsToken>();
+                initializer = expressionParser.Parse(tokens, diagnostics);
+            }
+            var semicolon = tokens.Expect<ISemicolonToken>();
+            return new FieldDeclarationSyntax(modifiers, binding, getter, name, colon, typeExpression,
+                equals, initializer, semicolon);
+        }
+
+        [MustUseReturnValue]
+        [CanBeNull]
+        private static FieldGetterSyntax ParseFieldGetter(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var publicKeyword = tokens.Accept<PublicKeywordToken>();
+            var getKeyword = tokens.Accept<GetKeywordToken>();
+            if (publicKeyword == null && getKeyword == null) return null;
+            return new FieldGetterSyntax(publicKeyword, getKeyword);
+        }
+
+        #endregion
+
+        #region Parse Functions
         [MustUseReturnValue]
         [NotNull]
         public NamedFunctionDeclarationSyntax ParseNamedFunction(

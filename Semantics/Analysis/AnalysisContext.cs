@@ -1,7 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using JetBrains.Annotations;
 

@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Function
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Clauses
 {
     public class ThrowEffectEntrySyntax : SyntaxNode
     {
