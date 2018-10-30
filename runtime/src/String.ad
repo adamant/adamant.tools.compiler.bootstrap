@@ -1,6 +1,11 @@
 namespace adamant.tools.compiler.runtime;
 
-public struct String$s
+/// String is a good example where treating the psuedo reference lifetime as just
+/// $self wouldn't make sense. For example, a string literal would have a "static"
+/// lifetime even though the struct referencing it would have a shorter lifetime.
+/// Thus the lifetime needs to be a separate lifetime parameter. Thus the new
+/// syntax of `ref struct` and the lifetime `$ref`.
+public ref struct String
 {
     public let count: size;
     protected let data: @byte;
@@ -12,4 +17,11 @@ public struct String$s
         self.count = count;
         self.data = data;
     }
+
+    // TODO the string needs to delete the memory if it is owned, but we don't
+    // have the allocate/free functions in the runtime?
+    // public safe delete()
+    // {
+
+    // }
 }
