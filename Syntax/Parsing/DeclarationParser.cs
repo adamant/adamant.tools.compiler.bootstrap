@@ -98,6 +98,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 case VarKeywordToken _:
                 case LetKeywordToken _:
                     return ParseField(modifiers, tokens, diagnostics);
+                case NewKeywordToken _:
+                    return ParseConstructor(modifiers, tokens, diagnostics);
                 default:
                     return ParseIncompleteDeclaration(modifiers, tokens, diagnostics);
                 case null:
@@ -329,6 +331,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             var body = blockParser.Parse(tokens, diagnostics);
             return new NamedFunctionDeclarationSyntax(modifiers, functionKeyword, name,
                 openParen, parameters, closeParen, arrow, returnTypeExpression, effects, body);
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
+        public ConstructorFunctionDeclarationSyntax ParseConstructor(
+            [NotNull] SyntaxList<ModifierSyntax> modifiers,
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var newKeyword = tokens.Take<NewKeywordToken>();
+            var name = tokens.Accept<IdentifierToken>();
+            var openParen = tokens.Expect<IOpenParenToken>();
+            var parameters = ParseParameters(tokens, diagnostics);
+            var closeParen = tokens.Expect<ICloseParenToken>();
+            EffectsSyntax effects = null;
+            if (tokens.Current is NoKeywordToken || tokens.Current is MayKeywordToken)
+            {
+                var mayKeyword = tokens.Expect<IMayKeywordToken>();
+                var allowedEffects = listParser.ParseSeparatedList(tokens, ParseEffect, TypeOf<CommaToken>(), TypeOf<OpenBraceToken>(), diagnostics);
+                var noKeyword = tokens.Expect<INoKeywordToken>();
+                var disallowedEffects = listParser.ParseSeparatedList(tokens, ParseEffect, TypeOf<CommaToken>(), TypeOf<OpenBraceToken>(), diagnostics);
+                effects = new EffectsSyntax(mayKeyword, allowedEffects, noKeyword, disallowedEffects);
+            }
+            var body = blockParser.Parse(tokens, diagnostics);
+            return new ConstructorFunctionDeclarationSyntax(modifiers, newKeyword, name,
+                openParen, parameters, closeParen, effects, body);
         }
 
         [MustUseReturnValue]
