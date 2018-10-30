@@ -55,6 +55,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     return ParseClass(modifiers, tokens, diagnostics);
                 case TypeKeywordToken _:
                     return ParseType(modifiers, tokens, diagnostics);
+                case StructKeywordToken _:
+                    return ParseStruct(modifiers, tokens, diagnostics);
                 case EnumKeywordToken _:
                     return ParseEnum(modifiers, tokens, diagnostics);
                 case FunctionKeywordToken _:
@@ -80,6 +82,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     return ParseClass(modifiers, tokens, diagnostics);
                 case TypeKeywordToken _:
                     return ParseType(modifiers, tokens, diagnostics);
+                case StructKeywordToken _:
+                    return ParseStruct(modifiers, tokens, diagnostics);
                 case EnumKeywordToken _:
                     return ParseEnum(modifiers, tokens, diagnostics);
                 case FunctionKeywordToken _:
@@ -197,6 +201,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 members, closeBrace);
         }
 
+
+        [MustUseReturnValue]
+        [NotNull]
+        private StructDeclarationSyntax ParseStruct(
+            [NotNull] SyntaxList<ModifierSyntax> modifiers,
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var structKeyword = tokens.Take<StructKeywordToken>();
+            var name = tokens.ExpectIdentifier();
+            var genericParameters = ParseGenericParameters(tokens, diagnostics);
+            var baseTypes = ParseBaseTypes(tokens, diagnostics);
+            var openBrace = tokens.Expect<IOpenBraceToken>();
+            var members = listParser.ParseList(tokens, ParseMemberDeclaration, TypeOf<CloseBraceToken>(), diagnostics);
+            var closeBrace = tokens.Expect<ICloseBraceToken>();
+            return new StructDeclarationSyntax(modifiers, structKeyword, name, genericParameters, baseTypes, openBrace,
+                members, closeBrace);
+        }
+
         [MustUseReturnValue]
         [NotNull]
         private MemberDeclarationSyntax ParseEnum(
@@ -254,7 +277,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        private MemberDeclarationSyntax ParseGetterFunction(
+        private GetterFunctionDeclarationSyntax ParseGetterFunction(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
@@ -282,7 +305,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        private MemberDeclarationSyntax ParseSetterFunction(
+        private SetterFunctionDeclarationSyntax ParseSetterFunction(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
