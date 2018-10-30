@@ -66,6 +66,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     return ParseEnum(modifiers, tokens, diagnostics);
                 case FunctionKeywordToken _:
                     return ParseNamedFunction(modifiers, tokens, diagnostics);
+                case ConstKeywordToken _:
+                    return ParseConst(modifiers, tokens, diagnostics);
                 default:
                     return ParseIncompleteDeclaration(modifiers, tokens, diagnostics);
                 case null:
@@ -102,6 +104,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     return ParseField(modifiers, tokens, diagnostics);
                 case NewKeywordToken _:
                     return ParseConstructor(modifiers, tokens, diagnostics);
+                case ConstKeywordToken _:
+                    return ParseConst(modifiers, tokens, diagnostics);
                 default:
                     return ParseIncompleteDeclaration(modifiers, tokens, diagnostics);
                 case null:
@@ -485,6 +489,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             return new EnsuresSyntax(ensuresKeyword, condition);
         }
         #endregion
+
+        [MustUseReturnValue]
+        [NotNull]
+        private ConstDeclarationSyntax ParseConst(
+            [NotNull] SyntaxList<ModifierSyntax> modifiers,
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var constKeyword = tokens.Take<ConstKeywordToken>();
+            var name = tokens.ExpectIdentifier();
+            IColonToken colon = null;
+            ExpressionSyntax typeExpression = null;
+            if (tokens.Current is ColonToken)
+            {
+                colon = tokens.Expect<IColonToken>();
+                // Need to not consume the assignment that separates the type from the initializer,
+                // hence the min operator precedence.
+                typeExpression = expressionParser.Parse(tokens, diagnostics, OperatorPrecedence.LogicalOr);
+            }
+            EqualsToken equals = null;
+            ExpressionSyntax initializer = null;
+            if (tokens.Current is EqualsToken)
+            {
+                equals = tokens.Take<EqualsToken>();
+                initializer = expressionParser.Parse(tokens, diagnostics);
+            }
+            var semicolon = tokens.Expect<ISemicolonToken>();
+            return new ConstDeclarationSyntax(modifiers, constKeyword, name, colon, typeExpression,
+                equals, initializer, semicolon);
+        }
 
         [MustUseReturnValue]
         [NotNull]
