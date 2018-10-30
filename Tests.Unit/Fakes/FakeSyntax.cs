@@ -5,7 +5,8 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Clauses;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Contracts;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Parameters;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
@@ -159,7 +160,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
                 SeparatedListSyntax<ParameterSyntax>.Empty,
                 Missing<ICloseParenToken>(),
                 Missing<IRightArrowToken>(),
-                Expression(), null, Block());
+                Expression(),
+                null,
+                SyntaxList<ContractSyntax>.Empty,
+                Block());
         }
 
 

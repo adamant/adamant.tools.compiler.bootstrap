@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Clauses;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Contracts;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Effects;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Parameters;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
@@ -16,6 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
         [NotNull] [ItemNotNull] public IEnumerable<ParameterSyntax> Parameters => ParameterList.Nodes();
         [NotNull] public ICloseParenToken CloseParen { get; }
         [CanBeNull] public EffectsSyntax Effects { get; }
+        [NotNull] public SyntaxList<ContractSyntax> Contracts { get; }
         [NotNull] public BlockExpressionSyntax Body { get; }
 
         protected FunctionDeclarationSyntax(
@@ -24,18 +27,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
             [NotNull] SeparatedListSyntax<ParameterSyntax> parameterList,
             [NotNull] ICloseParenToken closeParen,
             [CanBeNull] EffectsSyntax effects,
+            [NotNull] SyntaxList<ContractSyntax> contracts,
             [NotNull] BlockExpressionSyntax body)
         {
             Requires.NotNull(nameof(modifiers), modifiers);
             Requires.NotNull(nameof(openParen), openParen);
             Requires.NotNull(nameof(parameterList), parameterList);
             Requires.NotNull(nameof(closeParen), closeParen);
+            Requires.NotNull(nameof(contracts), contracts);
             Requires.NotNull(nameof(body), body);
             Modifiers = modifiers;
             OpenParen = openParen;
             ParameterList = parameterList;
             CloseParen = closeParen;
             Effects = effects;
+            Contracts = contracts;
             Body = body;
         }
     }

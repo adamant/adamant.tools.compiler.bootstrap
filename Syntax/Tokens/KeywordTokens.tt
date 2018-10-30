@@ -52,6 +52,9 @@
         "Abstract",
         "Get",
         "Set",
+        "Requires",
+        "Ensures",
+        "Invariant",
     }.AsReadOnly();
 #>
 using System;

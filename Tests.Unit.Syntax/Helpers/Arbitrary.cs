@@ -300,6 +300,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             { "abstract", typeof(AbstractKeywordToken) },
             { "get", typeof(GetKeywordToken) },
             { "set", typeof(SetKeywordToken) },
+            { "requires", typeof(RequiresKeywordToken) },
+            { "ensures", typeof(EnsuresKeywordToken) },
+            { "invariant", typeof(InvariantKeywordToken) },
         }.AsReadOnly();
     }
 }

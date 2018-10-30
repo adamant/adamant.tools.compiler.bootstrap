@@ -10,7 +10,9 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Field;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Clauses;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Contracts;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Effects;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Parameters;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types;
@@ -301,7 +303,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             if (publicKeyword == null && getKeyword == null) return null;
             return new FieldGetterSyntax(publicKeyword, getKeyword);
         }
-
         #endregion
 
         #region Parse Functions
@@ -319,18 +320,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             var closeParen = tokens.Expect<ICloseParenToken>();
             var arrow = tokens.Expect<IRightArrowToken>();
             var returnTypeExpression = expressionParser.Parse(tokens, diagnostics);
-            EffectsSyntax effects = null;
-            if (tokens.Current is NoKeywordToken || tokens.Current is MayKeywordToken)
-            {
-                var mayKeyword = tokens.Expect<IMayKeywordToken>();
-                var allowedEffects = listParser.ParseSeparatedList(tokens, ParseEffect, TypeOf<CommaToken>(), TypeOf<OpenBraceToken>(), diagnostics);
-                var noKeyword = tokens.Expect<INoKeywordToken>();
-                var disallowedEffects = listParser.ParseSeparatedList(tokens, ParseEffect, TypeOf<CommaToken>(), TypeOf<OpenBraceToken>(), diagnostics);
-                effects = new EffectsSyntax(mayKeyword, allowedEffects, noKeyword, disallowedEffects);
-            }
+            var effects = ParseEffects(tokens, diagnostics);
+            var contracts = ParseContracts(tokens, diagnostics);
             var body = blockParser.Parse(tokens, diagnostics);
             return new NamedFunctionDeclarationSyntax(modifiers, functionKeyword, name,
-                openParen, parameters, closeParen, arrow, returnTypeExpression, effects, body);
+                openParen, parameters, closeParen, arrow, returnTypeExpression, effects, contracts, body);
         }
 
         [MustUseReturnValue]
@@ -345,18 +339,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             var openParen = tokens.Expect<IOpenParenToken>();
             var parameters = ParseParameters(tokens, diagnostics);
             var closeParen = tokens.Expect<ICloseParenToken>();
-            EffectsSyntax effects = null;
-            if (tokens.Current is NoKeywordToken || tokens.Current is MayKeywordToken)
-            {
-                var mayKeyword = tokens.Expect<IMayKeywordToken>();
-                var allowedEffects = listParser.ParseSeparatedList(tokens, ParseEffect, TypeOf<CommaToken>(), TypeOf<OpenBraceToken>(), diagnostics);
-                var noKeyword = tokens.Expect<INoKeywordToken>();
-                var disallowedEffects = listParser.ParseSeparatedList(tokens, ParseEffect, TypeOf<CommaToken>(), TypeOf<OpenBraceToken>(), diagnostics);
-                effects = new EffectsSyntax(mayKeyword, allowedEffects, noKeyword, disallowedEffects);
-            }
+            var effects = ParseEffects(tokens, diagnostics);
+            var contracts = ParseContracts(tokens, diagnostics);
             var body = blockParser.Parse(tokens, diagnostics);
             return new ConstructorFunctionDeclarationSyntax(modifiers, newKeyword, name,
-                openParen, parameters, closeParen, effects, body);
+                openParen, parameters, closeParen, effects, contracts, body);
         }
 
         [MustUseReturnValue]
@@ -373,18 +360,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             var closeParen = tokens.Expect<ICloseParenToken>();
             var arrow = tokens.Expect<IRightArrowToken>();
             var returnTypeExpression = expressionParser.Parse(tokens, diagnostics);
-            EffectsSyntax effects = null;
-            if (tokens.Current is NoKeywordToken || tokens.Current is MayKeywordToken)
-            {
-                var mayKeyword = tokens.Expect<IMayKeywordToken>();
-                var allowedEffects = listParser.ParseSeparatedList(tokens, ParseEffect, TypeOf<CommaToken>(), TypeOf<OpenBraceToken>(), diagnostics);
-                var noKeyword = tokens.Expect<INoKeywordToken>();
-                var disallowedEffects = listParser.ParseSeparatedList(tokens, ParseEffect, TypeOf<CommaToken>(), TypeOf<OpenBraceToken>(), diagnostics);
-                effects = new EffectsSyntax(mayKeyword, allowedEffects, noKeyword, disallowedEffects);
-            }
+            var effects = ParseEffects(tokens, diagnostics);
+            var contracts = ParseContracts(tokens, diagnostics);
             var body = blockParser.Parse(tokens, diagnostics);
             return new GetterFunctionDeclarationSyntax(modifiers, getKeyword, name,
-                openParen, parameters, closeParen, arrow, returnTypeExpression, effects, body);
+                openParen, parameters, closeParen, arrow, returnTypeExpression, effects, contracts, body);
         }
 
         [MustUseReturnValue]
@@ -401,18 +381,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             var closeParen = tokens.Expect<ICloseParenToken>();
             var arrow = tokens.Expect<IRightArrowToken>();
             var returnTypeExpression = expressionParser.Parse(tokens, diagnostics);
-            EffectsSyntax effects = null;
-            if (tokens.Current is NoKeywordToken || tokens.Current is MayKeywordToken)
-            {
-                var mayKeyword = tokens.Expect<IMayKeywordToken>();
-                var allowedEffects = listParser.ParseSeparatedList(tokens, ParseEffect, TypeOf<CommaToken>(), TypeOf<OpenBraceToken>(), diagnostics);
-                var noKeyword = tokens.Expect<INoKeywordToken>();
-                var disallowedEffects = listParser.ParseSeparatedList(tokens, ParseEffect, TypeOf<CommaToken>(), TypeOf<OpenBraceToken>(), diagnostics);
-                effects = new EffectsSyntax(mayKeyword, allowedEffects, noKeyword, disallowedEffects);
-            }
+            var effects = ParseEffects(tokens, diagnostics);
+            var contracts = ParseContracts(tokens, diagnostics);
             var body = blockParser.Parse(tokens, diagnostics);
             return new SetterFunctionDeclarationSyntax(modifiers, setKeyword, name,
-                openParen, parameters, closeParen, arrow, returnTypeExpression, effects, body);
+                openParen, parameters, closeParen, arrow, returnTypeExpression, effects, contracts, body);
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
+        private SeparatedListSyntax<ParameterSyntax> ParseParameters([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            return listParser.ParseSeparatedList(tokens, parameterParser.Parse, TypeOf<CommaToken>(), TypeOf<CloseParenToken>(), diagnostics);
+        }
+
+        [MustUseReturnValue]
+        [CanBeNull]
+        private EffectsSyntax ParseEffects(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            if (!(tokens.Current is NoKeywordToken) && !(tokens.Current is MayKeywordToken))
+                return null;
+
+            var mayKeyword = tokens.Expect<IMayKeywordToken>();
+            var allowedEffects = listParser.ParseSeparatedList(tokens, ParseEffect,
+                TypeOf<CommaToken>(), TypeOf<OpenBraceToken>(), diagnostics);
+            var noKeyword = tokens.Expect<INoKeywordToken>();
+            var disallowedEffects = listParser.ParseSeparatedList(tokens, ParseEffect,
+                TypeOf<CommaToken>(), TypeOf<OpenBraceToken>(), diagnostics);
+            return new EffectsSyntax(mayKeyword, allowedEffects, noKeyword, disallowedEffects);
         }
 
         [MustUseReturnValue]
@@ -444,9 +442,45 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        private SeparatedListSyntax<ParameterSyntax> ParseParameters([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+        private SyntaxList<ContractSyntax> ParseContracts(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
         {
-            return listParser.ParseSeparatedList(tokens, parameterParser.Parse, TypeOf<CommaToken>(), TypeOf<CloseParenToken>(), diagnostics);
+            var contracts = new List<ContractSyntax>();
+            for (; ; )
+                switch (tokens.Current)
+                {
+                    case RequiresKeywordToken _:
+                        contracts.Add(ParseRequires(tokens, diagnostics));
+                        break;
+                    case EnsuresKeywordToken _:
+                        contracts.Add(ParseEnsures(tokens, diagnostics));
+                        break;
+                    default:
+                        return contracts.ToSyntaxList();
+                }
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
+        private RequiresSyntax ParseRequires(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var requiresKeyword = tokens.Take<RequiresKeywordToken>();
+            var condition = expressionParser.Parse(tokens, diagnostics);
+            return new RequiresSyntax(requiresKeyword, condition);
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
+        private EnsuresSyntax ParseEnsures(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var ensuresKeyword = tokens.Take<EnsuresKeywordToken>();
+            var condition = expressionParser.Parse(tokens, diagnostics);
+            return new EnsuresSyntax(ensuresKeyword, condition);
         }
         #endregion
 

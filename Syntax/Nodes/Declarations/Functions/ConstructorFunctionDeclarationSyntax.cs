@@ -1,5 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Clauses;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Contracts;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Effects;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Parameters;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
@@ -20,8 +22,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
             [NotNull] SeparatedListSyntax<ParameterSyntax> parameterList,
             [NotNull] ICloseParenToken closeParen,
             [CanBeNull] EffectsSyntax effects,
+            [NotNull] SyntaxList<ContractSyntax> contracts,
             [NotNull] BlockExpressionSyntax body)
-            : base(modifiers, openParen, parameterList, closeParen, effects, body)
+            : base(modifiers, openParen, parameterList, closeParen, effects, contracts, body)
         {
             Requires.NotNull(nameof(modifiers), modifiers);
             Requires.NotNull(nameof(newKeyword), newKeyword);

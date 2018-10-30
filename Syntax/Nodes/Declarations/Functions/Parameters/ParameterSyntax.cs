@@ -1,6 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Clauses
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Parameters
 {
     public abstract class ParameterSyntax : SyntaxNode
     {
