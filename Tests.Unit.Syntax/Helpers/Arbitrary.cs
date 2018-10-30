@@ -82,7 +82,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
                 case "=":
                     return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == "/=";
                 case "$":
-                    return t2.Text == ">" || t2.Text == ">=" || t2.Text == "<" || t2.Text == "<=";
+                    return t2.Text == ">" || t2.Text == ">="
+                        || t2.Text == "<" || t2.Text == "<="
+                        || t2.Text == "<:";
                 case "$>":
                 case "$<":
                     return t2.Text == "≠" || t2.Text == "/=";
@@ -306,6 +308,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             { "where", typeof(WhereKeywordToken) },
             { "const", typeof(ConstKeywordToken) },
             { "alias", typeof(AliasKeywordToken) },
+            { "uninitialized", typeof(UninitializedKeywordToken) },
         }.AsReadOnly();
     }
 }
