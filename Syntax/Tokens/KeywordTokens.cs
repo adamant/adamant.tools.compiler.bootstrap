@@ -64,6 +64,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
             typeof(AliasKeywordToken),
             typeof(UninitializedKeywordToken),
             typeof(NoneKeywordToken),
+            typeof(OperatorKeywordToken),
+            typeof(ImplicitKeywordToken),
+            typeof(ExplicitKeywordToken),
+            typeof(MoveKeywordToken),
+            typeof(CopyKeywordToken),
         }.AsReadOnly().AssertNotNull();
     }
 
@@ -543,6 +548,51 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         {
         }
     }
+
+    public partial interface IOperatorKeywordToken : IKeywordToken { }
+    public class OperatorKeywordToken : KeywordToken, IOperatorKeywordToken
+    {
+        public OperatorKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface IImplicitKeywordToken : IKeywordToken { }
+    public class ImplicitKeywordToken : KeywordToken, IImplicitKeywordToken
+    {
+        public ImplicitKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface IExplicitKeywordToken : IKeywordToken { }
+    public class ExplicitKeywordToken : KeywordToken, IExplicitKeywordToken
+    {
+        public ExplicitKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface IMoveKeywordToken : IKeywordToken { }
+    public class MoveKeywordToken : KeywordToken, IMoveKeywordToken
+    {
+        public MoveKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface ICopyKeywordToken : IKeywordToken { }
+    public class CopyKeywordToken : KeywordToken, ICopyKeywordToken
+    {
+        public CopyKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
     public partial class MissingToken :
         IPublicKeywordToken,
         IProtectedKeywordToken,
@@ -597,6 +647,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         IAliasKeywordToken,
         IUninitializedKeywordToken,
         INoneKeywordToken,
+        IOperatorKeywordToken,
+        IImplicitKeywordToken,
+        IExplicitKeywordToken,
+        IMoveKeywordToken,
+        ICopyKeywordToken,
         IKeywordToken // Implied, but saves issues with commas
     { }
 }

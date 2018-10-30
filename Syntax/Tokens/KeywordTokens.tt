@@ -60,6 +60,11 @@
         "Alias",
         "Uninitialized",
         "None",
+        "Operator",
+        "Implicit",
+        "Explicit",
+        "Move",
+        "Copy",
     }.AsReadOnly();
 #>
 using System;

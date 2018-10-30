@@ -310,6 +310,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             { "alias", typeof(AliasKeywordToken) },
             { "uninitialized", typeof(UninitializedKeywordToken) },
             { "none", typeof(NoneKeywordToken) },
+            { "operator", typeof(OperatorKeywordToken) },
+            { "implicit", typeof(ImplicitKeywordToken) },
+            { "explicit", typeof(ExplicitKeywordToken) },
+            { "move", typeof(MoveKeywordToken) },
+            { "copy", typeof(CopyKeywordToken) },
         }.AsReadOnly();
     }
 }
