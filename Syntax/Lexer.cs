@@ -258,12 +258,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         yield return new GreaterThanOrEqualToken(SymbolSpan());
                         break;
                     case '<':
-                        if (NextCharIs('='))
-                            // it is `<=`
-                            yield return new LessThanOrEqualToken(SymbolSpan(2));
-                        else
-                            // it is `<`
-                            yield return new LessThanToken(SymbolSpan());
+                        switch (NextChar())
+                        {
+                            case '=':
+                                // it is `<=`
+                                yield return new LessThanOrEqualToken(SymbolSpan(2));
+                                break;
+                            case ':':
+                                // it is `<:`
+                                yield return new LessThanColonToken(SymbolSpan(2));
+                                break;
+                            default:
+                                // it is `<`
+                                yield return new LessThanToken(SymbolSpan());
+                                break;
+                        }
                         break;
                     case '≤':
                     case '⩽':

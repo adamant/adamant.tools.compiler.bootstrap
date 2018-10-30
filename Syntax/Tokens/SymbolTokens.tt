@@ -18,6 +18,7 @@
         "Pipe", // `|` U+007C
         "Colon", // `:` U+003A
         "RightArrow", // `→` U+2192", `->` U+002D", U+003E
+        "LessThanColon" , // `<:` U+003C, U+003A
     }.AsReadOnly();
 #>
 using Adamant.Tools.Compiler.Bootstrap.Core;

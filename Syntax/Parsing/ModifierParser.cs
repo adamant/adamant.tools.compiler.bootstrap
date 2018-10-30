@@ -19,6 +19,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 case AbstractKeywordToken abstractKeyword:
                     tokens.MoveNext();
                     return new AbstractModifierSyntax(abstractKeyword);
+                case MutableKeywordToken mutableKeyword:
+                    tokens.MoveNext();
+                    return new MutableModifierSyntax(mutableKeyword);
                 case PublicKeywordToken _:
                 case ProtectedKeywordToken _:
                 case PrivateKeywordToken _:

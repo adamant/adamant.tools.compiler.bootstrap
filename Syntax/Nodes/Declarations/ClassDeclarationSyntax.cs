@@ -1,5 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Inheritance;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
@@ -12,6 +13,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
         [NotNull] public ClassKeywordToken ClassKeyword { get; }
         [NotNull] public override IIdentifierToken Name { get; }
         [CanBeNull] public GenericParametersSyntax GenericParameters { get; }
+        [CanBeNull] public BaseClassSyntax BaseClass { get; }
+        [CanBeNull] public BaseTypesSyntax BaseTypes { get; }
         [NotNull] public IOpenBraceToken OpenBrace { get; }
         [NotNull] public SyntaxList<MemberDeclarationSyntax> Members { get; }
         [NotNull] public ICloseBraceToken CloseBrace { get; }
@@ -21,6 +24,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
             [NotNull] ClassKeywordToken classKeyword,
             [NotNull] IIdentifierToken name,
             [CanBeNull] GenericParametersSyntax genericParameters,
+            [CanBeNull] BaseClassSyntax baseClass,
+            [CanBeNull] BaseTypesSyntax baseTypes,
             [NotNull] IOpenBraceToken openBrace,
             [NotNull] SyntaxList<MemberDeclarationSyntax> members,
             [NotNull] ICloseBraceToken closeBrace)
@@ -35,6 +40,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
             ClassKeyword = classKeyword;
             Name = name;
             GenericParameters = genericParameters;
+            BaseClass = baseClass;
+            BaseTypes = baseTypes;
             OpenBrace = openBrace;
             Members = members;
             CloseBrace = closeBrace;

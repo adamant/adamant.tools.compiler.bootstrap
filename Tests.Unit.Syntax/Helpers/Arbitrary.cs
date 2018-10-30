@@ -69,8 +69,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
                 case "+":
                 case "*":
                 case ">":
-                case "<":
                     return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=";
+                case "<":
+                    return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == ":";
                 case "-":
                     return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == ">" || t2.Text == ">=";
                 case "/":
@@ -212,6 +213,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             { ".", typeof(DotToken) },
             { "..", typeof(DotDotToken) },
             { ":", typeof(ColonToken) },
+            { "<:", typeof(LessThanColonToken) },
             { "?", typeof(QuestionToken) },
             { "?.", typeof(QuestionDotToken) },
             { "??", typeof(QuestionQuestionToken) },

@@ -10,6 +10,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Function;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Inheritance;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
@@ -132,6 +133,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         }
 
         [MustUseReturnValue]
+        [CanBeNull]
+        private BaseClassSyntax ParseBaseClass(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var colon = tokens.Accept<ColonToken>();
+            if (colon == null) return null;
+            var typeExpression = expressionParser.Parse(tokens, diagnostics);
+            return new BaseClassSyntax(colon, typeExpression);
+        }
+
+        [MustUseReturnValue]
+        [CanBeNull]
+        private BaseTypesSyntax ParseBaseTypes(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var lessThanColon = tokens.Accept<LessThanColonToken>();
+            if (lessThanColon == null) return null;
+            var typeExpressions = listParser.ParseSeparatedList(tokens, expressionParser.Parse,
+                TypeOf<CommaToken>(), TypeOf<OpenBraceToken>(), diagnostics);
+            return new BaseTypesSyntax(lessThanColon, typeExpressions);
+        }
+
+        [MustUseReturnValue]
         [NotNull]
         private ClassDeclarationSyntax ParseClass(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
@@ -141,10 +167,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             var classKeyword = tokens.Take<ClassKeywordToken>();
             var name = tokens.ExpectIdentifier();
             var genericParameters = ParseGenericParameters(tokens, diagnostics);
+            var baseClass = ParseBaseClass(tokens, diagnostics);
+            var baseTypes = ParseBaseTypes(tokens, diagnostics);
             var openBrace = tokens.Expect<IOpenBraceToken>();
             var members = listParser.ParseList(tokens, ParseMemberDeclaration, TypeOf<CloseBraceToken>(), diagnostics);
             var closeBrace = tokens.Expect<ICloseBraceToken>();
-            return new ClassDeclarationSyntax(modifiers, classKeyword, name, genericParameters, openBrace,
+            return new ClassDeclarationSyntax(modifiers, classKeyword, name, genericParameters, baseClass, baseTypes, openBrace,
                 members, closeBrace);
         }
 
@@ -158,10 +186,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             var typeKeyword = tokens.Take<TypeKeywordToken>();
             var name = tokens.ExpectIdentifier();
             var genericParameters = ParseGenericParameters(tokens, diagnostics);
+            var baseTypes = ParseBaseTypes(tokens, diagnostics);
             var openBrace = tokens.Expect<IOpenBraceToken>();
             var members = listParser.ParseList(tokens, ParseMemberDeclaration, TypeOf<CloseBraceToken>(), diagnostics);
             var closeBrace = tokens.Expect<ICloseBraceToken>();
-            return new TypeDeclarationSyntax(modifiers, typeKeyword, name, genericParameters, openBrace,
+            return new TypeDeclarationSyntax(modifiers, typeKeyword, name, genericParameters, baseTypes, openBrace,
                 members, closeBrace);
         }
 
