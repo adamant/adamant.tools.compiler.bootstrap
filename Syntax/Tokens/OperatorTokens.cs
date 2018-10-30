@@ -227,6 +227,33 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
+    public interface IQuestionToken : IOperatorToken { }
+    public class QuestionToken : OperatorToken, IQuestionToken
+    {
+        public QuestionToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public interface IQuestionQuestionToken : IOperatorToken { }
+    public class QuestionQuestionToken : OperatorToken, IQuestionQuestionToken
+    {
+        public QuestionQuestionToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public interface IQuestionDotToken : IOperatorToken { }
+    public class QuestionDotToken : OperatorToken, IQuestionDotToken
+    {
+        public QuestionDotToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
     public partial class MissingToken :
         IDotToken,
         IDotDotToken,
@@ -253,6 +280,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         IDollarLessThanNotEqualToken,
         IDollarGreaterThanToken,
         IDollarGreaterThanNotEqualToken,
+        IQuestionToken,
+        IQuestionQuestionToken,
+        IQuestionDotToken,
         IOperatorToken // Implied, but saves issues with commas
     { }
 }

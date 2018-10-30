@@ -64,7 +64,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         yield return new ColonToken(SymbolSpan());
                         break;
                     case '?':
-                        yield return new QuestionToken(SymbolSpan());
+                        switch (NextChar())
+                        {
+                            case '?':
+                                // it is `??`
+                                yield return new QuestionQuestionToken(SymbolSpan(2));
+                                break;
+                            case '.':
+                                // it is `?.`
+                                yield return new QuestionDotToken(SymbolSpan(2));
+                                break;
+                            default:
+                                // it is `?`
+                                yield return new QuestionToken(SymbolSpan());
+                                break;
+                        }
                         break;
                     case '|':
                         yield return new PipeToken(SymbolSpan());

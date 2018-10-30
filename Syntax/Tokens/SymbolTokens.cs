@@ -83,15 +83,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface IQuestionToken : ISymbolToken { }
-    public class QuestionToken : SymbolToken, IQuestionToken
-    {
-        public QuestionToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
     public interface IColonToken : ISymbolToken { }
     public class ColonToken : SymbolToken, IColonToken
     {
@@ -120,7 +111,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         ISemicolonToken,
         ICommaToken,
         IPipeToken,
-        IQuestionToken,
         IColonToken,
         IRightArrowToken,
         ISymbolToken // Implied, but saves issues with commas

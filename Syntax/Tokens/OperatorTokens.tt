@@ -32,6 +32,9 @@
         "DollarLessThanNotEqual", // `$<` U+0024, U+003C
         "DollarGreaterThan", // `$>` U+0024, U+003E
         "DollarGreaterThanNotEqual", // `$>≠` U+0024, U+003E, U+2260, `$>/=` U+0024, U+003E, U+002F, U+003D
+        "Question", // `?` U+003F
+        "QuestionQuestion", // `??` U+003F, U+003F
+        "QuestionDot", // `?.` U+003F, U+002E
     }.AsReadOnly();
 #>
 using Adamant.Tools.Compiler.Bootstrap.Core;

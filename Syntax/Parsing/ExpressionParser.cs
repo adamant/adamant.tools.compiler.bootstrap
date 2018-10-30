@@ -80,6 +80,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                             @operator = tokens.TakeOperator();
                         }
                         break;
+                    case QuestionQuestionToken _:
+                        if (minPrecedence <= OperatorPrecedence.Coalesce)
+                        {
+                            precedence = OperatorPrecedence.Coalesce;
+                            @operator = tokens.TakeOperator();
+                        }
+                        break;
                     case DollarToken _:
                     case DollarLessThanToken _:
                     case DollarLessThanNotEqualToken _:
@@ -151,6 +158,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                             @operator = tokens.TakeOperator();
                         }
                         break;
+                    case QuestionToken _:
+                        if (minPrecedence <= OperatorPrecedence.Unary)
+                        {
+                            @operator = tokens.TakeOperator();
+                            expression = new UnaryOperatorExpressionSyntax(@operator, expression);
+                            continue;
+                        }
+                        break;
                     case OpenParenToken _:
                         if (minPrecedence <= OperatorPrecedence.Primary)
                         {
@@ -175,6 +190,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         break;
                     case DotToken _:
                     case CaretDotToken _:
+                    case QuestionDotToken _:
                         if (minPrecedence <= OperatorPrecedence.Primary)
                         {
                             // Member Access

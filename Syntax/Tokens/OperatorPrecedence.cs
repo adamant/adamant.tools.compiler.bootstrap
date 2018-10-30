@@ -4,6 +4,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
     {
         Min = Assignment, // The minimum precedence
         Assignment = 1, // `=` `+=` `-=`
+        Coalesce, // `??`
         Lifetime, // `$<` `$<≠` `$>` `$>≠`
         LogicalOr, // `or`
         LogicalAnd, // `and`

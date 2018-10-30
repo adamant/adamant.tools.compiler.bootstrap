@@ -85,6 +85,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
                 case "$>":
                 case "$<":
                     return t2.Text == "≠" || t2.Text == "/=";
+                case "?":
+                    return t2.Text == "." || t2.Text == ".."
+                        || t2.Text == "?" || t2.Text == "?." || t2.Text == "??";
                 default:
                     if (typeof(KeywordToken).IsAssignableFrom(t1.TokenType)
                         || typeof(IdentifierToken).IsAssignableFrom(t1.TokenType)
@@ -210,6 +213,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             { "..", typeof(DotDotToken) },
             { ":", typeof(ColonToken) },
             { "?", typeof(QuestionToken) },
+            { "?.", typeof(QuestionDotToken) },
+            { "??", typeof(QuestionQuestionToken) },
             { "|", typeof(PipeToken) },
             { "→", typeof(RightArrowToken) },
             { "->", typeof(RightArrowToken) },
