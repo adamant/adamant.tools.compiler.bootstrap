@@ -37,9 +37,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
             var e = ParseWithoutError(tokens);
 
             var t = Assert.IsType<LifetimeTypeSyntax>(e);
-            var identifierName = Assert.IsType<IdentifierNameSyntax>(t.TypeName);
+            var identifierName = Assert.IsType<IdentifierNameSyntax>(t.TypeExpression);
             Assert.Equal(tokens[0], identifierName.Name);
-            Assert.Equal(tokens[1], t.Dollar);
+            Assert.Equal(tokens[1], t.Operator);
             Assert.Equal(tokens[2], t.Lifetime);
         }
 

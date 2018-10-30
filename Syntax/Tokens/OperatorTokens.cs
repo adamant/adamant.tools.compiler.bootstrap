@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 {
-    public interface IDotToken : IOperatorToken { }
+    public partial interface IDotToken : IOperatorToken { }
     public class DotToken : OperatorToken, IDotToken
     {
         public DotToken(TextSpan span)
@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface IDotDotToken : IOperatorToken { }
+    public partial interface IDotDotToken : IOperatorToken { }
     public class DotDotToken : OperatorToken, IDotDotToken
     {
         public DotDotToken(TextSpan span)
@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface IAtSignToken : IOperatorToken { }
+    public partial interface IAtSignToken : IOperatorToken { }
     public class AtSignToken : OperatorToken, IAtSignToken
     {
         public AtSignToken(TextSpan span)
@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface ICaretToken : IOperatorToken { }
+    public partial interface ICaretToken : IOperatorToken { }
     public class CaretToken : OperatorToken, ICaretToken
     {
         public CaretToken(TextSpan span)
@@ -38,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface ICaretDotToken : IOperatorToken { }
+    public partial interface ICaretDotToken : IOperatorToken { }
     public class CaretDotToken : OperatorToken, ICaretDotToken
     {
         public CaretDotToken(TextSpan span)
@@ -47,7 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface IPlusToken : IOperatorToken { }
+    public partial interface IPlusToken : IOperatorToken { }
     public class PlusToken : OperatorToken, IPlusToken
     {
         public PlusToken(TextSpan span)
@@ -56,7 +56,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface IMinusToken : IOperatorToken { }
+    public partial interface IMinusToken : IOperatorToken { }
     public class MinusToken : OperatorToken, IMinusToken
     {
         public MinusToken(TextSpan span)
@@ -65,7 +65,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface IAsteriskToken : IOperatorToken { }
+    public partial interface IAsteriskToken : IOperatorToken { }
     public class AsteriskToken : OperatorToken, IAsteriskToken
     {
         public AsteriskToken(TextSpan span)
@@ -74,7 +74,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface ISlashToken : IOperatorToken { }
+    public partial interface ISlashToken : IOperatorToken { }
     public class SlashToken : OperatorToken, ISlashToken
     {
         public SlashToken(TextSpan span)
@@ -83,7 +83,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface IEqualsToken : IOperatorToken { }
+    public partial interface IEqualsToken : IOperatorToken { }
     public class EqualsToken : OperatorToken, IEqualsToken
     {
         public EqualsToken(TextSpan span)
@@ -92,7 +92,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface IEqualsEqualsToken : IOperatorToken { }
+    public partial interface IEqualsEqualsToken : IOperatorToken { }
     public class EqualsEqualsToken : OperatorToken, IEqualsEqualsToken
     {
         public EqualsEqualsToken(TextSpan span)
@@ -101,7 +101,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface INotEqualToken : IOperatorToken { }
+    public partial interface INotEqualToken : IOperatorToken { }
     public class NotEqualToken : OperatorToken, INotEqualToken
     {
         public NotEqualToken(TextSpan span)
@@ -110,7 +110,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface IGreaterThanToken : IOperatorToken { }
+    public partial interface IGreaterThanToken : IOperatorToken { }
     public class GreaterThanToken : OperatorToken, IGreaterThanToken
     {
         public GreaterThanToken(TextSpan span)
@@ -119,7 +119,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface IGreaterThanOrEqualToken : IOperatorToken { }
+    public partial interface IGreaterThanOrEqualToken : IOperatorToken { }
     public class GreaterThanOrEqualToken : OperatorToken, IGreaterThanOrEqualToken
     {
         public GreaterThanOrEqualToken(TextSpan span)
@@ -128,7 +128,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface ILessThanToken : IOperatorToken { }
+    public partial interface ILessThanToken : IOperatorToken { }
     public class LessThanToken : OperatorToken, ILessThanToken
     {
         public LessThanToken(TextSpan span)
@@ -137,7 +137,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface ILessThanOrEqualToken : IOperatorToken { }
+    public partial interface ILessThanOrEqualToken : IOperatorToken { }
     public class LessThanOrEqualToken : OperatorToken, ILessThanOrEqualToken
     {
         public LessThanOrEqualToken(TextSpan span)
@@ -146,7 +146,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface IPlusEqualsToken : IOperatorToken { }
+    public partial interface IPlusEqualsToken : IOperatorToken { }
     public class PlusEqualsToken : OperatorToken, IPlusEqualsToken
     {
         public PlusEqualsToken(TextSpan span)
@@ -155,7 +155,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface IMinusEqualsToken : IOperatorToken { }
+    public partial interface IMinusEqualsToken : IOperatorToken { }
     public class MinusEqualsToken : OperatorToken, IMinusEqualsToken
     {
         public MinusEqualsToken(TextSpan span)
@@ -164,7 +164,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface IAsteriskEqualsToken : IOperatorToken { }
+    public partial interface IAsteriskEqualsToken : IOperatorToken { }
     public class AsteriskEqualsToken : OperatorToken, IAsteriskEqualsToken
     {
         public AsteriskEqualsToken(TextSpan span)
@@ -173,7 +173,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface ISlashEqualsToken : IOperatorToken { }
+    public partial interface ISlashEqualsToken : IOperatorToken { }
     public class SlashEqualsToken : OperatorToken, ISlashEqualsToken
     {
         public SlashEqualsToken(TextSpan span)
@@ -182,7 +182,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface IDollarToken : IOperatorToken { }
+    public partial interface IDollarToken : IOperatorToken { }
     public class DollarToken : OperatorToken, IDollarToken
     {
         public DollarToken(TextSpan span)
@@ -191,7 +191,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface IDollarLessThanToken : IOperatorToken { }
+    public partial interface IDollarLessThanToken : IOperatorToken { }
     public class DollarLessThanToken : OperatorToken, IDollarLessThanToken
     {
         public DollarLessThanToken(TextSpan span)
@@ -200,7 +200,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface IDollarLessThanNotEqualToken : IOperatorToken { }
+    public partial interface IDollarLessThanNotEqualToken : IOperatorToken { }
     public class DollarLessThanNotEqualToken : OperatorToken, IDollarLessThanNotEqualToken
     {
         public DollarLessThanNotEqualToken(TextSpan span)
@@ -209,7 +209,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface IDollarGreaterThanToken : IOperatorToken { }
+    public partial interface IDollarGreaterThanToken : IOperatorToken { }
     public class DollarGreaterThanToken : OperatorToken, IDollarGreaterThanToken
     {
         public DollarGreaterThanToken(TextSpan span)
@@ -218,7 +218,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface IDollarGreaterThanNotEqualToken : IOperatorToken { }
+    public partial interface IDollarGreaterThanNotEqualToken : IOperatorToken { }
     public class DollarGreaterThanNotEqualToken : OperatorToken, IDollarGreaterThanNotEqualToken
     {
         public DollarGreaterThanNotEqualToken(TextSpan span)
@@ -227,7 +227,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface IQuestionToken : IOperatorToken { }
+    public partial interface IQuestionToken : IOperatorToken { }
     public class QuestionToken : OperatorToken, IQuestionToken
     {
         public QuestionToken(TextSpan span)
@@ -236,7 +236,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface IQuestionQuestionToken : IOperatorToken { }
+    public partial interface IQuestionQuestionToken : IOperatorToken { }
     public class QuestionQuestionToken : OperatorToken, IQuestionQuestionToken
     {
         public QuestionQuestionToken(TextSpan span)
@@ -245,7 +245,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface IQuestionDotToken : IOperatorToken { }
+    public partial interface IQuestionDotToken : IOperatorToken { }
     public class QuestionDotToken : OperatorToken, IQuestionDotToken
     {
         public QuestionDotToken(TextSpan span)

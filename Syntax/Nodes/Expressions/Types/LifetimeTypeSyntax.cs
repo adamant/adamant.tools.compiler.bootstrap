@@ -1,6 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
@@ -8,21 +7,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types
 {
     public class LifetimeTypeSyntax : TypeSyntax
     {
-        [NotNull] public NameSyntax TypeName { get; }
-        [NotNull] public DollarToken Dollar { get; }
-        [NotNull] public IToken Lifetime { get; }
+        [NotNull] public ExpressionSyntax TypeExpression { get; }
+        [NotNull] public ILifetimeOperatorToken Operator { get; }
+        [NotNull] public ILifetimeNameToken Lifetime { get; }
 
         public LifetimeTypeSyntax(
-            [NotNull] NameSyntax typeName,
-            [NotNull] DollarToken dollar,
-            [NotNull] IToken lifetime)
-            : base(TextSpan.Covering(typeName.Span, lifetime.Span))
+            [NotNull] ExpressionSyntax typeExpression,
+            [NotNull] ILifetimeOperatorToken @operator,
+            [NotNull] ILifetimeNameToken lifetime)
+            : base(TextSpan.Covering(typeExpression.Span, lifetime.Span))
         {
-            Requires.NotNull(nameof(typeName), typeName);
-            Requires.NotNull(nameof(dollar), dollar);
+            Requires.NotNull(nameof(typeExpression), typeExpression);
+            Requires.NotNull(nameof(@operator), @operator);
             Requires.NotNull(nameof(lifetime), lifetime);
-            TypeName = typeName;
-            Dollar = dollar;
+            TypeExpression = typeExpression;
+            Operator = @operator;
             Lifetime = lifetime;
         }
     }

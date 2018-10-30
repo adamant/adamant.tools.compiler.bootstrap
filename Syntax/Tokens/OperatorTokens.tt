@@ -42,7 +42,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 {
 <# foreach(var @operator in operators) {#>
-    public interface I<#=@operator#>Token : IOperatorToken { }
+    public partial interface I<#=@operator#>Token : IOperatorToken { }
     public class <#=@operator#>Token : OperatorToken, I<#=@operator#>Token
     {
         public <#=@operator#>Token(TextSpan span)

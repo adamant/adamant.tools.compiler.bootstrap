@@ -94,11 +94,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     case DollarGreaterThanNotEqualToken _:
                         if (minPrecedence <= OperatorPrecedence.Lifetime)
                         {
-                            precedence = OperatorPrecedence.Lifetime;
                             var leftOperand = expression;
-                            @operator = tokens.TakeOperator();
-                            var identifier = tokens.ExpectIdentifier();
-                            expression = new BinaryOperatorExpressionSyntax(leftOperand, @operator, new IdentifierNameSyntax(identifier));
+                            var lifetimeOperator = tokens.Take<ILifetimeOperatorToken>();
+                            var name = tokens.Expect<ILifetimeNameToken>();
+                            expression = new LifetimeTypeSyntax(leftOperand, lifetimeOperator, name);
                             continue;
                         }
                         break;
@@ -309,9 +308,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         if (tokens.Current is DollarToken)
                         {
                             var dollar = tokens.Take<DollarToken>();
-                            var lifetime = tokens.Current is IdentifierToken
-                                ? (IToken)tokens.ExpectIdentifier()
-                                : tokens.Expect<IOwnedKeywordToken>();
+                            var lifetime = tokens.Expect<ILifetimeNameToken>();
                             return new LifetimeTypeSyntax(name, dollar, lifetime);
                         }
 
@@ -370,6 +367,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             }
         }
 
+        [MustUseReturnValue]
         [NotNull]
         private ExpressionSyntax ParseIfExpression(
             [NotNull] ITokenStream tokens,

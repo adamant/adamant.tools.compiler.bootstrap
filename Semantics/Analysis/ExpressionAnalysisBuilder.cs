@@ -76,7 +76,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                     return new GenericNameAnalysis(context, genericName,
                         genericName.Arguments.Select(a => Build(context, functionName, a)));
                 case LifetimeTypeSyntax lifetimeType:
-                    var typeName = Build(context, functionName, lifetimeType.TypeName);
+                    var typeName = Build(context, functionName, lifetimeType.TypeExpression);
                     return new LifetimeTypeAnalysis(context, lifetimeType, typeName);
                 case BlockExpressionSyntax blockExpression:
                     return BuildBlock(context, functionName, blockExpression);
