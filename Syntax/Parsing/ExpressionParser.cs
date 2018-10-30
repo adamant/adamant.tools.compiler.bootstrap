@@ -339,6 +339,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         var referencedType = Parse(tokens, diagnostics);
                         return new MutableTypeSyntax(mutableKeyword, referencedType);
                     }
+                case IfKeywordToken _:
+                    return ParseIfExpression(tokens, diagnostics);
                 case AsteriskToken _:
                 case SlashToken _:
                 case QuestionToken _:
@@ -349,6 +351,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 default:
                     throw NonExhaustiveMatchException.For(tokens.Current);
             }
+        }
+
+        [NotNull]
+        private ExpressionSyntax ParseIfExpression(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var ifKeyword = tokens.Take<IfKeywordToken>();
+            var condition = Parse(tokens, diagnostics);
+            var thenBlock = BlockParser.Parse(tokens, diagnostics);
+            var elseClause = ParseElseClause(tokens, diagnostics);
+            return new IfExpressionSyntax(ifKeyword, condition, thenBlock, elseClause);
+        }
+
+        [CanBeNull]
+        private ElseClauseSyntax ParseElseClause(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var elseKeyword = tokens.Accept<ElseKeywordToken>();
+            if (elseKeyword == null) return null;
+            var expression = tokens.Current is IfKeywordToken
+                ? ParseIfExpression(tokens, diagnostics)
+                : BlockParser.Parse(tokens, diagnostics);
+            return new ElseClauseSyntax(elseKeyword, expression);
         }
 
         [NotNull]
