@@ -261,9 +261,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 case AtSignToken _:
                 case CaretToken _:
                 case NotKeywordToken _:
-                    var @operator = tokens.TakeOperator();
-                    var operand = Parse(tokens, diagnostics, OperatorPrecedence.Unary);
-                    return new UnaryOperatorExpressionSyntax(@operator, operand);
+                    {
+                        var @operator = tokens.TakeOperator();
+                        var operand = Parse(tokens, diagnostics, OperatorPrecedence.Unary);
+                        return new UnaryOperatorExpressionSyntax(@operator, operand);
+                    }
                 case IntegerLiteralToken literal:
                     {
                         tokens.MoveNext();
@@ -341,6 +343,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     }
                 case IfKeywordToken _:
                     return ParseIfExpression(tokens, diagnostics);
+                case DotToken _:
+                    {
+                        // implicit self etc.
+                        var @operator = tokens.TakeOperator();
+                        var operand = Parse(tokens, diagnostics, OperatorPrecedence.Unary);
+                        return new UnaryOperatorExpressionSyntax(@operator, operand);
+                    }
                 case AsteriskToken _:
                 case SlashToken _:
                 case QuestionToken _:

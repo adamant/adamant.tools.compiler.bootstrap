@@ -315,6 +315,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         {
             var functionKeyword = tokens.Take<FunctionKeywordToken>();
             var name = tokens.ExpectIdentifier();
+            var genericParameters = ParseGenericParameters(tokens, diagnostics);
             var openParen = tokens.Expect<IOpenParenToken>();
             var parameters = ParseParameters(tokens, diagnostics);
             var closeParen = tokens.Expect<ICloseParenToken>();
@@ -323,7 +324,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             var effects = ParseEffects(tokens, diagnostics);
             var contracts = ParseContracts(tokens, diagnostics);
             var body = blockParser.Parse(tokens, diagnostics);
-            return new NamedFunctionDeclarationSyntax(modifiers, functionKeyword, name,
+            return new NamedFunctionDeclarationSyntax(modifiers, functionKeyword, name, genericParameters,
                 openParen, parameters, closeParen, arrow, returnTypeExpression, effects, contracts, body);
         }
 
@@ -336,6 +337,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         {
             var newKeyword = tokens.Take<NewKeywordToken>();
             var name = tokens.Accept<IdentifierToken>();
+            var genericParameters = ParseGenericParameters(tokens, diagnostics);
             var openParen = tokens.Expect<IOpenParenToken>();
             var parameters = ParseParameters(tokens, diagnostics);
             var closeParen = tokens.Expect<ICloseParenToken>();
@@ -343,7 +345,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             var contracts = ParseContracts(tokens, diagnostics);
             var body = blockParser.Parse(tokens, diagnostics);
             return new ConstructorFunctionDeclarationSyntax(modifiers, newKeyword, name,
-                openParen, parameters, closeParen, effects, contracts, body);
+                genericParameters, openParen, parameters, closeParen, effects, contracts, body);
         }
 
         [MustUseReturnValue]

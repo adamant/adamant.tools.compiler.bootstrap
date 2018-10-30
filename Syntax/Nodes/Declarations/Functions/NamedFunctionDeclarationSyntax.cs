@@ -2,6 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Contracts;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Effects;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Parameters;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
@@ -13,6 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
     {
         [NotNull] public FunctionKeywordToken FunctionKeyword { get; }
         [NotNull] public override IIdentifierToken Name { get; }
+        [CanBeNull] public GenericParametersSyntax GenericParameters { get; }
         [NotNull] public IRightArrowToken Arrow { get; }
         [NotNull] public ExpressionSyntax ReturnTypeExpression { get; }
 
@@ -21,6 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
             [NotNull] FunctionKeywordToken functionKeyword,
             [NotNull] IIdentifierToken name,
+            [CanBeNull] GenericParametersSyntax genericParameters,
             [NotNull] IOpenParenToken openParen,
             [NotNull] SeparatedListSyntax<ParameterSyntax> parameterList,
             [NotNull] ICloseParenToken closeParen,
@@ -42,6 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
             Requires.NotNull(nameof(body), body);
             FunctionKeyword = functionKeyword;
             Name = name;
+            GenericParameters = genericParameters;
             Arrow = arrow;
             ReturnTypeExpression = returnTypeExpression;
         }

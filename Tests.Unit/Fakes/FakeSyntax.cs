@@ -156,12 +156,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
                 AccessModifier().ToSyntaxList<ModifierSyntax>(),
                 new FunctionKeywordToken(FakeSpan),
                 Identifier(name),
+                null, // Generic Parameters
                 Missing<IOpenParenToken>(),
                 SeparatedListSyntax<ParameterSyntax>.Empty,
                 Missing<ICloseParenToken>(),
                 Missing<IRightArrowToken>(),
                 Expression(),
-                null,
+                null, // Effects
                 SyntaxList<ContractSyntax>.Empty,
                 Block());
         }

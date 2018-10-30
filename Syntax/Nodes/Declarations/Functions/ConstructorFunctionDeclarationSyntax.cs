@@ -2,6 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Contracts;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Effects;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Parameters;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
@@ -13,11 +14,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
     {
         [NotNull] public NewKeywordToken NewKeyword { get; }
         [CanBeNull] public override IIdentifierToken Name { get; }
+        [CanBeNull] public GenericParametersSyntax GenericParameters { get; }
 
         public ConstructorFunctionDeclarationSyntax(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
             [NotNull] NewKeywordToken newKeyword,
             [CanBeNull] IdentifierToken name,
+            [CanBeNull] GenericParametersSyntax genericParameters,
             [NotNull] IOpenParenToken openParen,
             [NotNull] SeparatedListSyntax<ParameterSyntax> parameterList,
             [NotNull] ICloseParenToken closeParen,
@@ -28,13 +31,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
         {
             Requires.NotNull(nameof(modifiers), modifiers);
             Requires.NotNull(nameof(newKeyword), newKeyword);
-            Requires.NotNull(nameof(name), name);
             Requires.NotNull(nameof(openParen), openParen);
             Requires.NotNull(nameof(parameterList), parameterList);
             Requires.NotNull(nameof(closeParen), closeParen);
             Requires.NotNull(nameof(body), body);
             NewKeyword = newKeyword;
             Name = name;
+            GenericParameters = genericParameters;
         }
     }
 }
