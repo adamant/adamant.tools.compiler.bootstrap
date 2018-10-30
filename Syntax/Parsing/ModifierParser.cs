@@ -13,6 +13,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         {
             switch (tokens.Current)
             {
+                case RefKeywordToken refKeyword:
+                    tokens.MoveNext();
+                    return new RefModifierSyntax(refKeyword);
                 case ExtendKeywordToken extendKeyword:
                     tokens.MoveNext();
                     return new ExtendModifierSyntax(extendKeyword);
