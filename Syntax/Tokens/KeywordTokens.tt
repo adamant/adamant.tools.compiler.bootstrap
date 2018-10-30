@@ -55,6 +55,7 @@
         "Requires",
         "Ensures",
         "Invariant",
+        "Where",
     }.AsReadOnly();
 #>
 using System;

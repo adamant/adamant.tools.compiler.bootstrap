@@ -303,6 +303,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             { "requires", typeof(RequiresKeywordToken) },
             { "ensures", typeof(EnsuresKeywordToken) },
             { "invariant", typeof(InvariantKeywordToken) },
+            { "where", typeof(WhereKeywordToken) },
         }.AsReadOnly();
     }
 }
