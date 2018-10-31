@@ -11,11 +11,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
     public class ControlFlowEmitter : IEmitter<ControlFlowGraph>
     {
         [NotNull] private readonly NameMangler nameMangler;
-        [NotNull] private readonly IConverter<DataType> typeConverter;
+        [NotNull] private readonly IConverter<KnownType> typeConverter;
 
         public ControlFlowEmitter(
             [NotNull] NameMangler nameMangler,
-            [NotNull] IConverter<DataType> typeConverter)
+            [NotNull] IConverter<KnownType> typeConverter)
         {
             this.typeConverter = typeConverter;
             this.nameMangler = nameMangler;

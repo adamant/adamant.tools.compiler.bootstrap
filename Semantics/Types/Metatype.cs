@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
     ///
     /// see https://docs.swift.org/swift-book/ReferenceManual/Types.html#grammar_metatype-type
     /// </summary>
-    public class Metatype : DataType
+    public class Metatype : KnownType
     {
         [NotNull] public QualifiedName Name { get; }
         // The type this is a metatype for. Named instance because it represents

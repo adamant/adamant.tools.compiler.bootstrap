@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C
         {
             var parameters = Enumerable.Repeat(0, parameterCount)
                 .Select(_ => new FakeParameter()).ToList();
-            var returnType = new FakeDataType();
+            var returnType = new FakeAdamantType();
             var function = new FunctionDeclaration("".ToFakeCodeFile(),
                 GlobalNamespaceName.Instance.Qualify("func"),
                 parameters,
@@ -88,7 +88,7 @@ typedef struct { ᵢMy_Type´0·ₐV_Table const*_Nonnull restrict ₐvtable; �
         {
             var nameMangler = new NameMangler();
             var parameterConverter = new FakeConverter<Parameter>();
-            var typeConvert = new FakeConverter<DataType>();
+            var typeConvert = new FakeConverter<KnownType>();
             var controlFlowEmitter = new FakeEmitter<ControlFlowGraph>();
             return new DeclarationEmitter(nameMangler, parameterConverter, typeConvert, controlFlowEmitter);
         }

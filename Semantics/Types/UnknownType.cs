@@ -1,0 +1,18 @@
+using JetBrains.Annotations;
+
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
+{
+    public class UnknownType : DataType
+    {
+        #region Singleton
+        [NotNull] public static readonly UnknownType Instance = new UnknownType();
+
+        private UnknownType() { }
+        #endregion
+
+        public override string ToString()
+        {
+            return "⧼unknown⧽";
+        }
+    }
+}

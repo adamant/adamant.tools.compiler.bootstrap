@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // They are all interdependent to some degree
             var nameBinder = new NameBinder();
             var typeChecker = new TypeChecker(nameBinder);
-            typeChecker.CheckTypes(declarationAnalyses);
+            typeChecker.CheckDeclarations(declarationAnalyses);
 
             // At this point, some but not all of the functions will have IL statements generated,
             // now generate the rest

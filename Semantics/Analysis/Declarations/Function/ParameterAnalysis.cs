@@ -34,7 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations.Funct
         [NotNull]
         public Parameter Complete()
         {
-            return new Parameter(MutableBinding, Name, Type.AssertNotNull());
+            return new Parameter(MutableBinding, Name, Type.AssertKnown());
         }
     }
 }

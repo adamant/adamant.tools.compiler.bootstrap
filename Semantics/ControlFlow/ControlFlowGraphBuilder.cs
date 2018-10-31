@@ -36,9 +36,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             function.ControlFlow = cfg;
 
             // Temp Variable for return
-            cfg.Let(function.ReturnType.AssertNotNull());
+            cfg.Let(function.ReturnType.AssertKnown());
             foreach (var parameter in function.Parameters)
-                cfg.AddParameter(parameter.MutableBinding, parameter.Type.AssertNotNull(), parameter.Name.Name.Text);
+                cfg.AddParameter(parameter.MutableBinding, parameter.Type.AssertKnown(), parameter.Name.Name.Text);
 
             var blocks = new Dictionary<SyntaxNode, BasicBlock>();
             var entryBlock = cfg.EntryBlock;
@@ -69,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             {
                 case VariableDeclarationStatementAnalysis variableDeclaration:
                     var variable = cfg.AddVariable(variableDeclaration.MutableBinding,
-                        variableDeclaration.Type.AssertNotNull(),
+                        variableDeclaration.Type.AssertKnown(),
                         variableDeclaration.Name.Name.Text);
                     if (variableDeclaration.Initializer != null)
                         ConvertAssignment(cfg, variable.Reference, variableDeclaration.Initializer, currentBlock);
@@ -113,7 +113,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                             break;
                         default:
                             // Could be side effects possibly.
-                            var temp = cfg.Let(binaryOperatorExpression.Type.AssertNotNull());
+                            var temp = cfg.Let(binaryOperatorExpression.Type.AssertKnown());
                             ConvertAssignment(cfg, temp.Reference, expression, currentBlock);
                             break;
                     }
@@ -152,7 +152,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             {
                 case NewObjectExpressionAnalysis newObjectExpression:
                     var args = newObjectExpression.Arguments.Select(a => ConvertToLValue(cfg, a.Value));
-                    currentBlock.Add(new NewObjectStatement(lvalue, newObjectExpression.Type.AssertNotNull(), args));
+                    currentBlock.Add(new NewObjectStatement(lvalue, newObjectExpression.Type.AssertKnown(), args));
                     break;
                 case IdentifierNameAnalysis identifier:
                     currentBlock.Add(new AssignmentStatement(lvalue, LookupVariable(cfg, identifier.Name.AssertNotNull())));

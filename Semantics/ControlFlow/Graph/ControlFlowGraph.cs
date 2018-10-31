@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Graph
         [NotNull] [ItemNotNull] public IReadOnlyList<LocalVariableDeclaration> VariableDeclarations { get; }
         [NotNull] [ItemNotNull] private readonly List<LocalVariableDeclaration> variableDeclarations = new List<LocalVariableDeclaration>();
         [NotNull] public LocalVariableDeclaration ReturnVariable => variableDeclarations[0];
-        [NotNull] public DataType ReturnType => ReturnVariable.Type;
+        [NotNull] public KnownType ReturnType => ReturnVariable.Type;
         //[NotNull] [ItemNotNull] public IEnumerable<LocalVariableDeclaration> Parameters => variableDeclarations.Skip(1).Take(Arity);
         [NotNull] [ItemNotNull] public IReadOnlyList<BasicBlock> BasicBlocks { get; }
         [NotNull] [ItemNotNull] private readonly List<BasicBlock> basicBlocks = new List<BasicBlock>();
@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Graph
         }
 
         [NotNull]
-        public LocalVariableDeclaration AddParameter(bool mutableBinding, [NotNull] DataType type, [CanBeNull] string name)
+        public LocalVariableDeclaration AddParameter(bool mutableBinding, [NotNull] KnownType type, [CanBeNull] string name)
         {
             Requires.NotNull(nameof(type), type);
             var variable = new LocalVariableDeclaration(true, mutableBinding, type, variableDeclarations.Count)
@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Graph
         }
 
         [NotNull]
-        public LocalVariableDeclaration AddVariable(bool mutableBinding, [NotNull] DataType type, [CanBeNull] string name = null)
+        public LocalVariableDeclaration AddVariable(bool mutableBinding, [NotNull] KnownType type, [CanBeNull] string name = null)
         {
             Requires.NotNull(nameof(type), type);
             var variable = new LocalVariableDeclaration(false, mutableBinding, type, variableDeclarations.Count)
@@ -51,14 +51,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Graph
         }
 
         [NotNull]
-        public LocalVariableDeclaration Let([NotNull] DataType type)
+        public LocalVariableDeclaration Let([NotNull] KnownType type)
         {
             Requires.NotNull(nameof(type), type);
             return AddVariable(false, type);
         }
 
         [NotNull]
-        public LocalVariableDeclaration Var([NotNull] DataType type)
+        public LocalVariableDeclaration Var([NotNull] KnownType type)
         {
             Requires.NotNull(nameof(type), type);
             return AddVariable(true, type);

@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
-    public class TypeConverter : IConverter<DataType>
+    public class TypeConverter : IConverter<KnownType>
     {
         [NotNull] private readonly NameMangler nameMangler;
 
@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             this.nameMangler = nameMangler;
         }
 
-        public string Convert([NotNull] DataType type)
+        public string Convert([NotNull] KnownType type)
         {
             Requires.NotNull(nameof(type), type);
             switch (type)

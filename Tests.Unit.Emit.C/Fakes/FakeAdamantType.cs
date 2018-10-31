@@ -3,11 +3,11 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C.Fakes
 {
-    public class FakeDataType : DataType
+    public class FakeAdamantType : KnownType
     {
         private readonly Guid instance;
 
-        public FakeDataType()
+        public FakeAdamantType()
         {
             instance = Guid.NewGuid();
         }

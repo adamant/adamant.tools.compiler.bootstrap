@@ -3,12 +3,12 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
 {
-    public class LifetimeType : DataType
+    public class LifetimeType : KnownType
     {
-        [NotNull] public DataType Type { get; }
+        [NotNull] public KnownType Type { get; }
         [NotNull] public Lifetime Lifetime { get; }
 
-        public LifetimeType([NotNull] DataType type, [NotNull] Lifetime lifetime)
+        public LifetimeType([NotNull] KnownType type, [NotNull] Lifetime lifetime)
         {
             Requires.NotNull(nameof(type), type);
             Requires.NotNull(nameof(lifetime), lifetime);

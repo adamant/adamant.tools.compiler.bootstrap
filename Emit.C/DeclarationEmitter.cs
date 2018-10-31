@@ -12,13 +12,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
     {
         [NotNull] private readonly NameMangler nameMangler;
         [NotNull] private readonly IConverter<Parameter> parameterConverter;
-        [NotNull] private readonly IConverter<DataType> typeConverter;
+        [NotNull] private readonly IConverter<KnownType> typeConverter;
         [NotNull] private readonly IEmitter<ControlFlowGraph> controlFlowEmitter;
 
         public DeclarationEmitter(
             [NotNull] NameMangler nameMangler,
             [NotNull] IConverter<Parameter> parameterConverter,
-            [NotNull] IConverter<DataType> typeConverter,
+            [NotNull] IConverter<KnownType> typeConverter,
             [NotNull] IEmitter<ControlFlowGraph> controlFlowEmitter)
         {
             Requires.NotNull(nameof(nameMangler), nameMangler);

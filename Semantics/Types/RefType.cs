@@ -2,12 +2,12 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
 {
-    public class RefType : DataType
+    public class RefType : KnownType
     {
         public bool VariableBinding { get; }
-        [CanBeNull] public DataType ReferencedType { get; }
+        [CanBeNull] public KnownType ReferencedType { get; }
 
-        public RefType(bool variableBinding, [CanBeNull] DataType referencedType)
+        public RefType(bool variableBinding, [CanBeNull] KnownType referencedType)
         {
             VariableBinding = variableBinding;
             ReferencedType = referencedType;

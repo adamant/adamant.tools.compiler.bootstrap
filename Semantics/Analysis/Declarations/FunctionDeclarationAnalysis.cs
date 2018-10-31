@@ -16,7 +16,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
 {
     public class FunctionDeclarationAnalysis : MemberDeclarationAnalysis
     {
-        [CanBeNull] public new FunctionType Type { get; set; }
         [NotNull] public new NamedFunctionDeclarationSyntax Syntax { get; }
         [NotNull] [ItemNotNull] public IReadOnlyList<ParameterAnalysis> Parameters { get; }
         public int Arity => Parameters.Count;
@@ -24,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
         [CanBeNull] public DataType ReturnType { get; set; }
         [NotNull] [ItemNotNull] public IReadOnlyList<StatementAnalysis> Statements { get; }
         [CanBeNull] public ControlFlowGraph ControlFlow { get; set; }
-
+        [CanBeNull] public new DataType Type { get; set; }
 
         public FunctionDeclarationAnalysis(
             [NotNull] AnalysisContext context,
@@ -38,7 +37,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
         {
             Requires.NotNull(nameof(syntax), syntax);
             Requires.NotNull(nameof(returnTypeExpression), returnTypeExpression);
-            Type = (FunctionType)base.Type;
             Syntax = syntax;
             Parameters = parameters.ToReadOnlyList();
             ReturnTypeExpression = returnTypeExpression;
@@ -59,7 +57,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
                 Context.File,
                 Name,
                 Parameters.Select(p => p.Complete()),
-                ReturnType.AssertNotNull(),
+                ReturnType.AssertKnown(),
                 ControlFlow);
         }
     }

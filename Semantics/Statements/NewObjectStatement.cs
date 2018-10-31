@@ -9,10 +9,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Statements
     public class NewObjectStatement : SimpleStatement
     {
         [NotNull] public readonly LValue ResultInto;
-        [NotNull] public readonly DataType Type;
+        [NotNull] public readonly KnownType Type;
         [NotNull] public IReadOnlyList<LValue> Arguments { get; }
 
-        public NewObjectStatement([NotNull] LValue resultInto, [NotNull] DataType type, [NotNull][ItemNotNull] IEnumerable<LValue> arguments)
+        public NewObjectStatement([NotNull] LValue resultInto, [NotNull] KnownType type, [NotNull][ItemNotNull] IEnumerable<LValue> arguments)
         {
             Requires.NotNull(nameof(resultInto), resultInto);
             Requires.NotNull(nameof(type), type);

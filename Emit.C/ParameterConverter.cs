@@ -7,11 +7,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
     public class ParameterConverter : IConverter<Parameter>
     {
         [NotNull] private readonly NameMangler nameMangler;
-        [NotNull] private readonly IConverter<DataType> typeConverter;
+        [NotNull] private readonly IConverter<KnownType> typeConverter;
 
         public ParameterConverter(
             [NotNull] NameMangler nameMangler,
-            [NotNull] IConverter<DataType> typeConverter)
+            [NotNull] IConverter<KnownType> typeConverter)
         {
             this.typeConverter = typeConverter;
             this.nameMangler = nameMangler;

@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
     // but no generic arguments is *open* or *unbound*. One with generic arguments supplied
     // for all parameters is *closed* or *bound*. One with some but not all
     // arguments supplied is *partially bound*.
-    public class ObjectType : DataType
+    public class ObjectType : KnownType
     {
         [NotNull] public static readonly ObjectType Void = new ObjectType(new QualifiedName(new SimpleName("void", true)), false);
         [NotNull] public static readonly ObjectType Never = new ObjectType(new QualifiedName(new SimpleName("never", true)), false);

@@ -9,12 +9,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations
     {
         public bool MutableBinding { get; }
         [NotNull] public QualifiedName Name { get; }
-        [NotNull] public DataType Type { get; internal set; }
+        [NotNull] public KnownType Type { get; internal set; }
 
         public Parameter(
             bool mutableBinding,
             [NotNull] QualifiedName name,
-            [NotNull] DataType type)
+            [NotNull] KnownType type)
         {
             Requires.NotNull(nameof(name), name);
             Requires.NotNull(nameof(type), type);
