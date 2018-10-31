@@ -398,12 +398,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                     }
                 case LifetimeTypeAnalysis lifetimeType:
                     var type = EvaluateType(lifetimeType.TypeName, diagnostics);
+                    if (type == null) return null;
                     var lifetimeToken = lifetimeType.Syntax.Lifetime;
                     Lifetime lifetime;
                     switch (lifetimeToken)
                     {
                         case OwnedKeywordToken _:
                             lifetime = OwnedLifetime.Instance;
+                            break;
+                        case RefKeywordToken _:
+                            lifetime = RefLifetime.Instance;
                             break;
                         case IdentifierToken identifier:
                             lifetime = new NamedLifetime(identifier.Value);
