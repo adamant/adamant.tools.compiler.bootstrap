@@ -317,6 +317,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             { "explicit", typeof(ExplicitKeywordToken) },
             { "move", typeof(MoveKeywordToken) },
             { "copy", typeof(CopyKeywordToken) },
+            { "match", typeof(MatchKeywordToken) },
+            { "loop", typeof(LoopKeywordToken) },
+            { "while", typeof(WhileKeywordToken) },
+            { "break", typeof(BreakKeywordToken) },
+            { "next", typeof(NextKeywordToken) },
         }.AsReadOnly();
     }
 }

@@ -69,6 +69,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
             typeof(ExplicitKeywordToken),
             typeof(MoveKeywordToken),
             typeof(CopyKeywordToken),
+            typeof(MatchKeywordToken),
+            typeof(LoopKeywordToken),
+            typeof(WhileKeywordToken),
+            typeof(BreakKeywordToken),
+            typeof(NextKeywordToken),
         }.AsReadOnly().AssertNotNull();
     }
 
@@ -593,6 +598,51 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         {
         }
     }
+
+    public partial interface IMatchKeywordToken : IKeywordToken { }
+    public class MatchKeywordToken : KeywordToken, IMatchKeywordToken
+    {
+        public MatchKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface ILoopKeywordToken : IKeywordToken { }
+    public class LoopKeywordToken : KeywordToken, ILoopKeywordToken
+    {
+        public LoopKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface IWhileKeywordToken : IKeywordToken { }
+    public class WhileKeywordToken : KeywordToken, IWhileKeywordToken
+    {
+        public WhileKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface IBreakKeywordToken : IKeywordToken { }
+    public class BreakKeywordToken : KeywordToken, IBreakKeywordToken
+    {
+        public BreakKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface INextKeywordToken : IKeywordToken { }
+    public class NextKeywordToken : KeywordToken, INextKeywordToken
+    {
+        public NextKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
     public partial class MissingToken :
         IPublicKeywordToken,
         IProtectedKeywordToken,
@@ -652,6 +702,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         IExplicitKeywordToken,
         IMoveKeywordToken,
         ICopyKeywordToken,
+        IMatchKeywordToken,
+        ILoopKeywordToken,
+        IWhileKeywordToken,
+        IBreakKeywordToken,
+        INextKeywordToken,
         IKeywordToken // Implied, but saves issues with commas
     { }
 }

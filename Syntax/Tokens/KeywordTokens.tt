@@ -65,6 +65,11 @@
         "Explicit",
         "Move",
         "Copy",
+        "Match",
+        "Loop",
+        "While",
+        "Break",
+        "Next",
     }.AsReadOnly();
 #>
 using System;
