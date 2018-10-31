@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Adamant.Tools.Compiler.Bootstrap.API;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using Adamant.Tools.Compiler.Bootstrap.Forge.Config;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -97,12 +98,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
                 lock (consoleLock)
                 {
                     Console.WriteLine($@"Build FAILED {project.Name} ({project.Path})");
-                    foreach (var diagnostic in diagnostics
-                        .OrderBy(d => d.File.Reference.ToString())
-                        .ThenBy(d => d.StartPosition))
+                    foreach (var group in diagnostics.GroupBy(d => d.File))
                     {
-                        Console.WriteLine($@"{diagnostic.File.Reference}:{diagnostic.StartPosition.Line}:{diagnostic.StartPosition.Column} {diagnostic.Level} {diagnostic.ErrorCode}");
-                        Console.WriteLine(@"    " + diagnostic.Message);
+                        var fileDiagnostics = group.ToList();
+                        foreach (var diagnostic in fileDiagnostics.Take(10))
+                        {
+                            Console.WriteLine($@"{diagnostic.File.Reference}:{diagnostic.StartPosition.Line}:{diagnostic.StartPosition.Column} {diagnostic.Level} {diagnostic.ErrorCode}");
+                            Console.WriteLine(@"    " + diagnostic.Message);
+                        }
+
+                        if (fileDiagnostics.Count > 10)
+                        {
+                            Console.WriteLine($"{group.Key.Reference}");
+                            Console.WriteLine($"    {fileDiagnostics.Skip(10).Count(d => d.Level >= DiagnosticLevel.CompilationError)} more errors not shown.");
+                            Console.WriteLine($"    {fileDiagnostics.Skip(10).Count(d => d.Level == DiagnosticLevel.Warning)} more warnings not shown.");
+                        }
                     }
                 }
                 return package;
