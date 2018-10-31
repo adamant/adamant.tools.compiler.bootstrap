@@ -296,15 +296,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         return name;
                     }
                 case ForeachKeywordToken _:
-                    {
-                        var foreachKeyword = tokens.Expect<ForeachKeywordToken>();
-                        var varKeyword = tokens.Accept<VarKeywordToken>();
-                        var identifier = tokens.ExpectIdentifier();
-                        var inKeyword = tokens.Expect<InKeywordToken>();
-                        var expression = ParseExpression(tokens, diagnostics);
-                        var block = ParseBlock(tokens, diagnostics);
-                        return new ForeachExpressionSyntax(foreachKeyword, varKeyword, identifier, inKeyword, expression, block);
-                    }
+                    return ParseForeach(tokens, diagnostics);
+                case WhileKeywordToken _:
+                    return ParseWhile(tokens, diagnostics);
                 case UnsafeKeywordToken unsafeKeyword:
                     {
                         tokens.MoveNext();
@@ -348,6 +342,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 default:
                     throw NonExhaustiveMatchException.For(tokens.Current);
             }
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
+        private ExpressionSyntax ParseForeach(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var foreachKeyword = tokens.Expect<ForeachKeywordToken>();
+            var varKeyword = tokens.Accept<VarKeywordToken>();
+            var identifier = tokens.ExpectIdentifier();
+            var inKeyword = tokens.Expect<InKeywordToken>();
+            var expression = ParseExpression(tokens, diagnostics);
+            var block = ParseBlock(tokens, diagnostics);
+            return new ForeachExpressionSyntax(foreachKeyword, varKeyword, identifier, inKeyword, expression, block);
+        }
+
+
+        [MustUseReturnValue]
+        [NotNull]
+        private WhileExpressionSyntax ParseWhile(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var whileKeyword = tokens.Expect<WhileKeywordToken>();
+            var condition = ParseExpression(tokens, diagnostics);
+            var block = ParseBlock(tokens, diagnostics);
+            return new WhileExpressionSyntax(whileKeyword, condition, block);
         }
 
         [MustUseReturnValue]
