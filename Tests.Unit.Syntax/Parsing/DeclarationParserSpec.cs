@@ -76,12 +76,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
             var blockParser = FakeParser.ForBlocks();
             var parameterParser = FakeParser.ForParameters();
             var modifierParser = FakeParser.ForModifiers();
+            var genericsParser = FakeParser.ForGenerics();
             return new DeclarationParser(
                 listParser,
                 expressionParser,
                 blockParser,
                 parameterParser,
-                modifierParser);
+                modifierParser,
+                genericsParser);
         }
     }
 }

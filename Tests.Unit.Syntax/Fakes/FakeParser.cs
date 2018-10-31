@@ -5,6 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Parameters;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
@@ -64,6 +65,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
         public static IBlockParser ForBlocks()
         {
             return new BlockParser();
+        }
+
+        [NotNull]
+        public static IGenericsParser ForGenerics()
+        {
+            return new GenericsParser();
         }
 
         [NotNull]
@@ -170,6 +177,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
             public BlockExpressionSyntax ParseBlock([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
             {
                 return FakeParse<BlockExpressionSyntax>(tokens, diagnostics);
+            }
+        }
+
+        private class GenericsParser : IGenericsParser
+        {
+            public GenericParametersSyntax AcceptGenericParameters(
+                ITokenStream tokens,
+                IDiagnosticsCollector diagnostics)
+            {
+                return FakeParse<GenericParametersSyntax>(tokens, diagnostics);
+            }
+
+            public SyntaxList<GenericConstraintSyntax> ParseGenericConstraints(ITokenStream tokens, IDiagnosticsCollector diagnostics)
+            {
+                return SyntaxList<GenericConstraintSyntax>.Empty;
             }
         }
 

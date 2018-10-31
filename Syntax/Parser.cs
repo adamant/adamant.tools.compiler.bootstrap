@@ -16,10 +16,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         {
             var listParser = new ListParser();
             var functionBodyParser = new FunctionBodyParser(listParser);
+            var genericsParser = new GenericsParser(listParser, functionBodyParser);
             var usingDirectiveParser = new UsingDirectiveParser(functionBodyParser);
             var parameterParser = new ParameterParser(functionBodyParser);
             var accessModifierParser = new ModifierParser();
-            var declarationParser = new DeclarationParser(listParser, functionBodyParser, functionBodyParser, parameterParser, accessModifierParser);
+            var declarationParser = new DeclarationParser(listParser, functionBodyParser,
+                functionBodyParser, parameterParser, accessModifierParser, genericsParser);
             compilationUnitParser = new CompilationUnitParser(usingDirectiveParser, declarationParser, functionBodyParser);
         }
 

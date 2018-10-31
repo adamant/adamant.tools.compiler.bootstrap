@@ -13,7 +13,6 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Contracts;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Effects;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Parameters;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types.Inheritance;
@@ -31,19 +30,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         [NotNull] private readonly IBlockParser blockParser;
         [NotNull] private readonly IParameterParser parameterParser;
         [NotNull] private readonly IModifierParser modifierParser;
+        [NotNull] private readonly IGenericsParser genericsParser;
 
         public DeclarationParser(
             [NotNull] IListParser listParser,
             [NotNull] IExpressionParser expressionParser,
             [NotNull] IBlockParser blockParser,
             [NotNull] IParameterParser parameterParser,
-            [NotNull] IModifierParser modifierParser)
+            [NotNull] IModifierParser modifierParser,
+            [NotNull] IGenericsParser genericsParser)
         {
             this.listParser = listParser;
             this.expressionParser = expressionParser;
             this.blockParser = blockParser;
             this.parameterParser = parameterParser;
             this.modifierParser = modifierParser;
+            this.genericsParser = genericsParser;
         }
 
         [MustUseReturnValue]
@@ -129,33 +131,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
         [MustUseReturnValue]
         [CanBeNull]
-        private GenericParametersSyntax AcceptGenericParameters(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
-        {
-            var openBracket = tokens.Accept<OpenBracketToken>();
-            if (openBracket == null) return null;
-            var parameters = listParser.ParseSeparatedList(tokens, ParseGenericParameter,
-                TypeOf<CommaToken>(), TypeOf<CloseBracketToken>(), diagnostics);
-            var closeBracket = tokens.Expect<ICloseBracketToken>();
-            return new GenericParametersSyntax(openBracket, parameters, closeBracket);
-        }
-
-        [MustUseReturnValue]
-        [NotNull]
-        private GenericParameterSyntax ParseGenericParameter(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
-        {
-            var paramsKeyword = tokens.Accept<ParamsKeywordToken>();
-            var name = tokens.ExpectIdentifier();
-            var colon = tokens.Accept<ColonToken>();
-            var typeExpression = colon != null ? expressionParser.ParseExpression(tokens, diagnostics) : null;
-            return new GenericParameterSyntax(paramsKeyword, name, colon, typeExpression);
-        }
-
-        [MustUseReturnValue]
-        [CanBeNull]
         private BaseClassSyntax AcceptBaseClass(
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
@@ -190,13 +165,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         {
             var classKeyword = tokens.Take<ClassKeywordToken>();
             var name = tokens.ExpectIdentifier();
-            var genericParameters = AcceptGenericParameters(tokens, diagnostics);
+            var genericParameters = genericsParser.AcceptGenericParameters(tokens, diagnostics);
             var baseClass = AcceptBaseClass(tokens, diagnostics);
             var baseTypes = AcceptBaseTypes(tokens, diagnostics);
+            var genericConstraints = genericsParser.ParseGenericConstraints(tokens, diagnostics);
             var openBrace = tokens.Expect<IOpenBraceToken>();
             var members = listParser.ParseList(tokens, ParseMemberDeclaration, TypeOf<CloseBraceToken>(), diagnostics);
             var closeBrace = tokens.Expect<ICloseBraceToken>();
-            return new ClassDeclarationSyntax(modifiers, classKeyword, name, genericParameters, baseClass, baseTypes, openBrace,
+            return new ClassDeclarationSyntax(modifiers, classKeyword, name, genericParameters, baseClass, baseTypes, genericConstraints, openBrace,
                 members, closeBrace);
         }
 
@@ -209,7 +185,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         {
             var typeKeyword = tokens.Take<TypeKeywordToken>();
             var name = tokens.ExpectIdentifier();
-            var genericParameters = AcceptGenericParameters(tokens, diagnostics);
+            var genericParameters = genericsParser.AcceptGenericParameters(tokens, diagnostics);
             var baseTypes = AcceptBaseTypes(tokens, diagnostics);
             var openBrace = tokens.Expect<IOpenBraceToken>();
             var members = listParser.ParseList(tokens, ParseMemberDeclaration, TypeOf<CloseBraceToken>(), diagnostics);
@@ -228,12 +204,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         {
             var structKeyword = tokens.Take<StructKeywordToken>();
             var name = tokens.Expect<IIdentifierOrPrimitiveToken>();
-            var genericParameters = AcceptGenericParameters(tokens, diagnostics);
+            var genericParameters = genericsParser.AcceptGenericParameters(tokens, diagnostics);
             var baseTypes = AcceptBaseTypes(tokens, diagnostics);
+            var genericConstraints = genericsParser.ParseGenericConstraints(tokens, diagnostics);
             var openBrace = tokens.Expect<IOpenBraceToken>();
             var members = listParser.ParseList(tokens, ParseMemberDeclaration, TypeOf<CloseBraceToken>(), diagnostics);
             var closeBrace = tokens.Expect<ICloseBraceToken>();
-            return new StructDeclarationSyntax(modifiers, structKeyword, name, genericParameters, baseTypes, openBrace,
+            return new StructDeclarationSyntax(modifiers, structKeyword, name, genericParameters, baseTypes, genericConstraints, openBrace,
                 members, closeBrace);
         }
 
@@ -319,7 +296,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         {
             var functionKeyword = tokens.Take<FunctionKeywordToken>();
             var name = tokens.ExpectIdentifier();
-            var genericParameters = AcceptGenericParameters(tokens, diagnostics);
+            var genericParameters = genericsParser.AcceptGenericParameters(tokens, diagnostics);
             var openParen = tokens.Expect<IOpenParenToken>();
             var parameters = ParseParameterList(tokens, diagnostics);
             var closeParen = tokens.Expect<ICloseParenToken>();
@@ -341,7 +318,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         {
             var newKeyword = tokens.Take<NewKeywordToken>();
             var name = tokens.Accept<IdentifierToken>();
-            var genericParameters = AcceptGenericParameters(tokens, diagnostics);
+            var genericParameters = genericsParser.AcceptGenericParameters(tokens, diagnostics);
             var openParen = tokens.Expect<IOpenParenToken>();
             var parameters = ParseParameterList(tokens, diagnostics);
             var closeParen = tokens.Expect<ICloseParenToken>();
