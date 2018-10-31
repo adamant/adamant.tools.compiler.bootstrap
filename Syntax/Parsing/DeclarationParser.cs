@@ -103,6 +103,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     return ParseOperatorFunction(modifiers, tokens, diagnostics);
                 case NewKeywordToken _:
                     return ParseConstructor(modifiers, tokens, diagnostics);
+                case InitKeywordToken _:
+                    return ParseInitializer(modifiers, tokens, diagnostics);
                 case DeleteKeywordToken _:
                     return ParseDestructor(modifiers, tokens, diagnostics);
                 case GetKeywordToken _:
@@ -366,6 +368,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             return new ConstructorFunctionDeclarationSyntax(modifiers, newKeyword, name,
                 genericParameters, openParen, parameters, closeParen, effects, contracts, body);
         }
+
+        [MustUseReturnValue]
+        [NotNull]
+        public InitializerFunctionDeclarationSyntax ParseInitializer(
+            [NotNull] SyntaxList<ModifierSyntax> modifiers,
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var initKeyword = tokens.Take<InitKeywordToken>();
+            var name = tokens.Accept<IdentifierToken>();
+            var genericParameters = genericsParser.AcceptGenericParameters(tokens, diagnostics);
+            var openParen = tokens.Expect<IOpenParenToken>();
+            var parameters = ParseParameterList(tokens, diagnostics);
+            var closeParen = tokens.Expect<ICloseParenToken>();
+            var effects = AcceptEffects(tokens, diagnostics);
+            var contracts = ParseContracts(tokens, diagnostics);
+            var body = blockParser.ParseBlock(tokens, diagnostics);
+            return new InitializerFunctionDeclarationSyntax(modifiers, initKeyword, name,
+                genericParameters, openParen, parameters, closeParen, effects, contracts, body);
+        }
+
 
         [MustUseReturnValue]
         [NotNull]

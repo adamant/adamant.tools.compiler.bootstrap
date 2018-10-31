@@ -1,8 +1,8 @@
-using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Contracts;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Effects;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Parameters;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Blocks;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
@@ -11,42 +11,35 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
 {
-    public abstract class FunctionDeclarationSyntax : MemberDeclarationSyntax
+    public class InitializerFunctionDeclarationSyntax : FunctionDeclarationSyntax
     {
-        [NotNull] public SyntaxList<ModifierSyntax> Modifiers { get; }
-        [NotNull] public abstract IIdentifierToken Name { get; }
-        [NotNull] public IOpenParenToken OpenParen { get; }
-        [NotNull] public SeparatedListSyntax<ParameterSyntax> ParameterList { get; }
-        [NotNull] [ItemNotNull] public IEnumerable<ParameterSyntax> Parameters => ParameterList.Nodes();
-        [NotNull] public ICloseParenToken CloseParen { get; }
-        [CanBeNull] public EffectsSyntax Effects { get; }
-        [NotNull] public SyntaxList<ContractSyntax> Contracts { get; }
-        [CanBeNull] public BlockSyntax Body { get; }
-        [CanBeNull] public ISemicolonToken Semicolon { get; }
+        [NotNull] public InitKeywordToken InitKeyword { get; }
+        [CanBeNull] public override IIdentifierToken Name { get; }
+        [CanBeNull] public GenericParametersSyntax GenericParameters { get; }
 
-        protected FunctionDeclarationSyntax(
+        public InitializerFunctionDeclarationSyntax(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
+            [NotNull] InitKeywordToken initKeyword,
+            [CanBeNull] IdentifierToken name,
+            [CanBeNull] GenericParametersSyntax genericParameters,
             [NotNull] IOpenParenToken openParen,
             [NotNull] SeparatedListSyntax<ParameterSyntax> parameterList,
             [NotNull] ICloseParenToken closeParen,
             [CanBeNull] EffectsSyntax effects,
             [NotNull] SyntaxList<ContractSyntax> contracts,
-            [CanBeNull] BlockSyntax body,
-            [CanBeNull] ISemicolonToken semicolon)
+            [NotNull] BlockSyntax body)
+            : base(modifiers, openParen, parameterList, closeParen, effects, contracts, body, null)
         {
             Requires.NotNull(nameof(modifiers), modifiers);
+            Requires.NotNull(nameof(initKeyword), initKeyword);
             Requires.NotNull(nameof(openParen), openParen);
             Requires.NotNull(nameof(parameterList), parameterList);
             Requires.NotNull(nameof(closeParen), closeParen);
             Requires.NotNull(nameof(contracts), contracts);
-            Modifiers = modifiers;
-            OpenParen = openParen;
-            ParameterList = parameterList;
-            CloseParen = closeParen;
-            Effects = effects;
-            Contracts = contracts;
-            Body = body;
-            Semicolon = semicolon;
+            Requires.NotNull(nameof(body), body);
+            InitKeyword = initKeyword;
+            Name = name;
+            GenericParameters = genericParameters;
         }
     }
 }
