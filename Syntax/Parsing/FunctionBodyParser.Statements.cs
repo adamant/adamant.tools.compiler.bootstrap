@@ -8,23 +8,13 @@ using static Adamant.Tools.Compiler.Bootstrap.Framework.TypeOperations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 {
-    public class StatementParser : IParser<StatementSyntax>, IParser<BlockExpressionSyntax>
+    public partial class FunctionBodyParser : IBlockParser
     {
-        [NotNull]
-        private readonly IListParser listParser;
-
-        [NotNull]
-        private readonly IExpressionParser expressionParser;
-
-        public StatementParser([NotNull] IListParser listParser, [NotNull] IExpressionParser expressionParser)
-        {
-            this.listParser = listParser;
-            this.expressionParser = expressionParser;
-        }
-
         [MustUseReturnValue]
         [NotNull]
-        public StatementSyntax Parse([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+        public StatementSyntax ParseStatement(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
         {
             switch (tokens.Current)
             {
@@ -43,41 +33,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                             colon = tokens.Expect<IColonToken>();
                             // Need to not consume the assignment that separates the type from the initializer,
                             // hence the min operator precedence.
-                            typeExpression = expressionParser.Parse(tokens, diagnostics, OperatorPrecedence.LogicalOr);
+                            typeExpression = ParseExpression(tokens, diagnostics, OperatorPrecedence.LogicalOr);
                         }
                         EqualsToken equals = null;
                         ExpressionSyntax initializer = null;
                         if (tokens.Current is EqualsToken)
                         {
                             equals = tokens.Take<EqualsToken>();
-                            initializer = expressionParser.Parse(tokens, diagnostics);
+                            initializer = ParseExpression(tokens, diagnostics);
                         }
                         var semicolon = tokens.Expect<ISemicolonToken>();
                         return new VariableDeclarationStatementSyntax(binding, name, colon, typeExpression, equals, initializer, semicolon);
                     }
                 default:
                     {
-                        var expression = expressionParser.Parse(tokens, diagnostics);
+                        var expression = ParseExpression(tokens, diagnostics);
                         var semicolon = tokens.Expect<ISemicolonToken>();
                         return new ExpressionStatementSyntax(expression, semicolon);
                     }
             }
         }
 
+        [MustUseReturnValue]
         [NotNull]
-        BlockExpressionSyntax IParser<BlockExpressionSyntax>.Parse(
+        public BlockExpressionSyntax ParseBlock(
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
-            return ParseBlock(tokens, diagnostics);
-        }
-
-        [MustUseReturnValue]
-        [NotNull]
-        public BlockExpressionSyntax ParseBlock([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
-        {
             var openBrace = tokens.Expect<IOpenBraceToken>();
-            var statements = listParser.ParseList(tokens, Parse, TypeOf<CloseBraceToken>(), diagnostics);
+            var statements = listParser.ParseList(tokens, ParseStatement, TypeOf<CloseBraceToken>(), diagnostics);
             var closeBrace = tokens.Expect<ICloseBraceToken>();
             return new BlockExpressionSyntax(openBrace, statements, closeBrace);
         }

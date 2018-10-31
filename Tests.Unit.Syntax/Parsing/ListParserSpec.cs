@@ -167,8 +167,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
             where TTerminator : Token
         {
             var diagnostics = new DiagnosticsBuilder();
-            var expressionParser = FakeParser.For<ExpressionSyntax>();
-            var syntaxList = new ListParser().ParseList(tokens, expressionParser.Parse, TypeOf<TTerminator>(), diagnostics);
+            var expressionParser = FakeParser.ForExpressions();
+            var syntaxList = new ListParser().ParseList(tokens, expressionParser.ParseExpression, TypeOf<TTerminator>(), diagnostics);
             Assert.Empty(diagnostics.Build());
             return syntaxList;
         }
@@ -179,8 +179,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
             where TTerminator : Token
         {
             var diagnostics = new DiagnosticsBuilder();
-            var expressionParser = FakeParser.For<ExpressionSyntax>();
-            var l = new ListParser().ParseSeparatedList(tokens, expressionParser.Parse, TypeOf<TSeparator>(), TypeOf<TTerminator>(), diagnostics);
+            var expressionParser = FakeParser.ForExpressions();
+            var l = new ListParser().ParseSeparatedList(tokens, expressionParser.ParseExpression, TypeOf<TSeparator>(), TypeOf<TTerminator>(), diagnostics);
             Assert.Empty(diagnostics.Build());
             return l;
         }

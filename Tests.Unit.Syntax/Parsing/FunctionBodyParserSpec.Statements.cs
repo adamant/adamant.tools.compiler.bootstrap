@@ -2,18 +2,14 @@ using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes;
 using JetBrains.Annotations;
 using Xunit;
-using Xunit.Categories;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
 {
-    [UnitTest]
-    [Category("Parse")]
-    public class StatementParserSpec
+    public partial class FunctionBodyParserSpec
     {
         [Fact]
         public void Parse_statement_block()
@@ -29,11 +25,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         }
 
         [NotNull]
-        private static StatementSyntax ParseWithoutError([NotNull] ITokenStream tokenStream)
+        private static StatementSyntax ParseStatementWithoutError([NotNull] ITokenStream tokenStream)
         {
-            var parser = NewStatementParser();
+            var parser = NewFunctionBodyParser();
             var diagnostics = new DiagnosticsBuilder();
-            var statementSyntax = parser.Parse(tokenStream, diagnostics);
+            var statementSyntax = parser.ParseStatement(tokenStream, diagnostics);
             Assert.Empty(diagnostics.Build());
             return statementSyntax;
         }
@@ -41,19 +37,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         [NotNull]
         private static BlockExpressionSyntax ParseBlockWithoutError([NotNull] ITokenStream tokenStream)
         {
-            var parser = NewStatementParser();
+            var parser = NewFunctionBodyParser();
             var diagnostics = new DiagnosticsBuilder();
             var blockSyntax = parser.ParseBlock(tokenStream, diagnostics);
             Assert.Empty(diagnostics.Build());
             return blockSyntax;
-        }
-
-        [NotNull]
-        private static StatementParser NewStatementParser()
-        {
-            var listParser = FakeParser.ForLists();
-            var expressionParser = FakeParser.ForExpressions();
-            return new StatementParser(listParser, expressionParser);
         }
     }
 }

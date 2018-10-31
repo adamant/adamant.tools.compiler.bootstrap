@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
@@ -15,18 +14,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 
         public Parser()
         {
-            var expressionParserSource = new TaskCompletionSource<IExpressionParser>();
-            var nameParser = new QualifiedNameParser(expressionParserSource.Task);
             var listParser = new ListParser();
-            var usingDirectiveParser = new UsingDirectiveParser(nameParser);
-            StatementParser statementParser = null;
-            var expressionParser = new ExpressionParser(listParser, nameParser, () => statementParser);
-            expressionParserSource.SetResult(expressionParser);
-            var parameterParser = new ParameterParser(expressionParser);
-            statementParser = new StatementParser(listParser, expressionParser);
+            var functionBodyParser = new FunctionBodyParser(listParser);
+            var usingDirectiveParser = new UsingDirectiveParser(functionBodyParser);
+            var parameterParser = new ParameterParser(functionBodyParser);
             var accessModifierParser = new ModifierParser();
-            var declarationParser = new DeclarationParser(listParser, expressionParser, statementParser, parameterParser, accessModifierParser);
-            compilationUnitParser = new CompilationUnitParser(usingDirectiveParser, declarationParser, nameParser);
+            var declarationParser = new DeclarationParser(listParser, functionBodyParser, functionBodyParser, parameterParser, accessModifierParser);
+            compilationUnitParser = new CompilationUnitParser(usingDirectiveParser, declarationParser, functionBodyParser);
         }
 
         [MustUseReturnValue]
@@ -38,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         [MustUseReturnValue]
         public CompilationUnitSyntax Parse([NotNull] ITokenStream tokens)
         {
-            return compilationUnitParser.Parse(tokens);
+            return compilationUnitParser.ParseCompilationUnit(tokens);
         }
     }
 }

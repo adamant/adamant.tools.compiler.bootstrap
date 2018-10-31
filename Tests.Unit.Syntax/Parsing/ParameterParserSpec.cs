@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         {
             var parser = NewAccessModifierParser();
             var diagnostics = new DiagnosticsBuilder();
-            var parameterSyntax = parser.Parse(tokens, diagnostics);
+            var parameterSyntax = parser.ParseParameter(tokens, diagnostics);
             Assert.Empty(diagnostics.Build());
             return parameterSyntax;
         }
@@ -43,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         [NotNull]
         private static ParameterParser NewAccessModifierParser()
         {
-            var expressionParser = FakeParser.For<ExpressionSyntax>();
+            var expressionParser = FakeParser.ForExpressions();
             return new ParameterParser(expressionParser);
         }
     }

@@ -4,7 +4,6 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
@@ -16,14 +15,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
     /// </summary>
     public class CompilationUnitParser
     {
-        [NotNull] private readonly IParser<UsingDirectiveSyntax> usingDirectiveParser;
-        [NotNull] private readonly IParser<DeclarationSyntax> declarationParser;
-        [NotNull] private readonly IParser<NameSyntax> qualifiedNameParser;
+        [NotNull] private readonly IUsingDirectiveParser usingDirectiveParser;
+        [NotNull] private readonly IDeclarationParser declarationParser;
+        [NotNull] private readonly INameParser qualifiedNameParser;
 
         public CompilationUnitParser(
-            [NotNull] IParser<UsingDirectiveSyntax> usingDirectiveParser,
-            [NotNull] IParser<DeclarationSyntax> declarationParser,
-            [NotNull] IParser<NameSyntax> qualifiedNameParser)
+            [NotNull] IUsingDirectiveParser usingDirectiveParser,
+            [NotNull] IDeclarationParser declarationParser,
+            [NotNull] INameParser qualifiedNameParser)
         {
             this.declarationParser = declarationParser;
             this.qualifiedNameParser = qualifiedNameParser;
@@ -32,10 +31,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        public CompilationUnitSyntax Parse([NotNull] ITokenStream tokens)
+        public CompilationUnitSyntax ParseCompilationUnit([NotNull] ITokenStream tokens)
         {
             var diagnosticsBuilder = new DiagnosticsBuilder();
-            var @namespace = ParseCompilationUnitNamespace(tokens, diagnosticsBuilder);
+            var @namespace = AcceptCompilationUnitNamespace(tokens, diagnosticsBuilder);
             var usingDirectives = ParseUsingDirectives(tokens, diagnosticsBuilder).ToSyntaxList();
             var declarations = ParseDeclarations(tokens, diagnosticsBuilder).ToSyntaxList();
             var endOfFile = tokens.TakeEndOfFile();
@@ -47,12 +46,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
         [MustUseReturnValue]
         [CanBeNull]
-        private CompilationUnitNamespaceSyntax ParseCompilationUnitNamespace([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+        private CompilationUnitNamespaceSyntax AcceptCompilationUnitNamespace([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
         {
             if (!(tokens.Current is NamespaceKeywordToken)) return null;
 
             var namespaceKeyword = tokens.Expect<INamespaceKeywordToken>();
-            var name = qualifiedNameParser.Parse(tokens, diagnostics);
+            var name = qualifiedNameParser.ParseName(tokens, diagnostics);
             var semicolon = tokens.Expect<ISemicolonToken>();
             return new CompilationUnitNamespaceSyntax(namespaceKeyword, name, semicolon);
         }
@@ -63,7 +62,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         {
             while (tokens.Current is UsingKeywordToken)
             {
-                yield return usingDirectiveParser.Parse(tokens, diagnostics);
+                yield return usingDirectiveParser.ParseUsingDirective(tokens, diagnostics);
             }
         }
 
@@ -73,7 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         {
             while (!tokens.AtEndOfFile())
             {
-                yield return declarationParser.Parse(tokens, diagnostics);
+                yield return declarationParser.ParseDeclaration(tokens, diagnostics);
             }
         }
     }

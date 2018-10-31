@@ -9,20 +9,17 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes;
 using JetBrains.Annotations;
 using Xunit;
-using Xunit.Categories;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
 {
-    [UnitTest]
-    [Category("Parse")]
-    public class ExpressionParserSpec
+    public partial class FunctionBodyParserSpec
     {
         [Fact]
         public void Return_void()
         {
             var tokens = FakeTokenStream.From($"return");
 
-            var e = ParseWithoutError(tokens);
+            var e = ParseExpressionWithoutError(tokens);
 
             var r = Assert.IsType<ReturnExpressionSyntax>(e);
             Assert.Equal(tokens[0], r.ReturnKeyword);
@@ -34,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         {
             var tokens = FakeTokenStream.From($"Test$owned");
 
-            var e = ParseWithoutError(tokens);
+            var e = ParseExpressionWithoutError(tokens);
 
             var t = Assert.IsType<LifetimeTypeSyntax>(e);
             var identifierName = Assert.IsType<IdentifierNameSyntax>(t.TypeExpression);
@@ -56,7 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         {
             var tokens = FakeTokenStream.FromString(text);
 
-            var e = ParseWithoutError(tokens);
+            var e = ParseExpressionWithoutError(tokens);
 
             var p = Assert.IsType<PrimitiveTypeSyntax>(e);
             Assert.Equal(tokens[0], p.Keyword);
@@ -72,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         {
             var tokens = FakeTokenStream.FromString(text + " x");
 
-            var e = ParseWithoutError(tokens);
+            var e = ParseExpressionWithoutError(tokens);
 
             var op = Assert.IsType<UnaryOperatorExpressionSyntax>(e);
             Assert.Equal(tokens[0], op.Operator);
@@ -105,7 +102,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         {
             var tokens = FakeTokenStream.FromString("x " + text + " y");
 
-            var e = ParseWithoutError(tokens);
+            var e = ParseExpressionWithoutError(tokens);
 
             var op = Assert.IsType<BinaryOperatorExpressionSyntax>(e);
             var leftOperand = Assert.IsType<IdentifierNameSyntax>(op.LeftOperand);
@@ -116,21 +113,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         }
 
         [NotNull]
-        private static ExpressionSyntax ParseWithoutError([NotNull] ITokenStream tokens)
+        private static ExpressionSyntax ParseExpressionWithoutError([NotNull] ITokenStream tokens)
         {
-            var parser = NewExpressionParser();
+            var parser = NewFunctionBodyParser();
             var diagnostics = new DiagnosticsBuilder();
-            var expressionSyntax = parser.Parse(tokens, diagnostics);
+            var expressionSyntax = parser.ParseExpression(tokens, diagnostics);
             Assert.Empty(diagnostics.Build());
             return expressionSyntax;
         }
 
         [NotNull]
-        private static ExpressionParser NewExpressionParser()
+        private static FunctionBodyParser NewFunctionBodyParser()
         {
             var listParser = FakeParser.ForLists();
-            var qualifiedNameParser = FakeParser.For<NameSyntax>();
-            return new ExpressionParser(listParser, qualifiedNameParser, FakeParser.For<BlockExpressionSyntax>);
+            return new FunctionBodyParser(listParser);
         }
     }
 }

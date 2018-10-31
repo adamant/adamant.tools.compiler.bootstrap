@@ -1,26 +1,24 @@
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Parameters;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 using VarKeywordToken = Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens.VarKeywordToken;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 {
-    public class ParameterParser : IParser<ParameterSyntax>
+    public class ParameterParser : IParameterParser
     {
-        [NotNull]
-        private readonly IParser<ExpressionSyntax> expressionParser;
+        [NotNull] private readonly IExpressionParser expressionParser;
 
-        public ParameterParser([NotNull] IParser<ExpressionSyntax> expressionParser)
+        public ParameterParser([NotNull] IExpressionParser expressionParser)
         {
             this.expressionParser = expressionParser;
         }
 
         [MustUseReturnValue]
         [NotNull]
-        public ParameterSyntax Parse([NotNull] ITokenStream tokens, IDiagnosticsCollector diagnostics)
+        public ParameterSyntax ParseParameter([NotNull] ITokenStream tokens, IDiagnosticsCollector diagnostics)
         {
             switch (tokens.Current)
             {
@@ -38,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     var varKeyword = tokens.Accept<VarKeywordToken>();
                     var name = tokens.ExpectIdentifier();
                     var colon = tokens.Expect<IColonToken>();
-                    var typeExpression = expressionParser.Parse(tokens, diagnostics);
+                    var typeExpression = expressionParser.ParseExpression(tokens, diagnostics);
                     return new NamedParameterSyntax(paramsKeyword, varKeyword, name, colon, typeExpression);
             }
         }

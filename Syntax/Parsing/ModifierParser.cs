@@ -6,10 +6,12 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 {
-    public class ModifierParser : IParser<ModifierSyntax>
+    public class ModifierParser : IModifierParser
     {
-        [CanBeNull] // This parser needs to be able to return null
-        public ModifierSyntax Parse([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+        [CanBeNull]
+        public ModifierSyntax AcceptModifier(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
         {
             switch (tokens.Current)
             {

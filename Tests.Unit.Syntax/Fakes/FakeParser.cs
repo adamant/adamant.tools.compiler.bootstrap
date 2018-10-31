@@ -3,9 +3,12 @@ using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Parameters;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers;
@@ -27,36 +30,60 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
             return new ExpressionParser();
         }
 
-
         [NotNull]
-        public static IParser<T> For<T>()
-            where T : SyntaxNode
+        public static INameParser ForNames()
         {
-            if (typeof(T) == typeof(UsingDirectiveSyntax))
-                return (IParser<T>)new UsingDirectiveParser();
-            if (typeof(T) == typeof(ModifierSyntax))
-                return (IParser<T>)new ModifierParser();
-            return new FakeTokenParser<T>();
+            return new NameParser();
         }
 
         [NotNull]
-        public static IParser<T> Skip<T>(T value)
+        public static IDeclarationParser ForDeclarations()
+        {
+            return new DeclarationParser();
+        }
+
+        [NotNull]
+        public static IModifierParser ForModifiers()
+        {
+            return new ModifierParser();
+        }
+
+        [NotNull]
+        public static IParameterParser ForParameters()
+        {
+            return new ParameterParser();
+        }
+
+        [NotNull]
+        public static IUsingDirectiveParser ForUsingDirectives()
+        {
+            return new UsingDirectiveParser();
+        }
+
+        [NotNull]
+        public static IBlockParser ForBlocks()
+        {
+            return new BlockParser();
+        }
+
+        [NotNull]
+        public static SkipParser<T> Skip<T>(T value)
             where T : SyntaxNode
         {
             return new SkipParser<T>(value);
         }
 
-        private class FakeTokenParser<T> : IParser<T>
+        [NotNull]
+        private static T FakeParse<T>(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
             where T : SyntaxNode
         {
-            public T Parse([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
-            {
-                var fakeToken = tokens.ExpectFake();
-                return (T)fakeToken?.FakeValue ?? throw new Exception($"Expected fake '{typeof(T).Name}' not found");
-            }
+            var fakeToken = tokens.ExpectFake();
+            return (T)fakeToken?.FakeValue ?? throw new Exception($"Expected fake '{typeof(T).Name}' not found");
         }
 
-        private class SkipParser<T> : IParser<T>
+        public class SkipParser<T>
             where T : SyntaxNode
         {
             private T value;
@@ -100,32 +127,56 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
 
         private class ExpressionParser : IExpressionParser
         {
-            [NotNull]
-            private readonly FakeTokenParser<ExpressionSyntax> fakeParser = new FakeTokenParser<ExpressionSyntax>();
-
-            public ExpressionSyntax Parse(ITokenStream tokens, IDiagnosticsCollector diagnostics)
+            public ExpressionSyntax ParseExpression(ITokenStream tokens, IDiagnosticsCollector diagnostics)
             {
-                return fakeParser.Parse(tokens, diagnostics);
+                return FakeParse<ExpressionSyntax>(tokens, diagnostics);
             }
 
-            public ExpressionSyntax Parse(
+            public ExpressionSyntax ParseExpression(
                 ITokenStream tokens,
                 IDiagnosticsCollector diagnostics,
                 OperatorPrecedence minPrecedence)
             {
-                return fakeParser.Parse(tokens, diagnostics);
-            }
-
-            public SeparatedListSyntax<ArgumentSyntax> ParseArguments(ITokenStream tokens, IDiagnosticsCollector diagnostics)
-            {
-                return SeparatedListSyntax<ArgumentSyntax>.Empty;
+                return FakeParse<ExpressionSyntax>(tokens, diagnostics);
             }
         }
 
-        private class UsingDirectiveParser : IParser<UsingDirectiveSyntax>
+        private class NameParser : INameParser
+        {
+            public NameSyntax ParseName(ITokenStream tokens, IDiagnosticsCollector diagnostics)
+            {
+                return FakeParse<NameSyntax>(tokens, diagnostics);
+            }
+        }
+
+        private class DeclarationParser : IDeclarationParser
+        {
+            public DeclarationSyntax ParseDeclaration([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+            {
+                return FakeParse<DeclarationSyntax>(tokens, diagnostics);
+            }
+        }
+
+        private class ParameterParser : IParameterParser
+        {
+            public ParameterSyntax ParseParameter([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+            {
+                return FakeParse<ParameterSyntax>(tokens, diagnostics);
+            }
+        }
+
+        private class BlockParser : IBlockParser
+        {
+            public BlockExpressionSyntax ParseBlock([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+            {
+                return FakeParse<BlockExpressionSyntax>(tokens, diagnostics);
+            }
+        }
+
+        private class UsingDirectiveParser : IUsingDirectiveParser
         {
             [NotNull]
-            public UsingDirectiveSyntax Parse(
+            public UsingDirectiveSyntax ParseUsingDirective(
                 [NotNull] ITokenStream tokens,
                 IDiagnosticsCollector diagnostics)
             {
@@ -136,9 +187,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
             }
         }
 
-        private class ModifierParser : IParser<ModifierSyntax>
+        private class ModifierParser : IModifierParser
         {
-            public ModifierSyntax Parse(ITokenStream tokens, IDiagnosticsCollector diagnostics)
+            public ModifierSyntax AcceptModifier(ITokenStream tokens, IDiagnosticsCollector diagnostics)
             {
                 if (tokens.Current is FakeToken fake && fake.FakeValue is ModifierSyntax syntax)
                 {

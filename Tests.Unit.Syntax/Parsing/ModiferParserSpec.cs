@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         {
             var parser = NewAccessModifierParser();
             var diagnostics = new DiagnosticsBuilder();
-            var modifierSyntax = parser.Parse(tokenStream, diagnostics);
+            var modifierSyntax = parser.AcceptModifier(tokenStream, diagnostics);
             Assert.Empty(diagnostics.Build());
             return modifierSyntax;
         }
