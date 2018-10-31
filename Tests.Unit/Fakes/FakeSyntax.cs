@@ -10,6 +10,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Param
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types.Enums;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Blocks;
@@ -187,6 +188,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
                 Missing<IStructKeywordToken>(),
                 Identifier(name),
                 Missing<IOpenBraceToken>(),
+                new EnumVariantsSyntax(SyntaxList<EnumVariantSyntax>.Empty, null),
                 SyntaxList<MemberDeclarationSyntax>.Empty,
                 Missing<ICloseBraceToken>());
         }

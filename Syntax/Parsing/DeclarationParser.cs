@@ -16,6 +16,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Effec
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Parameters;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types.Enums;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types.Inheritance;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Blocks;
@@ -279,16 +280,44 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     var structKeyword = tokens.Expect<IStructKeywordToken>();
                     var name = tokens.ExpectIdentifier();
                     var openBrace = tokens.Expect<IOpenBraceToken>();
+                    var variants = ParseEnumVariants(tokens, diagnostics);
                     var members = listParser.ParseList(tokens, ParseMemberDeclaration, TypeOf<CloseBraceToken>(), diagnostics);
                     var closeBrace = tokens.Expect<ICloseBraceToken>();
                     return new EnumStructDeclarationSyntax(modifiers, enumKeyword, structKeyword, name,
-                        openBrace, members, closeBrace);
+                        openBrace, variants, members, closeBrace);
                 case ClassKeywordToken _:
-                    throw new NotImplementedException(
-                        "Parsing enum classes not implemented");
+                    throw new NotImplementedException("Parsing enum classes not implemented");
                 default:
                     return ParseIncompleteDeclaration(attributes, modifiers, tokens, diagnostics);
             }
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
+        private EnumVariantsSyntax ParseEnumVariants(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var variants = new List<EnumVariantSyntax>();
+            while (tokens.Current is IdentifierToken)
+                variants.Add(ParseEnumVariant(tokens, diagnostics));
+
+            ISemicolonToken semicolon = null;
+            if (!(tokens.Current is CloseBraceToken))
+                semicolon = tokens.Expect<ISemicolonToken>();
+
+            return new EnumVariantsSyntax(variants.ToSyntaxList(), semicolon);
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
+        private EnumVariantSyntax ParseEnumVariant(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var identifier = tokens.ExpectIdentifier();
+            var comma = tokens.Accept<CommaToken>();
+            return new EnumVariantSyntax(identifier, comma);
         }
         #endregion
 

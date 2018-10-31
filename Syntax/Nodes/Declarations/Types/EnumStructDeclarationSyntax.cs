@@ -1,5 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types.Enums;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens.Identifiers;
 using JetBrains.Annotations;
@@ -13,6 +14,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types
         [NotNull] public IStructKeywordToken StructKeyword { get; }
         [NotNull] public IIdentifierToken Name { get; }
         [NotNull] public IOpenBraceToken OpenBrace { get; }
+        [NotNull]
+        public EnumVariantsSyntax Variants { get; }
         [NotNull] public SyntaxList<MemberDeclarationSyntax> Members { get; }
         [NotNull] public ICloseBraceToken CloseBrace { get; }
 
@@ -22,6 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types
             [NotNull] IStructKeywordToken structKeyword,
             [NotNull] IIdentifierToken name,
             [NotNull] IOpenBraceToken openBrace,
+            [NotNull] EnumVariantsSyntax variants,
             [NotNull] SyntaxList<MemberDeclarationSyntax> members,
             [NotNull] ICloseBraceToken closeBrace)
         {
@@ -30,6 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types
             Requires.NotNull(nameof(structKeyword), structKeyword);
             Requires.NotNull(nameof(name), name);
             Requires.NotNull(nameof(openBrace), openBrace);
+            Requires.NotNull(nameof(variants), variants);
             Requires.NotNull(nameof(members), members);
             Requires.NotNull(nameof(closeBrace), closeBrace);
             Modifiers = modifiers;
@@ -37,6 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types
             StructKeyword = structKeyword;
             Name = name;
             OpenBrace = openBrace;
+            Variants = variants;
             CloseBrace = closeBrace;
             Members = members;
         }
