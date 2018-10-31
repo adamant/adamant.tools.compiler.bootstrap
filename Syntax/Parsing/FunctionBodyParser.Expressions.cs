@@ -4,6 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow.Match;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Instance;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Literals;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators;
@@ -327,7 +328,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         return new MutableTypeSyntax(mutableKeyword, referencedType);
                     }
                 case IfKeywordToken _:
-                    return ParseIfExpression(tokens, diagnostics);
+                    return ParseIf(tokens, diagnostics);
+                case MatchKeywordToken _:
+                    return ParseMatch(tokens, diagnostics);
                 case DotToken _:
                     {
                         // implicit self etc.
@@ -349,30 +352,57 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        private ExpressionSyntax ParseIfExpression(
+        private ExpressionSyntax ParseIf(
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
             var ifKeyword = tokens.Take<IfKeywordToken>();
             var condition = ParseExpression(tokens, diagnostics);
             var thenBlock = ParseExpressionBlock(tokens, diagnostics);
-            var elseClause = AcceptElseClause(tokens, diagnostics);
+            var elseClause = AcceptElse(tokens, diagnostics);
             return new IfExpressionSyntax(ifKeyword, condition, thenBlock, elseClause);
         }
 
         [CanBeNull]
-        private ElseClauseSyntax AcceptElseClause(
+        private ElseClauseSyntax AcceptElse(
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
             var elseKeyword = tokens.Accept<ElseKeywordToken>();
             if (elseKeyword == null) return null;
             var expression = tokens.Current is IfKeywordToken
-                ? ParseIfExpression(tokens, diagnostics)
+                ? ParseIf(tokens, diagnostics)
                 : ParseExpressionBlock(tokens, diagnostics);
             return new ElseClauseSyntax(elseKeyword, expression);
         }
 
+        [MustUseReturnValue]
+        [NotNull]
+        private ExpressionSyntax ParseMatch(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var matchKeyword = tokens.Take<MatchKeywordToken>();
+            var value = ParseExpression(tokens, diagnostics);
+            var openBrace = tokens.Expect<IOpenBraceToken>();
+            var arms = listParser.ParseList(tokens, ParseMatchArm, TypeOf<CloseBraceToken>(), diagnostics);
+            var closeBrace = tokens.Expect<ICloseBraceToken>();
+            return new MatchExpressionSyntax(matchKeyword, value, openBrace, arms, closeBrace);
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
+        private MatchArmSyntax ParseMatchArm(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var pattern = ParsePattern(tokens, diagnostics);
+            var expression = ParseExpressionBlock(tokens, diagnostics);
+            var comma = tokens.Accept<CommaToken>();
+            return new MatchArmSyntax(pattern, expression, comma);
+        }
+
+        [MustUseReturnValue]
         [NotNull]
         private ExpressionSyntax ParseParenthesizedExpression(
             [NotNull] ITokenStream tokens,
