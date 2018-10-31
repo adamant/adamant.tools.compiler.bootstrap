@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types.Enums;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
@@ -13,9 +14,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types
         [NotNull] public EnumKeywordToken EnumKeyword { get; }
         [NotNull] public IStructKeywordToken StructKeyword { get; }
         [NotNull] public IIdentifierToken Name { get; }
+        [CanBeNull] public GenericParametersSyntax GenericParameters { get; }
         [NotNull] public IOpenBraceToken OpenBrace { get; }
-        [NotNull]
-        public EnumVariantsSyntax Variants { get; }
+        [NotNull] public EnumVariantsSyntax Variants { get; }
         [NotNull] public SyntaxList<MemberDeclarationSyntax> Members { get; }
         [NotNull] public ICloseBraceToken CloseBrace { get; }
 
@@ -24,6 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types
             [NotNull] EnumKeywordToken enumKeyword,
             [NotNull] IStructKeywordToken structKeyword,
             [NotNull] IIdentifierToken name,
+            [CanBeNull] GenericParametersSyntax genericParameters,
             [NotNull] IOpenBraceToken openBrace,
             [NotNull] EnumVariantsSyntax variants,
             [NotNull] SyntaxList<MemberDeclarationSyntax> members,
@@ -41,6 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types
             EnumKeyword = enumKeyword;
             StructKeyword = structKeyword;
             Name = name;
+            GenericParameters = genericParameters;
             OpenBrace = openBrace;
             Variants = variants;
             CloseBrace = closeBrace;

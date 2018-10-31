@@ -51,6 +51,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             [NotNull] FunctionDeclarationAnalysis function,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
+            foreach (var parameter in function.GenericParameters)
+            {
+                if (parameter.TypeExpression == null)
+                    parameter.Type = ObjectType.Type;
+                else
+                {
+                    CheckTypeExpression(parameter.TypeExpression, diagnostics);
+                    parameter.Type = EvaluateType(parameter.TypeExpression, diagnostics);
+                }
+            }
+
             foreach (var parameter in function.Parameters)
             {
                 CheckTypeExpression(parameter.TypeExpression, function.Diagnostics);
@@ -169,6 +180,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                                 break;
                             case VariableDeclarationStatementAnalysis variableDeclaration:
                                 expression.Type = variableDeclaration.Type; // TODO how can we be sure that type is resolved?
+                                break;
+                            case GenericParameterAnalysis genericParameter:
+                                expression.Type = genericParameter.Type; // TODO how can we be sure that type is resolved?
                                 break;
                             case null:
                                 diagnostics.Publish(NameBindingError.CouldNotBindName(expression.Context.File, identifierName.Syntax.Span, name));
@@ -372,6 +386,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                             case FunctionDeclarationAnalysis _: // The name doesn't match the name of a type
                                 diagnostics.Publish(TypeError.NameRefersToFunctionNotType(typeExpression.Context.File, identifier.Syntax.Span, name));
                                 return null;
+                            case GenericParameterAnalysis genericParameter:
+                                return genericParameter.Type; // TODO how can we be sure that it has been evaluated?
                             case null: // Name not known
                                 diagnostics.Publish(NameBindingError.CouldNotBindName(typeExpression.Context.File, identifier.Syntax.Span, name));
                                 return null;

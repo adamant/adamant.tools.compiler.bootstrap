@@ -30,10 +30,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
             [NotNull] AnalysisContext context,
             [NotNull] NamedFunctionDeclarationSyntax syntax,
             [NotNull] QualifiedName name,
+            [NotNull] [ItemNotNull] IEnumerable<GenericParameterAnalysis> genericParameters,
             [NotNull] [ItemNotNull] IEnumerable<ParameterAnalysis> parameters,
             [NotNull] ExpressionAnalysis returnTypeExpression,
             [CanBeNull] [ItemNotNull] IEnumerable<StatementAnalysis> statements)
-            : base(context, syntax, name)
+            : base(context, syntax, name, genericParameters)
         {
             Requires.NotNull(nameof(syntax), syntax);
             Requires.NotNull(nameof(returnTypeExpression), returnTypeExpression);

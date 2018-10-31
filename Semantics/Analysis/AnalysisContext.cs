@@ -1,8 +1,8 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Blocks;
 using JetBrains.Annotations;
 
@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         }
 
         [NotNull]
-        public AnalysisContext InFunction([NotNull] NamedFunctionDeclarationSyntax syntax)
+        public AnalysisContext InFunctionBody([NotNull] NamedFunctionDeclarationSyntax syntax)
         {
             Requires.NotNull(nameof(syntax), syntax);
             return new AnalysisContext(File, new FunctionScope(Scope, syntax));
@@ -33,6 +33,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         {
             Requires.NotNull(nameof(syntax), syntax);
             return new AnalysisContext(File, new BlockScope(Scope, syntax));
+        }
+
+        [NotNull]
+        public AnalysisContext WithGenericParameters([NotNull] MemberDeclarationSyntax syntax)
+        {
+            return new AnalysisContext(File, new GenericsScope(Scope, syntax));
         }
     }
 }

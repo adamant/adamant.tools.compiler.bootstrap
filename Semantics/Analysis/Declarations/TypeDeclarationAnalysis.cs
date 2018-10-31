@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
@@ -16,8 +17,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
         public TypeDeclarationAnalysis(
             [NotNull] AnalysisContext context,
             [NotNull] MemberDeclarationSyntax syntax,
-            [NotNull] QualifiedName name)
-            : base(context, syntax, name)
+            [NotNull] QualifiedName name,
+            [NotNull] [ItemNotNull] IEnumerable<GenericParameterAnalysis> genericParameters)
+            : base(context, syntax, name, genericParameters)
         {
             Requires.NotNull(nameof(syntax), syntax);
             Syntax = syntax;

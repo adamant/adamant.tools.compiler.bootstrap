@@ -279,11 +279,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 case StructKeywordToken _:
                     var structKeyword = tokens.Expect<IStructKeywordToken>();
                     var name = tokens.ExpectIdentifier();
+                    var genericParameters = genericsParser.AcceptGenericParameters(tokens, diagnostics);
                     var openBrace = tokens.Expect<IOpenBraceToken>();
                     var variants = ParseEnumVariants(tokens, diagnostics);
                     var members = listParser.ParseList(tokens, ParseMemberDeclaration, TypeOf<CloseBraceToken>(), diagnostics);
                     var closeBrace = tokens.Expect<ICloseBraceToken>();
-                    return new EnumStructDeclarationSyntax(modifiers, enumKeyword, structKeyword, name,
+                    return new EnumStructDeclarationSyntax(modifiers, enumKeyword, structKeyword, name, genericParameters,
                         openBrace, variants, members, closeBrace);
                 case ClassKeywordToken _:
                     throw new NotImplementedException("Parsing enum classes not implemented");

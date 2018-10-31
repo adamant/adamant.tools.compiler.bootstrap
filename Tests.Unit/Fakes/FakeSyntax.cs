@@ -187,6 +187,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
                 new EnumKeywordToken(FakeSpan),
                 Missing<IStructKeywordToken>(),
                 Identifier(name),
+                null, // Generic Parameters
                 Missing<IOpenBraceToken>(),
                 new EnumVariantsSyntax(SyntaxList<EnumVariantSyntax>.Empty, null),
                 SyntaxList<MemberDeclarationSyntax>.Empty,

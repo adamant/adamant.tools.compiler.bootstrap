@@ -11,7 +11,6 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Blocks;
 using JetBrains.Annotations;
 
@@ -54,28 +53,46 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
             switch (scope)
             {
                 case FunctionScope functionScope:
-                    var function =
-                        (FunctionDeclarationAnalysis)declarations[functionScope.Syntax]
-                            .AssertNotNull();
-                    var variableDeclarations = new Dictionary<string, IDeclarationAnalysis>();
-                    foreach (var parameter in function.Parameters)
-                        variableDeclarations.Add(parameter.Name.Name.Text, parameter);
+                    {
+                        var function =
+                            (FunctionDeclarationAnalysis)declarations[functionScope.Syntax]
+                                .AssertNotNull();
+                        var variables = new Dictionary<string, IDeclarationAnalysis>();
+                        foreach (var parameter in function.Parameters)
+                            variables.Add(parameter.Name.Name.Text, parameter);
 
-                    foreach (var declaration in function.Statements.OfType<VariableDeclarationStatementAnalysis>())
-                            variableDeclarations.Add(declaration.Name.Name.Text, declaration);
+                        foreach (var declaration in function.Statements
+                            .OfType<VariableDeclarationStatementAnalysis>())
+                            variables.Add(declaration.Name.Name.Text, declaration);
 
-                    functionScope.Bind(variableDeclarations);
+                        functionScope.Bind(variables);
 
-                    var blocks = new Dictionary<BlockSyntax, BlockExpressionAnalysis>();
-                    GetAllBlocks(function, blocks);
-                    foreach (var nestedScope in functionScope.NestedScopes.Cast<BlockScope>())
-                        BindBlock(nestedScope, blocks);
+                        var blocks = new Dictionary<BlockSyntax, BlockExpressionAnalysis>();
+                        GetAllBlocks(function, blocks);
+                        foreach (var nestedScope in functionScope.NestedScopes.Cast<BlockScope>())
+                            BindBlock(nestedScope, blocks);
+                    }
                     break;
                 case NamespaceScope namespaceScope:
-                    // TODO bind correct names in the namespace
-                    namespaceScope.Bind(new Dictionary<string, IDeclarationAnalysis>());
-                    foreach (var nestedScope in namespaceScope.NestedScopes)
-                        BindDeclaration(nestedScope);
+                    {
+                        // TODO bind correct names in the namespace
+                        namespaceScope.Bind(new Dictionary<string, IDeclarationAnalysis>());
+                        foreach (var nestedScope in namespaceScope.NestedScopes)
+                            BindDeclaration(nestedScope);
+                    }
+                    break;
+                case GenericsScope genericsScope:
+                    {
+                        var declaration = declarations[genericsScope.Syntax].AssertNotNull();
+                        var parameters = new Dictionary<string, IDeclarationAnalysis>();
+                        foreach (var parameter in declaration.GenericParameters)
+                            parameters.Add(parameter.Name.Name.Text, parameter);
+
+                        genericsScope.Bind(parameters);
+
+                        foreach (var nestedScope in genericsScope.NestedScopes)
+                            BindDeclaration(nestedScope);
+                    }
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(scope);

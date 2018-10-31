@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             StatementAnalysisBuilder statementBuilder = null;
             var expressionBuilder = new ExpressionAnalysisBuilder(() => statementBuilder);
             statementBuilder = new StatementAnalysisBuilder(expressionBuilder);
-            var declarationBuilder = new DeclarationAnalysisBuilder(nameBuilder, expressionBuilder, statementBuilder);
+            var declarationBuilder = new DeclarationAnalysisBuilder(expressionBuilder, statementBuilder);
             compilationUnitAnalysisBuilder = new CompilationUnitAnalysisBuilder(nameBuilder, declarationBuilder);
         }
 

@@ -65,7 +65,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics
             var nameBuilder = new NameBuilder();
             var expressionBuilder = new FakeExpressionAnalysisBuilder();
             var statementBuilder = new FakeStatementAnalysisBuilder();
-            var declarationBuilder = new DeclarationAnalysisBuilder(nameBuilder, expressionBuilder, statementBuilder);
+            var declarationBuilder = new DeclarationAnalysisBuilder(expressionBuilder, statementBuilder);
             var context = new AnalysisContext("".ToFakeCodeFile(), new FakeLexicalScope());
             return declarationBuilder.Build(context, @namespace ?? GlobalNamespaceName.Instance, declaration);
         }

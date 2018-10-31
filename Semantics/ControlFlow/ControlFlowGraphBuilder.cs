@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         {
             Requires.NotNull(nameof(functions), functions);
 
-            foreach (var function in functions.Where(f => !f.Diagnostics.Any()))
+            foreach (var function in functions.Where(f => !f.Diagnostics.Any() && f.Syntax.Body != null))
                 BuildGraph(function);
         }
 
