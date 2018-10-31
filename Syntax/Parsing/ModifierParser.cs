@@ -21,6 +21,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 case ExtendKeywordToken extendKeyword:
                     tokens.MoveNext();
                     return new ExtendModifierSyntax(extendKeyword);
+                case SafeKeywordToken safeKeyword:
+                    tokens.MoveNext();
+                    return new SafeModifierSyntax(safeKeyword);
                 case UnsafeKeywordToken unsafeKeyword:
                     tokens.MoveNext();
                     return new UnsafeModifierSyntax(unsafeKeyword);
