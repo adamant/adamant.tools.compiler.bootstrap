@@ -9,6 +9,9 @@
     {
         "Dot", // `.` U+002E
         "DotDot", // `..` U+002E, U+002E
+        "LessThanDotDot", // `<..` U+003C, U+002E, U+002E
+        "DotDotLessThan", // `..<` U+002E, U+002E, U+003C
+        "LessThanDotDotLessThan", // `<..<` U+002E, U+002E, U+003C
         "AtSign", // `@` U+0040 (named at sign to distinguish it from the word "at")
         "Caret", // `^` U+005E
         "CaretDot", // `^.` U+005E, U+002E

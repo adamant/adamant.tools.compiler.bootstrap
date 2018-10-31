@@ -20,6 +20,33 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
+    public partial interface ILessThanDotDotToken : IOperatorToken { }
+    public class LessThanDotDotToken : OperatorToken, ILessThanDotDotToken
+    {
+        public LessThanDotDotToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface IDotDotLessThanToken : IOperatorToken { }
+    public class DotDotLessThanToken : OperatorToken, IDotDotLessThanToken
+    {
+        public DotDotLessThanToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface ILessThanDotDotLessThanToken : IOperatorToken { }
+    public class LessThanDotDotLessThanToken : OperatorToken, ILessThanDotDotLessThanToken
+    {
+        public LessThanDotDotLessThanToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
     public partial interface IAtSignToken : IOperatorToken { }
     public class AtSignToken : OperatorToken, IAtSignToken
     {
@@ -275,6 +302,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
     public partial class MissingToken :
         IDotToken,
         IDotDotToken,
+        ILessThanDotDotToken,
+        IDotDotLessThanToken,
+        ILessThanDotDotLessThanToken,
         IAtSignToken,
         ICaretToken,
         ICaretDotToken,

@@ -107,7 +107,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                             continue;
                         }
                         break;
-                    case DotDotToken _:
+                    case DotDotToken _: // Should this have a different precedence because it is the "accept" operator?
+                    case LessThanDotDotToken _:
+                    case DotDotLessThanToken _:
+                    case LessThanDotDotLessThanToken _:
                         if (minPrecedence <= OperatorPrecedence.Range)
                         {
                             precedence = OperatorPrecedence.Range;

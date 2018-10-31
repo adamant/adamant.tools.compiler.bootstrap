@@ -56,8 +56,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     case '.':
                         if (NextCharIs('.'))
                         {
-                            // it is `..`
-                            yield return new DotDotToken(SymbolSpan(2));
+                            if (CharAtIs(2, '<'))
+                                // it is `..<`
+                                yield return new DotDotLessThanToken(SymbolSpan(3));
+                            else
+                                // it is `..`
+                                yield return new DotDotToken(SymbolSpan(2));
                         }
                         else
                             yield return new DotToken(SymbolSpan());
@@ -281,6 +285,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                             case ':':
                                 // it is `<:`
                                 yield return new LessThanColonToken(SymbolSpan(2));
+                                break;
+                            case '.':
+                                if (CharAtIs(2, '.'))
+                                {
+                                    if (CharAtIs(3, '<'))
+                                        // it is `<..<`
+                                        yield return new LessThanDotDotLessThanToken(SymbolSpan(4));
+                                    else
+                                        // it is `<..`
+                                        yield return new LessThanDotDotToken(SymbolSpan(3));
+                                }
+                                else
+                                    goto default;
                                 break;
                             default:
                                 // it is `<`

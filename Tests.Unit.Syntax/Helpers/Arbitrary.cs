@@ -73,7 +73,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
                 case ">":
                     return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=";
                 case "<":
-                    return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == ":";
+                    return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == ":"
+                        || t2.Text == ".." || t2.Text == "..<";
                 case "-":
                     return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == ">" || t2.Text == ">=";
                 case "/":
@@ -86,14 +87,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
                         || t2.Text == ">" || t2.Text == ">=";
                 case "$":
                     return t2.Text == ">" || t2.Text == ">="
-                        || t2.Text == "<" || t2.Text == "<="
-                        || t2.Text == "<:";
+                        || t2.Text == "<" || t2.Text == "<=" || t2.Text == "<:" || t2.Text == "<.." || t2.Text == "<..<";
                 case "$>":
                 case "$<":
                     return t2.Text == "≠" || t2.Text == "/=";
                 case "?":
                     return t2.Text == "." || t2.Text == ".."
                         || t2.Text == "?" || t2.Text == "?." || t2.Text == "??";
+                case "..":
+                    return t2.Text == "<" || t2.Text == "<=" || t2.Text == "<:" || t2.Text == "<.." || t2.Text == "<..<";
                 default:
                     if (typeof(KeywordToken).IsAssignableFrom(t1.TokenType)
                         || typeof(IdentifierToken).IsAssignableFrom(t1.TokenType)
@@ -217,6 +219,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             { ",", typeof(CommaToken) },
             { ".", typeof(DotToken) },
             { "..", typeof(DotDotToken) },
+            { "<..", typeof(LessThanDotDotToken) },
+            { "..<", typeof(DotDotLessThanToken) },
+            { "<..<", typeof(LessThanDotDotLessThanToken) },
             { ":", typeof(ColonToken) },
             { "<:", typeof(LessThanColonToken) },
             { "?", typeof(QuestionToken) },
