@@ -9,13 +9,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow
     {
         [NotNull] public IfKeywordToken IfKeyword { get; }
         [NotNull] public ExpressionSyntax Condition { get; }
-        [NotNull] public BlockExpressionSyntax ThenBlock { get; }
+        [NotNull] public BlockSyntax ThenBlock { get; }
         [CanBeNull] public ElseClauseSyntax ElseClause { get; }
 
         public IfExpressionSyntax(
             [NotNull] IfKeywordToken ifKeyword,
             [NotNull] ExpressionSyntax condition,
-            [NotNull] BlockExpressionSyntax thenBlock,
+            [NotNull] BlockSyntax thenBlock,
             [CanBeNull] ElseClauseSyntax elseClause)
             : base(TextSpan.Covering(ifKeyword.Span, thenBlock.Span, elseClause?.Span))
         {

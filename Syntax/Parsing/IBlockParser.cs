@@ -7,9 +7,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 {
     public interface IBlockParser
     {
+        [MustUseReturnValue]
+        [CanBeNull]
+        BlockSyntax AcceptBlock(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics);
+
         [NotNull]
         [MustUseReturnValue]
-        BlockExpressionSyntax ParseBlock(
+        BlockSyntax ParseBlock(
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics);
     }

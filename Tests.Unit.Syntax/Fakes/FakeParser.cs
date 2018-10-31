@@ -174,9 +174,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
 
         private class BlockParser : IBlockParser
         {
-            public BlockExpressionSyntax ParseBlock([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+            public BlockSyntax AcceptBlock(ITokenStream tokens, IDiagnosticsCollector diagnostics)
             {
-                return FakeParse<BlockExpressionSyntax>(tokens, diagnostics);
+                return FakeParse<BlockSyntax>(tokens, diagnostics);
+            }
+
+            public BlockSyntax ParseBlock([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+            {
+                return FakeParse<BlockSyntax>(tokens, diagnostics);
             }
         }
 

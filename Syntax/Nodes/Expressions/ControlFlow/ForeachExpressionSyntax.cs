@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow
         [NotNull] public IIdentifierToken Identifier { get; }
         [NotNull] public IInKeywordToken InKeyword { get; }
         [NotNull] public ExpressionSyntax InExpression { get; }
-        [NotNull] public BlockExpressionSyntax Block { get; }
+        [NotNull] public BlockSyntax Block { get; }
 
         public ForeachExpressionSyntax(
             [NotNull] ForeachKeywordToken foreachKeyword,
@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow
             [NotNull] IIdentifierToken identifier,
             [NotNull] IInKeywordToken inKeyword,
             [NotNull] ExpressionSyntax inExpression,
-            [NotNull] BlockExpressionSyntax block)
+            [NotNull] BlockSyntax block)
             : base(TextSpan.Covering(foreachKeyword.Span, block.Span))
         {
             Requires.NotNull(nameof(foreachKeyword), foreachKeyword);

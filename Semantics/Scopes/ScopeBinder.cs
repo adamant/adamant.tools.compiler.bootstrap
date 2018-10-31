@@ -59,13 +59,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
                     var variableDeclarations = new Dictionary<string, IDeclarationAnalysis>();
                     foreach (var parameter in function.Parameters)
                         variableDeclarations.Add(parameter.Name.Name.Text, parameter);
-                    foreach (var declaration in function.Statements
-                        .OfType<VariableDeclarationStatementAnalysis>())
-                        variableDeclarations.Add(declaration.Name.Name.Text, declaration);
+
+                    foreach (var declaration in function.Statements.OfType<VariableDeclarationStatementAnalysis>())
+                            variableDeclarations.Add(declaration.Name.Name.Text, declaration);
 
                     functionScope.Bind(variableDeclarations);
 
-                    var blocks = new Dictionary<BlockExpressionSyntax, BlockExpressionAnalysis>();
+                    var blocks = new Dictionary<BlockSyntax, BlockExpressionAnalysis>();
                     GetAllBlocks(function, blocks);
                     foreach (var nestedScope in functionScope.NestedScopes.Cast<BlockScope>())
                         BindBlock(nestedScope, blocks);
@@ -83,7 +83,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 
         private void GetAllBlocks(
             [NotNull] FunctionDeclarationAnalysis function,
-            [NotNull] Dictionary<BlockExpressionSyntax, BlockExpressionAnalysis> blocks)
+            [NotNull] Dictionary<BlockSyntax, BlockExpressionAnalysis> blocks)
         {
             foreach (var statement in function.Statements)
                 switch (statement)
@@ -102,7 +102,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 
         private void GetAllBlocks(
             [NotNull] ExpressionAnalysis expression,
-            [NotNull] Dictionary<BlockExpressionSyntax, BlockExpressionAnalysis> blocks)
+            [NotNull] Dictionary<BlockSyntax, BlockExpressionAnalysis> blocks)
         {
             switch (expression)
             {
@@ -157,7 +157,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 
         private void BindBlock(
             [NotNull] BlockScope scope,
-            [NotNull] Dictionary<BlockExpressionSyntax, BlockExpressionAnalysis> blocks)
+            [NotNull] Dictionary<BlockSyntax, BlockExpressionAnalysis> blocks)
         {
             Requires.NotNull(nameof(scope), scope);
             Requires.NotNull(nameof(blocks), blocks);

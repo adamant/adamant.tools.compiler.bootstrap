@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         }
 
         [NotNull]
-        private static BlockExpressionSyntax ParseBlockWithoutError([NotNull] ITokenStream tokenStream)
+        private static BlockSyntax ParseBlockWithoutError([NotNull] ITokenStream tokenStream)
         {
             var parser = NewFunctionBodyParser();
             var diagnostics = new DiagnosticsBuilder();

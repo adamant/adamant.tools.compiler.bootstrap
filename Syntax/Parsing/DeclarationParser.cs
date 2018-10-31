@@ -287,6 +287,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         #endregion
 
         #region Parse Functions
+        private (BlockSyntax, ISemicolonToken) ParseFunctionBody(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var body = blockParser.AcceptBlock(tokens, diagnostics);
+            ISemicolonToken semicolon = null;
+            if (body == null)
+                semicolon = tokens.Expect<ISemicolonToken>();
+            return (body, semicolon);
+        }
+
         [MustUseReturnValue]
         [NotNull]
         public NamedFunctionDeclarationSyntax ParseNamedFunction(
@@ -304,9 +315,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             var returnTypeExpression = expressionParser.ParseExpression(tokens, diagnostics);
             var effects = AcceptEffects(tokens, diagnostics);
             var contracts = ParseContracts(tokens, diagnostics);
-            var body = blockParser.ParseBlock(tokens, diagnostics);
+            var (body, semicolon) = ParseFunctionBody(tokens, diagnostics);
             return new NamedFunctionDeclarationSyntax(modifiers, functionKeyword, name, genericParameters,
-                openParen, parameters, closeParen, arrow, returnTypeExpression, effects, contracts, body);
+                openParen, parameters, closeParen, arrow, returnTypeExpression, effects, contracts, body, semicolon);
         }
 
         [MustUseReturnValue]
@@ -345,9 +356,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             var returnTypeExpression = expressionParser.ParseExpression(tokens, diagnostics);
             var effects = AcceptEffects(tokens, diagnostics);
             var contracts = ParseContracts(tokens, diagnostics);
-            var body = blockParser.ParseBlock(tokens, diagnostics);
+            var (body, semicolon) = ParseFunctionBody(tokens, diagnostics);
             return new GetterFunctionDeclarationSyntax(modifiers, getKeyword, name,
-                openParen, parameters, closeParen, arrow, returnTypeExpression, effects, contracts, body);
+                openParen, parameters, closeParen, arrow, returnTypeExpression, effects, contracts, body, semicolon);
         }
 
         [MustUseReturnValue]
@@ -366,9 +377,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             var returnTypeExpression = expressionParser.ParseExpression(tokens, diagnostics);
             var effects = AcceptEffects(tokens, diagnostics);
             var contracts = ParseContracts(tokens, diagnostics);
-            var body = blockParser.ParseBlock(tokens, diagnostics);
+            var (body, semicolon) = ParseFunctionBody(tokens, diagnostics);
             return new SetterFunctionDeclarationSyntax(modifiers, setKeyword, name,
-                openParen, parameters, closeParen, arrow, returnTypeExpression, effects, contracts, body);
+                openParen, parameters, closeParen, arrow, returnTypeExpression, effects, contracts, body, semicolon);
         }
 
         [MustUseReturnValue]

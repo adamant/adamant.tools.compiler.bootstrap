@@ -31,8 +31,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
             [NotNull] ExpressionSyntax returnTypeExpression,
             [CanBeNull] EffectsSyntax effects,
             [NotNull] SyntaxList<ContractSyntax> contracts,
-            [NotNull] BlockExpressionSyntax body)
-            : base(modifiers, openParen, parameterList, closeParen, effects, contracts, body)
+            [CanBeNull] BlockSyntax body,
+            [CanBeNull] ISemicolonToken semicolon)
+            : base(modifiers, openParen, parameterList, closeParen, effects, contracts, body, semicolon)
         {
             Requires.NotNull(nameof(modifiers), modifiers);
             Requires.NotNull(nameof(functionKeyword), functionKeyword);
@@ -42,7 +43,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
             Requires.NotNull(nameof(closeParen), closeParen);
             Requires.NotNull(nameof(arrow), arrow);
             Requires.NotNull(nameof(returnTypeExpression), returnTypeExpression);
-            Requires.NotNull(nameof(body), body);
             FunctionKeyword = functionKeyword;
             Name = name;
             GenericParameters = genericParameters;

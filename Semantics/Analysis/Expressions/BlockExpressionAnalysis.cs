@@ -8,12 +8,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions
 {
     public class BlockExpressionAnalysis : ExpressionAnalysis
     {
-        [NotNull] public new BlockExpressionSyntax Syntax { get; }
+        [NotNull] public new BlockSyntax Syntax { get; }
         [NotNull] [ItemNotNull] public IReadOnlyList<StatementAnalysis> Statements { get; }
 
         public BlockExpressionAnalysis(
             [NotNull] AnalysisContext context,
-            [NotNull] BlockExpressionSyntax syntax,
+            [NotNull] BlockSyntax syntax,
             [NotNull] [ItemNotNull] IEnumerable<StatementAnalysis> statements)
             : base(context, syntax)
         {

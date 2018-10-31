@@ -6,13 +6,13 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
 {
-    public class BlockExpressionSyntax : ExpressionSyntax
+    public class BlockSyntax : ExpressionSyntax
     {
         [NotNull] public IOpenBraceToken OpenBrace { get; }
         [NotNull] [ItemNotNull] public SyntaxList<StatementSyntax> Statements { get; }
         [NotNull] public ICloseBraceToken CloseBrace { get; }
 
-        public BlockExpressionSyntax(
+        public BlockSyntax(
             [NotNull] IOpenBraceToken openBrace,
             [NotNull][ItemNotNull] SyntaxList<StatementSyntax> statements,
             [NotNull] ICloseBraceToken closeBrace)

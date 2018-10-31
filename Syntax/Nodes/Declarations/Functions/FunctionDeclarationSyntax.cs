@@ -13,14 +13,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
     public abstract class FunctionDeclarationSyntax : MemberDeclarationSyntax
     {
         [NotNull] public SyntaxList<ModifierSyntax> Modifiers { get; }
+        [NotNull] public abstract IIdentifierToken Name { get; }
         [NotNull] public IOpenParenToken OpenParen { get; }
         [NotNull] public SeparatedListSyntax<ParameterSyntax> ParameterList { get; }
         [NotNull] [ItemNotNull] public IEnumerable<ParameterSyntax> Parameters => ParameterList.Nodes();
         [NotNull] public ICloseParenToken CloseParen { get; }
         [CanBeNull] public EffectsSyntax Effects { get; }
         [NotNull] public SyntaxList<ContractSyntax> Contracts { get; }
-        [NotNull] public BlockExpressionSyntax Body { get; }
-        [NotNull] public abstract IIdentifierToken Name { get; }
+        [CanBeNull] public BlockSyntax Body { get; }
+        [CanBeNull] public ISemicolonToken Semicolon { get; }
 
         protected FunctionDeclarationSyntax(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
@@ -29,14 +30,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
             [NotNull] ICloseParenToken closeParen,
             [CanBeNull] EffectsSyntax effects,
             [NotNull] SyntaxList<ContractSyntax> contracts,
-            [NotNull] BlockExpressionSyntax body)
+            [CanBeNull] BlockSyntax body,
+            [CanBeNull] ISemicolonToken semicolon)
         {
             Requires.NotNull(nameof(modifiers), modifiers);
             Requires.NotNull(nameof(openParen), openParen);
             Requires.NotNull(nameof(parameterList), parameterList);
             Requires.NotNull(nameof(closeParen), closeParen);
             Requires.NotNull(nameof(contracts), contracts);
-            Requires.NotNull(nameof(body), body);
             Modifiers = modifiers;
             OpenParen = openParen;
             ParameterList = parameterList;
@@ -44,6 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
             Effects = effects;
             Contracts = contracts;
             Body = body;
+            Semicolon = semicolon;
         }
     }
 }

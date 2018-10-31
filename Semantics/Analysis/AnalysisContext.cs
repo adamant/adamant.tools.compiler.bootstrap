@@ -28,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         }
 
         [NotNull]
-        public AnalysisContext InBlock([NotNull] BlockExpressionSyntax syntax)
+        public AnalysisContext InBlock([NotNull] BlockSyntax syntax)
         {
             Requires.NotNull(nameof(syntax), syntax);
             return new AnalysisContext(File, new BlockScope(Scope, syntax));

@@ -78,7 +78,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                 case LifetimeTypeSyntax lifetimeType:
                     var typeName = Build(context, functionName, lifetimeType.TypeExpression);
                     return new LifetimeTypeAnalysis(context, lifetimeType, typeName);
-                case BlockExpressionSyntax blockExpression:
+                case BlockSyntax blockExpression:
                     return BuildBlock(context, functionName, blockExpression);
                 case NewObjectExpressionSyntax newObjectExpression:
                     return new NewObjectExpressionAnalysis(context, newObjectExpression,
@@ -120,11 +120,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         private BlockExpressionAnalysis BuildBlock(
             [NotNull] AnalysisContext context,
             [NotNull] QualifiedName functionName,
-            [NotNull] BlockExpressionSyntax blockExpression)
+            [NotNull] BlockSyntax block)
         {
-            var blockContext = context.InBlock(blockExpression);
-            return new BlockExpressionAnalysis(context, blockExpression,
-                blockExpression.Statements.Select(
+            var blockContext = context.InBlock(block);
+            return new BlockExpressionAnalysis(context, block,
+                block.Statements.Select(
                     s => StatementBuilder.Build(blockContext, functionName, s)));
         }
 

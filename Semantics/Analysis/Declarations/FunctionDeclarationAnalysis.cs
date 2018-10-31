@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
             [NotNull] QualifiedName name,
             [NotNull] [ItemNotNull] IEnumerable<ParameterAnalysis> parameters,
             [NotNull] ExpressionAnalysis returnTypeExpression,
-            [NotNull] [ItemNotNull] IEnumerable<StatementAnalysis> statements)
+            [CanBeNull] [ItemNotNull] IEnumerable<StatementAnalysis> statements)
             : base(context, syntax, name)
         {
             Requires.NotNull(nameof(syntax), syntax);
@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
             Syntax = syntax;
             Parameters = parameters.ToReadOnlyList();
             ReturnTypeExpression = returnTypeExpression;
-            Statements = statements.ToReadOnlyList();
+            Statements = (statements ?? Enumerable.Empty<StatementAnalysis>()).ToReadOnlyList();
         }
 
         [CanBeNull]

@@ -55,15 +55,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         }
 
         [MustUseReturnValue]
+        [CanBeNull]
+        public BlockSyntax AcceptBlock(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var openBrace = tokens.Accept<OpenBraceToken>();
+            if (openBrace == null) return null;
+            var statements = listParser.ParseList(tokens, ParseStatement, TypeOf<CloseBraceToken>(), diagnostics);
+            var closeBrace = tokens.Expect<ICloseBraceToken>();
+            return new BlockSyntax(openBrace, statements, closeBrace);
+        }
+
+        [MustUseReturnValue]
         [NotNull]
-        public BlockExpressionSyntax ParseBlock(
+        public BlockSyntax ParseBlock(
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
             var openBrace = tokens.Expect<IOpenBraceToken>();
             var statements = listParser.ParseList(tokens, ParseStatement, TypeOf<CloseBraceToken>(), diagnostics);
             var closeBrace = tokens.Expect<ICloseBraceToken>();
-            return new BlockExpressionSyntax(openBrace, statements, closeBrace);
+            return new BlockSyntax(openBrace, statements, closeBrace);
         }
     }
 }

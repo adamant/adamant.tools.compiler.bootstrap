@@ -5,11 +5,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 {
     public class BlockScope : NestedScope
     {
-        [NotNull] public new BlockExpressionSyntax Syntax { get; }
+        [NotNull] public new BlockSyntax Syntax { get; }
 
         public BlockScope(
             [NotNull] LexicalScope containingScope,
-            [NotNull] BlockExpressionSyntax syntax)
+            [NotNull] BlockSyntax syntax)
             : base(containingScope, syntax)
         {
             Syntax = syntax;

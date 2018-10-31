@@ -26,14 +26,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
             [NotNull] ICloseParenToken closeParen,
             [CanBeNull] EffectsSyntax effects,
             [NotNull] SyntaxList<ContractSyntax> contracts,
-            [NotNull] BlockExpressionSyntax body)
-            : base(modifiers, openParen, parameterList, closeParen, effects, contracts, body)
+            [NotNull] BlockSyntax body)
+            : base(modifiers, openParen, parameterList, closeParen, effects, contracts, body, null)
         {
             Requires.NotNull(nameof(modifiers), modifiers);
             Requires.NotNull(nameof(newKeyword), newKeyword);
             Requires.NotNull(nameof(openParen), openParen);
             Requires.NotNull(nameof(parameterList), parameterList);
             Requires.NotNull(nameof(closeParen), closeParen);
+            Requires.NotNull(nameof(contracts), contracts);
             Requires.NotNull(nameof(body), body);
             NewKeyword = newKeyword;
             Name = name;

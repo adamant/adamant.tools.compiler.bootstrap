@@ -69,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                 context, syntax, fullName,
                 syntax.Parameters.Select(p => BuildParameter(context, fullName, p)),
                 expressionBuilder.Build(context, fullName, syntax.ReturnTypeExpression),
-                syntax.Body.Statements.Select(statementSyntax => statementBuilder.Build(bodyContext, fullName, statementSyntax)));
+                syntax.Body?.Statements.Select(statementSyntax => statementBuilder.Build(bodyContext, fullName, statementSyntax)));
         }
 
         private ParameterAnalysis BuildParameter(

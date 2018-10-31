@@ -7,6 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Contracts;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Parameters;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
@@ -37,9 +38,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         }
 
         [NotNull]
-        public static BlockExpressionSyntax Block()
+        public static BlockSyntax Block()
         {
-            return new BlockExpressionSyntax(Missing<IOpenBraceToken>(), List<StatementSyntax>(), Missing<ICloseBraceToken>());
+            return new BlockSyntax(Missing<IOpenBraceToken>(), List<StatementSyntax>(), Missing<ICloseBraceToken>());
         }
 
         [NotNull]
@@ -164,7 +165,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
                 Expression(),
                 null, // Effects
                 SyntaxList<ContractSyntax>.Empty,
-                Block());
+                Block(),
+                null); // Semicolon
         }
 
 
@@ -185,6 +187,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
                 Missing<IOpenBraceToken>(),
                 SyntaxList<MemberDeclarationSyntax>.Empty,
                 Missing<ICloseBraceToken>());
+        }
+
+        [NotNull]
+        public static GenericParametersSyntax GenericParameters()
+        {
+            return new GenericParametersSyntax(
+                Missing<IOpenBracketToken>(),
+                SeparatedListSyntax<GenericParameterSyntax>.Empty,
+                Missing<ICloseBracketToken>());
         }
     }
 }
