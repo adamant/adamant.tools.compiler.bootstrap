@@ -25,12 +25,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             {
                 case VariableDeclarationStatementSyntax variableDeclaration:
                     var name = functionName.Qualify(variableDeclaration.Name.Value ?? "_");
-                    var type = variableDeclaration.TypeExpression != null ? expressionBuilder.Build(context, functionName, variableDeclaration.TypeExpression) : null;
-                    var initializer = variableDeclaration.Initializer != null ? expressionBuilder.Build(context, functionName, variableDeclaration.Initializer) : null;
+                    var type = variableDeclaration.TypeExpression != null ? expressionBuilder.BuildExpression(context, functionName, variableDeclaration.TypeExpression) : null;
+                    var initializer = variableDeclaration.Initializer != null ? expressionBuilder.BuildExpression(context, functionName, variableDeclaration.Initializer) : null;
                     return new VariableDeclarationStatementAnalysis(context, variableDeclaration, name, type, initializer);
                 case ExpressionStatementSyntax expressionStatement:
                     // TODO that isn't the right scope I don't think
-                    return new ExpressionStatementAnalysis(context, expressionStatement, expressionBuilder.Build(context, functionName, expressionStatement.Expression));
+                    return new ExpressionStatementAnalysis(context, expressionStatement, expressionBuilder.BuildExpression(context, functionName, expressionStatement.Expression));
                 default:
                     throw NonExhaustiveMatchException.For(statement);
             }

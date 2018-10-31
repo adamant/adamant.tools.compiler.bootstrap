@@ -49,6 +49,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
         }
 
         [NotNull]
+        public static Diagnostic MustBeABoolExpression([NotNull] CodeFile file, TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3005, "Expression must be of type `bool`");
+        }
+
+        [NotNull]
         public static Diagnostic NotImplemented([NotNull] CodeFile file, TextSpan span, string message)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3000, message);

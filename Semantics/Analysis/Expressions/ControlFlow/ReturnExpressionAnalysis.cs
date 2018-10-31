@@ -5,6 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Contro
 {
     public class ReturnExpressionAnalysis : ExpressionAnalysis
     {
+        [NotNull] public new ReturnExpressionSyntax Syntax { get; }
         [CanBeNull] public ExpressionAnalysis ReturnExpression { get; }
 
         public ReturnExpressionAnalysis(
@@ -13,6 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Contro
             [CanBeNull] ExpressionAnalysis returnExpression)
             : base(context, syntax)
         {
+            Syntax = syntax;
             ReturnExpression = returnExpression;
         }
     }

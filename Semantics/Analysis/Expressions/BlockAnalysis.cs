@@ -7,12 +7,12 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions
 {
-    public class BlockExpressionAnalysis : ExpressionAnalysis
+    public class BlockAnalysis : ExpressionAnalysis
     {
         [NotNull] public new BlockSyntax Syntax { get; }
         [NotNull] [ItemNotNull] public IReadOnlyList<StatementAnalysis> Statements { get; }
 
-        public BlockExpressionAnalysis(
+        public BlockAnalysis(
             [NotNull] AnalysisContext context,
             [NotNull] BlockSyntax syntax,
             [NotNull] [ItemNotNull] IEnumerable<StatementAnalysis> statements)

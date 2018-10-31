@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Fakes
     public class FakeExpressionAnalysisBuilder : IExpressionAnalysisBuilder
     {
         [NotNull]
-        public ExpressionAnalysis Build(
+        public ExpressionAnalysis BuildExpression(
             [NotNull] AnalysisContext context,
             [NotNull] QualifiedName functionName,
             [NotNull] ExpressionSyntax expression)

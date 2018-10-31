@@ -8,13 +8,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Contro
     {
         [NotNull] public new ForeachExpressionSyntax Syntax { get; }
         [NotNull] public ExpressionAnalysis InExpression { get; }
-        [NotNull] public BlockExpressionAnalysis Block { get; }
+        [NotNull] public BlockAnalysis Block { get; }
 
         public ForeachExpressionAnalysis(
             [NotNull] AnalysisContext context,
             [NotNull] ForeachExpressionSyntax syntax,
             [NotNull] ExpressionAnalysis inExpression,
-            [NotNull] BlockExpressionAnalysis block)
+            [NotNull] BlockAnalysis block)
             : base(context, syntax)
         {
             Requires.NotNull(nameof(inExpression), inExpression);

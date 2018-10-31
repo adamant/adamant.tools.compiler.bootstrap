@@ -67,7 +67,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 
                         functionScope.Bind(variables);
 
-                        var blocks = new Dictionary<BlockSyntax, BlockExpressionAnalysis>();
+                        var blocks = new Dictionary<BlockSyntax, BlockAnalysis>();
                         GetAllBlocks(function, blocks);
                         foreach (var nestedScope in functionScope.NestedScopes.Cast<BlockScope>())
                             BindBlock(nestedScope, blocks);
@@ -101,7 +101,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 
         private void GetAllBlocks(
             [NotNull] FunctionDeclarationAnalysis function,
-            [NotNull] Dictionary<BlockSyntax, BlockExpressionAnalysis> blocks)
+            [NotNull] Dictionary<BlockSyntax, BlockAnalysis> blocks)
         {
             foreach (var statement in function.Statements)
                 switch (statement)
@@ -120,11 +120,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 
         private void GetAllBlocks(
             [NotNull] ExpressionAnalysis expression,
-            [NotNull] Dictionary<BlockSyntax, BlockExpressionAnalysis> blocks)
+            [NotNull] Dictionary<BlockSyntax, BlockAnalysis> blocks)
         {
             switch (expression)
             {
-                case BlockExpressionAnalysis block:
+                case BlockAnalysis block:
                     blocks.Add(block.Syntax, block);
                     break;
                 case ReturnExpressionAnalysis returnExpression:
@@ -163,6 +163,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
                 case RefTypeAnalysis refType:
                     GetAllBlocks(refType.ReferencedType, blocks);
                     break;
+                case IfExpressionAnalysis ifExpression:
+                    GetAllBlocks(ifExpression.Condition, blocks);
+                    GetAllBlocks(ifExpression.ThenBlock, blocks);
+                    if (ifExpression.ElseClause != null)
+                        GetAllBlocks(ifExpression.ElseClause, blocks);
+                    break;
+                case ResultExpressionAnalysis resultExpression:
+                    GetAllBlocks(resultExpression.Expression, blocks);
+                    break;
                 case IntegerLiteralExpressionAnalysis _:
                 case IdentifierNameAnalysis _:
                 case BooleanLiteralExpressionAnalysis _:
@@ -175,7 +184,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 
         private void BindBlock(
             [NotNull] BlockScope scope,
-            [NotNull] Dictionary<BlockSyntax, BlockExpressionAnalysis> blocks)
+            [NotNull] Dictionary<BlockSyntax, BlockAnalysis> blocks)
         {
             Requires.NotNull(nameof(scope), scope);
             Requires.NotNull(nameof(blocks), blocks);

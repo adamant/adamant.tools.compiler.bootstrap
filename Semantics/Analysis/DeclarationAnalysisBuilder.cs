@@ -69,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             return new FunctionDeclarationAnalysis(
                 context, syntax, fullName, BuildGenericParameters(context, fullName, syntax.GenericParameters),
                 syntax.Parameters.Select(p => BuildParameter(typesContext, fullName, p)),
-                expressionBuilder.Build(typesContext, fullName, syntax.ReturnTypeExpression),
+                expressionBuilder.BuildExpression(typesContext, fullName, syntax.ReturnTypeExpression),
                 syntax.Body?.Statements.Select(statementSyntax => statementBuilder.Build(bodyContext, fullName, statementSyntax)));
         }
 
@@ -82,7 +82,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             {
                 case NamedParameterSyntax namedParameter:
                     return new ParameterAnalysis(context, namedParameter, functionName.Qualify(namedParameter.Name.Value ?? "_"),
-                        expressionBuilder.Build(context, functionName, namedParameter.TypeExpression));
+                        expressionBuilder.BuildExpression(context, functionName, namedParameter.TypeExpression));
                 case SelfParameterSyntax selfParameter:
                     return new ParameterAnalysis(context, selfParameter, functionName.Qualify(new SimpleName("self", true)), null);
                 default:
@@ -169,7 +169,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             {
                 yield return new GenericParameterAnalysis(context, parameter,
                     memberName.Qualify(parameter.Name.Value ?? "_"),
-                    parameter.TypeExpression == null ? null : expressionBuilder.Build(context, memberName, parameter.TypeExpression));
+                    parameter.TypeExpression == null ? null : expressionBuilder.BuildExpression(context, memberName, parameter.TypeExpression));
             }
         }
     }

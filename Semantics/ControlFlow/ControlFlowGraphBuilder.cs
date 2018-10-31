@@ -123,7 +123,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         ConvertAssignment(cfg, cfg.ReturnVariable.Reference, returnExpression.ReturnExpression, currentBlock);
                     currentBlock.End(new ReturnStatement());
                     break;
-                case BlockExpressionAnalysis block:
+                case BlockAnalysis block:
                     foreach (var statementInBlock in block.Statements)
                         Convert(cfg, statementInBlock, currentBlock);
 
@@ -163,6 +163,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case IntegerLiteralExpressionAnalysis v:
                     currentBlock.Add(new IntegerLiteralStatement(lvalue, v.Value));
                     break;
+                case IfExpressionAnalysis ifExpression:
+                    Convert(cfg, ifExpression.Condition, currentBlock);
+                    // TODO assign the result into the temp, branch and execute then or else, assign result
+                    break;
                 default:
                     throw NonExhaustiveMatchException.For(value);
             }
@@ -180,6 +184,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     currentBlock.Add(new AddStatement(lvalue,
                         ConvertToLValue(cfg, binaryOperator.LeftOperand),
                         ConvertToLValue(cfg, binaryOperator.RightOperand)));
+                    break;
+                case LessThanToken _:
+                case LessThanOrEqualToken _:
+                case GreaterThanToken _:
+                case GreaterThanOrEqualToken _:
+                    // TODO generate the correct statement
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(binaryOperator.Operator);

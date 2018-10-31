@@ -136,6 +136,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                 diagnostics.Publish(TypeError.MustBeATypeExpression(expression.Context.File, expression.Syntax.Span));
         }
 
+        // Checks the expression is well typed, and that the type of the expression is `bool`
+        private void CheckBoolExpression(
+            [CanBeNull] ExpressionAnalysis expression,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            // Omitted types don't need further type checking
+            if (expression == null) return;
+            CheckTypes(expression, diagnostics);
+            if (expression.Type != ObjectType.Bool)
+                diagnostics.Publish(TypeError.MustBeABoolExpression(expression.Context.File, expression.Syntax.Span));
+        }
+
         private void CheckTypes(
             [CanBeNull] ExpressionAnalysis expression,
             [NotNull] IDiagnosticsCollector diagnostics)
@@ -158,7 +170,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                     expression.Type = ObjectType.Bool;
                     break;
                 case BinaryOperatorExpressionAnalysis binaryOperatorExpression:
-                    CheckTypes(binaryOperatorExpression, diagnostics);
+                    CheckBinaryOperatorTypes(binaryOperatorExpression, diagnostics);
                     break;
                 case IdentifierNameAnalysis identifierName:
                     var name = identifierName.Name;
@@ -194,7 +206,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                     }
                     break;
                 case UnaryOperatorExpressionAnalysis unaryOperatorExpression:
-                    CheckTypes(unaryOperatorExpression, diagnostics);
+                    CheckUnaryOperatorTypes(unaryOperatorExpression, diagnostics);
                     // TODO assign a type to this expression
                     break;
                 case LifetimeTypeAnalysis lifetimeType:
@@ -203,7 +215,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                         diagnostics.Publish(TypeError.MustBeATypeExpression(expression.Context.File, lifetimeType.TypeName.Syntax.Span));
                     lifetimeType.Type = ObjectType.Type;
                     break;
-                case BlockExpressionAnalysis blockExpression:
+                case BlockAnalysis blockExpression:
                     foreach (var statement in blockExpression.Statements)
                         CheckTypes(statement, diagnostics);
 
@@ -211,7 +223,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                     break;
                 case NewObjectExpressionAnalysis newObjectExpression:
                     foreach (var argument in newObjectExpression.Arguments)
-                        CheckTypes(argument, diagnostics);
+                        CheckArgumentTypes(argument, diagnostics);
 
                     CheckTypeExpression(newObjectExpression.ConstructorExpression, diagnostics);
                     newObjectExpression.Type = EvaluateType(newObjectExpression.ConstructorExpression, diagnostics);
@@ -220,7 +232,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                     break;
                 case InitStructExpressionAnalysis initStructExpression:
                     foreach (var argument in initStructExpression.Arguments)
-                        CheckTypes(argument, diagnostics);
+                        CheckArgumentTypes(argument, diagnostics);
 
                     CheckTypeExpression(initStructExpression.ConstructorExpression, diagnostics);
                     initStructExpression.Type = EvaluateType(initStructExpression.ConstructorExpression, diagnostics);
@@ -257,6 +269,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                     CheckTypeExpression(mutableType.ReferencedType, diagnostics);
                     mutableType.Type = EvaluateType(mutableType.ReferencedType, diagnostics);// TODO make that type mutable
                     break;
+                case IfExpressionAnalysis ifExpression:
+                    CheckBoolExpression(ifExpression.Condition, diagnostics);
+                    CheckTypes(ifExpression.ThenBlock, diagnostics);
+                    CheckTypes(ifExpression.ElseClause, diagnostics);
+                    // TODO assign a type to the if expression
+                    break;
+                case ResultExpressionAnalysis resultExpression:
+                    CheckTypes(resultExpression.Expression, diagnostics);
+                    resultExpression.Type = ObjectType.Never;
+                    break;
                 case null:
                     // Omitted expressions don't need any checking
                     break;
@@ -265,14 +287,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             }
         }
 
-        private void CheckTypes(
+        private void CheckArgumentTypes(
             [NotNull] ArgumentAnalysis argument,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
             CheckTypes(argument.Value, diagnostics);
         }
 
-        private void CheckTypes(
+        private void CheckBinaryOperatorTypes(
             [NotNull] BinaryOperatorExpressionAnalysis binaryOperatorExpression,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
@@ -293,6 +315,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                     typeError = leftOperand != rightOperand || leftOperand == ObjectType.Bool;
                     if (!typeError)
                         binaryOperatorExpression.Type = leftOperand;
+                    break;
+                case EqualsEqualsToken _:
+                case LessThanToken _:
+                case LessThanOrEqualToken _:
+                case GreaterThanToken _:
+                case GreaterThanOrEqualToken _:
+                    typeError = leftOperandCore != rightOperandCore;
+                    binaryOperatorExpression.Type = ObjectType.Bool;
                     break;
                 case EqualsToken _:
                     typeError = leftOperandCore != rightOperandCore;
@@ -327,7 +357,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                     binaryOperatorExpression.Syntax.Span, @operator, leftOperand, rightOperand));
         }
 
-        private void CheckTypes(
+        private void CheckUnaryOperatorTypes(
             [NotNull] UnaryOperatorExpressionAnalysis unaryOperatorExpression,
             [NotNull] IDiagnosticsCollector diagnostics)
         {

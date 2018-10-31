@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
     public interface IExpressionAnalysisBuilder
     {
         [NotNull]
-        ExpressionAnalysis Build(
+        ExpressionAnalysis BuildExpression(
             [NotNull] AnalysisContext context,
             [NotNull] QualifiedName functionName,
             [NotNull] ExpressionSyntax expression);
