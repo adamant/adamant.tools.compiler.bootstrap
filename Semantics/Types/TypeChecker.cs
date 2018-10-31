@@ -328,6 +328,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                     typeError = operand != ObjectType.Bool;
                     unaryOperatorExpression.Type = ObjectType.Bool;
                     break;
+                case AtSignToken _:
+                    typeError = false; // TODO check that the expression can have a pointer taken
+                    unaryOperatorExpression.Type = null; // TODO construct a pointer type
+                    break;
+                case QuestionToken _:
+                    typeError = false; // TODO check that the expression can have a pointer taken
+                    unaryOperatorExpression.Type = null; // TODO construct a pointer type
+                    break;
                 default:
                     throw NonExhaustiveMatchException.For(@operator);
             }
@@ -422,6 +430,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                 case GenericInvocationAnalysis _:
                 case GenericNameAnalysis _:
                 case BinaryOperatorExpressionAnalysis _:
+                case UnaryOperatorExpressionAnalysis _:
                     // TODO evaluate to type
                     return null;
                 case MutableTypeAnalysis mutableType:
