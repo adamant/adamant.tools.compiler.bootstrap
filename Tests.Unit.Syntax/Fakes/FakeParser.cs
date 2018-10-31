@@ -147,6 +147,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
             {
                 return FakeParse<ExpressionSyntax>(tokens, diagnostics);
             }
+
+            public SeparatedListSyntax<ArgumentSyntax> ParseArgumentList(ITokenStream tokens, IDiagnosticsCollector diagnostics)
+            {
+                return SeparatedListSyntax<ArgumentSyntax>.Empty;
+            }
         }
 
         private class NameParser : INameParser

@@ -101,6 +101,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
+    public interface IHashToken : ISymbolToken { }
+    public class HashToken : SymbolToken, IHashToken
+    {
+        public HashToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public interface IHashHashToken : ISymbolToken { }
+    public class HashHashToken : SymbolToken, IHashHashToken
+    {
+        public HashHashToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
     public partial class MissingToken :
         IOpenBraceToken,
         ICloseBraceToken,
@@ -113,6 +131,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         IPipeToken,
         IColonToken,
         IRightArrowToken,
+        IHashToken,
+        IHashHashToken,
         ISymbolToken // Implied, but saves issues with commas
     { }
 }

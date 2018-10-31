@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Attributes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
@@ -9,6 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
 {
     public class ConstDeclarationSyntax : MemberDeclarationSyntax
     {
+        [NotNull] public SyntaxList<AttributeSyntax> Attributes { get; }
         [NotNull] [ItemNotNull] public SyntaxList<ModifierSyntax> Modifiers { get; }
         [NotNull] public ConstKeywordToken ConstKeyword { get; }
         [NotNull] public IIdentifierToken Name { get; }
@@ -19,7 +21,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
         [NotNull] public ISemicolonToken Semicolon { get; }
 
         public ConstDeclarationSyntax(
-            [NotNull][ItemNotNull] SyntaxList<ModifierSyntax> modifiers,
+            [NotNull] SyntaxList<AttributeSyntax> attributes,
+            [NotNull] [ItemNotNull] SyntaxList<ModifierSyntax> modifiers,
             [NotNull] ConstKeywordToken constKeyword,
             [NotNull] IIdentifierToken name,
             [CanBeNull] IColonToken colon,
@@ -28,10 +31,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
             [CanBeNull] ExpressionSyntax initializer,
             [NotNull] ISemicolonToken semicolon)
         {
+            Requires.NotNull(nameof(attributes), attributes);
             Requires.NotNull(nameof(modifiers), modifiers);
             Requires.NotNull(nameof(constKeyword), constKeyword);
             Requires.NotNull(nameof(name), name);
             Requires.NotNull(nameof(semicolon), semicolon);
+            Attributes = attributes;
             Modifiers = modifiers;
             ConstKeyword = constKeyword;
             Name = name;

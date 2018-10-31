@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
 
         public static Arbitrary<List<PsuedoToken>> PsuedoTokenList()
         {
-            return Arb.From(GenPsuedoTokenList());
+            return Arb.From(GenPsuedoTokenList(), Arb.Shrink);
         }
 
         private static Gen<List<PsuedoToken>> GenPsuedoTokenList()
@@ -71,19 +71,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
                 case "+":
                 case "*":
                 case ">":
-                    return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=";
+                    return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == "=>";
                 case "<":
-                    return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == ":"
+                    return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == "=>" || t2.Text == ":"
                         || t2.Text == ".." || t2.Text == "..<";
                 case "-":
-                    return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == ">" || t2.Text == ">=";
+                    return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == "=>"
+                        || t2.Text == ">" || t2.Text == ">=";
                 case "/":
-                    return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/="
+                    return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == "=>"
                         || t2.Text == "*" || t2.Text == "*="
                         || t2.Text == "/" || t2.Text == "/="
                         || t2.TokenType == typeof(CommentToken);
                 case "=":
-                    return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == "/="
+                    return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == "=>" || t2.Text == "/="
                         || t2.Text == ">" || t2.Text == ">=";
                 case "$":
                     return t2.Text == ">" || t2.Text == ">="
@@ -92,10 +93,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
                 case "$<":
                     return t2.Text == "≠" || t2.Text == "/=";
                 case "?":
-                    return t2.Text == "." || t2.Text == ".."
+                    return t2.Text == "." || t2.Text == ".." || t2.Text == "..<"
                         || t2.Text == "?" || t2.Text == "?." || t2.Text == "??";
                 case "..":
+                case "<..":
                     return t2.Text == "<" || t2.Text == "<=" || t2.Text == "<:" || t2.Text == "<.." || t2.Text == "<..<";
+                case "#":
+                    return t2.Text == "#" || t2.Text == "##";
                 default:
                     if (typeof(KeywordToken).IsAssignableFrom(t1.TokenType)
                         || typeof(IdentifierToken).IsAssignableFrom(t1.TokenType)
@@ -261,6 +265,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             { "$>≠", typeof(DollarGreaterThanNotEqualToken) },
             { "$>/=", typeof(DollarGreaterThanNotEqualToken) },
             { "=>", typeof(EqualsGreaterThanToken) },
+            { "#", typeof(HashToken) },
+            { "##", typeof(HashHashToken) },
             { "public", typeof(PublicKeywordToken) },
             { "private", typeof(PrivateKeywordToken) },
             { "let", typeof(LetKeywordToken) },

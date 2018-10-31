@@ -81,13 +81,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
             var parameterParser = FakeParser.ForParameters();
             var modifierParser = FakeParser.ForModifiers();
             var genericsParser = FakeParser.ForGenerics();
+            var nameParser = FakeParser.ForNames();
             return new DeclarationParser(
                 listParser,
                 expressionParser,
                 blockParser,
                 parameterParser,
                 modifierParser,
-                genericsParser);
+                genericsParser,
+                nameParser);
         }
     }
 }

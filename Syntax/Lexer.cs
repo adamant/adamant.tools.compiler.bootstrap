@@ -53,6 +53,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                     case ',':
                         yield return new CommaToken(SymbolSpan());
                         break;
+                    case '#':
+                        if (NextCharIs('#'))
+                            // it is `##`
+                            yield return new HashHashToken(SymbolSpan(2));
+                        else
+                            // it is `#`
+                            yield return new HashToken(SymbolSpan(1));
+                        break;
                     case '.':
                         if (NextCharIs('.'))
                         {
