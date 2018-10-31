@@ -101,15 +101,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
-    public interface ILessThanColonToken : ISymbolToken { }
-    public class LessThanColonToken : SymbolToken, ILessThanColonToken
-    {
-        public LessThanColonToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
     public partial class MissingToken :
         IOpenBraceToken,
         ICloseBraceToken,
@@ -122,7 +113,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         IPipeToken,
         IColonToken,
         IRightArrowToken,
-        ILessThanColonToken,
         ISymbolToken // Implied, but saves issues with commas
     { }
 }

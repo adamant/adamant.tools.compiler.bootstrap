@@ -254,6 +254,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
+    public partial interface ILessThanColonToken : IOperatorToken { }
+    public class LessThanColonToken : OperatorToken, ILessThanColonToken
+    {
+        public LessThanColonToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
     public partial class MissingToken :
         IDotToken,
         IDotDotToken,
@@ -283,6 +292,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         IQuestionToken,
         IQuestionQuestionToken,
         IQuestionDotToken,
+        ILessThanColonToken,
         IOperatorToken // Implied, but saves issues with commas
     { }
 }

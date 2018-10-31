@@ -61,6 +61,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                             @operator = tokens.TakeOperator();
                         }
                         break;
+                    case LessThanColonToken _:
+                        if (minPrecedence <= OperatorPrecedence.Subtype)
+                        {
+                            precedence = OperatorPrecedence.Subtype;
+                            @operator = tokens.TakeOperator();
+                        }
+                        break;
                     case DollarToken _:
                     case DollarLessThanToken _:
                     case DollarLessThanNotEqualToken _:
