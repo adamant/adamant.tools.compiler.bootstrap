@@ -14,12 +14,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
         public int Length => Text.Length;
 
         [NotNull]
-        public TextLines Lines => lines.Value;
+        public TextLines Lines => lines.Value.AssertNotNull();
 
         [NotNull]
         private readonly Lazy<TextLines> lines;
 
-        public string this[TextSpan span] => Text.Substring(span.Start, span.Length);
+        [NotNull]
+        public string this[TextSpan span] => Text.Substring(span.Start, span.Length).AssertNotNull();
         public char this[int index] => Text[index];
 
         public CodeText([NotNull] string text)

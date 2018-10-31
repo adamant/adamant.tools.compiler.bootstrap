@@ -7,6 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Parameters;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
@@ -41,6 +42,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                     return BuildClass(context, @namespace, @class);
                 case TypeDeclarationSyntax type:
                     return BuildType(context, @namespace, type);
+                case StructDeclarationSyntax @struct:
+                    return BuildStruct(context, @namespace, @struct);
                 case IncompleteDeclarationSyntax _:
                     // Since it is incomplete, we can't do any analysis on it
                     return null;
@@ -107,6 +110,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
 
             var fullName = @namespace.Qualify(name);
             return new TypeDeclarationAnalysis(context, syntax, fullName);
+        }
+
+        private static TypeDeclarationAnalysis BuildStruct(
+            [NotNull] AnalysisContext context,
+            [NotNull] Name @namespace,
+            [NotNull] StructDeclarationSyntax syntax)
+        {
+            switch (syntax.Name)
+            {
+                case IdentifierToken identifier:
+                    {
+                        var fullName = @namespace.Qualify(identifier.Value);
+                        return new TypeDeclarationAnalysis(context, syntax, fullName);
+                    }
+                case MissingToken _:
+                default:
+                    // Skip any struct that doesn't have a name
+                    return null;
+                case IPrimitiveTypeToken primitive:
+                    {
+                        var name = new SimpleName(context.File.Code[primitive.Span], true);
+                        return new TypeDeclarationAnalysis(context, syntax, new QualifiedName(name));
+                    }
+            }
         }
 
         private static TypeDeclarationAnalysis BuildEnumStruct(
