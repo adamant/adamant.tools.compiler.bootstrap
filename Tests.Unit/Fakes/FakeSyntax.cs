@@ -166,6 +166,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
                 Missing<ICloseParenToken>(),
                 Missing<IRightArrowToken>(),
                 Expression(),
+                SyntaxList<GenericConstraintSyntax>.Empty,
                 null, // Effects
                 SyntaxList<ContractSyntax>.Empty,
                 Block(),
@@ -188,6 +189,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
                 Missing<IStructKeywordToken>(),
                 Identifier(name),
                 null, // Generic Parameters
+                SyntaxList<GenericConstraintSyntax>.Empty,
                 Missing<IOpenBraceToken>(),
                 new EnumVariantsSyntax(SyntaxList<EnumVariantSyntax>.Empty, null),
                 SyntaxList<MemberDeclarationSyntax>.Empty,

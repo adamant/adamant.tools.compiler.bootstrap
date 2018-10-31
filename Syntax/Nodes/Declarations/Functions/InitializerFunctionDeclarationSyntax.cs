@@ -16,6 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
         [NotNull] public InitKeywordToken InitKeyword { get; }
         [CanBeNull] public override IIdentifierToken Name { get; }
         [CanBeNull] public GenericParametersSyntax GenericParameters { get; }
+        [NotNull] public SyntaxList<GenericConstraintSyntax> GenericConstraints { get; }
 
         public InitializerFunctionDeclarationSyntax(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
@@ -25,6 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
             [NotNull] IOpenParenToken openParen,
             [NotNull] SeparatedListSyntax<ParameterSyntax> parameterList,
             [NotNull] ICloseParenToken closeParen,
+            [NotNull] SyntaxList<GenericConstraintSyntax> genericConstraints,
             [CanBeNull] EffectsSyntax effects,
             [NotNull] SyntaxList<ContractSyntax> contracts,
             [NotNull] BlockSyntax body)
@@ -35,11 +37,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
             Requires.NotNull(nameof(openParen), openParen);
             Requires.NotNull(nameof(parameterList), parameterList);
             Requires.NotNull(nameof(closeParen), closeParen);
+            Requires.NotNull(nameof(genericConstraints), genericConstraints);
             Requires.NotNull(nameof(contracts), contracts);
             Requires.NotNull(nameof(body), body);
             InitKeyword = initKeyword;
             Name = name;
             GenericParameters = genericParameters;
+            GenericConstraints = genericConstraints;
         }
     }
 }

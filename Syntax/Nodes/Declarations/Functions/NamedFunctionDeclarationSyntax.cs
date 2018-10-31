@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
         [CanBeNull] public GenericParametersSyntax GenericParameters { get; }
         [NotNull] public IRightArrowToken Arrow { get; }
         [NotNull] public ExpressionSyntax ReturnTypeExpression { get; }
-
+        [NotNull] public SyntaxList<GenericConstraintSyntax> GenericConstraints { get; }
 
         public NamedFunctionDeclarationSyntax(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
@@ -31,6 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
             [NotNull] ICloseParenToken closeParen,
             [NotNull] IRightArrowToken arrow,
             [NotNull] ExpressionSyntax returnTypeExpression,
+            [NotNull] SyntaxList<GenericConstraintSyntax> genericConstraints,
             [CanBeNull] EffectsSyntax effects,
             [NotNull] SyntaxList<ContractSyntax> contracts,
             [CanBeNull] BlockSyntax body,
@@ -42,6 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
             Requires.NotNull(nameof(name), name);
             Requires.NotNull(nameof(openParen), openParen);
             Requires.NotNull(nameof(parameterList), parameterList);
+            Requires.NotNull(nameof(genericConstraints), genericConstraints);
             Requires.NotNull(nameof(closeParen), closeParen);
             Requires.NotNull(nameof(arrow), arrow);
             Requires.NotNull(nameof(returnTypeExpression), returnTypeExpression);
@@ -50,6 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
             GenericParameters = genericParameters;
             Arrow = arrow;
             ReturnTypeExpression = returnTypeExpression;
+            GenericConstraints = genericConstraints;
         }
     }
 }

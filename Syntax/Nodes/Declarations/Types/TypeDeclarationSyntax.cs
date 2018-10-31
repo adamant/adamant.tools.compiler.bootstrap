@@ -15,6 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types
         [NotNull] public IIdentifierToken Name { get; }
         [CanBeNull] public GenericParametersSyntax GenericParameters { get; }
         [CanBeNull] public BaseTypesSyntax BaseTypes { get; }
+        [NotNull] public SyntaxList<GenericConstraintSyntax> GenericConstraints { get; }
         [NotNull] public IOpenBraceToken OpenBrace { get; }
         [NotNull] public SyntaxList<MemberDeclarationSyntax> Members { get; }
         [NotNull] public ICloseBraceToken CloseBrace { get; }
@@ -25,6 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types
             [NotNull] IIdentifierToken name,
             [CanBeNull] GenericParametersSyntax genericParameters,
             [CanBeNull] BaseTypesSyntax baseTypes,
+            [NotNull] SyntaxList<GenericConstraintSyntax> genericConstraints,
             [NotNull] IOpenBraceToken openBrace,
             [NotNull] SyntaxList<MemberDeclarationSyntax> members,
             [NotNull] ICloseBraceToken closeBrace)
@@ -32,6 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types
             Requires.NotNull(nameof(modifiers), modifiers);
             Requires.NotNull(nameof(typeKeyword), typeKeyword);
             Requires.NotNull(nameof(name), name);
+            Requires.NotNull(nameof(genericConstraints), genericConstraints);
             Requires.NotNull(nameof(openBrace), openBrace);
             Requires.NotNull(nameof(members), members);
             Requires.NotNull(nameof(closeBrace), closeBrace);
@@ -40,6 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types
             Name = name;
             GenericParameters = genericParameters;
             BaseTypes = baseTypes;
+            GenericConstraints = genericConstraints;
             OpenBrace = openBrace;
             Members = members;
             CloseBrace = closeBrace;
