@@ -11,6 +11,8 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens.Identifiers;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens.Literals;
 using JetBrains.Annotations;
 using static Adamant.Tools.Compiler.Bootstrap.Framework.TypeOperations;
 
@@ -89,11 +91,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     case LessThanOrEqualToken _:
                     case GreaterThanToken _:
                     case GreaterThanOrEqualToken _:
-                    case LessThanColonToken _:
+                    case LessThanColonToken _: // Subtype operator
                         if (minPrecedence <= OperatorPrecedence.Relational)
                         {
                             precedence = OperatorPrecedence.Relational;
                             @operator = tokens.TakeOperator();
+                        }
+                        break;
+                    case ColonToken _: // type kind
+                        if (minPrecedence <= OperatorPrecedence.Relational)
+                        {
+                            var colon = tokens.Take<ColonToken>();
+                            var typeKind = tokens.Expect<ITypeKindKeywordToken>();
+                            expression = new TypeKindExpressionSyntax(colon, typeKind);
+                            continue;
                         }
                         break;
                     case DotDotToken _:

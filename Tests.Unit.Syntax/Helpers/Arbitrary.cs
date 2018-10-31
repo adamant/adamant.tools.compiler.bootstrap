@@ -4,6 +4,8 @@ using System.Linq;
 using System.Numerics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens.Identifiers;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens.Literals;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
 using Fare;
 using FsCheck;

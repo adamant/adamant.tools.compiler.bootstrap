@@ -1,7 +1,7 @@
 using System.Numerics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens.Literals
 {
     public class IntegerLiteralToken : Token
     {

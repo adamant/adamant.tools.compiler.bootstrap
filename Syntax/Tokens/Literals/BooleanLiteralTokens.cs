@@ -1,6 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens.Literals
 {
     public interface IBooleanLiteralToken : IKeywordToken { }
     public abstract class BooleanLiteralToken : KeywordToken, IBooleanLiteralToken
