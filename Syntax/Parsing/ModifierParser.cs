@@ -15,6 +15,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         {
             switch (tokens.Current)
             {
+                case OverrideKeywordToken overrideKeyword:
+                    tokens.MoveNext();
+                    return new OverrideModifierSyntax(overrideKeyword);
                 case RefKeywordToken refKeyword:
                     tokens.MoveNext();
                     return new RefModifierSyntax(refKeyword);

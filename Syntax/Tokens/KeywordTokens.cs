@@ -74,6 +74,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
             typeof(WhileKeywordToken),
             typeof(BreakKeywordToken),
             typeof(NextKeywordToken),
+            typeof(OverrideKeywordToken),
         }.AsReadOnly().AssertNotNull();
     }
 
@@ -643,6 +644,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         {
         }
     }
+
+    public partial interface IOverrideKeywordToken : IKeywordToken { }
+    public class OverrideKeywordToken : KeywordToken, IOverrideKeywordToken
+    {
+        public OverrideKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
     public partial class MissingToken :
         IPublicKeywordToken,
         IProtectedKeywordToken,
@@ -707,6 +717,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         IWhileKeywordToken,
         IBreakKeywordToken,
         INextKeywordToken,
+        IOverrideKeywordToken,
         IKeywordToken // Implied, but saves issues with commas
     { }
 }

@@ -329,6 +329,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             { "while", typeof(WhileKeywordToken) },
             { "break", typeof(BreakKeywordToken) },
             { "next", typeof(NextKeywordToken) },
+            { "override", typeof(OverrideKeywordToken) },
         }.AsReadOnly();
     }
 }

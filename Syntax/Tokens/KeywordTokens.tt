@@ -70,6 +70,7 @@
         "While",
         "Break",
         "Next",
+        "Override",
     }.AsReadOnly();
 #>
 using System;
