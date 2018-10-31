@@ -248,6 +248,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         var closeParen = tokens.Expect<ICloseParenToken>();
                         return new InitStructExpressionSyntax(initKeyword, type, openParen, arguments, closeParen);
                     }
+                case DeleteKeywordToken deleteKeyword:
+                    {
+                        tokens.MoveNext();
+                        var expression = ParseExpression(tokens, diagnostics);
+                        return new DeleteExpressionSyntax(deleteKeyword, expression);
+                    }
                 case ReturnKeywordToken _:
                     {
                         var returnKeyword = tokens.Expect<IReturnKeywordToken>();
