@@ -263,6 +263,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         }
     }
 
+    public partial interface IEqualsGreaterThanToken : IOperatorToken { }
+    public class EqualsGreaterThanToken : OperatorToken, IEqualsGreaterThanToken
+    {
+        public EqualsGreaterThanToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
     public partial class MissingToken :
         IDotToken,
         IDotDotToken,
@@ -293,6 +302,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         IQuestionQuestionToken,
         IQuestionDotToken,
         ILessThanColonToken,
+        IEqualsGreaterThanToken,
         IOperatorToken // Implied, but saves issues with commas
     { }
 }

@@ -5,15 +5,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         Min = Assignment, // The minimum precedence
         Assignment = 1, // `=` `+=` `-=`
         Coalesce, // `??`
-        Subtype, // `<:`
-        Lifetime, // `$<` `$<≠` `$>` `$>≠`
         LogicalOr, // `or`
         LogicalAnd, // `and`
         Equality, // `==` `≠`
-        Relational, // `<` `<=` `>` `>=`
+        Relational, // `<` `<=` `>` `>=` `<:`
         Range, // `..` `..<`
         Additive, // `+` `-`
         Multiplicative, // `*` `/`
+        Lifetime, // `$<` `$<≠` `$>` `$>≠`
         Unary, // `+` `-` `not`
         Primary // f() . []
     }

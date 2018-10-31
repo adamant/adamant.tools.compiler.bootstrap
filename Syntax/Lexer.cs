@@ -232,15 +232,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                         }
                         break;
                     case '=':
-                        if (NextCharIs('='))
-                            // it is `==`
-                            yield return new EqualsEqualsToken(SymbolSpan(2));
-                        else if (NextCharIs('/') && CharAtIs(2, '='))
-                            // it is `=/=`
-                            yield return new NotEqualToken(SymbolSpan(3));
-                        else
-                            // it is `=`
-                            yield return new EqualsToken(SymbolSpan());
+                        switch (NextChar())
+                        {
+                            case '>':
+                                // it is `=>`
+                                yield return new EqualsGreaterThanToken(SymbolSpan(2));
+                                break;
+                            case '=':
+                                // it is `==`
+                                yield return new EqualsEqualsToken(SymbolSpan(2));
+                                break;
+                            case '/':
+                                if (CharAtIs(2, '='))
+                                    // it is `=/=`
+                                    yield return new NotEqualToken(SymbolSpan(3));
+                                else goto default;
+                                break;
+                            default:
+                                // it is `=`
+                                yield return new EqualsToken(SymbolSpan());
+                                break;
+                        }
                         break;
                     case '≠':
                         yield return new NotEqualToken(SymbolSpan());

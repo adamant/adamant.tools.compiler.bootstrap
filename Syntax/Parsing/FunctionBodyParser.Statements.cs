@@ -1,6 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Blocks;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
@@ -77,6 +78,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             var statements = listParser.ParseList(tokens, ParseStatement, TypeOf<CloseBraceToken>(), diagnostics);
             var closeBrace = tokens.Expect<ICloseBraceToken>();
             return new BlockSyntax(openBrace, statements, closeBrace);
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
+        public ExpressionBlockSyntax ParseExpressionBlock(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            switch (tokens.Current)
+            {
+                case EqualsGreaterThanToken equalsGreaterThan:
+                    tokens.MoveNext();
+                    var expression = ParseExpression(tokens, diagnostics);
+                    return new ResultExpressionSyntax(equalsGreaterThan, expression);
+                case OpenBraceToken _:
+                default:
+                    return ParseBlock(tokens, diagnostics);
+            }
         }
     }
 }

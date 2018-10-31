@@ -17,6 +17,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types.Inheritance;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Blocks;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 using static Adamant.Tools.Compiler.Bootstrap.Framework.TypeOperations;
@@ -97,6 +98,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     return ParseEnum(modifiers, tokens, diagnostics);
                 case FunctionKeywordToken _:
                     return ParseNamedFunction(modifiers, tokens, diagnostics);
+                case OperatorKeywordToken _:
+                    return ParseOperatorFunction(modifiers, tokens, diagnostics);
+                case NewKeywordToken _:
+                    return ParseConstructor(modifiers, tokens, diagnostics);
                 case GetKeywordToken _:
                     return ParseGetterFunction(modifiers, tokens, diagnostics);
                 case SetKeywordToken _:
@@ -104,8 +109,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 case VarKeywordToken _:
                 case LetKeywordToken _:
                     return ParseField(modifiers, tokens, diagnostics);
-                case NewKeywordToken _:
-                    return ParseConstructor(modifiers, tokens, diagnostics);
                 case ConstKeywordToken _:
                     return ParseConst(modifiers, tokens, diagnostics);
                 default:
@@ -317,6 +320,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             var contracts = ParseContracts(tokens, diagnostics);
             var (body, semicolon) = ParseFunctionBody(tokens, diagnostics);
             return new NamedFunctionDeclarationSyntax(modifiers, functionKeyword, name, genericParameters,
+                openParen, parameters, closeParen, arrow, returnTypeExpression, effects, contracts, body, semicolon);
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
+        public OperatorFunctionDeclarationSyntax ParseOperatorFunction(
+            [NotNull] SyntaxList<ModifierSyntax> modifiers,
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var operatorKeyword = tokens.Take<OperatorKeywordToken>();
+            var @operator = tokens.Expect<IOperatorToken>();
+            var openParen = tokens.Expect<IOpenParenToken>();
+            var parameters = ParseParameterList(tokens, diagnostics);
+            var closeParen = tokens.Expect<ICloseParenToken>();
+            var arrow = tokens.Expect<IRightArrowToken>();
+            var returnTypeExpression = expressionParser.ParseExpression(tokens, diagnostics);
+            var effects = AcceptEffects(tokens, diagnostics);
+            var contracts = ParseContracts(tokens, diagnostics);
+            var (body, semicolon) = ParseFunctionBody(tokens, diagnostics);
+            return new OperatorFunctionDeclarationSyntax(modifiers, operatorKeyword, @operator,
                 openParen, parameters, closeParen, arrow, returnTypeExpression, effects, contracts, body, semicolon);
         }
 

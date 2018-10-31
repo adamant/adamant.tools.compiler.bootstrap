@@ -4,9 +4,9 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Blocks
 {
-    public class BlockSyntax : ExpressionSyntax
+    public class BlockSyntax : ExpressionBlockSyntax
     {
         [NotNull] public IOpenBraceToken OpenBrace { get; }
         [NotNull] [ItemNotNull] public SyntaxList<StatementSyntax> Statements { get; }

@@ -1,5 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Blocks;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
@@ -9,13 +10,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow
     {
         [NotNull] public IfKeywordToken IfKeyword { get; }
         [NotNull] public ExpressionSyntax Condition { get; }
-        [NotNull] public BlockSyntax ThenBlock { get; }
+        [NotNull] public ExpressionBlockSyntax ThenBlock { get; }
         [CanBeNull] public ElseClauseSyntax ElseClause { get; }
 
         public IfExpressionSyntax(
             [NotNull] IfKeywordToken ifKeyword,
             [NotNull] ExpressionSyntax condition,
-            [NotNull] BlockSyntax thenBlock,
+            [NotNull] ExpressionBlockSyntax thenBlock,
             [CanBeNull] ElseClauseSyntax elseClause)
             : base(TextSpan.Covering(ifKeyword.Span, thenBlock.Span, elseClause?.Span))
         {

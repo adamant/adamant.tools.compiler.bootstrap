@@ -61,27 +61,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                             @operator = tokens.TakeOperator();
                         }
                         break;
-                    case LessThanColonToken _:
-                        if (minPrecedence <= OperatorPrecedence.Subtype)
-                        {
-                            precedence = OperatorPrecedence.Subtype;
-                            @operator = tokens.TakeOperator();
-                        }
-                        break;
-                    case DollarToken _:
-                    case DollarLessThanToken _:
-                    case DollarLessThanNotEqualToken _:
-                    case DollarGreaterThanToken _:
-                    case DollarGreaterThanNotEqualToken _:
-                        if (minPrecedence <= OperatorPrecedence.Lifetime)
-                        {
-                            var leftOperand = expression;
-                            var lifetimeOperator = tokens.Take<ILifetimeOperatorToken>();
-                            var name = tokens.Expect<ILifetimeNameToken>();
-                            expression = new LifetimeTypeSyntax(leftOperand, lifetimeOperator, name);
-                            continue;
-                        }
-                        break;
                     case OrKeywordToken _:
                     case XorKeywordToken _:
                         if (minPrecedence <= OperatorPrecedence.LogicalOr)
@@ -109,6 +88,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     case LessThanOrEqualToken _:
                     case GreaterThanToken _:
                     case GreaterThanOrEqualToken _:
+                    case LessThanColonToken _:
                         if (minPrecedence <= OperatorPrecedence.Relational)
                         {
                             precedence = OperatorPrecedence.Relational;
@@ -136,6 +116,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         {
                             precedence = OperatorPrecedence.Multiplicative;
                             @operator = tokens.TakeOperator();
+                        }
+                        break;
+                    case DollarToken _:
+                    case DollarLessThanToken _:
+                    case DollarLessThanNotEqualToken _:
+                    case DollarGreaterThanToken _:
+                    case DollarGreaterThanNotEqualToken _:
+                        if (minPrecedence <= OperatorPrecedence.Lifetime)
+                        {
+                            var leftOperand = expression;
+                            var lifetimeOperator = tokens.Take<ILifetimeOperatorToken>();
+                            var name = tokens.Expect<ILifetimeNameToken>();
+                            expression = new LifetimeTypeSyntax(leftOperand, lifetimeOperator, name);
+                            continue;
                         }
                         break;
                     case QuestionToken _:
@@ -206,6 +200,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         {
             switch (tokens.Current)
             {
+                case SelfTypeKeywordToken selfTypeKeyword:
+                    tokens.MoveNext();
+                    return new SelfTypeExpressionSyntax(selfTypeKeyword);
                 case UninitializedKeywordToken uninitializedKeyword:
                     tokens.MoveNext();
                     return new UninitializedExpressionSyntax(uninitializedKeyword);
@@ -242,6 +239,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         var expression = tokens.AtTerminator<SemicolonToken>() ? null : ParseExpression(tokens, diagnostics);
                         return new ReturnExpressionSyntax(returnKeyword, expression);
                     }
+                case EqualsGreaterThanToken _:
+                    return ParseExpressionBlock(tokens, diagnostics);
                 case OpenParenToken _:
                     return ParseParenthesizedExpression(tokens, diagnostics);
                 case MinusToken _:
@@ -356,7 +355,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         {
             var ifKeyword = tokens.Take<IfKeywordToken>();
             var condition = ParseExpression(tokens, diagnostics);
-            var thenBlock = ParseBlock(tokens, diagnostics);
+            var thenBlock = ParseExpressionBlock(tokens, diagnostics);
             var elseClause = AcceptElseClause(tokens, diagnostics);
             return new IfExpressionSyntax(ifKeyword, condition, thenBlock, elseClause);
         }
@@ -370,7 +369,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             if (elseKeyword == null) return null;
             var expression = tokens.Current is IfKeywordToken
                 ? ParseIfExpression(tokens, diagnostics)
-                : ParseBlock(tokens, diagnostics);
+                : ParseExpressionBlock(tokens, diagnostics);
             return new ElseClauseSyntax(elseKeyword, expression);
         }
 

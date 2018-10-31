@@ -10,17 +10,19 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
 {
-    public class GetterFunctionDeclarationSyntax : FunctionDeclarationSyntax
+    public class OperatorFunctionDeclarationSyntax : FunctionDeclarationSyntax
     {
-        [NotNull] public GetKeywordToken GetKeyword { get; }
-        [NotNull] public override IIdentifierToken Name { get; }
+        [NotNull] public OperatorKeywordToken OperatorKeyword { get; }
+        public override IIdentifierToken Name => throw new System.NotImplementedException();
+        [NotNull] public IOperatorToken Operator { get; }
         [NotNull] public IRightArrowToken Arrow { get; }
         [NotNull] public ExpressionSyntax ReturnTypeExpression { get; }
 
-        public GetterFunctionDeclarationSyntax(
+
+        public OperatorFunctionDeclarationSyntax(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] GetKeywordToken getKeyword,
-            [NotNull] IIdentifierToken name,
+            [NotNull] OperatorKeywordToken operatorKeyword,
+            [NotNull] IOperatorToken @operator,
             [NotNull] IOpenParenToken openParen,
             [NotNull] SeparatedListSyntax<ParameterSyntax> parameterList,
             [NotNull] ICloseParenToken closeParen,
@@ -33,15 +35,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
             : base(modifiers, openParen, parameterList, closeParen, effects, contracts, body, semicolon)
         {
             Requires.NotNull(nameof(modifiers), modifiers);
-            Requires.NotNull(nameof(getKeyword), getKeyword);
-            Requires.NotNull(nameof(name), name);
+            Requires.NotNull(nameof(operatorKeyword), operatorKeyword);
+            Requires.NotNull(nameof(@operator), @operator);
             Requires.NotNull(nameof(openParen), openParen);
             Requires.NotNull(nameof(parameterList), parameterList);
             Requires.NotNull(nameof(closeParen), closeParen);
             Requires.NotNull(nameof(arrow), arrow);
             Requires.NotNull(nameof(returnTypeExpression), returnTypeExpression);
-            GetKeyword = getKeyword;
-            Name = name;
+            OperatorKeyword = operatorKeyword;
+            Operator = @operator;
             Arrow = arrow;
             ReturnTypeExpression = returnTypeExpression;
         }
