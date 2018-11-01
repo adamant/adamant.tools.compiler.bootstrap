@@ -10,7 +10,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
 {
-    public abstract class MemberDeclarationAnalysis : AnalysisNode, IDeclarationAnalysis
+    public abstract class MemberDeclarationAnalysis : DeclarationAnalysis, IDeclarationAnalysis
     {
         [NotNull] public new MemberDeclarationSyntax Syntax { get; }
         [NotNull] public DiagnosticsBuilder Diagnostics { get; }

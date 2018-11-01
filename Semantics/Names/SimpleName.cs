@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
 {
-    public class SimpleName : Name, IEquatable<SimpleName>
+    public class SimpleName : IEquatable<SimpleName>
     {
         [NotNull] public readonly string Text;
         [NotNull] public readonly bool IsSpecial;
@@ -28,13 +28,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
         {
             // TODO deal with IsSpecial and Special chars like space
             return Text;
-        }
-
-        [NotNull]
-        public override QualifiedName Qualify([NotNull] SimpleName name)
-        {
-            Requires.NotNull(nameof(name), name);
-            return new QualifiedName(this, name);
         }
 
         #region Equals

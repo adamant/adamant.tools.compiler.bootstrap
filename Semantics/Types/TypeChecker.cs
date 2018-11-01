@@ -242,6 +242,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                 case GenericInvocationAnalysis genericInvocation:
                     foreach (var argument in genericInvocation.Arguments)
                         CheckExpression(argument.Value, diagnostics);
+
+                    // TODO assign return type
+                    genericInvocation.Type = DataType.Unknown;
                     break;
                 case GenericNameAnalysis genericName:
                     foreach (var argument in genericName.Arguments)

@@ -8,6 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Parameters;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Namespaces;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens.Identifiers;
@@ -19,17 +20,40 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
     {
         [NotNull] private readonly IExpressionAnalysisBuilder expressionBuilder;
         [NotNull] private readonly IStatementAnalysisBuilder statementBuilder;
+        [NotNull] private readonly NameBuilder nameBuilder;
 
         public DeclarationAnalysisBuilder(
             [NotNull] IExpressionAnalysisBuilder expressionBuilder,
-            [NotNull] IStatementAnalysisBuilder statementBuilder)
+            [NotNull] IStatementAnalysisBuilder statementBuilder,
+            [NotNull] NameBuilder nameBuilder)
         {
             this.statementBuilder = statementBuilder;
+            this.nameBuilder = nameBuilder;
             this.expressionBuilder = expressionBuilder;
         }
 
+        [NotNull]
+        public NamespaceDeclarationAnalysis BuildFileNamespace(
+            [NotNull] AnalysisContext context,
+            [NotNull] FileNamespaceDeclarationSyntax @namespace)
+        {
+            Name name = GlobalNamespaceName.Instance;
+            if (@namespace.Name != null)
+                name = nameBuilder.BuildName(@namespace.Name) ?? name;
+            var bodyContext = context.InNamespace(@namespace);
+
+            var declarations = new List<DeclarationAnalysis>();
+            foreach (var declaration in @namespace.Declarations)
+            {
+                var analysis = BuildDeclaration(bodyContext, name, declaration);
+                if (analysis != null)
+                    declarations.Add(analysis);
+            }
+            return new NamespaceDeclarationAnalysis(context, @namespace, declarations);
+        }
+
         [CanBeNull]
-        public MemberDeclarationAnalysis Build(
+        public MemberDeclarationAnalysis BuildDeclaration(
             [NotNull] AnalysisContext context,
             [NotNull] Name @namespace,
             [NotNull] DeclarationSyntax declaration)

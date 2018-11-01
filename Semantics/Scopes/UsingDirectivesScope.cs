@@ -3,11 +3,11 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 {
-    public class NamespaceScope : NestedScope
+    public class UsingDirectivesScope : NestedScope
     {
         [NotNull] public new NamespaceDeclarationSyntax Syntax { get; }
 
-        public NamespaceScope(
+        public UsingDirectivesScope(
             [NotNull] LexicalScope containingScope,
             [NotNull] NamespaceDeclarationSyntax @namespace)
             : base(containingScope, @namespace)

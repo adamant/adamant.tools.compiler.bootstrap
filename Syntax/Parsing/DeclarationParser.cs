@@ -15,11 +15,13 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Contr
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Effects;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Parameters;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Namespaces;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types.Enums;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types.Inheritance;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Blocks;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Call;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens.Identifiers;
 using JetBrains.Annotations;
@@ -36,6 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         [NotNull] private readonly IModifierParser modifierParser;
         [NotNull] private readonly IGenericsParser genericsParser;
         [NotNull] private readonly INameParser nameParser;
+        [NotNull] private readonly IUsingDirectiveParser usingDirectiveParser;
 
         public DeclarationParser(
             [NotNull] IListParser listParser,
@@ -44,7 +47,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             [NotNull] IParameterParser parameterParser,
             [NotNull] IModifierParser modifierParser,
             [NotNull] IGenericsParser genericsParser,
-            [NotNull] INameParser nameParser)
+            [NotNull] INameParser nameParser,
+            [NotNull] IUsingDirectiveParser usingDirectiveParser)
         {
             this.listParser = listParser;
             this.expressionParser = expressionParser;
@@ -53,6 +57,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             this.modifierParser = modifierParser;
             this.genericsParser = genericsParser;
             this.nameParser = nameParser;
+            this.usingDirectiveParser = usingDirectiveParser;
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
+        public SyntaxList<DeclarationSyntax> ParseDeclarations(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var declarations = new List<DeclarationSyntax>();
+            while (!tokens.AtEndOfFile())
+            {
+                declarations.Add(ParseDeclaration(tokens, diagnostics));
+            }
+
+            return declarations.ToSyntaxList();
         }
 
         [MustUseReturnValue]
@@ -66,6 +86,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
             switch (tokens.Current)
             {
+                case NamespaceKeywordToken _:
+                    return ParseNamespace(attributes, modifiers, tokens, diagnostics);
                 case ClassKeywordToken _:
                     return ParseClass(attributes, modifiers, tokens, diagnostics);
                 case TypeKeywordToken _:
@@ -204,6 +226,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         #endregion
 
         #region Parse Type Declarations
+        [MustUseReturnValue]
+        [NotNull]
+        private BlockNamespaceDeclarationSyntax ParseNamespace(
+            [NotNull] SyntaxList<AttributeSyntax> attributes,
+            [NotNull] SyntaxList<ModifierSyntax> modifiers,
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            var namespaceKeyword = tokens.Take<NamespaceKeywordToken>();
+            var name = nameParser.ParseName(tokens, diagnostics);
+            var openBrace = tokens.Expect<IOpenBraceToken>();
+            var usingDirectives = usingDirectiveParser.ParseUsingDirectives(tokens, diagnostics).ToSyntaxList();
+            var declarations = ParseDeclarations(tokens, diagnostics).ToSyntaxList();
+            var closeBrace = tokens.Expect<ICloseBraceToken>();
+            return new BlockNamespaceDeclarationSyntax(attributes, modifiers, namespaceKeyword, name, openBrace,
+                usingDirectives, declarations, closeBrace);
+        }
+
         [MustUseReturnValue]
         [NotNull]
         private ClassDeclarationSyntax ParseClass(

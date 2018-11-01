@@ -1,9 +1,8 @@
-using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Namespaces;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
@@ -17,15 +16,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
     {
         [NotNull] private readonly IUsingDirectiveParser usingDirectiveParser;
         [NotNull] private readonly IDeclarationParser declarationParser;
-        [NotNull] private readonly INameParser qualifiedNameParser;
+        [NotNull] private readonly INameParser nameParser;
 
         public CompilationUnitParser(
             [NotNull] IUsingDirectiveParser usingDirectiveParser,
             [NotNull] IDeclarationParser declarationParser,
-            [NotNull] INameParser qualifiedNameParser)
+            [NotNull] INameParser nameParser)
         {
             this.declarationParser = declarationParser;
-            this.qualifiedNameParser = qualifiedNameParser;
+            this.nameParser = nameParser;
             this.usingDirectiveParser = usingDirectiveParser;
         }
 
@@ -33,47 +32,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         [NotNull]
         public CompilationUnitSyntax ParseCompilationUnit([NotNull] ITokenStream tokens)
         {
-            var diagnosticsBuilder = new DiagnosticsBuilder();
-            var @namespace = AcceptCompilationUnitNamespace(tokens, diagnosticsBuilder);
-            var usingDirectives = ParseUsingDirectives(tokens, diagnosticsBuilder).ToSyntaxList();
-            var declarations = ParseDeclarations(tokens, diagnosticsBuilder).ToSyntaxList();
+            var diagnostics = new DiagnosticsBuilder();
+            var @namespace = ParseFileNamespaceDeclaration(tokens, diagnostics);
             var endOfFile = tokens.TakeEndOfFile();
 
-            diagnosticsBuilder.Publish(endOfFile.Diagnostics);
+            diagnostics.Publish(endOfFile.Diagnostics);
 
-            return new CompilationUnitSyntax(tokens.File, @namespace, usingDirectives, declarations, endOfFile, diagnosticsBuilder.Build());
-        }
-
-        [MustUseReturnValue]
-        [CanBeNull]
-        private CompilationUnitNamespaceSyntax AcceptCompilationUnitNamespace([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
-        {
-            if (!(tokens.Current is NamespaceKeywordToken)) return null;
-
-            var namespaceKeyword = tokens.Expect<INamespaceKeywordToken>();
-            var name = qualifiedNameParser.ParseName(tokens, diagnostics);
-            var semicolon = tokens.Expect<ISemicolonToken>();
-            return new CompilationUnitNamespaceSyntax(namespaceKeyword, name, semicolon);
+            return new CompilationUnitSyntax(tokens.File, @namespace, endOfFile, diagnostics.Build());
         }
 
         [MustUseReturnValue]
         [NotNull]
-        private IEnumerable<UsingDirectiveSyntax> ParseUsingDirectives([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+        private FileNamespaceDeclarationSyntax ParseFileNamespaceDeclaration(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
         {
-            while (tokens.Current is UsingKeywordToken)
+            var namespaceKeyword = tokens.Accept<NamespaceKeywordToken>();
+            NameSyntax name = null;
+            ISemicolonToken semicolon = null;
+            if (namespaceKeyword != null)
             {
-                yield return usingDirectiveParser.ParseUsingDirective(tokens, diagnostics);
+                name = nameParser.ParseName(tokens, diagnostics);
+                semicolon = tokens.Expect<ISemicolonToken>();
             }
-        }
-
-        [MustUseReturnValue]
-        [NotNull]
-        private IEnumerable<DeclarationSyntax> ParseDeclarations([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
-        {
-            while (!tokens.AtEndOfFile())
-            {
-                yield return declarationParser.ParseDeclaration(tokens, diagnostics);
-            }
+            var usingDirectives = usingDirectiveParser.ParseUsingDirectives(tokens, diagnostics).ToSyntaxList();
+            var declarations = declarationParser.ParseDeclarations(tokens, diagnostics).ToSyntaxList();
+            return new FileNamespaceDeclarationSyntax(namespaceKeyword, name, semicolon, usingDirectives, declarations);
         }
     }
 }

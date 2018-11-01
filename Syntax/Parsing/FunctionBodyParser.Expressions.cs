@@ -3,6 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Call;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow.Match;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Instance;

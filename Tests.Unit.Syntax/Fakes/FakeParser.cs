@@ -10,6 +10,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Blocks;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Call;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
@@ -85,7 +86,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
         private static T FakeParse<T>(
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
-            where T : SyntaxNode
+            where T : class
         {
             var fakeToken = tokens.ExpectFake();
             return (T)fakeToken?.FakeValue ?? throw new Exception($"Expected fake '{typeof(T).Name}' not found");
@@ -164,9 +165,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
 
         private class DeclarationParser : IDeclarationParser
         {
-            public DeclarationSyntax ParseDeclaration([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+            public SyntaxList<DeclarationSyntax> ParseDeclarations(ITokenStream tokens, IDiagnosticsCollector diagnostics)
             {
-                return FakeParse<DeclarationSyntax>(tokens, diagnostics);
+                return FakeParse<SyntaxList<DeclarationSyntax>>(tokens, diagnostics);
             }
         }
 
@@ -208,16 +209,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
 
         private class UsingDirectiveParser : IUsingDirectiveParser
         {
-            [NotNull]
-            public UsingDirectiveSyntax ParseUsingDirective(
-                [NotNull] ITokenStream tokens,
-                IDiagnosticsCollector diagnostics)
+            public SyntaxList<UsingDirectiveSyntax> ParseUsingDirectives(ITokenStream tokens, IDiagnosticsCollector diagnostics)
             {
-                var _ = tokens.Take<UsingKeywordToken>();
-
-                var fakeToken = tokens.ExpectFake();
-                return (UsingDirectiveSyntax)fakeToken?.FakeValue ?? throw new InvalidOperationException();
+                return FakeParse<SyntaxList<UsingDirectiveSyntax>>(tokens, diagnostics);
             }
+
+            //[NotNull]
+            //public UsingDirectiveSyntax ParseUsingDirective(
+            //    [NotNull] ITokenStream tokens,
+            //    IDiagnosticsCollector diagnostics)
+            //{
+            //    var _ = tokens.Take<UsingKeywordToken>();
+
+            //    var fakeToken = tokens.ExpectFake();
+            //    return (UsingDirectiveSyntax)fakeToken?.FakeValue ?? throw new InvalidOperationException();
+            //}
         }
 
         private class ModifierParser : IModifierParser

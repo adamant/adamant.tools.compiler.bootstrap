@@ -1,7 +1,6 @@
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes;
@@ -22,9 +21,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
 
             var cu = ParseWithoutError(tokens);
 
-            Assert.Null(cu.Namespace);
-            Assert.Empty(cu.UsingDirectives);
-            Assert.Empty(cu.Declarations);
+            Assert.Null(cu.Namespace.Name);
+            Assert.Empty(cu.Namespace.UsingDirectives);
+            Assert.Empty(cu.Namespace.Declarations);
             Assert.Empty(cu.Diagnostics);
         }
 
@@ -42,8 +41,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
             Assert.Equal(name, ns.Name);
             Assert.Equal(tokens[2], ns.Semicolon);
 
-            Assert.Empty(cu.UsingDirectives);
-            Assert.Empty(cu.Declarations);
+            Assert.Empty(cu.Namespace.UsingDirectives);
+            Assert.Empty(cu.Namespace.Declarations);
             Assert.Empty(cu.Diagnostics);
         }
 
@@ -55,9 +54,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
 
             var cu = ParseWithoutError(tokens);
 
-            Assert.Null(cu.Namespace);
-            Assert.Equal(@using, cu.UsingDirectives.Single());
-            Assert.Empty(cu.Declarations);
+            Assert.Null(cu.Namespace.Name);
+            Assert.Equal(@using, cu.Namespace.UsingDirectives.Single());
+            Assert.Empty(cu.Namespace.Declarations);
             Assert.Empty(cu.Diagnostics);
         }
 

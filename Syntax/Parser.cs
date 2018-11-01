@@ -21,7 +21,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             var parameterParser = new ParameterParser(functionBodyParser);
             var accessModifierParser = new ModifierParser();
             var declarationParser = new DeclarationParser(listParser, functionBodyParser,
-                functionBodyParser, parameterParser, accessModifierParser, genericsParser, functionBodyParser);
+                functionBodyParser, parameterParser, accessModifierParser,
+                genericsParser, functionBodyParser, usingDirectiveParser);
             compilationUnitParser = new CompilationUnitParser(usingDirectiveParser, declarationParser, functionBodyParser);
         }
 

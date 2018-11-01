@@ -3,6 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Namespaces;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Blocks;
 using JetBrains.Annotations;
 
@@ -39,6 +40,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         public AnalysisContext WithGenericParameters([NotNull] MemberDeclarationSyntax syntax)
         {
             return new AnalysisContext(File, new GenericsScope(Scope, syntax));
+        }
+
+        [NotNull]
+        public AnalysisContext InNamespace([NotNull] NamespaceDeclarationSyntax @namespace)
+        {
+            return new AnalysisContext(File, new UsingDirectivesScope(new NamespaceScope(Scope, @namespace), @namespace));
         }
     }
 }

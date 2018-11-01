@@ -11,19 +11,43 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
     {
         [NotNull] public CompilationUnitScope GlobalScope { get; }
         [NotNull] public new CompilationUnitSyntax Syntax { get; }
-        [NotNull] [ItemNotNull] public IReadOnlyList<MemberDeclarationAnalysis> Declarations { get; }
+        [NotNull] public NamespaceDeclarationAnalysis Namespace { get; }
+        [NotNull] public IReadOnlyList<MemberDeclarationAnalysis> MemberDeclarations { get; }
 
         public CompilationUnitAnalysis(
             [NotNull] CompilationUnitScope globalScope,
             [NotNull] CompilationUnitSyntax syntax,
-            [NotNull] [ItemNotNull] IEnumerable<MemberDeclarationAnalysis> declarations)
+            [NotNull] NamespaceDeclarationAnalysis @namespace)
             : base(new AnalysisContext(syntax.CodeFile, globalScope), syntax)
         {
             Requires.NotNull(nameof(globalScope), globalScope);
-            Requires.NotNull(nameof(declarations), declarations);
+            Requires.NotNull(nameof(@namespace), @namespace);
             GlobalScope = globalScope;
             Syntax = syntax;
-            Declarations = declarations.ToReadOnlyList();
+            Namespace = @namespace;
+            MemberDeclarations = GatherMemberDeclarations(@namespace).ToReadOnlyList();
+        }
+
+        private static List<MemberDeclarationAnalysis> GatherMemberDeclarations(NamespaceDeclarationAnalysis namespaceDeclaration)
+        {
+            var memberDeclarations = new List<MemberDeclarationAnalysis>();
+            var namespaces = new Queue<NamespaceDeclarationAnalysis>();
+            namespaces.Enqueue(namespaceDeclaration);
+            while (namespaces.TryDequeue(out namespaceDeclaration))
+                foreach (var declaration in namespaceDeclaration.Declarations)
+                    switch (declaration)
+                    {
+                        case NamespaceDeclarationAnalysis nestedNamespace:
+                            namespaces.Enqueue(nestedNamespace);
+                            break;
+                        case MemberDeclarationAnalysis memberDeclaration:
+                            memberDeclarations.Add(memberDeclaration);
+                            break;
+                        default:
+                            throw NonExhaustiveMatchException.For(declaration);
+                    }
+
+            return memberDeclarations;
         }
     }
 }

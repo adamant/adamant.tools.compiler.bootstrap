@@ -82,6 +82,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
             var modifierParser = FakeParser.ForModifiers();
             var genericsParser = FakeParser.ForGenerics();
             var nameParser = FakeParser.ForNames();
+            var usingDirectiveParser = FakeParser.ForUsingDirectives();
             return new DeclarationParser(
                 listParser,
                 expressionParser,
@@ -89,7 +90,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
                 parameterParser,
                 modifierParser,
                 genericsParser,
-                nameParser);
+                nameParser,
+                usingDirectiveParser);
         }
     }
 }

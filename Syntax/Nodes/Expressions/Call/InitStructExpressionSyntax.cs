@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Call
 {
     public class InitStructExpressionSyntax : ExpressionSyntax
     {

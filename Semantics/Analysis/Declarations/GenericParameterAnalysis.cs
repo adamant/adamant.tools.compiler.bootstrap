@@ -27,11 +27,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
             Name = name;
             TypeExpression = typeExpression;
         }
-
-        //[NotNull]
-        //public Parameter Complete()
-        //{
-        //    return new GenericParameter( Name, Type.AssertNotNull());
-        //}
     }
 }

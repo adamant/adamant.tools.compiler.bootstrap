@@ -9,6 +9,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Contr
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Parameters;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Namespaces;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types.Enums;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
@@ -135,14 +136,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
             [CanBeNull] NameSyntax @namespace,
             [NotNull] params DeclarationSyntax[] declarations)
         {
-            var namespaceSyntax = @namespace != null
-                ? new CompilationUnitNamespaceSyntax(null, @namespace, null)
-                : null;
+            var namespaceSyntax = new FileNamespaceDeclarationSyntax(
+                null, @namespace, null, SyntaxList<UsingDirectiveSyntax>.Empty,
+                new SyntaxList<DeclarationSyntax>(declarations)); ;
             return new CompilationUnitSyntax(
                 "".ToFakeCodeFile(),
                 namespaceSyntax,
-                SyntaxList<UsingDirectiveSyntax>.Empty,
-                new SyntaxList<DeclarationSyntax>(declarations),
                 new EndOfFileToken(FakeSpan, Diagnostics.Empty),
                 Diagnostics.Empty);
         }

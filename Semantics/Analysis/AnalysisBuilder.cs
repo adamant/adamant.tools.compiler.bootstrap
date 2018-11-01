@@ -14,15 +14,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             StatementAnalysisBuilder statementBuilder = null;
             var expressionBuilder = new ExpressionAnalysisBuilder(() => statementBuilder);
             statementBuilder = new StatementAnalysisBuilder(expressionBuilder);
-            var declarationBuilder = new DeclarationAnalysisBuilder(expressionBuilder, statementBuilder);
-            compilationUnitAnalysisBuilder = new CompilationUnitAnalysisBuilder(nameBuilder, declarationBuilder);
+            var declarationBuilder = new DeclarationAnalysisBuilder(expressionBuilder, statementBuilder, nameBuilder);
+            compilationUnitAnalysisBuilder = new CompilationUnitAnalysisBuilder(declarationBuilder);
         }
 
         [NotNull]
         [ItemNotNull]
         public IEnumerable<CompilationUnitAnalysis> Build([NotNull] PackageSyntax packageSyntax)
         {
-            return compilationUnitAnalysisBuilder.Build(packageSyntax);
+            return compilationUnitAnalysisBuilder.BuildPackage(packageSyntax);
         }
     }
 }

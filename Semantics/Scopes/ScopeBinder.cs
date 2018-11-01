@@ -10,6 +10,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Operators;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Statements;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Blocks;
 using JetBrains.Annotations;
@@ -18,20 +19,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 {
     public class ScopeBinder
     {
-        [NotNull]
-        private readonly Dictionary<MemberDeclarationSyntax, MemberDeclarationAnalysis>
-            declarations;
-
+        [NotNull] private readonly Dictionary<DeclarationSyntax, DeclarationAnalysis> declarations = new Dictionary<DeclarationSyntax, DeclarationAnalysis>();
         [NotNull] private readonly Dictionary<string, IDeclarationAnalysis> globalDeclarations;
+        [NotNull] private readonly NameBuilder nameBuilder;
 
         public ScopeBinder(
-            [NotNull] [ItemNotNull] IEnumerable<MemberDeclarationAnalysis> declarationAnalyses)
+            [NotNull] [ItemNotNull] IEnumerable<CompilationUnitAnalysis> compilationUnits,
+            [NotNull] NameBuilder nameBuilder)
         {
-            this.declarations = declarationAnalyses.ToDictionary(a => a.Syntax, a => a);
+            this.nameBuilder = nameBuilder;
+
+            foreach (var compilationUnit in compilationUnits)
+                GatherDeclarations(compilationUnit.Namespace);
 
             globalDeclarations = this.declarations.Values.AssertNotNull()
+                .OfType<IDeclarationAnalysis>()
                 .Where(IsGlobalDeclaration)
-                .ToDictionary(d => d.Name.Name.Text, d => d as IDeclarationAnalysis);
+                .ToDictionary(d => d.Name.Name.Text, d => d);
+        }
+
+        private void GatherDeclarations([NotNull] DeclarationAnalysis declaration)
+        {
+            declarations.Add(declaration.Syntax, declaration);
+            if (!(declaration is NamespaceDeclarationAnalysis namespaceDeclaration)) return;
+            foreach (var nestDeclaration in namespaceDeclaration.Declarations)
+                GatherDeclarations(nestDeclaration);
         }
 
         private static bool IsGlobalDeclaration([NotNull] IDeclarationAnalysis declaration)
@@ -39,15 +51,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
             return !declaration.Name.Qualifier.Any();
         }
 
-        public void Bind([NotNull] CompilationUnitScope scope)
+        public void BindCompilationUnitScope([NotNull] CompilationUnitScope scope)
         {
             Requires.NotNull(nameof(scope), scope);
             scope.Bind(globalDeclarations);
             foreach (var nestedScope in scope.NestedScopes)
-                BindDeclaration(nestedScope);
+                BindScope(nestedScope);
         }
 
-        private void BindDeclaration([NotNull] LexicalScope scope)
+        private void BindScope([NotNull] LexicalScope scope)
         {
             Requires.NotNull(nameof(scope), scope);
             switch (scope)
@@ -70,7 +82,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
                         var blocks = new Dictionary<BlockSyntax, BlockAnalysis>();
                         GetAllBlocks(function, blocks);
                         foreach (var nestedScope in functionScope.NestedScopes.Cast<BlockScope>())
-                            BindBlock(nestedScope, blocks);
+                            BindBlockScope(nestedScope, blocks);
                     }
                     break;
                 case NamespaceScope namespaceScope:
@@ -78,12 +90,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
                         // TODO bind correct names in the namespace
                         namespaceScope.Bind(new Dictionary<string, IDeclarationAnalysis>());
                         foreach (var nestedScope in namespaceScope.NestedScopes)
-                            BindDeclaration(nestedScope);
+                            BindScope(nestedScope);
                     }
                     break;
                 case GenericsScope genericsScope:
                     {
-                        var declaration = declarations[genericsScope.Syntax].AssertNotNull();
+                        var declaration = (MemberDeclarationAnalysis)declarations[genericsScope.Syntax].AssertNotNull();
                         var parameters = new Dictionary<string, IDeclarationAnalysis>();
                         foreach (var parameter in declaration.GenericParameters)
                             parameters.Add(parameter.Name.Name.Text, parameter);
@@ -91,7 +103,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
                         genericsScope.Bind(parameters);
 
                         foreach (var nestedScope in genericsScope.NestedScopes)
-                            BindDeclaration(nestedScope);
+                            BindScope(nestedScope);
+                    }
+                    break;
+                case UsingDirectivesScope usingDirectivesScope:
+                    {
+                        var declaration = (NamespaceDeclarationAnalysis)declarations[usingDirectivesScope.Syntax].AssertNotNull();
+                        var members = new Dictionary<string, IDeclarationAnalysis>();
+                        foreach (var usingDirective in declaration.Syntax.UsingDirectives)
+                        {
+                            var usingNamespace = nameBuilder.BuildName(usingDirective.Name).AssertNotNull();
+                            foreach (var importedDeclaration in declarations.Values
+                                .OfType<IDeclarationAnalysis>()
+                                .Where(d => d.Name.IsIn(usingNamespace)))
+                            {
+                                members.Add(importedDeclaration.Name.Name.Text, importedDeclaration);
+                            }
+                        }
+
+                        usingDirectivesScope.Bind(members);
+
+                        foreach (var nestedScope in usingDirectivesScope.NestedScopes)
+                            BindScope(nestedScope);
                     }
                     break;
                 default:
@@ -99,7 +132,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
             }
         }
 
-        private void GetAllBlocks(
+        private static void GetAllBlocks(
             [NotNull] FunctionDeclarationAnalysis function,
             [NotNull] Dictionary<BlockSyntax, BlockAnalysis> blocks)
         {
@@ -118,7 +151,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
                 }
         }
 
-        private void GetAllBlocks(
+        private static void GetAllBlocks(
             [NotNull] ExpressionAnalysis expression,
             [NotNull] Dictionary<BlockSyntax, BlockAnalysis> blocks)
         {
@@ -182,7 +215,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
             }
         }
 
-        private void BindBlock(
+        private void BindBlockScope(
             [NotNull] BlockScope scope,
             [NotNull] Dictionary<BlockSyntax, BlockAnalysis> blocks)
         {
@@ -195,7 +228,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
                 variableDeclarations.Add(declaration.Name.Name.Text, declaration);
 
             foreach (var nestedScope in scope.NestedScopes.Cast<BlockScope>())
-                BindBlock(nestedScope, blocks);
+                BindBlockScope(nestedScope, blocks);
 
             scope.Bind(variableDeclarations);
         }

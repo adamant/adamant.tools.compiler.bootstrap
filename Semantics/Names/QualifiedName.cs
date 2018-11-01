@@ -78,5 +78,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
             return !(name1 == name2);
         }
         #endregion
+
+        public bool IsIn([NotNull] QualifiedName other)
+        {
+            return other.FullName.SequenceEqual(Qualifier);
+        }
     }
 }
