@@ -97,10 +97,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                         case AssignmentStatement assignmentStatement:
                             {
                                 var claim = GetClaim(assignmentStatement.RValue, claimsBeforeStatement);
-                                var loan = new Loan(assignmentStatement.LValue.CoreVariable(),
-                                    assignmentStatement.RValue,
-                                    claim.Object);
-                                claimsAfterStatement.Add(loan);
+                                if (claim != null) // copy types don't have claims right now
+                                {
+                                    var loan = new Loan(assignmentStatement.LValue.CoreVariable(),
+                                        assignmentStatement.RValue,
+                                        claim.Object);
+                                    claimsAfterStatement.Add(loan);
+                                }
                                 break;
                             }
                         case DeleteStatement deleteStatement:
@@ -141,11 +144,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                 diagnostics.Publish(BorrowError.BorrowedValueDoesNotLiveLongEnough(function.Context.File, span));
         }
 
-        [NotNull]
+        [CanBeNull]
         private static Claim GetClaim([NotNull] RValue rvalue, [NotNull][ItemNotNull] HashSet<Claim> claims)
         {
             var coreVariable = rvalue.CoreVariable();
-            return claims.Single(t => t.Variable == coreVariable).AssertNotNull();
+            // Copy types don't have claims right now
+            return claims.SingleOrDefault(t => t.Variable == coreVariable);
         }
 
         private static Title GetTitle([NotNull] RValue rvalue, [NotNull] HashSet<Claim> claims)

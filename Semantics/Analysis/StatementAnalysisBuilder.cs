@@ -29,8 +29,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                     var initializer = variableDeclaration.Initializer != null ? expressionBuilder.BuildExpression(context, functionName, variableDeclaration.Initializer) : null;
                     return new VariableDeclarationStatementAnalysis(context, variableDeclaration, name, type, initializer);
                 case ExpressionStatementSyntax expressionStatement:
-                    // TODO that isn't the right scope I don't think
-                    return new ExpressionStatementAnalysis(context, expressionStatement, expressionBuilder.BuildExpression(context, functionName, expressionStatement.Expression));
+                    return new ExpressionStatementAnalysis(context, expressionStatement,
+                        expressionBuilder.BuildExpression(context, functionName, expressionStatement.Expression));
                 default:
                     throw NonExhaustiveMatchException.For(statement);
             }

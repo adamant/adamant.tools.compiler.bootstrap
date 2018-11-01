@@ -93,9 +93,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                 case BooleanLiteralExpressionSyntax booleanLiteralExpression:
                     return new BooleanLiteralExpressionAnalysis(context, booleanLiteralExpression);
                 case ForeachExpressionSyntax foreachExpression:
+                    // New context because a variable is declared
+                    var loopBodyContext = context.InLocalVariableScope(foreachExpression);
                     return new ForeachExpressionAnalysis(context, foreachExpression,
+                        functionName.Qualify(foreachExpression.Identifier.Value ?? "_"),
+                        foreachExpression.TypeExpression != null ?
+                            BuildExpression(context, functionName, foreachExpression.TypeExpression) : null,
                         BuildExpression(context, functionName, foreachExpression.InExpression),
-                        BuildBlock(context, functionName, foreachExpression.Block));
+                        BuildBlock(loopBodyContext, functionName, foreachExpression.Block));
                 case InvocationSyntax invocation:
                     return new InvocationAnalysis(context, invocation,
                         BuildExpression(context, functionName, invocation.Callee),
@@ -149,7 +154,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             [NotNull] QualifiedName functionName,
             [NotNull] BlockSyntax block)
         {
-            var blockContext = context.InBlock(block);
+            var blockContext = context.InLocalVariableScope(block);
             return new BlockAnalysis(context, block,
                 block.Statements.Select(
                     s => StatementBuilder.Build(blockContext, functionName, s)));

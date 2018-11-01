@@ -374,10 +374,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             var foreachKeyword = tokens.Expect<ForeachKeywordToken>();
             var varKeyword = tokens.Accept<VarKeywordToken>();
             var identifier = tokens.ExpectIdentifier();
+            var colon = tokens.Accept<ColonToken>();
+            ExpressionSyntax typeExpression = null;
+            if (colon != null)
+                typeExpression = ParseExpression(tokens, diagnostics);
             var inKeyword = tokens.Expect<InKeywordToken>();
             var expression = ParseExpression(tokens, diagnostics);
             var block = ParseBlock(tokens, diagnostics);
-            return new ForeachExpressionSyntax(foreachKeyword, varKeyword, identifier, inKeyword, expression, block);
+            return new ForeachExpressionSyntax(foreachKeyword, varKeyword, identifier,
+                colon, typeExpression, inKeyword, expression, block);
         }
 
 

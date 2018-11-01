@@ -12,7 +12,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Types.Name
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Blocks;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
@@ -79,10 +79,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 
                         functionScope.Bind(variables);
 
-                        var blocks = new Dictionary<BlockSyntax, BlockAnalysis>();
-                        GetAllBlocks(function, blocks);
-                        foreach (var nestedScope in functionScope.NestedScopes.Cast<BlockScope>())
-                            BindBlockScope(nestedScope, blocks);
+                        var blocks = new Dictionary<ExpressionSyntax, ILocalVariableScopeAnalysis>();
+                        GetVariableScopes(function, blocks);
+                        var bodyScope = functionScope.NestedScopes.Cast<LocalVariableScope>()
+                            .SingleOrDefault();
+                        if (bodyScope != null)
+                            BindBlockScope(bodyScope, blocks);
                     }
                     break;
                 case NamespaceScope namespaceScope:
@@ -132,78 +134,80 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
             }
         }
 
-        private static void GetAllBlocks(
+        private static void GetVariableScopes(
             [NotNull] FunctionDeclarationAnalysis function,
-            [NotNull] Dictionary<BlockSyntax, BlockAnalysis> blocks)
+            [NotNull] Dictionary<ExpressionSyntax, ILocalVariableScopeAnalysis> scopes)
         {
             foreach (var statement in function.Statements)
                 switch (statement)
                 {
                     case ExpressionStatementAnalysis expressionStatement:
-                        GetAllBlocks(expressionStatement.Expression, blocks);
+                        GetVariableScopes(expressionStatement.Expression, scopes);
                         break;
                     case VariableDeclarationStatementAnalysis variableDeclaration:
                         if (variableDeclaration.Initializer != null)
-                            GetAllBlocks(variableDeclaration.Initializer, blocks);
+                            GetVariableScopes(variableDeclaration.Initializer, scopes);
                         break;
                     default:
                         throw NonExhaustiveMatchException.For(statement);
                 }
         }
 
-        private static void GetAllBlocks(
+        private static void GetVariableScopes(
             [NotNull] ExpressionAnalysis expression,
-            [NotNull] Dictionary<BlockSyntax, BlockAnalysis> blocks)
+            [NotNull] Dictionary<ExpressionSyntax, ILocalVariableScopeAnalysis> scopes)
         {
             switch (expression)
             {
                 case BlockAnalysis block:
-                    blocks.Add(block.Syntax, block);
+                    scopes.Add(block.Syntax, block);
                     break;
                 case ReturnExpressionAnalysis returnExpression:
                     if (returnExpression.ReturnExpression != null)
-                        GetAllBlocks(returnExpression.ReturnExpression, blocks);
+                        GetVariableScopes(returnExpression.ReturnExpression, scopes);
                     break;
                 case BinaryOperatorExpressionAnalysis binaryOperatorExpression:
-                    GetAllBlocks(binaryOperatorExpression.LeftOperand, blocks);
-                    GetAllBlocks(binaryOperatorExpression.RightOperand, blocks);
+                    GetVariableScopes(binaryOperatorExpression.LeftOperand, scopes);
+                    GetVariableScopes(binaryOperatorExpression.RightOperand, scopes);
                     break;
                 case UnaryOperatorExpressionAnalysis unaryOperatorExpression:
-                    GetAllBlocks(unaryOperatorExpression.Operand, blocks);
+                    GetVariableScopes(unaryOperatorExpression.Operand, scopes);
                     break;
                 case ForeachExpressionAnalysis foreachExpression:
-                    GetAllBlocks(foreachExpression.Block, blocks);
+                    // The foreach expression itself declares a variable
+                    scopes.Add(foreachExpression.Syntax, foreachExpression);
+                    GetVariableScopes(foreachExpression.Block, scopes);
                     break;
                 case InvocationAnalysis invocation:
                     foreach (var argument in invocation.Arguments)
-                        GetAllBlocks(argument.Value, blocks);
+                        GetVariableScopes(argument.Value, scopes);
                     break;
                 case GenericInvocationAnalysis genericInvocation:
                     foreach (var argument in genericInvocation.Arguments)
-                        GetAllBlocks(argument.Value, blocks);
+                        GetVariableScopes(argument.Value, scopes);
                     break;
                 case NewObjectExpressionAnalysis newObjectExpression:
                     foreach (var argument in newObjectExpression.Arguments)
-                        GetAllBlocks(argument.Value, blocks);
+                        GetVariableScopes(argument.Value, scopes);
                     break;
                 case InitStructExpressionAnalysis initStructExpression:
                     foreach (var argument in initStructExpression.Arguments)
-                        GetAllBlocks(argument.Value, blocks);
+                        GetVariableScopes(argument.Value, scopes);
                     break;
                 case UnsafeExpressionAnalysis unsafeExpression:
-                    GetAllBlocks(unsafeExpression.Expression, blocks);
+                    GetVariableScopes(unsafeExpression.Expression, scopes);
                     break;
                 case RefTypeAnalysis refType:
-                    GetAllBlocks(refType.ReferencedType, blocks);
+                    GetVariableScopes(refType.ReferencedType, scopes);
                     break;
                 case IfExpressionAnalysis ifExpression:
-                    GetAllBlocks(ifExpression.Condition, blocks);
-                    GetAllBlocks(ifExpression.ThenBlock, blocks);
+                    GetVariableScopes(ifExpression.Condition, scopes);
+                    GetVariableScopes(ifExpression.ThenBlock, scopes);
                     if (ifExpression.ElseClause != null)
-                        GetAllBlocks(ifExpression.ElseClause, blocks);
+                        GetVariableScopes(ifExpression.ElseClause, scopes);
                     break;
                 case ResultExpressionAnalysis resultExpression:
-                    GetAllBlocks(resultExpression.Expression, blocks);
+                    GetVariableScopes(resultExpression.Expression, scopes);
                     break;
                 case IntegerLiteralExpressionAnalysis _:
                 case IdentifierNameAnalysis _:
@@ -216,21 +220,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
         }
 
         private void BindBlockScope(
-            [NotNull] BlockScope scope,
-            [NotNull] Dictionary<BlockSyntax, BlockAnalysis> blocks)
+            [NotNull] LocalVariableScope scope,
+            [NotNull] Dictionary<ExpressionSyntax, ILocalVariableScopeAnalysis> scopes)
         {
             Requires.NotNull(nameof(scope), scope);
-            Requires.NotNull(nameof(blocks), blocks);
+            Requires.NotNull(nameof(scopes), scopes);
 
-            var block = blocks[scope.Syntax].AssertNotNull();
+            var scopeAnalysis = scopes[scope.Syntax].AssertNotNull();
             var variableDeclarations = new Dictionary<string, IDeclarationAnalysis>();
-            foreach (var declaration in block.Statements.OfType<VariableDeclarationStatementAnalysis>())
+            foreach (var declaration in scopeAnalysis.LocalVariableDeclarations())
                 variableDeclarations.Add(declaration.Name.Name.Text, declaration);
 
-            foreach (var nestedScope in scope.NestedScopes.Cast<BlockScope>())
-                BindBlockScope(nestedScope, blocks);
-
             scope.Bind(variableDeclarations);
+
+            foreach (var nestedScope in scope.NestedScopes.Cast<LocalVariableScope>())
+                BindBlockScope(nestedScope, scopes);
         }
     }
 }

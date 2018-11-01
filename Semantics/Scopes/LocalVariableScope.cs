@@ -1,16 +1,15 @@
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Blocks;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 {
-    public class BlockScope : NestedScope
+    public class LocalVariableScope : NestedScope
     {
-        [NotNull] public new BlockSyntax Syntax { get; }
+        [NotNull] public new ExpressionSyntax Syntax { get; }
 
-        public BlockScope(
+        public LocalVariableScope(
             [NotNull] LexicalScope containingScope,
-            [NotNull] BlockSyntax syntax)
+            [NotNull] ExpressionSyntax syntax)
             : base(containingScope, syntax)
         {
             Syntax = syntax;

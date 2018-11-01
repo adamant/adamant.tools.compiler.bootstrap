@@ -175,13 +175,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                                 expression.Type = ObjectType.Type;
                                 break;
                             case ParameterAnalysis parameter:
-                                expression.Type = parameter.Type; // TODO how can we be sure that type is resolved?
+                                expression.Type = parameter.Type.AssertNotNull();
                                 break;
                             case VariableDeclarationStatementAnalysis variableDeclaration:
-                                expression.Type = variableDeclaration.Type; // TODO how can we be sure that type is resolved?
+                                expression.Type = variableDeclaration.Type.AssertNotNull();
                                 break;
                             case GenericParameterAnalysis genericParameter:
-                                expression.Type = genericParameter.Type; // TODO how can we be sure that type is resolved?
+                                expression.Type = genericParameter.Type.AssertNotNull();
+                                break;
+                            case ForeachExpressionAnalysis foreachExpression:
+                                expression.Type = foreachExpression.VariableType.AssertNotNull();
                                 break;
                             case null:
                                 diagnostics.Publish(NameBindingError.CouldNotBindName(expression.Context.File, identifierName.Syntax.Span, name));
@@ -225,7 +228,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                     initStructExpression.Type = EvaluateTypeExpression(initStructExpression.ConstructorExpression, diagnostics);
                     break;
                 case ForeachExpressionAnalysis foreachExpression:
+                    foreachExpression.VariableType =
+                        EvaluateTypeExpression(foreachExpression.TypeExpression, diagnostics);
                     CheckExpression(foreachExpression.InExpression, diagnostics);
+
                     // TODO check the break types
                     CheckExpression(foreachExpression.Block, diagnostics);
                     // TODO assign a type to the expression
@@ -302,7 +308,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
 
             // If either is unknown, then we can't know whether there is a a problem
             // (technically not true, for example, we could know that one arg should
-            // be a bool and isn't)
+            // be a bool and isn't, also we could know the result is a bool)
             if (leftOperand == DataType.Unknown
                 || rightOperand == DataType.Unknown)
             {
@@ -405,9 +411,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
         /// </summary>
         [NotNull]
         private DataType EvaluateTypeExpression(
-            [NotNull] ExpressionAnalysis typeExpression,
+            [CanBeNull] ExpressionAnalysis typeExpression,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
+            if (typeExpression == null)
+            {
+                // TODO report error?
+                return DataType.Unknown;
+            }
+
             CheckExpression(typeExpression, diagnostics);
             if (typeExpression.Type != ObjectType.Type)
             {

@@ -4,6 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Namespaces;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Blocks;
 using JetBrains.Annotations;
 
@@ -30,10 +31,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         }
 
         [NotNull]
-        public AnalysisContext InBlock([NotNull] BlockSyntax syntax)
+        public AnalysisContext InLocalVariableScope([NotNull] ExpressionSyntax syntax)
         {
             Requires.NotNull(nameof(syntax), syntax);
-            return new AnalysisContext(File, new BlockScope(Scope, syntax));
+            return new AnalysisContext(File, new LocalVariableScope(Scope, syntax));
         }
 
         [NotNull]

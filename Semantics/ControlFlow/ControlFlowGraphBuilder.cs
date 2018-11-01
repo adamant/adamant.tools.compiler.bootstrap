@@ -132,6 +132,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         currentBlock.Add(new DeleteStatement(LookupVariable(cfg, variableDeclaration.Name.Name.Text).VariableNumber, block.Syntax.CloseBrace.Span));
 
                     break;
+                case ForeachExpressionAnalysis @foreach:
+                    // TODO actually convert the expression
+                    break;
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
