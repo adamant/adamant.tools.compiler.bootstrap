@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Contracts;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Effects;
@@ -25,6 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
         [CanBeNull] public ISemicolonToken Semicolon { get; }
 
         protected FunctionDeclarationSyntax(
+            TextSpan signatureSpan,
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
             [NotNull] IOpenParenToken openParen,
             [NotNull] SeparatedListSyntax<ParameterSyntax> parameterList,
@@ -33,6 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
             [NotNull] SyntaxList<ContractSyntax> contracts,
             [CanBeNull] BlockSyntax body,
             [CanBeNull] ISemicolonToken semicolon)
+            : base(signatureSpan)
         {
             Requires.NotNull(nameof(modifiers), modifiers);
             Requires.NotNull(nameof(openParen), openParen);

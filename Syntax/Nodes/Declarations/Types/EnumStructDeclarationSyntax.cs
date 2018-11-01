@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
@@ -32,6 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types
             [NotNull] EnumVariantsSyntax variants,
             [NotNull] SyntaxList<MemberDeclarationSyntax> members,
             [NotNull] ICloseBraceToken closeBrace)
+            : base(TextSpan.Covering(enumKeyword.Span, name.Span))
         {
             Requires.NotNull(nameof(modifiers), modifiers);
             Requires.NotNull(nameof(enumKeyword), enumKeyword);

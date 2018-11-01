@@ -24,7 +24,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
             [CanBeNull] EffectsSyntax effects,
             [NotNull] SyntaxList<ContractSyntax> contracts,
             [NotNull] BlockSyntax body)
-            : base(modifiers, openParen, parameters, closeParen, effects, contracts, body, null)
+            : base(deleteKeyword.Span, modifiers, openParen, parameters, closeParen,
+                effects, contracts, body, null)
         {
             Requires.NotNull(nameof(deleteKeyword), deleteKeyword);
             Requires.NotNull(nameof(body), body);

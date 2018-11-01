@@ -1,5 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
@@ -15,6 +16,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
     /// </summary>
     public static class TypeError
     {
+        [NotNull]
+        public static Diagnostic NotImplemented([NotNull] CodeFile file, TextSpan span, [NotNull] string message)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3000, message);
+        }
+
         [NotNull]
         public static Diagnostic OperatorCannotBeAppliedToOperandsOfType(
             [NotNull] CodeFile file,
@@ -55,9 +62,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
         }
 
         [NotNull]
-        public static Diagnostic NotImplemented([NotNull] CodeFile file, TextSpan span, string message)
+        public static Diagnostic CircularDefinition([NotNull] CodeFile file, TextSpan span, QualifiedName typeDeclarationName)
         {
-            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3000, message);
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3006, $"Declaration of type `{typeDeclarationName}` is part of a circular definition");
+
         }
     }
 }

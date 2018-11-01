@@ -122,7 +122,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         [NotNull]
         public static IncompleteDeclarationSyntax IncompleteDeclaration()
         {
-            return new IncompleteDeclarationSyntax(Enumerable.Empty<Token>());
+            return new IncompleteDeclarationSyntax(Enumerable.Empty<Token>().ToList());
         }
 
         [NotNull]

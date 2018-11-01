@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
 {
     public class TypeDeclarationAnalysis : MemberDeclarationAnalysis
     {
-        [NotNull] public new Metatype Type { get; }
+        [CanBeNull] public new DataType Type { get; set; }
         [NotNull] public new MemberDeclarationSyntax Syntax { get; }
 
         public TypeDeclarationAnalysis(
@@ -23,7 +23,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations
         {
             Requires.NotNull(nameof(syntax), syntax);
             Syntax = syntax;
-            Type = new Metatype(name);
         }
 
         [CanBeNull]

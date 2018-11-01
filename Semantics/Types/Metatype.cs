@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using JetBrains.Annotations;
@@ -23,16 +24,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
         // the single object instance that is of this metatype.
         [NotNull] public ObjectType Instance { get; }
 
-        public Metatype([NotNull] QualifiedName qualifiedName)
+        public Metatype([NotNull]ObjectType objectType)
         {
-            Requires.NotNull(nameof(qualifiedName), qualifiedName);
-            Name = qualifiedName;
-            Instance = new ObjectType(qualifiedName, false); // TODO correctly read is mutable
+            Requires.NotNull(nameof(objectType), objectType);
+            Name = objectType.Name;
+            Instance = objectType;
         }
 
         public override string ToString()
         {
             throw new System.NotImplementedException();
+        }
+
+        public DataType WithGenericArguments(IEnumerable<DataType> genericArguments)
+        {
+            return new Metatype(Instance.WithGenericArguments(genericArguments));
         }
     }
 }

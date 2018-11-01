@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Contracts;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Effects;
@@ -35,7 +36,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
             [NotNull] SyntaxList<ContractSyntax> contracts,
             [CanBeNull] BlockSyntax body,
             [CanBeNull] ISemicolonToken semicolon)
-            : base(modifiers, openParen, parameterList, closeParen, effects, contracts, body, semicolon)
+            : base(TextSpan.Covering(operatorKeyword.Span, @operator.Span),
+            modifiers, openParen, parameterList, closeParen, effects, contracts, body, semicolon)
         {
             Requires.NotNull(nameof(modifiers), modifiers);
             Requires.NotNull(nameof(operatorKeyword), operatorKeyword);

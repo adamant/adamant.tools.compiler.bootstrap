@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
@@ -29,6 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types
             [NotNull] IOpenBraceToken openBrace,
             [NotNull] SyntaxList<MemberDeclarationSyntax> members,
             [NotNull] ICloseBraceToken closeBrace)
+            : base(TextSpan.Covering(structKeyword.Span, name.Span))
         {
             Requires.NotNull(nameof(modifiers), modifiers);
             Requires.NotNull(nameof(structKeyword), structKeyword);

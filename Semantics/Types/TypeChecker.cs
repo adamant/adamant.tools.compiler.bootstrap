@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Declarations.Function;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions;
@@ -11,6 +13,8 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens.Identifiers;
 using JetBrains.Annotations;
@@ -23,11 +27,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             [NotNull] IList<MemberDeclarationAnalysis> analyses)
         {
             foreach (var analysis in analyses)
-            {
                 switch (analysis)
                 {
                     case FunctionDeclarationAnalysis f:
-                        CheckFunction(f, f.Diagnostics);
+                        CheckFunction(f);
                         break;
                     case TypeDeclarationAnalysis t:
                         CheckTypeDeclaration(t);
@@ -35,17 +38,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                     default:
                         throw NonExhaustiveMatchException.For(analysis);
                 }
-            }
         }
 
-        private void CheckFunction(
-            [NotNull] FunctionDeclarationAnalysis function,
-            [NotNull] IDiagnosticsCollector diagnostics)
+        private void CheckFunction([NotNull] FunctionDeclarationAnalysis function)
         {
-            CheckGenericParameters(function.GenericParameters, diagnostics);
-            CheckParameters(function.Parameters, diagnostics);
+            // Check the signature first
+            function.Type = DataType.BeingChecked; ;
+            function.ReturnType = DataType.BeingChecked;
+            CheckGenericParameters(function.GenericParameters, function.Diagnostics);
+            CheckParameters(function.Parameters, function.Diagnostics);
 
-            function.ReturnType = EvaluateTypeExpression(function.ReturnTypeExpression, diagnostics);
+            function.ReturnType = EvaluateTypeExpression(function.ReturnTypeExpression, function.Diagnostics);
+            // TODO set the whole function type
+
+            // Now that the signature is done, we can check the body
             foreach (var statement in function.Statements)
                 CheckStatement(statement, function.Diagnostics);
         }
@@ -56,6 +62,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
         {
             foreach (var parameter in genericParameters)
             {
+                parameter.Type = DataType.BeingChecked;
                 parameter.Type = parameter.TypeExpression == null ?
                     ObjectType.Type
                     : EvaluateTypeExpression(parameter.TypeExpression, diagnostics);
@@ -68,6 +75,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
         {
             foreach (var parameter in parameters)
             {
+                parameter.Type = DataType.BeingChecked;
                 if (parameter.TypeExpression != null)
                     parameter.Type = EvaluateTypeExpression(parameter.TypeExpression, diagnostics);
                 else
@@ -101,13 +109,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             [NotNull] IDiagnosticsCollector diagnostics)
         {
             if (variableDeclaration.TypeExpression != null)
-            {
-                variableDeclaration.Type = EvaluateTypeExpression(variableDeclaration.TypeExpression, diagnostics);
-            }
+                variableDeclaration.Type =
+                    EvaluateTypeExpression(variableDeclaration.TypeExpression, diagnostics);
             else
             {
                 diagnostics.Publish(TypeError.NotImplemented(variableDeclaration.Context.File,
-                    variableDeclaration.Syntax.Name.Span, "Inference of local variable types not implemented"));
+                    variableDeclaration.Syntax.Name.Span,
+                    "Inference of local variable types not implemented"));
                 variableDeclaration.Type = DataType.Unknown;
             }
 
@@ -116,19 +124,73 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             // TODO check that the initializer type is compatible with the variable type
         }
 
-        private static void CheckTypeDeclaration(
+        /// <summary>
+        /// If the type has not been checked, this checks it and returns it.
+        /// Also watches for type cycles
+        /// </summary>
+        [NotNull]
+        private DataType GetTypeDeclarationType(
+            [NotNull] TypeDeclarationAnalysis typeDeclaration,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            if (typeDeclaration.Type == null)
+                CheckTypeDeclaration(typeDeclaration);
+
+            if (typeDeclaration.Type == DataType.BeingChecked)
+            {
+                diagnostics.Publish(TypeError.CircularDefinition(typeDeclaration.Context.File, typeDeclaration.Syntax.SignatureSpan, typeDeclaration.Name));
+                return DataType.Unknown;
+            }
+
+            return typeDeclaration.Type.AssertChecked();
+        }
+
+        private void CheckTypeDeclaration(
             [NotNull] TypeDeclarationAnalysis typeDeclaration)
         {
-            // TODO
+            if (typeDeclaration.Type != null)
+                return;   // We have already checked it
+
+            typeDeclaration.Type = DataType.BeingChecked;
+            var genericParameters = typeDeclaration.GenericParameters;
+            CheckGenericParameters(genericParameters, typeDeclaration.Diagnostics);
+            var genericParameterTypes = genericParameters.Select(p => p.Type.AssertNotNull());
+            switch (typeDeclaration.Syntax)
+            {
+                case ClassDeclarationSyntax classDeclaration:
+                    var classType = new ObjectType(typeDeclaration.Name, true,
+                        classDeclaration.Modifiers.Any(m => m is MutableModifierSyntax),
+                        genericParameterTypes);
+                    typeDeclaration.Type = new Metatype(classType);
+                    break;
+                case StructDeclarationSyntax structDeclaration:
+                    var structType = new ObjectType(typeDeclaration.Name, false,
+                        structDeclaration.Modifiers.Any(m => m is MutableModifierSyntax),
+                        genericParameterTypes);
+                    typeDeclaration.Type = new Metatype(structType);
+                    break;
+                case EnumStructDeclarationSyntax enumStructDeclaration:
+                    var enumStructType = new ObjectType(typeDeclaration.Name, false,
+                        enumStructDeclaration.Modifiers.Any(m => m is MutableModifierSyntax),
+                        genericParameterTypes);
+                    typeDeclaration.Type = new Metatype(enumStructType);
+                    break;
+                case TypeDeclarationSyntax declarationSyntax:
+                    var type = new ObjectType(typeDeclaration.Name, true,
+                        declarationSyntax.Modifiers.Any(m => m is MutableModifierSyntax),
+                        genericParameterTypes);
+                    typeDeclaration.Type = new Metatype(type);
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.For(typeDeclaration.Syntax);
+            }
         }
 
         // Checks the expression is well typed, and that the type of the expression is `bool`
         private void CheckExpressionTypeIsBool(
-            [CanBeNull] ExpressionAnalysis expression,
+            [NotNull] ExpressionAnalysis expression,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
-            // Omitted types don't need further type checking
-            if (expression == null) return;
             CheckExpression(expression, diagnostics);
             if (expression.Type != ObjectType.Bool)
                 diagnostics.Publish(TypeError.MustBeABoolExpression(expression.Context.File, expression.Syntax.Span));
@@ -140,12 +202,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
         {
             switch (expression)
             {
-                case PrimitiveTypeAnalysis _:
-                    expression.Type = ObjectType.Type;
+                case PrimitiveTypeAnalysis primitive:
+                    expression.Type = new Metatype(GetPrimitiveType(primitive));
                     break;
                 case ReturnExpressionAnalysis returnExpression:
                     if (returnExpression.ReturnExpression != null)
                         CheckExpression(returnExpression.ReturnExpression, diagnostics);
+                    // TODO check that expression type matches function return type
                     expression.Type = ObjectType.Never;
                     break;
                 case IntegerLiteralExpressionAnalysis _:
@@ -159,45 +222,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                     CheckBinaryOperator(binaryOperatorExpression, diagnostics);
                     break;
                 case IdentifierNameAnalysis identifierName:
-                    var name = identifierName.Name;
-                    if (name == null)
-                    {
-                        // Missing name, just use unknown
-                        // Error should already be emitted
-                        expression.Type = DataType.Unknown;
-                    }
-                    else
-                    {
-                        var declaration = expression.Context.Scope.Lookup(name);
-                        switch (declaration)
-                        {
-                            case TypeDeclarationAnalysis _:
-                                expression.Type = ObjectType.Type;
-                                break;
-                            case ParameterAnalysis parameter:
-                                expression.Type = parameter.Type.AssertNotNull();
-                                break;
-                            case VariableDeclarationStatementAnalysis variableDeclaration:
-                                expression.Type = variableDeclaration.Type.AssertNotNull();
-                                break;
-                            case GenericParameterAnalysis genericParameter:
-                                expression.Type = genericParameter.Type.AssertNotNull();
-                                break;
-                            case ForeachExpressionAnalysis foreachExpression:
-                                expression.Type = foreachExpression.VariableType.AssertNotNull();
-                                break;
-                            case null:
-                                diagnostics.Publish(NameBindingError.CouldNotBindName(expression.Context.File, identifierName.Syntax.Span, name));
-                                expression.Type = DataType.Unknown; // unknown
-                                break;
-                            default:
-                                throw NonExhaustiveMatchException.For(declaration);
-                        }
-                    }
+                    identifierName.Type = CheckName(expression.Context, identifierName.Syntax.Name, diagnostics);
                     break;
                 case UnaryOperatorExpressionAnalysis unaryOperatorExpression:
                     CheckUnaryOperator(unaryOperatorExpression, diagnostics);
-                    // TODO assign a type to this expression
                     break;
                 case LifetimeTypeAnalysis lifetimeType:
                     CheckExpression(lifetimeType.TypeName, diagnostics);
@@ -234,7 +262,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
 
                     // TODO check the break types
                     CheckExpression(foreachExpression.Block, diagnostics);
-                    // TODO assign a type to the expression
+                    // TODO assign correct type to the expression
                     foreachExpression.Type = DataType.Unknown;
                     break;
                 case InvocationAnalysis invocation:
@@ -242,24 +270,47 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                     // TODO the callee needs to be something callable
                     foreach (var argument in invocation.Arguments)
                         CheckExpression(argument.Value, diagnostics);
-                    // TODO assign return type
+                    // TODO assign correct return type
                     invocation.Type = DataType.Unknown;
                     break;
                 case GenericInvocationAnalysis genericInvocation:
+                    CheckExpression(genericInvocation.Callee, diagnostics);
+                    var calleeType = genericInvocation.Callee.Type;
                     foreach (var argument in genericInvocation.Arguments)
                         CheckExpression(argument.Value, diagnostics);
-
-                    // TODO assign return type
-                    genericInvocation.Type = DataType.Unknown;
+                    // TODO check that argument types match function type
+                    switch (calleeType)
+                    {
+                        case Metatype metatype:
+                            genericInvocation.Type = metatype.WithGenericArguments(genericInvocation.Arguments.Select(a => a.Value.Type));
+                            break;
+                        case UnknownType _:
+                            genericInvocation.Type = DataType.Unknown;
+                            break;
+                        default:
+                            throw NonExhaustiveMatchException.For(calleeType);
+                    }
                     break;
                 case GenericNameAnalysis genericName:
+                    genericName.NameType = CheckName(genericName.Context, genericName.Syntax.Name, diagnostics);
                     foreach (var argument in genericName.Arguments)
                         CheckExpression(argument.Value, diagnostics);
                     // TODO check that argument types match function type
-                    // TODO assign type
+                    switch (genericName.NameType)
+                    {
+                        case Metatype metatype:
+                            genericName.Type = metatype.WithGenericArguments(genericName.Arguments.Select(a => a.Value.Type));
+                            break;
+                        case UnknownType _:
+                            genericName.Type = DataType.Unknown;
+                            break;
+                        default:
+                            throw NonExhaustiveMatchException.For(genericName.NameType);
+                    }
                     break;
                 case RefTypeAnalysis refType:
-                    refType.Type = EvaluateTypeExpression(refType.ReferencedType, diagnostics);
+                    EvaluateTypeExpression(refType.ReferencedType, diagnostics);
+                    refType.Type = ObjectType.Type;
                     break;
                 case UnsafeExpressionAnalysis unsafeExpression:
                     CheckExpression(unsafeExpression.Expression, diagnostics);
@@ -284,6 +335,42 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(expression);
+            }
+        }
+
+        [NotNull]
+        private DataType CheckName(
+            [NotNull] AnalysisContext context,
+            [CanBeNull] IIdentifierToken name,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            if (name == null)
+            {
+                // Missing name, just use unknown
+                // Error should already be emitted
+                return DataType.Unknown;
+            }
+            else
+            {
+                var declaration = context.Scope.Lookup(name.Value);
+                switch (declaration)
+                {
+                    case TypeDeclarationAnalysis typeDeclaration:
+                        return GetTypeDeclarationType(typeDeclaration, diagnostics);
+                    case ParameterAnalysis parameter:
+                        return parameter.Type.AssertChecked();
+                    case VariableDeclarationStatementAnalysis variableDeclaration:
+                        return variableDeclaration.Type.AssertChecked();
+                    case GenericParameterAnalysis genericParameter:
+                        return genericParameter.Type.AssertChecked();
+                    case ForeachExpressionAnalysis foreachExpression:
+                        return foreachExpression.VariableType.AssertChecked();
+                    case null:
+                        diagnostics.Publish(NameBindingError.CouldNotBindName(context.File, name));
+                        return DataType.Unknown; // unknown
+                    default:
+                        throw NonExhaustiveMatchException.For(declaration);
+                }
             }
         }
 
@@ -421,7 +508,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             }
 
             CheckExpression(typeExpression, diagnostics);
-            if (typeExpression.Type != ObjectType.Type)
+            if (!(typeExpression.Type is Metatype) && typeExpression.Type != ObjectType.Type)
             {
                 diagnostics.Publish(TypeError.MustBeATypeExpression(typeExpression.Context.File,
                     typeExpression.Syntax.Span));
@@ -439,59 +526,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             switch (typeExpression)
             {
                 case IdentifierNameAnalysis identifier:
-                    var name = identifier.Name;
-                    if (name == null)
+                    var identifierType = identifier.Type;
+                    switch (identifierType)
                     {
-                        // Missing identifier, error already emitted, just treat as unknown type
-                        return DataType.Unknown;
-                    }
-                    else
-                    {
-                        var declaration = typeExpression.Context.Scope.Lookup(name);
-                        switch (declaration)
-                        {
-                            case TypeDeclarationAnalysis typeDeclaration:
-                                return typeDeclaration.Type.Instance;
-                            case FunctionDeclarationAnalysis _: // The name doesn't match the name of a type
-                                diagnostics.Publish(TypeError.NameRefersToFunctionNotType(
-                                    typeExpression.Context.File, identifier.Syntax.Span, name));
-                                return DataType.Unknown;
-                            case GenericParameterAnalysis genericParameter:
-                                return genericParameter.Type.AssertKnown();
-                            case null: // Name not known
-                                diagnostics.Publish(NameBindingError.CouldNotBindName(
-                                    typeExpression.Context.File, identifier.Syntax.Span, name));
-                                return null;
-                            default:
-                                throw NonExhaustiveMatchException.For(declaration);
-                        }
+                        case Metatype metatype:
+                            return metatype.Instance;
+                        case UnknownType _:
+                        case ObjectType t when t == ObjectType.Type: // It is a variable holding a type?
+                            return DataType.Unknown;
+                        default:
+                            throw NonExhaustiveMatchException.For(identifierType);
                     }
                 case PrimitiveTypeAnalysis primitive:
-                    switch (primitive.Syntax.Keyword)
-                    {
-                        case IntKeywordToken _:
-                            return ObjectType.Int;
-                        case UIntKeywordToken _:
-                            return ObjectType.UInt;
-                        case ByteKeywordToken _:
-                            return ObjectType.Byte;
-                        case SizeKeywordToken _:
-                            return ObjectType.Size;
-                        case VoidKeywordToken _:
-                            return ObjectType.Void;
-                        case BoolKeywordToken _:
-                            return ObjectType.Bool;
-                        case StringKeywordToken _:
-                            return ObjectType.String;
-                        case NeverKeywordToken _:
-                            return ObjectType.Never;
-                        case TypeKeywordToken _:
-                            return ObjectType.Type;
-                        case MetatypeKeywordToken _:
-                            return ObjectType.Metatype;
-                        default:
-                            throw NonExhaustiveMatchException.For(primitive.Syntax.Keyword);
-                    }
+                    return GetPrimitiveType(primitive);
                 case LifetimeTypeAnalysis lifetimeType:
                     var type = EvaluateCheckedTypeExpression(lifetimeType.TypeName, diagnostics);
                     if (type == DataType.Unknown) return DataType.Unknown;
@@ -526,6 +573,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                     return EvaluateCheckedTypeExpression(mutableType.ReferencedType, diagnostics); // TODO make the type mutable
                 default:
                     throw NonExhaustiveMatchException.For(typeExpression);
+            }
+        }
+
+        [NotNull]
+        private static ObjectType GetPrimitiveType([NotNull] PrimitiveTypeAnalysis primitive)
+        {
+            switch (primitive.Syntax.Keyword)
+            {
+                case IntKeywordToken _:
+                    return ObjectType.Int;
+                case UIntKeywordToken _:
+                    return ObjectType.UInt;
+                case ByteKeywordToken _:
+                    return ObjectType.Byte;
+                case SizeKeywordToken _:
+                    return ObjectType.Size;
+                case VoidKeywordToken _:
+                    return ObjectType.Void;
+                case BoolKeywordToken _:
+                    return ObjectType.Bool;
+                case StringKeywordToken _:
+                    return ObjectType.String;
+                case NeverKeywordToken _:
+                    return ObjectType.Never;
+                case TypeKeywordToken _:
+                    return ObjectType.Type;
+                case MetatypeKeywordToken _:
+                    return ObjectType.Metatype;
+                default:
+                    throw NonExhaustiveMatchException.For(primitive.Syntax.Keyword);
             }
         }
     }

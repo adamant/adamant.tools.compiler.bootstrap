@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Attributes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
@@ -30,6 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations
             [CanBeNull] EqualsToken @equals,
             [CanBeNull] ExpressionSyntax initializer,
             [NotNull] ISemicolonToken semicolon)
+            : base(TextSpan.Covering(constKeyword.Span, name.Span))
         {
             Requires.NotNull(nameof(attributes), attributes);
             Requires.NotNull(nameof(modifiers), modifiers);

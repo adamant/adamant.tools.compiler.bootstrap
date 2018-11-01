@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Contracts;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Effects;
@@ -30,7 +31,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
             [CanBeNull] EffectsSyntax effects,
             [NotNull] SyntaxList<ContractSyntax> contracts,
             [NotNull] BlockSyntax body)
-            : base(modifiers, openParen, parameterList, closeParen, effects, contracts, body, null)
+            : base(TextSpan.Covering(initKeyword.Span, name?.Span), modifiers,
+            openParen, parameterList, closeParen, effects, contracts, body, null)
         {
             Requires.NotNull(nameof(modifiers), modifiers);
             Requires.NotNull(nameof(initKeyword), initKeyword);
