@@ -1,6 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Parameters;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 using VarKeywordToken = Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens.VarKeywordToken;
@@ -18,7 +19,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        public ParameterSyntax ParseParameter([NotNull] ITokenStream tokens, IDiagnosticsCollector diagnostics)
+        public ParameterSyntax ParseParameter(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
         {
             switch (tokens.Current)
             {
@@ -36,8 +39,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     var varKeyword = tokens.Accept<VarKeywordToken>();
                     var name = tokens.ExpectIdentifier();
                     var colon = tokens.Expect<IColonToken>();
-                    var typeExpression = expressionParser.ParseExpression(tokens, diagnostics);
-                    return new NamedParameterSyntax(paramsKeyword, varKeyword, name, colon, typeExpression);
+                    // Need to not consume the assignment that separates the type from the default value,
+                    // hence the min operator precedence.
+                    var typeExpression = expressionParser.ParseExpression(tokens, diagnostics, OperatorPrecedence.AboveAssignment);
+                    var equals = tokens.Accept<EqualsToken>();
+                    ExpressionSyntax defaultValue = null;
+                    if (equals != null)
+                        defaultValue = expressionParser.ParseExpression(tokens, diagnostics);
+                    return new NamedParameterSyntax(paramsKeyword, varKeyword, name,
+                        colon, typeExpression, equals, defaultValue);
             }
         }
     }

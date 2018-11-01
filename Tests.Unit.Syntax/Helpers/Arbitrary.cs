@@ -67,7 +67,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             {
                 case ".":
                 case "^":
-                    return t2.Text == "." || t2.Text == "..";
+                    return t2.Text == "." || t2.Text == ".." || t2.Text == "..<";
                 case "+":
                 case "*":
                 case ">":

@@ -1,6 +1,7 @@
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes;
@@ -15,23 +16,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
     public class CompilationUnitParserSpec
     {
         [Fact]
-        public void Empty_file()
-        {
-            var tokens = FakeTokenStream.From($"");
-
-            var cu = ParseWithoutError(tokens);
-
-            Assert.Null(cu.Namespace.Name);
-            Assert.Empty(cu.Namespace.UsingDirectives);
-            Assert.Empty(cu.Namespace.Declarations);
-            Assert.Empty(cu.Diagnostics);
-        }
-
-        [Fact]
-        public void Namespace_only()
+        public void With_namespace()
         {
             var name = FakeSyntax.Name();
-            var tokens = FakeTokenStream.From($"namespace {name};");
+            var usings = FakeSyntax.List<UsingDirectiveSyntax>();
+            var declarations = FakeSyntax.List<DeclarationSyntax>();
+            var tokens = FakeTokenStream.From($"namespace {name};{usings}{declarations}");
 
             var cu = ParseWithoutError(tokens);
 
@@ -47,16 +37,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         }
 
         [Fact]
-        public void Using_only()
+        public void No_namespace()
         {
-            var @using = FakeSyntax.UsingDirective();
-            var tokens = FakeTokenStream.From($"using {@using}");
+            var usings = FakeSyntax.List<UsingDirectiveSyntax>();
+            var declarations = FakeSyntax.List<DeclarationSyntax>();
+            var tokens = FakeTokenStream.From($"{usings}{declarations}");
 
             var cu = ParseWithoutError(tokens);
 
             Assert.Null(cu.Namespace.Name);
-            Assert.Equal(@using, cu.Namespace.UsingDirectives.Single());
-            Assert.Empty(cu.Namespace.Declarations);
+            Assert.Equal(usings, cu.Namespace.UsingDirectives);
+            Assert.Equal(declarations, cu.Namespace.Declarations);
             Assert.Empty(cu.Diagnostics);
         }
 

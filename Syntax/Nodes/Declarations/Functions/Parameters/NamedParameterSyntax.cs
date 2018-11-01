@@ -14,13 +14,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.P
         [NotNull] public IIdentifierToken Name { get; }
         [NotNull] public IColonToken Colon { get; }
         [NotNull] public ExpressionSyntax TypeExpression { get; }
+        [CanBeNull] public EqualsToken Equals { get; }
+        [CanBeNull] public ExpressionSyntax DefaultValue { get; }
 
         public NamedParameterSyntax(
             [CanBeNull] ParamsKeywordToken paramsKeyword,
             [CanBeNull] VarKeywordToken varKeyword,
             [NotNull] IIdentifierToken name,
             [NotNull] IColonToken colon,
-            [NotNull] ExpressionSyntax typeExpression)
+            [NotNull] ExpressionSyntax typeExpression,
+            [CanBeNull] EqualsToken equals,
+            [CanBeNull] ExpressionSyntax defaultValue)
             : base(TextSpan.Covering(paramsKeyword?.Span, varKeyword?.Span, name.Span, typeExpression.Span))
         {
             Requires.NotNull(nameof(name), name);
@@ -31,6 +35,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.P
             Name = name;
             Colon = colon;
             TypeExpression = typeExpression;
+            Equals = @equals;
+            DefaultValue = defaultValue;
         }
     }
 }

@@ -384,7 +384,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 colon = tokens.Expect<IColonToken>();
                 // Need to not consume the assignment that separates the type from the initializer,
                 // hence the min operator precedence.
-                typeExpression = expressionParser.ParseExpression(tokens, diagnostics, OperatorPrecedence.LogicalOr);
+                typeExpression = expressionParser.ParseExpression(tokens, diagnostics, OperatorPrecedence.AboveAssignment);
             }
             EqualsToken equals = null;
             ExpressionSyntax initializer = null;
@@ -699,7 +699,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 colon = tokens.Expect<IColonToken>();
                 // Need to not consume the assignment that separates the type from the initializer,
                 // hence the min operator precedence.
-                typeExpression = expressionParser.ParseExpression(tokens, diagnostics, OperatorPrecedence.LogicalOr);
+                typeExpression = expressionParser.ParseExpression(tokens, diagnostics, OperatorPrecedence.AboveAssignment);
             }
             EqualsToken equals = null;
             ExpressionSyntax initializer = null;
