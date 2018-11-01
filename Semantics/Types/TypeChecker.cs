@@ -300,8 +300,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             var rightOperand = binaryOperatorExpression.RightOperand.Type;
             var rightOperandCore = rightOperand is LifetimeType r ? r.Type : rightOperand;
 
-            bool typeError;
+            // If either is unknown, then we can't know whether there is a a problem
+            // (technically not true, for example, we could know that one arg should
+            // be a bool and isn't)
+            if (leftOperand == DataType.Unknown
+                || rightOperand == DataType.Unknown)
+            {
+                binaryOperatorExpression.Type = DataType.Unknown;
+                return;
+            }
 
+            bool typeError;
             switch (@operator)
             {
                 case PlusToken _:
@@ -359,8 +368,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             var operand = unaryOperatorExpression.Operand.Type;
             var @operator = unaryOperatorExpression.Syntax.Operator;
 
-            bool typeError;
+            // If either is unknown, then we can't know whether there is a a problem
+            // (technically not true, for example, we could know that one arg should
+            // be a bool and isn't)
+            if (operand == DataType.Unknown)
+            {
+                unaryOperatorExpression.Type = DataType.Unknown;
+                return;
+            }
 
+            bool typeError;
             switch (@operator)
             {
                 case NotKeywordToken _:
