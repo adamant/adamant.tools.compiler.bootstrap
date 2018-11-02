@@ -33,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
             [NotNull] ExpressionSyntax returnTypeExpression,
             [NotNull] SyntaxList<GenericConstraintSyntax> genericConstraints,
             [CanBeNull] EffectsSyntax effects,
-            [NotNull] SyntaxList<ContractSyntax> contracts,
+            [NotNull] SyntaxList<FunctionContractSyntax> contracts,
             [CanBeNull] BlockSyntax body,
             [CanBeNull] ISemicolonToken semicolon)
             : base(TextSpan.Covering(operatorKeyword.Span, @operator.Span),

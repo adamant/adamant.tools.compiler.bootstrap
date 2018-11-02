@@ -47,8 +47,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         {
             var accessModifer = FakeSyntax.AccessModifier();
             var genericParameters = FakeSyntax.GenericParameters();
+            var invariants = FakeSyntax.List<InvariantSyntax>();
             var members = FakeSyntax.List<MemberDeclarationSyntax>();
-            var tokens = FakeTokenStream.From($"{accessModifer} class Class_Name{genericParameters} {{{members}}}");
+            var tokens = FakeTokenStream.From($"{accessModifer} class Class_Name{genericParameters}{invariants} {{{members}}}");
 
             var d = ParseWithoutError(tokens);
 
@@ -57,9 +58,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
             Assert.Equal(tokens[1], c.ClassKeyword);
             Assert.Equal(tokens[2], c.Name);
             Assert.Equal(genericParameters, c.GenericParameters);
-            Assert.Equal(tokens[4], c.OpenBrace);
+            Assert.Equal(invariants, c.Invariants);
+            Assert.Equal(tokens[5], c.OpenBrace);
             Assert.Equal(members, c.Members);
-            Assert.Equal(tokens[6], c.CloseBrace);
+            Assert.Equal(tokens[7], c.CloseBrace);
         }
 
         [NotNull]

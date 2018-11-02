@@ -169,28 +169,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
                 Expression(),
                 SyntaxList<GenericConstraintSyntax>.Empty,
                 null, // Effects
-                SyntaxList<ContractSyntax>.Empty,
+                SyntaxList<FunctionContractSyntax>.Empty,
                 Block(),
                 null); // Semicolon
         }
 
 
         [NotNull]
-        public static IdentifierToken Identifier(string name)
+        public static IdentifierToken Identifier([NotNull] string name)
         {
             return new BareIdentifierToken(FakeSpan, name);
         }
 
         [NotNull]
-        public static EnumStructDeclarationSyntax EnumStructDeclaration(string name)
+        public static EnumStructDeclarationSyntax EnumStructDeclaration([NotNull] string name)
         {
             return new EnumStructDeclarationSyntax(
                 AccessModifier().ToSyntaxList<ModifierSyntax>(),
                 new EnumKeywordToken(FakeSpan),
-                Missing<IStructKeywordToken>(),
+                new StructKeywordToken(FakeSpan),
                 Identifier(name),
                 null, // Generic Parameters
+                null, // Base Types
                 SyntaxList<GenericConstraintSyntax>.Empty,
+                SyntaxList<InvariantSyntax>.Empty,
                 Missing<IOpenBraceToken>(),
                 new EnumVariantsSyntax(SyntaxList<EnumVariantSyntax>.Empty, null),
                 SyntaxList<MemberDeclarationSyntax>.Empty,

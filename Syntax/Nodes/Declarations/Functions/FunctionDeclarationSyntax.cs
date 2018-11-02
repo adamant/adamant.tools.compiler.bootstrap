@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
         [NotNull] [ItemNotNull] public IEnumerable<ParameterSyntax> Parameters => ParameterList.Nodes();
         [NotNull] public ICloseParenToken CloseParen { get; }
         [CanBeNull] public EffectsSyntax Effects { get; }
-        [NotNull] public SyntaxList<ContractSyntax> Contracts { get; }
+        [NotNull] public SyntaxList<FunctionContractSyntax> Contracts { get; }
         [CanBeNull] public BlockSyntax Body { get; }
         [CanBeNull] public ISemicolonToken Semicolon { get; }
 
@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
             [NotNull] SeparatedListSyntax<ParameterSyntax> parameterList,
             [NotNull] ICloseParenToken closeParen,
             [CanBeNull] EffectsSyntax effects,
-            [NotNull] SyntaxList<ContractSyntax> contracts,
+            [NotNull] SyntaxList<FunctionContractSyntax> contracts,
             [CanBeNull] BlockSyntax body,
             [CanBeNull] ISemicolonToken semicolon)
             : base(signatureSpan)

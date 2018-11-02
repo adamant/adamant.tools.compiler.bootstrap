@@ -112,6 +112,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
 
         private class ListParser : IListParser
         {
+            public SyntaxList<T> ParseList<T>(
+                ITokenStream tokens,
+                AcceptFunction<T> acceptItem,
+                IDiagnosticsCollector diagnostics) where T : SyntaxNode
+            {
+                var fakeToken = tokens.ExpectFake();
+                return (SyntaxList<T>)fakeToken?.FakeValue ?? throw new InvalidOperationException();
+            }
+
             public SyntaxList<T> ParseList<T, TTerminator>(
                 ITokenStream tokens,
                 ParseFunction<T> parseItem,

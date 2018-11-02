@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Errors;
@@ -11,6 +12,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 {
     public class ListParser : IListParser
     {
+
+
         [MustUseReturnValue]
         [NotNull]
         public SeparatedListSyntax<T> ParseSeparatedList<T, TSeparator, TTerminator>(
@@ -52,6 +55,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 else
                     yield break;
             }
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
+        public SyntaxList<T> ParseList<T>(
+            [NotNull] ITokenStream tokens,
+            [NotNull] AcceptFunction<T> acceptItem,
+            [NotNull] IDiagnosticsCollector diagnostics)
+            where T : SyntaxNode
+        {
+            return new Generator<T>(() => acceptItem(tokens, diagnostics))
+                .TakeWhile(t => t != null).ToSyntaxList();
         }
 
         [MustUseReturnValue]

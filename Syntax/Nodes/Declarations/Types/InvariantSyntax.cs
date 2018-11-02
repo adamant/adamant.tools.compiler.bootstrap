@@ -3,20 +3,20 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Contracts
+namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types
 {
-    class RequiresSyntax : FunctionContractSyntax
+    public class InvariantSyntax : SyntaxNode
     {
-        [NotNull] public RequiresKeywordToken RequiresKeyword { get; }
+        [NotNull] public InvariantKeywordToken InvariantKeyword { get; }
         [NotNull] public ExpressionSyntax Condition { get; }
 
-        public RequiresSyntax(
-            [NotNull] RequiresKeywordToken requiresKeyword,
+        public InvariantSyntax(
+            [NotNull] InvariantKeywordToken invariantKeyword,
             [NotNull] ExpressionSyntax condition)
         {
-            Requires.NotNull(nameof(requiresKeyword), requiresKeyword);
+            Requires.NotNull(nameof(invariantKeyword), invariantKeyword);
             Requires.NotNull(nameof(condition), condition);
-            RequiresKeyword = requiresKeyword;
+            InvariantKeyword = invariantKeyword;
             Condition = condition;
         }
     }

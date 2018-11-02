@@ -68,16 +68,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                     return BuildType(context, @namespace, type);
                 case StructDeclarationSyntax @struct:
                     return BuildStruct(context, @namespace, @struct);
+                case EnumStructDeclarationSyntax enumStruct:
+                    return BuildEnumStruct(context, @namespace, enumStruct);
+                case EnumClassDeclarationSyntax enumClass:
+                    return BuildEnumClass(context, @namespace, enumClass);
                 case IncompleteDeclarationSyntax _:
                     // Since it is incomplete, we can't do any analysis on it
                     return null;
-                case EnumStructDeclarationSyntax enumStruct:
-                    return BuildEnumStruct(context, @namespace, enumStruct);
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
             }
         }
 
+        [CanBeNull]
         private FunctionDeclarationAnalysis BuildFunction(
             [NotNull] AnalysisContext context,
             [NotNull] Name @namespace,
@@ -97,6 +100,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                 syntax.Body?.Statements.Select(statementSyntax => statementBuilder.Build(bodyContext, fullName, statementSyntax)));
         }
 
+        [NotNull]
         private ParameterAnalysis BuildParameter(
             [NotNull] AnalysisContext context,
             [NotNull] QualifiedName functionName,
@@ -114,6 +118,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             }
         }
 
+        [CanBeNull]
         private TypeDeclarationAnalysis BuildClass(
             [NotNull] AnalysisContext context,
             [NotNull] Name @namespace,
@@ -127,6 +132,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                 BuildGenericParameters(context, fullName, syntax.GenericParameters));
         }
 
+        [CanBeNull]
         private TypeDeclarationAnalysis BuildType(
             [NotNull] AnalysisContext context,
             [NotNull] Name @namespace,
@@ -140,6 +146,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                 BuildGenericParameters(context, fullName, syntax.GenericParameters));
         }
 
+        [CanBeNull]
         private TypeDeclarationAnalysis BuildStruct(
             [NotNull] AnalysisContext context,
             [NotNull] Name @namespace,
@@ -168,10 +175,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             }
         }
 
+        [CanBeNull]
         private TypeDeclarationAnalysis BuildEnumStruct(
             [NotNull] AnalysisContext context,
             [NotNull] Name @namespace,
             [NotNull] EnumStructDeclarationSyntax syntax)
+        {
+            // Skip any struct that doesn't have a name
+            if (!(syntax.Name.Value is string name)) return null;
+
+            var fullName = @namespace.Qualify(name);
+            return new TypeDeclarationAnalysis(context, syntax, fullName,
+                BuildGenericParameters(context, fullName, syntax.GenericParameters));
+        }
+
+        [CanBeNull]
+        private TypeDeclarationAnalysis BuildEnumClass(
+            [NotNull] AnalysisContext context,
+            [NotNull] Name @namespace,
+            [NotNull] EnumClassDeclarationSyntax syntax)
         {
             // Skip any struct that doesn't have a name
             if (!(syntax.Name.Value is string name)) return null;

@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Contracts
 {
-    public class EnsuresSyntax : ContractSyntax
+    public class EnsuresSyntax : FunctionContractSyntax
     {
         [NotNull] public EnsuresKeywordToken EnsuresKeyword { get; }
         [NotNull] public ExpressionSyntax Condition { get; }

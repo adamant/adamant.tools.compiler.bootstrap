@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
             [NotNull] ICloseParenToken closeParen,
             [NotNull] SyntaxList<GenericConstraintSyntax> genericConstraints,
             [CanBeNull] EffectsSyntax effects,
-            [NotNull] SyntaxList<ContractSyntax> contracts,
+            [NotNull] SyntaxList<FunctionContractSyntax> contracts,
             [NotNull] BlockSyntax body)
             : base(TextSpan.Covering(initKeyword.Span, name?.Span), modifiers,
             openParen, parameterList, closeParen, effects, contracts, body, null)

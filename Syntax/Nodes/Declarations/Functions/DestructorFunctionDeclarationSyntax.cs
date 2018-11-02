@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
             [NotNull] SeparatedListSyntax<ParameterSyntax> parameters,
             [NotNull] ICloseParenToken closeParen,
             [CanBeNull] EffectsSyntax effects,
-            [NotNull] SyntaxList<ContractSyntax> contracts,
+            [NotNull] SyntaxList<FunctionContractSyntax> contracts,
             [NotNull] BlockSyntax body)
             : base(deleteKeyword.Span, modifiers, openParen, parameters, closeParen,
                 effects, contracts, body, null)

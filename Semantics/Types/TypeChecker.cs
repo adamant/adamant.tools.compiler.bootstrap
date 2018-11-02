@@ -175,6 +175,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                         genericParameterTypes);
                     typeDeclaration.Type = new Metatype(enumStructType);
                     break;
+                case EnumClassDeclarationSyntax enumStructDeclaration:
+                    var enumClassType = new ObjectType(typeDeclaration.Name, true,
+                        enumStructDeclaration.Modifiers.Any(m => m is MutableModifierSyntax),
+                        genericParameterTypes);
+                    typeDeclaration.Type = new Metatype(enumClassType);
+                    break;
                 case TypeDeclarationSyntax declarationSyntax:
                     var type = new ObjectType(typeDeclaration.Name, true,
                         declarationSyntax.Modifiers.Any(m => m is MutableModifierSyntax),

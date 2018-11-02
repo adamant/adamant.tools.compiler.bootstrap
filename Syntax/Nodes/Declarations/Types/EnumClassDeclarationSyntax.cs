@@ -10,13 +10,14 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types
 {
-    public class EnumStructDeclarationSyntax : MemberDeclarationSyntax
+    public class EnumClassDeclarationSyntax : MemberDeclarationSyntax
     {
         [NotNull] public SyntaxList<ModifierSyntax> Modifiers { get; }
         [NotNull] public EnumKeywordToken EnumKeyword { get; }
-        [NotNull] public StructKeywordToken StructKeyword { get; }
+        [NotNull] public ClassKeywordToken ClassKeyword { get; }
         [NotNull] public IIdentifierToken Name { get; }
         [CanBeNull] public GenericParametersSyntax GenericParameters { get; }
+        [CanBeNull] public BaseClassSyntax BaseClass { get; }
         [CanBeNull] public BaseTypesSyntax BaseTypes { get; }
         [NotNull] public SyntaxList<GenericConstraintSyntax> GenericConstraints { get; }
         [NotNull] public SyntaxList<InvariantSyntax> Invariants { get; }
@@ -25,12 +26,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types
         [NotNull] public SyntaxList<MemberDeclarationSyntax> Members { get; }
         [NotNull] public ICloseBraceToken CloseBrace { get; }
 
-        public EnumStructDeclarationSyntax(
+        public EnumClassDeclarationSyntax(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
             [NotNull] EnumKeywordToken enumKeyword,
-            [NotNull] StructKeywordToken structKeyword,
+            [NotNull] ClassKeywordToken classKeyword,
             [NotNull] IIdentifierToken name,
             [CanBeNull] GenericParametersSyntax genericParameters,
+            [CanBeNull] BaseClassSyntax baseClass,
             [CanBeNull] BaseTypesSyntax baseTypes,
             [NotNull] SyntaxList<GenericConstraintSyntax> genericConstraints,
             [NotNull] SyntaxList<InvariantSyntax> invariants,
@@ -42,7 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types
         {
             Requires.NotNull(nameof(modifiers), modifiers);
             Requires.NotNull(nameof(enumKeyword), enumKeyword);
-            Requires.NotNull(nameof(structKeyword), structKeyword);
+            Requires.NotNull(nameof(classKeyword), classKeyword);
             Requires.NotNull(nameof(name), name);
             Requires.NotNull(nameof(genericConstraints), genericConstraints);
             Requires.NotNull(nameof(invariants), invariants);
@@ -52,9 +54,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types
             Requires.NotNull(nameof(closeBrace), closeBrace);
             Modifiers = modifiers;
             EnumKeyword = enumKeyword;
-            StructKeyword = structKeyword;
+            ClassKeyword = classKeyword;
             Name = name;
             GenericParameters = genericParameters;
+            BaseClass = baseClass;
             BaseTypes = baseTypes;
             GenericConstraints = genericConstraints;
             Invariants = invariants;

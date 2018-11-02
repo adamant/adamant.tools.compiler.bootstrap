@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions
             [NotNull] IRightArrowToken arrow,
             [NotNull] ExpressionSyntax returnTypeExpression,
             [CanBeNull] EffectsSyntax effects,
-            [NotNull] SyntaxList<ContractSyntax> contracts,
+            [NotNull] SyntaxList<FunctionContractSyntax> contracts,
             [CanBeNull] BlockSyntax body,
             [CanBeNull] ISemicolonToken semicolon)
             : base(TextSpan.Covering(setKeyword.Span, name.Span), modifiers, openParen,
