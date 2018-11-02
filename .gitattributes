@@ -2,7 +2,7 @@
 
 *.vson      text eol=lf encoding=UTF-8
 *.json      text eol=lf encoding=UTF-8
-*.ad        text
+*.ad        text encoding=UTF-8
 *.md        text
 *.bat       text eol=crlf
 *.c         text eol=lf
