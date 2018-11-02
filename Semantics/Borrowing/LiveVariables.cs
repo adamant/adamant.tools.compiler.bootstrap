@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.Graph;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements;
 using JetBrains.Annotations;
 

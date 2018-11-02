@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Adamant.Tools.Compiler.Bootstrap.API;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using Adamant.Tools.Compiler.Bootstrap.Forge.Config;
 using Adamant.Tools.Compiler.Bootstrap.Framework;

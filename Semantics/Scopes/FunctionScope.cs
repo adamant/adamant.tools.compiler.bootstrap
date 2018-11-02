@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes

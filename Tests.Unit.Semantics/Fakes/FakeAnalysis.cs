@@ -1,5 +1,4 @@
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes;
 using JetBrains.Annotations;
 

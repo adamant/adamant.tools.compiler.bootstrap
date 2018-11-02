@@ -1,10 +1,6 @@
-using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes;
 using JetBrains.Annotations;

@@ -1,6 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens.Identifiers;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors

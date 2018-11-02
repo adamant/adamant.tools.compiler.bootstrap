@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements.LValues;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements.RValues;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing

@@ -1,24 +1,8 @@
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Contracts;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Functions.Parameters;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Generic;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Modifiers;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Namespaces;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Types.Enums;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Directives;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Blocks;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Statements;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens.Identifiers;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes

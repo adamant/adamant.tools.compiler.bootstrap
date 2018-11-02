@@ -1,0 +1,15 @@
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
+using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
+using JetBrains.Annotations;
+
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
+{
+    public interface IExpressionAnalysisBuilder
+    {
+        [NotNull]
+        ExpressionAnalysis BuildExpression(
+            [NotNull] AnalysisContext context,
+            [NotNull] QualifiedName functionName,
+            [NotNull] ExpressionSyntax expression);
+    }
+}

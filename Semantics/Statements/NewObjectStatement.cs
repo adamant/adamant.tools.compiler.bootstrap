@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements.LValues;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using JetBrains.Annotations;
 

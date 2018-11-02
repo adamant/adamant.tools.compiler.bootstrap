@@ -4,8 +4,6 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Declarations.Namespaces;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations

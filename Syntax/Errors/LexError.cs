@@ -1,5 +1,4 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Errors
 {

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements.LValues;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Statements
 {

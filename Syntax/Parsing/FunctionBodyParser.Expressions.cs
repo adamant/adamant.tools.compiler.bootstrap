@@ -1,19 +1,8 @@
-using Adamant.Tools.Compiler.Bootstrap.Core.Diagnostics;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Call;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.ControlFlow.Match;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Instance;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Literals;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Operators;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes.Expressions.Types.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens.Identifiers;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens.Literals;
 using JetBrains.Annotations;
 using static Adamant.Tools.Compiler.Bootstrap.Framework.TypeOperations;
 
