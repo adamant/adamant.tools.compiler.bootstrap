@@ -221,6 +221,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
                     // TODO do proper type inference
                     expression.Type = ObjectType.Int;
                     break;
+                case StringLiteralExpressionAnalysis _:
+                    // TODO what about interpolated expressions?
+                    expression.Type = ObjectType.String;
+                    break;
                 case BooleanLiteralExpressionAnalysis _:
                     expression.Type = ObjectType.Bool;
                     break;

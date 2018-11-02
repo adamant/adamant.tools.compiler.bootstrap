@@ -80,7 +80,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
                         functionScope.Bind(variables);
 
                         var blocks = new Dictionary<ExpressionSyntax, ILocalVariableScopeAnalysis>();
-                        GetVariableScopes(function, blocks);
+                        GetVariableScopes(function.Statements, blocks);
                         var bodyScope = functionScope.NestedScopes.Cast<LocalVariableScope>()
                             .SingleOrDefault();
                         if (bodyScope != null)
@@ -135,10 +135,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
         }
 
         private static void GetVariableScopes(
-            [NotNull] FunctionDeclarationAnalysis function,
+            [NotNull] IReadOnlyList<StatementAnalysis> statements,
             [NotNull] Dictionary<ExpressionSyntax, ILocalVariableScopeAnalysis> scopes)
         {
-            foreach (var statement in function.Statements)
+            foreach (var statement in statements)
                 switch (statement)
                 {
                     case ExpressionStatementAnalysis expressionStatement:
@@ -161,6 +161,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
             {
                 case BlockAnalysis block:
                     scopes.Add(block.Syntax, block);
+                    GetVariableScopes(block.Statements, scopes);
                     break;
                 case ReturnExpressionAnalysis returnExpression:
                     if (returnExpression.ReturnExpression != null)
@@ -176,6 +177,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
                 case ForeachExpressionAnalysis foreachExpression:
                     // The foreach expression itself declares a variable
                     scopes.Add(foreachExpression.Syntax, foreachExpression);
+                    GetVariableScopes(foreachExpression.InExpression, scopes);
                     GetVariableScopes(foreachExpression.Block, scopes);
                     break;
                 case InvocationAnalysis invocation:
@@ -212,6 +214,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
                 case IntegerLiteralExpressionAnalysis _:
                 case IdentifierNameAnalysis _:
                 case BooleanLiteralExpressionAnalysis _:
+                case StringLiteralExpressionAnalysis _:
                     // Do nothing
                     break;
                 default:

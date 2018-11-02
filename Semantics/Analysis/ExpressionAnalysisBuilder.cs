@@ -65,6 +65,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
                     return new PrimitiveTypeAnalysis(context, primitiveType);
                 case IntegerLiteralExpressionSyntax integerLiteral:
                     return new IntegerLiteralExpressionAnalysis(context, integerLiteral);
+                case StringLiteralExpressionSyntax stringLiteral:
+                    return new StringLiteralExpressionAnalysis(context, stringLiteral);
                 case BinaryOperatorExpressionSyntax binaryOperatorExpression:
                     var leftOperand = BuildExpression(context, functionName, binaryOperatorExpression.LeftOperand);
                     var rightOperand = BuildExpression(context, functionName, binaryOperatorExpression.RightOperand);
