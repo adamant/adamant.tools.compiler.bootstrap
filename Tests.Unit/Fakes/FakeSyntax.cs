@@ -122,7 +122,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         [NotNull]
         public static IncompleteDeclarationSyntax IncompleteDeclaration()
         {
-            return new IncompleteDeclarationSyntax(Enumerable.Empty<Token>().ToList());
+            // Need at least one token to prevent issues computing the span of the incomplete declaration
+            return new IncompleteDeclarationSyntax(new[] { Missing<IPublicKeywordToken>() });
         }
 
         [NotNull]

@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Helpers
 
         public static string GetRuntimeDirectory()
         {
-            return Path.Combine(SolutionDirectory.Get(), "test", "runtime");
+            return Path.Combine(SolutionDirectory.Get(), "tests", "runtime");
         }
         public static string GetRuntimeLibraryPath()
         {
