@@ -21,32 +21,45 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
     /// </summary>
     internal class ProjectSet : IEnumerable<Project>
     {
-        [NotNull] [ItemNotNull] private readonly HashSet<Project> projects = new HashSet<Project>();
+        [NotNull] private readonly Dictionary<string, Project> projects = new Dictionary<string, Project>();
 
-        public bool Add([NotNull] Project project)
+        public void AddAll([NotNull] ProjectConfigSet configs)
         {
-            return projects.Add(project);
+            foreach (var config in configs)
+                GetOrAdd(config, configs);
+        }
+
+        [NotNull]
+        private Project GetOrAdd([NotNull] ProjectConfig config, [NotNull] ProjectConfigSet configs)
+        {
+            var projectDir = Path.GetDirectoryName(config.FullPath);
+            if (projects.TryGetValue(projectDir, out var existingProject))
+                return existingProject;
+
+            // Add a placeholder to prevent cycles
+            projects.Add(projectDir, null);
+            var dependencies = config.Dependencies.Select(d =>
+            {
+                var dependencyConfig = configs.AtPath(d.Value.Path);
+                var dependencyProject = GetOrAdd(dependencyConfig, configs);
+                return new ProjectReference(d.Key, dependencyProject, d.Value.Trusted);
+            }).ToList();
+
+            var project = new Project(config, dependencies);
+            projects[projectDir] = project;
+            return project;
         }
 
         [NotNull]
         public IEnumerator<Project> GetEnumerator()
         {
-            return projects.GetEnumerator();
+            return projects.Values.AssertNotNull().GetEnumerator();
         }
 
         [NotNull]
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
-        }
-
-        public void LoadDependencies()
-        {
-            var projectQueue = new Queue<Project>(projects);
-            while (projectQueue.TryDequeue(out var project))
-            {
-                // TODO load up actual dependencies
-            }
         }
 
         [NotNull]
@@ -132,9 +145,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
         [ItemNotNull]
         private List<Project> TopologicalSort()
         {
-            var projectAlive = projects.ToDictionary(p => p, p => SortState.Alive);
+            var projectAlive = projects.Values.ToDictionary(p => p, p => SortState.Alive);
             var sorted = new List<Project>(projects.Count);
-            foreach (var project in projects)
+            foreach (var project in projects.Values)
                 TopologicalSortVisit(project, projectAlive, sorted);
 
             return sorted;
@@ -152,7 +165,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
 
                 case SortState.Alive:
                     state[project] = SortState.Undead;
-                    foreach (var referencedProject in project.ReferencedProjects)
+                    foreach (var referencedProject in project.References.Select(r => r.Project))
                         TopologicalSortVisit(referencedProject, state, sorted);
                     state[project] = SortState.Dead;
                     sorted.Add(project);

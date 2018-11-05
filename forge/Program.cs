@@ -62,9 +62,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge
             bool allowParallel,
             int? maxConcurrency)
         {
-            var projectFile = ProjectFile.Load(packagePath);
-            var projectSet = new ProjectSet() { new Project(projectFile) };
-            projectSet.LoadDependencies();
+            var configs = new ProjectConfigSet();
+            configs.Load(packagePath);
+            var projectSet = new ProjectSet();
+            projectSet.AddAll(configs);
             var taskScheduler = NewTaskScheduler(
                 allowParallel,
                 maxConcurrency);
