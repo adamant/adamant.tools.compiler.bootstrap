@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 switch (analysis)
                 {
                     case FunctionDeclarationAnalysis f:
-                        CheckFunction(f);
+                        CheckFunctionSignature(f);
                         break;
                     case TypeDeclarationAnalysis t:
                         CheckTypeDeclaration(t);
@@ -29,9 +29,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     default:
                         throw NonExhaustiveMatchException.For(analysis);
                 }
+
+            // Now that the signatures are done, we can check the bodies
+            foreach (var function in analyses.OfType<FunctionDeclarationAnalysis>())
+                CheckFunctionBody(function);
         }
 
-        private void CheckFunction([NotNull] FunctionDeclarationAnalysis function)
+        private void CheckFunctionSignature([NotNull] FunctionDeclarationAnalysis function)
         {
             // Check the signature first
             function.Type = DataType.BeingChecked;
@@ -41,8 +45,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
             function.ReturnType = EvaluateTypeExpression(function.ReturnTypeExpression, function.Diagnostics);
             function.Type = new FunctionType(function.Parameters.Select(p => p.Type), function.ReturnType);
+        }
 
-            // Now that the signature is done, we can check the body
+        private void CheckFunctionBody([NotNull] FunctionDeclarationAnalysis function)
+        {
             foreach (var statement in function.Statements)
                 CheckStatement(statement, function.Diagnostics);
         }
@@ -99,9 +105,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             [NotNull] VariableDeclarationStatementAnalysis variableDeclaration,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
+            if (variableDeclaration.Initializer != null)
+                CheckExpression(variableDeclaration.Initializer, diagnostics);
+
             if (variableDeclaration.TypeExpression != null)
+            {
                 variableDeclaration.Type =
                     EvaluateTypeExpression(variableDeclaration.TypeExpression, diagnostics);
+                // TODO check that the initializer type is compatible with the variable type
+            }
+            else if (variableDeclaration.Initializer != null)
+            {
+                // We'll assume the expression type is it
+                variableDeclaration.Type = variableDeclaration.Initializer.Type;
+            }
             else
             {
                 diagnostics.Publish(TypeError.NotImplemented(variableDeclaration.Context.File,
@@ -109,10 +126,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     "Inference of local variable types not implemented"));
                 variableDeclaration.Type = DataType.Unknown;
             }
-
-            if (variableDeclaration.Initializer != null)
-                CheckExpression(variableDeclaration.Initializer, diagnostics);
-            // TODO check that the initializer type is compatible with the variable type
         }
 
         /// <summary>
@@ -366,6 +379,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                         return genericParameter.Type.AssertChecked();
                     case ForeachExpressionAnalysis foreachExpression:
                         return foreachExpression.VariableType.AssertChecked();
+                    case FunctionDeclarationAnalysis functionDeclaration:
+                        return functionDeclaration.Type.AssertChecked();
                     case null:
                         diagnostics.Publish(NameBindingError.CouldNotBindName(context.File, name));
                         return DataType.Unknown; // unknown
