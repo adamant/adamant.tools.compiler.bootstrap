@@ -24,11 +24,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C
         [InlineData(3)]
         public void Empty_function(int parameterCount)
         {
+            var functionType = new FakeAdamantType();
             var parameters = Enumerable.Repeat(0, parameterCount)
                 .Select(_ => new FakeParameter()).ToList();
             var returnType = new FakeAdamantType();
             var function = new FunctionDeclaration("".ToFakeCodeFile(),
                 GlobalNamespaceName.Instance.Qualify("func"),
+                functionType,
                 parameters,
                 returnType,
                 new ControlFlowGraph());
@@ -56,8 +58,9 @@ $@"{returnType} ᵢfunc´{parameterCount}({parametersString})
         [Fact]
         public void Type()
         {
+            var declaredType = new FakeAdamantType();
             var typeName = GlobalNamespaceName.Instance.Qualify("My_Type");
-            var type = new TypeDeclaration("".ToFakeCodeFile(), typeName);
+            var type = new TypeDeclaration("".ToFakeCodeFile(), typeName, declaredType);
 
             var code = new Code();
             NewDeclarationEmitter().Emit(type, code);

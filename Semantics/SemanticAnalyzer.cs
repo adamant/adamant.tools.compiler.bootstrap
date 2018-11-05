@@ -3,11 +3,8 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using JetBrains.Annotations;
 
@@ -16,18 +13,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
     public class SemanticAnalyzer
     {
         [NotNull]
-        public Package Analyze([NotNull] PackageSyntax packageSyntax)
+        public Package Analyze(
+            [NotNull] PackageSyntax packageSyntax,
+            [NotNull] IReadOnlyDictionary<string, Package> references)
         {
             var nameBuilder = new NameBuilder();
 
             // Gather a list of all the namespaces for validating using statements
-            var namespaces = new NamespaceBuilder(nameBuilder).GatherNamespaces(packageSyntax).ToList();
+            var namespacesInPackage = new NamespaceBuilder(nameBuilder).GatherNamespaces(packageSyntax).ToList();
 
             // Gather all the declarations and simultaneously build up trees of lexical scopes
             var compilationUnits = new AnalysisBuilder(nameBuilder).Build(packageSyntax).ToList();
 
             // Check lexical scopes and attach to entities etc.
-            var scopeBinder = new ScopeBinder(compilationUnits, nameBuilder);
+            var scopeBinder = new ScopeBinder(compilationUnits, nameBuilder, references);
             foreach (var scope in compilationUnits.Select(cu => cu.GlobalScope))
                 scopeBinder.BindCompilationUnitScope(scope);
 
@@ -56,7 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             var declarations = declarationAnalyses.Select(d => d.Complete(diagnostics)).Where(d => d != null).ToList();
             var entryPoint = DetermineEntryPoint(declarations, diagnostics);
-            return new Package(packageSyntax.Name, diagnostics.Build(), namespaces, declarations, entryPoint);
+            return new Package(packageSyntax.Name, diagnostics.Build(), namespacesInPackage, declarations, entryPoint);
         }
 
         [CanBeNull]
@@ -64,8 +63,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         {
             var mainFunctions = declarations.OfType<FunctionDeclaration>()
                 // TODO make an easy way to construct and compare qualified names
-                .Where(f => !f.QualifiedName.Qualifier.Any()
-                            && f.QualifiedName.Name.Text == "main")
+                .Where(f => !f.Name.Qualifier.Any()
+                            && f.Name.Name.Text == "main")
                 .ToList();
 
             // TODO warn on and remove main functions that don't have correct parameters or types

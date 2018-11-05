@@ -48,9 +48,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             var codeFile = CodeFile.Load(testCase.FullCodePath);
             var code = codeFile.Code.Text;
             var compiler = new AdamantCompiler();
+            var references = new Dictionary<string, Package>();
 
             // Analyze
-            var package = compiler.CompilePackage("testPackage", codeFile.Yield());
+            var package = compiler.CompilePackage("testPackage", codeFile.Yield(), references);
 
             // Check for compiler errors
             var expectedCompileErrorLines = ExpectedCompileErrorLines(codeFile, code);

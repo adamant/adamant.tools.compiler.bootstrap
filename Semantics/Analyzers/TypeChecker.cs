@@ -3,6 +3,7 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
@@ -33,13 +34,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         private void CheckFunction([NotNull] FunctionDeclarationAnalysis function)
         {
             // Check the signature first
-            function.Type = DataType.BeingChecked; ;
+            function.Type = DataType.BeingChecked;
             function.ReturnType = DataType.BeingChecked;
             CheckGenericParameters(function.GenericParameters, function.Diagnostics);
             CheckParameters(function.Parameters, function.Diagnostics);
 
             function.ReturnType = EvaluateTypeExpression(function.ReturnTypeExpression, function.Diagnostics);
-            // TODO set the whole function type
+            function.Type = new FunctionType(function.Parameters.Select(p => p.Type), function.ReturnType);
 
             // Now that the signature is done, we can check the body
             foreach (var statement in function.Statements)
@@ -368,6 +369,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     case null:
                         diagnostics.Publish(NameBindingError.CouldNotBindName(context.File, name));
                         return DataType.Unknown; // unknown
+                    case TypeDeclaration typeDeclaration:
+                        return typeDeclaration.Type;
                     default:
                         throw NonExhaustiveMatchException.For(declaration);
                 }

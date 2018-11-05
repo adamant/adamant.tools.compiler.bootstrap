@@ -8,10 +8,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
     // A function type may be generic and have generic parameters
     public class FunctionType : KnownType
     {
-        [NotNull] [ItemNotNull] public readonly IReadOnlyList<KnownType> ParameterTypes;
-        [NotNull] public readonly KnownType ReturnType;
+        [NotNull] [ItemNotNull] public readonly IReadOnlyList<DataType> ParameterTypes;
+        [NotNull] public readonly DataType ReturnType;
 
-        public FunctionType([NotNull][ItemNotNull] IEnumerable<KnownType> parameterTypes, [NotNull] KnownType returnType)
+        public FunctionType([NotNull][ItemNotNull] IEnumerable<DataType> parameterTypes, [NotNull] DataType returnType)
         {
             Requires.NotNull(nameof(parameterTypes), parameterTypes);
             Requires.NotNull(nameof(returnType), returnType);

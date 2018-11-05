@@ -64,6 +64,7 @@ typedef enum Type_ID Type_ID;
         {
             var main = new FunctionDeclaration("".ToFakeCodeFile(),
                 new QualifiedName("main"),
+                new FakeAdamantType(),
                 Enumerable.Empty<Parameter>(),
                 ObjectType.Void,
                 new ControlFlowGraph());

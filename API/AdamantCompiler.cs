@@ -13,12 +13,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
 {
     public class AdamantCompiler
     {
-        public Task<Package> CompilePackageAsync([NotNull] string name, [NotNull][ItemNotNull] IEnumerable<ICodeFileSource> files)
+        [NotNull]
+        public Task<Package> CompilePackageAsync(
+            [NotNull] string name,
+            [NotNull] [ItemNotNull] IEnumerable<ICodeFileSource> files,
+            Dictionary<string, Task<Package>> references)
         {
-            return CompilePackageAsync(name, files, TaskScheduler.Default);
+            return CompilePackageAsync(name, files, references, TaskScheduler.Default);
         }
 
-        public Task<Package> CompilePackageAsync([NotNull] string name, [NotNull][ItemNotNull] IEnumerable<ICodeFileSource> fileSources, [CanBeNull] TaskScheduler taskScheduler)
+        [NotNull]
+        public Task<Package> CompilePackageAsync(
+            [NotNull] string name,
+            [NotNull] [ItemNotNull] IEnumerable<ICodeFileSource> fileSources,
+            Dictionary<string, Task<Package>> references,
+            [CanBeNull] TaskScheduler taskScheduler)
         {
             var lexer = new Lexer();
             var parser = new Parser();
@@ -43,13 +52,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         }
 
         [NotNull]
-        public Package CompilePackage([NotNull] string name, [NotNull][ItemNotNull] IEnumerable<ICodeFileSource> fileSources)
+        public Package CompilePackage(
+            [NotNull] string name,
+            [NotNull][ItemNotNull] IEnumerable<ICodeFileSource> fileSources,
+            [NotNull] IReadOnlyDictionary<string, Package> references)
         {
-            return CompilePackage(name, fileSources.Select(s => s.Load()));
+            return CompilePackage(name, fileSources.Select(s => s.Load()), references);
         }
 
         [NotNull]
-        public Package CompilePackage([NotNull] string name, [NotNull][ItemNotNull] IEnumerable<CodeFile> files)
+        public Package CompilePackage(
+            [NotNull] string name,
+            [NotNull] [ItemNotNull] IEnumerable<CodeFile> files,
+            [NotNull] IReadOnlyDictionary<string, Package> references)
         {
             var lexer = new Lexer();
             var parser = new Parser();
@@ -65,7 +80,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
 
             var analyzer = new SemanticAnalyzer();
 
-            return analyzer.Analyze(packageSyntax);
+            return analyzer.Analyze(packageSyntax, references);
         }
     }
 }

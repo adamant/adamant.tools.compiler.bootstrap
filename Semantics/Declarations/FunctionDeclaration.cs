@@ -17,11 +17,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations
 
         public FunctionDeclaration(
             [NotNull] CodeFile file,
-            [NotNull] QualifiedName qualifiedName,
-            [NotNull][ItemNotNull] IEnumerable<Parameter> parameters,
+            [NotNull] QualifiedName name,
+            [NotNull] KnownType type,
+            [NotNull] [ItemNotNull] IEnumerable<Parameter> parameters,
             [NotNull] KnownType returnType,
             [CanBeNull] ControlFlowGraph controlFlow)
-            : base(file, qualifiedName)
+            : base(file, name, type)
         {
             Requires.NotNull(nameof(parameters), parameters);
             Requires.NotNull(nameof(returnType), returnType);

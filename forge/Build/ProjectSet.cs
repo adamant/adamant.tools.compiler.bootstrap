@@ -91,19 +91,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
 
         [NotNull]
         private static async Task<Package> Build(
-            AdamantCompiler compiler,
-            Project project,
-            Task<IReadOnlyDictionary<Project, Task<Package>>> projectBuildsTask,
-            object consoleLock)
+            [NotNull] AdamantCompiler compiler,
+            [NotNull] Project project,
+            [NotNull] Task<IReadOnlyDictionary<Project, Task<Package>>> projectBuildsTask,
+            [NotNull] object consoleLock)
         {
             var projectBuilds = await projectBuildsTask;
             var sourceDir = Path.Combine(project.Path, "src");
             var sourcePaths = Directory.EnumerateFiles(sourceDir, "*.ad", SearchOption.AllDirectories);
+            // Wait for the references, unfortunately, this requires an ugly loop.
+            var referenceTasks = project.References.ToDictionary(r => r.Name, r => projectBuilds[r.Project]);
+            var references = new Dictionary<string, Package>();
+            foreach (var referenceTask in referenceTasks)
+                references.Add(referenceTask.Key, await referenceTask.Value);
+
+            var codeFiles = sourcePaths.Select(CodeFile.Load).ToList();
+            var package = compiler.CompilePackage(project.Name, codeFiles, references);
             // TODO switch to the async version of the compiler
             //var codeFiles = sourcePaths.Select(p => new CodePath(p)).ToList();
-            //var package = await compiler.CompilePackageAsync(codeFiles);
-            var codeFiles = sourcePaths.Select(CodeFile.Load).ToList();
-            var package = compiler.CompilePackage(project.Name, codeFiles);
+            //var references = project.References.ToDictionary(r => r.Name, r => projectBuilds[r.Project]);
+            //var package = await compiler.CompilePackageAsync(project.Name, codeFiles, references);
             var diagnostics = package.Diagnostics;
             if (diagnostics.Any())
             {

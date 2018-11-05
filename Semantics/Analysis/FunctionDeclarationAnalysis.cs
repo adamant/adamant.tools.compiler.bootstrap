@@ -53,6 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             return new FunctionDeclaration(
                 Context.File,
                 Name,
+                Type.AssertKnown(),
                 Parameters.Select(p => p.Complete()),
                 ReturnType.AssertKnown(),
                 ControlFlow);

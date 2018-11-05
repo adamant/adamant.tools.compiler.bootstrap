@@ -58,7 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         [NotNull]
         public string MangleName([NotNull] FunctionDeclaration function)
         {
-            var mangledName = Mangle(function.QualifiedName);
+            var mangledName = Mangle(function.Name);
             // builder with room for the characters we are likely to add
             var builder = new StringBuilder(mangledName, mangledName.Length + 5);
             builder.Append('´');
@@ -69,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         [NotNull]
         public string MangleName([NotNull] TypeDeclaration type)
         {
-            var mangledName = Mangle(type.QualifiedName);
+            var mangledName = Mangle(type.Name);
             // builder with room for the characters we are likely to add
             var builder = new StringBuilder(mangledName, mangledName.Length + 5);
             builder.Append('´');

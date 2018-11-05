@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         public override Declaration Complete([NotNull] DiagnosticsBuilder diagnostics)
         {
             if (CompleteDiagnostics(diagnostics)) return null;
-            return new TypeDeclaration(Context.File, Name);
+            return new TypeDeclaration(Context.File, Name, Type.AssertKnown());
         }
     }
 }

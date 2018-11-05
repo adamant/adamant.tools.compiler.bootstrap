@@ -1,5 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using JetBrains.Annotations;
 
@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
             containingScope.Add(this);
         }
 
-        public override IDeclarationAnalysis Lookup(string name)
+        public override ISymbol Lookup(string name)
         {
             return base.Lookup(name) ?? ContainingScope.Lookup(name);
         }
