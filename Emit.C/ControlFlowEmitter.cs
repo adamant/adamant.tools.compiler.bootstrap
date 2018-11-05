@@ -69,20 +69,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     case ReturnStatement _:
                         code.AppendLine(voidReturn ? "return;" : "return ₜresult;");
                         break;
+                    case AssignmentStatement assignment:
+                        code.AppendLine($"{Convert(assignment.LValue)} = {Convert(assignment.RValue)};");
+                        break;
                     default:
                         throw NonExhaustiveMatchException.For(statement);
                 }
             code.EndBlock();
         }
 
-        private static string Convert(LValue lValue)
+        private static string Convert(RValue rValue)
         {
-            switch (lValue)
+            switch (rValue)
             {
                 case VariableReference variable:
                     return "ₜ" + NameOf(variable);
                 default:
-                    throw NonExhaustiveMatchException.For(lValue);
+                    throw NonExhaustiveMatchException.For(rValue);
             }
         }
     }
