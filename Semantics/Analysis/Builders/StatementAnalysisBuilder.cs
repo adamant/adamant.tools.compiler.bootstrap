@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
         [NotNull]
         public StatementAnalysis Build(
             [NotNull] AnalysisContext context,
-            [NotNull] QualifiedName functionName,
+            [NotNull] Name functionName,
             [NotNull] StatementSyntax statement)
         {
             switch (statement)

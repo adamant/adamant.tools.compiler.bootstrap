@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
     public class ForeachExpressionAnalysis : ExpressionAnalysis, IDeclarationAnalysis, ILocalVariableScopeAnalysis
     {
         [NotNull] public new ForeachExpressionSyntax Syntax { get; }
-        [NotNull] public QualifiedName VariableName { get; }
+        [NotNull] public Name VariableName { get; }
         [CanBeNull] public ExpressionAnalysis TypeExpression { get; set; }
         [CanBeNull] public DataType VariableType { get; set; }
         [NotNull] public ExpressionAnalysis InExpression { get; }
@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         public ForeachExpressionAnalysis(
             [NotNull] AnalysisContext context,
             [NotNull] ForeachExpressionSyntax syntax,
-            [NotNull] QualifiedName variableName,
+            [NotNull] Name variableName,
             [CanBeNull] ExpressionAnalysis typeExpression,
             [NotNull] ExpressionAnalysis inExpression,
             [NotNull] BlockAnalysis block)
@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             yield return this;
         }
 
-        QualifiedName ISymbol.Name => VariableName;
+        Name ISymbol.Name => VariableName;
         IEnumerable<DataType> ISymbol.Types => VariableType.YieldValue();
         ISymbol ISymbol.ComposeWith(ISymbol symbol)
         {

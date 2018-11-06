@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
     /// </summary>
     public class Metatype : KnownType
     {
-        [NotNull] public QualifiedName Name { get; }
+        [NotNull] public Name Name { get; }
         // The type this is a metatype for. Named instance because it represents
         // the single object instance that is of this metatype.
         [NotNull] public ObjectType Instance { get; }

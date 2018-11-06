@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols
 {
     public class CompositeSymbol : ISymbol
     {
-        [NotNull] public QualifiedName Name { get; }
+        [NotNull] public Name Name { get; }
         [NotNull] [ItemNotNull] public IReadOnlyList<ISymbol> Symbols { get; }
 
         public CompositeSymbol([NotNull] ISymbol symbol1, [NotNull] ISymbol symbol2)
@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols
         }
 
         private CompositeSymbol(
-            [NotNull] QualifiedName name,
+            [NotNull] Name name,
             [NotNull][ItemNotNull]  IEnumerable<ISymbol> symbols)
         {
             Requires.NotNull(nameof(name), name);

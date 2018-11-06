@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations
     {
         public TypeDeclaration(
             [NotNull] CodeFile file,
-            [NotNull] QualifiedName name,
+            [NotNull] Name name,
             [NotNull] KnownType type)
             : base(file, name, type)
         {

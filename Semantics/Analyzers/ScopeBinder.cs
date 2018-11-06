@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             globalDeclarations = declarations.Values.AssertNotNull()
                 .OfType<IDeclarationAnalysis>()
                 .Where(IsGlobalDeclaration)
-                .ToDictionary(d => d.Name.Name.Text, d => d);
+                .ToDictionary(d => d.Name.UnqualifiedName.Text, d => d);
         }
 
         private void GatherDeclarations([NotNull] DeclarationAnalysis declaration)
@@ -45,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
         private static bool IsGlobalDeclaration([NotNull] ISymbol declaration)
         {
-            return !declaration.Name.Qualifier.Any();
+            return declaration.Name is SimpleName;
         }
 
         public void BindCompilationUnitScope([NotNull] CompilationUnitScope scope)
@@ -114,12 +114,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                             var usingNamespace = nameBuilder.BuildName(usingDirective.Name).AssertNotNull();
                             foreach (var importedDeclaration in declarations.Values
                                 .OfType<IDeclarationAnalysis>()
-                                .Where(d => d.Name.IsIn(usingNamespace)))
+                                .Where(d => d.Name.IsDirectlyIn(usingNamespace)))
                             {
                                 AddSymbol(members, importedDeclaration);
                             }
 
-                            foreach (var importedDeclaration in referencedDeclarations.Where(d => d.Name.IsIn(usingNamespace)))
+                            foreach (var importedDeclaration in referencedDeclarations.Where(d => d.Name.IsDirectlyIn(usingNamespace)))
                             {
                                 AddSymbol(members, importedDeclaration);
                             }
@@ -138,7 +138,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
         private static void AddSymbol([NotNull] Dictionary<string, ISymbol> symbols, [NotNull] ISymbol symbol)
         {
-            var name = symbol.Name.Name.Text;
+            var name = symbol.Name.UnqualifiedName.Text;
             if (symbols.TryGetValue(name, out var existingSymbol))
                 symbols[name] = existingSymbol.ComposeWith(symbol);
             else

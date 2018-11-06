@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             // Temp Variable for return
             cfg.Let(function.ReturnType.AssertKnown());
             foreach (var parameter in function.Parameters)
-                cfg.AddParameter(parameter.MutableBinding, parameter.Type.AssertKnown(), parameter.Name.Name.Text);
+                cfg.AddParameter(parameter.MutableBinding, parameter.Type.AssertKnown(), parameter.Name.UnqualifiedName.Text);
 
             var blocks = new Dictionary<SyntaxNode, BasicBlock>();
             var entryBlock = cfg.EntryBlock;
@@ -63,7 +63,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case VariableDeclarationStatementAnalysis variableDeclaration:
                     var variable = cfg.AddVariable(variableDeclaration.MutableBinding,
                         variableDeclaration.Type.AssertKnown(),
-                        variableDeclaration.Name.Name.Text);
+                        variableDeclaration.Name.UnqualifiedName.Text);
                     if (variableDeclaration.Initializer != null)
                         ConvertAssignment(cfg, variable.Reference, variableDeclaration.Initializer, currentBlock);
                     break;
@@ -122,7 +122,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
                     // Now we need to delete any owned variables
                     foreach (var variableDeclaration in block.Statements.OfType<VariableDeclarationStatementAnalysis>().Where(IsOwned))
-                        currentBlock.Add(new DeleteStatement(LookupVariable(cfg, variableDeclaration.Name.Name.Text).VariableNumber, block.Syntax.CloseBrace.Span));
+                        currentBlock.Add(new DeleteStatement(LookupVariable(cfg, variableDeclaration.Name.UnqualifiedName.Text).VariableNumber, block.Syntax.CloseBrace.Span));
 
                     break;
                 case ForeachExpressionAnalysis @foreach:

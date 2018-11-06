@@ -93,10 +93,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
         [InlineData(">")]
         [InlineData(">=")]
         [InlineData("..")]
-        [InlineData(".")]
-        public void Binary_operators([NotNull] string text)
+        public void Binary_operators([NotNull] string @operator)
         {
-            var tokens = FakeTokenStream.FromString("x " + text + " y");
+            var tokens = FakeTokenStream.FromString("x " + @operator + " y");
 
             var e = ParseExpressionWithoutError(tokens);
 
@@ -106,6 +105,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
             Assert.Equal(tokens[1], op.Operator);
             var rightOperand = Assert.IsType<IdentifierNameSyntax>(op.RightOperand);
             Assert.Equal(tokens[2], rightOperand.Name);
+        }
+
+        [Theory]
+        [InlineData(".")]
+        [InlineData("?.")]
+        [InlineData("^.")]
+        public void Member_access([NotNull] string @operator)
+        {
+            var tokens = FakeTokenStream.FromString("x" + @operator + "y");
+
+            var e = ParseExpressionWithoutError(tokens);
+
+            var op = Assert.IsType<MemberAccessExpressionSyntax>(e);
+            var expression = Assert.IsType<IdentifierNameSyntax>(op.Expression);
+            Assert.Equal(tokens[0], expression.Name);
+            Assert.Equal(tokens[1], op.AccessOperator);
+            Assert.Equal(tokens[2], op.Member);
         }
 
         [NotNull]

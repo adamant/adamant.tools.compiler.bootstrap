@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
     {
         [NotNull] public new MemberDeclarationSyntax Syntax { get; }
         [NotNull] public DiagnosticsBuilder Diagnostics { get; }
-        [NotNull] public QualifiedName Name { get; }
+        [NotNull] public Name Name { get; }
         [NotNull] [ItemNotNull] public IReadOnlyList<GenericParameterAnalysis> GenericParameters { get; }
         public int GenericArity => GenericParameters.Count;
         // This is the type of the value provided by using the name. So for
@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         protected MemberDeclarationAnalysis(
             [NotNull] AnalysisContext context,
             [NotNull] MemberDeclarationSyntax syntax,
-            [NotNull] QualifiedName name,
+            [NotNull] Name name,
             [NotNull] [ItemNotNull] IEnumerable<GenericParameterAnalysis> genericParameters)
             : base(context, syntax)
         {

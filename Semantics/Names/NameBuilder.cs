@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
     public class NameBuilder
     {
         [CanBeNull]
-        public QualifiedName BuildName([NotNull] NameSyntax nameSyntax)
+        public Name BuildName([NotNull] NameSyntax nameSyntax)
         {
             switch (nameSyntax)
             {
@@ -15,12 +15,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
                     {
                         var qualifier = BuildName(qualifiedNameSyntax.Qualifier);
                         var name = qualifiedNameSyntax.Name.Name.Value;
-                        return name != null ? qualifier?.Qualify(name) ?? new QualifiedName(name) : null;
+                        return name != null ? qualifier?.Qualify(name) ?? new SimpleName(name) : null;
                     }
                 case IdentifierNameSyntax identifierNameSyntax:
                     {
                         var name = identifierNameSyntax.Name.Value;
-                        return name != null ? new QualifiedName(name) : null;
+                        return name != null ? new SimpleName(name) : null;
                     }
                 default:
                     throw NonExhaustiveMatchException.For(nameSyntax);

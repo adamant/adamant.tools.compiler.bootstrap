@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         public FunctionDeclarationAnalysis(
             [NotNull] AnalysisContext context,
             [NotNull] NamedFunctionDeclarationSyntax syntax,
-            [NotNull] QualifiedName name,
+            [NotNull] Name name,
             [NotNull] [ItemNotNull] IEnumerable<GenericParameterAnalysis> genericParameters,
             [NotNull] [ItemNotNull] IEnumerable<ParameterAnalysis> parameters,
             [NotNull] ExpressionAnalysis returnTypeExpression,

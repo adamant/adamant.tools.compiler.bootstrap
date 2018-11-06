@@ -5,8 +5,9 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
 {
-    public class SimpleName : IEquatable<SimpleName>
+    public class SimpleName : Name, IEquatable<SimpleName>
     {
+        [NotNull] public override SimpleName UnqualifiedName => this;
         [NotNull] public readonly string Text;
         [NotNull] public readonly bool IsSpecial;
 
@@ -22,6 +23,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
             Requires.NotNull(nameof(text), text);
             Text = text;
             IsSpecial = isSpecial;
+        }
+
+        public override bool IsDirectlyIn(Name name)
+        {
+            Requires.NotNull(nameof(name), name);
+            // A simple name isn't inside any other names
+            return false;
         }
 
         public override string ToString()

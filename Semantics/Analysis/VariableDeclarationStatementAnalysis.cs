@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
     {
         [NotNull] public new VariableDeclarationStatementSyntax Syntax { get; }
         public bool MutableBinding => Syntax.Binding is VarKeywordToken;
-        [NotNull] public QualifiedName Name { get; }
+        [NotNull] public Name Name { get; }
         [CanBeNull] public ExpressionAnalysis TypeExpression { get; }
         [CanBeNull] public ExpressionAnalysis Initializer { get; }
         [CanBeNull] public DataType Type { get; set; }
@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         public VariableDeclarationStatementAnalysis(
             [NotNull] AnalysisContext context,
             [NotNull] VariableDeclarationStatementSyntax syntax,
-            [NotNull] QualifiedName name,
+            [NotNull] Name name,
             [CanBeNull] ExpressionAnalysis typeExpression,
             [CanBeNull] ExpressionAnalysis initializer)
             : base(context, syntax)

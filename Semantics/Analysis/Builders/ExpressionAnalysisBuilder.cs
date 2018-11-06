@@ -38,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
         [NotNull]
         public ExpressionAnalysis BuildExpression(
             [NotNull] AnalysisContext context,
-            [NotNull] QualifiedName functionName,
+            [NotNull] Name functionName,
             [NotNull] ExpressionSyntax expression)
         {
             switch (expression)
@@ -133,7 +133,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
         [NotNull]
         private ExpressionAnalysis BuildExpressionBlock(
             [NotNull] AnalysisContext context,
-            [NotNull] QualifiedName functionName,
+            [NotNull] Name functionName,
             [NotNull] ExpressionBlockSyntax expressionBlock)
         {
             switch (expressionBlock)
@@ -150,7 +150,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
         [NotNull]
         private BlockAnalysis BuildBlock(
             [NotNull] AnalysisContext context,
-            [NotNull] QualifiedName functionName,
+            [NotNull] Name functionName,
             [NotNull] BlockSyntax block)
         {
             var blockContext = context.InLocalVariableScope(block);
@@ -162,7 +162,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
         [NotNull]
         public ArgumentAnalysis BuildArgument(
             [NotNull] AnalysisContext context,
-            [NotNull] QualifiedName functionName,
+            [NotNull] Name functionName,
             [NotNull] ArgumentSyntax argument)
         {
             return new ArgumentAnalysis(context, argument, BuildExpression(context, functionName, argument.Value));
@@ -171,7 +171,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
         [CanBeNull]
         private ExpressionAnalysis BuildElseClause(
             [NotNull] AnalysisContext context,
-            [NotNull] QualifiedName functionName,
+            [NotNull] Name functionName,
             [CanBeNull] ElseClauseSyntax elseClause)
         {
             if (elseClause == null) return null;

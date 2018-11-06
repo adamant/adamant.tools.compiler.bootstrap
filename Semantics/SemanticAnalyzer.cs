@@ -62,9 +62,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         private static FunctionDeclaration DetermineEntryPoint([NotNull] List<Declaration> declarations, [NotNull] DiagnosticsBuilder diagnostics)
         {
             var mainFunctions = declarations.OfType<FunctionDeclaration>()
-                // TODO make an easy way to construct and compare qualified names
-                .Where(f => !f.Name.Qualifier.Any()
-                            && f.Name.Name.Text == "main")
+                .Where(f => f.Name is SimpleName name && name.Text == "main")
                 .ToList();
 
             // TODO warn on and remove main functions that don't have correct parameters or types

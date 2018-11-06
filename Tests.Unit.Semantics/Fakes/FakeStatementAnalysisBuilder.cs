@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Fakes
     {
         public StatementAnalysis Build(
             AnalysisContext context,
-            QualifiedName functionName,
+            Name functionName,
             StatementSyntax statement)
         {
             throw new System.NotImplementedException();

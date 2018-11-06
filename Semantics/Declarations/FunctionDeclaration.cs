@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations
 
         public FunctionDeclaration(
             [NotNull] CodeFile file,
-            [NotNull] QualifiedName name,
+            [NotNull] Name name,
             [NotNull] KnownType type,
             [NotNull] [ItemNotNull] IEnumerable<Parameter> parameters,
             [NotNull] KnownType returnType,

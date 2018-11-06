@@ -1,5 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using JetBrains.Annotations;
@@ -40,9 +41,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         }
 
         [NotNull]
-        public AnalysisContext InNamespace([NotNull] NamespaceDeclarationSyntax @namespace)
+        public AnalysisContext InNamespace(
+            [NotNull] NamespaceDeclarationSyntax @namespace,
+            [NotNull] Name name)
         {
-            return new AnalysisContext(File, new UsingDirectivesScope(new NamespaceScope(Scope, @namespace), @namespace));
+            return new AnalysisContext(File, new NamespaceScope(Scope, @namespace, name));
+        }
+
+        [NotNull]
+        public AnalysisContext WithUsingDirectives([NotNull] NamespaceDeclarationSyntax @namespace)
+        {
+            return new AnalysisContext(File, new UsingDirectivesScope(Scope, @namespace));
         }
     }
 }

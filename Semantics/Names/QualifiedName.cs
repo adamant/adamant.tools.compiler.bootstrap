@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
@@ -12,42 +11,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
     /// </summary>
     public class QualifiedName : Name, IEquatable<QualifiedName>
     {
-        [NotNull] [ItemNotNull] public IReadOnlyList<SimpleName> Qualifier { get; }
-        [NotNull] public SimpleName Name { get; }
-        [NotNull] [ItemNotNull] public IEnumerable<SimpleName> FullName => Qualifier.Append(Name).AssertNotNull();
+        [NotNull] public Name Qualifier { get; }
+        [NotNull] public override SimpleName UnqualifiedName { get; }
+        //[NotNull] [ItemNotNull] public IEnumerable<SimpleName> FullName => Qualifier.Append(Name).AssertNotNull();
 
         public QualifiedName(
-            [NotNull] [ItemNotNull] IEnumerable<SimpleName> qualifiers,
-            [NotNull] SimpleName name)
+            [NotNull] Name qualifier,
+            [NotNull] SimpleName simpleName)
         {
-            Requires.NotNull(nameof(qualifiers), qualifiers);
-            Requires.NotNull(nameof(name), name);
-            Name = name;
-            Qualifier = qualifiers.ToReadOnlyList();
-        }
-
-        public QualifiedName(
-            [NotNull] SimpleName firstPart,
-            [NotNull] [ItemNotNull] params SimpleName[] parts)
-        {
-            var allParts = firstPart.Yield().Concat(parts).ToList();
-            var lastIndex = allParts.Count - 1;
-            Name = allParts[lastIndex].AssertNotNull();
-            allParts.RemoveAt(lastIndex);
-            Qualifier = allParts.AsReadOnly().AssertNotNull();
-        }
-
-        [NotNull]
-        public override QualifiedName Qualify([NotNull] SimpleName name)
-        {
-            Requires.NotNull(nameof(name), name);
-            return new QualifiedName(FullName, name);
+            Requires.NotNull(nameof(qualifier), qualifier);
+            Requires.NotNull(nameof(simpleName), simpleName);
+            Qualifier = qualifier;
+            UnqualifiedName = simpleName;
         }
 
         [NotNull]
         public override string ToString()
         {
-            return $"{string.Join('.', FullName)}";
+            return $"{Qualifier}.{UnqualifiedName}";
         }
 
         #region Equals
@@ -58,14 +39,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
 
         public bool Equals(QualifiedName other)
         {
-            return other != null &&
-                   EqualityComparer<SimpleName>.Default.Equals(Name, other.Name) &&
-                   Qualifier.SequenceEqual(other.Qualifier);
+            return other != null
+                   && UnqualifiedName.Equals(other.UnqualifiedName)
+                   && Qualifier.Equals(other.Qualifier);
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Qualifier.Aggregate(Name.GetHashCode(), HashCode.Combine));
+            return HashCode.Combine(Qualifier, UnqualifiedName);
         }
 
         public static bool operator ==(QualifiedName name1, QualifiedName name2)
@@ -79,9 +60,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
         }
         #endregion
 
-        public bool IsIn([NotNull] QualifiedName other)
+        public override bool IsDirectlyIn([NotNull] Name name)
         {
-            return other.FullName.SequenceEqual(Qualifier);
+            Requires.NotNull(nameof(name), name);
+            return Qualifier.Equals(name);
         }
     }
 }

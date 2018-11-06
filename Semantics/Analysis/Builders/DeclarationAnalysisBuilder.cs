@@ -5,7 +5,6 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
-
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
 {
     public class DeclarationAnalysisBuilder
@@ -29,11 +28,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
             [NotNull] AnalysisContext context,
             [NotNull] FileNamespaceDeclarationSyntax @namespace)
         {
-            Name name = GlobalNamespaceName.Instance;
+            RootName name = GlobalNamespaceName.Instance;
+            var namespaceContext = context;
             if (@namespace.Name != null)
-                name = nameBuilder.BuildName(@namespace.Name) ?? name;
-            var bodyContext = context.InNamespace(@namespace);
-
+            {
+                var namespaceName = nameBuilder.BuildName(@namespace.Name);
+                if (namespaceName != null)
+                {
+                    namespaceContext = BuildNamespaceContext(namespaceContext, @namespace, namespaceName);
+                    name = namespaceName;
+                }
+            }
+            var bodyContext = namespaceContext.WithUsingDirectives(@namespace);
             var declarations = new List<DeclarationAnalysis>();
             foreach (var declaration in @namespace.Declarations)
             {
@@ -44,10 +50,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
             return new NamespaceDeclarationAnalysis(context, @namespace, declarations);
         }
 
+        [NotNull]
+        AnalysisContext BuildNamespaceContext(
+            [NotNull] AnalysisContext context,
+            [NotNull] FileNamespaceDeclarationSyntax @namespace,
+            [NotNull] Name name)
+        {
+            switch (name)
+            {
+                case SimpleName simpleName:
+                    return context.InNamespace(@namespace, simpleName);
+                case QualifiedName qualifiedName:
+                    context = BuildNamespaceContext(context, @namespace, qualifiedName.Qualifier);
+                    return context.InNamespace(@namespace, qualifiedName.UnqualifiedName);
+                default:
+                    throw NonExhaustiveMatchException.For(name);
+            }
+        }
+
         [CanBeNull]
         public MemberDeclarationAnalysis BuildDeclaration(
             [NotNull] AnalysisContext context,
-            [NotNull] Name @namespace,
+            [NotNull] RootName @namespace,
             [NotNull] DeclarationSyntax declaration)
         {
             switch (declaration)
@@ -75,7 +99,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
         [CanBeNull]
         private FunctionDeclarationAnalysis BuildFunction(
             [NotNull] AnalysisContext context,
-            [NotNull] Name @namespace,
+            [NotNull] RootName @namespace,
             [NotNull] NamedFunctionDeclarationSyntax syntax)
         {
             // Skip any function that doesn't have a name
@@ -95,7 +119,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
         [NotNull]
         private ParameterAnalysis BuildParameter(
             [NotNull] AnalysisContext context,
-            [NotNull] QualifiedName functionName,
+            [NotNull] Name functionName,
             [NotNull] ParameterSyntax parameter)
         {
             switch (parameter)
@@ -113,7 +137,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
         [CanBeNull]
         private TypeDeclarationAnalysis BuildClass(
             [NotNull] AnalysisContext context,
-            [NotNull] Name @namespace,
+            [NotNull] RootName @namespace,
             [NotNull] ClassDeclarationSyntax syntax)
         {
             // Skip any class that doesn't have a name
@@ -127,7 +151,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
         [CanBeNull]
         private TypeDeclarationAnalysis BuildType(
             [NotNull] AnalysisContext context,
-            [NotNull] Name @namespace,
+            [NotNull] RootName @namespace,
             [NotNull] TypeDeclarationSyntax syntax)
         {
             // Skip any class that doesn't have a name
@@ -141,7 +165,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
         [CanBeNull]
         private TypeDeclarationAnalysis BuildStruct(
             [NotNull] AnalysisContext context,
-            [NotNull] Name @namespace,
+            [NotNull] RootName @namespace,
             [NotNull] StructDeclarationSyntax syntax)
         {
             switch (syntax.Name)
@@ -159,10 +183,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
                 case IPrimitiveTypeToken primitive:
                     {
                         var name = new SimpleName(context.File.Code[primitive.Span], true);
-                        var fullName = new QualifiedName(name);
                         return new TypeDeclarationAnalysis(context, syntax,
-                            fullName,
-                            BuildGenericParameters(context, fullName, syntax.GenericParameters));
+                            name,
+                            BuildGenericParameters(context, name, syntax.GenericParameters));
                     }
             }
         }
@@ -170,7 +193,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
         [CanBeNull]
         private TypeDeclarationAnalysis BuildEnumStruct(
             [NotNull] AnalysisContext context,
-            [NotNull] Name @namespace,
+            [NotNull] RootName @namespace,
             [NotNull] EnumStructDeclarationSyntax syntax)
         {
             // Skip any struct that doesn't have a name
@@ -184,7 +207,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
         [CanBeNull]
         private TypeDeclarationAnalysis BuildEnumClass(
             [NotNull] AnalysisContext context,
-            [NotNull] Name @namespace,
+            [NotNull] RootName @namespace,
             [NotNull] EnumClassDeclarationSyntax syntax)
         {
             // Skip any struct that doesn't have a name
@@ -199,7 +222,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
         [ItemNotNull]
         private IEnumerable<GenericParameterAnalysis> BuildGenericParameters(
             [NotNull] AnalysisContext context,
-            [NotNull] QualifiedName memberName,
+            [NotNull] Name memberName,
             [CanBeNull] GenericParametersSyntax syntax)
         {
             if (syntax == null) yield break;

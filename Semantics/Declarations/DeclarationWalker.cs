@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
@@ -23,26 +22,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations
         {
             var namespaces = new HashSet<Name>();
             foreach (var compilationUnit in packageSyntax.CompilationUnits)
-                GatherNamespaces(compilationUnit.CodeFile, GlobalNamespaceName.Instance, compilationUnit.Namespace, namespaces);
+                GatherNamespaces(GlobalNamespaceName.Instance, compilationUnit.Namespace, namespaces);
 
             return namespaces.Select(ns => new Namespace(ns)).ToReadOnlyList();
         }
 
         private void GatherNamespaces(
-            [NotNull] CodeFile codeFile,
-            [NotNull] Name namespaceName,
+            [NotNull] RootName containingName,
             [NotNull] DeclarationSyntax declaration,
             [NotNull] HashSet<Name> namespaces)
         {
             if (!(declaration is NamespaceDeclarationSyntax namespaceDeclaration)) return;
 
-            if (namespaceDeclaration.Name != null)
-                namespaceName = nameBuilder.BuildName(namespaceDeclaration.Name) ?? namespaceName;
 
-            namespaces.Add(namespaceName);
+            if (namespaceDeclaration.Name != null)
+            {
+                var namespaceName = nameBuilder.BuildName(namespaceDeclaration.Name);
+                if (namespaceName != null)
+                {
+                    namespaces.Add(namespaceName);
+                    containingName = namespaceName;
+                }
+            }
 
             foreach (var nestedDeclaration in namespaceDeclaration.Declarations)
-                GatherNamespaces(codeFile, namespaceName, nestedDeclaration, namespaces);
+                GatherNamespaces(containingName, nestedDeclaration, namespaces);
         }
     }
 }

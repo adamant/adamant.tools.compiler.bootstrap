@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         [NotNull]
         StatementAnalysis Build(
             [NotNull] AnalysisContext context,
-            [NotNull] QualifiedName functionName,
+            [NotNull] Name functionName,
             [NotNull] StatementSyntax statement);
     }
 }

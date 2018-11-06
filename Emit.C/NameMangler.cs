@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -58,9 +57,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         [NotNull]
         public string MangleName([NotNull] FunctionDeclaration function)
         {
-            var mangledName = Mangle(function.Name);
             // builder with room for the characters we are likely to add
-            var builder = new StringBuilder(mangledName, mangledName.Length + 5);
+            var builder = new StringBuilder(EstimateSize(function.Name) + 5);
+            Mangle(function.Name, builder);
             builder.Append('´');
             builder.Append(function.Arity);
             return builder.ToString().AssertNotNull();
@@ -69,9 +68,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         [NotNull]
         public string MangleName([NotNull] TypeDeclaration type)
         {
-            var mangledName = Mangle(type.Name);
             // builder with room for the characters we are likely to add
-            var builder = new StringBuilder(mangledName, mangledName.Length + 5);
+            var builder = new StringBuilder(EstimateSize(type.Name) + 2);
+            Mangle(type.Name, builder);
             builder.Append('´');
             builder.Append("0"); // TODO actual number of generic parameters
             return builder.ToString().AssertNotNull();
@@ -80,46 +79,75 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         [NotNull]
         public string Mangle([NotNull] ObjectType type)
         {
-            var mangledName = Mangle(type.Name);
-            var builder = new StringBuilder(mangledName, mangledName.Length + 5);
+            // builder with room for the characters we are likely to add
+            var builder = new StringBuilder(EstimateSize(type.Name) + 2);
+            Mangle(type.Name, builder);
             builder.Append('´');
             builder.Append("0"); // TODO actual number of generic parameters
             return builder.ToString().AssertNotNull();
         }
 
         [NotNull]
-        public string Mangle([NotNull] QualifiedName qualifiedName)
+        public string Mangle([NotNull] Name name)
         {
-            if (qualifiedName.Qualifier.Any())
-                return 'ᵢ' + string.Join('·', qualifiedName.FullName.Select(Mangle)).AssertNotNull();
-
-            // An unqualified name could be a special name in which case, don't add 'ᵢ'
-            var mangled = Mangle(qualifiedName.Name);
-            return qualifiedName.Name.IsSpecial ? mangled : 'ᵢ' + mangled;
+            var builder = new StringBuilder(EstimateSize(name));
+            Mangle(name, builder);
+            return builder.ToString().AssertNotNull();
         }
 
         [NotNull]
-        public string Mangle([NotNull] SimpleName name)
+        public string Mangle([NotNull] string name)
         {
-            var mangled = ManglePart(name.Text);
-            return name.IsSpecial ? 'ₐ' + mangled : mangled;
+            return Mangle(new SimpleName(name));
+        }
+
+        private static int EstimateSize([NotNull] Name name)
+        {
+            switch (name)
+            {
+                case QualifiedName qualifiedName:
+                    return EstimateSize(qualifiedName.Qualifier) + 1 +
+                           EstimateSize(qualifiedName.UnqualifiedName);
+                case SimpleName simpleName:
+                    return 1 + simpleName.Text.Length;
+                default:
+                    throw NonExhaustiveMatchException.For(name);
+            }
+        }
+
+        private static void Mangle([NotNull] Name name, [NotNull] StringBuilder builder)
+        {
+            switch (name)
+            {
+                case SimpleName simpleName:
+                    builder.Append(simpleName.IsSpecial ? 'ₐ' : 'ᵢ');
+                    ManglePart(simpleName.Text, builder);
+                    break;
+                case QualifiedName qualifiedName:
+                    Mangle(qualifiedName.Qualifier, builder);
+                    builder.Append('.');
+                    Mangle(qualifiedName.UnqualifiedName, builder);
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.For(name);
+            }
         }
 
         /// <summary>
         /// Mangle an individual part of a name.
         /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
         [NotNull]
-        public string ManglePart([NotNull] string name)
+        internal static void ManglePart([NotNull] string name, [NotNull] StringBuilder builder)
         {
             // Fast path no need to escape anything
             if (StandardIdentifierPattern.IsMatch(name))
-                return name;
+            {
+                builder.Append(name);
+                return;
+            }
 
             // We separate the handling of characters in the Basic Multilingual
             // Plan (BMP) from those outside it
-            var builder = new StringBuilder();
             for (var i = 0; i < name.Length; i++)
             {
                 var c = name[i];
@@ -159,8 +187,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 builder.Append(codePoint.ToString("X")); // Supposedly faster than using AppendFormat()
                 builder.Append('ǂ');
             }
-
-            return builder.ToString().AssertNotNull();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

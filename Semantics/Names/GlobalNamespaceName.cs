@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
 {
-    public class GlobalNamespaceName : Name
+    public class GlobalNamespaceName : RootName
     {
         #region Singleton
         [NotNull] public static readonly GlobalNamespaceName Instance = new GlobalNamespaceName();
@@ -12,10 +12,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
         #endregion
 
         [NotNull]
-        public override QualifiedName Qualify([NotNull] SimpleName name)
+        public override Name Qualify([NotNull] SimpleName name)
         {
             Requires.NotNull(nameof(name), name);
-            return new QualifiedName(name);
+            return name;
         }
     }
 }

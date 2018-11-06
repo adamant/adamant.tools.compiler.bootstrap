@@ -61,7 +61,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
         }
 
         [NotNull]
-        public static Diagnostic CircularDefinition([NotNull] CodeFile file, TextSpan span, QualifiedName typeDeclarationName)
+        public static Diagnostic CircularDefinition([NotNull] CodeFile file, TextSpan span, Name typeDeclarationName)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3006, $"Declaration of type `{typeDeclarationName}` is part of a circular definition");
 

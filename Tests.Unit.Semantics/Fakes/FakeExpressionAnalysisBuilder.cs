@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Fakes
         [NotNull]
         public ExpressionAnalysis BuildExpression(
             [NotNull] AnalysisContext context,
-            [NotNull] QualifiedName functionName,
+            [NotNull] Name functionName,
             [NotNull] ExpressionSyntax expression)
         {
             return FakeAnalysis.Expression();

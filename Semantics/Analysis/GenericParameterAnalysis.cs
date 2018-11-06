@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
     public class GenericParameterAnalysis : AnalysisNode, IDeclarationAnalysis
     {
         [NotNull] public new GenericParameterSyntax Syntax { get; }
-        [NotNull] public QualifiedName Name { get; }
+        [NotNull] public Name Name { get; }
         // TypeExpression can be null for self parameters
         [CanBeNull] public ExpressionAnalysis TypeExpression { get; }
         [CanBeNull] public DataType Type { get; set; }
@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         public GenericParameterAnalysis(
             [NotNull] AnalysisContext context,
             [NotNull] GenericParameterSyntax syntax,
-            [NotNull] QualifiedName name,
+            [NotNull] Name name,
             [CanBeNull] ExpressionAnalysis typeExpression)
             : base(context, syntax)
         {

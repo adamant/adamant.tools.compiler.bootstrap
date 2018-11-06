@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         public TypeDeclarationAnalysis(
             [NotNull] AnalysisContext context,
             [NotNull] MemberDeclarationSyntax syntax,
-            [NotNull] QualifiedName name,
+            [NotNull] Name name,
             [NotNull] [ItemNotNull] IEnumerable<GenericParameterAnalysis> genericParameters)
             : base(context, syntax, name, genericParameters)
         {

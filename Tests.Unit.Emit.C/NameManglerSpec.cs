@@ -1,3 +1,4 @@
+using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using JetBrains.Annotations;
 using Xunit;
@@ -25,11 +26,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C
         [InlineData("\U0001FFFE\U000F1234\U0010FFFF", "µ1FFFEǂµF1234ǂµ10FFFFǂ")] // Not Valid, all lengths
         public void Mangle_part([NotNull] string name, [NotNull] string expectedMangledName)
         {
-            var mangler = new NameMangler();
+            var builder = new StringBuilder();
 
-            var mangledName = mangler.ManglePart(name);
+            NameMangler.ManglePart(name, builder);
 
-            Assert.Equal(expectedMangledName, mangledName);
+            Assert.Equal(expectedMangledName, builder.ToString());
         }
     }
 }

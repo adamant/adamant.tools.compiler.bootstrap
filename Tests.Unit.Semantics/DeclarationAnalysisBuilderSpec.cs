@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics
         public void Function_with_namespace()
         {
             var functionDeclaration = FakeSyntax.FunctionDeclaration("function_name");
-            var @namespace = new QualifiedName("myNamespace", "name");
+            var @namespace = Name.From("myNamespace", "name");
 
             var analysis = Build(functionDeclaration, @namespace);
 
@@ -60,7 +60,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics
 
         private static MemberDeclarationAnalysis Build(
             [NotNull] DeclarationSyntax declaration,
-            [CanBeNull] Name @namespace = null)
+            [CanBeNull] RootName @namespace = null)
         {
             var nameBuilder = new NameBuilder();
             var expressionBuilder = new FakeExpressionAnalysisBuilder();

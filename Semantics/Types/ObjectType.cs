@@ -14,19 +14,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
     // arguments supplied is *partially bound*.
     public class ObjectType : KnownType
     {
-        [NotNull] public static readonly ObjectType Void = new ObjectType(new QualifiedName(new SimpleName("void", true)), false, false);
-        [NotNull] public static readonly ObjectType Never = new ObjectType(new QualifiedName(new SimpleName("never", true)), false, false);
-        [NotNull] public static readonly ObjectType Int = new ObjectType(new QualifiedName(new SimpleName("int", true)), false, false);
-        [NotNull] public static readonly ObjectType UInt = new ObjectType(new QualifiedName(new SimpleName("uint", true)), false, false);
-        [NotNull] public static readonly ObjectType Byte = new ObjectType(new QualifiedName(new SimpleName("byte", true)), false, false);
-        [NotNull] public static readonly ObjectType Size = new ObjectType(new QualifiedName(new SimpleName("size", true)), false, false);
-        [NotNull] public static readonly ObjectType Bool = new ObjectType(new QualifiedName(new SimpleName("bool", true)), false, false);
-        [NotNull] public static readonly ObjectType String = new ObjectType(new QualifiedName(new SimpleName("string", true)), false, false);
-        [NotNull] public static readonly ObjectType Type = new ObjectType(new QualifiedName(new SimpleName("type", true)), true, false);
-        [NotNull] public static readonly ObjectType Metatype = new ObjectType(new QualifiedName(new SimpleName("metatype", true)), true, false);
-        [NotNull] public static readonly ObjectType Any = new ObjectType(new QualifiedName(new SimpleName("any", true)), true, false);
+        [NotNull] public static readonly ObjectType Void = new ObjectType(new SimpleName("void", true), false, false);
+        [NotNull] public static readonly ObjectType Never = new ObjectType(new SimpleName("never", true), false, false);
+        [NotNull] public static readonly ObjectType Int = new ObjectType(new SimpleName("int", true), false, false);
+        [NotNull] public static readonly ObjectType UInt = new ObjectType(new SimpleName("uint", true), false, false);
+        [NotNull] public static readonly ObjectType Byte = new ObjectType(new SimpleName("byte", true), false, false);
+        [NotNull] public static readonly ObjectType Size = new ObjectType(new SimpleName("size", true), false, false);
+        [NotNull] public static readonly ObjectType Bool = new ObjectType(new SimpleName("bool", true), false, false);
+        [NotNull] public static readonly ObjectType String = new ObjectType(new SimpleName("string", true), false, false);
+        [NotNull] public static readonly ObjectType Type = new ObjectType(new SimpleName("type", true), true, false);
+        [NotNull] public static readonly ObjectType Metatype = new ObjectType(new SimpleName("metatype", true), true, false);
+        [NotNull] public static readonly ObjectType Any = new ObjectType(new SimpleName("any", true), true, false);
 
-        [NotNull] public QualifiedName Name { get; }
+        [NotNull] public Name Name { get; }
         public bool IsReferenceType { get; }
         public bool DeclaredMutable { get; }
         [NotNull] public IReadOnlyList<DataType> GenericParameterTypes { get; }
@@ -34,7 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
         public bool IsMutable { get; }
 
         private ObjectType(
-            [NotNull] QualifiedName name,
+            [NotNull] Name name,
             bool isReferenceType,
             bool declaredMutable,
             [NotNull][ItemNotNull] IEnumerable<DataType> genericParameterTypes,
@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
         }
 
         public ObjectType(
-            [NotNull] QualifiedName name,
+            [NotNull] Name name,
             bool isReferenceType,
             bool declaredMutable,
             [NotNull][ItemNotNull] IEnumerable<DataType> genericParameterTypes)
@@ -59,7 +59,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
         {
         }
 
-        public ObjectType([NotNull] QualifiedName name, bool isReferenceType, bool declaredMutable)
+        public ObjectType([NotNull] Name name, bool isReferenceType, bool declaredMutable)
             : this(name, isReferenceType, declaredMutable, Enumerable.Empty<DataType>())
         {
         }
