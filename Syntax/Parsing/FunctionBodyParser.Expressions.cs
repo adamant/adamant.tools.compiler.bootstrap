@@ -116,7 +116,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                             continue;
                         }
                         break;
-                    case DotDotToken _: // Should this have a different precedence because it is the "accept" operator?
+                    case DotDotToken _:
                     case LessThanDotDotToken _:
                     case DotDotLessThanToken _:
                     case LessThanDotDotLessThanToken _:
@@ -192,8 +192,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         if (minPrecedence <= OperatorPrecedence.Primary)
                         {
                             // Member Access
-                            precedence = OperatorPrecedence.Primary;
-                            @operator = tokens.TakeOperator();
+                            var accessOperator = tokens.TakeOperator();
+                            var member = tokens.Expect<IMemberNameToken>();
+                            expression = new MemberAccessExpressionSyntax(expression, accessOperator, member);
+                            continue;
                         }
                         break;
                     default:
@@ -251,11 +253,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 case InitKeywordToken _:
                     {
                         var initKeyword = tokens.Expect<IInitKeywordToken>();
-                        var type = ParseName(tokens, diagnostics);
                         var openParen = tokens.Expect<IOpenParenToken>();
-                        var arguments = ParseArgumentList(tokens, diagnostics);
+                        var placeExpression = ParseExpression(tokens, diagnostics);
                         var closeParen = tokens.Expect<ICloseParenToken>();
-                        return new InitStructExpressionSyntax(initKeyword, type, openParen, arguments, closeParen);
+                        var type = ParseName(tokens, diagnostics);
+                        var argumentsOpenParen = tokens.Expect<IOpenParenToken>();
+                        var arguments = ParseArgumentList(tokens, diagnostics);
+                        var argumentsCloseParen = tokens.Expect<ICloseParenToken>();
+                        return new PlacementInitExpressionSyntax(initKeyword, openParen, placeExpression,
+                            closeParen, type, argumentsOpenParen, arguments, argumentsCloseParen);
                     }
                 case DeleteKeywordToken deleteKeyword:
                     {
@@ -307,6 +313,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 case NeverKeywordToken _:
                 case SizeKeywordToken _:
                 case TypeKeywordToken _:
+                case AnyKeywordToken _:
                     {
                         var keyword = tokens.Take<IPrimitiveTypeToken>();
                         return new PrimitiveTypeSyntax(keyword);

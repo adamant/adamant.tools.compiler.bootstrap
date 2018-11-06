@@ -24,6 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
         [NotNull] public static readonly ObjectType String = new ObjectType(new QualifiedName(new SimpleName("string", true)), false, false);
         [NotNull] public static readonly ObjectType Type = new ObjectType(new QualifiedName(new SimpleName("type", true)), true, false);
         [NotNull] public static readonly ObjectType Metatype = new ObjectType(new QualifiedName(new SimpleName("metatype", true)), true, false);
+        [NotNull] public static readonly ObjectType Any = new ObjectType(new QualifiedName(new SimpleName("any", true)), true, false);
 
         [NotNull] public QualifiedName Name { get; }
         public bool IsReferenceType { get; }

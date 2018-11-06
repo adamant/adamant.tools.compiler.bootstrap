@@ -13,4 +13,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
     public partial interface INeverKeywordToken : IPrimitiveTypeToken { }
     public partial interface ISizeKeywordToken : IPrimitiveTypeToken { }
     public partial interface ITypeKeywordToken : IPrimitiveTypeToken { }
+    public partial interface IAnyKeywordToken : IPrimitiveTypeToken { }
 }

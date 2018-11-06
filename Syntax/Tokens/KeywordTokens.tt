@@ -71,6 +71,7 @@
         "Break",
         "Next",
         "Override",
+        "Any",
     }.AsReadOnly();
 #>
 using System;

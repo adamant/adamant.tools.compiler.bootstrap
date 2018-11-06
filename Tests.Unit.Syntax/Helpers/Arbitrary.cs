@@ -336,6 +336,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             { "next", typeof(NextKeywordToken) },
             { "override", typeof(OverrideKeywordToken) },
             { "as", typeof(AsKeywordToken) },
+            { "any", typeof(AnyKeywordToken) },
         }.AsReadOnly();
     }
 }

@@ -75,10 +75,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
                     return new NewObjectExpressionAnalysis(context, newObjectExpression,
                         BuildExpression(context, functionName, newObjectExpression.Constructor),
                         newObjectExpression.Arguments.Select(a => BuildArgument(context, functionName, a)));
-                case InitStructExpressionSyntax initStructExpression:
-                    return new InitStructExpressionAnalysis(context, initStructExpression,
-                        BuildExpression(context, functionName, initStructExpression.Constructor),
-                        initStructExpression.Arguments.Select(a => BuildArgument(context, functionName, a)));
+                case PlacementInitExpressionSyntax placementInitExpression:
+                    return new PlacementInitExpressionAnalysis(context, placementInitExpression,
+                        BuildExpression(context, functionName, placementInitExpression.PlaceExpression),
+                        BuildExpression(context, functionName, placementInitExpression.Constructor),
+                        placementInitExpression.Arguments.Select(a => BuildArgument(context, functionName, a)));
                 case BooleanLiteralExpressionSyntax booleanLiteralExpression:
                     return new BooleanLiteralExpressionAnalysis(context, booleanLiteralExpression);
                 case UninitializedExpressionSyntax uninitializedExpression:
@@ -121,6 +122,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
                 case ResultExpressionSyntax resultExpression:
                     return new ResultExpressionAnalysis(context, resultExpression,
                         BuildExpression(context, functionName, resultExpression.Expression));
+                case MemberAccessExpressionSyntax memberAccessExpression:
+                    return new MemberAccessExpressionAnalysis(context, memberAccessExpression,
+                        BuildExpression(context, functionName, memberAccessExpression.Expression));
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }

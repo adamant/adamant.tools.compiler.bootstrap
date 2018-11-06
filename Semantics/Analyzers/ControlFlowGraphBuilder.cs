@@ -128,6 +128,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case ForeachExpressionAnalysis @foreach:
                     // TODO actually convert the expression
                     break;
+                case WhileExpressionAnalysis @foreach:
+                    // TODO actually convert the expression
+                    break;
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
@@ -163,6 +166,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     Convert(cfg, ifExpression.Condition, currentBlock);
                     // TODO assign the result into the temp, branch and execute then or else, assign result
                     break;
+                case UnsafeExpressionAnalysis unsafeExpression:
+                    Convert(cfg, unsafeExpression.Expression, currentBlock);
+                    break;
                 default:
                     throw NonExhaustiveMatchException.For(value);
             }
@@ -186,6 +192,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case GreaterThanToken _:
                 case GreaterThanOrEqualToken _:
                     // TODO generate the correct statement
+                    break;
+                case AsKeywordToken _:
+                    Convert(cfg, binaryOperator.LeftOperand, currentBlock);
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(binaryOperator.Operator);

@@ -207,7 +207,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     foreach (var argument in newObjectExpression.Arguments)
                         GetVariableScopes(argument.Value, scopes);
                     break;
-                case InitStructExpressionAnalysis initStructExpression:
+                case PlacementInitExpressionAnalysis initStructExpression:
                     foreach (var argument in initStructExpression.Arguments)
                         GetVariableScopes(argument.Value, scopes);
                     break;

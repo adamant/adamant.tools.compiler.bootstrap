@@ -262,7 +262,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
                     // TODO verify argument types against called function
                     break;
-                case InitStructExpressionAnalysis initStructExpression:
+                case PlacementInitExpressionAnalysis initStructExpression:
                     foreach (var argument in initStructExpression.Arguments)
                         CheckArgument(argument, diagnostics);
 
@@ -355,6 +355,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     // TODO assign a type to the expression
                     uninitializedExpression.Type = DataType.Unknown;
                     break;
+                case MemberAccessExpressionAnalysis memberAccess:
+                    CheckExpression(memberAccess.Expression, diagnostics);
+                    // TODO look up the member
+                    // TODO assign a type to the expression
+                    memberAccess.Type = DataType.Unknown;
+                    break;
                 case null:
                     // Omitted expressions don't need any checking
                     break;
@@ -427,11 +433,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
             // If either is unknown, then we can't know whether there is a a problem
             // (technically not true, for example, we could know that one arg should
-            // be a bool and isn't, also we could know the result is a bool)
+            // be a bool and isn't)
             if (leftOperand == DataType.Unknown
                 || rightOperand == DataType.Unknown)
             {
-                binaryOperatorExpression.Type = DataType.Unknown;
+                switch (@operator)
+                {
+                    case EqualsEqualsToken _:
+                    case LessThanToken _:
+                    case LessThanOrEqualToken _:
+                    case GreaterThanToken _:
+                    case GreaterThanOrEqualToken _:
+                    case AndKeywordToken _:
+                    case OrKeywordToken _:
+                    case XorKeywordToken _:
+                        binaryOperatorExpression.Type = ObjectType.Bool;
+                        break;
+                    default:
+                        binaryOperatorExpression.Type = DataType.Unknown;
+                        break;
+                }
                 return;
             }
 
@@ -439,10 +460,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             switch (@operator)
             {
                 case PlusToken _:
+                case PlusEqualsToken _:
+                    typeError = (leftOperand != rightOperand || leftOperand == ObjectType.Bool)
+                        // TODO really pointer arithmetic should allow `size` and `offset`, but we don't have constants working correct yet
+                        && !(leftOperand is PointerType && (rightOperand == ObjectType.Size || rightOperand == ObjectType.Int));
+                    binaryOperatorExpression.Type = !typeError ? leftOperand : DataType.Unknown;
+                    break;
                 case AsteriskEqualsToken _:
                     typeError = leftOperand != rightOperand || leftOperand == ObjectType.Bool;
-                    if (!typeError)
-                        binaryOperatorExpression.Type = leftOperand;
+                    binaryOperatorExpression.Type = !typeError ? leftOperand : DataType.Unknown;
                     break;
                 case EqualsEqualsToken _:
                 case LessThanToken _:
@@ -477,6 +503,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case DollarGreaterThanNotEqualToken _:
                     typeError = leftOperand != ObjectType.Type;
                     break;
+                case AsKeywordToken _:
+                    var asType = EvaluateCheckedTypeExpression(binaryOperatorExpression.RightOperand, diagnostics);
+                    // TODO check that left operand can be converted to this
+                    typeError = false;
+                    binaryOperatorExpression.Type = asType;
+                    break;
                 default:
                     throw NonExhaustiveMatchException.For(@operator);
             }
@@ -490,7 +522,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             [NotNull] IDiagnosticsCollector diagnostics)
         {
             CheckExpression(unaryOperatorExpression.Operand, diagnostics);
-            var operand = unaryOperatorExpression.Operand.Type;
+            var operand = unaryOperatorExpression.Operand.Type.AssertChecked();
             var @operator = unaryOperatorExpression.Syntax.Operator;
 
             // If either is unknown, then we can't know whether there is a a problem
@@ -511,11 +543,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     break;
                 case AtSignToken _:
                     typeError = false; // TODO check that the expression can have a pointer taken
-                    unaryOperatorExpression.Type = null; // TODO construct a pointer type
+                    if (operand is Metatype)
+                        unaryOperatorExpression.Type = ObjectType.Type; // constructing a type
+                    else
+                        unaryOperatorExpression.Type = new PointerType(operand); // taking the address of something
                     break;
                 case QuestionToken _:
                     typeError = false; // TODO check that the expression can have a pointer taken
                     unaryOperatorExpression.Type = null; // TODO construct a pointer type
+                    break;
+                case CaretToken _:
+                    switch (operand)
+                    {
+                        case PointerType pointerType:
+                            unaryOperatorExpression.Type = pointerType.ReferencedType;
+                            typeError = false;
+                            break;
+                        default:
+                            unaryOperatorExpression.Type = DataType.Unknown;
+                            typeError = true;
+                            break;
+                    }
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(@operator);
@@ -540,7 +588,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             }
 
             CheckExpression(typeExpression, diagnostics);
-            if (!(typeExpression.Type is Metatype) && typeExpression.Type != ObjectType.Type)
+            if (!(typeExpression.Type is Metatype)
+                && typeExpression.Type != ObjectType.Type)
             {
                 diagnostics.Publish(TypeError.MustBeATypeExpression(typeExpression.Context.File,
                     typeExpression.Syntax.Span));
@@ -595,10 +644,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case RefTypeAnalysis refType:
                     return new RefType(refType.VariableBinding,
                         EvaluateCheckedTypeExpression(refType.ReferencedType, diagnostics).AssertKnown());
+                case UnaryOperatorExpressionAnalysis unaryOperatorExpression:
+                    switch (unaryOperatorExpression.Syntax.Operator)
+                    {
+                        case AtSignToken _:
+                            if (unaryOperatorExpression.Operand.Type is Metatype metatype)
+                                return new PointerType(metatype.Instance.AssertChecked());
+                            // TODO evaluate to type
+                            return DataType.Unknown;
+                        default:
+                            // TODO evaluate to type
+                            return DataType.Unknown;
+                    }
                 case GenericInvocationAnalysis _:
                 case GenericNameAnalysis _:
                 case BinaryOperatorExpressionAnalysis _:
-                case UnaryOperatorExpressionAnalysis _:
                     // TODO evaluate to type
                     return DataType.Unknown;
                 case MutableTypeAnalysis mutableType:
@@ -633,6 +693,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     return ObjectType.Type;
                 case MetatypeKeywordToken _:
                     return ObjectType.Metatype;
+                case AnyKeywordToken _:
+                    return ObjectType.Any;
                 default:
                     throw NonExhaustiveMatchException.For(primitive.Syntax.Keyword);
             }

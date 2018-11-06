@@ -15,6 +15,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
         {
             switch (tokens.Current)
             {
+                case ImplicitKeywordToken implicitKeyword:
+                    tokens.MoveNext();
+                    return new ImplicitModiferSyntax(implicitKeyword);
+                case MoveKeywordToken moveKeyword:
+                    tokens.MoveNext();
+                    return new MoveModifierSyntax(moveKeyword);
                 case OverrideKeywordToken overrideKeyword:
                     tokens.MoveNext();
                     return new OverrideModifierSyntax(overrideKeyword);
