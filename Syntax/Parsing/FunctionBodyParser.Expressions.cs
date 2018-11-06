@@ -10,6 +10,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
 {
     public partial class FunctionBodyParser : IExpressionParser
     {
+        [CanBeNull]
+        public ExpressionSyntax AcceptExpression(
+            [NotNull] ITokenStream tokens,
+            [NotNull] IDiagnosticsCollector diagnostics)
+        {
+            switch (tokens.Current)
+            {
+                case CloseParenToken _:
+                case CloseBracketToken _:
+                case CloseBraceToken _:
+                case SemicolonToken _:
+                case CommaToken _:
+                    return null;
+                default:
+                    return ParseExpression(tokens, diagnostics);
+            }
+        }
+
         [NotNull]
         [MustUseReturnValue]
         public ExpressionSyntax ParseExpression(
@@ -457,18 +475,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var arguments = listParser.ParseSeparatedList(tokens, ParseArgument, TypeOf<CommaToken>(), TypeOf<CloseParenToken>(), diagnostics);
+            var arguments = listParser.ParseSeparatedList(tokens, AcceptArgument, TypeOf<CommaToken>(), diagnostics);
             return new SeparatedListSyntax<ArgumentSyntax>(arguments);
         }
 
         [MustUseReturnValue]
-        [NotNull]
-        private ArgumentSyntax ParseArgument(
+        [CanBeNull]
+        private ArgumentSyntax AcceptArgument(
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
             var paramsKeyword = tokens.Accept<ParamsKeywordToken>();
-            var value = ParseExpression(tokens, diagnostics);
+            var value = AcceptExpression(tokens, diagnostics);
+            if (paramsKeyword == null && value == null) return null;
             return new ArgumentSyntax(paramsKeyword, value);
         }
     }

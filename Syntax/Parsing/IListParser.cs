@@ -28,6 +28,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             [NotNull] IDiagnosticsCollector diagnostics)
             where T : SyntaxNode;
 
+        [MustUseReturnValue]
+        [NotNull]
+        SeparatedListSyntax<T> ParseSeparatedList<T, TSeparator>(
+            [NotNull] ITokenStream tokens,
+            [NotNull] AcceptFunction<T> acceptItem,
+            Type<TSeparator> separatorType,
+            [NotNull] IDiagnosticsCollector diagnostics)
+            where T : SyntaxNode
+            where TSeparator : Token;
+
         [Obsolete("Use ParseList() taking an AcceptFunction instead")]
         [MustUseReturnValue]
         [NotNull]

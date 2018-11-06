@@ -112,6 +112,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
                 return (SyntaxList<T>)fakeToken?.FakeValue ?? throw new InvalidOperationException();
             }
 
+            public SeparatedListSyntax<T> ParseSeparatedList<T, TSeparator>(
+                ITokenStream tokens,
+                AcceptFunction<T> acceptItem,
+                Type<TSeparator> separatorType,
+                IDiagnosticsCollector diagnostics) where T : SyntaxNode where TSeparator : Token
+            {
+                var fakeToken = tokens.ExpectFake();
+                return (SeparatedListSyntax<T>)fakeToken?.FakeValue ?? throw new InvalidOperationException();
+            }
+
             public SyntaxList<T> ParseList<T, TTerminator>(
                 ITokenStream tokens,
                 ParseFunction<T> parseItem,

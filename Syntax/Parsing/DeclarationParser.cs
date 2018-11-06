@@ -464,9 +464,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             var functionKeyword = tokens.Take<FunctionKeywordToken>();
             var name = tokens.ExpectIdentifier();
             var genericParameters = genericsParser.AcceptGenericParameters(tokens, diagnostics);
-            var openParen = tokens.Expect<IOpenParenToken>();
-            var parameters = ParseParameterList(tokens, diagnostics);
-            var closeParen = tokens.Expect<ICloseParenToken>();
+
+            IOpenParenToken openParen;
+            SeparatedListSyntax<ParameterSyntax> parameters;
+            ICloseParenToken closeParen;
+            if (tokens.Current is OpenParenToken)
+            {
+                openParen = tokens.Take<OpenParenToken>();
+                parameters = ParseParameterList(tokens, diagnostics);
+                closeParen = tokens.Expect<ICloseParenToken>();
+            }
+            else
+            {
+                // TODO handle this better
+                openParen = tokens.Missing<IOpenParenToken>();
+                parameters = SeparatedListSyntax<ParameterSyntax>.Empty;
+                closeParen = tokens.Missing<ICloseParenToken>();
+            }
             var arrow = tokens.Expect<IRightArrowToken>();
             var returnTypeExpression = expressionParser.ParseExpression(tokens, diagnostics);
             var genericConstraints = genericsParser.ParseGenericConstraints(tokens, diagnostics);
@@ -487,7 +501,44 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             [NotNull] IDiagnosticsCollector diagnostics)
         {
             var operatorKeyword = tokens.Take<OperatorKeywordToken>();
-            var @operator = tokens.Expect<IOperatorToken>();
+            // TODO save the generic parameters
+            var genericParameters = genericsParser.AcceptGenericParameters(tokens, diagnostics);
+            IOperatorToken @operator;
+            // TODO correctly store these in the syntax class
+            switch (tokens.Current)
+            {
+                case HashToken _:
+                    @operator = tokens.Expect<IOperatorToken>();
+                    tokens.MoveNext();
+                    switch (tokens.Current)
+                    {
+                        case OpenParenToken _:
+                            tokens.MoveNext();
+                            tokens.Expect<ICloseParenToken>();
+                            break;
+                        case OpenBracketToken _:
+                            tokens.MoveNext();
+                            tokens.Expect<ICloseBracketToken>();
+                            break;
+                        case OpenBraceToken _:
+                            tokens.MoveNext();
+                            tokens.Expect<ICloseBraceToken>();
+                            break;
+                        default:
+                            tokens.Expect<IOpenBracketToken>();
+                            break;
+                    }
+                    break;
+                case StringLiteralToken _:
+                    @operator = tokens.Expect<IOperatorToken>();
+                    tokens.MoveNext();
+                    // TODO need to check it is empty string
+                    break;
+                // TODO case for user defined literals ''
+                default:
+                    @operator = tokens.Expect<IOperatorToken>();
+                    break;
+            }
             var openParen = tokens.Expect<IOpenParenToken>();
             var parameters = ParseParameterList(tokens, diagnostics);
             var closeParen = tokens.Expect<ICloseParenToken>();
