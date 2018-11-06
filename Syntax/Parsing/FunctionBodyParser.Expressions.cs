@@ -256,12 +256,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                         var openParen = tokens.Expect<IOpenParenToken>();
                         var placeExpression = ParseExpression(tokens, diagnostics);
                         var closeParen = tokens.Expect<ICloseParenToken>();
-                        var type = ParseName(tokens, diagnostics);
+                        var initializer = ParseName(tokens, diagnostics);
                         var argumentsOpenParen = tokens.Expect<IOpenParenToken>();
                         var arguments = ParseArgumentList(tokens, diagnostics);
                         var argumentsCloseParen = tokens.Expect<ICloseParenToken>();
                         return new PlacementInitExpressionSyntax(initKeyword, openParen, placeExpression,
-                            closeParen, type, argumentsOpenParen, arguments, argumentsCloseParen);
+                            closeParen, initializer, argumentsOpenParen, arguments, argumentsCloseParen);
                     }
                 case DeleteKeywordToken deleteKeyword:
                     {

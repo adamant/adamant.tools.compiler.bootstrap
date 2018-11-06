@@ -78,7 +78,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
                 case PlacementInitExpressionSyntax placementInitExpression:
                     return new PlacementInitExpressionAnalysis(context, placementInitExpression,
                         BuildExpression(context, functionName, placementInitExpression.PlaceExpression),
-                        BuildExpression(context, functionName, placementInitExpression.Constructor),
+                        BuildExpression(context, functionName, placementInitExpression.Initializer),
                         placementInitExpression.Arguments.Select(a => BuildArgument(context, functionName, a)));
                 case BooleanLiteralExpressionSyntax booleanLiteralExpression:
                     return new BooleanLiteralExpressionAnalysis(context, booleanLiteralExpression);

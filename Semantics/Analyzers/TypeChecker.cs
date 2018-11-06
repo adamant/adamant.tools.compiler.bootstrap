@@ -55,7 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         }
 
         private void CheckGenericParameters(
-            [NotNull][ItemNotNull] IReadOnlyList<GenericParameterAnalysis> genericParameters,
+            [NotNull, ItemNotNull] IReadOnlyList<GenericParameterAnalysis> genericParameters,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
             foreach (var parameter in genericParameters)
@@ -68,7 +68,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         }
 
         private void CheckParameters(
-            [NotNull] [ItemNotNull] IReadOnlyList<ParameterAnalysis> parameters,
+            [NotNull, ItemNotNull] IReadOnlyList<ParameterAnalysis> parameters,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
             foreach (var parameter in parameters)
@@ -262,13 +262,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
                     // TODO verify argument types against called function
                     break;
-                case PlacementInitExpressionAnalysis initStructExpression:
-                    foreach (var argument in initStructExpression.Arguments)
+                case PlacementInitExpressionAnalysis placementInitExpression:
+                    foreach (var argument in placementInitExpression.Arguments)
                         CheckArgument(argument, diagnostics);
 
                     // TODO verify argument types against called function
 
-                    initStructExpression.Type = EvaluateTypeExpression(initStructExpression.ConstructorExpression, diagnostics);
+                    placementInitExpression.Type = EvaluateTypeExpression(placementInitExpression.InitializerExpression, diagnostics);
                     break;
                 case ForeachExpressionAnalysis foreachExpression:
                     foreachExpression.VariableType =

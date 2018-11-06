@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         public GenericNameAnalysis(
             [NotNull] AnalysisContext context,
             [NotNull] GenericNameSyntax syntax,
-            [NotNull] [ItemNotNull] IEnumerable<ArgumentAnalysis> arguments)
+            [NotNull, ItemNotNull] IEnumerable<ArgumentAnalysis> arguments)
             : base(context, syntax)
         {
             Requires.NotNull(nameof(arguments), arguments);

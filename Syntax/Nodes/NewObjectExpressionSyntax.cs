@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
     public class NewObjectExpressionSyntax : ExpressionSyntax
     {
         [NotNull] public INewKeywordToken NewKeyword { get; }
-        [NotNull] public TypeSyntax Constructor { get; }
+        [NotNull] public NameSyntax Constructor { get; }
         [NotNull] public IOpenParenToken OpenParen { get; }
         [NotNull] public SeparatedListSyntax<ArgumentSyntax> ArgumentList { get; }
         [NotNull] [ItemNotNull] public IEnumerable<ArgumentSyntax> Arguments => ArgumentList.Nodes();
@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
 
         public NewObjectExpressionSyntax(
             [NotNull] INewKeywordToken newKeyword,
-            [NotNull] TypeSyntax constructor,
+            [NotNull] NameSyntax constructor,
             [NotNull] IOpenParenToken openParen,
             [NotNull] SeparatedListSyntax<ArgumentSyntax> argumentList,
             [NotNull] ICloseParenToken closeParen)

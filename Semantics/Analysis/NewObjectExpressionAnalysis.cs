@@ -9,13 +9,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
     {
         [NotNull] public new NewObjectExpressionSyntax Syntax { get; }
         [NotNull] public ExpressionAnalysis ConstructorExpression { get; set; }
-        [NotNull] [ItemNotNull] public IReadOnlyList<ArgumentAnalysis> Arguments { get; }
+        [NotNull, ItemNotNull] public IReadOnlyList<ArgumentAnalysis> Arguments { get; }
 
         public NewObjectExpressionAnalysis(
             [NotNull] AnalysisContext context,
             [NotNull] NewObjectExpressionSyntax syntax,
             [NotNull] ExpressionAnalysis constructorExpression,
-            [NotNull] [ItemNotNull] IEnumerable<ArgumentAnalysis> arguments)
+            [NotNull, ItemNotNull] IEnumerable<ArgumentAnalysis> arguments)
             : base(context, syntax)
         {
             Requires.NotNull(nameof(constructorExpression), constructorExpression);

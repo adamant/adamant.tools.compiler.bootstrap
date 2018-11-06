@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
         [NotNull] public IOpenParenToken OpenParen { get; }
         [NotNull] public ExpressionSyntax PlaceExpression { get; }
         [NotNull] public ICloseParenToken CloseParen { get; }
-        [NotNull] public TypeSyntax Constructor { get; }
+        [NotNull] public NameSyntax Initializer { get; }
         [NotNull] public IOpenParenToken ArgumentsOpenParen { get; }
         [NotNull] public SeparatedListSyntax<ArgumentSyntax> ArgumentList { get; }
         [NotNull] [ItemNotNull] public IEnumerable<ArgumentSyntax> Arguments => ArgumentList.Nodes();
@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
             [NotNull] IOpenParenToken openParen,
             [NotNull] ExpressionSyntax placeExpression,
             [NotNull] ICloseParenToken closeParen,
-            [NotNull] TypeSyntax constructor,
+            [NotNull] NameSyntax initializer,
             [NotNull] IOpenParenToken argumentsOpenParen,
             [NotNull] SeparatedListSyntax<ArgumentSyntax> argumentList,
             [NotNull] ICloseParenToken argumentsCloseParen)
@@ -33,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
             Requires.NotNull(nameof(openParen), openParen);
             Requires.NotNull(nameof(placeExpression), placeExpression);
             Requires.NotNull(nameof(closeParen), closeParen);
-            Requires.NotNull(nameof(constructor), constructor);
+            Requires.NotNull(nameof(initializer), initializer);
             Requires.NotNull(nameof(argumentsOpenParen), argumentsOpenParen);
             Requires.NotNull(nameof(argumentList), argumentList);
             Requires.NotNull(nameof(argumentsCloseParen), argumentsCloseParen);
@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
             OpenParen = openParen;
             PlaceExpression = placeExpression;
             CloseParen = closeParen;
-            Constructor = constructor;
+            Initializer = initializer;
             ArgumentsOpenParen = argumentsOpenParen;
             ArgumentList = argumentList;
             ArgumentsCloseParen = argumentsCloseParen;

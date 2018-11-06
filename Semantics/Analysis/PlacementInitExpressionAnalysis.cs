@@ -9,23 +9,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
     {
         [NotNull] public new PlacementInitExpressionSyntax Syntax { get; }
         [NotNull] public ExpressionAnalysis PlaceExpression { get; set; }
-        [NotNull] public ExpressionAnalysis ConstructorExpression { get; set; }
-        [NotNull] [ItemNotNull] public IReadOnlyList<ArgumentAnalysis> Arguments { get; }
+        [NotNull] public ExpressionAnalysis InitializerExpression { get; set; }
+        [NotNull, ItemNotNull] public IReadOnlyList<ArgumentAnalysis> Arguments { get; }
 
         public PlacementInitExpressionAnalysis(
             [NotNull] AnalysisContext context,
             [NotNull] PlacementInitExpressionSyntax syntax,
             [NotNull] ExpressionAnalysis placeExpression,
-            [NotNull] ExpressionAnalysis constructorExpression,
-            [NotNull] [ItemNotNull] IEnumerable<ArgumentAnalysis> arguments)
+            [NotNull] ExpressionAnalysis initializerExpression,
+            [NotNull, ItemNotNull] IEnumerable<ArgumentAnalysis> arguments)
             : base(context, syntax)
         {
             Requires.NotNull(nameof(placeExpression), placeExpression);
-            Requires.NotNull(nameof(constructorExpression), constructorExpression);
+            Requires.NotNull(nameof(initializerExpression), initializerExpression);
             Requires.NotNull(nameof(arguments), arguments);
             Syntax = syntax;
             PlaceExpression = placeExpression;
-            ConstructorExpression = constructorExpression;
+            InitializerExpression = initializerExpression;
             Arguments = arguments.ToReadOnlyList();
         }
     }
