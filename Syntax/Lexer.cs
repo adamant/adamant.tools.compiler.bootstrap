@@ -403,7 +403,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                 var value = code[span];
                 if (TokenTypes.KeywordFactories.TryGetValue(value, out var keywordFactory))
                     return keywordFactory(span);
-                if (TokenTypes.BooleanKeywordFactories.TryGetValue(value, out var operatorFactory))
+                if (TokenTypes.ExtraKeywordFactories.TryGetValue(value, out var operatorFactory))
                     return operatorFactory(span);
 
                 return new BareIdentifierToken(span, value);

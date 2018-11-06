@@ -100,6 +100,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     case GreaterThanToken _:
                     case GreaterThanOrEqualToken _:
                     case LessThanColonToken _: // Subtype operator
+                    case AsKeywordToken _:
                         if (minPrecedence <= OperatorPrecedence.Relational)
                         {
                             precedence = OperatorPrecedence.Relational;

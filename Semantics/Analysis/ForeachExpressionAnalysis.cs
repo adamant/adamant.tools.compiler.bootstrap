@@ -41,7 +41,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             yield return this;
         }
 
-        QualifiedName IDeclarationAnalysis.Name => VariableName;
         QualifiedName ISymbol.Name => VariableName;
+        IEnumerable<DataType> ISymbol.Types => VariableType.YieldValue();
+        ISymbol ISymbol.ComposeWith(ISymbol symbol)
+        {
+            if (symbol is CompositeSymbol composite)
+                return composite.ComposeWith(this);
+            return new CompositeSymbol(this, symbol);
+        }
     }
 }

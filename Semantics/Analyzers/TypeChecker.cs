@@ -5,6 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
@@ -279,6 +280,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     // TODO assign correct type to the expression
                     foreachExpression.Type = DataType.Unknown;
                     break;
+                case WhileExpressionAnalysis whileExpression:
+                    CheckExpressionTypeIsBool(whileExpression.Condition, diagnostics);
+                    CheckExpression(whileExpression.Block, diagnostics);
+                    // TODO assign correct type to the expression
+                    whileExpression.Type = DataType.Unknown;
+                    break;
                 case InvocationAnalysis invocation:
                     CheckExpression(invocation.Callee, diagnostics);
                     // TODO the callee needs to be something callable
@@ -344,6 +351,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     CheckExpression(resultExpression.Expression, diagnostics);
                     resultExpression.Type = ObjectType.Never;
                     break;
+                case UninitializedExpressionAnalysis uninitializedExpression:
+                    // TODO assign a type to the expression
+                    uninitializedExpression.Type = DataType.Unknown;
+                    break;
                 case null:
                     // Omitted expressions don't need any checking
                     break;
@@ -386,6 +397,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                         return DataType.Unknown; // unknown
                     case TypeDeclaration typeDeclaration:
                         return typeDeclaration.Type;
+                    case CompositeSymbol composite:
+                        // TODO handle
+                        return DataType.Unknown; // unknown
                     default:
                         throw NonExhaustiveMatchException.For(declaration);
                 }

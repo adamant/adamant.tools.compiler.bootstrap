@@ -101,10 +101,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
                 default:
                     if (typeof(KeywordToken).IsAssignableFrom(t1.TokenType)
                         || typeof(IdentifierToken).IsAssignableFrom(t1.TokenType)
-                        || typeof(BooleanOperatorToken).IsAssignableFrom(t1.TokenType))
+                        || typeof(KeywordOperatorToken).IsAssignableFrom(t1.TokenType)
+                        )
                         return typeof(IdentifierToken).IsAssignableFrom(t2.TokenType)
                             || typeof(KeywordToken).IsAssignableFrom(t2.TokenType)
-                            || typeof(BooleanOperatorToken).IsAssignableFrom(t2.TokenType)
+                            || typeof(KeywordOperatorToken).IsAssignableFrom(t2.TokenType)
                             || t2.TokenType == typeof(IntegerLiteralToken);
                     else if (t1.TokenType == typeof(IntegerLiteralToken))
                         return t2.TokenType == typeof(IntegerLiteralToken);
@@ -334,6 +335,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             { "break", typeof(BreakKeywordToken) },
             { "next", typeof(NextKeywordToken) },
             { "override", typeof(OverrideKeywordToken) },
+            { "as", typeof(AsKeywordToken) },
         }.AsReadOnly();
     }
 }

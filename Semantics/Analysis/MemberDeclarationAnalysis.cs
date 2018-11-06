@@ -4,6 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using JetBrains.Annotations;
@@ -37,6 +38,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
 
         [CanBeNull]
         protected abstract DataType GetDataType();
+
+        IEnumerable<DataType> ISymbol.Types => Type.YieldValue();
+        ISymbol ISymbol.ComposeWith(ISymbol symbol)
+        {
+            if (symbol is CompositeSymbol composite)
+                return composite.ComposeWith(this);
+            return new CompositeSymbol(this, symbol);
+        }
 
         [CanBeNull]
         public abstract Declaration Complete([NotNull] DiagnosticsBuilder diagnostics);

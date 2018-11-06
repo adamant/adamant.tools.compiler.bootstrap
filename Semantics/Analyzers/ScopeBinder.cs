@@ -29,9 +29,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             foreach (var compilationUnit in compilationUnits)
                 GatherDeclarations(compilationUnit.Namespace);
 
-            foreach (var reference in references)
-                GatherDeclarations(reference.Value);
-
             globalDeclarations = declarations.Values.AssertNotNull()
                 .OfType<IDeclarationAnalysis>()
                 .Where(IsGlobalDeclaration)
@@ -46,16 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 GatherDeclarations(nestDeclaration);
         }
 
-        private void GatherDeclarations([NotNull] Package package)
-        {
-            // TODO deal with namespaces in the package
-            foreach (var declaration in package.Declarations)
-            {
-
-            }
-        }
-
-        private static bool IsGlobalDeclaration([NotNull] IDeclarationAnalysis declaration)
+        private static bool IsGlobalDeclaration([NotNull] ISymbol declaration)
         {
             return !declaration.Name.Qualifier.Any();
         }
@@ -80,11 +68,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                                 .AssertNotNull();
                         var variables = new Dictionary<string, ISymbol>();
                         foreach (var parameter in function.Parameters)
-                            variables.Add(parameter.Name.Name.Text, parameter);
+                            AddSymbol(variables, parameter);
 
                         foreach (var declaration in function.Statements
                             .OfType<VariableDeclarationStatementAnalysis>())
-                            variables.Add(declaration.Name.Name.Text, declaration);
+                            AddSymbol(variables, declaration);
 
                         functionScope.Bind(variables);
 
@@ -109,7 +97,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                         var declaration = (MemberDeclarationAnalysis)declarations[genericsScope.Syntax].AssertNotNull();
                         var parameters = new Dictionary<string, ISymbol>();
                         foreach (var parameter in declaration.GenericParameters)
-                            parameters.Add(parameter.Name.Name.Text, parameter);
+                            AddSymbol(parameters, parameter);
 
                         genericsScope.Bind(parameters);
 
@@ -128,12 +116,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                                 .OfType<IDeclarationAnalysis>()
                                 .Where(d => d.Name.IsIn(usingNamespace)))
                             {
-                                members.Add(importedDeclaration.Name.Name.Text, importedDeclaration);
+                                AddSymbol(members, importedDeclaration);
                             }
 
                             foreach (var importedDeclaration in referencedDeclarations.Where(d => d.Name.IsIn(usingNamespace)))
                             {
-                                members.Add(importedDeclaration.Name.Name.Text, importedDeclaration);
+                                AddSymbol(members, importedDeclaration);
                             }
                         }
 
@@ -146,6 +134,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 default:
                     throw NonExhaustiveMatchException.For(scope);
             }
+        }
+
+        private static void AddSymbol([NotNull] Dictionary<string, ISymbol> symbols, [NotNull] ISymbol symbol)
+        {
+            var name = symbol.Name.Name.Text;
+            if (symbols.TryGetValue(name, out var existingSymbol))
+                symbols[name] = existingSymbol.ComposeWith(symbol);
+            else
+                symbols.Add(name, symbol);
         }
 
         private static void GetVariableScopes(
@@ -194,6 +191,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     GetVariableScopes(foreachExpression.InExpression, scopes);
                     GetVariableScopes(foreachExpression.Block, scopes);
                     break;
+                case WhileExpressionAnalysis whileExpression:
+                    GetVariableScopes(whileExpression.Condition, scopes);
+                    GetVariableScopes(whileExpression.Block, scopes);
+                    break;
                 case InvocationAnalysis invocation:
                     foreach (var argument in invocation.Arguments)
                         GetVariableScopes(argument.Value, scopes);
@@ -229,6 +230,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case IdentifierNameAnalysis _:
                 case BooleanLiteralExpressionAnalysis _:
                 case StringLiteralExpressionAnalysis _:
+                case PrimitiveTypeAnalysis _:
+                case UninitializedExpressionAnalysis _:
                     // Do nothing
                     break;
                 default:
@@ -246,7 +249,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             var scopeAnalysis = scopes[scope.Syntax].AssertNotNull();
             var variableDeclarations = new Dictionary<string, ISymbol>();
             foreach (var declaration in scopeAnalysis.LocalVariableDeclarations())
-                variableDeclarations.Add(declaration.Name.Name.Text, declaration);
+                AddSymbol(variableDeclarations, declaration);
 
             scope.Bind(variableDeclarations);
 

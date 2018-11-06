@@ -81,6 +81,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
                         initStructExpression.Arguments.Select(a => BuildArgument(context, functionName, a)));
                 case BooleanLiteralExpressionSyntax booleanLiteralExpression:
                     return new BooleanLiteralExpressionAnalysis(context, booleanLiteralExpression);
+                case UninitializedExpressionSyntax uninitializedExpression:
+                    return new UninitializedExpressionAnalysis(context, uninitializedExpression);
                 case ForeachExpressionSyntax foreachExpression:
                     // New context because a variable is declared
                     var loopBodyContext = context.InLocalVariableScope(foreachExpression);
@@ -90,6 +92,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
                             BuildExpression(context, functionName, foreachExpression.TypeExpression) : null,
                         BuildExpression(context, functionName, foreachExpression.InExpression),
                         BuildBlock(loopBodyContext, functionName, foreachExpression.Block));
+                case WhileExpressionSyntax whileExpression:
+                    return new WhileExpressionAnalysis(context, whileExpression,
+                        BuildExpression(context, functionName, whileExpression.Condition),
+                        BuildBlock(context, functionName, whileExpression.Block));
                 case InvocationSyntax invocation:
                     return new InvocationAnalysis(context, invocation,
                         BuildExpression(context, functionName, invocation.Callee),

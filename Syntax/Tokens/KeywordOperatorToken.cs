@@ -2,9 +2,9 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 {
-    public class BooleanOperatorToken : OperatorToken
+    public class KeywordOperatorToken : OperatorToken
     {
-        public BooleanOperatorToken(TextSpan span)
+        public KeywordOperatorToken(TextSpan span)
             : base(span)
         {
         }

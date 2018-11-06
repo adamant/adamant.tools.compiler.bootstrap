@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
 
         [NotNull]
         [ItemNotNull]
-        public static readonly IReadOnlyList<Type> BooleanKeywords = new List<Type>()
+        public static readonly IReadOnlyList<Type> ExtraKeywords = new List<Type>()
         {
             typeof(NotKeywordToken),
             typeof(AndKeywordToken),
@@ -22,17 +22,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
             typeof(XorKeywordToken),
             typeof(TrueKeywordToken),
             typeof(FalseKeywordToken),
+            typeof(AsKeywordToken),
         }.AsReadOnly().AssertNotNull();
 
         [NotNull]
-        public static IReadOnlyDictionary<string, Func<TextSpan, Token>> BooleanKeywordFactories;
+        public static IReadOnlyDictionary<string, Func<TextSpan, Token>> ExtraKeywordFactories;
 
         private static readonly int KeywordTokenLength = "KeywordToken".Length;
 
         static TokenTypes()
         {
             KeywordFactories = BuildKeywordFactories();
-            BooleanKeywordFactories = BuildBooleanKeywordFactories();
+            ExtraKeywordFactories = BuildBooleanKeywordFactories();
         }
 
         [NotNull]
@@ -73,7 +74,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         {
             var factories = new Dictionary<string, Func<TextSpan, Token>>();
 
-            foreach (var tokenType in BooleanKeywords)
+            foreach (var tokenType in ExtraKeywords)
             {
                 var tokenTypeName = tokenType.Name;
                 var keyword = tokenTypeName

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
@@ -24,6 +25,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations
             File = file;
             Name = name;
             Type = type;
+        }
+
+        IEnumerable<DataType> ISymbol.Types => Type.Yield();
+        ISymbol ISymbol.ComposeWith([NotNull] ISymbol symbol)
+        {
+            if (symbol is CompositeSymbol composite)
+                return composite.ComposeWith(this);
+            return new CompositeSymbol(this, symbol);
         }
     }
 }
