@@ -59,6 +59,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         private void BindScope([NotNull] LexicalScope scope)
         {
             Requires.NotNull(nameof(scope), scope);
+            var symbols = new Dictionary<string, ISymbol>();
             switch (scope)
             {
                 case FunctionScope functionScope:
@@ -66,15 +67,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                         var function =
                             (FunctionDeclarationAnalysis)declarations[functionScope.Syntax]
                                 .AssertNotNull();
-                        var variables = new Dictionary<string, ISymbol>();
+
                         foreach (var parameter in function.Parameters)
-                            AddSymbol(variables, parameter);
+                            AddSymbol(symbols, parameter);
 
                         foreach (var declaration in function.Statements
                             .OfType<VariableDeclarationStatementAnalysis>())
-                            AddSymbol(variables, declaration);
+                            AddSymbol(symbols, declaration);
 
-                        functionScope.Bind(variables);
+                        functionScope.Bind(symbols);
 
                         var blocks = new Dictionary<ExpressionSyntax, ILocalVariableScopeAnalysis>();
                         GetVariableScopes(function.Statements, blocks);
@@ -86,8 +87,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     break;
                 case NamespaceScope namespaceScope:
                     {
-                        // TODO bind correct names in the namespace
-                        namespaceScope.Bind(new Dictionary<string, ISymbol>());
+                        AddSymbolsInNamespace(symbols, namespaceScope.Name);
+                        namespaceScope.Bind(symbols);
                         foreach (var nestedScope in namespaceScope.NestedScopes)
                             BindScope(nestedScope);
                     }
@@ -95,11 +96,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case GenericsScope genericsScope:
                     {
                         var declaration = (MemberDeclarationAnalysis)declarations[genericsScope.Syntax].AssertNotNull();
-                        var parameters = new Dictionary<string, ISymbol>();
                         foreach (var parameter in declaration.GenericParameters)
-                            AddSymbol(parameters, parameter);
+                            AddSymbol(symbols, parameter);
 
-                        genericsScope.Bind(parameters);
+                        genericsScope.Bind(symbols);
 
                         foreach (var nestedScope in genericsScope.NestedScopes)
                             BindScope(nestedScope);
@@ -108,24 +108,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case UsingDirectivesScope usingDirectivesScope:
                     {
                         var declaration = (NamespaceDeclarationAnalysis)declarations[usingDirectivesScope.Syntax].AssertNotNull();
-                        var members = new Dictionary<string, ISymbol>();
                         foreach (var usingDirective in declaration.Syntax.UsingDirectives)
                         {
                             var usingNamespace = nameBuilder.BuildName(usingDirective.Name).AssertNotNull();
-                            foreach (var importedDeclaration in declarations.Values
-                                .OfType<IDeclarationAnalysis>()
-                                .Where(d => d.Name.IsDirectlyIn(usingNamespace)))
-                            {
-                                AddSymbol(members, importedDeclaration);
-                            }
-
-                            foreach (var importedDeclaration in referencedDeclarations.Where(d => d.Name.IsDirectlyIn(usingNamespace)))
-                            {
-                                AddSymbol(members, importedDeclaration);
-                            }
+                            AddSymbolsInNamespace(symbols, usingNamespace);
                         }
 
-                        usingDirectivesScope.Bind(members);
+                        usingDirectivesScope.Bind(symbols);
 
                         foreach (var nestedScope in usingDirectivesScope.NestedScopes)
                             BindScope(nestedScope);
@@ -133,6 +122,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(scope);
+            }
+        }
+
+        private void AddSymbolsInNamespace([NotNull] Dictionary<string, ISymbol> symbols, [NotNull]  Name namespaceName)
+        {
+            foreach (var importedDeclaration in declarations.Values
+                .OfType<IDeclarationAnalysis>()
+                .Where(d => d.Name.IsDirectlyIn(namespaceName)))
+            {
+                AddSymbol(symbols, importedDeclaration);
+            }
+
+            foreach (var importedDeclaration in referencedDeclarations.Where(d =>
+                d.Name.IsDirectlyIn(namespaceName)))
+            {
+                AddSymbol(symbols, importedDeclaration);
             }
         }
 

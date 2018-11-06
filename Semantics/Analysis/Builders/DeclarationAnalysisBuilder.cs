@@ -62,7 +62,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
                     return context.InNamespace(@namespace, simpleName);
                 case QualifiedName qualifiedName:
                     context = BuildNamespaceContext(context, @namespace, qualifiedName.Qualifier);
-                    return context.InNamespace(@namespace, qualifiedName.UnqualifiedName);
+                    return context.InNamespace(@namespace, qualifiedName);
                 default:
                     throw NonExhaustiveMatchException.For(name);
             }
