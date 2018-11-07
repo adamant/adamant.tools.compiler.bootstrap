@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
             foreach (var function in functions.Where(f => !f.Diagnostics.Any() // It has errors, generating code could fail
                                                           && f.Syntax.Body != null // It is abstract
-                                                          && f.GenericArity == 0)) // It is not generic, generic functions need monomorphized
+                                                          && !f.IsGeneric)) // It is not generic, generic functions need monomorphized
                 BuildGraph(function);
         }
 

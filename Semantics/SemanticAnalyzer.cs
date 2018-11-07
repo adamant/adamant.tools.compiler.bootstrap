@@ -59,7 +59,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         }
 
         [CanBeNull]
-        private static FunctionDeclaration DetermineEntryPoint([NotNull] List<Declaration> declarations, [NotNull] DiagnosticsBuilder diagnostics)
+        private static FunctionDeclaration DetermineEntryPoint(
+            [NotNull] List<Declaration> declarations,
+            [NotNull] DiagnosticsBuilder diagnostics)
         {
             var mainFunctions = declarations.OfType<FunctionDeclaration>()
                 .Where(f => f.Name is SimpleName name && name.Text == "main")
