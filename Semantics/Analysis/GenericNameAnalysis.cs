@@ -11,6 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         [NotNull] public new GenericNameSyntax Syntax { get; }
         [CanBeNull] public DataType NameType { get; set; }
         [NotNull] [ItemNotNull] public IReadOnlyList<ArgumentAnalysis> Arguments { get; }
+        public int GenericArity => Arguments.Count;
 
         public GenericNameAnalysis(
             [NotNull] AnalysisContext context,

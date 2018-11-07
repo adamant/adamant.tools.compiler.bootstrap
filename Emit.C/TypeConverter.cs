@@ -27,6 +27,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     return nameMangler.Mangle(t);
                 case LifetimeType lifetimeType:
                     return Convert(lifetimeType.Type);
+                case PointerType ptr:
+                    return Convert(ptr.ReferencedType.AssertKnown()) + "*";
                 default:
                     throw NonExhaustiveMatchException.For(type);
             }

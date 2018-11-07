@@ -17,7 +17,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         {
             Requires.NotNull(nameof(functions), functions);
 
-            foreach (var function in functions.Where(f => !f.Diagnostics.Any() && f.Syntax.Body != null))
+            foreach (var function in functions.Where(f => !f.Diagnostics.Any() // It has errors, generating code could fail
+                                                          && f.Syntax.Body != null // It is abstract
+                                                          && f.GenericArity == 0)) // It is not generic, generic functions need monomorphized
                 BuildGraph(function);
         }
 

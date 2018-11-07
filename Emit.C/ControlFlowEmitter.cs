@@ -72,6 +72,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     case AssignmentStatement assignment:
                         code.AppendLine($"{Convert(assignment.LValue)} = {Convert(assignment.RValue)};");
                         break;
+                    case NewObjectStatement newObjectStatement:
+                        // TODO implement this
+                        break;
                     default:
                         throw NonExhaustiveMatchException.For(statement);
                 }

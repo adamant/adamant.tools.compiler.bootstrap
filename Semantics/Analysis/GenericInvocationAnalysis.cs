@@ -10,6 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         [NotNull] public new GenericsInvocationSyntax Syntax { get; }
         [NotNull] public ExpressionAnalysis Callee { get; }
         [NotNull] [ItemNotNull] public IReadOnlyList<ArgumentAnalysis> Arguments { get; }
+        public int GenericArity => Arguments.Count;
 
         public GenericInvocationAnalysis(
             [NotNull] AnalysisContext context,

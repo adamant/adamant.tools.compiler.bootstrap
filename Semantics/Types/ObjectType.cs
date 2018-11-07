@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
     // but no generic arguments is *open* or *unbound*. One with generic arguments supplied
     // for all parameters is *closed* or *bound*. One with some but not all
     // arguments supplied is *partially bound*.
-    public class ObjectType : KnownType
+    public class ObjectType : GenericType
     {
         [NotNull] public static readonly ObjectType Void = new ObjectType(new SimpleName("void", true), false, false);
         [NotNull] public static readonly ObjectType Never = new ObjectType(new SimpleName("never", true), false, false);
@@ -29,23 +29,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
         [NotNull] public Name Name { get; }
         public bool IsReferenceType { get; }
         public bool DeclaredMutable { get; }
-        [NotNull] public IReadOnlyList<DataType> GenericParameterTypes { get; }
-        [NotNull] public IReadOnlyList<DataType> GenericArguments { get; }
+        [NotNull, ItemNotNull] public override IReadOnlyList<DataType> GenericParameterTypes { get; }
+        [NotNull, ItemCanBeNull] public override IReadOnlyList<DataType> GenericArguments { get; }
         public bool IsMutable { get; }
 
         private ObjectType(
             [NotNull] Name name,
             bool isReferenceType,
             bool declaredMutable,
-            [NotNull][ItemNotNull] IEnumerable<DataType> genericParameterTypes,
-            [CanBeNull][ItemCanBeNull] IEnumerable<DataType> genericArguments)
+            [NotNull, ItemNotNull] IEnumerable<DataType> genericParameterTypes,
+            [CanBeNull, ItemCanBeNull] IEnumerable<DataType> genericArguments)
         {
             Requires.NotNull(nameof(name), name);
+            Requires.NotNull(nameof(genericParameterTypes), genericParameterTypes);
             Name = name;
             DeclaredMutable = declaredMutable;
-            GenericParameterTypes = genericParameterTypes.ToReadOnlyList();
-            GenericArguments = (genericArguments ?? GenericParameterTypes.Select(t => default(DataType))).ToReadOnlyList();
-            Requires.That(nameof(genericArguments), GenericArguments.Count == GenericParameterTypes.Count);
+            var genericParameterTypesList = genericParameterTypes.ToReadOnlyList();
+            GenericParameterTypes = genericParameterTypesList;
+            var genericArgumentsList = (genericArguments ?? genericParameterTypesList.Select(t => default(DataType))).ToReadOnlyList();
+            Requires.That(nameof(genericArguments), genericArgumentsList.Count == genericParameterTypesList.Count);
+            GenericArguments = genericArgumentsList;
             IsReferenceType = isReferenceType;
             IsMutable = false;
         }
@@ -54,7 +57,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             [NotNull] Name name,
             bool isReferenceType,
             bool declaredMutable,
-            [NotNull][ItemNotNull] IEnumerable<DataType> genericParameterTypes)
+            [NotNull, ItemNotNull] IEnumerable<DataType> genericParameterTypes)
             : this(name, isReferenceType, declaredMutable, genericParameterTypes, null)
         {
         }

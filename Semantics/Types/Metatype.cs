@@ -17,12 +17,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
     ///
     /// see https://docs.swift.org/swift-book/ReferenceManual/Types.html#grammar_metatype-type
     /// </summary>
-    public class Metatype : KnownType
+    public class Metatype : GenericType
     {
         [NotNull] public Name Name { get; }
         // The type this is a metatype for. Named instance because it represents
         // the single object instance that is of this metatype.
         [NotNull] public ObjectType Instance { get; }
+
+        public override IReadOnlyList<DataType> GenericParameterTypes => Instance.GenericParameterTypes;
+        public override IReadOnlyList<DataType> GenericArguments => Instance.GenericArguments;
 
         public Metatype([NotNull]ObjectType objectType)
         {

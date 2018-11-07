@@ -48,6 +48,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
         private void Emit([NotNull] FunctionDeclaration function, [NotNull] Code code)
         {
+            // Don't emit functions without control flow, they are generic
+            // TODO need to handle better
+            if (function.ControlFlow == null) return;
+
             var name = nameMangler.MangleName(function);
             var parameters = Convert(function.Parameters);
             var returnType = typeConverter.Convert(function.ReturnType);
