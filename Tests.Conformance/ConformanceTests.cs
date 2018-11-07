@@ -118,30 +118,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
         [NotNull]
         private string CompileToExecutable([NotNull] string codePath)
         {
-            // used to have: -Wno-incompatible-pointer-types
-            var options = "-std=c11 -fsanitize=undefined -fsanitize=integer -fsanitize=nullability -Wall  -Wno-unused-label";
-            // Next thing is needed for windows
-            options += " -Xclang -flto-visibility-public-std";
-            var sources = string.Join(" ", codePath, RuntimeLibraryFixture.GetRuntimeLibraryPath());
+            var compiler = new CLangCompiler();
+            var sourceFiles = new[] { codePath, RuntimeLibraryFixture.GetRuntimeLibraryPath() };
+            var headerSearchPaths = new[] { RuntimeLibraryFixture.GetRuntimeDirectory() };
             var outputPath = Path.ChangeExtension(codePath, "exe").AssertNotNull();
-            var arguments = $"{sources} -o {outputPath} --include-directory {RuntimeLibraryFixture.GetRuntimeDirectory()} {options}";
-            testOutput.WriteLine("clang arguments:");
-            testOutput.WriteLine(arguments);
-            var startInfo = new ProcessStartInfo("clang", arguments)
-            {
-                RedirectStandardInput = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true,
-                UseShellExecute = false,
-            };
-            var process = Process.Start(startInfo).AssertNotNull();
-            process.WaitForExit();
-            testOutput.WriteLine("clang stdout:");
-            testOutput.WriteLine(process.StandardOutput.ReadToEnd());
-            testOutput.WriteLine("clang stderr:");
-            testOutput.WriteLine(process.StandardError.ReadToEnd());
-            Assert.True(process.ExitCode == 0, $"clang exited with {process.ExitCode}");
+            var exitCode = compiler.Compile(new CompilerOutputAdapter(testOutput), sourceFiles, headerSearchPaths, outputPath);
+            Assert.True(exitCode == 0, $"clang exited with {exitCode}");
             return outputPath;
         }
 

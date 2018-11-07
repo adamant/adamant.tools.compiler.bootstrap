@@ -77,7 +77,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             var consoleLock = new object();
             foreach (var project in sortedProjects)
             {
-                Console.WriteLine($"Compiling {project.Name} ({project.Path})...");
                 var buildTask = taskFactory.StartNew(() =>
                     Build(compiler, project, projectBuildsTask, consoleLock))
                     .Unwrap(); // Needed because StartNew doesn't work intuitively with Async methods
@@ -98,13 +97,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
         {
             var projectBuilds = await projectBuildsTask;
             var sourceDir = Path.Combine(project.Path, "src");
-            var sourcePaths = Directory.EnumerateFiles(sourceDir, "*.ad", SearchOption.AllDirectories);
+            var sourcePaths = Directory.EnumerateFiles(sourceDir, "*.ad", SearchOption.AllDirectories).AssertNotNull();
             // Wait for the references, unfortunately, this requires an ugly loop.
             var referenceTasks = project.References.ToDictionary(r => r.Name, r => projectBuilds[r.Project]);
             var references = new Dictionary<string, Package>();
             foreach (var referenceTask in referenceTasks)
                 references.Add(referenceTask.Key, await referenceTask.Value);
 
+            lock (consoleLock)
+            {
+                Console.WriteLine($"Compiling {project.Name} ({project.Path})...");
+            }
             var codeFiles = sourcePaths.Select(CodeFile.Load).ToList();
             var package = compiler.CompilePackage(project.Name, codeFiles, references);
             // TODO switch to the async version of the compiler
@@ -114,13 +117,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             if (OutputDiagnostics(project, package, consoleLock))
                 return package;
 
-            EmitCode(project, package);
+            var cacheDir = PrepareCacheDir(project);
+            var codePath = EmitCode(project, package, cacheDir);
+            var success = CompileCode(project, cacheDir, codePath, consoleLock);
 
             lock (consoleLock)
             {
-                Console.WriteLine($"Build SUCCEEDED {project.Name} ({project.Path})");
+                Console.WriteLine(success
+                    ? $"Build SUCCEEDED {project.Name} ({project.Path})"
+                    : $"Build FAILED {project.Name} ({project.Path})");
             }
+
             return package;
+        }
+
+        [NotNull]
+        private static string PrepareCacheDir([NotNull] Project project)
+        {
+            var cacheDir = Path.Combine(project.Path, ".forge-cache").AssertNotNull();
+            Directory.CreateDirectory(cacheDir); // Ensure the cache directory exists
+
+            // Clear the cache directory?
+            var dir = new DirectoryInfo(cacheDir);
+            foreach (var file in dir.EnumerateFiles()) file.Delete();
+            foreach (var subDirectory in dir.EnumerateDirectories()) subDirectory.Delete(true);
+
+            return cacheDir;
         }
 
         private static bool OutputDiagnostics(
@@ -157,7 +179,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             return true;
         }
 
-        private static void EmitCode([NotNull] Project project, [NotNull]  Package package)
+        [NotNull]
+        private static string EmitCode([NotNull] Project project, [NotNull]  Package package, [NotNull] string cacheDir)
         {
             var emittedPackages = new HashSet<Package>();
             var packagesToEmit = new Queue<Package>();
@@ -174,23 +197,48 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
                 }
             }
 
-            var cacheDir = Path.Combine(project.Path, ".forge-cache");
-            Directory.CreateDirectory(cacheDir); // Ensure the cache directory exists
-            // TODO clear the cache directory?
             string outputPath;
             switch (project.Template)
             {
                 case ProjectTemplate.App:
-                    outputPath = Path.Combine(cacheDir, "program.c");
+                    outputPath = Path.Combine(cacheDir, "program.c").AssertNotNull();
                     break;
                 case ProjectTemplate.Lib:
-                    outputPath = Path.Combine(cacheDir, "lib.c");
+                    outputPath = Path.Combine(cacheDir, "lib.c").AssertNotNull();
                     break;
                 default:
                     throw NonExhaustiveMatchException.ForEnum(project.Template);
             }
 
             File.WriteAllText(outputPath, codeEmitter.GetEmittedCode(), Encoding.UTF8);
+
+            return outputPath;
+        }
+
+        private static bool CompileCode(
+            [NotNull] Project project,
+            [NotNull] string cacheDir,
+            [NotNull] string codePath,
+            [NotNull] object consoleLock)
+        {
+            var compiler = new CLangCompiler();
+
+            var runtimeLibrarySourcePath = Path.Combine(cacheDir, CodeEmitter.RuntimeLibraryCodeFileName);
+            File.WriteAllText(runtimeLibrarySourcePath, CodeEmitter.RuntimeLibraryCode, Encoding.UTF8);
+            var runtimeLibraryHeaderPath = Path.Combine(cacheDir, CodeEmitter.RuntimeLibraryHeaderFileName);
+            File.WriteAllText(runtimeLibraryHeaderPath, CodeEmitter.RuntimeLibraryHeader, Encoding.UTF8);
+
+            var sourceFiles = new[] { codePath, runtimeLibrarySourcePath };
+            var headerSearchPaths = new[] { cacheDir };
+            var outputPath = Path.ChangeExtension(codePath, "exe").AssertNotNull();
+            lock (consoleLock)
+            {
+                Console.WriteLine($"CLang Compiling {project.Name} ({project.Path})...");
+                var exitCode = compiler.Compile(ConsoleCompilerOutput.Instance, sourceFiles,
+                    headerSearchPaths, outputPath);
+
+                return exitCode == 0;
+            }
         }
 
         [NotNull]
