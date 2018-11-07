@@ -230,7 +230,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
 
             var sourceFiles = new[] { codePath, runtimeLibrarySourcePath };
             var headerSearchPaths = new[] { cacheDir };
-            var outputPath = Path.ChangeExtension(codePath, "exe").AssertNotNull();
+            string outputPath;
+            switch (project.Template)
+            {
+                case ProjectTemplate.App:
+                    outputPath = Path.ChangeExtension(codePath, "exe").AssertNotNull();
+                    break;
+                case ProjectTemplate.Lib:
+                    outputPath = Path.ChangeExtension(codePath, "o").AssertNotNull();
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.ForEnum(project.Template);
+            }
+
             lock (consoleLock)
             {
                 Console.WriteLine($"CLang Compiling {project.Name} ({project.Path})...");
