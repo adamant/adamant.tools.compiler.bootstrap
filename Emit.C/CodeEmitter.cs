@@ -12,7 +12,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         [NotNull] public static string RuntimeLibraryHeader => Resources.RuntimeLibraryHeader.AssertNotNull();
         [NotNull] public const string RuntimeLibraryHeaderFileName = "RuntimeLibrary.h";
 
-        [NotNull] private readonly IEmitter<Package> packageEmitter;
+        [NotNull] private readonly PackageEmitter packageEmitter;
+        [NotNull] private readonly Code code = new Code();
 
         public CodeEmitter()
         {
@@ -22,12 +23,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             var controlFlowEmitter = new ControlFlowEmitter(nameMangler, typeConverter);
             var declarationEmitter = new DeclarationEmitter(nameMangler, parameterConverter, typeConverter, controlFlowEmitter);
             packageEmitter = new PackageEmitter(nameMangler, declarationEmitter);
+            packageEmitter.EmitPreamble(code);
         }
 
-        public override string Emit([NotNull] Package package)
+        public override void Emit([NotNull] Package package)
         {
-            var code = new Code();
             packageEmitter.Emit(package, code);
+        }
+
+        public override string GetEmittedCode()
+        {
+            packageEmitter.EmitPostamble(code);
             return code.ToString();
         }
     }

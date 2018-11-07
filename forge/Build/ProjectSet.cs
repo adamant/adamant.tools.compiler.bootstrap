@@ -111,32 +111,69 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             //var codeFiles = sourcePaths.Select(p => new CodePath(p)).ToList();
             //var references = project.References.ToDictionary(r => r.Name, r => projectBuilds[r.Project]);
             //var package = await compiler.CompilePackageAsync(project.Name, codeFiles, references);
-            var diagnostics = package.Diagnostics;
-            if (diagnostics.Any())
-            {
-                lock (consoleLock)
-                {
-                    Console.WriteLine($@"Build FAILED {project.Name} ({project.Path})");
-                    foreach (var group in diagnostics.GroupBy(d => d.File))
-                    {
-                        var fileDiagnostics = group.ToList();
-                        foreach (var diagnostic in fileDiagnostics.Take(10))
-                        {
-                            Console.WriteLine($@"{diagnostic.File.Reference}:{diagnostic.StartPosition.Line}:{diagnostic.StartPosition.Column} {diagnostic.Level} {diagnostic.ErrorCode}");
-                            Console.WriteLine(@"    " + diagnostic.Message);
-                        }
+            if (OutputDiagnostics(project, package, consoleLock))
+                return package;
 
-                        if (fileDiagnostics.Count > 10)
-                        {
-                            Console.WriteLine($"{group.Key.Reference}");
-                            Console.WriteLine($"    {fileDiagnostics.Skip(10).Count(d => d.Level >= DiagnosticLevel.CompilationError)} more errors not shown.");
-                            Console.WriteLine($"    {fileDiagnostics.Skip(10).Count(d => d.Level == DiagnosticLevel.Warning)} more warnings not shown.");
-                        }
+            EmitCode(project, package);
+
+            lock (consoleLock)
+            {
+                Console.WriteLine($"Build SUCCEEDED {project.Name} ({project.Path})");
+            }
+            return package;
+        }
+
+        private static bool OutputDiagnostics(
+            [NotNull] Project project,
+            [NotNull] Package package,
+            [NotNull] object consoleLock)
+        {
+            var diagnostics = package.Diagnostics;
+            if (!diagnostics.Any()) return false;
+            lock (consoleLock)
+            {
+                Console.WriteLine($@"Build FAILED {project.Name} ({project.Path})");
+                foreach (var group in diagnostics.GroupBy(d => d.File))
+                {
+                    var fileDiagnostics = @group.ToList();
+                    foreach (var diagnostic in fileDiagnostics.Take(10))
+                    {
+                        Console.WriteLine(
+                            $@"{diagnostic.File.Reference}:{diagnostic.StartPosition.Line}:{diagnostic.StartPosition.Column} {diagnostic.Level} {diagnostic.ErrorCode}");
+                        Console.WriteLine(@"    " + diagnostic.Message);
+                    }
+
+                    if (fileDiagnostics.Count > 10)
+                    {
+                        Console.WriteLine($"{@group.Key.Reference}");
+                        Console.WriteLine(
+                            $"    {fileDiagnostics.Skip(10).Count(d => d.Level >= DiagnosticLevel.CompilationError)} more errors not shown.");
+                        Console.WriteLine(
+                            $"    {fileDiagnostics.Skip(10).Count(d => d.Level == DiagnosticLevel.Warning)} more warnings not shown.");
                     }
                 }
-                return package;
             }
-            var cCode = new CodeEmitter().Emit(package);
+
+            return true;
+        }
+
+        private static void EmitCode([NotNull] Project project, [NotNull]  Package package)
+        {
+            var emittedPackages = new HashSet<Package>();
+            var packagesToEmit = new Queue<Package>();
+            packagesToEmit.Enqueue(package);
+
+            var codeEmitter = new CodeEmitter();
+            while (packagesToEmit.TryDequeue(out var currentPackage))
+            {
+                if (!emittedPackages.Contains(currentPackage))
+                {
+                    codeEmitter.Emit(currentPackage);
+                    emittedPackages.Add(currentPackage);
+                    packagesToEmit.EnqueueRange(currentPackage.References.Values.AssertNotNull());
+                }
+            }
+
             var cacheDir = Path.Combine(project.Path, ".forge-cache");
             Directory.CreateDirectory(cacheDir); // Ensure the cache directory exists
             // TODO clear the cache directory?
@@ -153,12 +190,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
                     throw NonExhaustiveMatchException.ForEnum(project.Template);
             }
 
-            File.WriteAllText(outputPath, cCode, Encoding.UTF8);
-            lock (consoleLock)
-            {
-                Console.WriteLine($"Build SUCCEEDED {project.Name} ({project.Path})");
-            }
-            return package;
+            File.WriteAllText(outputPath, codeEmitter.GetEmittedCode(), Encoding.UTF8);
         }
 
         [NotNull]

@@ -20,14 +20,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
         public void Emit([NotNull] Package package, [NotNull] Code code)
         {
-            EmitPreamble(code);
-
             foreach (var declaration in package.Declarations)
                 declarationEmitter.Emit(declaration, code);
 
             EmitEntryPointAdapter(package.EntryPoint, code);
-
-            EmitPostamble(code);
         }
 
         public void EmitPreamble([NotNull] Code code)

@@ -55,7 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             var declarations = declarationAnalyses.Select(d => d.Complete(diagnostics)).Where(d => d != null).ToList();
             var entryPoint = DetermineEntryPoint(declarations, diagnostics);
-            return new Package(packageSyntax.Name, diagnostics.Build(), namespacesInPackage, declarations, entryPoint);
+            return new Package(packageSyntax.Name, diagnostics.Build(), references, namespacesInPackage, declarations, entryPoint);
         }
 
         [CanBeNull]

@@ -110,8 +110,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             [NotNull] Package package,
             [NotNull] string path)
         {
-            var code = new CodeEmitter().Emit(package);
-            File.WriteAllText(path, code, Encoding.UTF8);
+            var codeEmitter = new CodeEmitter();
+            codeEmitter.Emit(package);
+            File.WriteAllText(path, codeEmitter.GetEmittedCode(), Encoding.UTF8);
         }
 
         [NotNull]
