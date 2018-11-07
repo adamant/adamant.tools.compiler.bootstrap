@@ -96,7 +96,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case GenericsScope genericsScope:
                     {
                         var declaration = (MemberDeclarationAnalysis)declarations[genericsScope.Syntax].AssertNotNull();
-                        foreach (var parameter in declaration.GenericParameters)
+                        foreach (var parameter in declaration.GenericParameters.AssertNotNull())
                             AddSymbol(symbols, parameter);
 
                         genericsScope.Bind(symbols);

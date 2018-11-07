@@ -29,25 +29,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
         [NotNull] public Name Name { get; }
         public bool IsReferenceType { get; }
         public bool DeclaredMutable { get; }
-        [NotNull, ItemNotNull] public override IReadOnlyList<DataType> GenericParameterTypes { get; }
-        [NotNull, ItemCanBeNull] public override IReadOnlyList<DataType> GenericArguments { get; }
+        [CanBeNull, ItemNotNull] public override IReadOnlyList<DataType> GenericParameterTypes { get; }
+        [CanBeNull, ItemCanBeNull] public override IReadOnlyList<DataType> GenericArguments { get; }
         public bool IsMutable { get; }
 
         private ObjectType(
             [NotNull] Name name,
             bool isReferenceType,
             bool declaredMutable,
-            [NotNull, ItemNotNull] IEnumerable<DataType> genericParameterTypes,
+            [CanBeNull, ItemNotNull] IEnumerable<DataType> genericParameterTypes,
             [CanBeNull, ItemCanBeNull] IEnumerable<DataType> genericArguments)
         {
             Requires.NotNull(nameof(name), name);
-            Requires.NotNull(nameof(genericParameterTypes), genericParameterTypes);
             Name = name;
             DeclaredMutable = declaredMutable;
-            var genericParameterTypesList = genericParameterTypes.ToReadOnlyList();
+            var genericParameterTypesList = genericParameterTypes?.ToReadOnlyList();
             GenericParameterTypes = genericParameterTypesList;
-            var genericArgumentsList = (genericArguments ?? genericParameterTypesList.Select(t => default(DataType))).ToReadOnlyList();
-            Requires.That(nameof(genericArguments), genericArgumentsList.Count == genericParameterTypesList.Count);
+            var genericArgumentsList = (genericArguments ?? genericParameterTypesList?.Select(t => default(DataType)))?.ToReadOnlyList();
+            Requires.That(nameof(genericArguments), genericArgumentsList?.Count == genericParameterTypesList?.Count);
             GenericArguments = genericArgumentsList;
             IsReferenceType = isReferenceType;
             IsMutable = false;

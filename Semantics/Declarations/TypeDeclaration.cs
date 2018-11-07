@@ -9,18 +9,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations
 {
     public class TypeDeclaration : Declaration
     {
-        [NotNull, ItemNotNull] public IReadOnlyList<GenericParameter> GenericParameters { get; }
-        public int GenericArity => GenericParameters.Count;
+        [CanBeNull, ItemNotNull] public IReadOnlyList<GenericParameter> GenericParameters { get; }
+        public bool IsGeneric => GenericParameters != null;
+        public int? GenericArity => GenericParameters?.Count;
 
         public TypeDeclaration(
             [NotNull] CodeFile file,
             [NotNull] Name name,
             [NotNull] KnownType type,
-            [NotNull, ItemNotNull] IEnumerable<GenericParameter> genericParameters)
+            [CanBeNull, ItemNotNull] IEnumerable<GenericParameter> genericParameters)
             : base(file, name, type)
         {
-            Requires.NotNull(nameof(genericParameters), genericParameters);
-            GenericParameters = genericParameters.ToReadOnlyList();
+            Requires.NotNull(nameof(file), file);
+            Requires.NotNull(nameof(name), name);
+            Requires.NotNull(nameof(type), type);
+            GenericParameters = genericParameters?.ToReadOnlyList();
         }
     }
 }

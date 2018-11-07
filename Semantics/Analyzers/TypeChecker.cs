@@ -41,7 +41,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             // Check the signature first
             function.Type = DataType.BeingChecked;
             function.ReturnType = DataType.BeingChecked;
-            CheckGenericParameters(function.GenericParameters, function.Diagnostics);
+            if (function.IsGeneric)
+                CheckGenericParameters(function.GenericParameters.AssertNotNull(), function.Diagnostics);
             CheckParameters(function.Parameters, function.Diagnostics);
 
             function.ReturnType = EvaluateTypeExpression(function.ReturnTypeExpression, function.Diagnostics);
@@ -51,8 +52,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             if (!(function.Syntax.OpenParen is MissingToken))
                 functionType = new FunctionType(function.Parameters.Select(p => p.Type), functionType);
 
-            if (function.GenericParameters.Any())
-                functionType = new GenericFunctionType(function.GenericParameters.Select(p => p.Type.AssertChecked()), null, functionType);
+            if (function.IsGeneric && function.GenericParameters.AssertNotNull().Any())
+                functionType = new GenericFunctionType(function.GenericParameters.AssertNotNull().Select(p => p.Type.AssertChecked()), null, functionType);
 
             function.Type = functionType;
         }
@@ -155,9 +156,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 return;   // We have already checked it
 
             typeDeclaration.Type = DataType.BeingChecked;
-            var genericParameters = typeDeclaration.GenericParameters;
-            CheckGenericParameters(genericParameters, typeDeclaration.Diagnostics);
-            var genericParameterTypes = genericParameters.Select(p => p.Type.AssertNotNull());
+            IEnumerable<DataType> genericParameterTypes = null;
+            if (typeDeclaration.IsGeneric)
+            {
+                var genericParameters = typeDeclaration.GenericParameters.AssertNotNull();
+                CheckGenericParameters(genericParameters, typeDeclaration.Diagnostics);
+                genericParameterTypes = genericParameters.Select(p => p.Type.AssertNotNull());
+            }
             switch (typeDeclaration.Syntax)
             {
                 case ClassDeclarationSyntax classDeclaration:

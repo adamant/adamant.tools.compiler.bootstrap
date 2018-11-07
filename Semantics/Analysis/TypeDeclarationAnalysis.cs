@@ -12,14 +12,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
 {
     public class TypeDeclarationAnalysis : MemberDeclarationAnalysis
     {
-        [CanBeNull] public new DataType Type { get; set; }
         [NotNull] public new MemberDeclarationSyntax Syntax { get; }
+        [CanBeNull] public new DataType Type { get; set; }
 
         public TypeDeclarationAnalysis(
             [NotNull] AnalysisContext context,
             [NotNull] MemberDeclarationSyntax syntax,
             [NotNull] Name name,
-            [NotNull] [ItemNotNull] IEnumerable<GenericParameterAnalysis> genericParameters)
+            [CanBeNull, ItemNotNull] IEnumerable<GenericParameterAnalysis> genericParameters)
             : base(context, syntax, name, genericParameters)
         {
             Requires.NotNull(nameof(syntax), syntax);
@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         public override Declaration Complete([NotNull] DiagnosticsBuilder diagnostics)
         {
             if (CompleteDiagnostics(diagnostics)) return null;
-            return new TypeDeclaration(Context.File, Name, Type.AssertKnown(), GenericParameters.Select(p => p.Complete()));
+            return new TypeDeclaration(Context.File, Name, Type.AssertKnown(), GenericParameters?.Select(p => p.Complete()));
         }
     }
 }

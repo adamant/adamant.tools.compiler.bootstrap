@@ -16,8 +16,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         [NotNull] public new MemberDeclarationSyntax Syntax { get; }
         [NotNull] public DiagnosticsBuilder Diagnostics { get; }
         [NotNull] public Name Name { get; }
-        [NotNull] [ItemNotNull] public IReadOnlyList<GenericParameterAnalysis> GenericParameters { get; }
-        public int GenericArity => GenericParameters.Count;
+        [CanBeNull, ItemNotNull] public IReadOnlyList<GenericParameterAnalysis> GenericParameters { get; }
+        public bool IsGeneric => GenericParameters != null;
+        public int? GenericArity => GenericParameters?.Count;
         // This is the type of the value provided by using the name. So for
         // classes, it is the metatype, for functions, the function type
         [CanBeNull] public DataType Type => GetDataType();
@@ -26,14 +27,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             [NotNull] AnalysisContext context,
             [NotNull] MemberDeclarationSyntax syntax,
             [NotNull] Name name,
-            [NotNull] [ItemNotNull] IEnumerable<GenericParameterAnalysis> genericParameters)
+            [CanBeNull, ItemNotNull] IEnumerable<GenericParameterAnalysis> genericParameters = null)
             : base(context, syntax)
         {
             Requires.NotNull(nameof(name), name);
             Syntax = syntax;
             Diagnostics = new DiagnosticsBuilder();
             Name = name;
-            GenericParameters = genericParameters.ToReadOnlyList();
+            GenericParameters = genericParameters?.ToReadOnlyList();
         }
 
         [CanBeNull]

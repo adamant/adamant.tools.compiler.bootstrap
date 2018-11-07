@@ -28,7 +28,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 case LifetimeType lifetimeType:
                     return Convert(lifetimeType.Type);
                 case PointerType ptr:
-                    return Convert(ptr.ReferencedType.AssertKnown()) + "*";
+                    var referenced = ptr.ReferencedType.AssertKnown();
+                    if (referenced == ObjectType.Any)
+                        return "void*";
+
+                    return Convert(referenced) + "*";
                 default:
                     throw NonExhaustiveMatchException.For(type);
             }

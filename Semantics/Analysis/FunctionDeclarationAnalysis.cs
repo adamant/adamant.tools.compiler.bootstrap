@@ -11,14 +11,15 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
 {
+    [NotNull]
     public class FunctionDeclarationAnalysis : MemberDeclarationAnalysis
     {
         [NotNull] public new NamedFunctionDeclarationSyntax Syntax { get; }
-        [NotNull] [ItemNotNull] public IReadOnlyList<ParameterAnalysis> Parameters { get; }
+        [NotNull, ItemNotNull] public IReadOnlyList<ParameterAnalysis> Parameters { get; }
         public int Arity => Parameters.Count;
         [NotNull] public ExpressionAnalysis ReturnTypeExpression { get; }
         [CanBeNull] public DataType ReturnType { get; set; }
-        [NotNull] [ItemNotNull] public IReadOnlyList<StatementAnalysis> Statements { get; }
+        [NotNull, ItemNotNull] public IReadOnlyList<StatementAnalysis> Statements { get; }
         [CanBeNull] public ControlFlowGraph ControlFlow { get; set; }
         [CanBeNull] public new DataType Type { get; set; }
 
@@ -26,8 +27,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             [NotNull] AnalysisContext context,
             [NotNull] NamedFunctionDeclarationSyntax syntax,
             [NotNull] Name name,
-            [NotNull] [ItemNotNull] IEnumerable<GenericParameterAnalysis> genericParameters,
-            [NotNull] [ItemNotNull] IEnumerable<ParameterAnalysis> parameters,
+            [CanBeNull, ItemNotNull] IEnumerable<GenericParameterAnalysis> genericParameters,
+            [NotNull, ItemNotNull] IEnumerable<ParameterAnalysis> parameters,
             [NotNull] ExpressionAnalysis returnTypeExpression,
             [CanBeNull] [ItemNotNull] IEnumerable<StatementAnalysis> statements)
             : base(context, syntax, name, genericParameters)

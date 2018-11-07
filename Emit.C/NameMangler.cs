@@ -71,8 +71,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             // builder with room for the characters we are likely to add
             var builder = new StringBuilder(EstimateSize(type.Name) + 2);
             Mangle(type.Name, builder);
-            builder.Append('´');
-            builder.Append(type.GenericArity);
+            if (type.IsGeneric)
+            {
+                builder.Append('´');
+                builder.Append(type.GenericArity);
+            }
             return builder.ToString().AssertNotNull();
         }
 
@@ -125,7 +128,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     break;
                 case QualifiedName qualifiedName:
                     Mangle(qualifiedName.Qualifier, builder);
-                    builder.Append('.');
+                    builder.Append('·');
                     Mangle(qualifiedName.UnqualifiedName, builder);
                     break;
                 default:

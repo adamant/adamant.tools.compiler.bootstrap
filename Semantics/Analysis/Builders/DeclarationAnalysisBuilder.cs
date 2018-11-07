@@ -106,7 +106,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
             if (!(syntax.Name.Value is string name)) return null;
 
             var fullName = @namespace.Qualify(name);
-            var typesContext = context.WithGenericParameters(syntax);
+            var typesContext = syntax.GenericParameters != null ? context.WithGenericParameters(syntax) : context;
             var bodyContext = typesContext.InFunctionBody(syntax);
             // For missing parameter names, use `_` to ignore them
             return new FunctionDeclarationAnalysis(
@@ -218,20 +218,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
                 BuildGenericParameters(context, fullName, syntax.GenericParameters));
         }
 
-        [NotNull]
-        [ItemNotNull]
+        [CanBeNull, ItemNotNull]
         private IEnumerable<GenericParameterAnalysis> BuildGenericParameters(
             [NotNull] AnalysisContext context,
             [NotNull] Name memberName,
             [CanBeNull] GenericParametersSyntax syntax)
         {
-            if (syntax == null) yield break;
-            foreach (var parameter in syntax.Parameters)
-            {
-                yield return new GenericParameterAnalysis(context, parameter,
-                    memberName.Qualify(parameter.Name.Value ?? "_"),
-                    parameter.TypeExpression == null ? null : expressionBuilder.BuildExpression(context, memberName, parameter.TypeExpression));
-            }
+            return syntax?.Parameters.Select(parameter => new GenericParameterAnalysis(context,
+                parameter,
+                memberName.Qualify(parameter.Name.Value ?? "_"),
+                parameter.TypeExpression == null
+                    ? null
+                    : expressionBuilder.BuildExpression(context, memberName,
+                        parameter.TypeExpression)));
         }
     }
 }
