@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
@@ -35,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         public override Declaration Complete([NotNull] DiagnosticsBuilder diagnostics)
         {
             if (CompleteDiagnostics(diagnostics)) return null;
-            return new TypeDeclaration(Context.File, Name, Type.AssertKnown());
+            return new TypeDeclaration(Context.File, Name, Type.AssertKnown(), GenericParameters.Select(p => p.Complete()));
         }
     }
 }

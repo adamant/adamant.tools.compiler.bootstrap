@@ -139,7 +139,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             var cCode = new CodeEmitter().Emit(package);
             var cacheDir = Path.Combine(project.Path, ".forge-cache");
             Directory.CreateDirectory(cacheDir); // Ensure the cache directory exists
-            var outputPath = Path.Combine(cacheDir, "program.c");
+            // TODO clear the cache directory?
+            string outputPath;
+            switch (project.Template)
+            {
+                case ProjectTemplate.App:
+                    outputPath = Path.Combine(cacheDir, "program.c");
+                    break;
+                case ProjectTemplate.Lib:
+                    outputPath = Path.Combine(cacheDir, "lib.c");
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.ForEnum(project.Template);
+            }
+
             File.WriteAllText(outputPath, cCode, Encoding.UTF8);
             lock (consoleLock)
             {

@@ -72,7 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             var builder = new StringBuilder(EstimateSize(type.Name) + 2);
             Mangle(type.Name, builder);
             builder.Append('´');
-            builder.Append("0"); // TODO actual number of generic parameters
+            builder.Append(type.GenericArity);
             return builder.ToString().AssertNotNull();
         }
 
@@ -83,7 +83,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             var builder = new StringBuilder(EstimateSize(type.Name) + 2);
             Mangle(type.Name, builder);
             builder.Append('´');
-            builder.Append("0"); // TODO actual number of generic parameters
+            builder.Append(type.GenericArity);
             return builder.ToString().AssertNotNull();
         }
 

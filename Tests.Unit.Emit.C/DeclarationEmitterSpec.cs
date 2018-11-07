@@ -60,7 +60,7 @@ $@"{returnType} ᵢfunc´{parameterCount}({parametersString})
         {
             var declaredType = new FakeAdamantType();
             var typeName = GlobalNamespaceName.Instance.Qualify("My_Type");
-            var type = new TypeDeclaration("".ToFakeCodeFile(), typeName, declaredType);
+            var type = new TypeDeclaration("".ToFakeCodeFile(), typeName, declaredType, Enumerable.Empty<GenericParameter>());
 
             var code = new Code();
             NewDeclarationEmitter().Emit(type, code);

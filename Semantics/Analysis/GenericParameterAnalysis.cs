@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
@@ -35,6 +36,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             if (symbol is CompositeSymbol composite)
                 return composite.ComposeWith(this);
             return new CompositeSymbol(this, symbol);
+        }
+
+        [NotNull]
+        public GenericParameter Complete()
+        {
+            return new GenericParameter(Name, Type.AssertKnown());
         }
     }
 }

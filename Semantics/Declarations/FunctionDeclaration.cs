@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations
 {
     public class FunctionDeclaration : Declaration
     {
-        [NotNull] [ItemNotNull] public IReadOnlyList<Parameter> Parameters { get; }
+        [NotNull, ItemNotNull] public IReadOnlyList<Parameter> Parameters { get; }
         public int Arity => Parameters.Count;
         [NotNull] public KnownType ReturnType { get; }
         [CanBeNull] public ControlFlowGraph ControlFlow { get; }
@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations
             [NotNull] CodeFile file,
             [NotNull] Name name,
             [NotNull] KnownType type,
-            [NotNull] [ItemNotNull] IEnumerable<Parameter> parameters,
+            [NotNull, ItemNotNull] IEnumerable<Parameter> parameters,
             [NotNull] KnownType returnType,
             [CanBeNull] ControlFlowGraph controlFlow)
             : base(file, name, type)
