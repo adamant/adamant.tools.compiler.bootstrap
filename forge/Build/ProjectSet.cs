@@ -237,7 +237,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
                     outputPath = Path.ChangeExtension(codePath, "exe").AssertNotNull();
                     break;
                 case ProjectTemplate.Lib:
-                    outputPath = Path.ChangeExtension(codePath, "o").AssertNotNull();
+                    outputPath = Path.ChangeExtension(codePath, "dll").AssertNotNull();
                     break;
                 default:
                     throw NonExhaustiveMatchException.ForEnum(project.Template);

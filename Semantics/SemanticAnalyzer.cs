@@ -64,7 +64,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             [NotNull] DiagnosticsBuilder diagnostics)
         {
             var mainFunctions = declarations.OfType<FunctionDeclaration>()
-                .Where(f => f.Name is SimpleName name && name.Text == "main")
+                .Where(f => f.Name.UnqualifiedName.Text == "main" && !f.Name.UnqualifiedName.IsSpecial)
                 .ToList();
 
             // TODO warn on and remove main functions that don't have correct parameters or types

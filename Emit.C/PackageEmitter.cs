@@ -1,5 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using JetBrains.Annotations;
 
@@ -53,15 +57,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.Definitions.AppendLine("// Entry Point Adapter");
             code.Definitions.AppendLine("int32_t main(const int argc, char const * const * const argv)");
             code.Definitions.BeginBlock();
+            var arguments = new List<string>();
+            foreach (var parameterTypeName in entryPoint.Parameters.Select(p => p.Type).Cast<ObjectType>().Select(t => t.Name))
+            {
+                if (parameterTypeName.Equals(Name.From("system", "console", "Console")))
+                {
+                    arguments.Add("ᵢsystem·ᵢconsole·ᵢConsole·ₐnew()");
+                }
+                else if (parameterTypeName.Equals(Name.From("system", "console", "Arguments")))
+                    throw new NotImplementedException();
+                else
+                    throw new Exception($"Unexpected type for parameter to main: {parameterTypeName}");
+            }
+            var joinedArguments = string.Join(", ", arguments);
             if (entryPoint.ReturnType == ObjectType.Void)
             {
-                code.Definitions.AppendLine($"{nameMangler.MangleName(entryPoint)}();");
+                code.Definitions.AppendLine($"{nameMangler.MangleName(entryPoint)}({joinedArguments});");
                 code.Definitions.AppendLine("return 0;");
             }
             else
-            {
-                code.Definitions.AppendLine($"return {nameMangler.MangleName(entryPoint)}().ₐvalue;");
-            }
+                code.Definitions.AppendLine($"return {nameMangler.MangleName(entryPoint)}({joinedArguments}).ₐvalue;");
+
             code.Definitions.EndBlock();
         }
 

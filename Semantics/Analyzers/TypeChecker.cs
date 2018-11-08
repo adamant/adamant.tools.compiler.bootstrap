@@ -298,69 +298,69 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     invocation.Type = DataType.Unknown;
                     break;
                 case GenericInvocationAnalysis genericInvocation:
+                {
+                    foreach (var argument in genericInvocation.Arguments)
+                        CheckExpression(argument.Value, diagnostics);
+
+                    CheckExpression(genericInvocation.Callee, diagnostics);
+                    var calleeType = genericInvocation.Callee.Type;
+                    if (calleeType is OverloadedType overloadedType)
                     {
-                        foreach (var argument in genericInvocation.Arguments)
-                            CheckExpression(argument.Value, diagnostics);
-
-                        CheckExpression(genericInvocation.Callee, diagnostics);
-                        var calleeType = genericInvocation.Callee.Type;
-                        if (calleeType is OverloadedType overloadedType)
-                        {
-                            genericInvocation.Callee.Type = calleeType = overloadedType.Types
-                                .OfType<GenericType>()
-                                .Single(t => t.GenericArity == genericInvocation.GenericArity);
-                        }
-
-                        // TODO check that argument types match function type
-                        switch (calleeType)
-                        {
-                            case Metatype metatype:
-                                genericInvocation.Type =
-                                    metatype.WithGenericArguments(
-                                        genericInvocation.Arguments.Select(a => a.Value.Type));
-                                break;
-                            case GenericFunctionType genericFunctionType:
-                                genericInvocation.Type = genericFunctionType.ReturnType;
-                                break;
-                            case UnknownType _:
-                                genericInvocation.Type = DataType.Unknown;
-                                break;
-                            default:
-                                throw NonExhaustiveMatchException.For(calleeType);
-                        }
+                        genericInvocation.Callee.Type = calleeType = overloadedType.Types
+                            .OfType<GenericType>()
+                            .Single(t => t.GenericArity == genericInvocation.GenericArity);
                     }
-                    break;
+
+                    // TODO check that argument types match function type
+                    switch (calleeType)
+                    {
+                        case Metatype metatype:
+                            genericInvocation.Type =
+                                metatype.WithGenericArguments(
+                                    genericInvocation.Arguments.Select(a => a.Value.Type));
+                            break;
+                        case GenericFunctionType genericFunctionType:
+                            genericInvocation.Type = genericFunctionType.ReturnType;
+                            break;
+                        case UnknownType _:
+                            genericInvocation.Type = DataType.Unknown;
+                            break;
+                        default:
+                            throw NonExhaustiveMatchException.For(calleeType);
+                    }
+                }
+                break;
                 case GenericNameAnalysis genericName:
+                {
+                    foreach (var argument in genericName.Arguments)
+                        CheckExpression(argument.Value, diagnostics);
+
+                    var nameType = CheckName(genericName.Context, genericName.Syntax.Name,
+                        diagnostics);
+                    if (nameType is OverloadedType overloadedType)
                     {
-                        foreach (var argument in genericName.Arguments)
-                            CheckExpression(argument.Value, diagnostics);
-
-                        var nameType = CheckName(genericName.Context, genericName.Syntax.Name,
-                            diagnostics);
-                        if (nameType is OverloadedType overloadedType)
-                        {
-                            nameType = overloadedType.Types.OfType<GenericType>()
-                                .Single(t => t.GenericArity == genericName.GenericArity);
-                        }
-
-                        // TODO check that argument types match function type
-                        genericName.NameType = nameType;
-
-                        switch (genericName.NameType)
-                        {
-                            case Metatype metatype:
-                                genericName.Type =
-                                    metatype.WithGenericArguments(
-                                        genericName.Arguments.Select(a => a.Value.Type));
-                                break;
-                            case UnknownType _:
-                                genericName.Type = DataType.Unknown;
-                                break;
-                            default:
-                                throw NonExhaustiveMatchException.For(genericName.NameType);
-                        }
+                        nameType = overloadedType.Types.OfType<GenericType>()
+                            .Single(t => t.GenericArity == genericName.GenericArity);
                     }
-                    break;
+
+                    // TODO check that argument types match function type
+                    genericName.NameType = nameType;
+
+                    switch (genericName.NameType)
+                    {
+                        case Metatype metatype:
+                            genericName.Type =
+                                metatype.WithGenericArguments(
+                                    genericName.Arguments.Select(a => a.Value.Type));
+                            break;
+                        case UnknownType _:
+                            genericName.Type = DataType.Unknown;
+                            break;
+                        default:
+                            throw NonExhaustiveMatchException.For(genericName.NameType);
+                    }
+                }
+                break;
                 case RefTypeAnalysis refType:
                     EvaluateTypeExpression(refType.ReferencedType, diagnostics);
                     refType.Type = ObjectType.Type;
@@ -508,6 +508,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     binaryOperatorExpression.Type = !typeError ? leftOperand : DataType.Unknown;
                     break;
                 case EqualsEqualsToken _:
+                case NotEqualToken _:
                 case LessThanToken _:
                 case LessThanOrEqualToken _:
                 case GreaterThanToken _:
@@ -644,47 +645,47 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             switch (typeExpression)
             {
                 case IdentifierNameAnalysis identifier:
+                {
+                    var identifierType = identifier.Type;
+                    switch (identifierType)
                     {
-                        var identifierType = identifier.Type;
-                        switch (identifierType)
-                        {
-                            case Metatype metatype:
-                                return metatype.Instance;
-                            case ObjectType t
-                                when t == ObjectType.Type: // It is a variable holding a type?
-                                                           // for now, return a placeholder type
-                                return ObjectType.Any;
-                            case UnknownType _:
-                                return DataType.Unknown;
-                            default:
-                                throw NonExhaustiveMatchException.For(identifierType);
-                        }
+                        case Metatype metatype:
+                            return metatype.Instance;
+                        case ObjectType t
+                            when t == ObjectType.Type: // It is a variable holding a type?
+                                                       // for now, return a placeholder type
+                            return ObjectType.Any;
+                        case UnknownType _:
+                            return DataType.Unknown;
+                        default:
+                            throw NonExhaustiveMatchException.For(identifierType);
                     }
+                }
                 case PrimitiveTypeAnalysis primitive:
                     return GetPrimitiveType(primitive);
                 case LifetimeTypeAnalysis lifetimeType:
+                {
+                    var type = EvaluateCheckedTypeExpression(lifetimeType.TypeName, diagnostics);
+                    if (type == DataType.Unknown) return DataType.Unknown;
+                    var lifetimeToken = lifetimeType.Syntax.Lifetime;
+                    Lifetime lifetime;
+                    switch (lifetimeToken)
                     {
-                        var type = EvaluateCheckedTypeExpression(lifetimeType.TypeName, diagnostics);
-                        if (type == DataType.Unknown) return DataType.Unknown;
-                        var lifetimeToken = lifetimeType.Syntax.Lifetime;
-                        Lifetime lifetime;
-                        switch (lifetimeToken)
-                        {
-                            case OwnedKeywordToken _:
-                                lifetime = OwnedLifetime.Instance;
-                                break;
-                            case RefKeywordToken _:
-                                lifetime = RefLifetime.Instance;
-                                break;
-                            case IdentifierToken identifier:
-                                lifetime = new NamedLifetime(identifier.Value);
-                                break;
-                            default:
-                                throw NonExhaustiveMatchException.For(lifetimeToken);
-                        }
-
-                        return new LifetimeType(type.AssertKnown(), lifetime);
+                        case OwnedKeywordToken _:
+                            lifetime = OwnedLifetime.Instance;
+                            break;
+                        case RefKeywordToken _:
+                            lifetime = RefLifetime.Instance;
+                            break;
+                        case IdentifierToken identifier:
+                            lifetime = new NamedLifetime(identifier.Value);
+                            break;
+                        default:
+                            throw NonExhaustiveMatchException.For(lifetimeToken);
                     }
+
+                    return new LifetimeType(type.AssertKnown(), lifetime);
+                }
                 case RefTypeAnalysis refType:
                     return new RefType(refType.VariableBinding,
                         EvaluateCheckedTypeExpression(refType.ReferencedType, diagnostics).AssertKnown());
@@ -702,14 +703,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     }
                 case GenericInvocationAnalysis _:
                 case GenericNameAnalysis _:
-                    {
-                        var type = typeExpression.Type;
-                        if (type is Metatype metatype)
-                            return metatype.Instance;
+                {
+                    var type = typeExpression.Type;
+                    if (type is Metatype metatype)
+                        return metatype.Instance;
 
-                        // TODO evaluate to type
-                        return DataType.Unknown;
-                    }
+                    // TODO evaluate to type
+                    return DataType.Unknown;
+                }
                 case BinaryOperatorExpressionAnalysis _:
                     // TODO evaluate to type
                     return DataType.Unknown;

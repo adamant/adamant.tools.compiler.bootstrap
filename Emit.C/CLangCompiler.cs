@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
@@ -22,6 +23,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             var options = "-std=c11 -fsanitize=undefined -fsanitize=integer -fsanitize=nullability -Wall  -Wno-unused-label";
             // Next thing is needed for windows
             options += " -Xclang -flto-visibility-public-std";
+            if (Path.GetExtension(outputPath) == ".dll") // TODO take this as an argument or something
+                options += " --shared";
             var sources = string.Join(' ', sourceFiles);
             var headers = string.Join(' ', headerSearchPaths.Select(h => "--include-directory " + h));
             var arguments = $"{sources} -o {outputPath} {headers} {options}";
@@ -29,7 +32,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             output.WriteLine(arguments);
             var startInfo = new ProcessStartInfo("clang", arguments)
             {
-                //RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 CreateNoWindow = true,

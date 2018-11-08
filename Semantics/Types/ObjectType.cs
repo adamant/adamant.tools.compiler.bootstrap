@@ -30,6 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
         public bool IsReferenceType { get; }
         public bool DeclaredMutable { get; }
         [CanBeNull, ItemNotNull] public override IReadOnlyList<DataType> GenericParameterTypes { get; }
+        public bool IsGeneric => GenericParameterTypes != null;
         [CanBeNull, ItemCanBeNull] public override IReadOnlyList<DataType> GenericArguments { get; }
         public bool IsMutable { get; }
 
@@ -62,7 +63,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
         }
 
         public ObjectType([NotNull] Name name, bool isReferenceType, bool declaredMutable)
-            : this(name, isReferenceType, declaredMutable, Enumerable.Empty<DataType>())
+            : this(name, isReferenceType, declaredMutable, null, null)
         {
         }
 
@@ -72,7 +73,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             if (IsMutable)
                 return "mut " + Name;
 
-            return Name.ToString();
+            return Name.ToString().AssertNotNull();
         }
 
         [NotNull]
