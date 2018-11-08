@@ -13,7 +13,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
     {
         [NotNull] public Name Qualifier { get; }
         [NotNull] public override SimpleName UnqualifiedName { get; }
-        //[NotNull] [ItemNotNull] public IEnumerable<SimpleName> FullName => Qualifier.Append(Name).AssertNotNull();
 
         public QualifiedName(
             [NotNull] Name qualifier,
@@ -23,6 +22,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
             Requires.NotNull(nameof(simpleName), simpleName);
             Qualifier = qualifier;
             UnqualifiedName = simpleName;
+        }
+
+        public override bool HasQualifier([NotNull] Name name)
+        {
+            Requires.NotNull(nameof(name), name);
+            return Qualifier.Equals(name);
         }
 
         [NotNull]
@@ -59,11 +64,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
             return !(name1 == name2);
         }
         #endregion
-
-        public override bool IsDirectlyIn([NotNull] Name name)
-        {
-            Requires.NotNull(nameof(name), name);
-            return Qualifier.Equals(name);
-        }
     }
 }

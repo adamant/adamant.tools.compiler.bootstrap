@@ -12,10 +12,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
         [NotNull] public readonly bool IsSpecial;
 
         public SimpleName([NotNull] string text)
+            : this(text, false)
         {
-            Requires.NotNull(nameof(text), text);
-            Text = text;
-            IsSpecial = false;
         }
 
         public SimpleName([NotNull] string text, bool isSpecial)
@@ -25,10 +23,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
             IsSpecial = isSpecial;
         }
 
-        public override bool IsDirectlyIn(Name name)
+        public static implicit operator SimpleName([NotNull] string text)
+        {
+            return new SimpleName(text);
+        }
+
+        public override bool HasQualifier([NotNull] Name name)
         {
             Requires.NotNull(nameof(name), name);
-            // A simple name isn't inside any other names
+            // A simple name doesn't have a qualifier
             return false;
         }
 
@@ -64,11 +67,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
         public static bool operator !=(SimpleName name1, SimpleName name2)
         {
             return !(name1 == name2);
-        }
-
-        public static implicit operator SimpleName([NotNull] string text)
-        {
-            return new SimpleName(text);
         }
         #endregion
     }

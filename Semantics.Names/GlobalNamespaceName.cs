@@ -3,6 +3,9 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
 {
+    /// <summary>
+    /// Represents the "name" of the global namespace i.e. nothing
+    /// </summary>
     public class GlobalNamespaceName : RootName
     {
         #region Singleton

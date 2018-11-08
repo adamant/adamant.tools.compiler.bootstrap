@@ -129,13 +129,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         {
             foreach (var importedDeclaration in declarations.Values
                 .OfType<IDeclarationAnalysis>()
-                .Where(d => d.Name.IsDirectlyIn(namespaceName)))
+                .Where(d => d.Name.HasQualifier(namespaceName)))
             {
                 AddSymbol(symbols, importedDeclaration);
             }
 
             foreach (var importedDeclaration in referencedDeclarations.Where(d =>
-                d.Name.IsDirectlyIn(namespaceName)))
+                d.Name.HasQualifier(namespaceName)))
             {
                 AddSymbol(symbols, importedDeclaration);
             }
