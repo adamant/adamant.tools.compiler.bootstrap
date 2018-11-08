@@ -1,8 +1,9 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 {
     public class NameBuilder
     {
@@ -12,16 +13,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
             switch (nameSyntax)
             {
                 case QualifiedNameSyntax qualifiedNameSyntax:
-                    {
-                        var qualifier = BuildName(qualifiedNameSyntax.Qualifier);
-                        var name = qualifiedNameSyntax.Name.Name.Value;
-                        return name != null ? qualifier?.Qualify(name) ?? new SimpleName(name) : null;
-                    }
+                {
+                    var qualifier = BuildName(qualifiedNameSyntax.Qualifier);
+                    var name = qualifiedNameSyntax.Name.Name.Value;
+                    return name != null ? qualifier?.Qualify(name) ?? new SimpleName(name) : null;
+                }
                 case IdentifierNameSyntax identifierNameSyntax:
-                    {
-                        var name = identifierNameSyntax.Name.Value;
-                        return name != null ? new SimpleName(name) : null;
-                    }
+                {
+                    var name = identifierNameSyntax.Name.Value;
+                    return name != null ? new SimpleName(name) : null;
+                }
                 default:
                     throw NonExhaustiveMatchException.For(nameSyntax);
             }

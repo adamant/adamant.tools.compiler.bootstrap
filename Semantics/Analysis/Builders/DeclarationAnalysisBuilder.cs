@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
@@ -51,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
         }
 
         [NotNull]
-        AnalysisContext BuildNamespaceContext(
+        private AnalysisContext BuildNamespaceContext(
             [NotNull] AnalysisContext context,
             [NotNull] FileNamespaceDeclarationSyntax @namespace,
             [NotNull] Name name)
@@ -171,22 +172,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
             switch (syntax.Name)
             {
                 case IdentifierToken identifier:
-                    {
-                        var fullName = @namespace.Qualify(identifier.Value);
-                        return new TypeDeclarationAnalysis(context, syntax, fullName,
-                            BuildGenericParameters(context, fullName, syntax.GenericParameters));
-                    }
+                {
+                    var fullName = @namespace.Qualify(identifier.Value);
+                    return new TypeDeclarationAnalysis(context, syntax, fullName,
+                        BuildGenericParameters(context, fullName, syntax.GenericParameters));
+                }
                 case MissingToken _:
                 default:
                     // Skip any struct that doesn't have a name
                     return null;
                 case IPrimitiveTypeToken primitive:
-                    {
-                        var name = new SimpleName(context.File.Code[primitive.Span], true);
-                        return new TypeDeclarationAnalysis(context, syntax,
-                            name,
-                            BuildGenericParameters(context, name, syntax.GenericParameters));
-                    }
+                {
+                    var name = new SimpleName(context.File.Code[primitive.Span], true);
+                    return new TypeDeclarationAnalysis(context, syntax,
+                        name,
+                        BuildGenericParameters(context, name, syntax.GenericParameters));
+                }
             }
         }
 

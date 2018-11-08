@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Semantics</AssemblyName>
-    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Semantics</RootNamespace>
+    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Semantics.Types</AssemblyName>
+    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Semantics.Types</RootNamespace>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
@@ -16,10 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj" />
+    <ProjectReference Include="..\Framework\Framework.csproj" />
     <ProjectReference Include="..\Semantics.Names\Semantics.Names.csproj" />
-    <ProjectReference Include="..\Semantics.Types\Semantics.Types.csproj" />
-    <ProjectReference Include="..\Syntax\Syntax.csproj" />
   </ItemGroup>
 
 </Project>
