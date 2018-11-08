@@ -225,9 +225,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     // TODO check that expression type matches function return type
                     expression.Type = ObjectType.Never;
                     break;
-                case IntegerLiteralExpressionAnalysis _:
-                    // TODO do proper type inference
-                    expression.Type = ObjectType.Int;
+                case IntegerLiteralExpressionAnalysis integerLiteral:
+                    expression.Type = new IntegerConstantType(integerLiteral.Value);
                     break;
                 case StringLiteralExpressionAnalysis _:
                     // TODO what about interpolated expressions?
@@ -506,10 +505,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             switch (@operator)
             {
                 case PlusToken _:
+                    typeError = CheckNumericOperator(
+                        binaryOperatorExpression.LeftOperand,
+                        binaryOperatorExpression.RightOperand,
+                        null);
+                    binaryOperatorExpression.Type = !typeError ? leftOperand : DataType.Unknown;
+                    break;
                 case PlusEqualsToken _:
-                    typeError = (leftOperand != rightOperand || leftOperand == ObjectType.Bool)
-                        // TODO really pointer arithmetic should allow `size` and `offset`, but we don't have constants working correct yet
-                        && !(leftOperand is PointerType && (rightOperand == ObjectType.Size || rightOperand == ObjectType.Int));
+                    typeError = CheckNumericOperator(
+                        binaryOperatorExpression.LeftOperand,
+                        binaryOperatorExpression.RightOperand,
+                        binaryOperatorExpression.LeftOperand.Type as KnownType);
+                    //typeError = (leftOperand != rightOperand || leftOperand == ObjectType.Bool)
+                    //    // TODO really pointer arithmetic should allow `size` and `offset`, but we don't have constants working correct yet
+                    //    && !(leftOperand is PointerType && (rightOperand == ObjectType.Size || rightOperand == ObjectType.Int));
                     binaryOperatorExpression.Type = !typeError ? leftOperand : DataType.Unknown;
                     break;
                 case AsteriskEqualsToken _:
@@ -561,7 +570,51 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             }
             if (typeError)
                 diagnostics.Publish(TypeError.OperatorCannotBeAppliedToOperandsOfType(binaryOperatorExpression.Context.File,
-                    binaryOperatorExpression.Syntax.Span, @operator, leftOperand, rightOperand));
+                    binaryOperatorExpression.Syntax.Span, @operator,
+                    binaryOperatorExpression.LeftOperand.Type,
+                    binaryOperatorExpression.RightOperand.Type));
+        }
+
+        private bool CheckNumericOperator(
+            [NotNull] ExpressionAnalysis leftOperand,
+            [NotNull] ExpressionAnalysis rightOperand,
+            [CanBeNull] KnownType expectedResultType)
+        {
+            switch (leftOperand.Type)
+            {
+                case PointerType _:
+                {
+                    if (rightOperand.Type is IntegerConstantType)
+                        // TODO it may need to be size
+                        rightOperand.Type = ObjectType.Offset;
+
+                    return rightOperand.Type != ObjectType.Size &&
+                           rightOperand.Type != ObjectType.Offset;
+                }
+                case IntegerConstantType _:
+                    if (IsIntegerType(rightOperand.Type))
+                        // TODO may need to promote based on size
+                        leftOperand.Type = rightOperand.Type;
+
+                    return !IsIntegerType(rightOperand.Type);
+                case ObjectType type when IsIntegerType(type):
+                    if (rightOperand.Type is IntegerConstantType)
+                        // TODO it may need to be size
+                        rightOperand.Type = leftOperand.Type;
+
+                    return !IsIntegerType(rightOperand.Type);
+                default:
+                    throw NonExhaustiveMatchException.For(leftOperand.Type);
+            }
+        }
+
+        private static bool IsIntegerType(DataType type)
+        {
+            return type == ObjectType.Byte
+                   || type == ObjectType.Int
+                   || type == ObjectType.UInt
+                   || type == ObjectType.Size
+                   || type == ObjectType.Offset;
         }
 
         private void CheckUnaryOperator(

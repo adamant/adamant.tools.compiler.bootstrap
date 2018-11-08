@@ -133,6 +133,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case WhileExpressionAnalysis @while:
                     // TODO actually convert the expression
                     break;
+                case LoopExpressionAnalysis loop:
+                    // TODO actually convert the expression
+                    break;
                 case UnsafeExpressionAnalysis unsafeExpression:
                     Convert(cfg, unsafeExpression.Expression, currentBlock);
                     break;

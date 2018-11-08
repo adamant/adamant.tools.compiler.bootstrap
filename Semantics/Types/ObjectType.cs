@@ -20,6 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
         [NotNull] public static readonly ObjectType UInt = new ObjectType(new SimpleName("uint", true), false, false);
         [NotNull] public static readonly ObjectType Byte = new ObjectType(new SimpleName("byte", true), false, false);
         [NotNull] public static readonly ObjectType Size = new ObjectType(new SimpleName("size", true), false, false);
+        [NotNull] public static readonly ObjectType Offset = new ObjectType(new SimpleName("offset", true), false, false);
         [NotNull] public static readonly ObjectType Bool = new ObjectType(new SimpleName("bool", true), false, false);
         [NotNull] public static readonly ObjectType String = new ObjectType(new SimpleName("string", true), false, false);
         [NotNull] public static readonly ObjectType Type = new ObjectType(new SimpleName("type", true), true, false);
