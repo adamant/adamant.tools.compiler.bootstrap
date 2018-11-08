@@ -14,6 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
             typeof(PublicKeywordToken),
             typeof(ProtectedKeywordToken),
             typeof(PrivateKeywordToken),
+            typeof(InternalKeywordToken),
             typeof(LetKeywordToken),
             typeof(VarKeywordToken),
             typeof(VoidKeywordToken),
@@ -101,6 +102,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
     public class PrivateKeywordToken : KeywordToken, IPrivateKeywordToken
     {
         public PrivateKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface IInternalKeywordToken : IKeywordToken { }
+    public class InternalKeywordToken : KeywordToken, IInternalKeywordToken
+    {
+        public InternalKeywordToken(TextSpan span)
             : base(span)
         {
         }
@@ -667,6 +677,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
         IPublicKeywordToken,
         IProtectedKeywordToken,
         IPrivateKeywordToken,
+        IInternalKeywordToken,
         ILetKeywordToken,
         IVarKeywordToken,
         IVoidKeywordToken,

@@ -45,6 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                 case PublicKeywordToken _:
                 case ProtectedKeywordToken _:
                 case PrivateKeywordToken _:
+                case InternalKeywordToken _:
                     return new AccessModifierSyntax(tokens.Expect<IAccessModifierToken>());
                 default:
                     return null; // This parser needs to be able to return null

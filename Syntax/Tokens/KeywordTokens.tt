@@ -10,6 +10,7 @@
         "Public",
         "Protected",
         "Private",
+        "Internal",
         "Let",
         "Var",
         "Void",

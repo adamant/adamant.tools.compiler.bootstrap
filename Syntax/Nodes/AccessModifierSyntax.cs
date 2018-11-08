@@ -26,6 +26,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
                 case PrivateKeywordToken _:
                     Modifier = AccessModifier.Private;
                     break;
+                case InternalKeywordToken _:
+                    Modifier = AccessModifier.Internal;
+                    break;
                 default:
                     // must be of those type
                     Requires.That(nameof(token), false);

@@ -5,5 +5,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         Private = 1,
         Protected,
         Public,
+        Internal,
     }
 }
