@@ -318,7 +318,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     var calleeType = genericInvocation.Callee.Type.AssertComputed();
                     if (calleeType is OverloadedType overloadedType)
                     {
-                        genericInvocation.Callee.Type.Computed(calleeType = overloadedType.Types
+                        genericInvocation.Callee.Type.Resolve(calleeType = overloadedType.Types
                             .OfType<GenericType>()
                             .Single(t => t.GenericArity == genericInvocation.GenericArity));
                     }

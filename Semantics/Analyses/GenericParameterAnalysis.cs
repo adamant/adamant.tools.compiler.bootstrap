@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
         [NotNull] public Name Name { get; }
         // TypeExpression can be null for self parameters
         [CanBeNull] public ExpressionAnalysis TypeExpression { get; }
-        [CanBeNull] public TypeAnalysis Type { get; set; }
+        [NotNull] public TypeAnalysis Type { get; } = new TypeAnalysis();
 
         public GenericParameterAnalysis(
             [NotNull] AnalysisContext context,
