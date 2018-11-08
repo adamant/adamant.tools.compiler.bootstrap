@@ -97,6 +97,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis.Builders
                     return new WhileExpressionAnalysis(context, whileExpression,
                         BuildExpression(context, functionName, whileExpression.Condition),
                         BuildBlock(context, functionName, whileExpression.Block));
+                case LoopExpressionSyntax loopExpression:
+                    return new LoopExpressionAnalysis(context, loopExpression,
+                        BuildBlock(context, functionName, loopExpression.Block));
+                case BreakExpressionSyntax breakExpression:
+                    return new BreakExpressionAnalysis(context, breakExpression,
+                        breakExpression.Expression != null ? BuildExpression(context, functionName, breakExpression.Expression) : null);
                 case InvocationSyntax invocation:
                     return new InvocationAnalysis(context, invocation,
                         BuildExpression(context, functionName, invocation.Callee),

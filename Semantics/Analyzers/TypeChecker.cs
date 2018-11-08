@@ -289,6 +289,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     // TODO assign correct type to the expression
                     whileExpression.Type = DataType.Unknown;
                     break;
+                case LoopExpressionAnalysis loopExpression:
+                    CheckExpression(loopExpression.Block, diagnostics);
+                    // TODO assign correct type to the expression
+                    loopExpression.Type = DataType.Unknown;
+                    break;
                 case InvocationAnalysis invocation:
                     CheckExpression(invocation.Callee, diagnostics);
                     // TODO the callee needs to be something callable
@@ -392,6 +397,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     // TODO look up the member
                     // TODO assign a type to the expression
                     memberAccess.Type = DataType.Unknown;
+                    break;
+                case BreakExpressionAnalysis breakExpression:
+                    CheckExpression(breakExpression.Expression, diagnostics);
+                    breakExpression.Type = ObjectType.Never;
                     break;
                 case null:
                     // Omitted expressions don't need any checking

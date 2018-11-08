@@ -63,63 +63,63 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             switch (scope)
             {
                 case FunctionScope functionScope:
-                    {
-                        var function =
-                            (FunctionDeclarationAnalysis)declarations[functionScope.Syntax]
-                                .AssertNotNull();
+                {
+                    var function =
+                        (FunctionDeclarationAnalysis)declarations[functionScope.Syntax]
+                            .AssertNotNull();
 
-                        foreach (var parameter in function.Parameters)
-                            AddSymbol(symbols, parameter);
+                    foreach (var parameter in function.Parameters)
+                        AddSymbol(symbols, parameter);
 
-                        foreach (var declaration in function.Statements
-                            .OfType<VariableDeclarationStatementAnalysis>())
-                            AddSymbol(symbols, declaration);
+                    foreach (var declaration in function.Statements
+                        .OfType<VariableDeclarationStatementAnalysis>())
+                        AddSymbol(symbols, declaration);
 
-                        functionScope.Bind(symbols);
+                    functionScope.Bind(symbols);
 
-                        var blocks = new Dictionary<ExpressionSyntax, ILocalVariableScopeAnalysis>();
-                        GetVariableScopes(function.Statements, blocks);
-                        var bodyScope = functionScope.NestedScopes.Cast<LocalVariableScope>()
-                            .SingleOrDefault();
-                        if (bodyScope != null)
-                            BindBlockScope(bodyScope, blocks);
-                    }
-                    break;
+                    var blocks = new Dictionary<ExpressionSyntax, ILocalVariableScopeAnalysis>();
+                    GetVariableScopes(function.Statements, blocks);
+                    var bodyScope = functionScope.NestedScopes.Cast<LocalVariableScope>()
+                        .SingleOrDefault();
+                    if (bodyScope != null)
+                        BindBlockScope(bodyScope, blocks);
+                }
+                break;
                 case NamespaceScope namespaceScope:
-                    {
-                        AddSymbolsInNamespace(symbols, namespaceScope.Name);
-                        namespaceScope.Bind(symbols);
-                        foreach (var nestedScope in namespaceScope.NestedScopes)
-                            BindScope(nestedScope);
-                    }
-                    break;
+                {
+                    AddSymbolsInNamespace(symbols, namespaceScope.Name);
+                    namespaceScope.Bind(symbols);
+                    foreach (var nestedScope in namespaceScope.NestedScopes)
+                        BindScope(nestedScope);
+                }
+                break;
                 case GenericsScope genericsScope:
-                    {
-                        var declaration = (MemberDeclarationAnalysis)declarations[genericsScope.Syntax].AssertNotNull();
-                        foreach (var parameter in declaration.GenericParameters.AssertNotNull())
-                            AddSymbol(symbols, parameter);
+                {
+                    var declaration = (MemberDeclarationAnalysis)declarations[genericsScope.Syntax].AssertNotNull();
+                    foreach (var parameter in declaration.GenericParameters.AssertNotNull())
+                        AddSymbol(symbols, parameter);
 
-                        genericsScope.Bind(symbols);
+                    genericsScope.Bind(symbols);
 
-                        foreach (var nestedScope in genericsScope.NestedScopes)
-                            BindScope(nestedScope);
-                    }
-                    break;
+                    foreach (var nestedScope in genericsScope.NestedScopes)
+                        BindScope(nestedScope);
+                }
+                break;
                 case UsingDirectivesScope usingDirectivesScope:
+                {
+                    var declaration = (NamespaceDeclarationAnalysis)declarations[usingDirectivesScope.Syntax].AssertNotNull();
+                    foreach (var usingDirective in declaration.Syntax.UsingDirectives)
                     {
-                        var declaration = (NamespaceDeclarationAnalysis)declarations[usingDirectivesScope.Syntax].AssertNotNull();
-                        foreach (var usingDirective in declaration.Syntax.UsingDirectives)
-                        {
-                            var usingNamespace = nameBuilder.BuildName(usingDirective.Name).AssertNotNull();
-                            AddSymbolsInNamespace(symbols, usingNamespace);
-                        }
-
-                        usingDirectivesScope.Bind(symbols);
-
-                        foreach (var nestedScope in usingDirectivesScope.NestedScopes)
-                            BindScope(nestedScope);
+                        var usingNamespace = nameBuilder.BuildName(usingDirective.Name).AssertNotNull();
+                        AddSymbolsInNamespace(symbols, usingNamespace);
                     }
-                    break;
+
+                    usingDirectivesScope.Bind(symbols);
+
+                    foreach (var nestedScope in usingDirectivesScope.NestedScopes)
+                        BindScope(nestedScope);
+                }
+                break;
                 default:
                     throw NonExhaustiveMatchException.For(scope);
             }
@@ -200,6 +200,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     GetVariableScopes(whileExpression.Condition, scopes);
                     GetVariableScopes(whileExpression.Block, scopes);
                     break;
+                case LoopExpressionAnalysis loopExpression:
+                    GetVariableScopes(loopExpression.Block, scopes);
+                    break;
                 case InvocationAnalysis invocation:
                     foreach (var argument in invocation.Arguments)
                         GetVariableScopes(argument.Value, scopes);
@@ -230,6 +233,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     break;
                 case ResultExpressionAnalysis resultExpression:
                     GetVariableScopes(resultExpression.Expression, scopes);
+                    break;
+                case BreakExpressionAnalysis breakExpression:
+                    if (breakExpression.Expression != null)
+                        GetVariableScopes(breakExpression.Expression, scopes);
                     break;
                 case IntegerLiteralExpressionAnalysis _:
                 case IdentifierNameAnalysis _:
