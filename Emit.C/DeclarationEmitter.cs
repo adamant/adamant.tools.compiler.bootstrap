@@ -12,13 +12,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
     {
         [NotNull] private readonly NameMangler nameMangler;
         [NotNull] private readonly IConverter<Parameter> parameterConverter;
-        [NotNull] private readonly IConverter<KnownType> typeConverter;
+        [NotNull] private readonly IConverter<DataType> typeConverter;
         [NotNull] private readonly IEmitter<ControlFlowGraph> controlFlowEmitter;
 
         public DeclarationEmitter(
             [NotNull] NameMangler nameMangler,
             [NotNull] IConverter<Parameter> parameterConverter,
-            [NotNull] IConverter<KnownType> typeConverter,
+            [NotNull] IConverter<DataType> typeConverter,
             [NotNull] IEmitter<ControlFlowGraph> controlFlowEmitter)
         {
             Requires.NotNull(nameof(nameMangler), nameMangler);
@@ -54,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
             var name = nameMangler.MangleName(function);
             var parameters = Convert(function.Parameters);
-            var returnType = typeConverter.Convert(function.ReturnType);
+            var returnType = typeConverter.Convert(function.ReturnType.AssertResolved());
 
             // Write out the function declaration for C so we can call functions defined after others
             code.FunctionDeclarations.AppendLine($"{returnType} {name}({parameters});");

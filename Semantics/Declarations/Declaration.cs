@@ -12,12 +12,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations
     {
         [NotNull] public CodeFile File { get; }
         [NotNull] public Name Name { get; }
-        [NotNull] public DataType Type { get; } // TODO that should be a known type
+        [NotNull] public DataType Type { get; }
 
         protected Declaration(
             [NotNull] CodeFile file,
             [NotNull] Name name,
-            [NotNull] KnownType type)
+            [NotNull] DataType type)
         {
             Requires.NotNull(nameof(file), file);
             Requires.NotNull(nameof(name), name);

@@ -12,13 +12,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         [CanBeNull] public string Name = null;
         public readonly bool IsParameter;
         public readonly bool MutableBinding;
-        [NotNull] public readonly KnownType Type;
+        [NotNull] public readonly DataType Type;
         [NotNull] public readonly VariableReference Reference;
 
         public LocalVariableDeclaration(
             bool isParameter,
             bool mutableBinding,
-            [NotNull] KnownType type,
+            [NotNull] DataType type,
             int number)
         {
             IsParameter = isParameter;

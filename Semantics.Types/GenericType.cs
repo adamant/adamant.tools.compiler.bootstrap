@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
 {
-    public abstract class GenericType : KnownType
+    public abstract class GenericType : DataType
     {
         [CanBeNull, ItemNotNull] public abstract IReadOnlyList<DataType> GenericParameterTypes { get; }
         public int? GenericArity => GenericParameterTypes?.Count;

@@ -21,12 +21,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [NotNull]
-        [ItemNotNull]
-        public static IEnumerable<T> AssertItemNotNull<T>([NotNull][ItemCanBeNull] this IEnumerable<T> values)
+        [ContractAnnotation("null => null; notnull => notnull"), ItemNotNull]
+        public static IEnumerable<T> AssertItemNotNull<T>([CanBeNull, ItemCanBeNull] this IEnumerable<T> values)
             where T : class
         {
-            return values.Select(value => value ?? throw new InvalidOperationException());
+            return values?.Select(value => value ?? throw new InvalidOperationException());
         }
     }
 }

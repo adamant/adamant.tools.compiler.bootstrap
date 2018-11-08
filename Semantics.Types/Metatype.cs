@@ -26,14 +26,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
 
         public override IReadOnlyList<DataType> GenericParameterTypes => Instance.GenericParameterTypes;
         public override IReadOnlyList<DataType> GenericArguments => Instance.GenericArguments;
+        public override bool IsResolved { get; }
 
         public Metatype([NotNull]ObjectType objectType)
         {
             Requires.NotNull(nameof(objectType), objectType);
             Name = objectType.Name;
             Instance = objectType;
+            IsResolved = objectType.IsResolved;
         }
 
+        [NotNull]
         public override string ToString()
         {
             throw new System.NotImplementedException();

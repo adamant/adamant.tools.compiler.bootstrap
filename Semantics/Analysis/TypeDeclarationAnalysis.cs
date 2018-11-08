@@ -4,7 +4,6 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using JetBrains.Annotations;
 
@@ -13,7 +12,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
     public class TypeDeclarationAnalysis : MemberDeclarationAnalysis
     {
         [NotNull] public new MemberDeclarationSyntax Syntax { get; }
-        [CanBeNull] public new DataType Type { get; set; }
 
         public TypeDeclarationAnalysis(
             [NotNull] AnalysisContext context,
@@ -27,16 +25,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         }
 
         [CanBeNull]
-        protected override DataType GetDataType()
-        {
-            return Type;
-        }
-
-        [CanBeNull]
         public override Declaration Complete([NotNull] DiagnosticsBuilder diagnostics)
         {
             if (CompleteDiagnostics(diagnostics)) return null;
-            return new TypeDeclaration(Context.File, Name, Type.AssertKnown(), GenericParameters?.Select(p => p.Complete()));
+            return new TypeDeclaration(Context.File, Name, Type.AssertResolved(), GenericParameters?.Select(p => p.Complete()));
         }
     }
 }

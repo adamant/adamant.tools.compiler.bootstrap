@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C.Fakes
 {
-    public class FakeAdamantType : KnownType
+    public class FakeAdamantType : DataType
     {
         private readonly Guid instance;
 
@@ -11,6 +11,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C.Fakes
         {
             instance = Guid.NewGuid();
         }
+
+        public override bool IsResolved => true;
 
         public override string ToString()
         {

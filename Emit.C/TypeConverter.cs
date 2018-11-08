@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
-    public class TypeConverter : IConverter<KnownType>
+    public class TypeConverter : IConverter<DataType>
     {
         [NotNull] private readonly NameMangler nameMangler;
 
@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             this.nameMangler = nameMangler;
         }
 
-        public string Convert([NotNull] KnownType type)
+        public string Convert([NotNull] DataType type)
         {
             Requires.NotNull(nameof(type), type);
             switch (type)
@@ -26,9 +26,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 case ObjectType t:
                     return nameMangler.Mangle(t);
                 case LifetimeType lifetimeType:
-                    return Convert(lifetimeType.Type);
+                    return Convert(lifetimeType.Referent);
                 case PointerType ptr:
-                    var referenced = ptr.ReferencedType.AssertKnown();
+                    var referenced = ptr.Referent.AssertResolved();
                     if (referenced == ObjectType.Any)
                         return "void*";
 

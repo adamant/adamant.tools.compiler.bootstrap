@@ -4,12 +4,12 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
 {
-    public abstract class AnalysisNode
+    public abstract class SyntaxAnalysis
     {
         [NotNull] public AnalysisContext Context { get; }
         [NotNull] public SyntaxNode Syntax { get; }
 
-        protected AnalysisNode(
+        protected SyntaxAnalysis(
             [NotNull] AnalysisContext context,
             [NotNull] SyntaxNode syntax)
         {

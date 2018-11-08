@@ -31,9 +31,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             function.ControlFlow = cfg;
 
             // Temp Variable for return
-            cfg.Let(function.ReturnType.AssertKnown());
+            cfg.Let(function.ReturnType.AssertResolved());
             foreach (var parameter in function.Parameters)
-                cfg.AddParameter(parameter.MutableBinding, parameter.Type.AssertKnown(), parameter.Name.UnqualifiedName.Text);
+                cfg.AddParameter(parameter.MutableBinding, parameter.Type.AssertResolved(), parameter.Name.UnqualifiedName.Text);
 
             var blocks = new Dictionary<SyntaxNode, BasicBlock>();
             var entryBlock = cfg.EntryBlock;
@@ -64,7 +64,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             {
                 case VariableDeclarationStatementAnalysis variableDeclaration:
                     var variable = cfg.AddVariable(variableDeclaration.MutableBinding,
-                        variableDeclaration.Type.AssertKnown(),
+                        variableDeclaration.Type.AssertResolved(),
                         variableDeclaration.Name.UnqualifiedName.Text);
                     if (variableDeclaration.Initializer != null)
                         ConvertAssignment(cfg, variable.Reference, variableDeclaration.Initializer, currentBlock);
@@ -82,7 +82,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         private static bool IsOwned([NotNull] VariableDeclarationStatementAnalysis declaration)
         {
             Requires.NotNull(nameof(declaration), declaration);
-            if (declaration.Type is LifetimeType type)
+            if (declaration.Type.AssertResolved() is LifetimeType type)
                 return type.IsOwned;
 
             return false;
@@ -108,7 +108,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                             break;
                         default:
                             // Could be side effects possibly.
-                            var temp = cfg.Let(binaryOperatorExpression.Type.AssertKnown());
+                            var temp = cfg.Let(binaryOperatorExpression.Type.AssertResolved());
                             ConvertAssignment(cfg, temp.Reference, expression, currentBlock);
                             break;
                     }
@@ -162,7 +162,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             {
                 case NewObjectExpressionAnalysis newObjectExpression:
                     var args = newObjectExpression.Arguments.Select(a => ConvertToLValue(cfg, a.Value));
-                    currentBlock.Add(new NewObjectStatement(lvalue, newObjectExpression.Type.AssertKnown(), args));
+                    currentBlock.Add(new NewObjectStatement(lvalue, newObjectExpression.Type.AssertResolved(), args));
                     break;
                 case IdentifierNameAnalysis identifier:
                     currentBlock.Add(new AssignmentStatement(lvalue, LookupVariable(cfg, identifier.Name.AssertNotNull())));

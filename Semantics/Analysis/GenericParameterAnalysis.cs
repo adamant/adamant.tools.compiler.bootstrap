@@ -3,19 +3,20 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
 {
-    public class GenericParameterAnalysis : AnalysisNode, IDeclarationAnalysis
+    public class GenericParameterAnalysis : SyntaxAnalysis, IDeclarationAnalysis
     {
         [NotNull] public new GenericParameterSyntax Syntax { get; }
         [NotNull] public Name Name { get; }
         // TypeExpression can be null for self parameters
         [CanBeNull] public ExpressionAnalysis TypeExpression { get; }
-        [CanBeNull] public DataType Type { get; set; }
+        [CanBeNull] public TypeAnalysis Type { get; set; }
 
         public GenericParameterAnalysis(
             [NotNull] AnalysisContext context,
@@ -30,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             TypeExpression = typeExpression;
         }
 
-        IEnumerable<DataType> ISymbol.Types => Type.YieldValue();
+        IEnumerable<DataType> ISymbol.Types => Type.DataType.YieldValue();
         ISymbol ISymbol.ComposeWith(ISymbol symbol)
         {
             if (symbol is CompositeSymbol composite)
@@ -41,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         [NotNull]
         public GenericParameter Complete()
         {
-            return new GenericParameter(Name, Type.AssertKnown());
+            return new GenericParameter(Name, Type.AssertResolved());
         }
     }
 }

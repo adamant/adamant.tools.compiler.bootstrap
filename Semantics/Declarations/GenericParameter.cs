@@ -8,11 +8,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations
     public class GenericParameter
     {
         [NotNull] public Name Name { get; }
-        [NotNull] public KnownType Type { get; internal set; }
+        [NotNull] public DataType Type { get; internal set; }
 
         public GenericParameter(
             [NotNull] Name name,
-            [NotNull] KnownType type)
+            [NotNull] DataType type)
         {
             Requires.NotNull(nameof(name), name);
             Requires.NotNull(nameof(type), type);

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -11,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         [NotNull] [ItemNotNull] public IReadOnlyList<LocalVariableDeclaration> VariableDeclarations { get; }
         [NotNull] [ItemNotNull] private readonly List<LocalVariableDeclaration> variableDeclarations = new List<LocalVariableDeclaration>();
         [NotNull] public LocalVariableDeclaration ReturnVariable => variableDeclarations[0];
-        [NotNull] public KnownType ReturnType => ReturnVariable.Type;
+        [NotNull] public Object ReturnType => ReturnVariable.Type;
         //[NotNull] [ItemNotNull] public IEnumerable<LocalVariableDeclaration> Parameters => variableDeclarations.Skip(1).Take(Arity);
         [NotNull] [ItemNotNull] public IReadOnlyList<BasicBlock> BasicBlocks { get; }
         [NotNull] [ItemNotNull] private readonly List<BasicBlock> basicBlocks = new List<BasicBlock>();
@@ -26,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         }
 
         [NotNull]
-        public LocalVariableDeclaration AddParameter(bool mutableBinding, [NotNull] KnownType type, [CanBeNull] string name)
+        public LocalVariableDeclaration AddParameter(bool mutableBinding, [NotNull] DataType type, [CanBeNull] string name)
         {
             Requires.NotNull(nameof(type), type);
             var variable = new LocalVariableDeclaration(true, mutableBinding, type, variableDeclarations.Count)
@@ -38,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         }
 
         [NotNull]
-        public LocalVariableDeclaration AddVariable(bool mutableBinding, [NotNull] KnownType type, [CanBeNull] string name = null)
+        public LocalVariableDeclaration AddVariable(bool mutableBinding, [NotNull] DataType type, [CanBeNull] string name = null)
         {
             Requires.NotNull(nameof(type), type);
             var variable = new LocalVariableDeclaration(false, mutableBinding, type, variableDeclarations.Count)
@@ -50,14 +51,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         }
 
         [NotNull]
-        public LocalVariableDeclaration Let([NotNull] KnownType type)
+        public LocalVariableDeclaration Let([NotNull] DataType type)
         {
             Requires.NotNull(nameof(type), type);
             return AddVariable(false, type);
         }
 
         [NotNull]
-        public LocalVariableDeclaration Var([NotNull] KnownType type)
+        public LocalVariableDeclaration Var([NotNull] DataType type)
         {
             Requires.NotNull(nameof(type), type);
             return AddVariable(true, type);

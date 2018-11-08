@@ -91,7 +91,7 @@ typedef struct { ᵢMy_Type´0·ₐV_Table const*_Nonnull restrict ₐvtable; �
         {
             var nameMangler = new NameMangler();
             var parameterConverter = new FakeConverter<Parameter>();
-            var typeConvert = new FakeConverter<KnownType>();
+            var typeConvert = new FakeConverter<DataType>();
             var controlFlowEmitter = new FakeEmitter<ControlFlowGraph>();
             return new DeclarationEmitter(nameMangler, parameterConverter, typeConvert, controlFlowEmitter);
         }

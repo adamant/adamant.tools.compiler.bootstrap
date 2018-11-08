@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations
         public TypeDeclaration(
             [NotNull] CodeFile file,
             [NotNull] Name name,
-            [NotNull] KnownType type,
+            [NotNull] DataType type,
             [CanBeNull, ItemNotNull] IEnumerable<GenericParameter> genericParameters)
             : base(file, name, type)
         {

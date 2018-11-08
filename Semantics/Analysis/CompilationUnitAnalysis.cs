@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
 {
-    public class CompilationUnitAnalysis : AnalysisNode
+    public class CompilationUnitAnalysis : SyntaxAnalysis
     {
         [NotNull] public CompilationUnitScope GlobalScope { get; }
         [NotNull] public new CompilationUnitSyntax Syntax { get; }

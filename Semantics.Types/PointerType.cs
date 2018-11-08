@@ -3,19 +3,21 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
 {
-    public class PointerType : KnownType
+    public class PointerType : DataType
     {
-        [NotNull] public readonly DataType ReferencedType;
+        [NotNull] public readonly DataType Referent;
+        public override bool IsResolved { get; }
 
-        public PointerType([NotNull] DataType referencedType)
+        public PointerType([NotNull] DataType referent)
         {
-            Requires.NotNull(nameof(referencedType), referencedType);
-            ReferencedType = referencedType;
+            Requires.NotNull(nameof(referent), referent);
+            Referent = referent;
+            IsResolved = referent.IsResolved;
         }
 
         public override string ToString()
         {
-            return "@" + ReferencedType;
+            return "@" + Referent;
         }
     }
 }

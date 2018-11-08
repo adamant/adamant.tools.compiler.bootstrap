@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
 {
-    public abstract class DeclarationAnalysis : AnalysisNode
+    public abstract class DeclarationAnalysis : SyntaxAnalysis
     {
         [NotNull] public new DeclarationSyntax Syntax { get; }
 

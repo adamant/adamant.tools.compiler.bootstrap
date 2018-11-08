@@ -1,4 +1,5 @@
 using System.Numerics;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
 {
@@ -8,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
     /// variable. It is not a `KnownType` because all expressions should have
     /// their types inferred to some specific type.
     /// </summary>
-    public class IntegerConstantType : DataType
+    public class IntegerConstantType : UnresolvedType
     {
         public readonly BigInteger Value;
 
@@ -19,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
 
         public override string ToString()
         {
-            return $"⧼{Value}⧽";
+            return Value.ToString().AssertNotNull();
         }
     }
 }

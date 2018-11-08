@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
 {
-    public class ArgumentAnalysis : AnalysisNode
+    public class ArgumentAnalysis : SyntaxAnalysis
     {
         [NotNull] public new ArgumentSyntax Syntax { get; }
         [NotNull] public ExpressionAnalysis Value { get; }

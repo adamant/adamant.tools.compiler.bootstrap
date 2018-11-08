@@ -34,6 +34,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
         public bool IsGeneric => GenericParameterTypes != null;
         [CanBeNull, ItemCanBeNull] public override IReadOnlyList<DataType> GenericArguments { get; }
         public bool IsMutable { get; }
+        // TODO deal with the generic parameters and arguments
+        public override bool IsResolved => true;
 
         private ObjectType(
             [NotNull] Name name,
@@ -58,7 +60,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             [NotNull] Name name,
             bool isReferenceType,
             bool declaredMutable,
-            [NotNull, ItemNotNull] IEnumerable<DataType> genericParameterTypes)
+            [CanBeNull, ItemNotNull] IEnumerable<DataType> genericParameterTypes)
             : this(name, isReferenceType, declaredMutable, genericParameterTypes, null)
         {
         }

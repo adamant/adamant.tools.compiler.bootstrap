@@ -5,6 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using JetBrains.Annotations;
@@ -21,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
         public int? GenericArity => GenericParameters?.Count;
         // This is the type of the value provided by using the name. So for
         // classes, it is the metatype, for functions, the function type
-        [CanBeNull] public DataType Type => GetDataType();
+        [NotNull] public TypeAnalysis Type { get; } = new TypeAnalysis();
 
         protected MemberDeclarationAnalysis(
             [NotNull] AnalysisContext context,
@@ -37,10 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analysis
             GenericParameters = genericParameters?.ToReadOnlyList();
         }
 
-        [CanBeNull]
-        protected abstract DataType GetDataType();
-
-        IEnumerable<DataType> ISymbol.Types => Type.YieldValue();
+        IEnumerable<DataType> ISymbol.Types => Type.DataType.YieldValue();
         ISymbol ISymbol.ComposeWith(ISymbol symbol)
         {
             if (symbol is CompositeSymbol composite)

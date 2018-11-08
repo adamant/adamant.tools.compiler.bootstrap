@@ -1,22 +1,26 @@
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
 {
-    public class RefType : KnownType
+    public class RefType : DataType
     {
         public bool VariableBinding { get; }
-        [CanBeNull] public KnownType ReferencedType { get; }
+        [NotNull] public ObjectType Referent { get; }
+        public override bool IsResolved { get; }
 
-        public RefType(bool variableBinding, [CanBeNull] KnownType referencedType)
+        public RefType(bool variableBinding, [NotNull] ObjectType referent)
         {
+            Requires.NotNull(nameof(referent), referent);
             VariableBinding = variableBinding;
-            ReferencedType = referencedType;
+            Referent = referent;
+            IsResolved = referent.IsResolved;
         }
 
         [NotNull]
         public override string ToString()
         {
-            return (VariableBinding ? "ref var " : "ref ") + ReferencedType;
+            return (VariableBinding ? "ref var " : "ref ") + Referent;
         }
     }
 }

@@ -8,14 +8,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
     public static class EnumerableExtensions
     {
         [NotNull]
-        public static IEnumerable<T> Yield<T>(this T value)
+        [ItemCanBeNull]
+        public static IEnumerable<T> Yield<T>([CanBeNull] this T value)
         {
             yield return value;
         }
 
-        [NotNull]
-        [ItemNotNull]
-        public static IEnumerable<T> YieldValue<T>(this T value)
+        [NotNull, ItemNotNull]
+        public static IEnumerable<T> YieldValue<T>([CanBeNull] this T value)
             where T : class
         {
             if (value != null)

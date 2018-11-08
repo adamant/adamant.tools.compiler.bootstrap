@@ -6,17 +6,20 @@ using JetBrains.Annotations;
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
 {
     /// <summary>
-    /// A function type is the type of a declared function, method or constructor.
-    /// If a function is also a generic function, its type will be a
-    /// `MetaFunctionType` whose result is a function type.
+    /// A meta-function is a function that operates at the meta level. That is,
+    /// it is "evaluated" at compile time. A type constructor has a meta-function
+    /// type. For example, a class `Foo[T]` has the type `[type] -> type`.
+    /// However, generic functions also have meta-function types. For example,
+    /// the `size_of` function which has the type `[type] -> size`.
     /// </summary>
-    public class FunctionType : DataType
+    public class MetaFunctionType : DataType
     {
-        [NotNull, ItemNotNull] public readonly IReadOnlyList<DataType> ParameterTypes;
-        [NotNull] public readonly DataType ResultType;
+        [NotNull, ItemNotNull] public IReadOnlyList<DataType> ParameterTypes { get; }
+        public int Arity => ParameterTypes.Count;
+        [NotNull] public DataType ResultType { get; }
         public override bool IsResolved { get; }
 
-        public FunctionType(
+        public MetaFunctionType(
             [NotNull, ItemNotNull] IEnumerable<DataType> parameterTypes,
             [NotNull] DataType resultType)
         {
@@ -29,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
 
         public override string ToString()
         {
-            return $"({string.Join(',', ParameterTypes)}) -> {ResultType}";
+            return $"[{string.Join(',', ParameterTypes)}] -> {ResultType}";
         }
     }
 }
