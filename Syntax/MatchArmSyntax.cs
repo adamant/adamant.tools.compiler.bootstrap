@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class MatchArmSyntax : SyntaxNode
+    public class MatchArmSyntax : NonTerminal
     {
         [NotNull] public PatternSyntax Pattern { get; }
         [NotNull] public ExpressionBlockSyntax Expression { get; }

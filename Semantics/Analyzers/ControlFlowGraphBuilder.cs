@@ -33,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             foreach (var parameter in function.Parameters)
                 cfg.AddParameter(parameter.MutableBinding, parameter.Type.AssertResolved(), parameter.Name.UnqualifiedName.Text);
 
-            var blocks = new Dictionary<SyntaxNode, BasicBlock>();
+            var blocks = new Dictionary<NonTerminal, BasicBlock>();
             var entryBlock = cfg.EntryBlock;
             blocks.Add(function.Syntax.Body, entryBlock);
             var currentBlock = entryBlock;

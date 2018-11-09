@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class CompilationUnitSyntax : SyntaxNode
+    public class CompilationUnitSyntax : NonTerminal
     {
         [NotNull] public CodeFile CodeFile { get; }
         [NotNull] public FileNamespaceDeclarationSyntax Namespace { get; }

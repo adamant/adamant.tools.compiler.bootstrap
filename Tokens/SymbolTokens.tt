@@ -17,14 +17,14 @@
         "Comma", // `",` U+002C
         "Pipe", // `|` U+007C
         "Colon", // `:` U+003A
-        "RightArrow", // `→` U+2192", `->` U+002D", U+003E
+        "RightArrow", // `→` U+2192, `->` U+002D, U+003E
         "Hash", // `#` U+0023
         "HashHash", // `##` U+0023, U+0023
     }.AsReadOnly();
 #>
 using Adamant.Tools.Compiler.Bootstrap.Core;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens
+namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
 <# foreach(var @operator in operators) {#>
     public interface I<#=@operator#>Token : ISymbolToken { }

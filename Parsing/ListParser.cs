@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenStream tokens,
             [NotNull] AcceptFunction<T> acceptItem,
             [NotNull] IDiagnosticsCollector diagnostics)
-            where T : SyntaxNode
+            where T : NonTerminal
         {
             return new Generator<T>(() => acceptItem(tokens, diagnostics))
                 .TakeWhile(t => t != null).ToSyntaxList();
@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ParseFunction<T> parseItem,
             Type<TTerminator> terminatorType,
             [NotNull] IDiagnosticsCollector diagnostics)
-            where T : SyntaxNode
+            where T : NonTerminal
             where TTerminator : Token
         {
             return ParseEnumerable(tokens, parseItem, terminatorType, diagnostics).ToSyntaxList();
@@ -45,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ParseFunction<T> parseItem,
             Type<TTerminator> terminatorType,
             [NotNull] IDiagnosticsCollector diagnostics)
-            where T : SyntaxNode
+            where T : NonTerminal
             where TTerminator : Token
         {
             while (!(tokens.Current is TTerminator || tokens.Current is EndOfFileToken))
@@ -67,7 +67,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] AcceptFunction<T> acceptItem,
             Type<TSeparator> separatorType,
             [NotNull] IDiagnosticsCollector diagnostics)
-            where T : SyntaxNode
+            where T : NonTerminal
             where TSeparator : Token
         {
             return new SeparatedListSyntax<T>(ParseSeparatedEnumerable(tokens, acceptItem, separatorType, diagnostics));
@@ -77,7 +77,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [NotNull]
         private static IEnumerable<ISyntaxNodeOrToken> ParseSeparatedEnumerable<TSeparator>(
             [NotNull] ITokenStream tokens,
-            [NotNull] AcceptFunction<SyntaxNode> acceptItem,
+            [NotNull] AcceptFunction<NonTerminal> acceptItem,
             Type<TSeparator> separatorType,
             [NotNull] IDiagnosticsCollector diagnostics)
             where TSeparator : Token
@@ -103,7 +103,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             Type<TSeparator> separatorType,
             Type<TTerminator> terminatorType,
             [NotNull] IDiagnosticsCollector diagnostics)
-            where T : SyntaxNode
+            where T : NonTerminal
             where TSeparator : Token
             where TTerminator : Token
         {
@@ -114,7 +114,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [NotNull]
         private static IEnumerable<ISyntaxNodeOrToken> ParseSeparatedEnumerable<TSeparator, TTerminator>(
             [NotNull] ITokenStream tokens,
-            [NotNull] ParseFunction<SyntaxNode> parseItem,
+            [NotNull] ParseFunction<NonTerminal> parseItem,
             Type<TSeparator> separatorType,
             Type<TTerminator> terminatorType,
             [NotNull] IDiagnosticsCollector diagnostics)

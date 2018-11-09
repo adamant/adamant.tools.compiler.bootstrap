@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class EnumVariantsSyntax : SyntaxNode
+    public class EnumVariantsSyntax : NonTerminal
     {
         [NotNull] public SyntaxList<EnumVariantSyntax> Variants { get; }
         [CanBeNull] public ISemicolonToken Semicolon { get; }

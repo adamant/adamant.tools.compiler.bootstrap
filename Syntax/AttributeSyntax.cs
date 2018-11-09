@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class AttributeSyntax : SyntaxNode
+    public class AttributeSyntax : NonTerminal
     {
         [NotNull] public HashToken Hash { get; }
         [NotNull] public NameSyntax Name { get; }

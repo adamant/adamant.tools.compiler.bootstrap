@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class EnumVariantSyntax : SyntaxNode
+    public class EnumVariantSyntax : NonTerminal
     {
         [NotNull] public IIdentifierToken Identifier { get; }
         [CanBeNull] public CommaToken Comma { get; }

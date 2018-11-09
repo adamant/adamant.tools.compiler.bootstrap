@@ -8,12 +8,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 {
     public abstract class LexicalScope
     {
-        [NotNull] public SyntaxNode Syntax { get; }
+        [NotNull] public NonTerminal Syntax { get; }
         [NotNull] [ItemNotNull] public IReadOnlyList<LexicalScope> NestedScopes { get; }
         [NotNull] [ItemNotNull] private readonly List<LexicalScope> nestedScopes = new List<LexicalScope>();
         [CanBeNull] private IReadOnlyDictionary<string, ISymbol> declarations;
 
-        protected LexicalScope([NotNull] SyntaxNode syntax)
+        protected LexicalScope([NotNull] NonTerminal syntax)
         {
             Requires.NotNull(nameof(syntax), syntax);
             Syntax = syntax;

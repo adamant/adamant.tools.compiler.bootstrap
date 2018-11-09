@@ -3,9 +3,9 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
     /// <summary>
-    /// A non-missing token
+    /// An <see cref="IToken"/> or <see cref="IMissingToken"/>
     /// </summary>
-    public interface IToken : ISyntaxNodeOrToken
+    public interface ITokenPlace
     {
         TextSpan Span { get; }
     }

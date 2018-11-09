@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public abstract class ExpressionSyntax : SyntaxNode
+    public abstract class ExpressionSyntax : NonTerminal
     {
         public TextSpan Span { get; }
 

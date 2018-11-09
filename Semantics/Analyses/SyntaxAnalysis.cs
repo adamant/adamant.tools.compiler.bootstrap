@@ -7,11 +7,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
     public abstract class SyntaxAnalysis
     {
         [NotNull] public AnalysisContext Context { get; }
-        [NotNull] public SyntaxNode Syntax { get; }
+        [NotNull] public NonTerminal Syntax { get; }
 
         protected SyntaxAnalysis(
             [NotNull] AnalysisContext context,
-            [NotNull] SyntaxNode syntax)
+            [NotNull] NonTerminal syntax)
         {
             Requires.NotNull(nameof(context), context);
             Requires.NotNull(nameof(syntax), syntax);

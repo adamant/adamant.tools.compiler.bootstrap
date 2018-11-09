@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class ThrowEffectEntrySyntax : SyntaxNode
+    public class ThrowEffectEntrySyntax : NonTerminal
     {
         [CanBeNull] public ParamsKeywordToken ParamsKeyword { get; }
         [NotNull] public ExpressionSyntax ExceptionType { get; }

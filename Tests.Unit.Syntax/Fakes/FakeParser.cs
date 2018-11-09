@@ -68,7 +68,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
 
         [NotNull]
         public static SkipParser<T> Skip<T>(T value)
-            where T : SyntaxNode
+            where T : NonTerminal
         {
             return new SkipParser<T>(value);
         }
@@ -84,7 +84,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
         }
 
         public class SkipParser<T>
-            where T : SyntaxNode
+            where T : NonTerminal
         {
             private T value;
 
@@ -106,7 +106,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
             public SyntaxList<T> ParseList<T>(
                 ITokenStream tokens,
                 AcceptFunction<T> acceptItem,
-                IDiagnosticsCollector diagnostics) where T : SyntaxNode
+                IDiagnosticsCollector diagnostics) where T : NonTerminal
             {
                 var fakeToken = tokens.ExpectFake();
                 return (SyntaxList<T>)fakeToken?.FakeValue ?? throw new InvalidOperationException();
@@ -116,7 +116,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
                 ITokenStream tokens,
                 AcceptFunction<T> acceptItem,
                 Type<TSeparator> separatorType,
-                IDiagnosticsCollector diagnostics) where T : SyntaxNode where TSeparator : Token
+                IDiagnosticsCollector diagnostics) where T : NonTerminal where TSeparator : Token
             {
                 var fakeToken = tokens.ExpectFake();
                 return (SeparatedListSyntax<T>)fakeToken?.FakeValue ?? throw new InvalidOperationException();
@@ -126,7 +126,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
                 ITokenStream tokens,
                 ParseFunction<T> parseItem,
                 Type<TTerminator> terminatorType,
-                IDiagnosticsCollector diagnostics) where T : SyntaxNode where TTerminator : Token
+                IDiagnosticsCollector diagnostics) where T : NonTerminal where TTerminator : Token
             {
                 var fakeToken = tokens.ExpectFake();
                 return (SyntaxList<T>)fakeToken?.FakeValue ?? throw new InvalidOperationException();
@@ -137,7 +137,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
                 ParseFunction<T> parseItem,
                 Type<TSeparator> separatorType,
                 Type<TTerminator> terminatorType,
-                IDiagnosticsCollector diagnostics) where T : SyntaxNode where TSeparator : Token where TTerminator : Token
+                IDiagnosticsCollector diagnostics) where T : NonTerminal where TSeparator : Token where TTerminator : Token
             {
                 var fakeToken = tokens.ExpectFake();
                 return (SeparatedListSyntax<T>)fakeToken?.FakeValue ?? throw new InvalidOperationException();

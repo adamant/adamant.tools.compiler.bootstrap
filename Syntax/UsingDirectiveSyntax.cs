@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class UsingDirectiveSyntax : SyntaxNode
+    public class UsingDirectiveSyntax : NonTerminal
     {
         [NotNull] public IUsingKeywordToken UsingKeyword { get; }
         [NotNull] public NameSyntax Name { get; }

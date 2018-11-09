@@ -155,7 +155,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Parsing
             Assert.Collection(diagnostics.Build(), d => { d.AssertParsingDiagnostic(3002, 0, 4); });
         }
 
-        private static SyntaxNode NotCalled([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+        private static NonTerminal NotCalled([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
         {
             Assert.True(false, "ParseFunction<T> called when it wasn't supposed to be");
             throw new Exception("Unreachable");

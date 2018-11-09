@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class ArgumentSyntax : SyntaxNode
+    public class ArgumentSyntax : NonTerminal
     {
         [CanBeNull] public ParamsKeywordToken ParamsKeyword { get; }
         [CanBeNull] public ExpressionSyntax Value { get; }

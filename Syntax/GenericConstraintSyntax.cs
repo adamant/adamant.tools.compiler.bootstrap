@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class GenericConstraintSyntax : SyntaxNode
+    public class GenericConstraintSyntax : NonTerminal
     {
         [NotNull] public WhereKeywordToken WhereKeyword { get; }
         [NotNull] public ExpressionSyntax Expression { get; }

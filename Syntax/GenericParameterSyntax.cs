@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class GenericParameterSyntax : SyntaxNode
+    public class GenericParameterSyntax : NonTerminal
     {
         [CanBeNull] public ParamsKeywordToken ParamsKeyword { get; }
         [NotNull] public IIdentifierToken Name { get; }

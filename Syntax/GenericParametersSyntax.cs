@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class GenericParametersSyntax : SyntaxNode
+    public class GenericParametersSyntax : NonTerminal
     {
         [NotNull] public IOpenBracketToken OpenBracket { get; }
         [NotNull] public SeparatedListSyntax<GenericParameterSyntax> ParametersList { get; }

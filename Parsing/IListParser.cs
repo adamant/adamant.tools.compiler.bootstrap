@@ -11,11 +11,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     // Delegate needed so we can declare the arg as not null
     [NotNull]
     public delegate T ParseFunction<out T>([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
-        where T : SyntaxNode;
+        where T : NonTerminal;
 
     [CanBeNull]
     public delegate T AcceptFunction<out T>([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
-        where T : SyntaxNode;
+        where T : NonTerminal;
 
     // TODO list parsing based on a terminator is problematic, it would be better to have the parse function decide if the next token was a start
     public interface IListParser
@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenStream tokens,
             [NotNull] AcceptFunction<T> acceptItem,
             [NotNull] IDiagnosticsCollector diagnostics)
-            where T : SyntaxNode;
+            where T : NonTerminal;
 
         [MustUseReturnValue]
         [NotNull]
@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] AcceptFunction<T> acceptItem,
             Type<TSeparator> separatorType,
             [NotNull] IDiagnosticsCollector diagnostics)
-            where T : SyntaxNode
+            where T : NonTerminal
             where TSeparator : Token;
 
         [Obsolete("Use ParseList() taking an AcceptFunction instead")]
@@ -46,7 +46,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ParseFunction<T> parseItem,
             Type<TTerminator> terminatorType,
             [NotNull] IDiagnosticsCollector diagnostics)
-            where T : SyntaxNode
+            where T : NonTerminal
             where TTerminator : Token;
 
         [Obsolete("Use ParseSeparatedList() taking an AcceptFunction instead")]
@@ -58,7 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             Type<TSeparator> separatorType,
             Type<TTerminator> terminatorType,
             [NotNull] IDiagnosticsCollector diagnostics)
-            where T : SyntaxNode
+            where T : NonTerminal
             where TSeparator : Token
             where TTerminator : Token;
     }

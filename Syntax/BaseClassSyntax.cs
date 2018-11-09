@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class BaseClassSyntax : SyntaxNode
+    public class BaseClassSyntax : NonTerminal
     {
         [NotNull] public ColonToken Colon { get; }
         [NotNull] public ExpressionSyntax TypeExpression { get; }

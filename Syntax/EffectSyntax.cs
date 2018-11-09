@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public abstract class EffectSyntax : SyntaxNode
+    public abstract class EffectSyntax : NonTerminal
     {
     }
 }

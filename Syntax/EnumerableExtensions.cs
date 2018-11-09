@@ -8,14 +8,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     {
         [NotNull]
         public static SyntaxList<T> ToSyntaxList<T>([CanBeNull][ItemNotNull] this IEnumerable<T> nodes)
-            where T : SyntaxNode
+            where T : NonTerminal
         {
             return nodes == null ? SyntaxList<T>.Empty : new SyntaxList<T>(nodes);
         }
 
         [NotNull]
         public static SyntaxList<T> ToSyntaxList<T>([CanBeNull] this T node)
-            where T : SyntaxNode
+            where T : NonTerminal
         {
             return node == null ? SyntaxList<T>.Empty : new SyntaxList<T>(node.Yield());
         }

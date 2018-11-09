@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class InvariantSyntax : SyntaxNode
+    public class InvariantSyntax : NonTerminal
     {
         [NotNull] public InvariantKeywordToken InvariantKeyword { get; }
         [NotNull] public ExpressionSyntax Condition { get; }

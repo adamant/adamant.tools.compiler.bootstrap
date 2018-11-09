@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class EffectsSyntax : SyntaxNode
+    public class EffectsSyntax : NonTerminal
     {
         [NotNull] public IMayKeywordToken MayKeyword { get; }
         [NotNull] public SeparatedListSyntax<EffectSyntax> AllowedEffects { get; }

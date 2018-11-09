@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 
         protected NestedScope(
             [NotNull] LexicalScope containingScope,
-            [NotNull] SyntaxNode syntax)
+            [NotNull] NonTerminal syntax)
             : base(syntax)
         {
             Requires.NotNull(nameof(containingScope), containingScope);

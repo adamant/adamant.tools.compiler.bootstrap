@@ -8,8 +8,8 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class SeparatedListSyntax<T> : SyntaxNode, IReadOnlyList<ISyntaxNodeOrToken>
-        where T : SyntaxNode
+    public class SeparatedListSyntax<T> : NonTerminal, IReadOnlyList<ISyntaxNodeOrToken>
+        where T : NonTerminal
     {
         [NotNull]
         public static readonly SeparatedListSyntax<T> Empty = new SeparatedListSyntax<T>(Enumerable.Empty<ISyntaxNodeOrToken>());

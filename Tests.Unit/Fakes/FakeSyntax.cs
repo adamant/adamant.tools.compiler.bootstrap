@@ -33,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
 
         [NotNull]
         public static SyntaxList<T> List<T>()
-            where T : SyntaxNode
+            where T : NonTerminal
         {
             return new SyntaxList<T>(Enumerable.Empty<T>());
         }
@@ -46,7 +46,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
 
         [NotNull]
         public static SeparatedListSyntax<T> SeparatedList<T>()
-            where T : SyntaxNode
+            where T : NonTerminal
         {
             return new SeparatedListSyntax<T>(Enumerable.Empty<T>());
         }

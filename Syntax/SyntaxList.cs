@@ -13,9 +13,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     /// to construct new lists from them which would introduce inefficiency and
     /// overhead.
     /// </summary>
-    /// <typeparam name="TNode">Type of <see cref="SyntaxNode"/>s in the list</typeparam>
+    /// <typeparam name="TNode">Type of <see cref="NonTerminal"/>s in the list</typeparam>
     public class SyntaxList<TNode> : IReadOnlyList<TNode>
-        where TNode : SyntaxNode
+        where TNode : NonTerminal
     {
         [NotNull]
         public static readonly SyntaxList<TNode> Empty = new SyntaxList<TNode>(Enumerable.Empty<TNode>());
