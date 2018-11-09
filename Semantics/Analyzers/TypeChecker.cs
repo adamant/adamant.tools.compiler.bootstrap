@@ -326,11 +326,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     // TODO check that argument types match function type
                     switch (calleeType)
                     {
-                        case Metatype metatype:
-                            genericInvocation.Type.Computed(
-                                metatype.WithGenericArguments(
-                                    genericInvocation.Arguments.Select(a => a.Value.Type.AssertComputed())));
-                            break;
+                        // TODO implemet
+                        //case Metatype metatype:
+                        //    genericInvocation.Type.Computed(
+                        //        metatype.WithGenericArguments(
+                        //            genericInvocation.Arguments.Select(a => a.Value.Type.AssertComputed())));
+                        //    break;
                         case MetaFunctionType metaFunctionType:
                             genericInvocation.Type.Computed(metaFunctionType.ResultType);
                             break;
@@ -360,11 +361,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
                     switch (genericName.NameType)
                     {
-                        case Metatype metatype:
-                            genericName.Type.Computed(
-                                metatype.WithGenericArguments(
-                                    genericName.Arguments.Select(a => a.Value.Type.AssertComputed())));
-                            break;
+                        // TODO implement
+                        //case Metatype metatype:
+                        //    genericName.Type.Computed(
+                        //        metatype.WithGenericArguments(
+                        //            genericName.Arguments.Select(a => a.Value.Type.AssertComputed())));
+                        //    break;
                         case UnknownType _:
                             genericName.Type.Computed(DataType.Unknown);
                             break;
@@ -604,7 +606,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                         leftOperand.Type.Resolve(rightType);
 
                     return !IsIntegerType(rightType);
-                case ObjectType type when IsIntegerType(type):
+                case DataType type when IsIntegerType(type):
                     if (rightType is IntegerConstantType)
                         // TODO it may need to be size
                         rightType = rightOperand.Type.Resolve(leftOperand.Type);
@@ -621,9 +623,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         private static bool IsIntegerType([NotNull] DataType type)
         {
             Requires.NotNull(nameof(type), type);
-            return type == ObjectType.Byte
-                   || type == ObjectType.Int
-                   || type == ObjectType.UInt
+            return type is PrimitiveFixedIntegerType
                    || type == ObjectType.Size
                    || type == ObjectType.Offset;
         }
@@ -801,16 +801,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         }
 
         [NotNull]
-        private static ObjectType GetPrimitiveType([NotNull] PrimitiveTypeAnalysis primitive)
+        private static DataType GetPrimitiveType([NotNull] PrimitiveTypeAnalysis primitive)
         {
             switch (primitive.Syntax.Keyword)
             {
                 case IntKeywordToken _:
-                    return ObjectType.Int;
+                    return PrimitiveFixedIntegerType.Int;
                 case UIntKeywordToken _:
-                    return ObjectType.UInt;
+                    return PrimitiveFixedIntegerType.UInt;
                 case ByteKeywordToken _:
-                    return ObjectType.Byte;
+                    return PrimitiveFixedIntegerType.Byte;
                 case SizeKeywordToken _:
                     return ObjectType.Size;
                 case VoidKeywordToken _:

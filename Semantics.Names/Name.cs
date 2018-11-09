@@ -38,5 +38,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
         }
 
         public abstract bool HasQualifier([NotNull] Name name);
+
+        [NotNull]
+        public abstract override string ToString();
     }
 }

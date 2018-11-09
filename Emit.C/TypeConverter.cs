@@ -21,8 +21,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 // TODO perhaps the name mangler should be used on primitives
                 case var t when t == ObjectType.Void:
                     return "void";
-                case var t when t == ObjectType.Int:
-                    return "ₐint";
+                case PrimitiveFixedIntegerType integerType:
+                    return nameMangler.Mangle(integerType.Name);
                 case ObjectType t:
                     return nameMangler.Mangle(t);
                 case LifetimeType lifetimeType:

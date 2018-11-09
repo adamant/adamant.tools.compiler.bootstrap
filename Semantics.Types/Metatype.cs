@@ -1,6 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
@@ -19,21 +19,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
     /// </summary>
     public class Metatype : GenericType
     {
-        [NotNull] public Name Name { get; }
         // The type this is a metatype for. Named instance because it represents
         // the single object instance that is of this metatype.
-        [NotNull] public ObjectType Instance { get; }
+        [NotNull] public DataType Instance { get; }
 
-        public override IReadOnlyList<DataType> GenericParameterTypes => Instance.GenericParameterTypes;
-        public override IReadOnlyList<DataType> GenericArguments => Instance.GenericArguments;
+        public override IReadOnlyList<DataType> GenericParameterTypes { get; }
+        public override IReadOnlyList<DataType> GenericArguments { get; }
         public override bool IsResolved { get; }
 
-        public Metatype([NotNull]ObjectType objectType)
+        public Metatype([NotNull] DataType instanceType)
         {
-            Requires.NotNull(nameof(objectType), objectType);
-            Name = objectType.Name;
-            Instance = objectType;
-            IsResolved = objectType.IsResolved;
+            Requires.NotNull(nameof(instanceType), instanceType);
+            Instance = instanceType;
+            IsResolved = instanceType.IsResolved;
+            GenericParameterTypes = Enumerable.Empty<DataType>().ToReadOnlyList();
+            GenericArguments = Enumerable.Empty<DataType>().ToReadOnlyList();
         }
 
         [NotNull]
@@ -44,7 +44,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
 
         public DataType WithGenericArguments(IEnumerable<DataType> genericArguments)
         {
-            return new Metatype(Instance.WithGenericArguments(genericArguments));
+            // TODO fix implementation
+            return this;
         }
     }
 }

@@ -16,9 +16,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
     {
         [NotNull] public static readonly ObjectType Void = new ObjectType(new SimpleName("void", true), false, false);
         [NotNull] public static readonly ObjectType Never = new ObjectType(new SimpleName("never", true), false, false);
-        [NotNull] public static readonly ObjectType Int = new ObjectType(new SimpleName("int", true), false, false);
-        [NotNull] public static readonly ObjectType UInt = new ObjectType(new SimpleName("uint", true), false, false);
-        [NotNull] public static readonly ObjectType Byte = new ObjectType(new SimpleName("byte", true), false, false);
         [NotNull] public static readonly ObjectType Size = new ObjectType(new SimpleName("size", true), false, false);
         [NotNull] public static readonly ObjectType Offset = new ObjectType(new SimpleName("offset", true), false, false);
         [NotNull] public static readonly ObjectType Bool = new ObjectType(new SimpleName("bool", true), false, false);
