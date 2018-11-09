@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 using static Adamant.Tools.Compiler.Bootstrap.Framework.TypeOperations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public class GenericsParser : IGenericsParser
     {

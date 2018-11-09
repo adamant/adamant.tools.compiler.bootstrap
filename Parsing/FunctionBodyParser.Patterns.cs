@@ -1,11 +1,11 @@
-﻿using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public partial class FunctionBodyParser
     {
@@ -40,16 +40,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             switch (tokens.Current)
             {
                 case IdentifierToken identifier:
-                    {
-                        tokens.MoveNext();
-                        return new AnyPatternSyntax(identifier);
-                    }
+                {
+                    tokens.MoveNext();
+                    return new AnyPatternSyntax(identifier);
+                }
                 case DotToken dotToken:
-                    {
-                        tokens.MoveNext();
-                        var identifier = tokens.ExpectIdentifier();
-                        return new EnumValuePatternSyntax(dotToken, identifier);
-                    }
+                {
+                    tokens.MoveNext();
+                    var identifier = tokens.ExpectIdentifier();
+                    return new EnumValuePatternSyntax(dotToken, identifier);
+                }
                 default:
                     throw NonExhaustiveMatchException.For(tokens.Current);
             }

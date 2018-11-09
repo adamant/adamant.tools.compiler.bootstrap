@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public interface IUsingDirectiveParser
     {

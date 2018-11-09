@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     // Delegate needed so we can declare the arg as not null
     [NotNull]

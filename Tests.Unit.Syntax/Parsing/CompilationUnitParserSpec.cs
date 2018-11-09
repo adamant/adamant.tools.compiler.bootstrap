@@ -1,6 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
+using Adamant.Tools.Compiler.Bootstrap.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes;
 using JetBrains.Annotations;

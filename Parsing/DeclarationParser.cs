@@ -4,13 +4,12 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 using static Adamant.Tools.Compiler.Bootstrap.Framework.TypeOperations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public class DeclarationParser : IDeclarationParser
     {
@@ -327,40 +326,40 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
             switch (tokens.Current)
             {
                 case StructKeywordToken _:
-                    {
-                        var structKeyword = tokens.Take<StructKeywordToken>();
-                        var name = tokens.ExpectIdentifier();
-                        var genericParameters = genericsParser.AcceptGenericParameters(tokens, diagnostics);
-                        var baseTypes = AcceptBaseTypes(tokens, diagnostics);
-                        var genericConstraints = genericsParser.ParseGenericConstraints(tokens, diagnostics);
-                        var invariants = ParseInvariants(tokens, diagnostics);
-                        var openBrace = tokens.Expect<IOpenBraceToken>();
-                        var variants = ParseEnumVariants(tokens, diagnostics);
-                        var members = listParser.ParseList(tokens, ParseMemberDeclaration,
-                            TypeOf<CloseBraceToken>(), diagnostics);
-                        var closeBrace = tokens.Expect<ICloseBraceToken>();
-                        return new EnumStructDeclarationSyntax(modifiers, enumKeyword, structKeyword,
-                            name, genericParameters, baseTypes, genericConstraints,
-                            invariants, openBrace, variants, members, closeBrace);
-                    }
+                {
+                    var structKeyword = tokens.Take<StructKeywordToken>();
+                    var name = tokens.ExpectIdentifier();
+                    var genericParameters = genericsParser.AcceptGenericParameters(tokens, diagnostics);
+                    var baseTypes = AcceptBaseTypes(tokens, diagnostics);
+                    var genericConstraints = genericsParser.ParseGenericConstraints(tokens, diagnostics);
+                    var invariants = ParseInvariants(tokens, diagnostics);
+                    var openBrace = tokens.Expect<IOpenBraceToken>();
+                    var variants = ParseEnumVariants(tokens, diagnostics);
+                    var members = listParser.ParseList(tokens, ParseMemberDeclaration,
+                        TypeOf<CloseBraceToken>(), diagnostics);
+                    var closeBrace = tokens.Expect<ICloseBraceToken>();
+                    return new EnumStructDeclarationSyntax(modifiers, enumKeyword, structKeyword,
+                        name, genericParameters, baseTypes, genericConstraints,
+                        invariants, openBrace, variants, members, closeBrace);
+                }
                 case ClassKeywordToken _:
-                    {
-                        var classKeyword = tokens.Expect<ClassKeywordToken>();
-                        var name = tokens.ExpectIdentifier();
-                        var genericParameters = genericsParser.AcceptGenericParameters(tokens, diagnostics);
-                        var baseClass = AcceptBaseClass(tokens, diagnostics);
-                        var baseTypes = AcceptBaseTypes(tokens, diagnostics);
-                        var genericConstraints = genericsParser.ParseGenericConstraints(tokens, diagnostics);
-                        var invariants = ParseInvariants(tokens, diagnostics);
-                        var openBrace = tokens.Expect<IOpenBraceToken>();
-                        var variants = ParseEnumVariants(tokens, diagnostics);
-                        var members = listParser.ParseList(tokens, ParseMemberDeclaration,
-                            TypeOf<CloseBraceToken>(), diagnostics);
-                        var closeBrace = tokens.Expect<ICloseBraceToken>();
-                        return new EnumClassDeclarationSyntax(modifiers, enumKeyword, classKeyword,
-                            name, genericParameters, baseClass, baseTypes, genericConstraints,
-                            invariants, openBrace, variants, members, closeBrace);
-                    }
+                {
+                    var classKeyword = tokens.Expect<ClassKeywordToken>();
+                    var name = tokens.ExpectIdentifier();
+                    var genericParameters = genericsParser.AcceptGenericParameters(tokens, diagnostics);
+                    var baseClass = AcceptBaseClass(tokens, diagnostics);
+                    var baseTypes = AcceptBaseTypes(tokens, diagnostics);
+                    var genericConstraints = genericsParser.ParseGenericConstraints(tokens, diagnostics);
+                    var invariants = ParseInvariants(tokens, diagnostics);
+                    var openBrace = tokens.Expect<IOpenBraceToken>();
+                    var variants = ParseEnumVariants(tokens, diagnostics);
+                    var members = listParser.ParseList(tokens, ParseMemberDeclaration,
+                        TypeOf<CloseBraceToken>(), diagnostics);
+                    var closeBrace = tokens.Expect<ICloseBraceToken>();
+                    return new EnumClassDeclarationSyntax(modifiers, enumKeyword, classKeyword,
+                        name, genericParameters, baseClass, baseTypes, genericConstraints,
+                        invariants, openBrace, variants, members, closeBrace);
+                }
                 default:
                     return ParseIncompleteDeclaration(attributes, modifiers, tokens, diagnostics);
             }

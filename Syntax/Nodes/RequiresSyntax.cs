@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes
 {
-    class RequiresSyntax : FunctionContractSyntax
+    public class RequiresSyntax : FunctionContractSyntax
     {
         [NotNull] public RequiresKeywordToken RequiresKeyword { get; }
         [NotNull] public ExpressionSyntax Condition { get; }

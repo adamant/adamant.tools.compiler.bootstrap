@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 using static Adamant.Tools.Compiler.Bootstrap.Framework.TypeOperations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public partial class FunctionBodyParser : IBlockParser
     {
@@ -22,34 +22,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Parsing
                     return new ExpressionStatementSyntax(ParseBlock(tokens, diagnostics), null);
                 case LetKeywordToken _:
                 case VarKeywordToken _:
+                {
+                    var binding = tokens.Take<IBindingKeywordToken>();
+                    var name = tokens.ExpectIdentifier();
+                    IColonToken colon = null;
+                    ExpressionSyntax typeExpression = null;
+                    if (tokens.Current is ColonToken)
                     {
-                        var binding = tokens.Take<IBindingKeywordToken>();
-                        var name = tokens.ExpectIdentifier();
-                        IColonToken colon = null;
-                        ExpressionSyntax typeExpression = null;
-                        if (tokens.Current is ColonToken)
-                        {
-                            colon = tokens.Expect<IColonToken>();
-                            // Need to not consume the assignment that separates the type from the initializer,
-                            // hence the min operator precedence.
-                            typeExpression = ParseExpression(tokens, diagnostics, OperatorPrecedence.LogicalOr);
-                        }
-                        EqualsToken equals = null;
-                        ExpressionSyntax initializer = null;
-                        if (tokens.Current is EqualsToken)
-                        {
-                            equals = tokens.Take<EqualsToken>();
-                            initializer = ParseExpression(tokens, diagnostics);
-                        }
-                        var semicolon = tokens.Expect<ISemicolonToken>();
-                        return new VariableDeclarationStatementSyntax(binding, name, colon, typeExpression, equals, initializer, semicolon);
+                        colon = tokens.Expect<IColonToken>();
+                        // Need to not consume the assignment that separates the type from the initializer,
+                        // hence the min operator precedence.
+                        typeExpression = ParseExpression(tokens, diagnostics, OperatorPrecedence.LogicalOr);
                     }
+                    EqualsToken equals = null;
+                    ExpressionSyntax initializer = null;
+                    if (tokens.Current is EqualsToken)
+                    {
+                        equals = tokens.Take<EqualsToken>();
+                        initializer = ParseExpression(tokens, diagnostics);
+                    }
+                    var semicolon = tokens.Expect<ISemicolonToken>();
+                    return new VariableDeclarationStatementSyntax(binding, name, colon, typeExpression, equals, initializer, semicolon);
+                }
                 default:
-                    {
-                        var expression = ParseExpression(tokens, diagnostics);
-                        var semicolon = tokens.Expect<ISemicolonToken>();
-                        return new ExpressionStatementSyntax(expression, semicolon);
-                    }
+                {
+                    var expression = ParseExpression(tokens, diagnostics);
+                    var semicolon = tokens.Expect<ISemicolonToken>();
+                    return new ExpressionStatementSyntax(expression, semicolon);
+                }
             }
         }
 
