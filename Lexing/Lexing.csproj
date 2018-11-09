@@ -2,13 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Syntax</AssemblyName>
-    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Syntax</RootNamespace>
+    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Lexing</AssemblyName>
+    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Lexing</RootNamespace>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <LangVersion>latest</LangVersion>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
 
@@ -17,14 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj" />
-    <ProjectReference Include="..\Framework\Framework.csproj" />
-    <ProjectReference Include="..\Lexing\Lexing.csproj" />
     <ProjectReference Include="..\Syntax.Tokens\Syntax.Tokens.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 
 </Project>
