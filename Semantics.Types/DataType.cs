@@ -1,3 +1,4 @@
+using System;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
@@ -9,11 +10,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
     public abstract class DataType
     {
         [NotNull] public static UnknownType Unknown = UnknownType.Instance;
+        [NotNull] public static IntegerConstantType IntegerConstant = IntegerConstantType.Instance;
 
         /// <summary>
         /// A resolved type is one that has no unknown or unresolved parts
         /// </summary>
         public abstract bool IsResolved { get; }
+
+        [NotNull]
+        public DataType AssertResolved()
+        {
+            if (!IsResolved)
+                throw new ArgumentException($"Type {this} not resolved");
+
+            return this;
+        }
 
         [NotNull]
         public abstract override string ToString();

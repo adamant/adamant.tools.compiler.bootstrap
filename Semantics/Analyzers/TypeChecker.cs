@@ -233,8 +233,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     // TODO check that expression type matches function return type
                     expression.Type.Computed(ObjectType.Never);
                     break;
-                case IntegerLiteralExpressionAnalysis integerLiteral:
-                    expression.Type.Computed(new IntegerConstantType(integerLiteral.Value));
+                case IntegerLiteralExpressionAnalysis _:
+                    expression.Type.Computed(DataType.IntegerConstant);
                     break;
                 case StringLiteralExpressionAnalysis _:
                     // TODO what about interpolated expressions?
