@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -12,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
         [NotNull] [ItemNotNull] public IReadOnlyList<LocalVariableDeclaration> VariableDeclarations { get; }
         [NotNull] [ItemNotNull] private readonly List<LocalVariableDeclaration> variableDeclarations = new List<LocalVariableDeclaration>();
         [NotNull] public LocalVariableDeclaration ReturnVariable => variableDeclarations[0];
-        [NotNull] public Object ReturnType => ReturnVariable.Type;
+        [NotNull] public DataType ReturnType => ReturnVariable.Type;
         //[NotNull] [ItemNotNull] public IEnumerable<LocalVariableDeclaration> Parameters => variableDeclarations.Skip(1).Take(Arity);
         [NotNull] [ItemNotNull] public IReadOnlyList<BasicBlock> BasicBlocks { get; }
         [NotNull] [ItemNotNull] private readonly List<BasicBlock> basicBlocks = new List<BasicBlock>();
@@ -75,7 +74,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
         [NotNull]
         public Edges Edges()
         {
-            return new Edges(this);
+            return IntermediateLanguage.Edges.InGraph(this);
         }
     }
 }

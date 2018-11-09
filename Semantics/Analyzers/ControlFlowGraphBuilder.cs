@@ -41,8 +41,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 ConvertStatementAnalysisToStatement(cfg, currentBlock, statement);
 
             // Generate the implicit return statement
-            if (currentBlock.Number == 0 && currentBlock.EndStatement == null)
-                currentBlock.End(new ReturnStatement());
+            if (currentBlock.Number == 0 && currentBlock.Terminator == null)
+                currentBlock.End(new ReturnTerminator());
         }
 
         [NotNull]
@@ -68,7 +68,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                         variableDeclaration.Type.AssertResolved(),
                         variableDeclaration.Name.UnqualifiedName.Text);
                     if (variableDeclaration.Initializer != null)
-                        ConvertAssignment(cfg, variable.Reference, variableDeclaration.Initializer, currentBlock);
+                        ConvertToAssignmentStatement(cfg, variable.Reference, variableDeclaration.Initializer, currentBlock);
                     break;
 
                 case ExpressionStatementAnalysis expressionStatement:
@@ -108,19 +108,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     {
                         case IEqualsToken _:
                             var lvalue = ConvertToLValue(cfg, binaryOperatorExpression.LeftOperand);
-                            ConvertAssignment(cfg, lvalue, binaryOperatorExpression.RightOperand, currentBlock);
+                            ConvertToAssignmentStatement(cfg, lvalue, binaryOperatorExpression.RightOperand, currentBlock);
                             break;
                         default:
                             // Could be side effects possibly.
                             var temp = cfg.Let(binaryOperatorExpression.Type.AssertResolved());
-                            ConvertAssignment(cfg, temp.Reference, expression, currentBlock);
+                            ConvertToAssignmentStatement(cfg, temp.Reference, expression, currentBlock);
                             break;
                     }
                     break;
                 case ReturnExpressionAnalysis returnExpression:
                     if (returnExpression.ReturnExpression != null)
-                        ConvertAssignment(cfg, cfg.ReturnVariable.Reference, returnExpression.ReturnExpression, currentBlock);
-                    currentBlock.End(new ReturnStatement());
+                        ConvertToAssignmentStatement(cfg, cfg.ReturnVariable.Reference, returnExpression.ReturnExpression, currentBlock);
+                    currentBlock.End(new ReturnTerminator());
                     break;
                 case BlockAnalysis block:
                     foreach (var statementInBlock in block.Statements)
@@ -151,14 +151,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             }
         }
 
-        private void ConvertAssignment(
+        private void ConvertToAssignmentStatement(
             [NotNull] ControlFlowGraph cfg,
-            [NotNull] Place lvalue,
+            [NotNull] Place place,
             [NotNull] ExpressionAnalysis value,
             [NotNull] BasicBlock currentBlock)
         {
             Requires.NotNull(nameof(cfg), cfg);
-            Requires.NotNull(nameof(lvalue), lvalue);
+            Requires.NotNull(nameof(place), place);
             Requires.NotNull(nameof(value), value);
             Requires.NotNull(nameof(currentBlock), currentBlock);
 
@@ -166,16 +166,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             {
                 case NewObjectExpressionAnalysis newObjectExpression:
                     var args = newObjectExpression.Arguments.Select(a => ConvertToLValue(cfg, a.Value));
-                    currentBlock.Add(new NewObjectStatement(lvalue, newObjectExpression.Type.AssertResolved(), args));
+                    currentBlock.Add(new NewObjectStatement(place, newObjectExpression.Type.AssertResolved(), args));
                     break;
                 case IdentifierNameAnalysis identifier:
-                    currentBlock.Add(new AssignmentStatement(lvalue, new CopyPlace(LookupVariable(cfg, identifier.Name.AssertNotNull()))));
+                    currentBlock.Add(new AssignmentStatement(place, new CopyPlace(LookupVariable(cfg, identifier.Name.AssertNotNull()))));
                     break;
                 case BinaryOperatorExpressionAnalysis binaryOperator:
-                    ConvertOperator(cfg, lvalue, binaryOperator, currentBlock);
+                    ConvertOperator(cfg, place, binaryOperator, currentBlock);
                     break;
                 case IntegerLiteralExpressionAnalysis v:
-                    currentBlock.Add(new IntegerLiteralStatement(lvalue, v.Value));
+                    var constant = new IntegerConstant(v.Value, v.Type);
+                    currentBlock.Add(new AssignmentStatement(place, constant));
                     break;
                 case IfExpressionAnalysis ifExpression:
                     ConvertExpressionAnalysisToStatement(cfg, currentBlock, ifExpression.Condition);

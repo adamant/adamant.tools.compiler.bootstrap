@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         /// <param name="variable">Variable the reference is loaned to</param>
         /// <param name="rvalue">The value loaned from</param>
         /// <param name="object">Which object is loaned</param>
-        public Loan(int variable, [NotNull] RValue rvalue, int @object)
+        public Loan(int variable, [NotNull] IValue rvalue, int @object)
             : base(variable, @object)
         {
             Requires.NotNull(nameof(rvalue), rvalue);
@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             Restrictions = Enumerable.Empty<Restriction>().ToReadOnlyList();
         }
 
-        private static void GatherRestrictions([NotNull] RValue rvalue, [NotNull] List<Restriction> restrictions)
+        private static void GatherRestrictions([NotNull] IValue rvalue, [NotNull] List<Restriction> restrictions)
         {
             switch (rvalue)
             {

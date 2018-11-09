@@ -3,17 +3,17 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
 {
-    public class AssignmentStatement : SimpleStatement
+    public class AssignmentStatement : Statement
     {
         [NotNull] public Place Place { get; }
-        [NotNull] public RValue RValue { get; }
+        [NotNull] public IValue Value { get; }
 
-        public AssignmentStatement([NotNull] Place place, [NotNull] RValue rValue)
+        public AssignmentStatement([NotNull] Place place, [NotNull] IValue value)
         {
             Requires.NotNull(nameof(place), place);
-            Requires.NotNull(nameof(rValue), rValue);
+            Requires.NotNull(nameof(value), value);
             Place = place;
-            RValue = rValue;
+            Value = value;
         }
     }
 }

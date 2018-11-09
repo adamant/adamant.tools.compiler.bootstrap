@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
 {
-    public abstract class Constant : Operand
+    public abstract class Constant : Operand, IValue
     {
         [NotNull] public readonly DataType Type;
 

@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
         public readonly int Number; // The block number is used as its name in IR
         [NotNull] [ItemNotNull] public IReadOnlyList<Statement> Statements { get; }
         [NotNull] [ItemNotNull] private readonly List<Statement> statements = new List<Statement>();
-        [CanBeNull] public EndStatement EndStatement { get; private set; }
+        [CanBeNull] public BlockTerminator Terminator { get; private set; }
 
         public BasicBlock(int number)
         {
@@ -17,22 +17,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
             Statements = statements.AsReadOnly().AssertNotNull();
         }
 
-        public void Add([NotNull] SimpleStatement statement)
+        public void Add([NotNull] Statement statement)
         {
             Requires.NotNull(nameof(statement), statement);
-            if (EndStatement == null)
-                statements.Add(statement);
-            else
-                statements.Insert(statements.Count - 2, statement);
+            statements.Add(statement);
         }
 
-        public void End([NotNull] EndStatement endStatement)
+        public void End([NotNull] BlockTerminator terminator)
         {
-            Requires.NotNull(nameof(endStatement), endStatement);
-            // Can only set an end statement if there isn't already one
-            Requires.Null(nameof(EndStatement), EndStatement);
-            EndStatement = endStatement;
-            statements.Add(EndStatement);
+            Requires.NotNull(nameof(terminator), terminator);
+            // Can only set an terminator if there isn't already one
+            Requires.Null(nameof(Terminator), Terminator);
+            Terminator = terminator;
         }
     }
 }

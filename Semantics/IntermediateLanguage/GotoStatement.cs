@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
 {
-    public class GotoStatement : EndStatement
+    public class GotoStatement : BlockTerminator
     {
         public readonly int BlockNumber;
 

@@ -2,7 +2,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
 {
-    public class CopyPlace : RValue
+    public class CopyPlace : IValue
     {
         [NotNull] public readonly Place Place;
 

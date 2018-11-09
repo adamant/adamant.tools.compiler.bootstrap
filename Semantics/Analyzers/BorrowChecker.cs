@@ -46,7 +46,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             // TODO we need to check definite assignment as well
 
             var diagnostics = function.Diagnostics;
-            var edges = new Edges(function.ControlFlow);
+            var edges = function.ControlFlow.Edges();
 
             // Compute aliveness at point after each statement
             var liveBefore = ComputeLiveness(function.ControlFlow, edges);
@@ -71,8 +71,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     }
                 }
 
-                foreach (var predecessor in edges.To(block).Select(b => b.EndStatement.AssertNotNull()))
-                    claimsBeforeStatement.UnionWith(claims.After(predecessor));
+                //foreach (var predecessor in edges.To(block).Select(b => b.Terminator.AssertNotNull()))
+                //    claimsBeforeStatement.UnionWith(claims.After(predecessor));
 
                 foreach (var statement in block.Statements)
                 {
@@ -91,11 +91,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                         }
                         //case AssignmentStatement assignmentStatement:
                         //{
-                        //    var claim = GetClaim(assignmentStatement.RValue, claimsBeforeStatement);
+                        //    var claim = GetClaim(assignmentStatement.Value, claimsBeforeStatement);
                         //    if (claim != null) // copy types don't have claims right now
                         //    {
                         //        var loan = new Loan(assignmentStatement.Place.CoreVariable(),
-                        //            assignmentStatement.RValue,
+                        //            assignmentStatement.Value,
                         //            claim.Object);
                         //        claimsAfterStatement.Add(loan);
                         //    }
@@ -109,9 +109,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                             claimsAfterStatement.RemoveWhere(c => c.Variable == title.Variable);
                             break;
                         }
-                        case ReturnStatement _:// Add only applies to copy types so no loans
-                        case IntegerLiteralStatement _:
-                            break;
                         default:
                             throw NonExhaustiveMatchException.For(statement);
                     }
@@ -120,6 +117,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
                     // Get Ready for next statement
                     claimsBeforeStatement = claimsAfterStatement;
+                }
+
+                switch (block.Terminator)
+                {
+                    case ReturnTerminator _: // Add only applies to copy types so no loans
+                        break;
+                    default:
+                        throw NonExhaustiveMatchException.For(block.Terminator);
                 }
             }
         }
@@ -139,9 +144,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         }
 
         //[CanBeNull]
-        //private static Claim GetClaim([NotNull] RValue rvalue, [NotNull][ItemNotNull] HashSet<Claim> claims)
+        //private static Claim GetClaim([NotNull] IValue value, [NotNull][ItemNotNull] HashSet<Claim> claims)
         //{
-        //    var coreVariable = rvalue.CoreVariable();
+        //    var coreVariable = value.CoreVariable();
         //    // Copy types don't have claims right now
         //    return claims.SingleOrDefault(t => t.Variable == coreVariable);
         //}
@@ -182,7 +187,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     {
                         case AssignmentStatement assignment:
                             KillVariables(liveSet, assignment.Place);
-                            EnlivenVariables(liveSet, assignment.RValue);
+                            EnlivenVariables(liveSet, assignment.Value);
                             break;
                         //case AddStatement addStatement:
                         //    KillVariables(liveSet, addStatement.LValue);
@@ -200,14 +205,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                         //case IntegerLiteralStatement integerLiteralStatement:
                         //    EnlivenVariables(liveSet, integerLiteralStatement.Place);
                         //    break;
-                        case ReturnStatement _:
-                            break;
                         default:
                             throw NonExhaustiveMatchException.For(statement);
                     }
 
                     // For the next statement
                     liveAfterStatement = liveSet;
+                }
+
+                switch (block.Terminator)
+                {
+                    case ReturnTerminator _:
+                        break;
+                    default:
+                        throw NonExhaustiveMatchException.For(block.Terminator);
                 }
 
                 if (!liveBeforeBlock.Equals(liveVariables.Before(block.Statements.First())))
@@ -232,9 +243,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     throw NonExhaustiveMatchException.For(lvalue);
             }
         }
-        private static void EnlivenVariables([NotNull] BitArray variables, [NotNull] RValue rValue)
+        private static void EnlivenVariables([NotNull] BitArray variables, [NotNull] IValue value)
         {
-            switch (rValue)
+            switch (value)
             {
                 //case Dereference dereference:
                 //    EnlivenVariables(variables, dereference.DereferencedValue);
@@ -242,8 +253,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 //case VariableReference variableReference:
                 //    variables[variableReference.VariableNumber] = true;
                 //    break;
+                case Constant _:
+                    // No variables
+                    break;
                 default:
-                    throw NonExhaustiveMatchException.For(rValue);
+                    throw NonExhaustiveMatchException.For(value);
             }
         }
     }

@@ -65,9 +65,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     //    // TODO this could be of a different type
                     //    code.AppendLine($"{Convert(s.Place)} = (ₐint){{{s.Value}}};");
                     //    break;
-                    case ReturnStatement _:
-                        code.AppendLine(voidReturn ? "return;" : "return ₜresult;");
-                        break;
+                    //case ReturnTerminator _:
+                    //    code.AppendLine(voidReturn ? "return;" : "return ₜresult;");
+                    //    break;
                     //case AssignmentStatement assignment:
                     //    code.AppendLine($"{Convert(assignment.Place)} = {Convert(assignment.RValue)};");
                     //    break;
@@ -80,14 +80,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.EndBlock();
         }
 
-        private static string Convert(RValue rValue)
+        private static string Convert(IValue value)
         {
-            switch (rValue)
+            switch (value)
             {
                 //case VariableReference variable:
                 //    return "ₜ" + NameOf(variable);
                 default:
-                    throw NonExhaustiveMatchException.For(rValue);
+                    throw NonExhaustiveMatchException.For(value);
             }
         }
     }

@@ -1,7 +1,7 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
 {
-    public abstract class RValue
+    public interface IValue
     {
-        public abstract override string ToString();
+        string ToString();
     }
 }

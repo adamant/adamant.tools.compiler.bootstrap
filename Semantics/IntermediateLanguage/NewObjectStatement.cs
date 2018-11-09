@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
 {
-    public class NewObjectStatement : SimpleStatement
+    public class NewObjectStatement : Statement
     {
         [NotNull] public readonly Place ResultInto;
         [NotNull] public readonly Object Type;

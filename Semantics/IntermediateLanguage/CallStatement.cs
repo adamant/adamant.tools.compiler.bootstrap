@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
 {
-    public class CallStatement : SimpleStatement
+    public class CallStatement : Statement
     {
         public readonly Place Place;
         public readonly string FunctionName;
