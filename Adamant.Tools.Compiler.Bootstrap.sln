@@ -50,9 +50,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Unit.Semantics", "Tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Unit.Syntax", "Tests.Unit.Syntax\Tests.Unit.Syntax.csproj", "{A146ABDB-73CF-4EEA-AE85-DF79EA5E8A3E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Semantics.Names", "Semantics.Names\Semantics.Names.csproj", "{EADD0595-2A21-4CBB-BD51-360942E49266}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Semantics.Names", "Semantics.Names\Semantics.Names.csproj", "{EADD0595-2A21-4CBB-BD51-360942E49266}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Semantics.Types", "Semantics.Types\Semantics.Types.csproj", "{1C0B0F09-F0B9-4C07-BC35-4273796C1888}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Semantics.Types", "Semantics.Types\Semantics.Types.csproj", "{1C0B0F09-F0B9-4C07-BC35-4273796C1888}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Syntax.Tokens", "Syntax.Tokens\Syntax.Tokens.csproj", "{F2226A08-38D8-4B7A-87A4-81869DAB4113}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -132,6 +134,10 @@ Global
 		{1C0B0F09-F0B9-4C07-BC35-4273796C1888}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C0B0F09-F0B9-4C07-BC35-4273796C1888}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C0B0F09-F0B9-4C07-BC35-4273796C1888}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2226A08-38D8-4B7A-87A4-81869DAB4113}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2226A08-38D8-4B7A-87A4-81869DAB4113}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2226A08-38D8-4B7A-87A4-81869DAB4113}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2226A08-38D8-4B7A-87A4-81869DAB4113}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
