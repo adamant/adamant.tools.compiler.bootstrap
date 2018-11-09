@@ -2,8 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
@@ -17,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         {
             Requires.NotNull(nameof(functions), functions);
 
-            foreach (var function in functions.Where(f => !f.Diagnostics.Any() // It has errors, generating code could fail
+            foreach (var function in functions.Where(f => !f.Diagnostics.Any() // It has errors, can't generate intermediate code
                                                           && f.Syntax.Body != null // It is abstract
                                                           && !f.IsGeneric)) // It is not generic, generic functions need monomorphized
                 BuildGraph(function);
@@ -27,8 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         {
             Requires.NotNull(nameof(function), function);
 
-            var cfg = new ControlFlowGraph();
-            function.ControlFlow = cfg;
+            var cfg = function.CreateControlFlowGraph();
 
             // Temp Variable for return
             cfg.Let(function.ReturnType.AssertResolved());
@@ -40,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             blocks.Add(function.Syntax.Body, entryBlock);
             var currentBlock = entryBlock;
             foreach (var statement in function.Statements)
-                Convert(cfg, statement, currentBlock);
+                ConvertStatementAnalysisToStatement(cfg, currentBlock, statement);
 
             // Generate the implicit return statement
             if (currentBlock.Number == 0 && currentBlock.EndStatement == null)
@@ -54,7 +52,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             return cfg.VariableDeclarations.Single(v => v.Name == name).AssertNotNull().Reference;
         }
 
-        private void Convert([NotNull] ControlFlowGraph cfg, [NotNull] StatementAnalysis statement, [NotNull] BasicBlock currentBlock)
+        private void ConvertStatementAnalysisToStatement(
+            [NotNull] ControlFlowGraph cfg,
+            [NotNull] BasicBlock currentBlock,
+            [NotNull] StatementAnalysis statement)
         {
             Requires.NotNull(nameof(cfg), cfg);
             Requires.NotNull(nameof(statement), statement);
@@ -71,7 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     break;
 
                 case ExpressionStatementAnalysis expressionStatement:
-                    Convert(cfg, expressionStatement.Expression, currentBlock);
+                    ConvertExpressionAnalysisToStatement(cfg, currentBlock, expressionStatement.Expression);
                     break;
 
                 default:
@@ -88,7 +89,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             return false;
         }
 
-        private void Convert([NotNull] ControlFlowGraph cfg, [NotNull] ExpressionAnalysis expression, [NotNull] BasicBlock currentBlock)
+        private void ConvertExpressionAnalysisToStatement(
+            [NotNull] ControlFlowGraph cfg,
+            [NotNull] BasicBlock currentBlock,
+            [NotNull] ExpressionAnalysis expression)
         {
             Requires.NotNull(nameof(cfg), cfg);
             Requires.NotNull(nameof(expression), expression);
@@ -120,7 +124,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     break;
                 case BlockAnalysis block:
                     foreach (var statementInBlock in block.Statements)
-                        Convert(cfg, statementInBlock, currentBlock);
+                        ConvertStatementAnalysisToStatement(cfg, currentBlock, statementInBlock);
 
                     // Now we need to delete any owned variables
                     foreach (var variableDeclaration in block.Statements.OfType<VariableDeclarationStatementAnalysis>().Where(IsOwned))
@@ -137,7 +141,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     // TODO actually convert the expression
                     break;
                 case UnsafeExpressionAnalysis unsafeExpression:
-                    Convert(cfg, unsafeExpression.Expression, currentBlock);
+                    ConvertExpressionAnalysisToStatement(cfg, currentBlock, unsafeExpression.Expression);
                     break;
                 case InvocationAnalysis invocation:
                     // TODO actually convert the expression
@@ -149,7 +153,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
         private void ConvertAssignment(
             [NotNull] ControlFlowGraph cfg,
-            [NotNull] LValue lvalue,
+            [NotNull] Place lvalue,
             [NotNull] ExpressionAnalysis value,
             [NotNull] BasicBlock currentBlock)
         {
@@ -165,7 +169,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     currentBlock.Add(new NewObjectStatement(lvalue, newObjectExpression.Type.AssertResolved(), args));
                     break;
                 case IdentifierNameAnalysis identifier:
-                    currentBlock.Add(new AssignmentStatement(lvalue, LookupVariable(cfg, identifier.Name.AssertNotNull())));
+                    currentBlock.Add(new AssignmentStatement(lvalue, new CopyPlace(LookupVariable(cfg, identifier.Name.AssertNotNull()))));
                     break;
                 case BinaryOperatorExpressionAnalysis binaryOperator:
                     ConvertOperator(cfg, lvalue, binaryOperator, currentBlock);
@@ -174,11 +178,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     currentBlock.Add(new IntegerLiteralStatement(lvalue, v.Value));
                     break;
                 case IfExpressionAnalysis ifExpression:
-                    Convert(cfg, ifExpression.Condition, currentBlock);
+                    ConvertExpressionAnalysisToStatement(cfg, currentBlock, ifExpression.Condition);
                     // TODO assign the result into the temp, branch and execute then or else, assign result
                     break;
                 case UnsafeExpressionAnalysis unsafeExpression:
-                    Convert(cfg, unsafeExpression.Expression, currentBlock);
+                    ConvertExpressionAnalysisToStatement(cfg, currentBlock, unsafeExpression.Expression);
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(value);
@@ -187,17 +191,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
         private void ConvertOperator(
             [NotNull] ControlFlowGraph cfg,
-            [NotNull] LValue lvalue,
+            [NotNull] Place lvalue,
             [NotNull] BinaryOperatorExpressionAnalysis binaryOperator,
             [NotNull] BasicBlock currentBlock)
         {
             switch (binaryOperator.Operator)
             {
-                case PlusToken _:
-                    currentBlock.Add(new AddStatement(lvalue,
-                        ConvertToLValue(cfg, binaryOperator.LeftOperand),
-                        ConvertToLValue(cfg, binaryOperator.RightOperand)));
-                    break;
+                //case PlusToken _:
+                //    currentBlock.Add(new AddStatement(lvalue,
+                //        ConvertToLValue(cfg, binaryOperator.LeftOperand),
+                //        ConvertToLValue(cfg, binaryOperator.RightOperand)));
+                //    break;
                 case LessThanToken _:
                 case LessThanOrEqualToken _:
                 case GreaterThanToken _:
@@ -205,7 +209,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     // TODO generate the correct statement
                     break;
                 case AsKeywordToken _:
-                    Convert(cfg, binaryOperator.LeftOperand, currentBlock);
+                    ConvertExpressionAnalysisToStatement(cfg, currentBlock, binaryOperator.LeftOperand);
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(binaryOperator.Operator);
@@ -213,7 +217,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         }
 
         [NotNull]
-        private LValue ConvertToLValue([NotNull] ControlFlowGraph cfg, [NotNull] ExpressionAnalysis value)
+        private Place ConvertToLValue([NotNull] ControlFlowGraph cfg, [NotNull] ExpressionAnalysis value)
         {
             Requires.NotNull(nameof(value), value);
             switch (value)

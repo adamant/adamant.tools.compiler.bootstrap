@@ -5,9 +5,8 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
@@ -84,34 +83,33 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     switch (statement)
                     {
                         case NewObjectStatement newObjectStatement:
-                            {
-                                var title = new Title(newObjectStatement.ResultInto.CoreVariable(), nextObject);
-                                nextObject += 1;
-                                claimsAfterStatement.Add(title);
-                                break;
-                            }
-                        case AssignmentStatement assignmentStatement:
-                            {
-                                var claim = GetClaim(assignmentStatement.RValue, claimsBeforeStatement);
-                                if (claim != null) // copy types don't have claims right now
-                                {
-                                    var loan = new Loan(assignmentStatement.LValue.CoreVariable(),
-                                        assignmentStatement.RValue,
-                                        claim.Object);
-                                    claimsAfterStatement.Add(loan);
-                                }
-                                break;
-                            }
+                        {
+                            var title = new Title(newObjectStatement.ResultInto.CoreVariable(), nextObject);
+                            nextObject += 1;
+                            claimsAfterStatement.Add(title);
+                            break;
+                        }
+                        //case AssignmentStatement assignmentStatement:
+                        //{
+                        //    var claim = GetClaim(assignmentStatement.RValue, claimsBeforeStatement);
+                        //    if (claim != null) // copy types don't have claims right now
+                        //    {
+                        //        var loan = new Loan(assignmentStatement.Place.CoreVariable(),
+                        //            assignmentStatement.RValue,
+                        //            claim.Object);
+                        //        claimsAfterStatement.Add(loan);
+                        //    }
+                        //    break;
+                        //}
                         case DeleteStatement deleteStatement:
-                            {
-                                var title = GetTitle(deleteStatement.VariableNumber,
-                                    claimsBeforeStatement);
-                                CheckCanMove(title.Object, claimsBeforeStatement, function, deleteStatement.Span, diagnostics);
-                                claimsAfterStatement.RemoveWhere(c => c.Variable == title.Variable);
-                                break;
-                            }
-                        case AddStatement _: // Add only applies to copy types so no loans
-                        case ReturnStatement _:
+                        {
+                            var title = GetTitle(deleteStatement.VariableNumber,
+                                claimsBeforeStatement);
+                            CheckCanMove(title.Object, claimsBeforeStatement, function, deleteStatement.Span, diagnostics);
+                            claimsAfterStatement.RemoveWhere(c => c.Variable == title.Variable);
+                            break;
+                        }
+                        case ReturnStatement _:// Add only applies to copy types so no loans
                         case IntegerLiteralStatement _:
                             break;
                         default:
@@ -140,19 +138,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 diagnostics.Publish(BorrowError.BorrowedValueDoesNotLiveLongEnough(function.Context.File, span));
         }
 
-        [CanBeNull]
-        private static Claim GetClaim([NotNull] RValue rvalue, [NotNull][ItemNotNull] HashSet<Claim> claims)
-        {
-            var coreVariable = rvalue.CoreVariable();
-            // Copy types don't have claims right now
-            return claims.SingleOrDefault(t => t.Variable == coreVariable);
-        }
+        //[CanBeNull]
+        //private static Claim GetClaim([NotNull] RValue rvalue, [NotNull][ItemNotNull] HashSet<Claim> claims)
+        //{
+        //    var coreVariable = rvalue.CoreVariable();
+        //    // Copy types don't have claims right now
+        //    return claims.SingleOrDefault(t => t.Variable == coreVariable);
+        //}
 
-        private static Title GetTitle([NotNull] RValue rvalue, [NotNull] HashSet<Claim> claims)
-        {
-            var coreVariable = rvalue.CoreVariable();
-            return GetTitle(coreVariable, claims);
-        }
+        //private static Title GetTitle([NotNull] RValue rvalue, [NotNull] HashSet<Claim> claims)
+        //{
+        //    var coreVariable = rvalue.CoreVariable();
+        //    return GetTitle(coreVariable, claims);
+        //}
 
         [NotNull]
         private static Title GetTitle([NotNull] int variable, [NotNull] HashSet<Claim> claims)
@@ -183,25 +181,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     switch (statement)
                     {
                         case AssignmentStatement assignment:
-                            KillVariables(liveSet, assignment.LValue);
+                            KillVariables(liveSet, assignment.Place);
                             EnlivenVariables(liveSet, assignment.RValue);
                             break;
-                        case AddStatement addStatement:
-                            KillVariables(liveSet, addStatement.LValue);
-                            EnlivenVariables(liveSet, addStatement.LeftOperand);
-                            EnlivenVariables(liveSet, addStatement.RightOperand);
-                            break;
+                        //case AddStatement addStatement:
+                        //    KillVariables(liveSet, addStatement.LValue);
+                        //    EnlivenVariables(liveSet, addStatement.LeftOperand);
+                        //    EnlivenVariables(liveSet, addStatement.RightOperand);
+                        //    break;
                         case DeleteStatement deleteStatement:
                             liveSet[deleteStatement.VariableNumber] = true;
                             break;
-                        case NewObjectStatement newObjectStatement:
-                            KillVariables(liveSet, newObjectStatement.ResultInto);
-                            foreach (var argument in newObjectStatement.Arguments)
-                                EnlivenVariables(liveSet, argument);
-                            break;
-                        case IntegerLiteralStatement integerLiteralStatement:
-                            EnlivenVariables(liveSet, integerLiteralStatement.LValue);
-                            break;
+                        //case NewObjectStatement newObjectStatement:
+                        //    KillVariables(liveSet, newObjectStatement.ResultInto);
+                        //    foreach (var argument in newObjectStatement.Arguments)
+                        //        EnlivenVariables(liveSet, argument);
+                        //    break;
+                        //case IntegerLiteralStatement integerLiteralStatement:
+                        //    EnlivenVariables(liveSet, integerLiteralStatement.Place);
+                        //    break;
                         case ReturnStatement _:
                             break;
                         default:
@@ -220,7 +218,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             return liveVariables;
         }
 
-        private static void KillVariables([NotNull] BitArray variables, [NotNull] LValue lvalue)
+        private static void KillVariables([NotNull] BitArray variables, [NotNull] Place lvalue)
         {
             switch (lvalue)
             {
@@ -238,12 +236,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         {
             switch (rValue)
             {
-                case Dereference dereference:
-                    EnlivenVariables(variables, dereference.DereferencedValue);
-                    break;
-                case VariableReference variableReference:
-                    variables[variableReference.VariableNumber] = true;
-                    break;
+                //case Dereference dereference:
+                //    EnlivenVariables(variables, dereference.DereferencedValue);
+                //    break;
+                //case VariableReference variableReference:
+                //    variables[variableReference.VariableNumber] = true;
+                //    break;
                 default:
                     throw NonExhaustiveMatchException.For(rValue);
             }

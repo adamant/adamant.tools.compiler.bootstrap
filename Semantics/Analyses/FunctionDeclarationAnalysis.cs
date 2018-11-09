@@ -2,8 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Declarations;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Nodes;
 using JetBrains.Annotations;
@@ -19,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
         [NotNull] public ExpressionAnalysis ReturnTypeExpression { get; }
         [NotNull] public TypeAnalysis ReturnType { get; } = new TypeAnalysis();
         [NotNull, ItemNotNull] public IReadOnlyList<StatementAnalysis> Statements { get; }
-        [CanBeNull] public ControlFlowGraph ControlFlow { get; set; }
+        [CanBeNull] public ControlFlowGraph ControlFlow { get; private set; }
 
         public FunctionDeclarationAnalysis(
             [NotNull] AnalysisContext context,
@@ -37,6 +36,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             Parameters = parameters.ToReadOnlyList();
             ReturnTypeExpression = returnTypeExpression;
             Statements = (statements ?? Enumerable.Empty<StatementAnalysis>()).ToReadOnlyList();
+        }
+
+        [NotNull]
+        public ControlFlowGraph CreateControlFlowGraph()
+        {
+            Requires.Null(nameof(ControlFlow), ControlFlow);
+            return ControlFlow = new ControlFlowGraph();
         }
 
         [CanBeNull]

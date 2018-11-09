@@ -1,7 +1,6 @@
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using JetBrains.Annotations;
 
@@ -58,20 +57,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             foreach (var statement in block.Statements)
                 switch (statement)
                 {
-                    case AddStatement a:
-                        // TODO this should emit something that can do a checked add
-                        code.AppendLine($"{Convert(a.LValue)} = (ₐint){{{Convert(a.LeftOperand)}.ₐvalue + {Convert(a.RightOperand)}.ₐvalue}};");
-                        break;
-                    case IntegerLiteralStatement s:
-                        // TODO this could be of a different type
-                        code.AppendLine($"{Convert(s.LValue)} = (ₐint){{{s.Value}}};");
-                        break;
+                    //case AddStatement a:
+                    //    // TODO this should emit something that can do a checked add
+                    //    code.AppendLine($"{Convert(a.LValue)} = (ₐint){{{Convert(a.LeftOperand)}.ₐvalue + {Convert(a.RightOperand)}.ₐvalue}};");
+                    //    break;
+                    //case IntegerLiteralStatement s:
+                    //    // TODO this could be of a different type
+                    //    code.AppendLine($"{Convert(s.Place)} = (ₐint){{{s.Value}}};");
+                    //    break;
                     case ReturnStatement _:
                         code.AppendLine(voidReturn ? "return;" : "return ₜresult;");
                         break;
-                    case AssignmentStatement assignment:
-                        code.AppendLine($"{Convert(assignment.LValue)} = {Convert(assignment.RValue)};");
-                        break;
+                    //case AssignmentStatement assignment:
+                    //    code.AppendLine($"{Convert(assignment.Place)} = {Convert(assignment.RValue)};");
+                    //    break;
                     case NewObjectStatement newObjectStatement:
                         // TODO implement this
                         break;
@@ -85,8 +84,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             switch (rValue)
             {
-                case VariableReference variable:
-                    return "ₜ" + NameOf(variable);
+                //case VariableReference variable:
+                //    return "ₜ" + NameOf(variable);
                 default:
                     throw NonExhaustiveMatchException.For(rValue);
             }

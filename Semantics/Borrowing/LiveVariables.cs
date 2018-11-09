@@ -1,8 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing

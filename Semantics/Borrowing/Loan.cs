@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Statements;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
@@ -35,8 +35,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         {
             switch (rvalue)
             {
-                case VariableReference variable:
-                    restrictions.Add(new Restriction(variable.VariableNumber, false));
+                case CopyPlace copyPlace:
+                    //case VariableReference variable:
+                    restrictions.Add(new Restriction(copyPlace.Place.CoreVariable(), false));
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(rvalue);
