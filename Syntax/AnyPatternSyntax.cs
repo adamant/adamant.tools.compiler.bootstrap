@@ -6,9 +6,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class AnyPatternSyntax : PatternSyntax
     {
-        [NotNull] public IdentifierToken Identifier { get; }
+        [NotNull] public IIdentifierToken Identifier { get; }
 
-        public AnyPatternSyntax([NotNull] IdentifierToken identifier)
+        public AnyPatternSyntax([NotNull] IIdentifierToken identifier)
         {
             Requires.NotNull(nameof(identifier), identifier);
             Identifier = identifier;

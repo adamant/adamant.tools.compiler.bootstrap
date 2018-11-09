@@ -7,15 +7,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class MoveModifierSyntax : ModifierSyntax
     {
-        [NotNull] public MoveKeywordToken MoveKeyword { get; }
+        [NotNull] public IMoveKeywordToken MoveKeyword { get; }
 
-        public MoveModifierSyntax([NotNull] MoveKeywordToken moveKeyword)
+        public MoveModifierSyntax([NotNull] IMoveKeywordToken moveKeyword)
         {
             Requires.NotNull(nameof(moveKeyword), moveKeyword);
             MoveKeyword = moveKeyword;
         }
 
-        public override IEnumerable<IToken> Tokens()
+        public override IEnumerable<ITokenPlace> Tokens()
         {
             yield return MoveKeyword;
         }

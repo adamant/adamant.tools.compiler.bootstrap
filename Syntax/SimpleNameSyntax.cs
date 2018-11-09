@@ -7,9 +7,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public abstract class SimpleNameSyntax : NameSyntax
     {
-        [NotNull] public IIdentifierToken Name { get; }
+        [NotNull] public IIdentifierTokenPlace Name { get; }
 
-        protected SimpleNameSyntax([NotNull] IIdentifierToken name, TextSpan span)
+        protected SimpleNameSyntax([NotNull] IIdentifierTokenPlace name, TextSpan span)
             : base(span)
         {
             Requires.NotNull(nameof(name), name);

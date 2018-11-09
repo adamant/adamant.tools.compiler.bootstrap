@@ -8,18 +8,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     {
         [NotNull] public SyntaxList<AttributeSyntax> Attributes { get; }
         [NotNull] public SyntaxList<ModifierSyntax> Modifiers { get; }
-        [NotNull] public IOpenBraceToken OpenBrace { get; }
-        [NotNull] public ICloseBraceToken CloseBrace { get; }
+        [NotNull] public IOpenBraceTokenPlace OpenBrace { get; }
+        [NotNull] public ICloseBraceTokenPlace CloseBrace { get; }
 
         public BlockNamespaceDeclarationSyntax(
             [NotNull] SyntaxList<AttributeSyntax> attributes,
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] NamespaceKeywordToken namespaceKeyword,
+            [NotNull] INamespaceKeywordToken namespaceKeyword,
             [NotNull] NameSyntax name,
-            [NotNull] IOpenBraceToken openBrace,
+            [NotNull] IOpenBraceTokenPlace openBrace,
             [NotNull] SyntaxList<UsingDirectiveSyntax> usingDirectives,
             [NotNull] SyntaxList<DeclarationSyntax> declarations,
-            [NotNull] ICloseBraceToken closeBrace)
+            [NotNull] ICloseBraceTokenPlace closeBrace)
             : base(namespaceKeyword, name, usingDirectives, declarations)
         {
             Requires.NotNull(nameof(attributes), attributes);

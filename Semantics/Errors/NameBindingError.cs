@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
     public static class NameBindingError
     {
         [NotNull]
-        public static Diagnostic CouldNotBindName([NotNull] CodeFile file, [NotNull] IIdentifierToken name)
+        public static Diagnostic CouldNotBindName([NotNull] CodeFile file, [NotNull] IIdentifierTokenPlace name)
         {
             return new Diagnostic(file, name.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5001, $"The name `{name.Value}` is not defined in this scope.");
         }

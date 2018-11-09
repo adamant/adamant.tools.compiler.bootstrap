@@ -6,11 +6,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class InvariantSyntax : NonTerminal
     {
-        [NotNull] public InvariantKeywordToken InvariantKeyword { get; }
+        [NotNull] public IInvariantKeywordToken InvariantKeyword { get; }
         [NotNull] public ExpressionSyntax Condition { get; }
 
         public InvariantSyntax(
-            [NotNull] InvariantKeywordToken invariantKeyword,
+            [NotNull] IInvariantKeywordToken invariantKeyword,
             [NotNull] ExpressionSyntax condition)
         {
             Requires.NotNull(nameof(invariantKeyword), invariantKeyword);

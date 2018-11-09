@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         }
 
         [MustUseReturnValue]
-        public CompilationUnitSyntax Parse([NotNull] CodeFile file, [NotNull]  IEnumerable<Token> tokens)
+        public CompilationUnitSyntax Parse([NotNull] CodeFile file, [NotNull]  IEnumerable<IToken> tokens)
         {
             return Parse(new TokenStream(file, tokens));
         }

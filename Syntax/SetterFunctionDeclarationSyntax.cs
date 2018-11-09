@@ -7,24 +7,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class SetterFunctionDeclarationSyntax : FunctionDeclarationSyntax
     {
-        [NotNull] public SetKeywordToken SetKeyword { get; }
-        [NotNull] public override IIdentifierToken Name { get; }
-        [NotNull] public IRightArrowToken Arrow { get; }
+        [NotNull] public ISetKeywordToken SetKeyword { get; }
+        [NotNull] public override IIdentifierTokenPlace Name { get; }
+        [NotNull] public IRightArrowTokenPlace Arrow { get; }
         [NotNull] public ExpressionSyntax ReturnTypeExpression { get; }
 
         public SetterFunctionDeclarationSyntax(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] SetKeywordToken setKeyword,
-            [NotNull] IIdentifierToken name,
-            [NotNull] IOpenParenToken openParen,
+            [NotNull] ISetKeywordToken setKeyword,
+            [NotNull] IIdentifierTokenPlace name,
+            [NotNull] IOpenParenTokenPlace openParen,
             [NotNull] SeparatedListSyntax<ParameterSyntax> parameterList,
-            [NotNull] ICloseParenToken closeParen,
-            [NotNull] IRightArrowToken arrow,
+            [NotNull] ICloseParenTokenPlace closeParen,
+            [NotNull] IRightArrowTokenPlace arrow,
             [NotNull] ExpressionSyntax returnTypeExpression,
             [CanBeNull] EffectsSyntax effects,
             [NotNull] SyntaxList<FunctionContractSyntax> contracts,
             [CanBeNull] BlockSyntax body,
-            [CanBeNull] ISemicolonToken semicolon)
+            [CanBeNull] ISemicolonTokenPlace semicolon)
             : base(TextSpan.Covering(setKeyword.Span, name.Span), modifiers, openParen,
                 parameterList, closeParen, effects, contracts, body, semicolon)
         {

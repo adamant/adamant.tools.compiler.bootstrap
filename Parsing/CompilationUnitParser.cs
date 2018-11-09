@@ -45,13 +45,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var namespaceKeyword = tokens.Accept<NamespaceKeywordToken>();
+            var namespaceKeyword = tokens.Accept<INamespaceKeywordToken>();
             NameSyntax name = null;
-            ISemicolonToken semicolon = null;
+            ISemicolonTokenPlace semicolon = null;
             if (namespaceKeyword != null)
             {
                 name = nameParser.ParseName(tokens, diagnostics);
-                semicolon = tokens.Expect<ISemicolonToken>();
+                semicolon = tokens.Expect<ISemicolonTokenPlace>();
             }
             var usingDirectives = usingDirectiveParser.ParseUsingDirectives(tokens, diagnostics).ToSyntaxList();
             var declarations = declarationParser.ParseDeclarations(tokens, diagnostics).ToSyntaxList();

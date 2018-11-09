@@ -50,7 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
             var functionType = returnType;
             // TODO better way to check for having regular arguments?
-            if (!(function.Syntax.OpenParen is MissingToken))
+            if (!(function.Syntax.OpenParen is IMissingToken))
                 functionType = new FunctionType(function.Parameters.Select(p => p.Type.AssertComputed()), functionType);
 
             if (function.IsGeneric && function.GenericParameters.AssertNotNull().Any())
@@ -419,7 +419,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         [NotNull]
         private DataType CheckName(
             [NotNull] AnalysisContext context,
-            [NotNull] IIdentifierToken name,
+            [NotNull] IIdentifierTokenPlace name,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
             Requires.NotNull(nameof(context), context);
@@ -491,14 +491,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             {
                 switch (@operator)
                 {
-                    case EqualsEqualsToken _:
-                    case LessThanToken _:
-                    case LessThanOrEqualToken _:
-                    case GreaterThanToken _:
-                    case GreaterThanOrEqualToken _:
-                    case AndKeywordToken _:
-                    case OrKeywordToken _:
-                    case XorKeywordToken _:
+                    case IEqualsEqualsToken _:
+                    case ILessThanToken _:
+                    case ILessThanOrEqualToken _:
+                    case IGreaterThanToken _:
+                    case IGreaterThanOrEqualToken _:
+                    case IAndKeywordToken _:
+                    case IOrKeywordToken _:
+                    case IXorKeywordToken _:
                         binaryOperatorExpression.Type.Computed(ObjectType.Bool);
                         break;
                     default:
@@ -511,14 +511,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             bool typeError;
             switch (@operator)
             {
-                case PlusToken _:
+                case IPlusToken _:
                     typeError = CheckNumericOperator(
                         binaryOperatorExpression.LeftOperand,
                         binaryOperatorExpression.RightOperand,
                         null);
                     binaryOperatorExpression.Type.Computed(!typeError ? leftOperand : DataType.Unknown);
                     break;
-                case PlusEqualsToken _:
+                case IPlusEqualsToken _:
                     typeError = CheckNumericOperator(
                         binaryOperatorExpression.LeftOperand,
                         binaryOperatorExpression.RightOperand,
@@ -528,45 +528,45 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     //    && !(leftOperand is PointerType && (rightOperand == ObjectType.Size || rightOperand == ObjectType.Int));
                     binaryOperatorExpression.Type.Computed(!typeError ? leftOperand : DataType.Unknown);
                     break;
-                case AsteriskEqualsToken _:
+                case IAsteriskEqualsToken _:
                     typeError = leftOperand != rightOperand || leftOperand == ObjectType.Bool;
                     binaryOperatorExpression.Type.Computed(!typeError ? leftOperand : DataType.Unknown);
                     break;
-                case EqualsEqualsToken _:
-                case NotEqualToken _:
-                case LessThanToken _:
-                case LessThanOrEqualToken _:
-                case GreaterThanToken _:
-                case GreaterThanOrEqualToken _:
+                case IEqualsEqualsToken _:
+                case INotEqualToken _:
+                case ILessThanToken _:
+                case ILessThanOrEqualToken _:
+                case IGreaterThanToken _:
+                case IGreaterThanOrEqualToken _:
                     typeError = leftOperandCore != rightOperandCore;
                     binaryOperatorExpression.Type.Computed(ObjectType.Bool);
                     break;
-                case EqualsToken _:
+                case IEqualsToken _:
                     typeError = leftOperandCore != rightOperandCore;
                     if (!typeError)
                         binaryOperatorExpression.Type.Computed(leftOperand);
                     break;
-                case AndKeywordToken _:
-                case OrKeywordToken _:
-                case XorKeywordToken _:
+                case IAndKeywordToken _:
+                case IOrKeywordToken _:
+                case IXorKeywordToken _:
                     typeError = leftOperand != ObjectType.Bool || rightOperand != ObjectType.Bool;
 
                     binaryOperatorExpression.Type.Computed(ObjectType.Bool);
                     break;
-                case DotDotToken _:
-                case DotToken _:
-                case CaretDotToken _:
+                case IDotDotToken _:
+                case IDotToken _:
+                case ICaretDotToken _:
                     // TODO type check this
                     typeError = false;
                     break;
-                case DollarToken _:
-                case DollarLessThanToken _:
-                case DollarLessThanNotEqualToken _:
-                case DollarGreaterThanToken _:
-                case DollarGreaterThanNotEqualToken _:
+                case IDollarToken _:
+                case IDollarLessThanToken _:
+                case IDollarLessThanNotEqualToken _:
+                case IDollarGreaterThanToken _:
+                case IDollarGreaterThanNotEqualToken _:
                     typeError = leftOperand != ObjectType.Type;
                     break;
-                case AsKeywordToken _:
+                case IAsKeywordToken _:
                     var asType = EvaluateCheckedTypeExpression(binaryOperatorExpression.RightOperand, diagnostics);
                     // TODO check that left operand can be converted to this
                     typeError = false;
@@ -648,22 +648,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             bool typeError;
             switch (@operator)
             {
-                case NotKeywordToken _:
+                case INotKeywordToken _:
                     typeError = operand != ObjectType.Bool;
                     unaryOperatorExpression.Type.Computed(ObjectType.Bool);
                     break;
-                case AtSignToken _:
+                case IAtSignToken _:
                     typeError = false; // TODO check that the expression can have a pointer taken
                     if (operand is Metatype)
                         unaryOperatorExpression.Type.Computed(ObjectType.Type); // constructing a type
                     else
                         unaryOperatorExpression.Type.Computed(new PointerType(operand)); // taking the address of something
                     break;
-                case QuestionToken _:
+                case IQuestionToken _:
                     typeError = false; // TODO check that the expression can have a pointer taken
                     unaryOperatorExpression.Type.Computed(new PointerType(operand));
                     break;
-                case CaretToken _:
+                case ICaretToken _:
                     switch (operand)
                     {
                         case PointerType pointerType:
@@ -745,13 +745,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     Lifetime lifetime;
                     switch (lifetimeToken)
                     {
-                        case OwnedKeywordToken _:
+                        case IOwnedKeywordToken _:
                             lifetime = OwnedLifetime.Instance;
                             break;
-                        case RefKeywordToken _:
+                        case IRefKeywordToken _:
                             lifetime = RefLifetime.Instance;
                             break;
-                        case IdentifierToken identifier:
+                        case IIdentifierToken identifier:
                             lifetime = new NamedLifetime(identifier.Value);
                             break;
                         default:
@@ -771,7 +771,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case UnaryOperatorExpressionAnalysis unaryOperatorExpression:
                     switch (unaryOperatorExpression.Syntax.Operator)
                     {
-                        case AtSignToken _:
+                        case IAtSignToken _:
                             if (unaryOperatorExpression.Operand.Type.AssertComputed() is Metatype metatype)
                                 return new PointerType(metatype.Instance);
                             // TODO evaluate to type
@@ -805,27 +805,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         {
             switch (primitive.Syntax.Keyword)
             {
-                case IntKeywordToken _:
+                case IIntKeywordToken _:
                     return PrimitiveFixedIntegerType.Int;
-                case UIntKeywordToken _:
+                case IUIntKeywordToken _:
                     return PrimitiveFixedIntegerType.UInt;
-                case ByteKeywordToken _:
+                case IByteKeywordToken _:
                     return PrimitiveFixedIntegerType.Byte;
-                case SizeKeywordToken _:
+                case ISizeKeywordToken _:
                     return ObjectType.Size;
-                case VoidKeywordToken _:
+                case IVoidKeywordToken _:
                     return ObjectType.Void;
-                case BoolKeywordToken _:
+                case IBoolKeywordToken _:
                     return ObjectType.Bool;
-                case StringKeywordToken _:
+                case IStringKeywordToken _:
                     return ObjectType.String;
-                case NeverKeywordToken _:
+                case INeverKeywordToken _:
                     return ObjectType.Never;
-                case TypeKeywordToken _:
+                case ITypeKeywordToken _:
                     return ObjectType.Type;
-                case MetatypeKeywordToken _:
+                case IMetatypeKeywordToken _:
                     return ObjectType.Metatype;
-                case AnyKeywordToken _:
+                case IAnyKeywordToken _:
                     return ObjectType.Any;
                 default:
                     throw NonExhaustiveMatchException.For(primitive.Syntax.Keyword);

@@ -7,11 +7,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class ElseClauseSyntax : ExpressionSyntax
     {
-        [NotNull] public ElseKeywordToken ElseKeyword { get; }
+        [NotNull] public IElseKeywordToken ElseKeyword { get; }
         [NotNull] public ExpressionSyntax Expression { get; }
 
         public ElseClauseSyntax(
-            [NotNull] ElseKeywordToken elseKeyword,
+            [NotNull] IElseKeywordToken elseKeyword,
             [NotNull] ExpressionSyntax expression)
             : base(TextSpan.Covering(elseKeyword.Span, expression.Span))
         {

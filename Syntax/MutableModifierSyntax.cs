@@ -7,15 +7,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class MutableModifierSyntax : ModifierSyntax
     {
-        [NotNull] public MutableKeywordToken MutableKeyword { get; }
+        [NotNull] public IMutableKeywordToken MutableKeyword { get; }
 
-        public MutableModifierSyntax([NotNull] MutableKeywordToken mutableKeyword)
+        public MutableModifierSyntax([NotNull] IMutableKeywordToken mutableKeyword)
         {
             Requires.NotNull(nameof(mutableKeyword), mutableKeyword);
             MutableKeyword = mutableKeyword;
         }
 
-        public override IEnumerable<IToken> Tokens()
+        public override IEnumerable<ITokenPlace> Tokens()
         {
             yield return MutableKeyword;
         }

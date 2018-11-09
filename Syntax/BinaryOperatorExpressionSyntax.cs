@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 
         public BinaryOperatorExpressionSyntax(
             [NotNull] ExpressionSyntax leftOperand,
-            [NotNull] OperatorToken @operator,
+            [NotNull] IOperatorToken @operator,
             [NotNull] ExpressionSyntax rightOperand)
             : base(@operator, TextSpan.Covering(leftOperand.Span, rightOperand.Span))
         {

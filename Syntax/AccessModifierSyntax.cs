@@ -7,26 +7,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class AccessModifierSyntax : ModifierSyntax
     {
-        [NotNull] public IAccessModifierToken Token { get; }
+        [NotNull] public IAccessModifierTokenPlace Token { get; }
         public AccessModifier Modifier { get; }
 
-        public AccessModifierSyntax([NotNull] IAccessModifierToken token)
+        public AccessModifierSyntax([NotNull] IAccessModifierTokenPlace token)
         {
             Requires.NotNull(nameof(token), token);
             Token = token;
             switch (Token)
             {
-                case MissingToken _: // To avoid later errors, if the modifer is missing, we treat it as public
-                case PublicKeywordToken _:
+                case IMissingToken _: // To avoid later errors, if the modifer is missing, we treat it as public
+                case IPublicKeywordToken _:
                     Modifier = AccessModifier.Public;
                     break;
-                case ProtectedKeywordToken _:
+                case IProtectedKeywordToken _:
                     Modifier = AccessModifier.Protected;
                     break;
-                case PrivateKeywordToken _:
+                case IPrivateKeywordToken _:
                     Modifier = AccessModifier.Private;
                     break;
-                case InternalKeywordToken _:
+                case IInternalKeywordToken _:
                     Modifier = AccessModifier.Internal;
                     break;
                 default:
@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             }
         }
 
-        public override IEnumerable<IToken> Tokens()
+        public override IEnumerable<ITokenPlace> Tokens()
         {
             yield return Token;
         }

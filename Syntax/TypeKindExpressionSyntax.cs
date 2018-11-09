@@ -7,10 +7,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class TypeKindExpressionSyntax : ExpressionSyntax
     {
-        [NotNull] public ColonToken Colon { get; }
-        [NotNull] public ITypeKindKeywordToken TypeKind { get; }
+        [NotNull] public IColonToken Colon { get; }
+        [NotNull] public ITypeKindKeywordTokenPlace TypeKind { get; }
 
-        public TypeKindExpressionSyntax([NotNull] ColonToken colon, [NotNull] ITypeKindKeywordToken typeKind)
+        public TypeKindExpressionSyntax([NotNull] IColonToken colon, [NotNull] ITypeKindKeywordTokenPlace typeKind)
             : base(TextSpan.Covering(colon.Span, typeKind.Span))
         {
             Requires.NotNull(nameof(colon), colon);

@@ -6,9 +6,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class NoneExpressionSyntax : LiteralExpressionSyntax
     {
-        [NotNull] public NoneKeywordToken NoneKeyword { get; }
+        [NotNull] public INoneKeywordToken NoneKeyword { get; }
 
-        public NoneExpressionSyntax([NotNull] NoneKeywordToken noneKeyword)
+        public NoneExpressionSyntax([NotNull] INoneKeywordToken noneKeyword)
             : base(noneKeyword.Span)
         {
             Requires.NotNull(nameof(noneKeyword), noneKeyword);

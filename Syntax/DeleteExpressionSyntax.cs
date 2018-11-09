@@ -7,11 +7,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class DeleteExpressionSyntax : ExpressionSyntax
     {
-        [NotNull] public DeleteKeywordToken DeleteKeyword { get; }
+        [NotNull] public IDeleteKeywordToken DeleteKeyword { get; }
         [NotNull] public ExpressionSyntax Expression { get; }
 
         public DeleteExpressionSyntax(
-            [NotNull] DeleteKeywordToken deleteKeyword,
+            [NotNull] IDeleteKeywordToken deleteKeyword,
             [NotNull] ExpressionSyntax expression)
             : base(TextSpan.Covering(deleteKeyword.Span, expression.Span))
         {

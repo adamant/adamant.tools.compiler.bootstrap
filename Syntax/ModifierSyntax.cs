@@ -5,6 +5,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public abstract class ModifierSyntax : NonTerminal
     {
-        public abstract IEnumerable<IToken> Tokens();
+        public abstract IEnumerable<ITokenPlace> Tokens();
     }
 }

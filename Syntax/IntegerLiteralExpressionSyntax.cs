@@ -6,9 +6,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class IntegerLiteralExpressionSyntax : LiteralExpressionSyntax
     {
-        [NotNull] public IntegerLiteralToken Literal { get; }
+        [NotNull] public IIntegerLiteralToken Literal { get; }
 
-        public IntegerLiteralExpressionSyntax([NotNull] IntegerLiteralToken literal)
+        public IntegerLiteralExpressionSyntax([NotNull] IIntegerLiteralToken literal)
             : base(literal.Span)
         {
             Requires.NotNull(nameof(literal), literal);

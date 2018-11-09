@@ -6,15 +6,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class DestructorFunctionDeclarationSyntax : FunctionDeclarationSyntax
     {
-        [NotNull] public DeleteKeywordToken DeleteKeyword { get; }
-        public override IIdentifierToken Name => throw new System.NotImplementedException();
+        [NotNull] public IDeleteKeywordToken DeleteKeyword { get; }
+        public override IIdentifierTokenPlace Name => throw new System.NotImplementedException();
 
         public DestructorFunctionDeclarationSyntax(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] DeleteKeywordToken deleteKeyword,
-            [NotNull] IOpenParenToken openParen,
+            [NotNull] IDeleteKeywordToken deleteKeyword,
+            [NotNull] IOpenParenTokenPlace openParen,
             [NotNull] SeparatedListSyntax<ParameterSyntax> parameters,
-            [NotNull] ICloseParenToken closeParen,
+            [NotNull] ICloseParenTokenPlace closeParen,
             [CanBeNull] EffectsSyntax effects,
             [NotNull] SyntaxList<FunctionContractSyntax> contracts,
             [NotNull] BlockSyntax body)

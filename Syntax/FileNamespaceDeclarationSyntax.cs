@@ -5,12 +5,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class FileNamespaceDeclarationSyntax : NamespaceDeclarationSyntax
     {
-        [CanBeNull] public ISemicolonToken Semicolon { get; }
+        [CanBeNull] public ISemicolonTokenPlace Semicolon { get; }
 
         public FileNamespaceDeclarationSyntax(
-            [CanBeNull] NamespaceKeywordToken namespaceKeyword,
+            [CanBeNull] INamespaceKeywordToken namespaceKeyword,
             [CanBeNull] NameSyntax name,
-            [CanBeNull] ISemicolonToken semicolon,
+            [CanBeNull] ISemicolonTokenPlace semicolon,
             [NotNull] SyntaxList<UsingDirectiveSyntax> usingDirectives,
             [NotNull] SyntaxList<DeclarationSyntax> declarations)
             : base(namespaceKeyword, name, usingDirectives, declarations)

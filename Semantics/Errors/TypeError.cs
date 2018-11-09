@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
         public static Diagnostic OperatorCannotBeAppliedToOperandsOfType(
             [NotNull] CodeFile file,
             TextSpan span,
-            [NotNull] OperatorToken @operator,
+            [NotNull] IOperatorToken @operator,
             [CanBeNull] DataType leftOperandType,
             [CanBeNull] DataType rightOperandType)
         {
@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
         public static Diagnostic OperatorCannotBeAppliedToOperandOfType(
             [NotNull] CodeFile file,
             TextSpan span,
-            [NotNull] OperatorToken @operator,
+            [NotNull] IOperatorToken @operator,
             [CanBeNull] DataType operandType)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3002, $"Operator `{@operator.Text(file.Code)}` cannot be applied to operand of type `{operandType}`.");

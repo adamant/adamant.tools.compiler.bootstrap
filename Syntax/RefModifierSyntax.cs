@@ -7,15 +7,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class RefModifierSyntax : ModifierSyntax
     {
-        [NotNull] public RefKeywordToken RefKeyword { get; }
+        [NotNull] public IRefKeywordToken RefKeyword { get; }
 
-        public RefModifierSyntax([NotNull] RefKeywordToken refKeyword)
+        public RefModifierSyntax([NotNull] IRefKeywordToken refKeyword)
         {
             Requires.NotNull(nameof(refKeyword), refKeyword);
             RefKeyword = refKeyword;
         }
 
-        public override IEnumerable<IToken> Tokens()
+        public override IEnumerable<ITokenPlace> Tokens()
         {
             yield return RefKeyword;
         }

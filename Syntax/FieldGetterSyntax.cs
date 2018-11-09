@@ -5,12 +5,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class FieldGetterSyntax : NonTerminal
     {
-        [CanBeNull] public PublicKeywordToken PublicKeyword { get; }
-        [CanBeNull] public GetKeywordToken GetKeyword { get; }
+        [CanBeNull] public IPublicKeywordToken PublicKeyword { get; }
+        [CanBeNull] public IGetKeywordToken GetKeyword { get; }
 
         public FieldGetterSyntax(
-            [CanBeNull] PublicKeywordToken publicKeyword,
-            [CanBeNull] GetKeywordToken getKeyword)
+            [CanBeNull] IPublicKeywordToken publicKeyword,
+            [CanBeNull] IGetKeywordToken getKeyword)
         {
             PublicKeyword = publicKeyword;
             GetKeyword = getKeyword;

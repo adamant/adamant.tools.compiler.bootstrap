@@ -9,26 +9,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     public abstract class FunctionDeclarationSyntax : MemberDeclarationSyntax
     {
         [NotNull] public SyntaxList<ModifierSyntax> Modifiers { get; }
-        [NotNull] public abstract IIdentifierToken Name { get; }
-        [NotNull] public IOpenParenToken OpenParen { get; }
+        [NotNull] public abstract IIdentifierTokenPlace Name { get; }
+        [NotNull] public IOpenParenTokenPlace OpenParen { get; }
         [NotNull] public SeparatedListSyntax<ParameterSyntax> ParameterList { get; }
         [NotNull] [ItemNotNull] public IEnumerable<ParameterSyntax> Parameters => ParameterList.Nodes();
-        [NotNull] public ICloseParenToken CloseParen { get; }
+        [NotNull] public ICloseParenTokenPlace CloseParen { get; }
         [CanBeNull] public EffectsSyntax Effects { get; }
         [NotNull] public SyntaxList<FunctionContractSyntax> Contracts { get; }
         [CanBeNull] public BlockSyntax Body { get; }
-        [CanBeNull] public ISemicolonToken Semicolon { get; }
+        [CanBeNull] public ISemicolonTokenPlace Semicolon { get; }
 
         protected FunctionDeclarationSyntax(
             TextSpan signatureSpan,
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] IOpenParenToken openParen,
+            [NotNull] IOpenParenTokenPlace openParen,
             [NotNull] SeparatedListSyntax<ParameterSyntax> parameterList,
-            [NotNull] ICloseParenToken closeParen,
+            [NotNull] ICloseParenTokenPlace closeParen,
             [CanBeNull] EffectsSyntax effects,
             [NotNull] SyntaxList<FunctionContractSyntax> contracts,
             [CanBeNull] BlockSyntax body,
-            [CanBeNull] ISemicolonToken semicolon)
+            [CanBeNull] ISemicolonTokenPlace semicolon)
             : base(signatureSpan)
         {
             Requires.NotNull(nameof(modifiers), modifiers);

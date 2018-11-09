@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         [NotNull] public ExpressionSyntax Operand { get; }
 
         public UnaryOperatorExpressionSyntax(
-            [NotNull] OperatorToken @operator,
+            [NotNull] IOperatorToken @operator,
             [NotNull] ExpressionSyntax operand)
             : base(@operator, TextSpan.Covering(@operator.Span, operand.Span))
         {

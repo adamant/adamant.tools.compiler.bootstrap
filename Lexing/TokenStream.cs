@@ -15,14 +15,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
 
         [NotNull]
         [ItemNotNull]
-        private readonly IEnumerator<Token> tokens;
+        private readonly IEnumerator<IToken> tokens;
 
-        public TokenStream([NotNull] CodeFile file, [NotNull][ItemNotNull] IEnumerable<Token> tokens)
+        public TokenStream([NotNull] CodeFile file, [NotNull][ItemNotNull] IEnumerable<IToken> tokens)
         {
             Requires.NotNull(nameof(file), file);
             Requires.NotNull(nameof(tokens), tokens);
             File = file;
-            this.tokens = tokens.Where(t => !(t is TriviaToken)).GetEnumerator().AssertNotNull();
+            this.tokens = tokens.Where(t => !(t is ITriviaToken)).GetEnumerator().AssertNotNull();
             this.tokens.MoveNext();
         }
 
@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
             tokens.Reset();
         }
 
-        public Token Current => tokens.Current;
+        public IToken Current => tokens.Current;
 
         object IEnumerator.Current => Current;
 

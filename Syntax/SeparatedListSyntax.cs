@@ -8,15 +8,15 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class SeparatedListSyntax<T> : NonTerminal, IReadOnlyList<ISyntaxNodeOrToken>
+    public class SeparatedListSyntax<T> : NonTerminal, IReadOnlyList<ISyntaxNodeOrTokenPlace>
         where T : NonTerminal
     {
         [NotNull]
-        public static readonly SeparatedListSyntax<T> Empty = new SeparatedListSyntax<T>(Enumerable.Empty<ISyntaxNodeOrToken>());
+        public static readonly SeparatedListSyntax<T> Empty = new SeparatedListSyntax<T>(Enumerable.Empty<ISyntaxNodeOrTokenPlace>());
 
-        [NotNull] [ItemNotNull] private readonly IReadOnlyList<ISyntaxNodeOrToken> children;
+        [NotNull] [ItemNotNull] private readonly IReadOnlyList<ISyntaxNodeOrTokenPlace> children;
 
-        public SeparatedListSyntax([NotNull][ItemNotNull] IEnumerable<ISyntaxNodeOrToken> children)
+        public SeparatedListSyntax([NotNull][ItemNotNull] IEnumerable<ISyntaxNodeOrTokenPlace> children)
         {
             this.children = children.ToReadOnlyList();
             Validate();
@@ -34,15 +34,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                 }
                 else
                 {
-                    Debug.Assert(item is SymbolToken, "Separator token missing or invalid in separated list.");
+                    Debug.Assert(item is ITokenPlace, "Separator token missing or invalid in separated list.");
                 }
             }
         }
 
         [NotNull]
-        public IEnumerator<ISyntaxNodeOrToken> GetEnumerator()
+        public IEnumerator<ISyntaxNodeOrTokenPlace> GetEnumerator()
         {
-            return children.GetEnumerator();
+            return children.GetEnumerator().AssertNotNull();
         }
 
         [NotNull]
@@ -54,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         public int Count => children.Count;
 
         [NotNull]
-        public ISyntaxNodeOrToken this[int index] => children[index];
+        public ISyntaxNodeOrTokenPlace this[int index] => children[index];
 
         [NotNull]
         public IEnumerable<T> Nodes()
@@ -63,9 +63,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         }
 
         [NotNull]
-        public IEnumerable<SymbolToken> Separators()
+        public IEnumerable<ITokenPlace> Separators()
         {
-            return children.OfType<SymbolToken>();
+            return children.OfType<ITokenPlace>();
         }
     }
 }

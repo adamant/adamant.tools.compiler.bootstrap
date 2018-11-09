@@ -6,11 +6,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class GenericConstraintSyntax : NonTerminal
     {
-        [NotNull] public WhereKeywordToken WhereKeyword { get; }
+        [NotNull] public IWhereKeywordToken WhereKeyword { get; }
         [NotNull] public ExpressionSyntax Expression { get; }
 
         public GenericConstraintSyntax(
-            [NotNull] WhereKeywordToken whereKeyword,
+            [NotNull] IWhereKeywordToken whereKeyword,
             [NotNull] ExpressionSyntax expression)
         {
             Requires.NotNull(nameof(whereKeyword), whereKeyword);

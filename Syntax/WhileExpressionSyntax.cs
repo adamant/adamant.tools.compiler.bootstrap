@@ -7,12 +7,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class WhileExpressionSyntax : ExpressionSyntax
     {
-        [NotNull] public WhileKeywordToken WhileKeyword { get; }
+        [NotNull] public IWhileKeywordToken WhileKeyword { get; }
         [NotNull] public ExpressionSyntax Condition { get; }
         [NotNull] public BlockSyntax Block { get; }
 
         public WhileExpressionSyntax(
-            [NotNull] WhileKeywordToken whileKeyword,
+            [NotNull] IWhileKeywordToken whileKeyword,
             [NotNull] ExpressionSyntax condition,
             [NotNull] BlockSyntax block)
             : base(TextSpan.Covering(whileKeyword.Span, block.Span))

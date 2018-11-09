@@ -9,9 +9,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class IncompleteDeclarationSyntax : MemberDeclarationSyntax
     {
-        [NotNull] [ItemNotNull] public IReadOnlyList<IToken> Tokens { get; }
+        [NotNull] [ItemNotNull] public IReadOnlyList<ITokenPlace> Tokens { get; }
 
-        public IncompleteDeclarationSyntax([NotNull][ItemNotNull] IReadOnlyList<IToken> tokens)
+        public IncompleteDeclarationSyntax([NotNull][ItemNotNull] IReadOnlyList<ITokenPlace> tokens)
             : base(TextSpan.Covering(tokens.Select(t => t.Span).Cast<TextSpan?>().ToArray()))
         {
             Tokens = tokens.ToReadOnlyList();

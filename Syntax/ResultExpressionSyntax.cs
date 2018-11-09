@@ -7,10 +7,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class ResultExpressionSyntax : ExpressionBlockSyntax
     {
-        [NotNull] public EqualsGreaterThanToken EqualsGreaterThan { get; }
+        [NotNull] public IEqualsGreaterThanToken EqualsGreaterThan { get; }
         [NotNull] public ExpressionSyntax Expression { get; }
         public ResultExpressionSyntax(
-            [NotNull] EqualsGreaterThanToken equalsGreaterThan,
+            [NotNull] IEqualsGreaterThanToken equalsGreaterThan,
             [NotNull] ExpressionSyntax expression)
             : base(TextSpan.Covering(equalsGreaterThan.Span, expression.Span))
         {

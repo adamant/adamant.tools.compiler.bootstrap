@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             Type<TSeparator> separatorType,
             [NotNull] IDiagnosticsCollector diagnostics)
             where T : NonTerminal
-            where TSeparator : Token;
+            where TSeparator : class, IToken;
 
         [Obsolete("Use ParseList() taking an AcceptFunction instead")]
         [MustUseReturnValue]
@@ -47,7 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             Type<TTerminator> terminatorType,
             [NotNull] IDiagnosticsCollector diagnostics)
             where T : NonTerminal
-            where TTerminator : Token;
+            where TTerminator : class, IToken;
 
         [Obsolete("Use ParseSeparatedList() taking an AcceptFunction instead")]
         [MustUseReturnValue]
@@ -59,7 +59,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             Type<TTerminator> terminatorType,
             [NotNull] IDiagnosticsCollector diagnostics)
             where T : NonTerminal
-            where TSeparator : Token
-            where TTerminator : Token;
+            where TSeparator : class, IToken
+            where TTerminator : class, IToken;
     }
 }

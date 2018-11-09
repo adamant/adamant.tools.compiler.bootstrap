@@ -9,13 +9,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     {
         [NotNull] public CodeFile CodeFile { get; }
         [NotNull] public FileNamespaceDeclarationSyntax Namespace { get; }
-        [NotNull] public EndOfFileToken EndOfFile { get; }
+        [NotNull] public IEndOfFileToken EndOfFile { get; }
         [NotNull] public Diagnostics Diagnostics { get; }
 
         public CompilationUnitSyntax(
             [NotNull] CodeFile codeFile,
             [NotNull] FileNamespaceDeclarationSyntax @namespace,
-            [NotNull] EndOfFileToken endOfFile,
+            [NotNull] IEndOfFileToken endOfFile,
             [NotNull] Diagnostics diagnostics)
         {
             Requires.NotNull(nameof(codeFile), codeFile);

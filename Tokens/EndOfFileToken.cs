@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
-    public class EndOfFileToken : Token
+    internal class EndOfFileToken : Token, IEndOfFileToken
     {
         [NotNull]
         public Diagnostics Diagnostics { get; }
@@ -14,6 +14,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         {
             Requires.NotNull(nameof(diagnostics), diagnostics);
             Diagnostics = diagnostics;
+        }
+    }
+
+    public static partial class TokenFactory
+    {
+        [NotNull]
+        public static IEndOfFileToken EndOfFile(TextSpan span, [NotNull] Diagnostics diagnostics)
+        {
+            return new EndOfFileToken(span, diagnostics);
         }
     }
 }

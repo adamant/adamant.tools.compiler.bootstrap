@@ -4,15 +4,22 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes
 {
-    public class FakeToken : Token
+    public class FakeToken : IToken
     {
+        public TextSpan Span { get; }
+
         [CanBeNull]
         public readonly object FakeValue;
 
         public FakeToken(TextSpan span, [CanBeNull] object fakeValue)
-            : base(span)
         {
+            Span = span;
             FakeValue = fakeValue;
+        }
+
+        public string Text(CodeText code)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

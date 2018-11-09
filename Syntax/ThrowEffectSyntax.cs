@@ -6,11 +6,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class ThrowEffectSyntax : EffectSyntax
     {
-        [NotNull] public ThrowKeywordToken ThrowKeyword { get; }
+        [NotNull] public IThrowKeywordToken ThrowKeyword { get; }
         [NotNull] public SeparatedListSyntax<ThrowEffectEntrySyntax> Exceptions { get; }
 
         public ThrowEffectSyntax(
-            [NotNull] ThrowKeywordToken throwKeyword,
+            [NotNull] IThrowKeywordToken throwKeyword,
             [NotNull] SeparatedListSyntax<ThrowEffectEntrySyntax> exceptions)
         {
             Requires.NotNull(nameof(throwKeyword), throwKeyword);

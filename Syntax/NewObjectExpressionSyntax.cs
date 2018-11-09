@@ -8,19 +8,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class NewObjectExpressionSyntax : ExpressionSyntax
     {
-        [NotNull] public INewKeywordToken NewKeyword { get; }
+        [NotNull] public INewKeywordTokenPlace NewKeyword { get; }
         [NotNull] public NameSyntax Constructor { get; }
-        [NotNull] public IOpenParenToken OpenParen { get; }
+        [NotNull] public IOpenParenTokenPlace OpenParen { get; }
         [NotNull] public SeparatedListSyntax<ArgumentSyntax> ArgumentList { get; }
         [NotNull] [ItemNotNull] public IEnumerable<ArgumentSyntax> Arguments => ArgumentList.Nodes();
-        [NotNull] public ICloseParenToken CloseParen { get; }
+        [NotNull] public ICloseParenTokenPlace CloseParen { get; }
 
         public NewObjectExpressionSyntax(
-            [NotNull] INewKeywordToken newKeyword,
+            [NotNull] INewKeywordTokenPlace newKeyword,
             [NotNull] NameSyntax constructor,
-            [NotNull] IOpenParenToken openParen,
+            [NotNull] IOpenParenTokenPlace openParen,
             [NotNull] SeparatedListSyntax<ArgumentSyntax> argumentList,
-            [NotNull] ICloseParenToken closeParen)
+            [NotNull] ICloseParenTokenPlace closeParen)
             : base(TextSpan.Covering(newKeyword.Span, closeParen.Span))
         {
             Requires.NotNull(nameof(newKeyword), newKeyword);

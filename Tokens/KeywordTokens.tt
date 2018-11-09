@@ -73,6 +73,13 @@
         "Next",
         "Override",
         "Any",
+        "True",
+        "False",
+        "As",
+        "And",
+        "Or",
+        "Xor",
+        "Not",
     }.AsReadOnly();
 #>
 using System;
@@ -85,18 +92,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
     public static partial class TokenTypes
     {
-        [NotNull][ItemNotNull]
-        public static readonly IReadOnlyList<Type> Keyword = new List<Type>()
+        [NotNull, ItemNotNull]
+        private static readonly IReadOnlyList<Type> Keyword = new List<Type>()
         {
 <# foreach(var keyword in keywords) {#>
             typeof(<#=keyword#>KeywordToken),
 <#}#>
         }.AsReadOnly().AssertNotNull();
     }
+
+    public static partial class TokenFactory
+    {
+<# foreach(var keyword in keywords) {#>
+        [NotNull]
+        public static I<#=keyword#>KeywordToken <#=keyword#>Keyword(TextSpan span)
+        {
+            return new <#=keyword#>KeywordToken(span);
+        }
+
+<#}#>
+    }
 <# foreach(var keyword in keywords) {#>
 
-    public partial interface I<#=keyword#>KeywordToken : IKeywordToken { }
-    public class <#=keyword#>KeywordToken : KeywordToken, I<#=keyword#>KeywordToken
+    public partial interface I<#=keyword#>KeywordTokenPlace : IKeywordTokenPlace { }
+    public partial interface I<#=keyword#>KeywordToken : IKeywordToken, I<#=keyword#>KeywordTokenPlace { }
+    internal partial class <#=keyword#>KeywordToken : Token, I<#=keyword#>KeywordToken
     {
         public <#=keyword#>KeywordToken(TextSpan span)
             : base(span)
@@ -104,10 +124,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 <#}#>
-    public partial class MissingToken :
+    public partial interface IMissingToken :
 <# foreach(var keyword in keywords) {#>
-        I<#=keyword#>KeywordToken,
+        I<#=keyword#>KeywordTokenPlace,
 <#}#>
-        IKeywordToken // Implied, but saves issues with commas
+        IKeywordTokenPlace // Implied, but saves issues with commas
     { }
 }

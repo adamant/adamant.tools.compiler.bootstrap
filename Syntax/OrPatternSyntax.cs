@@ -7,12 +7,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     public class OrPatternSyntax : PatternSyntax
     {
         [NotNull] public PatternSyntax LeftAlternative { get; }
-        [NotNull] public PipeToken Pipe { get; }
+        [NotNull] public IPipeToken Pipe { get; }
         [NotNull] public PatternSyntax RightAlternative { get; }
 
         public OrPatternSyntax(
             [NotNull] PatternSyntax leftAlternative,
-            [NotNull] PipeToken pipe,
+            [NotNull] IPipeToken pipe,
             [NotNull] PatternSyntax rightAlternative)
         {
             Requires.NotNull(nameof(leftAlternative), leftAlternative);

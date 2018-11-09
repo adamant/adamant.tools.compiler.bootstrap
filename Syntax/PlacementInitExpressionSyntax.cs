@@ -8,25 +8,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class PlacementInitExpressionSyntax : ExpressionSyntax
     {
-        [NotNull] public IInitKeywordToken InitKeyword { get; }
-        [NotNull] public IOpenParenToken OpenParen { get; }
+        [NotNull] public IInitKeywordTokenPlace InitKeyword { get; }
+        [NotNull] public IOpenParenTokenPlace OpenParen { get; }
         [NotNull] public ExpressionSyntax PlaceExpression { get; }
-        [NotNull] public ICloseParenToken CloseParen { get; }
+        [NotNull] public ICloseParenTokenPlace CloseParen { get; }
         [NotNull] public NameSyntax Initializer { get; }
-        [NotNull] public IOpenParenToken ArgumentsOpenParen { get; }
+        [NotNull] public IOpenParenTokenPlace ArgumentsOpenParen { get; }
         [NotNull] public SeparatedListSyntax<ArgumentSyntax> ArgumentList { get; }
         [NotNull] [ItemNotNull] public IEnumerable<ArgumentSyntax> Arguments => ArgumentList.Nodes();
-        [NotNull] public ICloseParenToken ArgumentsCloseParen { get; }
+        [NotNull] public ICloseParenTokenPlace ArgumentsCloseParen { get; }
 
         public PlacementInitExpressionSyntax(
-            [NotNull] IInitKeywordToken initKeyword,
-            [NotNull] IOpenParenToken openParen,
+            [NotNull] IInitKeywordTokenPlace initKeyword,
+            [NotNull] IOpenParenTokenPlace openParen,
             [NotNull] ExpressionSyntax placeExpression,
-            [NotNull] ICloseParenToken closeParen,
+            [NotNull] ICloseParenTokenPlace closeParen,
             [NotNull] NameSyntax initializer,
-            [NotNull] IOpenParenToken argumentsOpenParen,
+            [NotNull] IOpenParenTokenPlace argumentsOpenParen,
             [NotNull] SeparatedListSyntax<ArgumentSyntax> argumentList,
-            [NotNull] ICloseParenToken argumentsCloseParen)
+            [NotNull] ICloseParenTokenPlace argumentsCloseParen)
             : base(TextSpan.Covering(initKeyword.Span, argumentsCloseParen.Span))
         {
             Requires.NotNull(nameof(initKeyword), initKeyword);

@@ -5,9 +5,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class SimpleEffectSyntax : EffectSyntax
     {
-        [NotNull] public IdentifierToken Identifier { get; }
+        [NotNull] public IIdentifierToken Identifier { get; }
 
-        public SimpleEffectSyntax([NotNull] IdentifierToken identifier)
+        public SimpleEffectSyntax([NotNull] IIdentifierToken identifier)
         {
             Identifier = identifier;
         }

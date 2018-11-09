@@ -5,8 +5,24 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ output extension=".cs" #>
 <#
-    var operators = new List<string>()
+    var tokens = new List<string>()
     {
+        "Whitespace",
+        "Comment",
+        "Unexpected",
+        "OpenBrace", // `{` U+007B
+        "CloseBrace", // `}` U+007D
+        "OpenParen", // `(` U+0028
+        "CloseParen", // `)` U+0029
+        "OpenBracket", // `[` U+005B
+        "CloseBracket", // `]` U+005D
+        "Semicolon", // `;` U+003B
+        "Comma", // `",` U+002C
+        "Pipe", // `|` U+007C
+        "Colon", // `:` U+003A
+        "RightArrow", // `→` U+2192, `->` U+002D, U+003E
+        "Hash", // `#` U+0023
+        "HashHash", // `##` U+0023, U+0023
         "Dot", // `.` U+002E
         "DotDot", // `..` U+002E, U+002E
         "LessThanDotDot", // `<..` U+003C, U+002E, U+002E
@@ -43,24 +59,38 @@
     }.AsReadOnly();
 #>
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
-<# foreach(var @operator in operators) {#>
-    public partial interface I<#=@operator#>Token : IOperatorToken { }
-    public class <#=@operator#>Token : OperatorToken, I<#=@operator#>Token
+    public static partial class TokenFactory
     {
-        public <#=@operator#>Token(TextSpan span)
+<# foreach(var token in tokens) {#>
+        [NotNull]
+        public static I<#=token#>Token <#=token#>(TextSpan span)
+        {
+            return new <#=token#>Token(span);
+        }
+
+<#}#>
+    }
+<# foreach(var token in tokens) {#>
+
+    public partial interface I<#=token#>TokenPlace : ITokenPlace { }
+    public partial interface I<#=token#>Token : IToken, I<#=token#>TokenPlace { }
+    internal partial class <#=token#>Token : Token, I<#=token#>Token
+    {
+        public <#=token#>Token(TextSpan span)
             : base(span)
         {
         }
     }
+<#}#>
 
+    public partial interface IMissingToken :
+<# foreach(var token in tokens) {#>
+        I<#=token#>TokenPlace,
 <#}#>
-    public partial class MissingToken :
-<# foreach(var @operator in operators) {#>
-        I<#=@operator#>Token,
-<#}#>
-        IOperatorToken // Implied, but saves issues with commas
+        ITokenPlace // Implied, but saves issues with commas
     { }
 }

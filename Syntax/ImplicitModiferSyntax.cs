@@ -7,15 +7,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class ImplicitModiferSyntax : ModifierSyntax
     {
-        [NotNull] public ImplicitKeywordToken ImplicitKeyword { get; }
+        [NotNull] public IImplicitKeywordToken ImplicitKeyword { get; }
 
-        public ImplicitModiferSyntax([NotNull] ImplicitKeywordToken implicitKeyword)
+        public ImplicitModiferSyntax([NotNull] IImplicitKeywordToken implicitKeyword)
         {
             Requires.NotNull(nameof(implicitKeyword), implicitKeyword);
             ImplicitKeyword = implicitKeyword;
         }
 
-        public override IEnumerable<IToken> Tokens()
+        public override IEnumerable<ITokenPlace> Tokens()
         {
             yield return ImplicitKeyword;
         }

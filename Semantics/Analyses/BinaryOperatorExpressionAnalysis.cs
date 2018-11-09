@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
     {
         [NotNull] public new BinaryOperatorExpressionSyntax Syntax { get; }
         [NotNull] public ExpressionAnalysis LeftOperand { get; }
-        [NotNull] public OperatorToken Operator => Syntax.Operator;
+        [NotNull] public IOperatorToken Operator => Syntax.Operator;
         [NotNull] public ExpressionAnalysis RightOperand { get; }
 
         public BinaryOperatorExpressionAnalysis(

@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
-    public interface ISyntaxNodeOrToken
+    public interface IBareIdentifierToken : IIdentifierToken
     {
     }
 }

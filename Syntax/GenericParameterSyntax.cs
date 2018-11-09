@@ -6,15 +6,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class GenericParameterSyntax : NonTerminal
     {
-        [CanBeNull] public ParamsKeywordToken ParamsKeyword { get; }
-        [NotNull] public IIdentifierToken Name { get; }
-        [CanBeNull] public IColonToken Colon { get; }
+        [CanBeNull] public IParamsKeywordToken ParamsKeyword { get; }
+        [NotNull] public IIdentifierTokenPlace Name { get; }
+        [CanBeNull] public IColonTokenPlace Colon { get; }
         [CanBeNull] public ExpressionSyntax TypeExpression { get; }
 
         public GenericParameterSyntax(
-            [CanBeNull] ParamsKeywordToken paramsKeyword,
-            [NotNull] IIdentifierToken name,
-            [CanBeNull] IColonToken colon,
+            [CanBeNull] IParamsKeywordToken paramsKeyword,
+            [NotNull] IIdentifierTokenPlace name,
+            [CanBeNull] IColonTokenPlace colon,
             [CanBeNull] ExpressionSyntax typeExpression)
         {
             Requires.NotNull(nameof(name), name);

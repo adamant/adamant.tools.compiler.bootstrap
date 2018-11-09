@@ -13,9 +13,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public NameSyntax ParseName([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
         {
             NameSyntax name = ParseSimpleName(tokens, diagnostics);
-            while (tokens.Current is DotToken)
+            while (tokens.Current is IDotToken)
             {
-                var dot = tokens.Take<DotToken>();
+                var dot = tokens.Take<IDotToken>();
                 var simpleName = ParseSimpleName(tokens, diagnostics);
                 name = new QualifiedNameSyntax(name, dot, simpleName);
             }
@@ -28,11 +28,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             var identifier = tokens.ExpectIdentifier();
             SimpleNameSyntax simpleName;
-            if (tokens.Current is OpenBracketToken)
+            if (tokens.Current is IOpenBracketToken)
             {
-                var openBracket = tokens.Expect<IOpenBracketToken>();
+                var openBracket = tokens.Expect<IOpenBracketTokenPlace>();
                 var arguments = ParseArgumentList(tokens, diagnostics);
-                var closeBracket = tokens.Expect<ICloseBracketToken>();
+                var closeBracket = tokens.Expect<ICloseBracketTokenPlace>();
                 simpleName = new GenericNameSyntax(identifier, openBracket, arguments, closeBracket);
             }
             else

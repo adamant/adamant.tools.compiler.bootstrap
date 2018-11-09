@@ -7,21 +7,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class NamedParameterSyntax : ParameterSyntax
     {
-        [CanBeNull] public ParamsKeywordToken ParamsKeyword { get; }
-        [CanBeNull] public VarKeywordToken VarKeyword { get; }
-        [NotNull] public IIdentifierToken Name { get; }
-        [NotNull] public IColonToken Colon { get; }
+        [CanBeNull] public IParamsKeywordToken ParamsKeyword { get; }
+        [CanBeNull] public IVarKeywordToken VarKeyword { get; }
+        [NotNull] public IIdentifierTokenPlace Name { get; }
+        [NotNull] public IColonTokenPlace Colon { get; }
         [NotNull] public ExpressionSyntax TypeExpression { get; }
-        [CanBeNull] public EqualsToken EqualsToken { get; }
+        [CanBeNull] public IEqualsToken EqualsToken { get; }
         [CanBeNull] public ExpressionSyntax DefaultValue { get; }
 
         public NamedParameterSyntax(
-            [CanBeNull] ParamsKeywordToken paramsKeyword,
-            [CanBeNull] VarKeywordToken varKeyword,
-            [NotNull] IIdentifierToken name,
-            [NotNull] IColonToken colon,
+            [CanBeNull] IParamsKeywordToken paramsKeyword,
+            [CanBeNull] IVarKeywordToken varKeyword,
+            [NotNull] IIdentifierTokenPlace name,
+            [NotNull] IColonTokenPlace colon,
             [NotNull] ExpressionSyntax typeExpression,
-            [CanBeNull] EqualsToken equalsToken,
+            [CanBeNull] IEqualsToken equalsToken,
             [CanBeNull] ExpressionSyntax defaultValue)
             : base(TextSpan.Covering(paramsKeyword?.Span, varKeyword?.Span, name.Span, typeExpression.Span))
         {

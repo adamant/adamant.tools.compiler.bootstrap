@@ -6,19 +6,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class AttributeSyntax : NonTerminal
     {
-        [NotNull] public HashToken Hash { get; }
+        [NotNull] public IHashToken Hash { get; }
         [NotNull] public NameSyntax Name { get; }
-        [CanBeNull] public IOpenParenToken OpenParen { get; }
+        [CanBeNull] public IOpenParenTokenPlace OpenParen { get; }
         [NotNull] public SeparatedListSyntax<ArgumentSyntax> ArgumentList { get; }
         [NotNull] public IEnumerable<ArgumentSyntax> Arguments => ArgumentList.Nodes();
-        [CanBeNull] public ICloseParenToken CloseParen { get; }
+        [CanBeNull] public ICloseParenTokenPlace CloseParen { get; }
 
         public AttributeSyntax(
-            [NotNull] HashToken hash,
+            [NotNull] IHashToken hash,
             [NotNull] NameSyntax name,
-            [CanBeNull] IOpenParenToken openParen,
+            [CanBeNull] IOpenParenTokenPlace openParen,
             [CanBeNull] SeparatedListSyntax<ArgumentSyntax> argumentList,
-            [CanBeNull] ICloseParenToken closeParen)
+            [CanBeNull] ICloseParenTokenPlace closeParen)
         {
             Hash = hash;
             Name = name;
@@ -28,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         }
 
         [ItemNotNull]
-        public IEnumerable<IToken> Tokens()
+        public IEnumerable<ITokenPlace> Tokens()
         {
             yield return Hash;
             // TODO tokens for Name

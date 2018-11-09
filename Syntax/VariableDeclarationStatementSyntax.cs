@@ -6,22 +6,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class VariableDeclarationStatementSyntax : StatementSyntax
     {
-        [NotNull] public IBindingKeywordToken Binding { get; }
-        [NotNull] public IIdentifierToken Name { get; }
-        [CanBeNull] public IColonToken Colon { get; }
+        [NotNull] public IBindingToken Binding { get; }
+        [NotNull] public IIdentifierTokenPlace Name { get; }
+        [CanBeNull] public IColonTokenPlace Colon { get; }
         [CanBeNull] public ExpressionSyntax TypeExpression { get; }
-        [CanBeNull] public new EqualsToken Equals { get; }
+        [CanBeNull] public new IEqualsToken Equals { get; }
         [CanBeNull] public ExpressionSyntax Initializer { get; }
-        [NotNull] public ISemicolonToken Semicolon { get; }
+        [NotNull] public ISemicolonTokenPlace Semicolon { get; }
 
         public VariableDeclarationStatementSyntax(
-            [NotNull] IBindingKeywordToken binding,
-            [NotNull] IIdentifierToken name,
-            [CanBeNull] IColonToken colon,
+            [NotNull] IBindingToken binding,
+            [NotNull] IIdentifierTokenPlace name,
+            [CanBeNull] IColonTokenPlace colon,
             [CanBeNull] ExpressionSyntax typeExpression,
-            [CanBeNull] EqualsToken equals,
+            [CanBeNull] IEqualsToken equals,
             [CanBeNull] ExpressionSyntax initializer,
-            [NotNull] ISemicolonToken semicolon)
+            [NotNull] ISemicolonTokenPlace semicolon)
         {
             Requires.NotNull(nameof(binding), binding);
             Requires.NotNull(nameof(name), name);

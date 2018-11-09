@@ -4,8 +4,8 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
-using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes;
+using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using FsCheck;
@@ -56,7 +56,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax
             var file = symbol.ToFakeCodeFile();
             var output = lexer.Lex(file);
             var token = output.AssertSingleNoErrors();
-            Assert.IsType(tokenType, token);
+
+            token.AssertOfType(tokenType);
             Assert.Equal(new TextSpan(0, symbol.Length), token.Span);
         }
 
@@ -72,7 +73,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax
             var output = lexer.Lex(file);
             var (token, diagnostics) = output.AssertCount(3);
             token[0].AssertIdentifier(0, 1, "x");
-            token[1].AssertIs<NotEqualToken>(1, 2);
+            token[1].AssertIs<INotEqualToken>(1, 2);
             token[2].AssertIdentifier(3, 1, "y");
             diagnostics.AssertCount(1);
             diagnostics[0].AssertError(1004, 1, 2);
@@ -92,7 +93,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax
             var file = comment.ToFakeCodeFile();
             var output = lexer.Lex(file);
             var token = output.AssertSingleNoErrors();
-            token.AssertIs<CommentToken>(0, comment.Length);
+            token.AssertIs<ICommentToken>(0, comment.Length);
         }
 
         [Fact]
@@ -101,7 +102,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax
             var file = "/*".ToFakeCodeFile();
             var tokens = lexer.Lex(file);
             var (comment, diagnostics) = tokens.AssertSingleWithErrors();
-            comment.AssertIs<CommentToken>(0, 2);
+            comment.AssertIs<ICommentToken>(0, 2);
             var diagnostic = diagnostics.AssertSingle();
             diagnostic.AssertError(1001, 0, 2);
         }
@@ -170,9 +171,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax
             var file = text.ToFakeCodeFile();
             var output = lexer.Lex(file);
             var (token, diagnostics) = output.AssertCount(3);
-            token[0].AssertIs<WhitespaceToken>(0, 1);
-            token[1].AssertIs<UnexpectedToken>(1, 1);
-            token[2].AssertIs<WhitespaceToken>(2, 1);
+            token[0].AssertIs<IWhitespaceToken>(0, 1);
+            token[1].AssertIs<IUnexpectedToken>(1, 1);
+            token[2].AssertIs<IWhitespaceToken>(2, 1);
             diagnostics.AssertCount(1);
             diagnostics[0].AssertError(1005, 1, 1);
             Assert.True(diagnostics[0]?.Message.Contains(text[1]), "Doesn't contain character");
@@ -194,10 +195,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax
         {
             return Prop.ForAll(Arbitrary.PsuedoToken(), token =>
             {
+                Assert.NotNull(token);
                 var file = token.ToFakeCodeFile();
                 var output = lexer.Lex(file);
                 var outputAsPsuedoTokens = output.ToPsuedoTokens(file);
-                var expectedPsuedoTokens = token.Yield().Append(PsuedoToken.EndOfFile()).ToList();
+                var expectedPsuedoTokens = token.Yield().Append(PsuedoToken.EndOfFile()).AssertNotNull().ToList();
                 return expectedPsuedoTokens.SequenceEqual(outputAsPsuedoTokens)
                     .Label($"Actual:   {outputAsPsuedoTokens.DebugFormat()}")
                     .Label($"Expected: {expectedPsuedoTokens.DebugFormat()}")

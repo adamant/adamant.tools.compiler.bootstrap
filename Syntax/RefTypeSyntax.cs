@@ -6,13 +6,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class RefTypeSyntax : TypeSyntax
     {
-        [NotNull] public RefKeywordToken RefKeyword { get; }
-        [CanBeNull] public VarKeywordToken VarKeyword { get; }
+        [NotNull] public IRefKeywordToken RefKeyword { get; }
+        [CanBeNull] public IVarKeywordToken VarKeyword { get; }
         [NotNull] public ExpressionSyntax ReferencedType { get; }
 
         public RefTypeSyntax(
-            [NotNull] RefKeywordToken refKeyword,
-            [CanBeNull] VarKeywordToken varKeyword,
+            [NotNull] IRefKeywordToken refKeyword,
+            [CanBeNull] IVarKeywordToken varKeyword,
             [NotNull] ExpressionSyntax referencedType)
             : base(TextSpan.Covering(refKeyword.Span, referencedType.Span))
         {

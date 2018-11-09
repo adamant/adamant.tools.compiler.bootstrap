@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Lexing
 {
@@ -11,27 +12,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
     /// </summary>
     internal static class LexError
     {
-        public static Diagnostic UnclosedBlockComment(CodeFile file, TextSpan span)
+        [NotNull]
+        public static Diagnostic UnclosedBlockComment([NotNull] CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1001, "End-of-file found, expected `*/`");
         }
 
-        public static Diagnostic UnclosedStringLiteral(CodeFile file, TextSpan span)
+        [NotNull]
+        public static Diagnostic UnclosedStringLiteral([NotNull] CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1002, "End-of-file in string constant");
         }
 
-        public static Diagnostic InvalidEscapeSequence(CodeFile file, TextSpan span)
+        [NotNull]
+        public static Diagnostic InvalidEscapeSequence([NotNull] CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1003, "Unrecognized escape sequence");
         }
 
-        public static Diagnostic CStyleNotEquals(CodeFile file, TextSpan span)
+        [NotNull]
+        public static Diagnostic CStyleNotEquals([NotNull] CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1004, "Use `≠` or `=/=` for not equal instead of `!=`");
         }
 
-        public static Diagnostic UnexpectedCharacter(CodeFile file, TextSpan span, char character)
+        [NotNull]
+        public static Diagnostic UnexpectedCharacter([NotNull] CodeFile file, TextSpan span, char character)
         {
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1005, $"Unexpected character `{character}`");
         }

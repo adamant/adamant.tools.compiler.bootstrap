@@ -5,9 +5,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class SelfExpressionSyntax : InstanceExpressionSyntax
     {
-        [NotNull] public SelfKeywordToken Token { get; }
+        [NotNull] public ISelfKeywordToken Token { get; }
 
-        public SelfExpressionSyntax([NotNull] SelfKeywordToken token)
+        public SelfExpressionSyntax([NotNull] ISelfKeywordToken token)
             : base(token.Span)
         {
             Token = token;

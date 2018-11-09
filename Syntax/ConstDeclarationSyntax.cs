@@ -9,24 +9,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     {
         [NotNull] public SyntaxList<AttributeSyntax> Attributes { get; }
         [NotNull] [ItemNotNull] public SyntaxList<ModifierSyntax> Modifiers { get; }
-        [NotNull] public ConstKeywordToken ConstKeyword { get; }
-        [NotNull] public IIdentifierToken Name { get; }
-        [CanBeNull] public IColonToken Colon { get; }
+        [NotNull] public IConstKeywordToken ConstKeyword { get; }
+        [NotNull] public IIdentifierTokenPlace Name { get; }
+        [CanBeNull] public IColonTokenPlace Colon { get; }
         [CanBeNull] public ExpressionSyntax TypeExpression { get; }
-        [CanBeNull] public new EqualsToken Equals { get; }
+        [CanBeNull] public new IEqualsToken Equals { get; }
         [CanBeNull] public ExpressionSyntax Initializer { get; }
-        [NotNull] public ISemicolonToken Semicolon { get; }
+        [NotNull] public ISemicolonTokenPlace Semicolon { get; }
 
         public ConstDeclarationSyntax(
             [NotNull] SyntaxList<AttributeSyntax> attributes,
             [NotNull] [ItemNotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] ConstKeywordToken constKeyword,
-            [NotNull] IIdentifierToken name,
-            [CanBeNull] IColonToken colon,
+            [NotNull] IConstKeywordToken constKeyword,
+            [NotNull] IIdentifierTokenPlace name,
+            [CanBeNull] IColonTokenPlace colon,
             [CanBeNull] ExpressionSyntax typeExpression,
-            [CanBeNull] EqualsToken @equals,
+            [CanBeNull] IEqualsToken @equals,
             [CanBeNull] ExpressionSyntax initializer,
-            [NotNull] ISemicolonToken semicolon)
+            [NotNull] ISemicolonTokenPlace semicolon)
             : base(TextSpan.Covering(constKeyword.Span, name.Span))
         {
             Requires.NotNull(nameof(attributes), attributes);

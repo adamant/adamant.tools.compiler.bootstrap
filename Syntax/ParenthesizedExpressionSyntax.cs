@@ -7,14 +7,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class ParenthesizedExpressionSyntax : ExpressionSyntax
     {
-        [NotNull] public IOpenParenToken OpenParen { get; }
+        [NotNull] public IOpenParenTokenPlace OpenParen { get; }
         [NotNull] public ExpressionSyntax Expression { get; }
-        [NotNull] public ICloseParenToken CloseParen { get; }
+        [NotNull] public ICloseParenTokenPlace CloseParen { get; }
 
         public ParenthesizedExpressionSyntax(
-            [NotNull] IOpenParenToken openParen,
+            [NotNull] IOpenParenTokenPlace openParen,
             [NotNull] ExpressionSyntax expression,
-            [NotNull] ICloseParenToken closeParen)
+            [NotNull] ICloseParenTokenPlace closeParen)
             : base(TextSpan.Covering(openParen.Span, closeParen.Span))
         {
             Requires.NotNull(nameof(openParen), openParen);

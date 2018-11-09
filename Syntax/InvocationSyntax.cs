@@ -9,16 +9,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     public class InvocationSyntax : ExpressionSyntax
     {
         [NotNull] public ExpressionSyntax Callee { get; set; }
-        [NotNull] public IOpenParenToken OpenParen { get; }
+        [NotNull] public IOpenParenTokenPlace OpenParen { get; }
         [NotNull] public SeparatedListSyntax<ArgumentSyntax> ArgumentList { get; }
         [NotNull] [ItemNotNull] public IEnumerable<ArgumentSyntax> Arguments => ArgumentList.Nodes();
-        [NotNull] public ICloseParenToken CloseParen { get; }
+        [NotNull] public ICloseParenTokenPlace CloseParen { get; }
 
         public InvocationSyntax(
             [NotNull] ExpressionSyntax callee,
-            [NotNull] IOpenParenToken openParen,
+            [NotNull] IOpenParenTokenPlace openParen,
             [NotNull] SeparatedListSyntax<ArgumentSyntax> argumentList,
-            [NotNull] ICloseParenToken closeParen)
+            [NotNull] ICloseParenTokenPlace closeParen)
             : base(TextSpan.Covering(callee.Span, closeParen.Span))
         {
             Requires.NotNull(nameof(callee), callee);

@@ -15,38 +15,38 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             switch (tokens.Current)
             {
-                case ImplicitKeywordToken implicitKeyword:
+                case IImplicitKeywordToken implicitKeyword:
                     tokens.MoveNext();
                     return new ImplicitModiferSyntax(implicitKeyword);
-                case MoveKeywordToken moveKeyword:
+                case IMoveKeywordToken moveKeyword:
                     tokens.MoveNext();
                     return new MoveModifierSyntax(moveKeyword);
-                case OverrideKeywordToken overrideKeyword:
+                case IOverrideKeywordToken overrideKeyword:
                     tokens.MoveNext();
                     return new OverrideModifierSyntax(overrideKeyword);
-                case RefKeywordToken refKeyword:
+                case IRefKeywordToken refKeyword:
                     tokens.MoveNext();
                     return new RefModifierSyntax(refKeyword);
-                case ExtendKeywordToken extendKeyword:
+                case IExtendKeywordToken extendKeyword:
                     tokens.MoveNext();
                     return new ExtendModifierSyntax(extendKeyword);
-                case SafeKeywordToken safeKeyword:
+                case ISafeKeywordToken safeKeyword:
                     tokens.MoveNext();
                     return new SafeModifierSyntax(safeKeyword);
-                case UnsafeKeywordToken unsafeKeyword:
+                case IUnsafeKeywordToken unsafeKeyword:
                     tokens.MoveNext();
                     return new UnsafeModifierSyntax(unsafeKeyword);
-                case AbstractKeywordToken abstractKeyword:
+                case IAbstractKeywordToken abstractKeyword:
                     tokens.MoveNext();
                     return new AbstractModifierSyntax(abstractKeyword);
-                case MutableKeywordToken mutableKeyword:
+                case IMutableKeywordToken mutableKeyword:
                     tokens.MoveNext();
                     return new MutableModifierSyntax(mutableKeyword);
-                case PublicKeywordToken _:
-                case ProtectedKeywordToken _:
-                case PrivateKeywordToken _:
-                case InternalKeywordToken _:
-                    return new AccessModifierSyntax(tokens.Expect<IAccessModifierToken>());
+                case IPublicKeywordToken _:
+                case IProtectedKeywordToken _:
+                case IPrivateKeywordToken _:
+                case IInternalKeywordToken _:
+                    return new AccessModifierSyntax(tokens.Expect<IAccessModifierTokenPlace>());
                 default:
                     return null; // This parser needs to be able to return null
             }

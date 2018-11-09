@@ -6,13 +6,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public abstract class NamespaceDeclarationSyntax : DeclarationSyntax
     {
-        [CanBeNull] public NamespaceKeywordToken NamespaceKeyword { get; }
+        [CanBeNull] public INamespaceKeywordToken NamespaceKeyword { get; }
         [CanBeNull] public NameSyntax Name { get; }
         [NotNull] public SyntaxList<UsingDirectiveSyntax> UsingDirectives { get; }
         [NotNull] public SyntaxList<DeclarationSyntax> Declarations { get; }
 
         protected NamespaceDeclarationSyntax(
-            [CanBeNull] NamespaceKeywordToken namespaceKeyword,
+            [CanBeNull] INamespaceKeywordToken namespaceKeyword,
             [CanBeNull] NameSyntax name,
             [NotNull] SyntaxList<UsingDirectiveSyntax> usingDirectives,
             [NotNull] SyntaxList<DeclarationSyntax> declarations)

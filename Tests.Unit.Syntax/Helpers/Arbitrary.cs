@@ -8,8 +8,6 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using Fare;
 using FsCheck;
 using JetBrains.Annotations;
-using LetKeywordToken = Adamant.Tools.Compiler.Bootstrap.Tokens.LetKeywordToken;
-using VarKeywordToken = Adamant.Tools.Compiler.Bootstrap.Tokens.VarKeywordToken;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
 {
@@ -80,7 +78,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
                     return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == "=>"
                         || t2.Text == "*" || t2.Text == "*="
                         || t2.Text == "/" || t2.Text == "/="
-                        || t2.TokenType == typeof(CommentToken);
+                        || t2.TokenType == typeof(ICommentToken);
                 case "=":
                     return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == "=>" || t2.Text == "/="
                         || t2.Text == ">" || t2.Text == ">=";
@@ -99,18 +97,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
                 case "#":
                     return t2.Text == "#" || t2.Text == "##";
                 default:
-                    if (typeof(KeywordToken).IsAssignableFrom(t1.TokenType)
-                        || typeof(IdentifierToken).IsAssignableFrom(t1.TokenType)
-                        || typeof(KeywordOperatorToken).IsAssignableFrom(t1.TokenType)
+                    if (typeof(IKeywordTokenPlace).IsAssignableFrom(t1.TokenType)
+                        || typeof(IIdentifierTokenPlace).IsAssignableFrom(t1.TokenType)
                         )
-                        return typeof(IdentifierToken).IsAssignableFrom(t2.TokenType)
-                            || typeof(KeywordToken).IsAssignableFrom(t2.TokenType)
-                            || typeof(KeywordOperatorToken).IsAssignableFrom(t2.TokenType)
-                            || t2.TokenType == typeof(IntegerLiteralToken);
-                    else if (t1.TokenType == typeof(IntegerLiteralToken))
-                        return t2.TokenType == typeof(IntegerLiteralToken);
-                    else if (t1.TokenType == typeof(WhitespaceToken))
-                        return t2.TokenType == typeof(WhitespaceToken);
+                        return typeof(IIdentifierTokenPlace).IsAssignableFrom(t2.TokenType)
+                            || typeof(IKeywordTokenPlace).IsAssignableFrom(t2.TokenType)
+                            || t2.TokenType == typeof(IIntegerLiteralToken);
+                    else if (t1.TokenType == typeof(IIntegerLiteralToken))
+                        return t2.TokenType == typeof(IIntegerLiteralToken);
+                    else if (t1.TokenType == typeof(IWhitespaceToken))
+                        return t2.TokenType == typeof(IWhitespaceToken);
                     else
                         return false;
             }
@@ -153,7 +149,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
         private static Gen<PsuedoToken> GenWhitespace()
         {
             return GenRegex("[ \t\n\r]")
-                .Select(s => new PsuedoToken(typeof(WhitespaceToken), s));
+                .Select(s => new PsuedoToken(typeof(IWhitespaceToken), s));
         }
 
         [NotNull]
@@ -162,7 +158,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
             // Covers both block comments and line comments
             // For line comments, end in newline requires escape sequences
             return GenRegex(@"(/\*(\**[^/])*\*/)|" + "(//.*[\r\n])")
-                .Select(s => new PsuedoToken(typeof(CommentToken), s));
+                .Select(s => new PsuedoToken(typeof(ICommentToken), s));
         }
 
         [NotNull]
@@ -170,7 +166,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
         {
             return GenRegex(@"[a-zA-Z_][a-zA-Z_0-9]*")
                 .Where(s => !Symbols.ContainsKey(s)) // don't emit keywords
-                .Select(s => new PsuedoToken(typeof(BareIdentifierToken), s, s));
+                .Select(s => new PsuedoToken(typeof(IBareIdentifierToken), s, s));
         }
 
         [NotNull]
@@ -178,14 +174,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
         {
             return GenRegex(@"\\[a-zA-Z_0-9]+")
                 .Where(s => !Symbols.ContainsKey(s)) // don't emit keywords
-                .Select(s => new PsuedoToken(typeof(EscapedIdentifierToken), s, s.Substring(1)));
+                .Select(s => new PsuedoToken(typeof(IEscapedIdentifierToken), s, s.Substring(1)));
         }
 
         [NotNull]
         private static Gen<PsuedoToken> GenIntegerLiteral()
         {
             return GenRegex(@"0|[1-9][0-9]*")
-                .Select(s => new PsuedoToken(typeof(IntegerLiteralToken), s, BigInteger.Parse(s)));
+                .Select(s => new PsuedoToken(typeof(IIntegerLiteralToken), s, BigInteger.Parse(s)));
         }
 
         [NotNull]
@@ -205,139 +201,139 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
                         .Replace(@"\""", "\"")
                         .Replace(@"\b", "\\");
 
-                    return new PsuedoToken(typeof(StringLiteralToken), s, value);
+                    return new PsuedoToken(typeof(IStringLiteralToken), s, value);
                 });
         }
 
         [NotNull]
         public static IReadOnlyDictionary<string, Type> Symbols = new Dictionary<string, Type>()
         {
-            { "{", typeof(OpenBraceToken) },
-            { "}", typeof(CloseBraceToken) },
-            { "(", typeof(OpenParenToken) },
-            { ")", typeof(CloseParenToken) },
-            { "[", typeof(OpenBracketToken) },
-            { "]", typeof(CloseBracketToken) },
-            { ";", typeof(SemicolonToken) },
-            { ",", typeof(CommaToken) },
-            { ".", typeof(DotToken) },
-            { "..", typeof(DotDotToken) },
-            { "<..", typeof(LessThanDotDotToken) },
-            { "..<", typeof(DotDotLessThanToken) },
-            { "<..<", typeof(LessThanDotDotLessThanToken) },
-            { ":", typeof(ColonToken) },
-            { "<:", typeof(LessThanColonToken) },
-            { "?", typeof(QuestionToken) },
-            { "?.", typeof(QuestionDotToken) },
-            { "??", typeof(QuestionQuestionToken) },
-            { "|", typeof(PipeToken) },
-            { "→", typeof(RightArrowToken) },
-            { "->", typeof(RightArrowToken) },
-            { "@", typeof(AtSignToken) },
-            { "^", typeof(CaretToken) },
-            { "^.", typeof(CaretDotToken) },
-            { "+", typeof(PlusToken) },
-            { "-", typeof(MinusToken) },
-            { "*", typeof(AsteriskToken) },
-            { "/", typeof(SlashToken) },
-            { "=", typeof(EqualsToken) },
-            { "==", typeof(EqualsEqualsToken) },
-            { "≠", typeof(NotEqualToken) },
-            { "=/=", typeof(NotEqualToken) },
-            { ">", typeof(GreaterThanToken) },
-            { "≥", typeof(GreaterThanOrEqualToken) },
-            { "⩾", typeof(GreaterThanOrEqualToken) },
-            { ">=", typeof(GreaterThanOrEqualToken) },
-            { "<", typeof(LessThanToken) },
-            { "≤", typeof(LessThanOrEqualToken) },
-            { "⩽", typeof(LessThanOrEqualToken) },
-            { "<=", typeof(LessThanOrEqualToken) },
-            { "+=", typeof(PlusEqualsToken) },
-            { "-=", typeof(MinusEqualsToken) },
-            { "*=", typeof(AsteriskEqualsToken) },
-            { "/=", typeof(SlashEqualsToken) },
-            { "$", typeof(DollarToken) },
-            { "$<", typeof(DollarLessThanToken) },
-            { "$<≠", typeof(DollarLessThanNotEqualToken) },
-            { "$</=", typeof(DollarLessThanNotEqualToken) },
-            { "$>", typeof(DollarGreaterThanToken) },
-            { "$>≠", typeof(DollarGreaterThanNotEqualToken) },
-            { "$>/=", typeof(DollarGreaterThanNotEqualToken) },
-            { "=>", typeof(EqualsGreaterThanToken) },
-            { "#", typeof(HashToken) },
-            { "##", typeof(HashHashToken) },
-            { "public", typeof(PublicKeywordToken) },
-            { "private", typeof(PrivateKeywordToken) },
-            { "protected", typeof(ProtectedKeywordToken) },
-            { "internal", typeof(InternalKeywordToken) },
-            { "let", typeof(LetKeywordToken) },
-            { "var", typeof(VarKeywordToken) },
-            { "void", typeof(VoidKeywordToken) },
-            { "int", typeof(IntKeywordToken) },
-            { "uint", typeof(UIntKeywordToken) },
-            { "bool", typeof(BoolKeywordToken) },
-            { "string", typeof(StringKeywordToken) },
-            { "return", typeof(ReturnKeywordToken) },
-            { "class", typeof(ClassKeywordToken) },
-            { "new", typeof(NewKeywordToken) },
-            { "delete", typeof(DeleteKeywordToken) },
-            { "namespace", typeof(NamespaceKeywordToken) },
-            { "using", typeof(UsingKeywordToken) },
-            { "foreach", typeof(ForeachKeywordToken) },
-            { "in", typeof(InKeywordToken) },
-            { "if", typeof(IfKeywordToken) },
-            { "else", typeof(ElseKeywordToken) },
-            { "not", typeof(NotKeywordToken) },
-            { "and", typeof(AndKeywordToken) },
-            { "or", typeof(OrKeywordToken) },
-            { "xor", typeof(XorKeywordToken) },
-            { "struct", typeof(StructKeywordToken) },
-            { "enum", typeof(EnumKeywordToken) },
-            { "byte", typeof(ByteKeywordToken) },
-            { "size", typeof(SizeKeywordToken) },
-            { "unsafe", typeof(UnsafeKeywordToken) },
-            { "safe", typeof(SafeKeywordToken) },
-            { "base", typeof(BaseKeywordToken) },
-            { "fn", typeof(FunctionKeywordToken) },
-            { "Self", typeof(SelfTypeKeywordToken) },
-            { "init", typeof(InitKeywordToken) },
-            { "owned", typeof(OwnedKeywordToken) },
-            { "self", typeof(SelfKeywordToken) },
-            { "extend", typeof(ExtendKeywordToken) },
-            { "type", typeof(TypeKeywordToken) },
-            { "metatype", typeof(MetatypeKeywordToken) },
-            { "true", typeof(TrueKeywordToken) },
-            { "false", typeof(FalseKeywordToken) },
-            { "mut", typeof(MutableKeywordToken) },
-            { "params", typeof(ParamsKeywordToken) },
-            { "may", typeof(MayKeywordToken) },
-            { "no", typeof(NoKeywordToken) },
-            { "throw", typeof(ThrowKeywordToken) },
-            { "ref", typeof(RefKeywordToken) },
-            { "abstract", typeof(AbstractKeywordToken) },
-            { "get", typeof(GetKeywordToken) },
-            { "set", typeof(SetKeywordToken) },
-            { "requires", typeof(RequiresKeywordToken) },
-            { "ensures", typeof(EnsuresKeywordToken) },
-            { "invariant", typeof(InvariantKeywordToken) },
-            { "where", typeof(WhereKeywordToken) },
-            { "const", typeof(ConstKeywordToken) },
-            { "alias", typeof(AliasKeywordToken) },
-            { "uninitialized", typeof(UninitializedKeywordToken) },
-            { "none", typeof(NoneKeywordToken) },
-            { "operator", typeof(OperatorKeywordToken) },
-            { "implicit", typeof(ImplicitKeywordToken) },
-            { "explicit", typeof(ExplicitKeywordToken) },
-            { "move", typeof(MoveKeywordToken) },
-            { "copy", typeof(CopyKeywordToken) },
-            { "match", typeof(MatchKeywordToken) },
-            { "loop", typeof(LoopKeywordToken) },
-            { "while", typeof(WhileKeywordToken) },
-            { "break", typeof(BreakKeywordToken) },
-            { "next", typeof(NextKeywordToken) },
-            { "override", typeof(OverrideKeywordToken) },
-            { "as", typeof(AsKeywordToken) },
-            { "any", typeof(AnyKeywordToken) },
+            { "{", typeof(IOpenBraceToken) },
+            { "}", typeof(ICloseBraceToken) },
+            { "(", typeof(IOpenParenToken) },
+            { ")", typeof(ICloseParenToken) },
+            { "[", typeof(IOpenBracketToken) },
+            { "]", typeof(ICloseBracketToken) },
+            { ";", typeof(ISemicolonToken) },
+            { ",", typeof(ICommaToken) },
+            { ".", typeof(IDotToken) },
+            { "..", typeof(IDotDotToken) },
+            { "<..", typeof(ILessThanDotDotToken) },
+            { "..<", typeof(IDotDotLessThanToken) },
+            { "<..<", typeof(ILessThanDotDotLessThanToken) },
+            { ":", typeof(IColonToken) },
+            { "<:", typeof(ILessThanColonToken) },
+            { "?", typeof(IQuestionToken) },
+            { "?.", typeof(IQuestionDotToken) },
+            { "??", typeof(IQuestionQuestionToken) },
+            { "|", typeof(IPipeToken) },
+            { "→", typeof(IRightArrowToken) },
+            { "->", typeof(IRightArrowToken) },
+            { "@", typeof(IAtSignToken) },
+            { "^", typeof(ICaretToken) },
+            { "^.", typeof(ICaretDotToken) },
+            { "+", typeof(IPlusToken) },
+            { "-", typeof(IMinusToken) },
+            { "*", typeof(IAsteriskToken) },
+            { "/", typeof(ISlashToken) },
+            { "=", typeof(IEqualsToken) },
+            { "==", typeof(IEqualsEqualsToken) },
+            { "≠", typeof(INotEqualToken) },
+            { "=/=", typeof(INotEqualToken) },
+            { ">", typeof(IGreaterThanToken) },
+            { "≥", typeof(IGreaterThanOrEqualToken) },
+            { "⩾", typeof(IGreaterThanOrEqualToken) },
+            { ">=", typeof(IGreaterThanOrEqualToken) },
+            { "<", typeof(ILessThanToken) },
+            { "≤", typeof(ILessThanOrEqualToken) },
+            { "⩽", typeof(ILessThanOrEqualToken) },
+            { "<=", typeof(ILessThanOrEqualToken) },
+            { "+=", typeof(IPlusEqualsToken) },
+            { "-=", typeof(IMinusEqualsToken) },
+            { "*=", typeof(IAsteriskEqualsToken) },
+            { "/=", typeof(ISlashEqualsToken) },
+            { "$", typeof(IDollarToken) },
+            { "$<", typeof(IDollarLessThanToken) },
+            { "$<≠", typeof(IDollarLessThanNotEqualToken) },
+            { "$</=", typeof(IDollarLessThanNotEqualToken) },
+            { "$>", typeof(IDollarGreaterThanToken) },
+            { "$>≠", typeof(IDollarGreaterThanNotEqualToken) },
+            { "$>/=", typeof(IDollarGreaterThanNotEqualToken) },
+            { "=>", typeof(IEqualsGreaterThanToken) },
+            { "#", typeof(IHashToken) },
+            { "##", typeof(IHashHashToken) },
+            { "public", typeof(IPublicKeywordToken) },
+            { "private", typeof(IPrivateKeywordToken) },
+            { "protected", typeof(IProtectedKeywordToken) },
+            { "internal", typeof(IInternalKeywordToken) },
+            { "let", typeof(ILetKeywordToken) },
+            { "var", typeof(IVarKeywordToken) },
+            { "void", typeof(IVoidKeywordToken) },
+            { "int", typeof(IIntKeywordToken) },
+            { "uint", typeof(IUIntKeywordToken) },
+            { "bool", typeof(IBoolKeywordToken) },
+            { "string", typeof(IStringKeywordToken) },
+            { "return", typeof(IReturnKeywordToken) },
+            { "class", typeof(IClassKeywordToken) },
+            { "new", typeof(INewKeywordToken) },
+            { "delete", typeof(IDeleteKeywordToken) },
+            { "namespace", typeof(INamespaceKeywordToken) },
+            { "using", typeof(IUsingKeywordToken) },
+            { "foreach", typeof(IForeachKeywordToken) },
+            { "in", typeof(IInKeywordToken) },
+            { "if", typeof(IIfKeywordToken) },
+            { "else", typeof(IElseKeywordToken) },
+            { "not", typeof(INotKeywordToken) },
+            { "and", typeof(IAndKeywordToken) },
+            { "or", typeof(IOrKeywordToken) },
+            { "xor", typeof(IXorKeywordToken) },
+            { "struct", typeof(IStructKeywordToken) },
+            { "enum", typeof(IEnumKeywordToken) },
+            { "byte", typeof(IByteKeywordToken) },
+            { "size", typeof(ISizeKeywordToken) },
+            { "unsafe", typeof(IUnsafeKeywordToken) },
+            { "safe", typeof(ISafeKeywordToken) },
+            { "base", typeof(IBaseKeywordToken) },
+            { "fn", typeof(IFunctionKeywordToken) },
+            { "Self", typeof(ISelfTypeKeywordToken) },
+            { "init", typeof(IInitKeywordToken) },
+            { "owned", typeof(IOwnedKeywordToken) },
+            { "self", typeof(ISelfKeywordToken) },
+            { "extend", typeof(IExtendKeywordToken) },
+            { "type", typeof(ITypeKeywordToken) },
+            { "metatype", typeof(IMetatypeKeywordToken) },
+            { "true", typeof(ITrueKeywordTokenPlace) },
+            { "false", typeof(IFalseKeywordTokenPlace) },
+            { "mut", typeof(IMutableKeywordToken) },
+            { "params", typeof(IParamsKeywordToken) },
+            { "may", typeof(IMayKeywordToken) },
+            { "no", typeof(INoKeywordToken) },
+            { "throw", typeof(IThrowKeywordToken) },
+            { "ref", typeof(IRefKeywordToken) },
+            { "abstract", typeof(IAbstractKeywordToken) },
+            { "get", typeof(IGetKeywordToken) },
+            { "set", typeof(ISetKeywordToken) },
+            { "requires", typeof(IRequiresKeywordToken) },
+            { "ensures", typeof(IEnsuresKeywordToken) },
+            { "invariant", typeof(IInvariantKeywordToken) },
+            { "where", typeof(IWhereKeywordToken) },
+            { "const", typeof(IConstKeywordToken) },
+            { "alias", typeof(IAliasKeywordToken) },
+            { "uninitialized", typeof(IUninitializedKeywordToken) },
+            { "none", typeof(INoneKeywordToken) },
+            { "operator", typeof(IOperatorKeywordToken) },
+            { "implicit", typeof(IImplicitKeywordToken) },
+            { "explicit", typeof(IExplicitKeywordToken) },
+            { "move", typeof(IMoveKeywordToken) },
+            { "copy", typeof(ICopyKeywordToken) },
+            { "match", typeof(IMatchKeywordToken) },
+            { "loop", typeof(ILoopKeywordToken) },
+            { "while", typeof(IWhileKeywordToken) },
+            { "break", typeof(IBreakKeywordToken) },
+            { "next", typeof(INextKeywordToken) },
+            { "override", typeof(IOverrideKeywordToken) },
+            { "as", typeof(IAsKeywordToken) },
+            { "any", typeof(IAnyKeywordToken) },
         }.AsReadOnly();
     }
 }

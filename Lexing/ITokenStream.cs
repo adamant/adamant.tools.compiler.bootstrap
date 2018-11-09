@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
     /// A stream of tokens form a <see cref="CodeFile"/>. Never includes
     /// <see cref="TriviaToken"/>s.
     /// </summary>
-    public interface ITokenStream : IEnumerator<Token>
+    public interface ITokenStream : IEnumerator<IToken>
     {
         [NotNull]
         CodeFile File { get; }

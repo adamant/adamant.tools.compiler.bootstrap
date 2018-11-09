@@ -4,15 +4,24 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
-    public class StringLiteralToken : Token
+    internal class StringLiteralToken : Token, IStringLiteralToken
     {
-        [NotNull] public readonly string Value;
+        [NotNull] public string Value { get; }
 
         public StringLiteralToken(TextSpan span, [NotNull] string value)
             : base(span)
         {
             Requires.NotNull(nameof(value), value);
             Value = value;
+        }
+    }
+
+    public static partial class TokenFactory
+    {
+        [NotNull]
+        public static IStringLiteralToken StringLiteral(TextSpan span, [NotNull] string value)
+        {
+            return new StringLiteralToken(span, value);
         }
     }
 }

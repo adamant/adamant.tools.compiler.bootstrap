@@ -7,28 +7,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class NamedFunctionDeclarationSyntax : FunctionDeclarationSyntax
     {
-        [NotNull] public FunctionKeywordToken FunctionKeyword { get; }
-        [NotNull] public override IIdentifierToken Name { get; }
+        [NotNull] public IFunctionKeywordToken FunctionKeyword { get; }
+        [NotNull] public override IIdentifierTokenPlace Name { get; }
         [CanBeNull] public GenericParametersSyntax GenericParameters { get; }
-        [NotNull] public IRightArrowToken Arrow { get; }
+        [NotNull] public IRightArrowTokenPlace Arrow { get; }
         [NotNull] public ExpressionSyntax ReturnTypeExpression { get; }
         [NotNull] public SyntaxList<GenericConstraintSyntax> GenericConstraints { get; }
 
         public NamedFunctionDeclarationSyntax(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] FunctionKeywordToken functionKeyword,
-            [NotNull] IIdentifierToken name,
+            [NotNull] IFunctionKeywordToken functionKeyword,
+            [NotNull] IIdentifierTokenPlace name,
             [CanBeNull] GenericParametersSyntax genericParameters,
-            [NotNull] IOpenParenToken openParen,
+            [NotNull] IOpenParenTokenPlace openParen,
             [NotNull] SeparatedListSyntax<ParameterSyntax> parameterList,
-            [NotNull] ICloseParenToken closeParen,
-            [NotNull] IRightArrowToken arrow,
+            [NotNull] ICloseParenTokenPlace closeParen,
+            [NotNull] IRightArrowTokenPlace arrow,
             [NotNull] ExpressionSyntax returnTypeExpression,
             [NotNull] SyntaxList<GenericConstraintSyntax> genericConstraints,
             [CanBeNull] EffectsSyntax effects,
             [NotNull] SyntaxList<FunctionContractSyntax> contracts,
             [CanBeNull] BlockSyntax body,
-            [CanBeNull] ISemicolonToken semicolon)
+            [CanBeNull] ISemicolonTokenPlace semicolon)
             : base(TextSpan.Covering(functionKeyword.Span, name.Span), modifiers,
             openParen, parameterList, closeParen, effects, contracts, body, semicolon)
         {

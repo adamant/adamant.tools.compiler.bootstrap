@@ -8,13 +8,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     public class MemberAccessExpressionSyntax : ExpressionSyntax
     {
         [NotNull] public ExpressionSyntax Expression { get; }
-        [NotNull] public OperatorToken AccessOperator { get; }
-        [NotNull] public IMemberNameToken Member { get; }
+        [NotNull] public IOperatorToken AccessOperator { get; }
+        [NotNull] public IMemberNameTokenPlace Member { get; }
 
         public MemberAccessExpressionSyntax(
             [NotNull] ExpressionSyntax expression,
-            [NotNull] OperatorToken accessOperator,
-            [NotNull] IMemberNameToken member)
+            [NotNull] IOperatorToken accessOperator,
+            [NotNull] IMemberNameTokenPlace member)
             : base(TextSpan.Covering(expression.Span, member.Span))
         {
             Requires.NotNull(nameof(expression), expression);

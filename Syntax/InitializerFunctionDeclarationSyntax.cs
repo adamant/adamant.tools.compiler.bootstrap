@@ -7,19 +7,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class InitializerFunctionDeclarationSyntax : FunctionDeclarationSyntax
     {
-        [NotNull] public InitKeywordToken InitKeyword { get; }
-        [CanBeNull] public override IIdentifierToken Name { get; }
+        [NotNull] public IInitKeywordToken InitKeyword { get; }
+        [CanBeNull] public override IIdentifierTokenPlace Name { get; }
         [CanBeNull] public GenericParametersSyntax GenericParameters { get; }
         [NotNull] public SyntaxList<GenericConstraintSyntax> GenericConstraints { get; }
 
         public InitializerFunctionDeclarationSyntax(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] InitKeywordToken initKeyword,
-            [CanBeNull] IdentifierToken name,
+            [NotNull] IInitKeywordToken initKeyword,
+            [CanBeNull] IIdentifierToken name,
             [CanBeNull] GenericParametersSyntax genericParameters,
-            [NotNull] IOpenParenToken openParen,
+            [NotNull] IOpenParenTokenPlace openParen,
             [NotNull] SeparatedListSyntax<ParameterSyntax> parameterList,
-            [NotNull] ICloseParenToken closeParen,
+            [NotNull] ICloseParenTokenPlace closeParen,
             [NotNull] SyntaxList<GenericConstraintSyntax> genericConstraints,
             [CanBeNull] EffectsSyntax effects,
             [NotNull] SyntaxList<FunctionContractSyntax> contracts,

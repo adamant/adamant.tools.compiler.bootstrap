@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             {
                 switch (tokens.Current)
                 {
-                    case PipeToken pipe:
+                    case IPipeToken pipe:
                         tokens.MoveNext();
                         var rightOperand = ParsePatternAtom(tokens, diagnostics);
                         pattern = new OrPatternSyntax(pattern, pipe, rightOperand);
@@ -39,12 +39,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             switch (tokens.Current)
             {
-                case IdentifierToken identifier:
+                case IIdentifierToken identifier:
                 {
                     tokens.MoveNext();
                     return new AnyPatternSyntax(identifier);
                 }
-                case DotToken dotToken:
+                case IDotToken dotToken:
                 {
                     tokens.MoveNext();
                     var identifier = tokens.ExpectIdentifier();

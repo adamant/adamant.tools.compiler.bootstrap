@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
     public class VariableDeclarationStatementAnalysis : StatementAnalysis, IDeclarationAnalysis
     {
         [NotNull] public new VariableDeclarationStatementSyntax Syntax { get; }
-        public bool MutableBinding => Syntax.Binding is VarKeywordToken;
+        public bool MutableBinding => Syntax.Binding is IVarKeywordToken;
         [NotNull] public Name Name { get; }
         [CanBeNull] public ExpressionAnalysis TypeExpression { get; }
         [CanBeNull] public ExpressionAnalysis Initializer { get; }

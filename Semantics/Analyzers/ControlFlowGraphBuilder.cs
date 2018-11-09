@@ -106,7 +106,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case BinaryOperatorExpressionAnalysis binaryOperatorExpression:
                     switch (binaryOperatorExpression.Operator)
                     {
-                        case EqualsToken _:
+                        case IEqualsToken _:
                             var lvalue = ConvertToLValue(cfg, binaryOperatorExpression.LeftOperand);
                             ConvertAssignment(cfg, lvalue, binaryOperatorExpression.RightOperand, currentBlock);
                             break;
@@ -202,13 +202,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 //        ConvertToLValue(cfg, binaryOperator.LeftOperand),
                 //        ConvertToLValue(cfg, binaryOperator.RightOperand)));
                 //    break;
-                case LessThanToken _:
-                case LessThanOrEqualToken _:
-                case GreaterThanToken _:
-                case GreaterThanOrEqualToken _:
+                case ILessThanToken _:
+                case ILessThanOrEqualToken _:
+                case IGreaterThanToken _:
+                case IGreaterThanOrEqualToken _:
                     // TODO generate the correct statement
                     break;
-                case AsKeywordToken _:
+                case IAsKeywordToken _:
                     ConvertExpressionAnalysisToStatement(cfg, currentBlock, binaryOperator.LeftOperand);
                     break;
                 default:

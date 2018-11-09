@@ -7,11 +7,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class BreakExpressionSyntax : ExpressionSyntax
     {
-        [NotNull] public IBreakKeywordToken BreakKeyword { get; }
+        [NotNull] public IBreakKeywordTokenPlace BreakKeyword { get; }
         [CanBeNull] public ExpressionSyntax Expression { get; }
 
         public BreakExpressionSyntax(
-            [NotNull] IBreakKeywordToken breakKeyword,
+            [NotNull] IBreakKeywordTokenPlace breakKeyword,
             [CanBeNull] ExpressionSyntax expression)
             : base(TextSpan.Covering(breakKeyword.Span, expression?.Span))
         {

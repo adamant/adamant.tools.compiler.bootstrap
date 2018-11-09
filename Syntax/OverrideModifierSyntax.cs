@@ -7,15 +7,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class OverrideModifierSyntax : ModifierSyntax
     {
-        [NotNull] public OverrideKeywordToken OverrideKeyword { get; }
+        [NotNull] public IOverrideKeywordToken OverrideKeyword { get; }
 
-        public OverrideModifierSyntax([NotNull] OverrideKeywordToken overrideKeyword)
+        public OverrideModifierSyntax([NotNull] IOverrideKeywordToken overrideKeyword)
         {
             Requires.NotNull(nameof(overrideKeyword), overrideKeyword);
             OverrideKeyword = overrideKeyword;
         }
 
-        public override IEnumerable<IToken> Tokens()
+        public override IEnumerable<ITokenPlace> Tokens()
         {
             yield return OverrideKeyword;
         }

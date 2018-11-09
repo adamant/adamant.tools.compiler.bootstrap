@@ -7,9 +7,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public abstract class OperatorExpressionSyntax : ExpressionSyntax
     {
-        [NotNull] public OperatorToken Operator { get; }
+        [NotNull] public IOperatorToken Operator { get; }
 
-        protected OperatorExpressionSyntax([NotNull] OperatorToken @operator, TextSpan span)
+        protected OperatorExpressionSyntax([NotNull] IOperatorToken @operator, TextSpan span)
             : base(span)
         {
             Requires.NotNull(nameof(@operator), @operator);

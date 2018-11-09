@@ -6,11 +6,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class BaseTypesSyntax : NonTerminal
     {
-        [NotNull] public LessThanColonToken LessThanColon { get; }
+        [NotNull] public ILessThanColonToken LessThanColon { get; }
         [NotNull] public SeparatedListSyntax<ExpressionSyntax> TypeExpressions { get; }
 
         public BaseTypesSyntax(
-            [NotNull] LessThanColonToken lessThanColon,
+            [NotNull] ILessThanColonToken lessThanColon,
             [NotNull] SeparatedListSyntax<ExpressionSyntax> typeExpressions)
         {
             Requires.NotNull(nameof(lessThanColon), lessThanColon);

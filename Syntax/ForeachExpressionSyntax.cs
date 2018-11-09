@@ -7,22 +7,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class ForeachExpressionSyntax : ExpressionSyntax
     {
-        [NotNull] public ForeachKeywordToken ForeachKeyword { get; }
-        [CanBeNull] public VarKeywordToken VarKeyword { get; }
-        [NotNull] public IIdentifierToken Identifier { get; }
-        [CanBeNull] public ColonToken Colon { get; }
+        [NotNull] public IForeachKeywordToken ForeachKeyword { get; }
+        [CanBeNull] public IVarKeywordToken VarKeyword { get; }
+        [NotNull] public IIdentifierTokenPlace Identifier { get; }
+        [CanBeNull] public IColonToken Colon { get; }
         [CanBeNull] public ExpressionSyntax TypeExpression { get; }
-        [NotNull] public IInKeywordToken InKeyword { get; }
+        [NotNull] public IInKeywordTokenPlace InKeyword { get; }
         [NotNull] public ExpressionSyntax InExpression { get; }
         [NotNull] public BlockSyntax Block { get; }
 
         public ForeachExpressionSyntax(
-            [NotNull] ForeachKeywordToken foreachKeyword,
-            [CanBeNull] VarKeywordToken varKeyword,
-            [NotNull] IIdentifierToken identifier,
-            [CanBeNull] ColonToken colon,
+            [NotNull] IForeachKeywordToken foreachKeyword,
+            [CanBeNull] IVarKeywordToken varKeyword,
+            [NotNull] IIdentifierTokenPlace identifier,
+            [CanBeNull] IColonToken colon,
             [CanBeNull] ExpressionSyntax typeExpression,
-            [NotNull] IInKeywordToken inKeyword,
+            [NotNull] IInKeywordTokenPlace inKeyword,
             [NotNull] ExpressionSyntax inExpression,
             [NotNull] BlockSyntax block)
             : base(TextSpan.Covering(foreachKeyword.Span, block.Span))

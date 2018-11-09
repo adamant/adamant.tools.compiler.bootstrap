@@ -28,26 +28,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
 
         public static PsuedoToken EndOfFile()
         {
-            return new PsuedoToken(typeof(EndOfFileToken), "", new List<Diagnostic>().AsReadOnly());
+            return new PsuedoToken(typeof(IEndOfFileToken), "", new List<Diagnostic>().AsReadOnly());
         }
 
-        public static PsuedoToken For([NotNull] Token token, [NotNull] CodeText code)
+        public static PsuedoToken For([NotNull] ITokenPlace token, [NotNull] CodeText code)
         {
+            var tokenType = token.GetType().AssertNotNull();
             switch (token)
             {
-                case IdentifierToken identifier:
-                    return new PsuedoToken(token.GetType(), token.Text(code), identifier.Value);
-                case StringLiteralToken stringLiteral:
-                    return new PsuedoToken(token.GetType(), token.Text(code), stringLiteral.Value);
-                case IntegerLiteralToken integerLiteral:
-                    return new PsuedoToken(token.GetType(), token.Text(code), integerLiteral.Value);
-                case EndOfFileToken eof:
-                    return new PsuedoToken(token.GetType(), token.Text(code), eof.Diagnostics);
-                case OperatorToken _:
-                case KeywordToken _:
-                case SymbolToken _:
-                case TriviaToken _:
-                    return new PsuedoToken(token.GetType(), token.Text(code));
+                case IIdentifierTokenPlace identifier:
+                    return new PsuedoToken(tokenType, token.Text(code), identifier.Value);
+                case IStringLiteralToken stringLiteral:
+                    return new PsuedoToken(tokenType, token.Text(code), stringLiteral.Value);
+                case IIntegerLiteralToken integerLiteral:
+                    return new PsuedoToken(tokenType, token.Text(code), integerLiteral.Value);
+                case IEndOfFileToken eof:
+                    return new PsuedoToken(tokenType, token.Text(code), eof.Diagnostics);
+                case ITokenPlace _:
+                    return new PsuedoToken(tokenType, token.Text(code));
                 default:
                     throw NonExhaustiveMatchException.For(token);
             }
@@ -62,7 +60,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
         public override bool Equals(object obj)
         {
             if (obj is PsuedoToken token &&
-                TokenType == token.TokenType &&
+                (TokenType == token.TokenType
+                    || TokenType.IsAssignableFrom(token.TokenType)
+                    || token.TokenType.IsAssignableFrom(TokenType)) &&
                 Text == token.Text)
             {
                 if (Value is IReadOnlyList<Diagnostic> diagnostics

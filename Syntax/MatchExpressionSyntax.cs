@@ -7,18 +7,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class MatchExpressionSyntax : ExpressionSyntax
     {
-        [NotNull] public MatchKeywordToken MatchKeyword { get; }
+        [NotNull] public IMatchKeywordToken MatchKeyword { get; }
         [NotNull] public ExpressionSyntax Value { get; }
-        [NotNull] public IOpenBraceToken OpenBrace { get; }
+        [NotNull] public IOpenBraceTokenPlace OpenBrace { get; }
         [NotNull] public SyntaxList<MatchArmSyntax> Arms { get; }
-        [NotNull] public ICloseBraceToken CloseBrace { get; }
+        [NotNull] public ICloseBraceTokenPlace CloseBrace { get; }
 
         public MatchExpressionSyntax(
-            [NotNull] MatchKeywordToken matchKeyword,
+            [NotNull] IMatchKeywordToken matchKeyword,
             [NotNull] ExpressionSyntax value,
-            [NotNull] IOpenBraceToken openBrace,
+            [NotNull] IOpenBraceTokenPlace openBrace,
             [NotNull] SyntaxList<MatchArmSyntax> arms,
-            [NotNull] ICloseBraceToken closeBrace)
+            [NotNull] ICloseBraceTokenPlace closeBrace)
             : base(TextSpan.Covering(matchKeyword.Span, closeBrace.Span))
         {
             Requires.NotNull(nameof(matchKeyword), matchKeyword);

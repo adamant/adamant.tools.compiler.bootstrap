@@ -5,9 +5,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class BaseExpressionSyntax : InstanceExpressionSyntax
     {
-        [NotNull] public BaseKeywordToken Token { get; }
+        [NotNull] public IBaseKeywordToken Token { get; }
 
-        public BaseExpressionSyntax([NotNull] BaseKeywordToken token)
+        public BaseExpressionSyntax([NotNull] IBaseKeywordToken token)
             : base(token.Span)
         {
             Token = token;

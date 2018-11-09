@@ -7,11 +7,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class UnsafeExpressionSyntax : ExpressionSyntax
     {
-        [NotNull] public UnsafeKeywordToken UnsafeKeyword { get; }
+        [NotNull] public IUnsafeKeywordToken UnsafeKeyword { get; }
         [NotNull] public ExpressionSyntax Expression { get; }
 
         public UnsafeExpressionSyntax(
-            [NotNull] UnsafeKeywordToken unsafeKeyword,
+            [NotNull] IUnsafeKeywordToken unsafeKeyword,
             [NotNull] ExpressionSyntax expression)
             : base(TextSpan.Covering(unsafeKeyword.Span, expression.Span))
         {

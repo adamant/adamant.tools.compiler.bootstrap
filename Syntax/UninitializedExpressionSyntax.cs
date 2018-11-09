@@ -6,9 +6,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class UninitializedExpressionSyntax : LiteralExpressionSyntax
     {
-        [NotNull] public UninitializedKeywordToken UninitializedKeyword { get; }
+        [NotNull] public IUninitializedKeywordToken UninitializedKeyword { get; }
 
-        public UninitializedExpressionSyntax([NotNull] UninitializedKeywordToken uninitializedKeyword)
+        public UninitializedExpressionSyntax([NotNull] IUninitializedKeywordToken uninitializedKeyword)
             : base(uninitializedKeyword.Span)
         {
             Requires.NotNull(nameof(uninitializedKeyword), uninitializedKeyword);

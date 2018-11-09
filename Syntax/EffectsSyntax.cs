@@ -6,15 +6,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class EffectsSyntax : NonTerminal
     {
-        [NotNull] public IMayKeywordToken MayKeyword { get; }
+        [NotNull] public IMayKeywordTokenPlace MayKeyword { get; }
         [NotNull] public SeparatedListSyntax<EffectSyntax> AllowedEffects { get; }
-        [NotNull] public INoKeywordToken NoKeyword { get; }
+        [NotNull] public INoKeywordTokenPlace NoKeyword { get; }
         [NotNull] public SeparatedListSyntax<EffectSyntax> DisallowedEffects { get; }
 
         public EffectsSyntax(
-            [NotNull] IMayKeywordToken mayKeyword,
+            [NotNull] IMayKeywordTokenPlace mayKeyword,
             [NotNull] SeparatedListSyntax<EffectSyntax> allowedEffects,
-            [NotNull] INoKeywordToken noKeyword,
+            [NotNull] INoKeywordTokenPlace noKeyword,
             [NotNull] SeparatedListSyntax<EffectSyntax> disallowedEffects)
         {
             Requires.NotNull(nameof(mayKeyword), mayKeyword);

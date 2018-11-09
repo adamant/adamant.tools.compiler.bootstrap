@@ -27,11 +27,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var openBracket = tokens.Accept<OpenBracketToken>();
+            var openBracket = tokens.Accept<IOpenBracketToken>();
             if (openBracket == null) return null;
             var parameters = listParser.ParseSeparatedList(tokens, ParseGenericParameter,
-                TypeOf<CommaToken>(), TypeOf<CloseBracketToken>(), diagnostics);
-            var closeBracket = tokens.Expect<ICloseBracketToken>();
+                TypeOf<ICommaToken>(), TypeOf<ICloseBracketToken>(), diagnostics);
+            var closeBracket = tokens.Expect<ICloseBracketTokenPlace>();
             return new GenericParametersSyntax(openBracket, parameters, closeBracket);
         }
 
@@ -41,9 +41,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var paramsKeyword = tokens.Accept<ParamsKeywordToken>();
+            var paramsKeyword = tokens.Accept<IParamsKeywordToken>();
             var name = tokens.ExpectIdentifier();
-            var colon = tokens.Accept<ColonToken>();
+            var colon = tokens.Accept<IColonToken>();
             var typeExpression = colon != null ? expressionParser.ParseExpression(tokens, diagnostics) : null;
             return new GenericParameterSyntax(paramsKeyword, name, colon, typeExpression);
         }
@@ -55,7 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] IDiagnosticsCollector diagnostics)
         {
             var constraints = new List<GenericConstraintSyntax>();
-            while (tokens.Current is WhereKeywordToken)
+            while (tokens.Current is IWhereKeywordToken)
                 constraints.Add(ParseGenericConstraint(tokens, diagnostics));
 
             return constraints.ToSyntaxList();
@@ -67,7 +67,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var whereKeyword = tokens.Take<WhereKeywordToken>();
+            var whereKeyword = tokens.Take<IWhereKeywordToken>();
             var expression = expressionParser.ParseExpression(tokens, diagnostics);
             return new GenericConstraintSyntax(whereKeyword, expression);
         }

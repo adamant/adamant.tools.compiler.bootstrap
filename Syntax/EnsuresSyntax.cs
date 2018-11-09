@@ -6,11 +6,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class EnsuresSyntax : FunctionContractSyntax
     {
-        [NotNull] public EnsuresKeywordToken EnsuresKeyword { get; }
+        [NotNull] public IEnsuresKeywordToken EnsuresKeyword { get; }
         [NotNull] public ExpressionSyntax Condition { get; }
 
         public EnsuresSyntax(
-            [NotNull] EnsuresKeywordToken ensuresKeyword,
+            [NotNull] IEnsuresKeywordToken ensuresKeyword,
             [NotNull] ExpressionSyntax condition)
         {
             Requires.NotNull(nameof(ensuresKeyword), ensuresKeyword);

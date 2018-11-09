@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
-    public partial class MissingToken : IToken, IIdentifierToken
+    internal class MissingToken : IMissingToken, IIdentifierTokenPlace
     {
         public TextSpan Span { get; }
 
@@ -19,6 +19,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             return Span.GetText(code.Text);
         }
 
-        [CanBeNull] string IIdentifierToken.Value => null;
+        [CanBeNull] string IIdentifierTokenPlace.Value => null;
+    }
+
+    public static partial class TokenFactory
+    {
+        [NotNull]
+        public static IMissingToken Missing(TextSpan span)
+        {
+            return new MissingToken(span);
+        }
     }
 }

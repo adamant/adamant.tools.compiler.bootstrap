@@ -6,14 +6,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class UsingDirectiveSyntax : NonTerminal
     {
-        [NotNull] public IUsingKeywordToken UsingKeyword { get; }
+        [NotNull] public IUsingKeywordTokenPlace UsingKeyword { get; }
         [NotNull] public NameSyntax Name { get; }
-        [NotNull] public ISemicolonToken Semicolon { get; }
+        [NotNull] public ISemicolonTokenPlace Semicolon { get; }
 
         public UsingDirectiveSyntax(
-            [NotNull] IUsingKeywordToken usingKeyword,
+            [NotNull] IUsingKeywordTokenPlace usingKeyword,
             [NotNull] NameSyntax name,
-            [NotNull] ISemicolonToken semicolon)
+            [NotNull] ISemicolonTokenPlace semicolon)
         {
             Requires.NotNull(nameof(name), name);
             UsingKeyword = usingKeyword;

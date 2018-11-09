@@ -8,16 +8,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class GenericNameSyntax : SimpleNameSyntax
     {
-        [NotNull] public IOpenBracketToken OpenBracket { get; }
+        [NotNull] public IOpenBracketTokenPlace OpenBracket { get; }
         [NotNull] public SeparatedListSyntax<ArgumentSyntax> ArgumentList { get; }
         [NotNull] public IEnumerable<ArgumentSyntax> Arguments => ArgumentList.Nodes();
-        [NotNull] public ICloseBracketToken CloseBracket { get; }
+        [NotNull] public ICloseBracketTokenPlace CloseBracket { get; }
 
         public GenericNameSyntax(
-            [NotNull] IIdentifierToken name,
-            [NotNull] IOpenBracketToken openBracket,
+            [NotNull] IIdentifierTokenPlace name,
+            [NotNull] IOpenBracketTokenPlace openBracket,
             [NotNull] SeparatedListSyntax<ArgumentSyntax> argumentList,
-            [NotNull] ICloseBracketToken closeBracket)
+            [NotNull] ICloseBracketTokenPlace closeBracket)
             : base(name, TextSpan.Covering(name.Span, closeBracket.Span))
         {
             Requires.NotNull(nameof(openBracket), openBracket);

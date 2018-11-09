@@ -4,6 +4,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -13,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
     {
         [MustUseReturnValue]
         [NotNull]
-        public IEnumerable<Token> Lex([NotNull] CodeFile file)
+        public IEnumerable<IToken> Lex([NotNull] CodeFile file)
         {
             var code = file.Code;
             var text = code.Text;
@@ -26,72 +27,72 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                 switch (currentChar)
                 {
                     case '{':
-                        yield return new OpenBraceToken(SymbolSpan());
+                        yield return TokenFactory.OpenBrace(SymbolSpan());
                         break;
                     case '}':
-                        yield return new CloseBraceToken(SymbolSpan());
+                        yield return TokenFactory.CloseBrace(SymbolSpan());
                         break;
                     case '(':
-                        yield return new OpenParenToken(SymbolSpan());
+                        yield return TokenFactory.OpenParen(SymbolSpan());
                         break;
                     case ')':
-                        yield return new CloseParenToken(SymbolSpan());
+                        yield return TokenFactory.CloseParen(SymbolSpan());
                         break;
                     case '[':
-                        yield return new OpenBracketToken(SymbolSpan());
+                        yield return TokenFactory.OpenBracket(SymbolSpan());
                         break;
                     case ']':
-                        yield return new CloseBracketToken(SymbolSpan());
+                        yield return TokenFactory.CloseBracket(SymbolSpan());
                         break;
                     case ';':
-                        yield return new SemicolonToken(SymbolSpan());
+                        yield return TokenFactory.Semicolon(SymbolSpan());
                         break;
                     case ',':
-                        yield return new CommaToken(SymbolSpan());
+                        yield return TokenFactory.Comma(SymbolSpan());
                         break;
                     case '#':
                         if (NextCharIs('#'))
                             // it is `##`
-                            yield return new HashHashToken(SymbolSpan(2));
+                            yield return TokenFactory.HashHash(SymbolSpan(2));
                         else
                             // it is `#`
-                            yield return new HashToken(SymbolSpan(1));
+                            yield return TokenFactory.Hash(SymbolSpan(1));
                         break;
                     case '.':
                         if (NextCharIs('.'))
                         {
                             if (CharAtIs(2, '<'))
                                 // it is `..<`
-                                yield return new DotDotLessThanToken(SymbolSpan(3));
+                                yield return TokenFactory.DotDotLessThan(SymbolSpan(3));
                             else
                                 // it is `..`
-                                yield return new DotDotToken(SymbolSpan(2));
+                                yield return TokenFactory.DotDot(SymbolSpan(2));
                         }
                         else
-                            yield return new DotToken(SymbolSpan());
+                            yield return TokenFactory.Dot(SymbolSpan());
                         break;
                     case ':':
-                        yield return new ColonToken(SymbolSpan());
+                        yield return TokenFactory.Colon(SymbolSpan());
                         break;
                     case '?':
                         switch (NextChar())
                         {
                             case '?':
                                 // it is `??`
-                                yield return new QuestionQuestionToken(SymbolSpan(2));
+                                yield return TokenFactory.QuestionQuestion(SymbolSpan(2));
                                 break;
                             case '.':
                                 // it is `?.`
-                                yield return new QuestionDotToken(SymbolSpan(2));
+                                yield return TokenFactory.QuestionDot(SymbolSpan(2));
                                 break;
                             default:
                                 // it is `?`
-                                yield return new QuestionToken(SymbolSpan());
+                                yield return TokenFactory.Question(SymbolSpan());
                                 break;
                         }
                         break;
                     case '|':
-                        yield return new PipeToken(SymbolSpan());
+                        yield return TokenFactory.Pipe(SymbolSpan());
                         break;
                     case '$':
                         switch (NextChar())
@@ -101,19 +102,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                                 {
                                     case '≠':
                                         // it is `$<≠`
-                                        yield return new DollarLessThanNotEqualToken(SymbolSpan(3));
+                                        yield return TokenFactory.DollarLessThanNotEqual(SymbolSpan(3));
                                         break;
                                     case '/':
                                         if (CharAtIs(3, '='))
                                             // it is `$</=`
-                                            yield return new DollarLessThanNotEqualToken(
+                                            yield return TokenFactory.DollarLessThanNotEqual(
                                                 SymbolSpan(4));
                                         else
                                             goto default;
                                         break;
                                     default:
                                         // it is `$<`
-                                        yield return new DollarLessThanToken(SymbolSpan(2));
+                                        yield return TokenFactory.DollarLessThan(SymbolSpan(2));
                                         break;
                                 }
                                 break;
@@ -122,74 +123,74 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                                 {
                                     case '≠':
                                         // it is `$>≠`
-                                        yield return new DollarGreaterThanNotEqualToken(SymbolSpan(3));
+                                        yield return TokenFactory.DollarGreaterThanNotEqual(SymbolSpan(3));
                                         break;
                                     case '/':
                                         if (CharAtIs(3, '='))
                                             // it is `$>/=`
-                                            yield return new DollarGreaterThanNotEqualToken(
+                                            yield return TokenFactory.DollarGreaterThanNotEqual(
                                                 SymbolSpan(4));
                                         else
                                             goto default;
                                         break;
                                     default:
                                         // it is `$>`
-                                        yield return new DollarGreaterThanToken(SymbolSpan(2));
+                                        yield return TokenFactory.DollarGreaterThan(SymbolSpan(2));
                                         break;
                                 }
                                 break;
                             default:
                                 // it is `=`
-                                yield return new DollarToken(SymbolSpan());
+                                yield return TokenFactory.Dollar(SymbolSpan());
                                 break;
                         }
                         break;
                     case '→':
-                        yield return new RightArrowToken(SymbolSpan());
+                        yield return TokenFactory.RightArrow(SymbolSpan());
                         break;
                     case '@':
-                        yield return new AtSignToken(SymbolSpan());
+                        yield return TokenFactory.AtSign(SymbolSpan());
                         break;
                     case '^':
                         if (NextCharIs('.'))
                             // it is `^.`
-                            yield return new CaretDotToken(SymbolSpan(2));
+                            yield return TokenFactory.CaretDot(SymbolSpan(2));
                         else
                             // it is `^`
-                            yield return new CaretToken(SymbolSpan());
+                            yield return TokenFactory.Caret(SymbolSpan());
                         break;
                     case '+':
                         if (NextCharIs('='))
                             // it is `+=`
-                            yield return new PlusEqualsToken(SymbolSpan(2));
+                            yield return TokenFactory.PlusEquals(SymbolSpan(2));
                         else
                             // it is `+`
-                            yield return new PlusToken(SymbolSpan());
+                            yield return TokenFactory.Plus(SymbolSpan());
                         break;
                     case '-':
                         switch (NextChar())
                         {
                             case '=':
                                 // it is `-=`
-                                yield return new MinusEqualsToken(SymbolSpan(2));
+                                yield return TokenFactory.MinusEquals(SymbolSpan(2));
                                 break;
                             case '>':
                                 // it is `->`
-                                yield return new RightArrowToken(SymbolSpan(2));
+                                yield return TokenFactory.RightArrow(SymbolSpan(2));
                                 break;
                             default:
                                 // it is `-`
-                                yield return new MinusToken(SymbolSpan());
+                                yield return TokenFactory.Minus(SymbolSpan());
                                 break;
                         }
                         break;
                     case '*':
                         if (NextCharIs('='))
                             // it is `*=`
-                            yield return new AsteriskEqualsToken(SymbolSpan(2));
+                            yield return TokenFactory.AsteriskEquals(SymbolSpan(2));
                         else
                             // it is `*`
-                            yield return new AsteriskToken(SymbolSpan());
+                            yield return TokenFactory.Asterisk(SymbolSpan());
                         break;
                     case '/':
                         switch (NextChar())
@@ -206,7 +207,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                                         break;
                                 }
 
-                                yield return new CommentToken(TokenSpan());
+                                yield return TokenFactory.Comment(TokenSpan());
                                 break;
                             case '*':
                                 // it is a block comment `/*`
@@ -229,15 +230,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                                     lastCharWasStar = currentChar == '*';
                                 }
 
-                                yield return new CommentToken(TokenSpan());
+                                yield return TokenFactory.Comment(TokenSpan());
                                 break;
                             case '=':
                                 // it is `/=`
-                                yield return new SlashEqualsToken(SymbolSpan(2));
+                                yield return TokenFactory.SlashEquals(SymbolSpan(2));
                                 break;
                             default:
                                 // it is `/`
-                                yield return new SlashToken(SymbolSpan());
+                                yield return TokenFactory.Slash(SymbolSpan());
                                 break;
                         }
                         break;
@@ -246,72 +247,72 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                         {
                             case '>':
                                 // it is `=>`
-                                yield return new EqualsGreaterThanToken(SymbolSpan(2));
+                                yield return TokenFactory.EqualsGreaterThan(SymbolSpan(2));
                                 break;
                             case '=':
                                 // it is `==`
-                                yield return new EqualsEqualsToken(SymbolSpan(2));
+                                yield return TokenFactory.EqualsEquals(SymbolSpan(2));
                                 break;
                             case '/':
                                 if (CharAtIs(2, '='))
                                     // it is `=/=`
-                                    yield return new NotEqualToken(SymbolSpan(3));
+                                    yield return TokenFactory.NotEqual(SymbolSpan(3));
                                 else goto default;
                                 break;
                             default:
                                 // it is `=`
-                                yield return new EqualsToken(SymbolSpan());
+                                yield return TokenFactory.Equals(SymbolSpan());
                                 break;
                         }
                         break;
                     case '≠':
-                        yield return new NotEqualToken(SymbolSpan());
+                        yield return TokenFactory.NotEqual(SymbolSpan());
                         break;
                     case '>':
                         if (NextCharIs('='))
                             // it is `>=`
-                            yield return new GreaterThanOrEqualToken(SymbolSpan(2));
+                            yield return TokenFactory.GreaterThanOrEqual(SymbolSpan(2));
                         else
                             // it is `>`
-                            yield return new GreaterThanToken(SymbolSpan());
+                            yield return TokenFactory.GreaterThan(SymbolSpan());
                         break;
                     case '≥':
                     case '⩾':
-                        yield return new GreaterThanOrEqualToken(SymbolSpan());
+                        yield return TokenFactory.GreaterThanOrEqual(SymbolSpan());
                         break;
                     case '<':
                         switch (NextChar())
                         {
                             case '=':
                                 // it is `<=`
-                                yield return new LessThanOrEqualToken(SymbolSpan(2));
+                                yield return TokenFactory.LessThanOrEqual(SymbolSpan(2));
                                 break;
                             case ':':
                                 // it is `<:`
-                                yield return new LessThanColonToken(SymbolSpan(2));
+                                yield return TokenFactory.LessThanColon(SymbolSpan(2));
                                 break;
                             case '.':
                                 if (CharAtIs(2, '.'))
                                 {
                                     if (CharAtIs(3, '<'))
                                         // it is `<..<`
-                                        yield return new LessThanDotDotLessThanToken(SymbolSpan(4));
+                                        yield return TokenFactory.LessThanDotDotLessThan(SymbolSpan(4));
                                     else
                                         // it is `<..`
-                                        yield return new LessThanDotDotToken(SymbolSpan(3));
+                                        yield return TokenFactory.LessThanDotDot(SymbolSpan(3));
                                 }
                                 else
                                     goto default;
                                 break;
                             default:
                                 // it is `<`
-                                yield return new LessThanToken(SymbolSpan());
+                                yield return TokenFactory.LessThan(SymbolSpan());
                                 break;
                         }
                         break;
                     case '≤':
                     case '⩽':
-                        yield return new LessThanOrEqualToken(SymbolSpan());
+                        yield return TokenFactory.LessThanOrEqual(SymbolSpan());
                         break;
                     case '"':
                         yield return LexString();
@@ -333,7 +334,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
 
                         var span = TokenSpan();
                         var value = BigInteger.Parse(code[span]);
-                        yield return new IntegerLiteralToken(span, value);
+                        yield return TokenFactory.IntegerLiteral(span, value);
                         break;
                     }
                     case '\\':
@@ -343,7 +344,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                             tokenEnd += 1;
 
                         var identifierStart = tokenStart + 1;
-                        yield return new EscapedIdentifierToken(TokenSpan(), text.Substring(identifierStart, tokenEnd - identifierStart));
+                        yield return TokenFactory.EscapedIdentifier(TokenSpan(), text.Substring(identifierStart, tokenEnd - identifierStart));
                         break;
                     }
                     default:
@@ -354,7 +355,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                             while (tokenEnd < text.Length && char.IsWhiteSpace(text[tokenEnd]))
                                 tokenEnd += 1;
 
-                            yield return new WhitespaceToken(TokenSpan());
+                            yield return TokenFactory.Whitespace(TokenSpan());
                         }
                         else if (IsIdentifierStartCharacter(currentChar))
                         {
@@ -368,13 +369,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                         {
                             var span = SymbolSpan(2);
                             diagnostics.Publish(LexError.CStyleNotEquals(file, span));
-                            yield return new NotEqualToken(span);
+                            yield return TokenFactory.NotEqual(span);
                         }
                         else
                         {
                             var span = SymbolSpan();
                             diagnostics.Publish(LexError.UnexpectedCharacter(file, span, currentChar));
-                            yield return new UnexpectedToken(span);
+                            yield return TokenFactory.Unexpected(span);
                         }
                         break;
                 }
@@ -382,7 +383,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
             }
 
             // The end of file token provides something to attach any final errors to
-            yield return new EndOfFileToken(SymbolSpan(0), diagnostics.Build());
+            yield return TokenFactory.EndOfFile(SymbolSpan(0), diagnostics.Build());
             yield break;
 
             TextSpan SymbolSpan(int length = 1)
@@ -396,16 +397,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                 tokenEnd = end ?? tokenEnd;
                 return TextSpan.FromStartEnd(tokenStart, tokenEnd);
             }
-            Token NewIdentifierOrKeywordToken()
+            IToken NewIdentifierOrKeywordToken()
             {
                 var span = TextSpan.FromStartEnd(tokenStart, tokenEnd);
                 var value = code[span];
                 if (TokenTypes.KeywordFactories.TryGetValue(value, out var keywordFactory))
                     return keywordFactory(span);
-                if (TokenTypes.ExtraKeywordFactories.TryGetValue(value, out var operatorFactory))
-                    return operatorFactory(span);
 
-                return new BareIdentifierToken(span, value);
+                return TokenFactory.BareIdentifier(span, value);
             }
 
             char? NextChar()
@@ -432,7 +431,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                 return index < text.Length && text[index] == c;
             }
 
-            Token LexString()
+            IToken LexString()
             {
                 tokenEnd = tokenStart + 1;
                 var content = new StringBuilder();
@@ -554,7 +553,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                     diagnostics.Publish(LexError.UnclosedStringLiteral(file,
                         TextSpan.FromStartEnd(tokenStart, tokenEnd)));
 
-                return new StringLiteralToken(TextSpan.FromStartEnd(tokenStart, tokenEnd), content.ToString());
+                return TokenFactory.StringLiteral(TextSpan.FromStartEnd(tokenStart, tokenEnd), content.ToString().AssertNotNull());
             }
         }
 

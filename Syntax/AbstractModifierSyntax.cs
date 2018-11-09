@@ -7,15 +7,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class AbstractModifierSyntax : ModifierSyntax
     {
-        [NotNull] public AbstractKeywordToken AbstractKeyword { get; }
+        [NotNull] public IAbstractKeywordToken AbstractKeyword { get; }
 
-        public AbstractModifierSyntax([NotNull] AbstractKeywordToken abstractKeyword)
+        public AbstractModifierSyntax([NotNull] IAbstractKeywordToken abstractKeyword)
         {
             Requires.NotNull(nameof(abstractKeyword), abstractKeyword);
             AbstractKeyword = abstractKeyword;
         }
 
-        public override IEnumerable<IToken> Tokens()
+        public override IEnumerable<ITokenPlace> Tokens()
         {
             yield return AbstractKeyword;
         }

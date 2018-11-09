@@ -9,12 +9,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     {
         [NotNull] public ExpressionSyntax TypeExpression { get; }
         [NotNull] public ILifetimeOperatorToken Operator { get; }
-        [NotNull] public ILifetimeNameToken Lifetime { get; }
+        [NotNull] public ILifetimeNameTokenPlace Lifetime { get; }
 
         public LifetimeTypeSyntax(
             [NotNull] ExpressionSyntax typeExpression,
             [NotNull] ILifetimeOperatorToken @operator,
-            [NotNull] ILifetimeNameToken lifetime)
+            [NotNull] ILifetimeNameTokenPlace lifetime)
             : base(TextSpan.Covering(typeExpression.Span, lifetime.Span))
         {
             Requires.NotNull(nameof(typeExpression), typeExpression);

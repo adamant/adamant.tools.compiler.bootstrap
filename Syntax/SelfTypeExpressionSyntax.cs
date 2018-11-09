@@ -6,9 +6,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class SelfTypeExpressionSyntax : TypeSyntax
     {
-        [NotNull] public SelfTypeKeywordToken SelfTypeKeyword { get; }
+        [NotNull] public ISelfTypeKeywordToken SelfTypeKeyword { get; }
 
-        public SelfTypeExpressionSyntax([NotNull] SelfTypeKeywordToken selfTypeKeyword)
+        public SelfTypeExpressionSyntax([NotNull] ISelfTypeKeywordToken selfTypeKeyword)
             : base(selfTypeKeyword.Span)
         {
             Requires.NotNull(nameof(selfTypeKeyword), selfTypeKeyword);

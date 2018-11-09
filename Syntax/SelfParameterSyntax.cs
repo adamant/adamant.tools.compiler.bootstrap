@@ -7,12 +7,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class SelfParameterSyntax : ParameterSyntax
     {
-        [CanBeNull] public MutableKeywordToken MutableKeyword { get; }
-        [NotNull] public SelfKeywordToken SelfKeyword { get; }
+        [CanBeNull] public IMutableKeywordToken MutableKeyword { get; }
+        [NotNull] public ISelfKeywordTokenPlace SelfKeyword { get; }
 
         public SelfParameterSyntax(
-            [CanBeNull] MutableKeywordToken mutableKeyword,
-            [NotNull] SelfKeywordToken selfKeyword)
+            [CanBeNull] IMutableKeywordToken mutableKeyword,
+            [NotNull] ISelfKeywordTokenPlace selfKeyword)
             : base(TextSpan.Covering(mutableKeyword?.Span, selfKeyword.Span))
         {
             Requires.NotNull(nameof(selfKeyword), selfKeyword);

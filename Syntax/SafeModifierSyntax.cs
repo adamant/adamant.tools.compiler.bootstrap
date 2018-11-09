@@ -7,15 +7,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class SafeModifierSyntax : ModifierSyntax
     {
-        [NotNull] public SafeKeywordToken SafeKeyword { get; }
+        [NotNull] public ISafeKeywordToken SafeKeyword { get; }
 
-        public SafeModifierSyntax([NotNull] SafeKeywordToken safeKeyword)
+        public SafeModifierSyntax([NotNull] ISafeKeywordToken safeKeyword)
         {
             Requires.NotNull(nameof(safeKeyword), safeKeyword);
             SafeKeyword = safeKeyword;
         }
 
-        public override IEnumerable<IToken> Tokens()
+        public override IEnumerable<ITokenPlace> Tokens()
         {
             yield return SafeKeyword;
         }

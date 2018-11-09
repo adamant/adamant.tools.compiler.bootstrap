@@ -7,15 +7,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class ExtendModifierSyntax : ModifierSyntax
     {
-        [NotNull] public ExtendKeywordToken ExtendKeyword { get; }
+        [NotNull] public IExtendKeywordToken ExtendKeyword { get; }
 
-        public ExtendModifierSyntax([NotNull] ExtendKeywordToken extendKeyword)
+        public ExtendModifierSyntax([NotNull] IExtendKeywordToken extendKeyword)
         {
             Requires.NotNull(nameof(extendKeyword), extendKeyword);
             ExtendKeyword = extendKeyword;
         }
 
-        public override IEnumerable<IToken> Tokens()
+        public override IEnumerable<ITokenPlace> Tokens()
         {
             yield return ExtendKeyword;
         }

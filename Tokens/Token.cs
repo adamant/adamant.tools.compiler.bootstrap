@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
-    public abstract partial class Token : ISyntaxNodeOrToken, IToken
+    internal abstract partial class Token : IToken
     {
         public TextSpan Span { get; }
 

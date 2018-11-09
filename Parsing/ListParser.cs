@@ -33,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             Type<TTerminator> terminatorType,
             [NotNull] IDiagnosticsCollector diagnostics)
             where T : NonTerminal
-            where TTerminator : Token
+            where TTerminator : class, IToken
         {
             return ParseEnumerable(tokens, parseItem, terminatorType, diagnostics).ToSyntaxList();
         }
@@ -46,9 +46,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             Type<TTerminator> terminatorType,
             [NotNull] IDiagnosticsCollector diagnostics)
             where T : NonTerminal
-            where TTerminator : Token
+            where TTerminator : class, IToken
         {
-            while (!(tokens.Current is TTerminator || tokens.Current is EndOfFileToken))
+            while (!(tokens.Current is TTerminator || tokens.Current is IEndOfFileToken))
             {
                 var start = tokens.Current;
                 yield return parseItem(tokens, diagnostics);
@@ -68,19 +68,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             Type<TSeparator> separatorType,
             [NotNull] IDiagnosticsCollector diagnostics)
             where T : NonTerminal
-            where TSeparator : Token
+            where TSeparator : class, IToken
         {
             return new SeparatedListSyntax<T>(ParseSeparatedEnumerable(tokens, acceptItem, separatorType, diagnostics));
         }
 
         [MustUseReturnValue]
         [NotNull]
-        private static IEnumerable<ISyntaxNodeOrToken> ParseSeparatedEnumerable<TSeparator>(
+        private static IEnumerable<ISyntaxNodeOrTokenPlace> ParseSeparatedEnumerable<TSeparator>(
             [NotNull] ITokenStream tokens,
             [NotNull] AcceptFunction<NonTerminal> acceptItem,
             Type<TSeparator> separatorType,
             [NotNull] IDiagnosticsCollector diagnostics)
-            where TSeparator : Token
+            where TSeparator : class, IToken
         {
             var item = acceptItem(tokens, diagnostics);
             if (item != null) yield return item;
@@ -104,24 +104,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             Type<TTerminator> terminatorType,
             [NotNull] IDiagnosticsCollector diagnostics)
             where T : NonTerminal
-            where TSeparator : Token
-            where TTerminator : Token
+            where TSeparator : class, IToken
+            where TTerminator : class, IToken
         {
             return new SeparatedListSyntax<T>(ParseSeparatedEnumerable(tokens, parseItem, separatorType, terminatorType, diagnostics));
         }
 
         [MustUseReturnValue]
         [NotNull]
-        private static IEnumerable<ISyntaxNodeOrToken> ParseSeparatedEnumerable<TSeparator, TTerminator>(
+        private static IEnumerable<ISyntaxNodeOrTokenPlace> ParseSeparatedEnumerable<TSeparator, TTerminator>(
             [NotNull] ITokenStream tokens,
             [NotNull] ParseFunction<NonTerminal> parseItem,
             Type<TSeparator> separatorType,
             Type<TTerminator> terminatorType,
             [NotNull] IDiagnosticsCollector diagnostics)
-            where TSeparator : Token
-            where TTerminator : Token
+            where TSeparator : class, IToken
+            where TTerminator : class, IToken
         {
-            while (!(tokens.Current is TTerminator || tokens.Current is EndOfFileToken))
+            while (!(tokens.Current is TTerminator || tokens.Current is IEndOfFileToken))
             {
                 var start = tokens.Current;
                 yield return parseItem(tokens, diagnostics);

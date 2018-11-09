@@ -7,14 +7,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     public class EnumValuePatternSyntax : PatternSyntax
     {
         [NotNull]
-        public DotToken DotToken { get; }
+        public IDotToken DotToken { get; }
 
         [NotNull]
-        public IIdentifierToken Identifier { get; }
+        public IIdentifierTokenPlace Identifier { get; }
 
         public EnumValuePatternSyntax(
-            [NotNull] DotToken dotToken,
-            [NotNull] IIdentifierToken identifier)
+            [NotNull] IDotToken dotToken,
+            [NotNull] IIdentifierTokenPlace identifier)
         {
             Requires.NotNull(nameof(dotToken), dotToken);
             Requires.NotNull(nameof(identifier), identifier);

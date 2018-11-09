@@ -8,12 +8,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     public class QualifiedNameSyntax : NameSyntax
     {
         [NotNull] public NameSyntax Qualifier { get; }
-        [NotNull] public DotToken Dot { get; }
+        [NotNull] public IDotToken Dot { get; }
         [NotNull] public SimpleNameSyntax Name { get; }
 
         public QualifiedNameSyntax(
             [NotNull] NameSyntax qualifier,
-            [NotNull] DotToken dot,
+            [NotNull] IDotToken dot,
             [NotNull] SimpleNameSyntax name)
             : base(TextSpan.Covering(qualifier.Span, name.Span))
         {

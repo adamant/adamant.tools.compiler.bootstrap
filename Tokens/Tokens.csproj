@@ -25,13 +25,8 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
-    <Compile Update="OperatorTokens.cs">
-      <DependentUpon>OperatorTokens.tt</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
-    <Compile Update="SymbolTokens.cs">
-      <DependentUpon>SymbolTokens.tt</DependentUpon>
+    <Compile Update="Tokens.cs">
+      <DependentUpon>Tokens.tt</DependentUpon>
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
@@ -42,12 +37,8 @@
       <LastGenOutput>KeywordTokens.cs</LastGenOutput>
       <Generator>TextTemplatingFileGenerator</Generator>
     </None>
-    <None Update="OperatorTokens.tt">
-      <LastGenOutput>OperatorTokens.cs</LastGenOutput>
-      <Generator>TextTemplatingFileGenerator</Generator>
-    </None>
-    <None Update="SymbolTokens.tt">
-      <LastGenOutput>SymbolTokens.cs</LastGenOutput>
+    <None Update="Tokens.tt">
+      <LastGenOutput>Tokens.cs</LastGenOutput>
       <Generator>TextTemplatingFileGenerator</Generator>
     </None>
   </ItemGroup>

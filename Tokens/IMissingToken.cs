@@ -1,6 +1,4 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
-    public interface IMissingToken : ITokenPlace
-    {
-    }
+    public partial interface IMissingToken : ITokenPlace { }
 }

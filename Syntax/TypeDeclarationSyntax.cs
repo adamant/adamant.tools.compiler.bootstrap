@@ -9,28 +9,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     {
         [NotNull] public SyntaxList<AttributeSyntax> Attributes { get; }
         [NotNull] public SyntaxList<ModifierSyntax> Modifiers { get; }
-        [NotNull] public TypeKeywordToken TypeKeyword { get; }
-        [NotNull] public IIdentifierToken Name { get; }
+        [NotNull] public ITypeKeywordToken TypeKeyword { get; }
+        [NotNull] public IIdentifierTokenPlace Name { get; }
         [CanBeNull] public GenericParametersSyntax GenericParameters { get; }
         [CanBeNull] public BaseTypesSyntax BaseTypes { get; }
         [NotNull] public SyntaxList<GenericConstraintSyntax> GenericConstraints { get; }
         [NotNull] public SyntaxList<InvariantSyntax> Invariants { get; }
-        [NotNull] public IOpenBraceToken OpenBrace { get; }
+        [NotNull] public IOpenBraceTokenPlace OpenBrace { get; }
         [NotNull] public SyntaxList<MemberDeclarationSyntax> Members { get; }
-        [NotNull] public ICloseBraceToken CloseBrace { get; }
+        [NotNull] public ICloseBraceTokenPlace CloseBrace { get; }
 
         public TypeDeclarationSyntax(
             [NotNull] SyntaxList<AttributeSyntax> attributes,
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] TypeKeywordToken typeKeyword,
-            [NotNull] IIdentifierToken name,
+            [NotNull] ITypeKeywordToken typeKeyword,
+            [NotNull] IIdentifierTokenPlace name,
             [CanBeNull] GenericParametersSyntax genericParameters,
             [CanBeNull] BaseTypesSyntax baseTypes,
             [NotNull] SyntaxList<GenericConstraintSyntax> genericConstraints,
             [NotNull] SyntaxList<InvariantSyntax> invariants,
-            [NotNull] IOpenBraceToken openBrace,
+            [NotNull] IOpenBraceTokenPlace openBrace,
             [NotNull] SyntaxList<MemberDeclarationSyntax> members,
-            [NotNull] ICloseBraceToken closeBrace)
+            [NotNull] ICloseBraceTokenPlace closeBrace)
             : base(TextSpan.Covering(typeKeyword.Span, name.Span))
         {
             Requires.NotNull(nameof(attributes), attributes);

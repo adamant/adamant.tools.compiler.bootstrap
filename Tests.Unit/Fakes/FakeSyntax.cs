@@ -14,21 +14,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
 
         [NotNull]
         private static T Missing<T>()
-            where T : IToken
+            where T : ITokenPlace
         {
-            return (T)(object)new MissingToken(FakeSpan);
+            return (T)TokenFactory.Missing(FakeSpan);
         }
 
         [NotNull]
         public static AccessModifierSyntax AccessModifier()
         {
-            return new AccessModifierSyntax(Missing<IAccessModifierToken>());
+            return new AccessModifierSyntax(Missing<IAccessModifierTokenPlace>());
         }
 
         [NotNull]
         public static BlockSyntax Block()
         {
-            return new BlockSyntax(Missing<IOpenBraceToken>(), List<StatementSyntax>(), Missing<ICloseBraceToken>());
+            return new BlockSyntax(Missing<IOpenBraceTokenPlace>(), List<StatementSyntax>(), Missing<ICloseBraceTokenPlace>());
         }
 
         [NotNull]
@@ -69,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
                 if (nameSyntax == null)
                     nameSyntax = partSyntax;
                 else
-                    nameSyntax = new QualifiedNameSyntax(nameSyntax, new DotToken(new TextSpan(0, 1)), partSyntax);
+                    nameSyntax = new QualifiedNameSyntax(nameSyntax, TokenFactory.Dot(FakeSpan), partSyntax);
             }
 
             return nameSyntax.AssertNotNull();
@@ -78,13 +78,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         [NotNull]
         public static UsingDirectiveSyntax UsingDirective()
         {
-            return new UsingDirectiveSyntax(Missing<IUsingKeywordToken>(), Name(), Missing<ISemicolonToken>());
+            return new UsingDirectiveSyntax(Missing<IUsingKeywordTokenPlace>(), Name(), Missing<ISemicolonTokenPlace>());
         }
 
         public static ParameterSyntax Parameter()
         {
-            return new NamedParameterSyntax(null, null, Missing<IIdentifierToken>(),
-                Missing<IColonToken>(), Expression(), null, null);
+            return new NamedParameterSyntax(null, null, Missing<IIdentifierTokenPlace>(),
+                Missing<IColonTokenPlace>(), Expression(), null, null);
         }
 
         private class FakeExpressionSyntax : ExpressionSyntax
@@ -107,7 +107,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         public static IncompleteDeclarationSyntax IncompleteDeclaration()
         {
             // Need at least one token to prevent issues computing the span of the incomplete declaration
-            return new IncompleteDeclarationSyntax(new[] { Missing<IPublicKeywordToken>() });
+            return new IncompleteDeclarationSyntax(new[] { Missing<IPublicKeywordTokenPlace>() });
         }
 
         [NotNull]
@@ -128,7 +128,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
             return new CompilationUnitSyntax(
                 "".ToFakeCodeFile(),
                 namespaceSyntax,
-                new EndOfFileToken(FakeSpan, Diagnostics.Empty),
+                TokenFactory.EndOfFile(FakeSpan, Diagnostics.Empty),
                 Diagnostics.Empty);
         }
 
@@ -143,13 +143,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         {
             return new NamedFunctionDeclarationSyntax(
                 AccessModifier().ToSyntaxList<ModifierSyntax>(),
-                new FunctionKeywordToken(FakeSpan),
+                TokenFactory.FunctionKeyword(FakeSpan),
                 Identifier(name),
                 null, // Generic Parameters
-                Missing<IOpenParenToken>(),
+                Missing<IOpenParenTokenPlace>(),
                 SeparatedListSyntax<ParameterSyntax>.Empty,
-                Missing<ICloseParenToken>(),
-                Missing<IRightArrowToken>(),
+                Missing<ICloseParenTokenPlace>(),
+                Missing<IRightArrowTokenPlace>(),
                 Expression(),
                 SyntaxList<GenericConstraintSyntax>.Empty,
                 null, // Effects
@@ -160,9 +160,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
 
 
         [NotNull]
-        public static IdentifierToken Identifier([NotNull] string name)
+        public static IIdentifierToken Identifier([NotNull] string name)
         {
-            return new BareIdentifierToken(FakeSpan, name);
+            return TokenFactory.BareIdentifier(FakeSpan, name);
         }
 
         [NotNull]
@@ -170,26 +170,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         {
             return new EnumStructDeclarationSyntax(
                 AccessModifier().ToSyntaxList<ModifierSyntax>(),
-                new EnumKeywordToken(FakeSpan),
-                new StructKeywordToken(FakeSpan),
+                TokenFactory.EnumKeyword(FakeSpan),
+                TokenFactory.StructKeyword(FakeSpan),
                 Identifier(name),
                 null, // Generic Parameters
                 null, // Base Types
                 SyntaxList<GenericConstraintSyntax>.Empty,
                 SyntaxList<InvariantSyntax>.Empty,
-                Missing<IOpenBraceToken>(),
+                Missing<IOpenBraceTokenPlace>(),
                 new EnumVariantsSyntax(SyntaxList<EnumVariantSyntax>.Empty, null),
                 SyntaxList<MemberDeclarationSyntax>.Empty,
-                Missing<ICloseBraceToken>());
+                Missing<ICloseBraceTokenPlace>());
         }
 
         [NotNull]
         public static GenericParametersSyntax GenericParameters()
         {
             return new GenericParametersSyntax(
-                Missing<IOpenBracketToken>(),
+                Missing<IOpenBracketTokenPlace>(),
                 SeparatedListSyntax<GenericParameterSyntax>.Empty,
-                Missing<ICloseBracketToken>());
+                Missing<ICloseBracketTokenPlace>());
         }
     }
 }

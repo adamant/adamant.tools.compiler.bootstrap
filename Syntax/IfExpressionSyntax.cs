@@ -7,13 +7,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class IfExpressionSyntax : ExpressionSyntax
     {
-        [NotNull] public IfKeywordToken IfKeyword { get; }
+        [NotNull] public IIfKeywordToken IfKeyword { get; }
         [NotNull] public ExpressionSyntax Condition { get; }
         [NotNull] public ExpressionBlockSyntax ThenBlock { get; }
         [CanBeNull] public ElseClauseSyntax ElseClause { get; }
 
         public IfExpressionSyntax(
-            [NotNull] IfKeywordToken ifKeyword,
+            [NotNull] IIfKeywordToken ifKeyword,
             [NotNull] ExpressionSyntax condition,
             [NotNull] ExpressionBlockSyntax thenBlock,
             [CanBeNull] ElseClauseSyntax elseClause)

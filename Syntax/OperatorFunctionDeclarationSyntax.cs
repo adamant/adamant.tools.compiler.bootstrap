@@ -7,27 +7,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class OperatorFunctionDeclarationSyntax : FunctionDeclarationSyntax
     {
-        [NotNull] public OperatorKeywordToken OperatorKeyword { get; }
-        public override IIdentifierToken Name => throw new System.NotImplementedException();
-        [NotNull] public IOperatorToken Operator { get; }
-        [NotNull] public IRightArrowToken Arrow { get; }
+        [NotNull] public IOperatorKeywordToken OperatorKeyword { get; }
+        public override IIdentifierTokenPlace Name => throw new System.NotImplementedException();
+        [NotNull] public IOperatorTokenPlace Operator { get; }
+        [NotNull] public IRightArrowTokenPlace Arrow { get; }
         [NotNull] public ExpressionSyntax ReturnTypeExpression { get; }
         [NotNull] public SyntaxList<GenericConstraintSyntax> GenericConstraints { get; }
 
         public OperatorFunctionDeclarationSyntax(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] OperatorKeywordToken operatorKeyword,
-            [NotNull] IOperatorToken @operator,
-            [NotNull] IOpenParenToken openParen,
+            [NotNull] IOperatorKeywordToken operatorKeyword,
+            [NotNull] IOperatorTokenPlace @operator,
+            [NotNull] IOpenParenTokenPlace openParen,
             [NotNull] SeparatedListSyntax<ParameterSyntax> parameterList,
-            [NotNull] ICloseParenToken closeParen,
-            [NotNull] IRightArrowToken arrow,
+            [NotNull] ICloseParenTokenPlace closeParen,
+            [NotNull] IRightArrowTokenPlace arrow,
             [NotNull] ExpressionSyntax returnTypeExpression,
             [NotNull] SyntaxList<GenericConstraintSyntax> genericConstraints,
             [CanBeNull] EffectsSyntax effects,
             [NotNull] SyntaxList<FunctionContractSyntax> contracts,
             [CanBeNull] BlockSyntax body,
-            [CanBeNull] ISemicolonToken semicolon)
+            [CanBeNull] ISemicolonTokenPlace semicolon)
             : base(TextSpan.Covering(operatorKeyword.Span, @operator.Span),
             modifiers, openParen, parameterList, closeParen, effects, contracts, body, semicolon)
         {

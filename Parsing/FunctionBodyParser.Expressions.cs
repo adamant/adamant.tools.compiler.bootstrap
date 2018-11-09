@@ -17,11 +17,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             switch (tokens.Current)
             {
-                case CloseParenToken _:
-                case CloseBracketToken _:
-                case CloseBraceToken _:
-                case SemicolonToken _:
-                case CommaToken _:
+                case ICloseParenToken _:
+                case ICloseBracketToken _:
+                case ICloseBraceToken _:
+                case ISemicolonToken _:
+                case ICommaToken _:
                     return null;
                 default:
                     return ParseExpression(tokens, diagnostics);
@@ -48,16 +48,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
             for (; ; )
             {
-                OperatorToken @operator = null;
+                IOperatorToken @operator = null;
                 OperatorPrecedence? precedence = null;
                 var leftAssociative = true;
                 switch (tokens.Current)
                 {
-                    case EqualsToken _:
-                    case PlusEqualsToken _:
-                    case MinusEqualsToken _:
-                    case AsteriskEqualsToken _:
-                    case SlashEqualsToken _:
+                    case IEqualsToken _:
+                    case IPlusEqualsToken _:
+                    case IMinusEqualsToken _:
+                    case IAsteriskEqualsToken _:
+                    case ISlashEqualsToken _:
                         if (minPrecedence <= OperatorPrecedence.Assignment)
                         {
                             precedence = OperatorPrecedence.Assignment;
@@ -65,98 +65,98 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                             @operator = tokens.TakeOperator();
                         }
                         break;
-                    case QuestionQuestionToken _:
+                    case IQuestionQuestionToken _:
                         if (minPrecedence <= OperatorPrecedence.Coalesce)
                         {
                             precedence = OperatorPrecedence.Coalesce;
                             @operator = tokens.TakeOperator();
                         }
                         break;
-                    case OrKeywordToken _:
-                    case XorKeywordToken _:
+                    case IOrKeywordToken _:
+                    case IXorKeywordToken _:
                         if (minPrecedence <= OperatorPrecedence.LogicalOr)
                         {
                             precedence = OperatorPrecedence.LogicalOr;
                             @operator = tokens.TakeOperator();
                         }
                         break;
-                    case AndKeywordToken _:
+                    case IAndKeywordToken _:
                         if (minPrecedence <= OperatorPrecedence.LogicalAnd)
                         {
                             precedence = OperatorPrecedence.LogicalAnd;
                             @operator = tokens.TakeOperator();
                         }
                         break;
-                    case EqualsEqualsToken _:
-                    case NotEqualToken _:
+                    case IEqualsEqualsToken _:
+                    case INotEqualToken _:
                         if (minPrecedence <= OperatorPrecedence.Equality)
                         {
                             precedence = OperatorPrecedence.Equality;
                             @operator = tokens.TakeOperator();
                         }
                         break;
-                    case LessThanToken _:
-                    case LessThanOrEqualToken _:
-                    case GreaterThanToken _:
-                    case GreaterThanOrEqualToken _:
-                    case LessThanColonToken _: // Subtype operator
-                    case AsKeywordToken _:
+                    case ILessThanToken _:
+                    case ILessThanOrEqualToken _:
+                    case IGreaterThanToken _:
+                    case IGreaterThanOrEqualToken _:
+                    case ILessThanColonToken _: // Subtype operator
+                    case IAsKeywordToken _:
                         if (minPrecedence <= OperatorPrecedence.Relational)
                         {
                             precedence = OperatorPrecedence.Relational;
                             @operator = tokens.TakeOperator();
                         }
                         break;
-                    case ColonToken _: // type kind
+                    case IColonToken _: // type kind
                         if (minPrecedence <= OperatorPrecedence.Relational)
                         {
-                            var colon = tokens.Take<ColonToken>();
-                            var typeKind = tokens.Expect<ITypeKindKeywordToken>();
+                            var colon = tokens.Take<IColonToken>();
+                            var typeKind = tokens.Expect<ITypeKindKeywordTokenPlace>();
                             expression = new TypeKindExpressionSyntax(colon, typeKind);
                             continue;
                         }
                         break;
-                    case DotDotToken _:
-                    case LessThanDotDotToken _:
-                    case DotDotLessThanToken _:
-                    case LessThanDotDotLessThanToken _:
+                    case IDotDotToken _:
+                    case ILessThanDotDotToken _:
+                    case IDotDotLessThanToken _:
+                    case ILessThanDotDotLessThanToken _:
                         if (minPrecedence <= OperatorPrecedence.Range)
                         {
                             precedence = OperatorPrecedence.Range;
                             @operator = tokens.TakeOperator();
                         }
                         break;
-                    case PlusToken _:
-                    case MinusToken _:
+                    case IPlusToken _:
+                    case IMinusToken _:
                         if (minPrecedence <= OperatorPrecedence.Additive)
                         {
                             precedence = OperatorPrecedence.Additive;
                             @operator = tokens.TakeOperator();
                         }
                         break;
-                    case AsteriskToken _:
-                    case SlashToken _:
+                    case IAsteriskToken _:
+                    case ISlashToken _:
                         if (minPrecedence <= OperatorPrecedence.Multiplicative)
                         {
                             precedence = OperatorPrecedence.Multiplicative;
                             @operator = tokens.TakeOperator();
                         }
                         break;
-                    case DollarToken _:
-                    case DollarLessThanToken _:
-                    case DollarLessThanNotEqualToken _:
-                    case DollarGreaterThanToken _:
-                    case DollarGreaterThanNotEqualToken _:
+                    case IDollarToken _:
+                    case IDollarLessThanToken _:
+                    case IDollarLessThanNotEqualToken _:
+                    case IDollarGreaterThanToken _:
+                    case IDollarGreaterThanNotEqualToken _:
                         if (minPrecedence <= OperatorPrecedence.Lifetime)
                         {
                             var leftOperand = expression;
                             var lifetimeOperator = tokens.Take<ILifetimeOperatorToken>();
-                            var name = tokens.Expect<ILifetimeNameToken>();
+                            var name = tokens.Expect<ILifetimeNameTokenPlace>();
                             expression = new LifetimeTypeSyntax(leftOperand, lifetimeOperator, name);
                             continue;
                         }
                         break;
-                    case QuestionToken _:
+                    case IQuestionToken _:
                         if (minPrecedence <= OperatorPrecedence.Unary)
                         {
                             @operator = tokens.TakeOperator();
@@ -164,36 +164,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                             continue;
                         }
                         break;
-                    case OpenParenToken _:
+                    case IOpenParenToken _:
                         if (minPrecedence <= OperatorPrecedence.Primary)
                         {
                             var callee = expression;
-                            var openParen = tokens.Expect<IOpenParenToken>();
+                            var openParen = tokens.Expect<IOpenParenTokenPlace>();
                             var arguments = ParseArgumentList(tokens, diagnostics);
-                            var closeParen = tokens.Expect<ICloseParenToken>();
+                            var closeParen = tokens.Expect<ICloseParenTokenPlace>();
                             expression = new InvocationSyntax(callee, openParen, arguments, closeParen);
                             continue;
                         }
                         break;
-                    case OpenBracketToken _:
+                    case IOpenBracketToken _:
                         if (minPrecedence <= OperatorPrecedence.Primary)
                         {
                             var callee = expression;
-                            var openBracket = tokens.Expect<IOpenBracketToken>();
+                            var openBracket = tokens.Expect<IOpenBracketTokenPlace>();
                             var arguments = ParseArgumentList(tokens, diagnostics);
-                            var closeBracket = tokens.Expect<ICloseBracketToken>();
+                            var closeBracket = tokens.Expect<ICloseBracketTokenPlace>();
                             expression = new GenericsInvocationSyntax(callee, openBracket, arguments, closeBracket);
                             continue;
                         }
                         break;
-                    case DotToken _:
-                    case CaretDotToken _:
-                    case QuestionDotToken _:
+                    case IDotToken _:
+                    case ICaretDotToken _:
+                    case IQuestionDotToken _:
                         if (minPrecedence <= OperatorPrecedence.Primary)
                         {
                             // Member Access
                             var accessOperator = tokens.TakeOperator();
-                            var member = tokens.Expect<IMemberNameToken>();
+                            var member = tokens.Expect<IMemberNameTokenPlace>();
                             expression = new MemberAccessExpressionSyntax(expression, accessOperator, member);
                             continue;
                         }
@@ -202,7 +202,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         return expression;
                 }
 
-                if (@operator is OperatorToken @operatorToken &&
+                if (@operator is IOperatorToken operatorToken &&
                     precedence is OperatorPrecedence operatorPrecedence)
                 {
                     if (leftAssociative)
@@ -226,162 +226,162 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             switch (tokens.Current)
             {
-                case SelfTypeKeywordToken selfTypeKeyword:
+                case ISelfTypeKeywordToken selfTypeKeyword:
                     tokens.MoveNext();
                     return new SelfTypeExpressionSyntax(selfTypeKeyword);
-                case UninitializedKeywordToken uninitializedKeyword:
+                case IUninitializedKeywordToken uninitializedKeyword:
                     tokens.MoveNext();
                     return new UninitializedExpressionSyntax(uninitializedKeyword);
-                case NoneKeywordToken noneKeyword:
+                case INoneKeywordToken noneKeyword:
                     tokens.MoveNext();
                     return new NoneExpressionSyntax(noneKeyword);
-                case SelfKeywordToken selfKeyword:
+                case ISelfKeywordToken selfKeyword:
                     tokens.MoveNext();
                     return new SelfExpressionSyntax(selfKeyword);
-                case BaseKeywordToken baseKeyword:
+                case IBaseKeywordToken baseKeyword:
                     tokens.MoveNext();
                     return new BaseExpressionSyntax(baseKeyword);
-                case NewKeywordToken _:
+                case INewKeywordToken _:
                 {
-                    var newKeyword = tokens.Expect<INewKeywordToken>();
+                    var newKeyword = tokens.Expect<INewKeywordTokenPlace>();
                     var type = ParseName(tokens, diagnostics);
-                    var openParen = tokens.Expect<IOpenParenToken>();
+                    var openParen = tokens.Expect<IOpenParenTokenPlace>();
                     var arguments = ParseArgumentList(tokens, diagnostics);
-                    var closeParen = tokens.Expect<ICloseParenToken>();
+                    var closeParen = tokens.Expect<ICloseParenTokenPlace>();
                     return new NewObjectExpressionSyntax(newKeyword, type, openParen, arguments, closeParen);
                 }
-                case InitKeywordToken _:
+                case IInitKeywordToken _:
                 {
-                    var initKeyword = tokens.Expect<IInitKeywordToken>();
-                    var openParen = tokens.Expect<IOpenParenToken>();
+                    var initKeyword = tokens.Expect<IInitKeywordTokenPlace>();
+                    var openParen = tokens.Expect<IOpenParenTokenPlace>();
                     var placeExpression = ParseExpression(tokens, diagnostics);
-                    var closeParen = tokens.Expect<ICloseParenToken>();
+                    var closeParen = tokens.Expect<ICloseParenTokenPlace>();
                     var initializer = ParseName(tokens, diagnostics);
-                    var argumentsOpenParen = tokens.Expect<IOpenParenToken>();
+                    var argumentsOpenParen = tokens.Expect<IOpenParenTokenPlace>();
                     var arguments = ParseArgumentList(tokens, diagnostics);
-                    var argumentsCloseParen = tokens.Expect<ICloseParenToken>();
+                    var argumentsCloseParen = tokens.Expect<ICloseParenTokenPlace>();
                     return new PlacementInitExpressionSyntax(initKeyword, openParen, placeExpression,
                         closeParen, initializer, argumentsOpenParen, arguments, argumentsCloseParen);
                 }
-                case DeleteKeywordToken deleteKeyword:
+                case IDeleteKeywordToken deleteKeyword:
                 {
                     tokens.MoveNext();
                     var expression = ParseExpression(tokens, diagnostics);
                     return new DeleteExpressionSyntax(deleteKeyword, expression);
                 }
-                case ReturnKeywordToken _:
+                case IReturnKeywordToken _:
                 {
-                    var returnKeyword = tokens.Expect<IReturnKeywordToken>();
-                    var expression = tokens.AtTerminator<SemicolonToken>() ? null : ParseExpression(tokens, diagnostics);
+                    var returnKeyword = tokens.Expect<IReturnKeywordTokenPlace>();
+                    var expression = tokens.AtTerminator<ISemicolonToken>() ? null : ParseExpression(tokens, diagnostics);
                     return new ReturnExpressionSyntax(returnKeyword, expression);
                 }
-                case EqualsGreaterThanToken _:
+                case IEqualsGreaterThanToken _:
                     return ParseExpressionBlock(tokens, diagnostics);
-                case OpenParenToken _:
+                case IOpenParenToken _:
                     return ParseParenthesizedExpression(tokens, diagnostics);
-                case MinusToken _:
-                case PlusToken _:
-                case AtSignToken _:
-                case CaretToken _:
-                case NotKeywordToken _:
+                case IMinusToken _:
+                case IPlusToken _:
+                case IAtSignToken _:
+                case ICaretToken _:
+                case INotKeywordToken _:
                 {
                     var @operator = tokens.TakeOperator();
                     var operand = ParseExpression(tokens, diagnostics, OperatorPrecedence.Unary);
                     return new UnaryOperatorExpressionSyntax(@operator, operand);
                 }
-                case IntegerLiteralToken literal:
+                case IIntegerLiteralToken literal:
                 {
                     tokens.MoveNext();
                     return new IntegerLiteralExpressionSyntax(literal);
                 }
-                case StringLiteralToken literal:
+                case IStringLiteralToken literal:
                 {
                     tokens.MoveNext();
                     return new StringLiteralExpressionSyntax(literal);
                 }
-                case BooleanLiteralToken literal:
+                case IBooleanLiteralToken literal:
                 {
                     tokens.MoveNext();
                     return new BooleanLiteralExpressionSyntax(literal);
                 }
-                case VoidKeywordToken _:
-                case IntKeywordToken _:
-                case UIntKeywordToken _:
-                case BoolKeywordToken _:
-                case ByteKeywordToken _:
-                case StringKeywordToken _:
-                case NeverKeywordToken _:
-                case SizeKeywordToken _:
-                case TypeKeywordToken _:
-                case AnyKeywordToken _:
+                case IVoidKeywordToken _:
+                case IIntKeywordToken _:
+                case IUIntKeywordToken _:
+                case IBoolKeywordToken _:
+                case IByteKeywordToken _:
+                case IStringKeywordToken _:
+                case INeverKeywordToken _:
+                case ISizeKeywordToken _:
+                case ITypeKeywordToken _:
+                case IAnyKeywordToken _:
                 {
                     var keyword = tokens.Take<IPrimitiveTypeToken>();
                     return new PrimitiveTypeSyntax(keyword);
                 }
-                case IdentifierToken _:
+                case IIdentifierToken _:
                 {
                     var identifier = tokens.ExpectIdentifier();
                     var name = new IdentifierNameSyntax(identifier);
-                    if (tokens.Current is DollarToken)
+                    if (tokens.Current is IDollarToken)
                     {
-                        var dollar = tokens.Take<DollarToken>();
-                        var lifetime = tokens.Expect<ILifetimeNameToken>();
+                        var dollar = tokens.Take<IDollarToken>();
+                        var lifetime = tokens.Expect<ILifetimeNameTokenPlace>();
                         return new LifetimeTypeSyntax(name, dollar, lifetime);
                     }
 
                     return name;
                 }
-                case ForeachKeywordToken _:
+                case IForeachKeywordToken _:
                     return ParseForeach(tokens, diagnostics);
-                case WhileKeywordToken _:
+                case IWhileKeywordToken _:
                     return ParseWhile(tokens, diagnostics);
-                case LoopKeywordToken _:
+                case ILoopKeywordToken _:
                     return ParseLoop(tokens, diagnostics);
-                case BreakKeywordToken _:
+                case IBreakKeywordToken _:
                 {
-                    var breakKeyword = tokens.Expect<IBreakKeywordToken>();
+                    var breakKeyword = tokens.Expect<IBreakKeywordTokenPlace>();
                     // TODO parse label
                     var expression = AcceptExpression(tokens, diagnostics);
                     return new BreakExpressionSyntax(breakKeyword, expression);
                 }
-                case UnsafeKeywordToken unsafeKeyword:
+                case IUnsafeKeywordToken unsafeKeyword:
                 {
                     tokens.MoveNext();
-                    var expression = tokens.Current is OpenBraceToken ?
+                    var expression = tokens.Current is IOpenBraceToken ?
                         ParseBlock(tokens, diagnostics)
                         : ParseParenthesizedExpression(tokens, diagnostics);
 
                     return new UnsafeExpressionSyntax(unsafeKeyword, expression);
                 }
-                case RefKeywordToken refKeyword:
+                case IRefKeywordToken refKeyword:
                 {
                     tokens.MoveNext();
-                    var varKeyword = tokens.Accept<VarKeywordToken>();
+                    var varKeyword = tokens.Accept<IVarKeywordToken>();
                     var referencedType = ParseExpression(tokens, diagnostics);
                     return new RefTypeSyntax(refKeyword, varKeyword, referencedType);
                 }
-                case MutableKeywordToken mutableKeyword:
+                case IMutableKeywordToken mutableKeyword:
                 {
                     tokens.MoveNext();
                     var referencedType = ParseExpression(tokens, diagnostics);
                     return new MutableTypeSyntax(mutableKeyword, referencedType);
                 }
-                case IfKeywordToken _:
+                case IIfKeywordToken _:
                     return ParseIf(tokens, diagnostics);
-                case MatchKeywordToken _:
+                case IMatchKeywordToken _:
                     return ParseMatch(tokens, diagnostics);
-                case DotToken _:
+                case IDotToken _:
                 {
                     // implicit self etc.
                     var @operator = tokens.TakeOperator();
                     var operand = ParseExpression(tokens, diagnostics, OperatorPrecedence.Unary);
                     return new UnaryOperatorExpressionSyntax(@operator, operand);
                 }
-                case AsteriskToken _:
-                case SlashToken _:
-                case QuestionToken _:
-                case SemicolonToken _:
-                case CloseParenToken _:
+                case IAsteriskToken _:
+                case ISlashToken _:
+                case IQuestionToken _:
+                case ISemicolonToken _:
+                case ICloseParenToken _:
                     // If it is one of these, we assume there is a missing identifier
                     return new IdentifierNameSyntax(tokens.ExpectIdentifier());
                 default:
@@ -395,14 +395,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var foreachKeyword = tokens.Expect<ForeachKeywordToken>();
-            var varKeyword = tokens.Accept<VarKeywordToken>();
+            var foreachKeyword = tokens.Expect<IForeachKeywordToken>();
+            var varKeyword = tokens.Accept<IVarKeywordToken>();
             var identifier = tokens.ExpectIdentifier();
-            var colon = tokens.Accept<ColonToken>();
+            var colon = tokens.Accept<IColonToken>();
             ExpressionSyntax typeExpression = null;
             if (colon != null)
                 typeExpression = ParseExpression(tokens, diagnostics);
-            var inKeyword = tokens.Expect<InKeywordToken>();
+            var inKeyword = tokens.Expect<IInKeywordToken>();
             var expression = ParseExpression(tokens, diagnostics);
             var block = ParseBlock(tokens, diagnostics);
             return new ForeachExpressionSyntax(foreachKeyword, varKeyword, identifier,
@@ -415,7 +415,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var whileKeyword = tokens.Expect<WhileKeywordToken>();
+            var whileKeyword = tokens.Expect<IWhileKeywordToken>();
             var condition = ParseExpression(tokens, diagnostics);
             var block = ParseBlock(tokens, diagnostics);
             return new WhileExpressionSyntax(whileKeyword, condition, block);
@@ -427,7 +427,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var loopKeyword = tokens.Expect<LoopKeywordToken>();
+            var loopKeyword = tokens.Expect<ILoopKeywordToken>();
             var block = ParseBlock(tokens, diagnostics);
             return new LoopExpressionSyntax(loopKeyword, block);
         }
@@ -438,7 +438,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var ifKeyword = tokens.Take<IfKeywordToken>();
+            var ifKeyword = tokens.Take<IIfKeywordToken>();
             var condition = ParseExpression(tokens, diagnostics);
             var thenBlock = ParseExpressionBlock(tokens, diagnostics);
             var elseClause = AcceptElse(tokens, diagnostics);
@@ -450,9 +450,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var elseKeyword = tokens.Accept<ElseKeywordToken>();
+            var elseKeyword = tokens.Accept<IElseKeywordToken>();
             if (elseKeyword == null) return null;
-            var expression = tokens.Current is IfKeywordToken
+            var expression = tokens.Current is IIfKeywordToken
                 ? ParseIf(tokens, diagnostics)
                 : ParseExpressionBlock(tokens, diagnostics);
             return new ElseClauseSyntax(elseKeyword, expression);
@@ -464,11 +464,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var matchKeyword = tokens.Take<MatchKeywordToken>();
+            var matchKeyword = tokens.Take<IMatchKeywordToken>();
             var value = ParseExpression(tokens, diagnostics);
-            var openBrace = tokens.Expect<IOpenBraceToken>();
-            var arms = listParser.ParseList(tokens, ParseMatchArm, TypeOf<CloseBraceToken>(), diagnostics);
-            var closeBrace = tokens.Expect<ICloseBraceToken>();
+            var openBrace = tokens.Expect<IOpenBraceTokenPlace>();
+            var arms = listParser.ParseList(tokens, ParseMatchArm, TypeOf<ICloseBraceToken>(), diagnostics);
+            var closeBrace = tokens.Expect<ICloseBraceTokenPlace>();
             return new MatchExpressionSyntax(matchKeyword, value, openBrace, arms, closeBrace);
         }
 
@@ -480,7 +480,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             var pattern = ParsePattern(tokens, diagnostics);
             var expression = ParseExpressionBlock(tokens, diagnostics);
-            var comma = tokens.Accept<CommaToken>();
+            var comma = tokens.Accept<ICommaToken>();
             return new MatchArmSyntax(pattern, expression, comma);
         }
 
@@ -490,9 +490,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var openParen = tokens.Expect<IOpenParenToken>();
+            var openParen = tokens.Expect<IOpenParenTokenPlace>();
             var expression = ParseExpression(tokens, diagnostics);
-            var closeParen = tokens.Expect<ICloseParenToken>();
+            var closeParen = tokens.Expect<ICloseParenTokenPlace>();
             return new ParenthesizedExpressionSyntax(openParen, expression, closeParen);
         }
 
@@ -502,7 +502,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var arguments = listParser.ParseSeparatedList(tokens, AcceptArgument, TypeOf<CommaToken>(), diagnostics);
+            var arguments = listParser.ParseSeparatedList(tokens, AcceptArgument, TypeOf<ICommaToken>(), diagnostics);
             return new SeparatedListSyntax<ArgumentSyntax>(arguments);
         }
 
@@ -512,7 +512,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var paramsKeyword = tokens.Accept<ParamsKeywordToken>();
+            var paramsKeyword = tokens.Accept<IParamsKeywordToken>();
             var value = AcceptExpression(tokens, diagnostics);
             if (paramsKeyword == null && value == null) return null;
             return new ArgumentSyntax(paramsKeyword, value);

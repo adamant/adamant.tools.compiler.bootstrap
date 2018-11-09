@@ -7,11 +7,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class LoopExpressionSyntax : ExpressionSyntax
     {
-        [NotNull] public LoopKeywordToken LoopKeyword { get; }
+        [NotNull] public ILoopKeywordToken LoopKeyword { get; }
         [NotNull] public BlockSyntax Block { get; }
 
         public LoopExpressionSyntax(
-            [NotNull] LoopKeywordToken loopKeyword,
+            [NotNull] ILoopKeywordToken loopKeyword,
             [NotNull] BlockSyntax block)
             : base(TextSpan.Covering(loopKeyword.Span, block.Span))
         {

@@ -7,14 +7,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class BlockSyntax : ExpressionBlockSyntax
     {
-        [NotNull] public IOpenBraceToken OpenBrace { get; }
+        [NotNull] public IOpenBraceTokenPlace OpenBrace { get; }
         [NotNull] [ItemNotNull] public SyntaxList<StatementSyntax> Statements { get; }
-        [NotNull] public ICloseBraceToken CloseBrace { get; }
+        [NotNull] public ICloseBraceTokenPlace CloseBrace { get; }
 
         public BlockSyntax(
-            [NotNull] IOpenBraceToken openBrace,
+            [NotNull] IOpenBraceTokenPlace openBrace,
             [NotNull][ItemNotNull] SyntaxList<StatementSyntax> statements,
-            [NotNull] ICloseBraceToken closeBrace)
+            [NotNull] ICloseBraceTokenPlace closeBrace)
             : base(TextSpan.Covering(openBrace.Span, closeBrace.Span))
         {
             Requires.NotNull(nameof(openBrace), openBrace);

@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] IDiagnosticsCollector diagnostics)
         {
             var directives = new List<UsingDirectiveSyntax>();
-            while (tokens.Current is UsingKeywordToken)
+            while (tokens.Current is IUsingKeywordToken)
                 directives.Add(ParseUsingDirective(tokens, diagnostics));
 
             return directives.ToSyntaxList();
@@ -34,9 +34,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenStream tokens,
             [NotNull] IDiagnosticsCollector diagnostics)
         {
-            var usingKeyword = tokens.Expect<IUsingKeywordToken>();
+            var usingKeyword = tokens.Expect<IUsingKeywordTokenPlace>();
             var name = qualifiedNameParser.ParseName(tokens, diagnostics);
-            var semicolon = tokens.Expect<ISemicolonToken>();
+            var semicolon = tokens.Expect<ISemicolonTokenPlace>();
             return new UsingDirectiveSyntax(usingKeyword, name, semicolon);
         }
     }

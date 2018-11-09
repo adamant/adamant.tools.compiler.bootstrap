@@ -8,31 +8,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     public class EnumStructDeclarationSyntax : MemberDeclarationSyntax
     {
         [NotNull] public SyntaxList<ModifierSyntax> Modifiers { get; }
-        [NotNull] public EnumKeywordToken EnumKeyword { get; }
-        [NotNull] public StructKeywordToken StructKeyword { get; }
-        [NotNull] public IIdentifierToken Name { get; }
+        [NotNull] public IEnumKeywordToken EnumKeyword { get; }
+        [NotNull] public IStructKeywordToken StructKeyword { get; }
+        [NotNull] public IIdentifierTokenPlace Name { get; }
         [CanBeNull] public GenericParametersSyntax GenericParameters { get; }
         [CanBeNull] public BaseTypesSyntax BaseTypes { get; }
         [NotNull] public SyntaxList<GenericConstraintSyntax> GenericConstraints { get; }
         [NotNull] public SyntaxList<InvariantSyntax> Invariants { get; }
-        [NotNull] public IOpenBraceToken OpenBrace { get; }
+        [NotNull] public IOpenBraceTokenPlace OpenBrace { get; }
         [NotNull] public EnumVariantsSyntax Variants { get; }
         [NotNull] public SyntaxList<MemberDeclarationSyntax> Members { get; }
-        [NotNull] public ICloseBraceToken CloseBrace { get; }
+        [NotNull] public ICloseBraceTokenPlace CloseBrace { get; }
 
         public EnumStructDeclarationSyntax(
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] EnumKeywordToken enumKeyword,
-            [NotNull] StructKeywordToken structKeyword,
-            [NotNull] IIdentifierToken name,
+            [NotNull] IEnumKeywordToken enumKeyword,
+            [NotNull] IStructKeywordToken structKeyword,
+            [NotNull] IIdentifierTokenPlace name,
             [CanBeNull] GenericParametersSyntax genericParameters,
             [CanBeNull] BaseTypesSyntax baseTypes,
             [NotNull] SyntaxList<GenericConstraintSyntax> genericConstraints,
             [NotNull] SyntaxList<InvariantSyntax> invariants,
-            [NotNull] IOpenBraceToken openBrace,
+            [NotNull] IOpenBraceTokenPlace openBrace,
             [NotNull] EnumVariantsSyntax variants,
             [NotNull] SyntaxList<MemberDeclarationSyntax> members,
-            [NotNull] ICloseBraceToken closeBrace)
+            [NotNull] ICloseBraceTokenPlace closeBrace)
             : base(TextSpan.Covering(enumKeyword.Span, name.Span))
         {
             Requires.NotNull(nameof(modifiers), modifiers);
