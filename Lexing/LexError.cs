@@ -1,6 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Errors
+namespace Adamant.Tools.Compiler.Bootstrap.Lexing
 {
     /// <summary>
     /// Error Code Ranges:

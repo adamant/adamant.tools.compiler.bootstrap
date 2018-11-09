@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing
+namespace Adamant.Tools.Compiler.Bootstrap.Lexing
 {
     public class TokenStream : ITokenStream
     {

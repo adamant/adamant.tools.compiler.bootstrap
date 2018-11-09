@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing;
+using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Fakes;
 using JetBrains.Annotations;
 

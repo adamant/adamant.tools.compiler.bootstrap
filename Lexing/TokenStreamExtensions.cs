@@ -4,7 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing
+namespace Adamant.Tools.Compiler.Bootstrap.Lexing
 {
     /// <summary>
     /// * Take - throws InvalidOperationException if that kind of token isn't find

@@ -4,11 +4,10 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax
+namespace Adamant.Tools.Compiler.Bootstrap.Lexing
 {
     public class Lexer
     {

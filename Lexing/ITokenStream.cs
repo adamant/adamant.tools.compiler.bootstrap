@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Syntax.Lexing
+namespace Adamant.Tools.Compiler.Bootstrap.Lexing
 {
     /// <summary>
     /// A stream of tokens form a <see cref="CodeFile"/>. Never includes
