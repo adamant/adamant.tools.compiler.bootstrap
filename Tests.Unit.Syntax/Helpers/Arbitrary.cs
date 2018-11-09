@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
+using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using Fare;
 using FsCheck;
 using JetBrains.Annotations;
-using LetKeywordToken = Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens.LetKeywordToken;
-using VarKeywordToken = Adamant.Tools.Compiler.Bootstrap.Syntax.Tokens.VarKeywordToken;
+using LetKeywordToken = Adamant.Tools.Compiler.Bootstrap.Tokens.LetKeywordToken;
+using VarKeywordToken = Adamant.Tools.Compiler.Bootstrap.Tokens.VarKeywordToken;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Syntax.Helpers
 {

@@ -19,7 +19,6 @@
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Semantics.Names\Semantics.Names.csproj" />
     <ProjectReference Include="..\Semantics.Types\Semantics.Types.csproj" />
-    <ProjectReference Include="..\Syntax.Tokens\Syntax.Tokens.csproj" />
     <ProjectReference Include="..\Syntax\Syntax.csproj" />
   </ItemGroup>
 

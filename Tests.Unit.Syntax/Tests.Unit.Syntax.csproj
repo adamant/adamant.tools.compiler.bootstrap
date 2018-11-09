@@ -31,6 +31,7 @@
     <ProjectReference Include="..\Parsing\Parsing.csproj" />
     <ProjectReference Include="..\Syntax\Syntax.csproj" />
     <ProjectReference Include="..\Tests.Unit\Tests.Unit.csproj" />
+    <ProjectReference Include="..\Tokens\Tokens.csproj" />
   </ItemGroup>
 
 </Project>

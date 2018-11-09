@@ -54,11 +54,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Semantics.Names", "Semantic
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Semantics.Types", "Semantics.Types\Semantics.Types.csproj", "{1C0B0F09-F0B9-4C07-BC35-4273796C1888}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Syntax.Tokens", "Syntax.Tokens\Syntax.Tokens.csproj", "{F2226A08-38D8-4B7A-87A4-81869DAB4113}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lexing", "Lexing\Lexing.csproj", "{794D1EE6-A091-4B32-8A89-08C5A095DADA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lexing", "Lexing\Lexing.csproj", "{794D1EE6-A091-4B32-8A89-08C5A095DADA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parsing", "Parsing\Parsing.csproj", "{9E0558AC-5A8A-402D-B0B5-C8CB8833D0C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parsing", "Parsing\Parsing.csproj", "{9E0558AC-5A8A-402D-B0B5-C8CB8833D0C7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tokens", "Tokens\Tokens.csproj", "{2F5A2A61-05AB-4E97-A6E9-CC79E7A5DE2D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -138,10 +138,6 @@ Global
 		{1C0B0F09-F0B9-4C07-BC35-4273796C1888}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C0B0F09-F0B9-4C07-BC35-4273796C1888}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C0B0F09-F0B9-4C07-BC35-4273796C1888}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F2226A08-38D8-4B7A-87A4-81869DAB4113}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F2226A08-38D8-4B7A-87A4-81869DAB4113}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F2226A08-38D8-4B7A-87A4-81869DAB4113}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F2226A08-38D8-4B7A-87A4-81869DAB4113}.Release|Any CPU.Build.0 = Release|Any CPU
 		{794D1EE6-A091-4B32-8A89-08C5A095DADA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{794D1EE6-A091-4B32-8A89-08C5A095DADA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{794D1EE6-A091-4B32-8A89-08C5A095DADA}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -150,6 +146,10 @@ Global
 		{9E0558AC-5A8A-402D-B0B5-C8CB8833D0C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E0558AC-5A8A-402D-B0B5-C8CB8833D0C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E0558AC-5A8A-402D-B0B5-C8CB8833D0C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F5A2A61-05AB-4E97-A6E9-CC79E7A5DE2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F5A2A61-05AB-4E97-A6E9-CC79E7A5DE2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F5A2A61-05AB-4E97-A6E9-CC79E7A5DE2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F5A2A61-05AB-4E97-A6E9-CC79E7A5DE2D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
