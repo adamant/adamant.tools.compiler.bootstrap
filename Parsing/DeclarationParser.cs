@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
@@ -62,7 +63,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             switch (Tokens.Current)
             {
                 case INamespaceKeywordToken _:
-                    return ParseNamespace(attributes, modifiers);
+                    return ParseNamespaceDeclaration(attributes, modifiers);
                 //case IClassKeywordToken _:
                 //    return ParseClass(attributes, modifiers);
                 //case ITypeKeywordToken _:
@@ -71,8 +72,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 //    return ParseStruct(attributes, modifiers);
                 //case IEnumKeywordToken _:
                 //    return ParseEnum(attributes, modifiers);
-                //case IFunctionKeywordToken _:
-                //    return ParseNamedFunction(attributes, modifiers);
+                case IFunctionKeywordToken _:
+                    return ParseNamedFunction(attributes, modifiers);
                 //case IConstKeywordToken _:
                 //    return ParseConst(attributes, modifiers);
                 //default:
@@ -82,22 +83,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 default:
                     throw NonExhaustiveMatchException.For(Tokens.Current);
             }
-        }
-
-        [MustUseReturnValue]
-        [NotNull]
-        private BlockNamespaceDeclarationSyntax ParseNamespace(
-            [NotNull] FixedList<AttributeSyntax> attributes,
-            [NotNull] FixedList<IModiferToken> modifiers)
-        {
-            var namespaceKeyword = Tokens.Required<INamespaceKeywordToken>();
-            var name = nameParser.ParseName(Tokens, Tokens.Context.Diagnostics);
-            var openBrace = Tokens.Expect<IOpenBraceToken>();
-            var usingDirectives = usingDirectiveParser.ParseUsingDirectives(Tokens, Tokens.Context.Diagnostics).ToSyntaxList();
-            var declarations = ParseDeclarations().ToSyntaxList();
-            var closeBrace = Tokens.Expect<ICloseBraceToken>();
-            return new BlockNamespaceDeclarationSyntax(attributes, modifiers, name,
-                usingDirectives.ToFixedList(), declarations.ToFixedList());
         }
 
         //[MustUseReturnValue]
@@ -142,6 +127,57 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         //            throw new InvalidOperationException("Can't parse past end of file");
         //    }
         //}
+
+        #region Parse Namespaces
+        [MustUseReturnValue]
+        [NotNull]
+        public NamespaceDeclarationSyntax ParseFileNamespace([NotNull] FixedList<string> name)
+        {
+            var usingDirectives = usingDirectiveParser.ParseUsingDirectives(Tokens, Tokens.Context.Diagnostics).ToFixedList();
+            var declarations = ParseDeclarations().ToFixedList();
+            return new NamespaceDeclarationSyntax(true, name, null, usingDirectives, declarations);
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
+        public NamespaceDeclarationSyntax ParseNamespaceDeclaration(
+            [NotNull] FixedList<AttributeSyntax> attributes,
+            [NotNull] FixedList<IModiferToken> modifiers)
+        {
+            // TODO generate errors for attributes or modifiers
+            Tokens.Required<INamespaceKeywordToken>();
+            var globalQualifier = Tokens.Accept<IColonColonToken>();
+            var (name, span) = ParseNamespaceName();
+            span = TextSpan.Covering(span, globalQualifier?.Span);
+            Tokens.Expect<IOpenBraceToken>();
+            var usingDirectives = usingDirectiveParser.ParseUsingDirectives(Tokens, Tokens.Context.Diagnostics).ToFixedList();
+            var declarations = ParseDeclarations();
+            Tokens.Expect<ICloseBraceToken>();
+            return new NamespaceDeclarationSyntax(globalQualifier != null, name, span, usingDirectives, declarations);
+        }
+
+        [MustUseReturnValue]
+        private (FixedList<string>, TextSpan) ParseNamespaceName()
+        {
+            var name = new List<string>();
+
+            var nameSegment = Tokens.RequiredIdentifier();
+            if (nameSegment == null)
+                return (FixedList<string>.Empty, Tokens.Current.NotNull().Span);
+            var span = nameSegment.Span;
+            name.Add(nameSegment.Value);
+
+            while (Tokens.Accept<IDotToken>() != null)
+            {
+                nameSegment = Tokens.ExpectIdentifier();
+                if (nameSegment == null) break;
+                span = TextSpan.Covering(span, nameSegment.Span);
+                name.Add(nameSegment.Value);
+            }
+
+            return (name.ToFixedList(), span);
+        }
+        #endregion
 
         #region Parse Type Parts
         [MustUseReturnValue]
@@ -418,53 +454,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         #endregion
 
         #region Parse Functions
-        //private (BlockSyntax, ISemicolonTokenPlace) ParseFunctionBody(
-        //    [NotNull] ITokenIterator tokens,
-        //    [NotNull] Diagnostics diagnostics)
-        //{
-        //    var body = blockParser.AcceptBlock(tokens, diagnostics);
-        //    ISemicolonTokenPlace semicolon = null;
-        //    if (body == null)
-        //        semicolon = tokens.Consume<ISemicolonTokenPlace>();
-        //    return (body, semicolon);
-        //}
-
-        //[MustUseReturnValue]
-        //[NotNull]
-        //public NamedFunctionDeclarationSyntax ParseNamedFunction(
-        //    [NotNull] FixedList<AttributeSyntax> attributes,
-        //    [NotNull] FixedList<IModiferToken> modifiers)
-        //{
-        //    var functionKeyword = tokens.Take<IFunctionKeywordToken>();
-        //    var name = tokens.ExpectIdentifier();
-        //    var genericParameters = genericsParser.AcceptGenericParameters(tokens, diagnostics);
-
-        //    IOpenParenTokenPlace openParen;
-        //    SeparatedListSyntax<ParameterSyntax> parameters;
-        //    ICloseParenTokenPlace closeParen;
-        //    if (tokens.Current is IOpenParenToken)
-        //    {
-        //        openParen = tokens.Take<IOpenParenToken>();
-        //        parameters = ParseParameterList(tokens, diagnostics);
-        //        closeParen = tokens.Expect<ICloseParenTokenPlace>();
-        //    }
-        //    else
-        //    {
-        //        // TODO handle this better
-        //        openParen = tokens.Missing<IOpenParenTokenPlace>();
-        //        parameters = SeparatedListSyntax<ParameterSyntax>.Empty;
-        //        closeParen = tokens.Missing<ICloseParenTokenPlace>();
-        //    }
-        //    var arrow = tokens.Expect<IRightArrowTokenPlace>();
-        //    var returnTypeExpression = expressionParser.ParseExpression(tokens, diagnostics);
-        //    var genericConstraints = genericsParser.ParseGenericConstraints(tokens, diagnostics);
-        //    var effects = AcceptEffects(tokens, diagnostics);
-        //    var contracts = ParseFunctionContracts(tokens, diagnostics);
-        //    var (body, semicolon) = ParseFunctionBody(tokens, diagnostics);
-        //    return new NamedFunctionDeclarationSyntax(modifiers, functionKeyword, name, genericParameters,
-        //        openParen, parameters, closeParen, arrow, returnTypeExpression,
-        //        genericConstraints, effects, contracts, body, semicolon);
-        //}
+        [MustUseReturnValue]
+        [NotNull]
+        public NamedFunctionDeclarationSyntax ParseNamedFunction(
+            [NotNull] FixedList<AttributeSyntax> attributes,
+            [NotNull] FixedList<IModiferToken> modifiers)
+        {
+            Tokens.Required<IFunctionKeywordToken>();
+            var name = Tokens.RequiredIdentifier();
+            var genericParameters = genericsParser.AcceptGenericParameters(Tokens, Tokens.Context.Diagnostics);
+            var parameters = AcceptParameters();
+            Tokens.Expect<IRightArrowToken>();
+            var returnTypeExpression = expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics);
+            var genericConstraints = genericsParser.ParseGenericConstraints(Tokens, Tokens.Context.Diagnostics);
+            var mayEffects = ParseMayEffects();
+            var noEffects = ParseNoEffects();
+            var (requires, ensures) = ParseFunctionContracts();
+            var body = ParseFunctionBody(Tokens, Tokens.Context.Diagnostics);
+            return new NamedFunctionDeclarationSyntax(modifiers, name, genericParameters, parameters, returnTypeExpression,
+                genericConstraints, mayEffects, noEffects, requires, ensures, body);
+        }
 
         //[MustUseReturnValue]
         //[NotNull]
@@ -623,108 +632,114 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         //        openParen, parameters, closeParen, arrow, returnTypeExpression, effects, contracts, body, semicolon);
         //}
 
-        //[MustUseReturnValue]
-        //[NotNull]
-        //private SeparatedListSyntax<ParameterSyntax> ParseParameterList(
-        //    [NotNull] ITokenIterator tokens,
-        //    [NotNull] Diagnostics diagnostics)
-        //{
-        //    return listParser.ParseSeparatedList(tokens, parameterParser.ParseParameter, TypeOf<ICommaToken>(), TypeOf<ICloseParenToken>(), diagnostics);
-        //}
+        [MustUseReturnValue]
+        [CanBeNull]
+        private FixedList<ParameterSyntax> AcceptParameters()
+        {
+            var parameters = new List<ParameterSyntax>();
+            if (Tokens.Accept<IOpenParenToken>() == null)
+                return null;
+            while (!Tokens.AtEndOfFile() && !(Tokens.Current is ICloseParenToken))
+            {
+                parameters.Add(parameterParser.ParseParameter(Tokens, Tokens.Context.Diagnostics));
+            }
+            Tokens.Expect<ICloseParenToken>();
+            return parameters.ToFixedList();
+        }
 
-        //[MustUseReturnValue]
-        //[CanBeNull]
-        //private EffectsSyntax AcceptEffects(
-        //    [NotNull] ITokenIterator tokens,
-        //    [NotNull] Diagnostics diagnostics)
-        //{
-        //    if (!(tokens.Current is INoKeywordToken) && !(tokens.Current is IMayKeywordToken))
-        //        return null;
+        [MustUseReturnValue]
+        [NotNull]
+        private FixedList<EffectSyntax> ParseMayEffects()
+        {
+            if (Tokens.Accept<IMayKeywordToken>() == null)
+                return FixedList<EffectSyntax>.Empty;
 
-        //    var mayKeyword = tokens.Consume<IMayKeywordTokenPlace>();
-        //    var allowedEffects = mayKeyword is IMissingToken ? SeparatedListSyntax<EffectSyntax>.Empty
-        //        : listParser.ParseSeparatedList(tokens, ParseEffect,
-        //        TypeOf<ICommaToken>(), TypeOf<IOpenBraceToken>(), diagnostics);
-        //    var noKeyword = tokens.Consume<INoKeywordTokenPlace>();
-        //    var disallowedEffects = noKeyword is IMissingToken ? SeparatedListSyntax<EffectSyntax>.Empty
-        //        : listParser.ParseSeparatedList(tokens, ParseEffect,
-        //        TypeOf<ICommaToken>(), TypeOf<IOpenBraceToken>(), diagnostics);
-        //    return new EffectsSyntax(mayKeyword, allowedEffects, noKeyword, disallowedEffects);
-        //}
+            return listParser.ParseSeparatedList<EffectSyntax, ICommaToken>(ParseEffect);
+        }
 
-        //[MustUseReturnValue]
-        //[NotNull]
-        //public EffectSyntax ParseEffect(
-        //    [NotNull] ITokenIterator tokens,
-        //    [NotNull] Diagnostics diagnostics)
-        //{
-        //    switch (tokens.Current)
-        //    {
-        //        case IThrowKeywordToken throwKeyword:
-        //            tokens.Next();
-        //            var exceptions = listParser.ParseSeparatedList(tokens, ParseThrowEffectEntry, TypeOf<ICommaToken>(), TypeOf<IOpenBraceToken>(), diagnostics);
-        //            return new ThrowEffectSyntax(throwKeyword, exceptions);
-        //        case IIdentifierToken identifier:
-        //            tokens.Next();
-        //            return new SimpleEffectSyntax(identifier);
-        //        default:
-        //            throw NonExhaustiveMatchException.For(tokens.Current);
-        //    }
-        //}
+        [MustUseReturnValue]
+        [NotNull]
+        private FixedList<EffectSyntax> ParseNoEffects()
+        {
+            if (Tokens.Accept<INoKeywordToken>() == null)
+                return FixedList<EffectSyntax>.Empty;
 
-        //[MustUseReturnValue]
-        //[NotNull]
-        //private ThrowEffectEntrySyntax ParseThrowEffectEntry(
-        //    [NotNull] ITokenIterator tokens,
-        //    [NotNull] Diagnostics diagnostics)
-        //{
-        //    var paramsKeyword = tokens.Accept<IParamsKeywordToken>();
-        //    var exceptionType = expressionParser.ParseExpression(tokens, diagnostics);
-        //    return new ThrowEffectEntrySyntax(paramsKeyword, exceptionType);
-        //}
+            return listParser.ParseSeparatedList<EffectSyntax, ICommaToken>(ParseEffect);
+        }
 
-        //[MustUseReturnValue]
-        //[NotNull]
-        //private SyntaxList<FunctionContractSyntax> ParseFunctionContracts(
-        //    [NotNull] ITokenIterator tokens,
-        //    [NotNull] Diagnostics diagnostics)
-        //{
-        //    var contracts = new List<FunctionContractSyntax>();
-        //    for (; ; )
-        //        switch (tokens.Current)
-        //        {
-        //            case IRequiresKeywordToken _:
-        //                contracts.Add(ParseRequires(tokens, diagnostics));
-        //                break;
-        //            case IEnsuresKeywordToken _:
-        //                contracts.Add(ParseEnsures(tokens, diagnostics));
-        //                break;
-        //            default:
-        //                return contracts.ToSyntaxList();
-        //        }
-        //}
 
-        //[MustUseReturnValue]
-        //[NotNull]
-        //private RequiresSyntax ParseRequires(
-        //    [NotNull] ITokenIterator tokens,
-        //    [NotNull] Diagnostics diagnostics)
-        //{
-        //    var requiresKeyword = tokens.Take<IRequiresKeywordToken>();
-        //    var condition = expressionParser.ParseExpression(tokens, diagnostics);
-        //    return new RequiresSyntax(requiresKeyword, condition);
-        //}
+        [MustUseReturnValue]
+        [NotNull]
+        public EffectSyntax ParseEffect()
+        {
+            switch (Tokens.Current)
+            {
+                case IThrowKeywordToken throwKeyword:
+                    Tokens.Next();
+                    var exceptions = listParser.ParseSeparatedList<ThrowEffectEntrySyntax, ICommaToken>(ParseThrowEffectEntry);
+                    return new ThrowEffectSyntax(exceptions);
+                case IIdentifierToken identifier:
+                    Tokens.Next();
+                    return new SimpleEffectSyntax(identifier);
+                default:
+                    throw NonExhaustiveMatchException.For(Tokens.Current);
+            }
+        }
 
-        //[MustUseReturnValue]
-        //[NotNull]
-        //private EnsuresSyntax ParseEnsures(
-        //    [NotNull] ITokenIterator tokens,
-        //    [NotNull] Diagnostics diagnostics)
-        //{
-        //    var ensuresKeyword = tokens.Take<IEnsuresKeywordToken>();
-        //    var condition = expressionParser.ParseExpression(tokens, diagnostics);
-        //    return new EnsuresSyntax(ensuresKeyword, condition);
-        //}
+        [MustUseReturnValue]
+        [NotNull]
+        private ThrowEffectEntrySyntax ParseThrowEffectEntry()
+        {
+            var paramsKeyword = Tokens.Accept<IParamsKeywordToken>();
+            var exceptionType = expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics);
+            return new ThrowEffectEntrySyntax(paramsKeyword, exceptionType);
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
+        private (FixedList<ExpressionSyntax> Requires, FixedList<ExpressionSyntax> Ensures) ParseFunctionContracts()
+        {
+            var requires = new List<ExpressionSyntax>();
+            var ensures = new List<ExpressionSyntax>();
+            for (; ; )
+                switch (Tokens.Current)
+                {
+                    case IRequiresKeywordToken _:
+                        requires.Add(ParseRequires());
+                        break;
+                    case IEnsuresKeywordToken _:
+                        ensures.Add(ParseEnsures());
+                        break;
+                    default:
+                        return (requires.ToFixedList(), ensures.ToFixedList());
+                }
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
+        private ExpressionSyntax ParseRequires()
+        {
+            Tokens.Required<IRequiresKeywordToken>();
+            return expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics);
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
+        private ExpressionSyntax ParseEnsures()
+        {
+            Tokens.Required<IEnsuresKeywordToken>();
+            return expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics);
+        }
+
+        private BlockSyntax ParseFunctionBody(
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
+        {
+            var body = blockParser.AcceptBlock(tokens, diagnostics);
+            if (body == null)
+                tokens.Expect<ISemicolonToken>();
+            return body;
+        }
         #endregion
 
         //[MustUseReturnValue]

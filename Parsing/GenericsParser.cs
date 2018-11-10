@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
@@ -50,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        public SyntaxList<GenericConstraintSyntax> ParseGenericConstraints(
+        public FixedList<GenericConstraintSyntax> ParseGenericConstraints(
             [NotNull] ITokenIterator tokens,
             [NotNull] Diagnostics diagnostics)
         {
@@ -58,7 +59,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             while (tokens.Current is IWhereKeywordToken)
                 constraints.Add(ParseGenericConstraint(tokens, diagnostics));
 
-            return constraints.ToSyntaxList();
+            return constraints.ToFixedList();
         }
 
         [MustUseReturnValue]

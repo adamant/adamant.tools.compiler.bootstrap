@@ -20,6 +20,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
             public WhereNotTriviaIterator([NotNull] ITokenIterator tokens)
             {
                 this.tokens = tokens.NotNull();
+                if (Current is ITriviaToken)
+                    Next();
             }
 
             [NotNull] public ParseContext Context => tokens.Context;

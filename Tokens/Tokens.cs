@@ -114,6 +114,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
 
         [NotNull]
+        public static IColonColonToken ColonColon(TextSpan span)
+        {
+            return new ColonColonToken(span);
+        }
+
+        [NotNull]
         public static IDotDotToken DotDot(TextSpan span)
         {
             return new DotDotToken(span);
@@ -487,6 +493,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
+    public partial interface IColonColonTokenPlace : ITokenPlace { }
+    public partial interface IColonColonToken : IToken, IColonColonTokenPlace { }
+    internal partial class ColonColonToken : Token, IColonColonToken
+    {
+        public ColonColonToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
     public partial interface IDotDotTokenPlace : ITokenPlace { }
     public partial interface IDotDotToken : IToken, IDotDotTokenPlace { }
     internal partial class DotDotToken : Token, IDotDotToken
@@ -826,6 +842,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         IHashTokenPlace,
         IHashHashTokenPlace,
         IDotTokenPlace,
+        IColonColonTokenPlace,
         IDotDotTokenPlace,
         ILessThanDotDotTokenPlace,
         IDotDotLessThanTokenPlace,

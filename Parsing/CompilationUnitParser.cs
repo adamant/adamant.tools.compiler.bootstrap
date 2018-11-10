@@ -11,50 +11,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     /// Doesn't implement IParser{CompilationUnitSyntax} because it doesn't take
     /// an <see cref="Diagnostics"/>
     /// </summary>
-    public class CompilationUnitParser
+    public class CompilationUnitParser : Parser
     {
-        [NotNull] private readonly IUsingDirectiveParser usingDirectiveParser;
         [NotNull] private readonly IDeclarationParser declarationParser;
-        [NotNull] private readonly INameParser nameParser;
 
         public CompilationUnitParser(
-            [NotNull] IUsingDirectiveParser usingDirectiveParser,
-            [NotNull] IDeclarationParser declarationParser,
-            [NotNull] INameParser nameParser)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] IDeclarationParser declarationParser)
+            : base(tokens)
         {
             this.declarationParser = declarationParser;
-            this.nameParser = nameParser;
-            this.usingDirectiveParser = usingDirectiveParser;
         }
 
         [MustUseReturnValue]
         [NotNull]
-        public CompilationUnitSyntax ParseCompilationUnit([NotNull] ITokenIterator tokens)
+        public CompilationUnitSyntax ParseCompilationUnit()
         {
-            var diagnostics = tokens.Context.Diagnostics;
-            var @namespace = ParseFileNamespaceDeclaration(tokens, diagnostics);
-            tokens.Required<IEndOfFileToken>();
+            // TODO actually pass in the correct implicit namespace name
+            var @namespace = declarationParser.ParseFileNamespace(FixedList<string>.Empty);
+            Tokens.Required<IEndOfFileToken>();
 
-            return new CompilationUnitSyntax(tokens.Context.File, @namespace, diagnostics.Build());
-        }
-
-        [MustUseReturnValue]
-        [NotNull]
-        private FileNamespaceDeclarationSyntax ParseFileNamespaceDeclaration(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] Diagnostics diagnostics)
-        {
-            var namespaceKeyword = tokens.Accept<INamespaceKeywordToken>();
-            NameSyntax name = null;
-            ISemicolonTokenPlace semicolon = null;
-            if (namespaceKeyword != null)
-            {
-                name = nameParser.ParseName(tokens, diagnostics);
-                semicolon = tokens.Consume<ISemicolonTokenPlace>();
-            }
-            var usingDirectives = usingDirectiveParser.ParseUsingDirectives(tokens, diagnostics).ToFixedList();
-            var declarations = declarationParser.ParseDeclarations().ToFixedList();
-            return new FileNamespaceDeclarationSyntax(namespaceKeyword, name, semicolon, usingDirectives, declarations);
+            return new CompilationUnitSyntax(Tokens.Context.File, @namespace, Tokens.Context.Diagnostics.Build());
         }
     }
 }

@@ -1,8 +1,5 @@
-using System.Collections.Generic;
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
-using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
@@ -13,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         public FileParser([NotNull] ITokenIterator tokens)
         {
-            var listParser = new ListParser();
+            var listParser = new ListParser(tokens);
             var functionBodyParser = new FunctionBodyParser(listParser);
             var genericsParser = new GenericsParser(listParser, functionBodyParser);
             var usingDirectiveParser = new UsingDirectiveParser(functionBodyParser);
@@ -22,19 +19,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var declarationParser = new DeclarationParser(tokens, listParser, functionBodyParser,
                 functionBodyParser, parameterParser, accessModifierParser,
                 genericsParser, functionBodyParser, usingDirectiveParser);
-            compilationUnitParser = new CompilationUnitParser(usingDirectiveParser, declarationParser, functionBodyParser);
+            compilationUnitParser = new CompilationUnitParser(tokens, declarationParser);
         }
 
         [MustUseReturnValue]
-        public CompilationUnitSyntax Parse([NotNull] ParseContext context, [NotNull]  IEnumerable<IToken> tokens)
+        public CompilationUnitSyntax Parse()
         {
-            return Parse(new TokenIterator(context, tokens));
-        }
-
-        [MustUseReturnValue]
-        public CompilationUnitSyntax Parse([NotNull] ITokenIterator tokens)
-        {
-            return compilationUnitParser.ParseCompilationUnit(tokens);
+            return compilationUnitParser.ParseCompilationUnit();
         }
     }
 }

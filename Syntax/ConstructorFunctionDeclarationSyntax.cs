@@ -10,31 +10,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         [NotNull] public INewKeywordToken NewKeyword { get; }
         [CanBeNull] public override IIdentifierTokenPlace Name { get; }
         [CanBeNull] public GenericParametersSyntax GenericParameters { get; }
-        [NotNull] public SyntaxList<GenericConstraintSyntax> GenericConstraints { get; }
+        [NotNull] public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
 
         public ConstructorFunctionDeclarationSyntax(
-            [NotNull] SyntaxList<ModifierSyntax> modifiers,
+            [NotNull] FixedList<IModiferToken> modifiers,
             [NotNull] INewKeywordToken newKeyword,
             [CanBeNull] IIdentifierToken name,
             [CanBeNull] GenericParametersSyntax genericParameters,
-            [NotNull] IOpenParenTokenPlace openParen,
-            [NotNull] SeparatedListSyntax<ParameterSyntax> parameterList,
-            [NotNull] ICloseParenTokenPlace closeParen,
-            [NotNull] SyntaxList<GenericConstraintSyntax> genericConstraints,
-            [CanBeNull] EffectsSyntax effects,
-            [NotNull] SyntaxList<FunctionContractSyntax> contracts,
+            [NotNull] FixedList<ParameterSyntax> parameters,
+            [NotNull] FixedList<GenericConstraintSyntax> genericConstraints,
+            [NotNull] FixedList<EffectSyntax> mayEffects,
+            [NotNull] FixedList<EffectSyntax> noEffects,
+            [NotNull] FixedList<ExpressionSyntax> requires,
+            [NotNull] FixedList<ExpressionSyntax> ensures,
             [NotNull] BlockSyntax body)
-            : base(TextSpan.Covering(newKeyword.Span, name?.Span), modifiers,
-            openParen, parameterList, closeParen, effects, contracts, body, null)
+            : base(TextSpan.Covering(newKeyword.Span, name?.Span), modifiers, parameters, mayEffects, noEffects, requires, ensures, body)
         {
-            Requires.NotNull(nameof(modifiers), modifiers);
-            Requires.NotNull(nameof(newKeyword), newKeyword);
-            Requires.NotNull(nameof(openParen), openParen);
-            Requires.NotNull(nameof(parameterList), parameterList);
-            Requires.NotNull(nameof(closeParen), closeParen);
-            Requires.NotNull(nameof(genericConstraints), genericConstraints);
-            Requires.NotNull(nameof(contracts), contracts);
-            Requires.NotNull(nameof(body), body);
+
             NewKeyword = newKeyword;
             Name = name;
             GenericParameters = genericParameters;

@@ -38,12 +38,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
             return new FakeExpressionSyntax();
         }
 
-        [NotNull]
-        public static SeparatedListSyntax<T> SeparatedList<T>()
-            where T : NonTerminal
-        {
-            return new SeparatedListSyntax<T>(Enumerable.Empty<T>());
-        }
 
         [NotNull]
         public static NameSyntax Name()
@@ -69,11 +63,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
             return nameSyntax.NotNull();
         }
 
-        [NotNull]
-        public static UsingDirectiveSyntax UsingDirective()
-        {
-            return new UsingDirectiveSyntax(Missing<IUsingKeywordTokenPlace>(), Name(), Missing<ISemicolonTokenPlace>());
-        }
 
         public static ParameterSyntax Parameter()
         {
@@ -104,52 +93,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
             return new IncompleteDeclarationSyntax(new[] { Missing<IPublicKeywordTokenPlace>() });
         }
 
-        [NotNull]
-        public static CompilationUnitSyntax CompilationUnit(
-            [NotNull] params DeclarationSyntax[] declarations)
-        {
-            return CompilationUnit(null, declarations);
-        }
-
-        [NotNull]
-        public static CompilationUnitSyntax CompilationUnit(
-            [CanBeNull] NameSyntax @namespace,
-            [NotNull] params DeclarationSyntax[] declarations)
-        {
-            var namespaceSyntax = new FileNamespaceDeclarationSyntax(
-                null, @namespace, null, FixedList<UsingDirectiveSyntax>.Empty,
-                declarations.ToFixedList());
-            return new CompilationUnitSyntax(
-                FakeCodeFile.For(""),
-                namespaceSyntax,
-                FixedList<Diagnostic>.Empty);
-        }
-
-        [NotNull]
-        public static PackageSyntax Package([NotNull]params CompilationUnitSyntax[] compilationUnits)
-        {
-            return new PackageSyntax("Test", new SyntaxList<CompilationUnitSyntax>(compilationUnits));
-        }
-
-        [NotNull]
-        public static NamedFunctionDeclarationSyntax FunctionDeclaration([NotNull] string name)
-        {
-            return new NamedFunctionDeclarationSyntax(
-                SyntaxList<ModifierSyntax>.Empty,
-                TokenFactory.FunctionKeyword(FakeSpan),
-                Identifier(name),
-                null, // Generic Parameters
-                Missing<IOpenParenTokenPlace>(),
-                SeparatedListSyntax<ParameterSyntax>.Empty,
-                Missing<ICloseParenTokenPlace>(),
-                Missing<IRightArrowTokenPlace>(),
-                Expression(),
-                SyntaxList<GenericConstraintSyntax>.Empty,
-                null, // Effects
-                SyntaxList<FunctionContractSyntax>.Empty,
-                Block(),
-                null); // Semicolon
-        }
 
 
         [NotNull]
@@ -158,31 +101,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
             return TokenFactory.BareIdentifier(FakeSpan, name);
         }
 
-        [NotNull]
-        public static EnumStructDeclarationSyntax EnumStructDeclaration([NotNull] string name)
-        {
-            return new EnumStructDeclarationSyntax(
-                SyntaxList<ModifierSyntax>.Empty,
-                TokenFactory.EnumKeyword(FakeSpan),
-                TokenFactory.StructKeyword(FakeSpan),
-                Identifier(name),
-                null, // Generic Parameters
-                null, // Base Types
-                SyntaxList<GenericConstraintSyntax>.Empty,
-                SyntaxList<InvariantSyntax>.Empty,
-                Missing<IOpenBraceTokenPlace>(),
-                new EnumVariantsSyntax(SyntaxList<EnumVariantSyntax>.Empty, null),
-                SyntaxList<MemberDeclarationSyntax>.Empty,
-                Missing<ICloseBraceTokenPlace>());
-        }
 
-        [NotNull]
-        public static GenericParametersSyntax GenericParameters()
-        {
-            return new GenericParametersSyntax(
-                Missing<IOpenBracketTokenPlace>(),
-                SeparatedListSyntax<GenericParameterSyntax>.Empty,
-                Missing<ICloseBracketTokenPlace>());
-        }
     }
 }

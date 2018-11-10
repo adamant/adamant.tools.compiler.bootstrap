@@ -10,8 +10,13 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
-    public class ListParser : IListParser
+    public class ListParser : Parser, IListParser
     {
+        public ListParser([NotNull] ITokenIterator tokens)
+            : base(tokens)
+        {
+        }
+
         [MustUseReturnValue]
         [NotNull, ItemNotNull]
         public FixedList<T> ParseList<T>([NotNull] Func<T> acceptItem)
@@ -22,15 +27,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         }
 
         [MustUseReturnValue]
-        [NotNull]
-        public SyntaxList<T> ParseList<T>(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] AcceptFunction<T> acceptItem,
-            [NotNull] Diagnostics diagnostics)
-            where T : NonTerminal
+        [NotNull, ItemNotNull]
+        public FixedList<T> ParseSeparatedList<T, TSeparator>([NotNull] Func<T> acceptItem)
+            where T : class
+            where TSeparator : class, IToken
         {
-            return new Generator<T>(() => acceptItem(tokens, diagnostics))
-                .TakeWhile(t => t != null).ToSyntaxList();
+            var item = acceptItem();
+            if (item == null)
+                throw new ParseFailedException();
+            var items = new List<T>();
+            while (item != null)
+            {
+                items.Add(item);
+                if (Tokens.Accept<TSeparator>() == null)
+                    break;
+
+                item = acceptItem();
+            }
+            return items.ToFixedList();
         }
 
         [Obsolete("Use ParseList() taking an AcceptFunction instead")]

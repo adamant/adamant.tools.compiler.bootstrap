@@ -37,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                     var file = await fileSource.LoadAsync();
                     var context = new ParseContext(file, new Diagnostics());
                     var tokens = lexer.Lex(context).WhereNotTrivia();
-                    return new FileParser(tokens).Parse(tokens);
+                    return new FileParser(tokens).Parse();
                 }, new ExecutionDataflowBlockOptions()
                 {
                     TaskScheduler = taskScheduler,
@@ -74,7 +74,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                 {
                     var context = new ParseContext(file, new Diagnostics());
                     var tokens = lexer.Lex(context).WhereNotTrivia();
-                    return new FileParser(tokens).Parse(tokens);
+                    return new FileParser(tokens).Parse();
                 })
                 .ToSyntaxList();
             var packageSyntax = new PackageSyntax(name, compilationUnits);

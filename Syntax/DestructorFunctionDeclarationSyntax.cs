@@ -10,19 +10,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         public override IIdentifierTokenPlace Name => throw new System.NotImplementedException();
 
         public DestructorFunctionDeclarationSyntax(
-            [NotNull] SyntaxList<ModifierSyntax> modifiers,
+            [NotNull] FixedList<IModiferToken> modifiers,
             [NotNull] IDeleteKeywordToken deleteKeyword,
-            [NotNull] IOpenParenTokenPlace openParen,
-            [NotNull] SeparatedListSyntax<ParameterSyntax> parameters,
-            [NotNull] ICloseParenTokenPlace closeParen,
-            [CanBeNull] EffectsSyntax effects,
-            [NotNull] SyntaxList<FunctionContractSyntax> contracts,
+            [NotNull] FixedList<ParameterSyntax> parameters,
+            [NotNull] FixedList<EffectSyntax> mayEffects,
+            [NotNull] FixedList<EffectSyntax> noEffects,
+            [NotNull] FixedList<ExpressionSyntax> requires,
+            [NotNull] FixedList<ExpressionSyntax> ensures,
             [NotNull] BlockSyntax body)
-            : base(deleteKeyword.Span, modifiers, openParen, parameters, closeParen,
-                effects, contracts, body, null)
+            : base(deleteKeyword.Span, modifiers, parameters,
+                mayEffects, noEffects, requires, ensures, body)
         {
-            Requires.NotNull(nameof(deleteKeyword), deleteKeyword);
-            Requires.NotNull(nameof(body), body);
             DeleteKeyword = deleteKeyword;
         }
     }

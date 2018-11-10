@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         [NotNull] public SyntaxList<InvariantSyntax> Invariants { get; }
         [NotNull] public IOpenBraceTokenPlace OpenBrace { get; }
         [NotNull] public EnumVariantsSyntax Variants { get; }
-        [NotNull] public SyntaxList<MemberDeclarationSyntax> Members { get; }
+        [NotNull] public FixedList<MemberDeclarationSyntax> Members { get; }
         [NotNull] public ICloseBraceTokenPlace CloseBrace { get; }
 
         public EnumStructDeclarationSyntax(
@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [NotNull] SyntaxList<InvariantSyntax> invariants,
             [NotNull] IOpenBraceTokenPlace openBrace,
             [NotNull] EnumVariantsSyntax variants,
-            [NotNull] SyntaxList<MemberDeclarationSyntax> members,
+            [NotNull] FixedList<MemberDeclarationSyntax> members,
             [NotNull] ICloseBraceTokenPlace closeBrace)
             : base(TextSpan.Covering(enumKeyword.Span, name.Span))
         {

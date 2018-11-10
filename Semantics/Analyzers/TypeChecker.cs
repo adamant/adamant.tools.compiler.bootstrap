@@ -7,7 +7,6 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
-using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -50,7 +49,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
             var functionType = returnType;
             // TODO better way to check for having regular arguments?
-            if (!(function.Syntax.OpenParen is IMissingToken))
+            if (function.Parameters != null)
                 functionType = new FunctionType(function.Parameters.Select(p => p.Type.AssertComputed()), functionType);
 
             if (function.IsGeneric && function.GenericParameters.NotNull().Any())

@@ -10,39 +10,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         [NotNull] public IOperatorKeywordToken OperatorKeyword { get; }
         public override IIdentifierTokenPlace Name => throw new System.NotImplementedException();
         [NotNull] public IOperatorTokenPlace Operator { get; }
-        [NotNull] public IRightArrowTokenPlace Arrow { get; }
         [NotNull] public ExpressionSyntax ReturnTypeExpression { get; }
-        [NotNull] public SyntaxList<GenericConstraintSyntax> GenericConstraints { get; }
+        [NotNull] public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
 
         public OperatorFunctionDeclarationSyntax(
-            [NotNull] SyntaxList<ModifierSyntax> modifiers,
+            [NotNull] FixedList<IModiferToken> modifiers,
             [NotNull] IOperatorKeywordToken operatorKeyword,
             [NotNull] IOperatorTokenPlace @operator,
-            [NotNull] IOpenParenTokenPlace openParen,
-            [NotNull] SeparatedListSyntax<ParameterSyntax> parameterList,
-            [NotNull] ICloseParenTokenPlace closeParen,
-            [NotNull] IRightArrowTokenPlace arrow,
+            [NotNull] FixedList<ParameterSyntax> parameters,
             [NotNull] ExpressionSyntax returnTypeExpression,
-            [NotNull] SyntaxList<GenericConstraintSyntax> genericConstraints,
-            [CanBeNull] EffectsSyntax effects,
-            [NotNull] SyntaxList<FunctionContractSyntax> contracts,
-            [CanBeNull] BlockSyntax body,
-            [CanBeNull] ISemicolonTokenPlace semicolon)
+            [NotNull] FixedList<GenericConstraintSyntax> genericConstraints,
+            [NotNull] FixedList<EffectSyntax> mayEffects,
+            [NotNull] FixedList<EffectSyntax> noEffects,
+            [NotNull] FixedList<ExpressionSyntax> requires,
+            [NotNull] FixedList<ExpressionSyntax> ensures,
+            [CanBeNull] BlockSyntax body)
             : base(TextSpan.Covering(operatorKeyword.Span, @operator.Span),
-            modifiers, openParen, parameterList, closeParen, effects, contracts, body, semicolon)
+            modifiers, parameters, mayEffects, noEffects, requires, ensures, body)
         {
-            Requires.NotNull(nameof(modifiers), modifiers);
-            Requires.NotNull(nameof(operatorKeyword), operatorKeyword);
-            Requires.NotNull(nameof(@operator), @operator);
-            Requires.NotNull(nameof(openParen), openParen);
-            Requires.NotNull(nameof(parameterList), parameterList);
-            Requires.NotNull(nameof(closeParen), closeParen);
-            Requires.NotNull(nameof(arrow), arrow);
-            Requires.NotNull(nameof(returnTypeExpression), returnTypeExpression);
-            Requires.NotNull(nameof(genericConstraints), genericConstraints);
             OperatorKeyword = operatorKeyword;
             Operator = @operator;
-            Arrow = arrow;
             ReturnTypeExpression = returnTypeExpression;
             GenericConstraints = genericConstraints;
         }

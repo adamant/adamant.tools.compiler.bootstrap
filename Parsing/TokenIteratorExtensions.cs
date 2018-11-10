@@ -26,6 +26,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             tokens.Next();
             return span;
         }
+
+        [NotNull]
+        public static IIdentifierToken RequiredIdentifier([NotNull] this ITokenIterator tokens)
+        {
+            if (tokens.Current is IIdentifierToken identifier)
+            {
+                tokens.Next();
+                return identifier;
+            }
+
+            throw new ParseFailedException($"Requires identifier, found {tokens.Current?.GetType().NotNull().GetFriendlyName()}");
+        }
         #endregion
 
         #region Take
@@ -59,9 +71,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (!(tokens.Current is T))
                 tokens.Context.Diagnostics.Add(ParseError.MissingToken(tokens.Context.File, typeof(T), tokens.Current.NotNull()));
 
-            var span = tokens.Current.Span;
+            var span = tokens.Current.NotNull().Span;
             tokens.Next();
             return span;
+        }
+
+        [MustUseReturnValue]
+        [CanBeNull]
+        public static IIdentifierToken ExpectIdentifier([NotNull] this ITokenIterator tokens)
+        {
+            if (tokens.Current is IIdentifierToken identifier)
+            {
+                tokens.Next();
+                return identifier;
+            }
+
+            tokens.Context.Diagnostics.Add(ParseError.MissingToken(tokens.Context.File, typeof(IIdentifierToken), tokens.Current.NotNull()));
+            return null;
         }
 
         [MustUseReturnValue]
@@ -90,19 +116,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
 
             return null;
-        }
-
-        [MustUseReturnValue]
-        [NotNull]
-        public static IIdentifierTokenPlace ExpectIdentifier([NotNull] this ITokenIterator tokens)
-        {
-            if (tokens.Current is IIdentifierToken token)
-            {
-                tokens.Next();
-                return token;
-            }
-
-            return Missing<IIdentifierTokenPlace>(tokens);
         }
 
         [MustUseReturnValue]

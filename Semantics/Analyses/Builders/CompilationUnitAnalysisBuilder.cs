@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
             {
                 var scope = new CompilationUnitScope(compilationUnit);
                 var context = new AnalysisContext(compilationUnit.CodeFile, scope);
-                var fileNamespace = declarationBuilder.BuildFileNamespace(context, compilationUnit.Namespace);
+                var fileNamespace = declarationBuilder.BuildFileNamespace(context, compilationUnit.FileNamespace);
                 yield return new CompilationUnitAnalysis(scope, compilationUnit, fileNamespace);
             }
         }

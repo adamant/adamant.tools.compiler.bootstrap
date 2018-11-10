@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         [NotNull] public SyntaxList<GenericConstraintSyntax> GenericConstraints { get; }
         [NotNull] public SyntaxList<InvariantSyntax> Invariants { get; }
         [NotNull] public IOpenBraceTokenPlace OpenBrace { get; }
-        [NotNull] public SyntaxList<MemberDeclarationSyntax> Members { get; }
+        [NotNull] public FixedList<MemberDeclarationSyntax> Members { get; }
         [NotNull] public ICloseBraceTokenPlace CloseBrace { get; }
 
         public ClassDeclarationSyntax(
@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [NotNull] SyntaxList<GenericConstraintSyntax> genericConstraints,
             [NotNull] SyntaxList<InvariantSyntax> invariants,
             [NotNull] IOpenBraceTokenPlace openBrace,
-            [NotNull] SyntaxList<MemberDeclarationSyntax> members,
+            [NotNull] FixedList<MemberDeclarationSyntax> members,
             [NotNull] ICloseBraceTokenPlace closeBrace)
             : base(TextSpan.Covering(classKeyword.Span, name.Span))
         {

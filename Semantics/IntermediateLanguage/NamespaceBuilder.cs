@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
         {
             var namespaces = new HashSet<Name>();
             foreach (var compilationUnit in packageSyntax.CompilationUnits)
-                GatherNamespaces(GlobalNamespaceName.Instance, compilationUnit.Namespace, namespaces);
+                GatherNamespaces(GlobalNamespaceName.Instance, compilationUnit.FileNamespace, namespaces);
 
             return namespaces.Select(ns => new Namespace(ns)).ToReadOnlyList();
         }
@@ -36,15 +36,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
             if (!(declaration is NamespaceDeclarationSyntax namespaceDeclaration)) return;
 
 
-            if (namespaceDeclaration.Name != null)
-            {
-                var namespaceName = nameBuilder.BuildName(namespaceDeclaration.Name);
-                if (namespaceName != null)
-                {
-                    namespaces.Add(namespaceName);
-                    containingName = namespaceName;
-                }
-            }
+            // TODO apply namespace name
+            //if (namespaceDeclaration.Name != null)
+            //{
+            //    var namespaceName = nameBuilder.BuildName(namespaceDeclaration.Name);
+            //    if (namespaceName != null)
+            //    {
+            //        namespaces.Add(namespaceName);
+            //        containingName = namespaceName;
+            //    }
+            //}
 
             foreach (var nestedDeclaration in namespaceDeclaration.Declarations)
                 GatherNamespaces(containingName, nestedDeclaration, namespaces);

@@ -28,34 +28,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
         [NotNull]
         public NamespaceDeclarationAnalysis BuildFileNamespace(
             [NotNull] AnalysisContext context,
-            [NotNull] FileNamespaceDeclarationSyntax @namespace)
+            [NotNull] NamespaceDeclarationSyntax fileNamespace)
         {
+            Requires.That(nameof(fileNamespace), fileNamespace.InGlobalNamespace);
             RootName name = GlobalNamespaceName.Instance;
             var namespaceContext = context;
-            if (@namespace.Name != null)
-            {
-                var namespaceName = nameBuilder.BuildName(@namespace.Name);
-                if (namespaceName != null)
-                {
-                    namespaceContext = BuildNamespaceContext(namespaceContext, @namespace, namespaceName);
-                    name = namespaceName;
-                }
-            }
-            var bodyContext = namespaceContext.WithUsingDirectives(@namespace);
+            // TODO actually use the name of the declaration
+            //if (fileNamespace.Name != null)
+            //{
+            //    var namespaceName = nameBuilder.BuildName(fileNamespace.Name);
+            //    if (namespaceName != null)
+            //    {
+            //        namespaceContext = BuildNamespaceContext(namespaceContext, fileNamespace, namespaceName);
+            //        name = namespaceName;
+            //    }
+            //}
+            var bodyContext = namespaceContext.WithUsingDirectives(fileNamespace);
             var declarations = new List<DeclarationAnalysis>();
-            foreach (var declaration in @namespace.Declarations)
+            foreach (var declaration in fileNamespace.Declarations)
             {
                 var analysis = BuildDeclaration(bodyContext, name, declaration);
                 if (analysis != null)
                     declarations.Add(analysis);
             }
-            return new NamespaceDeclarationAnalysis(context, @namespace, declarations);
+            return new NamespaceDeclarationAnalysis(context, fileNamespace, declarations);
         }
 
         [NotNull]
         private AnalysisContext BuildNamespaceContext(
             [NotNull] AnalysisContext context,
-            [NotNull] FileNamespaceDeclarationSyntax @namespace,
+            [NotNull] NamespaceDeclarationSyntax @namespace,
             [NotNull] Name name)
         {
             switch (name)

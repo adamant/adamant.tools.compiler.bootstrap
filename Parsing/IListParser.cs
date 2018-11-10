@@ -24,12 +24,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             where T : class;
 
         [MustUseReturnValue]
-        [NotNull]
-        SyntaxList<T> ParseList<T>(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] AcceptFunction<T> acceptItem,
-            [NotNull] Diagnostics diagnostics)
-            where T : NonTerminal;
+        [NotNull, ItemNotNull]
+        FixedList<T> ParseSeparatedList<T, TSeparator>(Func<T> acceptItem)
+            where T : class
+            where TSeparator : class, IToken;
 
         [MustUseReturnValue]
         [NotNull]

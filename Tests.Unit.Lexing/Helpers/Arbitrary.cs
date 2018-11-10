@@ -96,6 +96,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
                     return t2.Text == "<" || t2.Text == "<=" || t2.Text == "<:" || t2.Text == "<.." || t2.Text == "<..<";
                 case "#":
                     return t2.Text == "#" || t2.Text == "##";
+                case ":":
+                    return t2.Text == ":" || t2.Text == "::";
                 default:
                     if (typeof(IKeywordTokenPlace).IsAssignableFrom(t1.TokenType)
                         || typeof(IIdentifierTokenPlace).IsAssignableFrom(t1.TokenType)
@@ -191,7 +193,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             return GenRegex(@"\""([^\\""]|\\(r|n|0|t|\'|\""))*\""")
                 .Select(s =>
                 {
-                    var value = s.Substring(1, s.Length - 2)
+                    var value = s
+                        .Substring(1, s.Length - 2)
                         .Replace(@"\\", @"\b") // Swap out backslash escape to not mess up others
                         .Replace(@"\r", "\r")
                         .Replace(@"\n", "\n")
@@ -202,11 +205,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
                         .Replace(@"\b", "\\");
 
                     return new PsuedoToken(typeof(IStringLiteralToken), s, value);
-                });
+                }).NotNull();
         }
 
         [NotNull]
-        public static IReadOnlyDictionary<string, Type> Symbols = new Dictionary<string, Type>()
+        public static FixedDictionary<string, Type> Symbols = new Dictionary<string, Type>()
         {
             { "{", typeof(IOpenBraceToken) },
             { "}", typeof(ICloseBraceToken) },
@@ -217,6 +220,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             { ";", typeof(ISemicolonToken) },
             { ",", typeof(ICommaToken) },
             { ".", typeof(IDotToken) },
+            { "::", typeof(IColonColonToken) },
             { "..", typeof(IDotDotToken) },
             { "<..", typeof(ILessThanDotDotToken) },
             { "..<", typeof(IDotDotLessThanToken) },
@@ -334,6 +338,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             { "override", typeof(IOverrideKeywordToken) },
             { "as", typeof(IAsKeywordToken) },
             { "any", typeof(IAnyKeywordToken) },
-        }.AsReadOnly();
+        }.ToFixedDictionary();
     }
 }
