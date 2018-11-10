@@ -4,7 +4,6 @@ using System.Linq;
 using System.Numerics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -28,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
 
         public static PsuedoToken EndOfFile()
         {
-            return new PsuedoToken(typeof(IEndOfFileToken), "", new List<Diagnostic>().AsReadOnly());
+            return new PsuedoToken(typeof(IEndOfFileToken), "");
         }
 
         public static PsuedoToken For([NotNull] ITokenPlace token, [NotNull] CodeText code)
@@ -42,19 +41,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
                     return new PsuedoToken(tokenType, token.Text(code), stringLiteral.Value);
                 case IIntegerLiteralToken integerLiteral:
                     return new PsuedoToken(tokenType, token.Text(code), integerLiteral.Value);
-                case IEndOfFileToken eof:
-                    return new PsuedoToken(tokenType, token.Text(code), eof.Diagnostics);
                 case ITokenPlace _:
                     return new PsuedoToken(tokenType, token.Text(code));
                 default:
                     throw NonExhaustiveMatchException.For(token);
             }
-        }
-
-        [NotNull]
-        public CodeFile ToFakeCodeFile()
-        {
-            return FakeCodeFile.For(Text);
         }
 
         public override bool Equals(object obj)

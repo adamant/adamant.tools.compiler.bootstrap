@@ -11,7 +11,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
 
         public Generator([NotNull] Func<T> generator)
         {
-            Requires.NotNull(nameof(generator), generator);
             this.generator = generator;
         }
 

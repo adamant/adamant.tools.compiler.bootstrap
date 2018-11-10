@@ -10,6 +10,7 @@
         "Whitespace",
         "Comment",
         "Unexpected",
+        "EndOfFile",
         "OpenBrace", // `{` U+007B
         "CloseBrace", // `}` U+007D
         "OpenParen", // `(` U+0028

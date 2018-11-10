@@ -389,7 +389,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
             }
 
             // The end of file token provides something to attach any final errors to
-            yield return TokenFactory.EndOfFile(SymbolSpan(0), diagnostics.Build());
+            yield return TokenFactory.EndOfFile(SymbolSpan(0));
             yield break;
 
             TextSpan SymbolSpan(int length = 1)

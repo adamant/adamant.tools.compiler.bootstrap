@@ -14,7 +14,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
 
         public FixedList([NotNull, ItemNotNull] IEnumerable<T> items)
         {
-            Requires.NotNull(nameof(items), items);
             this.items = items.ItemsNotNull().ToReadOnlyList();
         }
 

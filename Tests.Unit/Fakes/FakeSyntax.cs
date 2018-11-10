@@ -128,7 +128,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
             return new CompilationUnitSyntax(
                 FakeCodeFile.For(""),
                 namespaceSyntax,
-                TokenFactory.EndOfFile(FakeSpan, FixedList<Diagnostic>.Empty),
                 FixedList<Diagnostic>.Empty);
         }
 

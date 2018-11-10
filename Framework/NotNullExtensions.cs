@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
-    public static class AssertNotNullExtension
+    public static class NotNullExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [NotNull]

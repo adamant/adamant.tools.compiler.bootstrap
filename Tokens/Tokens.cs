@@ -24,6 +24,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
 
         [NotNull]
+        public static IEndOfFileToken EndOfFile(TextSpan span)
+        {
+            return new EndOfFileToken(span);
+        }
+
+        [NotNull]
         public static IOpenBraceToken OpenBrace(TextSpan span)
         {
             return new OpenBraceToken(span);
@@ -326,6 +332,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     internal partial class UnexpectedToken : Token, IUnexpectedToken
     {
         public UnexpectedToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface IEndOfFileTokenPlace : ITokenPlace { }
+    public partial interface IEndOfFileToken : IToken, IEndOfFileTokenPlace { }
+    internal partial class EndOfFileToken : Token, IEndOfFileToken
+    {
+        public EndOfFileToken(TextSpan span)
             : base(span)
         {
         }
@@ -795,6 +811,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         IWhitespaceTokenPlace,
         ICommentTokenPlace,
         IUnexpectedTokenPlace,
+        IEndOfFileTokenPlace,
         IOpenBraceTokenPlace,
         ICloseBraceTokenPlace,
         IOpenParenTokenPlace,

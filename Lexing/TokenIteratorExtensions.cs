@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 namespace Adamant.Tools.Compiler.Bootstrap.Lexing
 {
     /// <summary>
+    /// * Consume - throws <see cref="InvalidOperationException"/> if that kind of token isn't found
     /// * Take - throws InvalidOperationException if that kind of token isn't find
     /// * Accept - returns null if that kind of token isn't find
     /// * Expect - returns MissingToken if that kind of token isn't find
@@ -16,14 +17,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
         [NotNull]
         public static ITokenIterator WhereNotTrivia([NotNull] this ITokenIterator tokens)
         {
-            return new RemoveTrivia(tokens.NotNull());
+            return new WhereNotTriviaIterator(tokens.NotNull());
         }
 
-        private class RemoveTrivia : ITokenIterator
+        private class WhereNotTriviaIterator : ITokenIterator
         {
             [NotNull] private readonly ITokenIterator tokens;
 
-            public RemoveTrivia([NotNull] ITokenIterator tokens)
+            public WhereNotTriviaIterator([NotNull] ITokenIterator tokens)
             {
                 this.tokens = tokens.NotNull();
             }
@@ -42,7 +43,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
             public IToken Current => tokens.Current;
         }
 
+        #region Consume
+        public static TextSpan Consume<T>([NotNull] this ITokenIterator tokens)
+            where T : IToken
+        {
+            if (!(tokens.Current is T))
+                throw new InvalidOperationException($"Expected {typeof(T).GetFriendlyName()}, found {tokens.Current?.GetType().NotNull().GetFriendlyName()}");
+
+            var span = tokens.Current.Span;
+            tokens.Next();
+            return span;
+        }
+        #endregion
+
         #region Take
+        [Obsolete("Use Consume() instead")]
         [MustUseReturnValue]
         [NotNull]
         public static T Take<T>([NotNull] this ITokenIterator tokens)
@@ -57,18 +72,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
             throw new InvalidOperationException($"Expected {typeof(T).GetFriendlyName()}, found {tokens.Current.GetType().GetFriendlyName()}");
         }
 
+        [Obsolete("Use Consume() instead")]
         [MustUseReturnValue]
         [NotNull]
         public static IOperatorToken TakeOperator([NotNull] this ITokenIterator tokens)
         {
             return Take<IOperatorToken>(tokens);
-        }
-
-        [MustUseReturnValue]
-        [NotNull]
-        public static IEndOfFileToken TakeEndOfFile([NotNull] this ITokenIterator tokens)
-        {
-            return Take<IEndOfFileToken>(tokens);
         }
         #endregion
 

@@ -30,13 +30,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [NotNull]
         public CompilationUnitSyntax ParseCompilationUnit([NotNull] ITokenIterator tokens)
         {
-            var diagnostics = new Diagnostics();
+            var diagnostics = tokens.Context.Diagnostics;
             var @namespace = ParseFileNamespaceDeclaration(tokens, diagnostics);
-            var endOfFile = tokens.TakeEndOfFile();
+            tokens.Consume<IEndOfFileToken>();
 
-            diagnostics.Add(endOfFile.Diagnostics);
-
-            return new CompilationUnitSyntax(tokens.Context.File, @namespace, endOfFile, diagnostics.Build());
+            return new CompilationUnitSyntax(tokens.Context.File, @namespace, diagnostics.Build());
         }
 
         [MustUseReturnValue]
