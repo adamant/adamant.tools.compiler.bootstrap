@@ -42,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         [NotNull]
         public IEnumerator<ISyntaxNodeOrTokenPlace> GetEnumerator()
         {
-            return children.GetEnumerator().AssertNotNull();
+            return children.GetEnumerator().NotNull();
         }
 
         [NotNull]

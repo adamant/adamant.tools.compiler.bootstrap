@@ -84,7 +84,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
                 Assert.Empty(diagnostics);
 
             // Emit Code
-            var codePath = Path.ChangeExtension(testCase.FullCodePath, "c").AssertNotNull();
+            var codePath = Path.ChangeExtension(testCase.FullCodePath, "c").NotNull();
             EmitCode(package, codePath);
 
             // Compile Code to Executable
@@ -101,7 +101,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
         [NotNull]
         private static List<int> ExpectedCompileErrorLines([NotNull] CodeFile codeFile, [NotNull] string code)
         {
-            return ErrorPattern.Matches(code).AssertItemNotNull()
+            return ErrorPattern.Matches(code).ItemsNotNull()
                 .Select(match => codeFile.Code.Lines.LineIndexContainingOffset(match.Index) + 1)
                 .ToList();
         }
@@ -121,7 +121,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             var compiler = new CLangCompiler();
             var sourceFiles = new[] { codePath, RuntimeLibraryFixture.GetRuntimeLibraryPath() };
             var headerSearchPaths = new[] { RuntimeLibraryFixture.GetRuntimeDirectory() };
-            var outputPath = Path.ChangeExtension(codePath, "exe").AssertNotNull();
+            var outputPath = Path.ChangeExtension(codePath, "exe").NotNull();
             var exitCode = compiler.Compile(new CompilerOutputAdapter(testOutput), sourceFiles, headerSearchPaths, outputPath);
             Assert.True(exitCode == 0, $"clang exited with {exitCode}");
             return outputPath;
@@ -139,7 +139,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
                 UseShellExecute = false,
             };
 
-            return Process.Start(startInfo).AssertNotNull();
+            return Process.Start(startInfo).NotNull();
         }
 
         private static int ExpectedExitCode([NotNull] string code)
@@ -151,7 +151,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
         [NotNull]
         private static string ExpectedOutput([NotNull] string code, [NotNull] string channel)
         {
-            var regex = new Regex(string.Format(ExpectedOutputFormat, channel).AssertNotNull());
+            var regex = new Regex(string.Format(ExpectedOutputFormat, channel).NotNull());
             return regex.Match(code).Groups["output"]?.Captures.SingleOrDefault()?.Value ?? "";
         }
 
@@ -160,7 +160,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
         {
             var testCases = new TheoryData<TestCase>();
             var testsDirectory = Path.Combine(SolutionDirectory.Get(), "tests");
-            foreach (var fullPath in Directory.EnumerateFiles(testsDirectory, "*.ad", SearchOption.AllDirectories).AssertNotNull())
+            foreach (var fullPath in Directory.EnumerateFiles(testsDirectory, "*.ad", SearchOption.AllDirectories).NotNull())
             {
                 var relativePath = Path.GetRelativePath(testsDirectory, fullPath);
                 testCases.Add(new TestCase(fullPath, relativePath));

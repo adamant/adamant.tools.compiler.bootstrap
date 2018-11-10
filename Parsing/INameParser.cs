@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         NameSyntax ParseName(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics);
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics);
     }
 }

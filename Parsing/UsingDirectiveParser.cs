@@ -19,8 +19,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         public SyntaxList<UsingDirectiveSyntax> ParseUsingDirectives(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var directives = new List<UsingDirectiveSyntax>();
             while (tokens.Current is IUsingKeywordToken)
@@ -31,8 +31,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [NotNull]
         public UsingDirectiveSyntax ParseUsingDirective(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var usingKeyword = tokens.Expect<IUsingKeywordTokenPlace>();
             var name = qualifiedNameParser.ParseName(tokens, diagnostics);

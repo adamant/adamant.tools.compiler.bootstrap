@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     {
         [CanBeNull]
         ModifierSyntax AcceptModifier(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics);
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics);
     }
 }

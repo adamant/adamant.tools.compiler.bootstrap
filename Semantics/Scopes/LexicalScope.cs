@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
         {
             Requires.NotNull(nameof(syntax), syntax);
             Syntax = syntax;
-            NestedScopes = nestedScopes.AsReadOnly().AssertNotNull();
+            NestedScopes = nestedScopes.AsReadOnly().NotNull();
         }
 
         internal void Add([NotNull] NestedScope nestedScope)
@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
         public virtual ISymbol Lookup([NotNull] string name)
         {
             Requires.NotNull(nameof(name), name);
-            return declarations.AssertNotNull().TryGetValue(name, out var declaration) ? declaration : null;
+            return declarations.NotNull().TryGetValue(name, out var declaration) ? declaration : null;
         }
     }
 }

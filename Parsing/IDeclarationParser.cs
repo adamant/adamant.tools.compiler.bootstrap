@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         SyntaxList<DeclarationSyntax> ParseDeclarations(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics);
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics);
     }
 }

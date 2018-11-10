@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
         public static CodeFile Load([NotNull]string path)
         {
             var fullPath = Path.GetFullPath(path);
-            return new CodeFile(new CodePath(fullPath), new CodeText(File.ReadAllText(fullPath, Encoding).AssertNotNull()));
+            return new CodeFile(new CodePath(fullPath), new CodeText(File.ReadAllText(fullPath, Encoding).NotNull()));
         }
     }
 }

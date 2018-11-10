@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             // Skip void variables
             if (variable.Type == ObjectType.Void) return;
 
-            var initializer = variable.IsParameter ? $" = {nameMangler.Mangle(variable.Name.AssertNotNull())}" : "";
+            var initializer = variable.IsParameter ? $" = {nameMangler.Mangle(variable.Name.NotNull())}" : "";
             code.AppendLine($"{typeConverter.Convert(variable.Type)} ₜ{NameOf(variable.Reference)}{initializer};");
         }
 

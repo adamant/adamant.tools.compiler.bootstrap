@@ -10,37 +10,37 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     {
         [CanBeNull]
         public ModifierSyntax AcceptModifier(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             switch (tokens.Current)
             {
                 case IImplicitKeywordToken implicitKeyword:
-                    tokens.MoveNext();
+                    tokens.Next();
                     return new ImplicitModiferSyntax(implicitKeyword);
                 case IMoveKeywordToken moveKeyword:
-                    tokens.MoveNext();
+                    tokens.Next();
                     return new MoveModifierSyntax(moveKeyword);
                 case IOverrideKeywordToken overrideKeyword:
-                    tokens.MoveNext();
+                    tokens.Next();
                     return new OverrideModifierSyntax(overrideKeyword);
                 case IRefKeywordToken refKeyword:
-                    tokens.MoveNext();
+                    tokens.Next();
                     return new RefModifierSyntax(refKeyword);
                 case IExtendKeywordToken extendKeyword:
-                    tokens.MoveNext();
+                    tokens.Next();
                     return new ExtendModifierSyntax(extendKeyword);
                 case ISafeKeywordToken safeKeyword:
-                    tokens.MoveNext();
+                    tokens.Next();
                     return new SafeModifierSyntax(safeKeyword);
                 case IUnsafeKeywordToken unsafeKeyword:
-                    tokens.MoveNext();
+                    tokens.Next();
                     return new UnsafeModifierSyntax(unsafeKeyword);
                 case IAbstractKeywordToken abstractKeyword:
-                    tokens.MoveNext();
+                    tokens.Next();
                     return new AbstractModifierSyntax(abstractKeyword);
                 case IMutableKeywordToken mutableKeyword:
-                    tokens.MoveNext();
+                    tokens.Next();
                     return new MutableModifierSyntax(mutableKeyword);
                 case IPublicKeywordToken _:
                 case IProtectedKeywordToken _:

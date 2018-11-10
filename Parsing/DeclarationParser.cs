@@ -45,8 +45,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         public SyntaxList<DeclarationSyntax> ParseDeclarations(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var declarations = new List<DeclarationSyntax>();
             while (!tokens.AtEndOfFile())
@@ -60,8 +60,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         public DeclarationSyntax ParseDeclaration(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var attributes = ParseAttributes(tokens, diagnostics);
             var modifiers = ParseModifiers(tokens, diagnostics);
@@ -94,8 +94,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private BlockNamespaceDeclarationSyntax ParseNamespace(
             [NotNull] SyntaxList<AttributeSyntax> attributes,
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var namespaceKeyword = tokens.Take<INamespaceKeywordToken>();
             var name = nameParser.ParseName(tokens, diagnostics);
@@ -110,8 +110,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         public MemberDeclarationSyntax ParseMemberDeclaration(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var attributes = ParseAttributes(tokens, diagnostics);
             var modifiers = ParseModifiers(tokens, diagnostics);
@@ -156,8 +156,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         private SyntaxList<AttributeSyntax> ParseAttributes(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var attributes = new List<AttributeSyntax>();
             // Take modifiers until null
@@ -169,8 +169,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [CanBeNull]
         private AttributeSyntax AcceptAttribute(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var hash = tokens.Accept<IHashToken>();
             if (hash == null) return null;
@@ -189,8 +189,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         private SyntaxList<ModifierSyntax> ParseModifiers(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var modifiers = new List<ModifierSyntax>();
             // Take modifiers until null
@@ -202,8 +202,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [CanBeNull]
         private BaseClassSyntax AcceptBaseClass(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var colon = tokens.Accept<IColonToken>();
             if (colon == null) return null;
@@ -214,8 +214,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [CanBeNull]
         private BaseTypesSyntax AcceptBaseTypes(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var lessThanColon = tokens.Accept<ILessThanColonToken>();
             if (lessThanColon == null) return null;
@@ -227,8 +227,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         private SyntaxList<InvariantSyntax> ParseInvariants(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             return listParser.ParseList(tokens, AcceptInvariant, diagnostics);
         }
@@ -236,8 +236,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [CanBeNull]
         private InvariantSyntax AcceptInvariant(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var invariantKeyword = tokens.Accept<IInvariantKeywordToken>();
             if (invariantKeyword == null) return null;
@@ -252,8 +252,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private ClassDeclarationSyntax ParseClass(
             [NotNull] SyntaxList<AttributeSyntax> attributes,
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var classKeyword = tokens.Take<IClassKeywordToken>();
             var name = tokens.ExpectIdentifier();
@@ -275,8 +275,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private TypeDeclarationSyntax ParseType(
             [NotNull] SyntaxList<AttributeSyntax> attributes,
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var typeKeyword = tokens.Take<ITypeKeywordToken>();
             var name = tokens.ExpectIdentifier();
@@ -297,8 +297,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private StructDeclarationSyntax ParseStruct(
             [NotNull] SyntaxList<AttributeSyntax> attributes,
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var structKeyword = tokens.Take<IStructKeywordToken>();
             var name = tokens.Expect<IIdentifierOrPrimitiveTokenPlace>();
@@ -319,8 +319,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private MemberDeclarationSyntax ParseEnum(
             [NotNull] SyntaxList<AttributeSyntax> attributes,
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var enumKeyword = tokens.Take<IEnumKeywordToken>();
             switch (tokens.Current)
@@ -368,8 +368,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         private EnumVariantsSyntax ParseEnumVariants(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var variants = new List<EnumVariantSyntax>();
             while (tokens.Current is IIdentifierToken)
@@ -385,8 +385,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         private EnumVariantSyntax ParseEnumVariant(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var identifier = tokens.ExpectIdentifier();
             var comma = tokens.Accept<ICommaToken>();
@@ -400,8 +400,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private FieldDeclarationSyntax ParseField(
             [NotNull] SyntaxList<AttributeSyntax> attributes,
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var binding = tokens.Take<IBindingToken>();
             var getter = AcceptFieldGetter(tokens, diagnostics);
@@ -430,8 +430,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [CanBeNull]
         private static FieldGetterSyntax AcceptFieldGetter(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var publicKeyword = tokens.Accept<IPublicKeywordToken>();
             var getKeyword = tokens.Accept<IGetKeywordToken>();
@@ -442,8 +442,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         #region Parse Functions
         private (BlockSyntax, ISemicolonTokenPlace) ParseFunctionBody(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var body = blockParser.AcceptBlock(tokens, diagnostics);
             ISemicolonTokenPlace semicolon = null;
@@ -457,8 +457,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public NamedFunctionDeclarationSyntax ParseNamedFunction(
             [NotNull] SyntaxList<AttributeSyntax> attributes,
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var functionKeyword = tokens.Take<IFunctionKeywordToken>();
             var name = tokens.ExpectIdentifier();
@@ -496,8 +496,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public OperatorFunctionDeclarationSyntax ParseOperatorFunction(
             [NotNull] SyntaxList<AttributeSyntax> attributes,
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var operatorKeyword = tokens.Take<IOperatorKeywordToken>();
             // TODO save the generic parameters
@@ -508,19 +508,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             {
                 case IHashToken _:
                     @operator = tokens.Expect<IOperatorTokenPlace>();
-                    tokens.MoveNext();
+                    tokens.Next();
                     switch (tokens.Current)
                     {
                         case IOpenParenToken _:
-                            tokens.MoveNext();
+                            tokens.Next();
                             tokens.Expect<ICloseParenTokenPlace>();
                             break;
                         case IOpenBracketToken _:
-                            tokens.MoveNext();
+                            tokens.Next();
                             tokens.Expect<ICloseBracketTokenPlace>();
                             break;
                         case IOpenBraceToken _:
-                            tokens.MoveNext();
+                            tokens.Next();
                             tokens.Expect<ICloseBraceTokenPlace>();
                             break;
                         default:
@@ -530,7 +530,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     break;
                 case IStringLiteralToken _:
                     @operator = tokens.Expect<IOperatorTokenPlace>();
-                    tokens.MoveNext();
+                    tokens.Next();
                     // TODO need to check it is empty string
                     break;
                 // TODO case for user defined literals ''
@@ -557,8 +557,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public ConstructorFunctionDeclarationSyntax ParseConstructor(
             [NotNull] SyntaxList<AttributeSyntax> attributes,
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var newKeyword = tokens.Take<INewKeywordToken>();
             var name = tokens.Accept<IIdentifierToken>();
@@ -579,8 +579,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public InitializerFunctionDeclarationSyntax ParseInitializer(
             [NotNull] SyntaxList<AttributeSyntax> attributes,
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var initKeyword = tokens.Take<IInitKeywordToken>();
             var name = tokens.Accept<IIdentifierToken>();
@@ -602,8 +602,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public DestructorFunctionDeclarationSyntax ParseDestructor(
             [NotNull] SyntaxList<AttributeSyntax> attributes,
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var deleteKeyword = tokens.Take<IDeleteKeywordToken>();
             var openParen = tokens.Expect<IOpenParenTokenPlace>();
@@ -621,8 +621,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private GetterFunctionDeclarationSyntax ParseGetterFunction(
             [NotNull] SyntaxList<AttributeSyntax> attributes,
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var getKeyword = tokens.Take<IGetKeywordToken>();
             var name = tokens.ExpectIdentifier();
@@ -643,8 +643,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private SetterFunctionDeclarationSyntax ParseSetterFunction(
             [NotNull] SyntaxList<AttributeSyntax> attributes,
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var setKeyword = tokens.Take<ISetKeywordToken>();
             var name = tokens.ExpectIdentifier();
@@ -663,8 +663,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         private SeparatedListSyntax<ParameterSyntax> ParseParameterList(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             return listParser.ParseSeparatedList(tokens, parameterParser.ParseParameter, TypeOf<ICommaToken>(), TypeOf<ICloseParenToken>(), diagnostics);
         }
@@ -672,8 +672,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [CanBeNull]
         private EffectsSyntax AcceptEffects(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             if (!(tokens.Current is INoKeywordToken) && !(tokens.Current is IMayKeywordToken))
                 return null;
@@ -692,17 +692,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         public EffectSyntax ParseEffect(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             switch (tokens.Current)
             {
                 case IThrowKeywordToken throwKeyword:
-                    tokens.MoveNext();
+                    tokens.Next();
                     var exceptions = listParser.ParseSeparatedList(tokens, ParseThrowEffectEntry, TypeOf<ICommaToken>(), TypeOf<IOpenBraceToken>(), diagnostics);
                     return new ThrowEffectSyntax(throwKeyword, exceptions);
                 case IIdentifierToken identifier:
-                    tokens.MoveNext();
+                    tokens.Next();
                     return new SimpleEffectSyntax(identifier);
                 default:
                     throw NonExhaustiveMatchException.For(tokens.Current);
@@ -712,8 +712,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         private ThrowEffectEntrySyntax ParseThrowEffectEntry(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var paramsKeyword = tokens.Accept<IParamsKeywordToken>();
             var exceptionType = expressionParser.ParseExpression(tokens, diagnostics);
@@ -723,8 +723,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         private SyntaxList<FunctionContractSyntax> ParseFunctionContracts(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var contracts = new List<FunctionContractSyntax>();
             for (; ; )
@@ -744,8 +744,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         private RequiresSyntax ParseRequires(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var requiresKeyword = tokens.Take<IRequiresKeywordToken>();
             var condition = expressionParser.ParseExpression(tokens, diagnostics);
@@ -755,8 +755,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         private EnsuresSyntax ParseEnsures(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var ensuresKeyword = tokens.Take<IEnsuresKeywordToken>();
             var condition = expressionParser.ParseExpression(tokens, diagnostics);
@@ -769,8 +769,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private ConstDeclarationSyntax ParseConst(
             [NotNull] SyntaxList<AttributeSyntax> attributes,
             [NotNull] SyntaxList<ModifierSyntax> modifiers,
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var constKeyword = tokens.Take<IConstKeywordToken>();
             var name = tokens.ExpectIdentifier();
@@ -800,8 +800,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private static IncompleteDeclarationSyntax ParseIncompleteDeclaration(
             [NotNull] SyntaxList<AttributeSyntax> attributes,
             [NotNull] IEnumerable<ModifierSyntax> modifiers,
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var skipped = attributes.SelectMany(a => a.Tokens()).Concat(modifiers.SelectMany(m => m.Tokens())).ToList();
             skipped.Add(tokens.ExpectIdentifier());    // The name we are expecting
@@ -811,14 +811,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 // We haven't consumed any tokens, we need to consume a token so
                 // we make progress.
                 skipped.Add(tokens.Current);
-                tokens.MoveNext();
+                tokens.Next();
             }
 
             var span = TextSpan.Covering(
-                skipped.First(s => s != null).AssertNotNull().Span,
-                skipped.Last(s => s != null).AssertNotNull().Span);
+                skipped.First(s => s != null).NotNull().Span,
+                skipped.Last(s => s != null).NotNull().Span);
 
-            diagnostics.Publish(ParseError.IncompleteDeclaration(tokens.File, span));
+            diagnostics.Add(ParseError.IncompleteDeclaration(tokens.Context.File, span));
             return new IncompleteDeclarationSyntax(skipped);
         }
     }

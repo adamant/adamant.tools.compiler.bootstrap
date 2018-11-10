@@ -4,7 +4,6 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using JetBrains.Annotations;
 
@@ -48,10 +47,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             borrowChecker.Check(declarationAnalyses);
 
             // Gather the diagnostics and declarations into a package
-            var diagnostics = new DiagnosticsBuilder();
+            var diagnostics = new Diagnostics();
             // First pull over all the lexer and parser errors from the compilation units
             foreach (var compilationUnit in packageSyntax.CompilationUnits)
-                diagnostics.Publish(compilationUnit.Diagnostics);
+                diagnostics.Add(compilationUnit.Diagnostics);
 
             var declarations = declarationAnalyses.Select(d => d.Complete(diagnostics)).Where(d => d != null).ToList();
             var entryPoint = DetermineEntryPoint(declarations, diagnostics);
@@ -61,7 +60,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         [CanBeNull]
         private static FunctionDeclaration DetermineEntryPoint(
             [NotNull] List<Declaration> declarations,
-            [NotNull] DiagnosticsBuilder diagnostics)
+            [NotNull] Diagnostics diagnostics)
         {
             var mainFunctions = declarations.OfType<FunctionDeclaration>()
                 .Where(f => f.Name.UnqualifiedName.Text == "main" && !f.Name.UnqualifiedName.IsSpecial)

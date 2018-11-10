@@ -73,7 +73,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
             if (IsMutable)
                 return "mut " + Name;
 
-            return Name.ToString().AssertNotNull();
+            return Name.ToString().NotNull();
         }
 
         [NotNull]

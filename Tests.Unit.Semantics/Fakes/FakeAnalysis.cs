@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes;
 using JetBrains.Annotations;
@@ -9,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Fakes
         [NotNull]
         public static AnalysisContext Analysis()
         {
-            return new AnalysisContext("".ToFakeCodeFile(), new FakeLexicalScope());
+            return new AnalysisContext(FakeCodeFile.For(""), new FakeLexicalScope());
         }
 
         [NotNull]

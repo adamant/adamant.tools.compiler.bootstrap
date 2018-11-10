@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
         {
             Requires.That(nameof(State), State == AnalysisState.Computed);
             Requires.NotNull(nameof(type), type);
-            Requires.That(nameof(type), !DataType.AssertNotNull().IsResolved);
+            Requires.That(nameof(type), !DataType.NotNull().IsResolved);
             Requires.That(nameof(type), type.IsResolved);
             DataType = type;
             return type;
@@ -53,7 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             if (State != AnalysisState.Computed)
                 throw new InvalidOperationException("Type analysis still being computed");
 
-            return DataType.AssertNotNull();
+            return DataType.NotNull();
         }
 
         [NotNull]
@@ -62,7 +62,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             if (State != AnalysisState.Computed)
                 throw new InvalidOperationException("Type analysis still being computed");
 
-            return DataType.AssertNotNull().AssertResolved();
+            return DataType.NotNull().AssertResolved();
         }
     }
 }

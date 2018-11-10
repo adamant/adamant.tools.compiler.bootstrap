@@ -12,8 +12,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     {
         [CanBeNull]
         public ExpressionSyntax AcceptExpression(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             switch (tokens.Current)
             {
@@ -31,8 +31,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [NotNull]
         [MustUseReturnValue]
         public ExpressionSyntax ParseExpression(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             return ParseExpression(tokens, diagnostics, OperatorPrecedence.Min);
         }
@@ -40,8 +40,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         public ExpressionSyntax ParseExpression(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics,
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics,
             OperatorPrecedence minPrecedence)
         {
             var expression = ParseAtom(tokens, diagnostics);
@@ -222,24 +222,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         // An atom is the unit of an expression that occurs between infix operators, i.e. an identifier, literal, group, or new
         [MustUseReturnValue]
         [NotNull]
-        private ExpressionSyntax ParseAtom([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+        private ExpressionSyntax ParseAtom([NotNull] ITokenIterator tokens, [NotNull] Diagnostics diagnostics)
         {
             switch (tokens.Current)
             {
                 case ISelfTypeKeywordToken selfTypeKeyword:
-                    tokens.MoveNext();
+                    tokens.Next();
                     return new SelfTypeExpressionSyntax(selfTypeKeyword);
                 case IUninitializedKeywordToken uninitializedKeyword:
-                    tokens.MoveNext();
+                    tokens.Next();
                     return new UninitializedExpressionSyntax(uninitializedKeyword);
                 case INoneKeywordToken noneKeyword:
-                    tokens.MoveNext();
+                    tokens.Next();
                     return new NoneExpressionSyntax(noneKeyword);
                 case ISelfKeywordToken selfKeyword:
-                    tokens.MoveNext();
+                    tokens.Next();
                     return new SelfExpressionSyntax(selfKeyword);
                 case IBaseKeywordToken baseKeyword:
-                    tokens.MoveNext();
+                    tokens.Next();
                     return new BaseExpressionSyntax(baseKeyword);
                 case INewKeywordToken _:
                 {
@@ -265,7 +265,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 }
                 case IDeleteKeywordToken deleteKeyword:
                 {
-                    tokens.MoveNext();
+                    tokens.Next();
                     var expression = ParseExpression(tokens, diagnostics);
                     return new DeleteExpressionSyntax(deleteKeyword, expression);
                 }
@@ -291,17 +291,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 }
                 case IIntegerLiteralToken literal:
                 {
-                    tokens.MoveNext();
+                    tokens.Next();
                     return new IntegerLiteralExpressionSyntax(literal);
                 }
                 case IStringLiteralToken literal:
                 {
-                    tokens.MoveNext();
+                    tokens.Next();
                     return new StringLiteralExpressionSyntax(literal);
                 }
                 case IBooleanLiteralToken literal:
                 {
-                    tokens.MoveNext();
+                    tokens.Next();
                     return new BooleanLiteralExpressionSyntax(literal);
                 }
                 case IVoidKeywordToken _:
@@ -346,7 +346,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 }
                 case IUnsafeKeywordToken unsafeKeyword:
                 {
-                    tokens.MoveNext();
+                    tokens.Next();
                     var expression = tokens.Current is IOpenBraceToken ?
                         ParseBlock(tokens, diagnostics)
                         : ParseParenthesizedExpression(tokens, diagnostics);
@@ -355,14 +355,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 }
                 case IRefKeywordToken refKeyword:
                 {
-                    tokens.MoveNext();
+                    tokens.Next();
                     var varKeyword = tokens.Accept<IVarKeywordToken>();
                     var referencedType = ParseExpression(tokens, diagnostics);
                     return new RefTypeSyntax(refKeyword, varKeyword, referencedType);
                 }
                 case IMutableKeywordToken mutableKeyword:
                 {
-                    tokens.MoveNext();
+                    tokens.Next();
                     var referencedType = ParseExpression(tokens, diagnostics);
                     return new MutableTypeSyntax(mutableKeyword, referencedType);
                 }
@@ -392,8 +392,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         private ExpressionSyntax ParseForeach(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var foreachKeyword = tokens.Expect<IForeachKeywordToken>();
             var varKeyword = tokens.Accept<IVarKeywordToken>();
@@ -412,8 +412,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         private WhileExpressionSyntax ParseWhile(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var whileKeyword = tokens.Expect<IWhileKeywordToken>();
             var condition = ParseExpression(tokens, diagnostics);
@@ -424,8 +424,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         private LoopExpressionSyntax ParseLoop(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var loopKeyword = tokens.Expect<ILoopKeywordToken>();
             var block = ParseBlock(tokens, diagnostics);
@@ -435,8 +435,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         private ExpressionSyntax ParseIf(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var ifKeyword = tokens.Take<IIfKeywordToken>();
             var condition = ParseExpression(tokens, diagnostics);
@@ -447,8 +447,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [CanBeNull]
         private ElseClauseSyntax AcceptElse(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var elseKeyword = tokens.Accept<IElseKeywordToken>();
             if (elseKeyword == null) return null;
@@ -461,8 +461,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         private ExpressionSyntax ParseMatch(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var matchKeyword = tokens.Take<IMatchKeywordToken>();
             var value = ParseExpression(tokens, diagnostics);
@@ -475,8 +475,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         private MatchArmSyntax ParseMatchArm(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var pattern = ParsePattern(tokens, diagnostics);
             var expression = ParseExpressionBlock(tokens, diagnostics);
@@ -487,8 +487,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         private ExpressionSyntax ParseParenthesizedExpression(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var openParen = tokens.Expect<IOpenParenTokenPlace>();
             var expression = ParseExpression(tokens, diagnostics);
@@ -499,8 +499,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         public SeparatedListSyntax<ArgumentSyntax> ParseArgumentList(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var arguments = listParser.ParseSeparatedList(tokens, AcceptArgument, TypeOf<ICommaToken>(), diagnostics);
             return new SeparatedListSyntax<ArgumentSyntax>(arguments);
@@ -509,8 +509,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [CanBeNull]
         private ArgumentSyntax AcceptArgument(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var paramsKeyword = tokens.Accept<IParamsKeywordToken>();
             var value = AcceptExpression(tokens, diagnostics);

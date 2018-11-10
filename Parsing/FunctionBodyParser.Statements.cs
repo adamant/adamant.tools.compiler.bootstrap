@@ -12,8 +12,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         public StatementSyntax ParseStatement(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             switch (tokens.Current)
             {
@@ -56,8 +56,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [CanBeNull]
         public BlockSyntax AcceptBlock(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var openBrace = tokens.Accept<IOpenBraceToken>();
             if (openBrace == null) return null;
@@ -69,8 +69,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         public BlockSyntax ParseBlock(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var openBrace = tokens.Expect<IOpenBraceTokenPlace>();
             var statements = listParser.ParseList(tokens, ParseStatement, TypeOf<ICloseBraceToken>(), diagnostics);
@@ -81,13 +81,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         public ExpressionBlockSyntax ParseExpressionBlock(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             switch (tokens.Current)
             {
                 case IEqualsGreaterThanToken equalsGreaterThan:
-                    tokens.MoveNext();
+                    tokens.Next();
                     var expression = ParseExpression(tokens, diagnostics);
                     return new ResultExpressionSyntax(equalsGreaterThan, expression);
                 case IOpenBraceToken _:

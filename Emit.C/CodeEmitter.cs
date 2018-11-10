@@ -7,9 +7,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
     public class CodeEmitter : Emitter
     {
-        [NotNull] public static string RuntimeLibraryCode => Resources.RuntimeLibraryCode.AssertNotNull();
+        [NotNull] public static string RuntimeLibraryCode => Resources.RuntimeLibraryCode.NotNull();
         [NotNull] public const string RuntimeLibraryCodeFileName = "RuntimeLibrary.c";
-        [NotNull] public static string RuntimeLibraryHeader => Resources.RuntimeLibraryHeader.AssertNotNull();
+        [NotNull] public static string RuntimeLibraryHeader => Resources.RuntimeLibraryHeader.NotNull();
         [NotNull] public const string RuntimeLibraryHeaderFileName = "RuntimeLibrary.h";
 
         [NotNull] private readonly PackageEmitter packageEmitter;

@@ -11,20 +11,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         ExpressionSyntax ParseExpression(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics);
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics);
 
         [MustUseReturnValue]
         [NotNull]
         ExpressionSyntax ParseExpression(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics,
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics,
             OperatorPrecedence minPrecedence);
 
         [MustUseReturnValue]
         [NotNull]
         SeparatedListSyntax<ArgumentSyntax> ParseArgumentList(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics);
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics);
     }
 }

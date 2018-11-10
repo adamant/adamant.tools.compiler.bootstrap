@@ -1,52 +1,41 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
-    /// <summary>
-    /// An immutable list of diagnostics. This allows code to accept a diagnostic
-    /// list and use it directly, knowing it can't change. Use this rather
-    /// than <see cref="ImmutableList{T}"/> because we don't need the ability
-    /// to construct new lists from them which would introduce inefficiency and
-    /// overhead. This class also causes the null checking to work correctly
-    /// </summary>
-    public class Diagnostics : IReadOnlyList<Diagnostic>
+    public class Diagnostics : IEnumerable<Diagnostic>
     {
-        [NotNull] public static readonly Diagnostics Empty = new Diagnostics(Enumerable.Empty<Diagnostic>());
+        [NotNull] private readonly List<Diagnostic> items = new List<Diagnostic>();
 
-        [NotNull] [ItemNotNull] private readonly List<Diagnostic> items;
-
-        public Diagnostics([NotNull][ItemNotNull] IEnumerable<Diagnostic> items)
+        public void Add([NotNull] Diagnostic diagnostic)
         {
-            this.items = items.ToList();
-            this.items.Sort();
+            Requires.NotNull(nameof(diagnostic), diagnostic);
+            items.Add(diagnostic);
         }
 
-        // Internal constructor used by Diagnostics builder for performance
-        internal Diagnostics([NotNull][ItemNotNull] List<Diagnostic> items)
+        public void Add([NotNull, ItemNotNull] IEnumerable<Diagnostic> diagnostics)
         {
-            this.items = items;
-            this.items.Sort();
+            Requires.NotNull(nameof(diagnostics), diagnostics);
+            items.AddRange(diagnostics.ItemsNotNull());
         }
 
         [NotNull]
+        public FixedList<Diagnostic> Build()
+        {
+            items.Sort();
+            return items.ToFixedList();
+        }
+
         public IEnumerator<Diagnostic> GetEnumerator()
         {
             return items.GetEnumerator();
         }
 
-        [NotNull]
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return items.GetEnumerator();
+            return ((IEnumerable)items).GetEnumerator();
         }
-
-        public int Count => items.Count;
-
-        [NotNull]
-        public Diagnostic this[int index] => items[index];
     }
 }

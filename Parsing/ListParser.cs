@@ -15,9 +15,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         public SyntaxList<T> ParseList<T>(
-            [NotNull] ITokenStream tokens,
+            [NotNull] ITokenIterator tokens,
             [NotNull] AcceptFunction<T> acceptItem,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] Diagnostics diagnostics)
             where T : NonTerminal
         {
             return new Generator<T>(() => acceptItem(tokens, diagnostics))
@@ -28,10 +28,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         public SyntaxList<T> ParseList<T, TTerminator>(
-            [NotNull] ITokenStream tokens,
+            [NotNull] ITokenIterator tokens,
             [NotNull] ParseFunction<T> parseItem,
             Type<TTerminator> terminatorType,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] Diagnostics diagnostics)
             where T : NonTerminal
             where TTerminator : class, IToken
         {
@@ -41,10 +41,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         private static IEnumerable<T> ParseEnumerable<T, TTerminator>(
-            [NotNull] ITokenStream tokens,
+            [NotNull] ITokenIterator tokens,
             [NotNull] ParseFunction<T> parseItem,
             Type<TTerminator> terminatorType,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] Diagnostics diagnostics)
             where T : NonTerminal
             where TTerminator : class, IToken
         {
@@ -54,8 +54,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 yield return parseItem(tokens, diagnostics);
                 if (tokens.Current == start)
                 {
-                    diagnostics.Publish(ParseError.UnexpectedToken(tokens.File, tokens.Current.Span));
-                    tokens.MoveNext();
+                    diagnostics.Add(ParseError.UnexpectedToken(tokens.Context.File, tokens.Current.Span));
+                    tokens.Next();
                 }
             }
         }
@@ -63,10 +63,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         public SeparatedListSyntax<T> ParseSeparatedList<T, TSeparator>(
-            [NotNull] ITokenStream tokens,
+            [NotNull] ITokenIterator tokens,
             [NotNull] AcceptFunction<T> acceptItem,
             Type<TSeparator> separatorType,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] Diagnostics diagnostics)
             where T : NonTerminal
             where TSeparator : class, IToken
         {
@@ -76,10 +76,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         private static IEnumerable<ISyntaxNodeOrTokenPlace> ParseSeparatedEnumerable<TSeparator>(
-            [NotNull] ITokenStream tokens,
+            [NotNull] ITokenIterator tokens,
             [NotNull] AcceptFunction<NonTerminal> acceptItem,
             Type<TSeparator> separatorType,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] Diagnostics diagnostics)
             where TSeparator : class, IToken
         {
             var item = acceptItem(tokens, diagnostics);
@@ -98,11 +98,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         public SeparatedListSyntax<T> ParseSeparatedList<T, TSeparator, TTerminator>(
-            [NotNull] ITokenStream tokens,
+            [NotNull] ITokenIterator tokens,
             [NotNull] ParseFunction<T> parseItem,
             Type<TSeparator> separatorType,
             Type<TTerminator> terminatorType,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] Diagnostics diagnostics)
             where T : NonTerminal
             where TSeparator : class, IToken
             where TTerminator : class, IToken
@@ -113,11 +113,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         private static IEnumerable<ISyntaxNodeOrTokenPlace> ParseSeparatedEnumerable<TSeparator, TTerminator>(
-            [NotNull] ITokenStream tokens,
+            [NotNull] ITokenIterator tokens,
             [NotNull] ParseFunction<NonTerminal> parseItem,
             Type<TSeparator> separatorType,
             Type<TTerminator> terminatorType,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] Diagnostics diagnostics)
             where TSeparator : class, IToken
             where TTerminator : class, IToken
         {
@@ -127,8 +127,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 yield return parseItem(tokens, diagnostics);
                 if (tokens.Current == start)
                 {
-                    diagnostics.Publish(ParseError.UnexpectedToken(tokens.File, tokens.Current.Span));
-                    tokens.MoveNext();
+                    diagnostics.Add(ParseError.UnexpectedToken(tokens.Context.File, tokens.Current.Span));
+                    tokens.Next();
                 }
 
                 if (tokens.Current is TSeparator)

@@ -59,7 +59,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
             while (blocks.Any())
             {
-                var block = blocks.Dequeue().AssertNotNull();
+                var block = blocks.Dequeue().NotNull();
                 var claimsBeforeStatement = new HashSet<Claim>();
 
                 if (block == function.ControlFlow.EntryBlock)
@@ -134,13 +134,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             [NotNull] HashSet<Claim> claims,
             [NotNull] FunctionDeclarationAnalysis function,
             [NotNull] TextSpan span,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] Diagnostics diagnostics)
         {
             var canTake = claims.OfType<Loan>().SelectMany(l => l.Restrictions)
                 .Any(r => r.Place == @object && !r.CanTake);
 
             if (!canTake)
-                diagnostics.Publish(BorrowError.BorrowedValueDoesNotLiveLongEnough(function.Context.File, span));
+                diagnostics.Add(BorrowError.BorrowedValueDoesNotLiveLongEnough(function.Context.File, span));
         }
 
         //[CanBeNull]
@@ -160,7 +160,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         [NotNull]
         private static Title GetTitle([NotNull] int variable, [NotNull] HashSet<Claim> claims)
         {
-            return claims.OfType<Title>().Single(t => t.Variable == variable).AssertNotNull();
+            return claims.OfType<Title>().Single(t => t.Variable == variable).NotNull();
         }
 
         private static LiveVariables ComputeLiveness([NotNull] ControlFlowGraph function, [NotNull] Edges edges)

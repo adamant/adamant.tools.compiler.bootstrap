@@ -31,13 +31,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             [CanBeNull] TaskScheduler taskScheduler)
         {
             var lexer = new Lexer();
-            var parser = new Parser();
             var parseBlock = new TransformBlock<ICodeFileSource, CompilationUnitSyntax>(
                 async (fileSource) =>
                 {
                     var file = await fileSource.LoadAsync();
-                    var tokens = lexer.Lex(file);
-                    return parser.Parse(file, tokens);
+                    var context = new ParseContext(file, new Diagnostics());
+                    var tokens = lexer.Lex(context).WhereNotTrivia();
+                    return new FileParser(tokens).Parse(tokens);
                 }, new ExecutionDataflowBlockOptions()
                 {
                     TaskScheduler = taskScheduler,
@@ -68,13 +68,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             [NotNull] IReadOnlyDictionary<string, Package> references)
         {
             var lexer = new Lexer();
-            var parser = new Parser();
 
             var compilationUnits = files
                 .Select(file =>
                 {
-                    var tokens = lexer.Lex(file);
-                    return parser.Parse(file, tokens);
+                    var context = new ParseContext(file, new Diagnostics());
+                    var tokens = lexer.Lex(context).WhereNotTrivia();
+                    return new FileParser(tokens).Parse(tokens);
                 })
                 .ToSyntaxList();
             var packageSyntax = new PackageSyntax(name, compilationUnits);

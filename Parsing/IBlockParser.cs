@@ -10,13 +10,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [CanBeNull]
         BlockSyntax AcceptBlock(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics);
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics);
 
         [NotNull]
         [MustUseReturnValue]
         BlockSyntax ParseBlock(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics);
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics);
     }
 }

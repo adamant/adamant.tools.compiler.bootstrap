@@ -49,7 +49,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         private VariableReference LookupVariable([NotNull] ControlFlowGraph cfg, [NotNull] string name)
         {
             Requires.NotNull(nameof(name), name);
-            return cfg.VariableDeclarations.Single(v => v.Name == name).AssertNotNull().Reference;
+            return cfg.VariableDeclarations.Single(v => v.Name == name).NotNull().Reference;
         }
 
         private void ConvertStatementAnalysisToStatement(
@@ -169,7 +169,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     currentBlock.Add(new NewObjectStatement(place, newObjectExpression.Type.AssertResolved(), args));
                     break;
                 case IdentifierNameAnalysis identifier:
-                    currentBlock.Add(new AssignmentStatement(place, new CopyPlace(LookupVariable(cfg, identifier.Name.AssertNotNull()))));
+                    currentBlock.Add(new AssignmentStatement(place, new CopyPlace(LookupVariable(cfg, identifier.Name.NotNull()))));
                     break;
                 case BinaryOperatorExpressionAnalysis binaryOperator:
                     ConvertOperator(cfg, place, binaryOperator, currentBlock);
@@ -224,7 +224,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             switch (value)
             {
                 case IdentifierNameAnalysis identifier:
-                    return LookupVariable(cfg, identifier.Name.AssertNotNull());
+                    return LookupVariable(cfg, identifier.Name.NotNull());
                 //case VariableExpression variableExpression:
                 //    return LookupVariable(variableExpression.Name);
                 default:

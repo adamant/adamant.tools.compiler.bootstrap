@@ -15,13 +15,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
         //[NotNull] [ItemNotNull] public IEnumerable<LocalVariableDeclaration> Parameters => variableDeclarations.Skip(1).Take(Arity);
         [NotNull] [ItemNotNull] public IReadOnlyList<BasicBlock> BasicBlocks { get; }
         [NotNull] [ItemNotNull] private readonly List<BasicBlock> basicBlocks = new List<BasicBlock>();
-        [NotNull] public BasicBlock EntryBlock => basicBlocks.First().AssertNotNull();
+        [NotNull] public BasicBlock EntryBlock => basicBlocks.First().NotNull();
         public BasicBlock ExitBlock => basicBlocks.Last(); // TODO this is likely not right
 
         public ControlFlowGraph()
         {
-            VariableDeclarations = variableDeclarations.AsReadOnly().AssertNotNull();
-            BasicBlocks = basicBlocks.AsReadOnly().AssertNotNull();
+            VariableDeclarations = variableDeclarations.AsReadOnly().NotNull();
+            BasicBlocks = basicBlocks.AsReadOnly().NotNull();
             AddBlock(); // Create the entry block
         }
 

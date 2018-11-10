@@ -16,9 +16,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
             {
                 if (statementBuilder != null) return statementBuilder;
 
-                statementBuilder = statementBuilderProvider.AssertNotNull()();
+                statementBuilder = statementBuilderProvider.NotNull()();
                 statementBuilderProvider = null;
-                return statementBuilder.AssertNotNull();
+                return statementBuilder.NotNull();
             }
         }
         [CanBeNull] private StatementAnalysisBuilder statementBuilder;

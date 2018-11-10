@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
         public BasicBlock(int number)
         {
             Number = number;
-            Statements = statements.AsReadOnly().AssertNotNull();
+            Statements = statements.AsReadOnly().NotNull();
         }
 
         public void Add([NotNull] Statement statement)

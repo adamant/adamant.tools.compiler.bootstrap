@@ -1,4 +1,5 @@
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage;
@@ -27,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C
             var parameters = Enumerable.Repeat(0, parameterCount)
                 .Select(_ => new FakeParameter()).ToList();
             var returnType = new FakeAdamantType();
-            var function = new FunctionDeclaration("".ToFakeCodeFile(),
+            var function = new FunctionDeclaration(FakeCodeFile.For(""),
                 GlobalNamespaceName.Instance.Qualify("func"),
                 functionType,
                 parameters,
@@ -59,7 +60,7 @@ $@"{returnType} ᵢfunc´{parameterCount}({parametersString})
         {
             var declaredType = new FakeAdamantType();
             var typeName = GlobalNamespaceName.Instance.Qualify("My_Type");
-            var type = new TypeDeclaration("".ToFakeCodeFile(), typeName, declaredType, Enumerable.Empty<GenericParameter>());
+            var type = new TypeDeclaration(FakeCodeFile.For(""), typeName, declaredType, Enumerable.Empty<GenericParameter>());
 
             var code = new Code();
             NewDeclarationEmitter().Emit(type, code);

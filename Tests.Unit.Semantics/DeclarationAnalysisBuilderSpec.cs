@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers;
@@ -67,7 +68,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics
             var expressionBuilder = new FakeExpressionAnalysisBuilder();
             var statementBuilder = new FakeStatementAnalysisBuilder();
             var declarationBuilder = new DeclarationAnalysisBuilder(expressionBuilder, statementBuilder, nameBuilder);
-            var context = new AnalysisContext("".ToFakeCodeFile(), new FakeLexicalScope());
+            var context = new AnalysisContext(FakeCodeFile.For(""), new FakeLexicalScope());
             return declarationBuilder.BuildDeclaration(context, @namespace ?? GlobalNamespaceName.Instance, declaration);
         }
     }

@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
             Requires.NotNull(nameof(text), text);
             Text = text;
             startOfLine = LineStarts(text);
-            StartOfLine = startOfLine.AsReadOnly().AssertNotNull();
+            StartOfLine = startOfLine.AsReadOnly().NotNull();
         }
 
         [NotNull]

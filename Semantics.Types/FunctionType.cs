@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
         {
             Requires.NotNull(nameof(parameterTypes), parameterTypes);
             Requires.NotNull(nameof(resultType), resultType);
-            ParameterTypes = parameterTypes.AssertItemNotNull().ToReadOnlyList();
+            ParameterTypes = parameterTypes.ItemsNotNull().ToReadOnlyList();
             ResultType = resultType;
             IsResolved = ParameterTypes.All(pt => pt.IsResolved) && ResultType.IsResolved;
         }

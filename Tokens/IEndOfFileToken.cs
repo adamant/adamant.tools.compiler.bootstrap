@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
@@ -6,6 +7,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     public interface IEndOfFileToken : IToken
     {
         [NotNull]
-        Diagnostics Diagnostics { get; }
+        FixedList<Diagnostic> Diagnostics { get; }
     }
 }

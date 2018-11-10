@@ -19,8 +19,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
                 return string.Empty;
 
             return new StringBuilder(input.Length * count)
-                .Insert(0, input, count).AssertNotNull()
-                .ToString().AssertNotNull();
+                .Insert(0, input, count).NotNull()
+                .ToString().NotNull();
         }
 
         [NotNull]
@@ -61,7 +61,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
                         break;
                 }
             }
-            return escaped.ToString().AssertNotNull();
+            return escaped.ToString().NotNull();
         }
     }
 }

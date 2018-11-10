@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
 {
-    public class FakeCodeReference : CodeReference
+    internal class FakeCodeReference : CodeReference
     {
         #region Singleton
         [NotNull]

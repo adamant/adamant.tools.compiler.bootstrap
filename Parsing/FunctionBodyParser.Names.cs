@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     {
         [MustUseReturnValue]
         [NotNull]
-        public NameSyntax ParseName([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+        public NameSyntax ParseName([NotNull] ITokenIterator tokens, [NotNull] Diagnostics diagnostics)
         {
             NameSyntax name = ParseSimpleName(tokens, diagnostics);
             while (tokens.Current is IDotToken)
@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        private SimpleNameSyntax ParseSimpleName([NotNull]ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+        private SimpleNameSyntax ParseSimpleName([NotNull]ITokenIterator tokens, [NotNull] Diagnostics diagnostics)
         {
             var identifier = tokens.ExpectIdentifier();
             SimpleNameSyntax simpleName;

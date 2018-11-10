@@ -24,8 +24,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [CanBeNull]
         public GenericParametersSyntax AcceptGenericParameters(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var openBracket = tokens.Accept<IOpenBracketToken>();
             if (openBracket == null) return null;
@@ -38,8 +38,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         public GenericParameterSyntax ParseGenericParameter(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var paramsKeyword = tokens.Accept<IParamsKeywordToken>();
             var name = tokens.ExpectIdentifier();
@@ -51,8 +51,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         public SyntaxList<GenericConstraintSyntax> ParseGenericConstraints(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var constraints = new List<GenericConstraintSyntax>();
             while (tokens.Current is IWhereKeywordToken)
@@ -64,8 +64,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         public GenericConstraintSyntax ParseGenericConstraint(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var whereKeyword = tokens.Take<IWhereKeywordToken>();
             var expression = expressionParser.ParseExpression(tokens, diagnostics);

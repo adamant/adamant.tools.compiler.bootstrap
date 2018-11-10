@@ -34,7 +34,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         public static IReadOnlyList<T> ToReadOnlyList<T>([NotNull] this IEnumerable<T> values)
         {
             Requires.NotNull(nameof(values), values);
-            return values.ToList().AsReadOnly().AssertNotNull();
+            return values.ToList().AsReadOnly().NotNull();
+        }
+
+        [NotNull]
+        public static FixedList<T> ToFixedList<T>([NotNull] this IEnumerable<T> values)
+            where T : class
+        {
+            return new FixedList<T>(values);
         }
 
         [NotNull]

@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
         [NotNull]
         private static MethodInfo GetMethodInfo([NotNull] Func<int, int> f)
         {
-            return f.Method.AssertNotNull();
+            return f.Method.NotNull();
         }
 
         [Fact]

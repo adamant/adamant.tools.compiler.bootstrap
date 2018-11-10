@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             foreach (var compilationUnit in compilationUnits)
                 GatherDeclarations(compilationUnit.Namespace);
 
-            globalDeclarations = declarations.Values.AssertNotNull()
+            globalDeclarations = declarations.Values.NotNull()
                 .OfType<IDeclarationAnalysis>()
                 .Where(IsGlobalDeclaration)
                 .ToDictionary(d => d.Name.UnqualifiedName.Text, d => d);
@@ -66,7 +66,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 {
                     var function =
                         (FunctionDeclarationAnalysis)declarations[functionScope.Syntax]
-                            .AssertNotNull();
+                            .NotNull();
 
                     foreach (var parameter in function.Parameters)
                         AddSymbol(symbols, parameter);
@@ -95,8 +95,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 break;
                 case GenericsScope genericsScope:
                 {
-                    var declaration = (MemberDeclarationAnalysis)declarations[genericsScope.Syntax].AssertNotNull();
-                    foreach (var parameter in declaration.GenericParameters.AssertNotNull())
+                    var declaration = (MemberDeclarationAnalysis)declarations[genericsScope.Syntax].NotNull();
+                    foreach (var parameter in declaration.GenericParameters.NotNull())
                         AddSymbol(symbols, parameter);
 
                     genericsScope.Bind(symbols);
@@ -107,10 +107,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 break;
                 case UsingDirectivesScope usingDirectivesScope:
                 {
-                    var declaration = (NamespaceDeclarationAnalysis)declarations[usingDirectivesScope.Syntax].AssertNotNull();
+                    var declaration = (NamespaceDeclarationAnalysis)declarations[usingDirectivesScope.Syntax].NotNull();
                     foreach (var usingDirective in declaration.Syntax.UsingDirectives)
                     {
-                        var usingNamespace = nameBuilder.BuildName(usingDirective.Name).AssertNotNull();
+                        var usingNamespace = nameBuilder.BuildName(usingDirective.Name).NotNull();
                         AddSymbolsInNamespace(symbols, usingNamespace);
                     }
 
@@ -258,7 +258,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             Requires.NotNull(nameof(scope), scope);
             Requires.NotNull(nameof(scopes), scopes);
 
-            var scopeAnalysis = scopes[scope.Syntax].AssertNotNull();
+            var scopeAnalysis = scopes[scope.Syntax].NotNull();
             var variableDeclarations = new Dictionary<string, ISymbol>();
             foreach (var declaration in scopeAnalysis.LocalVariableDeclarations())
                 AddSymbol(variableDeclarations, declaration);

@@ -53,7 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
         [NotNull]
         public IEnumerator<Project> GetEnumerator()
         {
-            return projects.Values.AssertNotNull().GetEnumerator();
+            return projects.Values.NotNull().GetEnumerator();
         }
 
         [NotNull]
@@ -97,7 +97,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
         {
             var projectBuilds = await projectBuildsTask;
             var sourceDir = Path.Combine(project.Path, "src");
-            var sourcePaths = Directory.EnumerateFiles(sourceDir, "*.ad", SearchOption.AllDirectories).AssertNotNull();
+            var sourcePaths = Directory.EnumerateFiles(sourceDir, "*.ad", SearchOption.AllDirectories).NotNull();
             // Wait for the references, unfortunately, this requires an ugly loop.
             var referenceTasks = project.References.ToDictionary(r => r.Name, r => projectBuilds[r.Project]);
             var references = new Dictionary<string, Package>();
@@ -134,7 +134,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
         [NotNull]
         private static string PrepareCacheDir([NotNull] Project project)
         {
-            var cacheDir = Path.Combine(project.Path, ".forge-cache").AssertNotNull();
+            var cacheDir = Path.Combine(project.Path, ".forge-cache").NotNull();
             Directory.CreateDirectory(cacheDir); // Ensure the cache directory exists
 
             // Clear the cache directory?
@@ -193,7 +193,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
                 {
                     codeEmitter.Emit(currentPackage);
                     emittedPackages.Add(currentPackage);
-                    packagesToEmit.EnqueueRange(currentPackage.References.Values.AssertNotNull());
+                    packagesToEmit.EnqueueRange(currentPackage.References.Values.NotNull());
                 }
             }
 
@@ -201,10 +201,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             switch (project.Template)
             {
                 case ProjectTemplate.App:
-                    outputPath = Path.Combine(cacheDir, "program.c").AssertNotNull();
+                    outputPath = Path.Combine(cacheDir, "program.c").NotNull();
                     break;
                 case ProjectTemplate.Lib:
-                    outputPath = Path.Combine(cacheDir, "lib.c").AssertNotNull();
+                    outputPath = Path.Combine(cacheDir, "lib.c").NotNull();
                     break;
                 default:
                     throw NonExhaustiveMatchException.ForEnum(project.Template);
@@ -234,10 +234,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             switch (project.Template)
             {
                 case ProjectTemplate.App:
-                    outputPath = Path.ChangeExtension(codePath, "exe").AssertNotNull();
+                    outputPath = Path.ChangeExtension(codePath, "exe").NotNull();
                     break;
                 case ProjectTemplate.Lib:
-                    outputPath = Path.ChangeExtension(codePath, "dll").AssertNotNull();
+                    outputPath = Path.ChangeExtension(codePath, "dll").NotNull();
                     break;
                 default:
                     throw NonExhaustiveMatchException.ForEnum(project.Template);

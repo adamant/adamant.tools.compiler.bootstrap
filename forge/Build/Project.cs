@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             [NotNull][ItemNotNull] IEnumerable<ProjectReference> references)
         {
             Requires.NotNull(nameof(file), file);
-            Path = System.IO.Path.GetDirectoryName(file.FullPath).AssertNotNull();
+            Path = System.IO.Path.GetDirectoryName(file.FullPath).NotNull();
             Name = file.Name ?? throw new InvalidOperationException();
             Authors = (file.Authors ?? throw new InvalidOperationException()).ToReadOnlyList();
             Template = file.Template;

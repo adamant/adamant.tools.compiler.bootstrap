@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     /// <summary>
     /// Doesn't implement IParser{CompilationUnitSyntax} because it doesn't take
-    /// an <see cref="IDiagnosticsCollector"/>
+    /// an <see cref="Diagnostics"/>
     /// </summary>
     public class CompilationUnitParser
     {
@@ -28,22 +28,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        public CompilationUnitSyntax ParseCompilationUnit([NotNull] ITokenStream tokens)
+        public CompilationUnitSyntax ParseCompilationUnit([NotNull] ITokenIterator tokens)
         {
-            var diagnostics = new DiagnosticsBuilder();
+            var diagnostics = new Diagnostics();
             var @namespace = ParseFileNamespaceDeclaration(tokens, diagnostics);
             var endOfFile = tokens.TakeEndOfFile();
 
-            diagnostics.Publish(endOfFile.Diagnostics);
+            diagnostics.Add(endOfFile.Diagnostics);
 
-            return new CompilationUnitSyntax(tokens.File, @namespace, endOfFile, diagnostics.Build());
+            return new CompilationUnitSyntax(tokens.Context.File, @namespace, endOfFile, diagnostics.Build());
         }
 
         [MustUseReturnValue]
         [NotNull]
         private FileNamespaceDeclarationSyntax ParseFileNamespaceDeclaration(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var namespaceKeyword = tokens.Accept<INamespaceKeywordToken>();
             NameSyntax name = null;

@@ -42,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             function.Type.BeginComputing();
             function.ReturnType.BeginComputing();
             if (function.IsGeneric)
-                CheckGenericParameters(function.GenericParameters.AssertNotNull(), function.Diagnostics);
+                CheckGenericParameters(function.GenericParameters.NotNull(), function.Diagnostics);
             CheckParameters(function.Parameters, function.Diagnostics);
 
             var returnType = EvaluateTypeExpression(function.ReturnTypeExpression, function.Diagnostics);
@@ -53,8 +53,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             if (!(function.Syntax.OpenParen is IMissingToken))
                 functionType = new FunctionType(function.Parameters.Select(p => p.Type.AssertComputed()), functionType);
 
-            if (function.IsGeneric && function.GenericParameters.AssertNotNull().Any())
-                functionType = new MetaFunctionType(function.GenericParameters.AssertNotNull().Select(p => p.Type.AssertComputed()), functionType);
+            if (function.IsGeneric && function.GenericParameters.NotNull().Any())
+                functionType = new MetaFunctionType(function.GenericParameters.NotNull().Select(p => p.Type.AssertComputed()), functionType);
 
             function.Type.Computed(functionType);
         }
@@ -67,7 +67,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
         private void CheckGenericParameters(
             [NotNull, ItemNotNull] IReadOnlyList<GenericParameterAnalysis> genericParameters,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] Diagnostics diagnostics)
         {
             foreach (var parameter in genericParameters)
             {
@@ -80,7 +80,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
         private void CheckParameters(
             [NotNull, ItemNotNull] IReadOnlyList<ParameterAnalysis> parameters,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] Diagnostics diagnostics)
         {
             foreach (var parameter in parameters)
             {
@@ -89,7 +89,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     parameter.Type.Computed(EvaluateTypeExpression(parameter.TypeExpression, diagnostics));
                 else
                 {
-                    diagnostics.Publish(TypeError.NotImplemented(parameter.Context.File,
+                    diagnostics.Add(TypeError.NotImplemented(parameter.Context.File,
                         parameter.Syntax.Span, "Self parameters not implemented"));
                     parameter.Type.Computed(DataType.Unknown);
                 }
@@ -98,7 +98,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
         private void CheckStatement(
             [NotNull] StatementAnalysis statement,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] Diagnostics diagnostics)
         {
             switch (statement)
             {
@@ -115,7 +115,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
         private void CheckVariableDeclaration(
             [NotNull] VariableDeclarationStatementAnalysis variableDeclaration,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] Diagnostics diagnostics)
         {
             variableDeclaration.Type.BeginComputing();
             if (variableDeclaration.Initializer != null)
@@ -134,7 +134,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             }
             else
             {
-                diagnostics.Publish(TypeError.NotImplemented(variableDeclaration.Context.File,
+                diagnostics.Add(TypeError.NotImplemented(variableDeclaration.Context.File,
                     variableDeclaration.Syntax.Name.Span,
                     "Inference of local variable types not implemented"));
                 variableDeclaration.Type.Computed(DataType.Unknown);
@@ -151,7 +151,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             switch (typeDeclaration.Type.State)
             {
                 case AnalysisState.BeingComputed:
-                    typeDeclaration.Diagnostics.Publish(TypeError.CircularDefinition(typeDeclaration.Context.File, typeDeclaration.Syntax.SignatureSpan, typeDeclaration.Name));
+                    typeDeclaration.Diagnostics.Add(TypeError.CircularDefinition(typeDeclaration.Context.File, typeDeclaration.Syntax.SignatureSpan, typeDeclaration.Name));
                     return;
                 case AnalysisState.Computed:
                     return;   // We have already checked it
@@ -164,7 +164,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             IEnumerable<DataType> genericParameterTypes = null;
             if (typeDeclaration.IsGeneric)
             {
-                var genericParameters = typeDeclaration.GenericParameters.AssertNotNull();
+                var genericParameters = typeDeclaration.GenericParameters.NotNull();
                 CheckGenericParameters(genericParameters, typeDeclaration.Diagnostics);
                 genericParameterTypes = genericParameters.Select(p => p.Type.AssertComputed());
             }
@@ -208,16 +208,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         // Checks the expression is well typed, and that the type of the expression is `bool`
         private void CheckExpressionTypeIsBool(
             [NotNull] ExpressionAnalysis expression,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] Diagnostics diagnostics)
         {
             CheckExpression(expression, diagnostics);
             if (expression.Type.AssertComputed() != ObjectType.Bool)
-                diagnostics.Publish(TypeError.MustBeABoolExpression(expression.Context.File, expression.Syntax.Span));
+                diagnostics.Add(TypeError.MustBeABoolExpression(expression.Context.File, expression.Syntax.Span));
         }
 
         private void CheckExpression(
             [CanBeNull] ExpressionAnalysis expression,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] Diagnostics diagnostics)
         {
             if (expression == null) return;
 
@@ -255,7 +255,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case LifetimeTypeAnalysis lifetimeType:
                     CheckExpression(lifetimeType.TypeName, diagnostics);
                     if (lifetimeType.TypeName.Type.AssertComputed() != ObjectType.Type)
-                        diagnostics.Publish(TypeError.MustBeATypeExpression(expression.Context.File, lifetimeType.TypeName.Syntax.Span));
+                        diagnostics.Add(TypeError.MustBeATypeExpression(expression.Context.File, lifetimeType.TypeName.Syntax.Span));
                     expression.Type.Computed(ObjectType.Type);
                     break;
                 case BlockAnalysis blockExpression:
@@ -420,7 +420,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         private DataType CheckName(
             [NotNull] AnalysisContext context,
             [NotNull] IIdentifierTokenPlace name,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] Diagnostics diagnostics)
         {
             Requires.NotNull(nameof(context), context);
             Requires.NotNull(nameof(name), name);
@@ -448,7 +448,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case FunctionDeclarationAnalysis functionDeclaration:
                     return functionDeclaration.Type.AssertComputed();
                 case null:
-                    diagnostics.Publish(NameBindingError.CouldNotBindName(context.File, name));
+                    diagnostics.Add(NameBindingError.CouldNotBindName(context.File, name));
                     return DataType.Unknown; // unknown
                 case TypeDeclaration typeDeclaration:
                     return typeDeclaration.Type.AssertResolved();
@@ -466,14 +466,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
         private void CheckArgument(
             [NotNull] ArgumentAnalysis argument,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] Diagnostics diagnostics)
         {
             CheckExpression(argument.Value, diagnostics);
         }
 
         private void CheckBinaryOperator(
             [NotNull] BinaryOperatorExpressionAnalysis binaryOperatorExpression,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] Diagnostics diagnostics)
         {
             CheckExpression(binaryOperatorExpression.LeftOperand, diagnostics);
             var leftOperand = binaryOperatorExpression.LeftOperand.Type.AssertComputed();
@@ -576,7 +576,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     throw NonExhaustiveMatchException.For(@operator);
             }
             if (typeError)
-                diagnostics.Publish(TypeError.OperatorCannotBeAppliedToOperandsOfType(binaryOperatorExpression.Context.File,
+                diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandsOfType(binaryOperatorExpression.Context.File,
                     binaryOperatorExpression.Syntax.Span, @operator,
                     binaryOperatorExpression.LeftOperand.Type,
                     binaryOperatorExpression.RightOperand.Type));
@@ -630,7 +630,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
         private void CheckUnaryOperator(
             [NotNull] UnaryOperatorExpressionAnalysis unaryOperatorExpression,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] Diagnostics diagnostics)
         {
             CheckExpression(unaryOperatorExpression.Operand, diagnostics);
             var operand = unaryOperatorExpression.Operand.Type.AssertComputed();
@@ -680,7 +680,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     throw NonExhaustiveMatchException.For(@operator);
             }
             if (typeError)
-                diagnostics.Publish(TypeError.OperatorCannotBeAppliedToOperandOfType(unaryOperatorExpression.Context.File,
+                diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandOfType(unaryOperatorExpression.Context.File,
                     unaryOperatorExpression.Syntax.Span, @operator, operand));
         }
 
@@ -690,7 +690,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         [NotNull]
         private DataType EvaluateTypeExpression(
             [CanBeNull] ExpressionAnalysis typeExpression,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] Diagnostics diagnostics)
         {
             if (typeExpression == null)
             {
@@ -703,7 +703,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             if (!(type is Metatype)
                 && type != ObjectType.Type)
             {
-                diagnostics.Publish(TypeError.MustBeATypeExpression(typeExpression.Context.File,
+                diagnostics.Add(TypeError.MustBeATypeExpression(typeExpression.Context.File,
                     typeExpression.Syntax.Span));
                 return DataType.Unknown;
             }
@@ -714,7 +714,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         [NotNull]
         private DataType EvaluateCheckedTypeExpression(
             [NotNull] ExpressionAnalysis typeExpression,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] Diagnostics diagnostics)
         {
             switch (typeExpression)
             {

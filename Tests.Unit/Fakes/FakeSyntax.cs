@@ -60,7 +60,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         [NotNull]
         public static NameSyntax Name([NotNull] string name)
         {
-            var parts = name.Split('.').AssertNotNull();
+            var parts = name.Split('.').NotNull();
 
             NameSyntax nameSyntax = null;
             foreach (var part in parts)
@@ -72,7 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
                     nameSyntax = new QualifiedNameSyntax(nameSyntax, TokenFactory.Dot(FakeSpan), partSyntax);
             }
 
-            return nameSyntax.AssertNotNull();
+            return nameSyntax.NotNull();
         }
 
         [NotNull]
@@ -126,10 +126,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
                 null, @namespace, null, SyntaxList<UsingDirectiveSyntax>.Empty,
                 new SyntaxList<DeclarationSyntax>(declarations)); ;
             return new CompilationUnitSyntax(
-                "".ToFakeCodeFile(),
+                FakeCodeFile.For(""),
                 namespaceSyntax,
-                TokenFactory.EndOfFile(FakeSpan, Diagnostics.Empty),
-                Diagnostics.Empty);
+                TokenFactory.EndOfFile(FakeSpan, FixedList<Diagnostic>.Empty),
+                FixedList<Diagnostic>.Empty);
         }
 
         [NotNull]

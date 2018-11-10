@@ -46,7 +46,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
         }
 
         [CanBeNull]
-        public override Declaration Complete([NotNull] DiagnosticsBuilder diagnostics)
+        public override Declaration Complete([NotNull] Diagnostics diagnostics)
         {
             if (CompleteDiagnostics(diagnostics)) return null;
             return new FunctionDeclaration(

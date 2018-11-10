@@ -1,4 +1,5 @@
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage;
@@ -61,7 +62,7 @@ typedef enum Type_ID Type_ID;
         [Fact]
         public void EmitsEntryPointAdapterForNoArgVoidReturnMain()
         {
-            var main = new FunctionDeclaration("".ToFakeCodeFile(),
+            var main = new FunctionDeclaration(FakeCodeFile.For(""),
                 new SimpleName("main"),
                 new FakeAdamantType(),
                 Enumerable.Empty<Parameter>(),

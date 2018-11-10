@@ -9,18 +9,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
     public class Package
     {
         [NotNull] public string Name { get; }
-        [NotNull] [ItemNotNull] public Diagnostics Diagnostics { get; internal set; }
+        [NotNull, ItemNotNull] public FixedList<Diagnostic> Diagnostics { get; internal set; }
         [NotNull] public IReadOnlyDictionary<string, Package> References { get; }
-        [NotNull] [ItemNotNull] public IReadOnlyList<Namespace> Namespaces { get; }
-        [NotNull] [ItemNotNull] public IReadOnlyList<Declaration> Declarations { get; }
+        [NotNull, ItemNotNull] public IReadOnlyList<Namespace> Namespaces { get; }
+        [NotNull, ItemNotNull] public IReadOnlyList<Declaration> Declarations { get; }
         [CanBeNull] public FunctionDeclaration EntryPoint { get; internal set; }
 
         public Package(
             [NotNull] string name,
-            [NotNull] Diagnostics diagnostics,
+            [NotNull] FixedList<Diagnostic> diagnostics,
             [NotNull] IReadOnlyDictionary<string, Package> references,
-            [NotNull] [ItemNotNull] IEnumerable<Namespace> namespaces,
-            [NotNull] [ItemNotNull] IEnumerable<Declaration> declarations,
+            [NotNull, ItemNotNull] IEnumerable<Namespace> namespaces,
+            [NotNull, ItemNotNull] IEnumerable<Declaration> declarations,
             [CanBeNull] FunctionDeclaration entryPoint)
         {
             Requires.NotNull(nameof(name), name);

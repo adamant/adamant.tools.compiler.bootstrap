@@ -12,8 +12,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         private static PatternSyntax ParsePattern(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             var pattern = ParsePatternAtom(tokens, diagnostics);
             for (; ; )
@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 switch (tokens.Current)
                 {
                     case IPipeToken pipe:
-                        tokens.MoveNext();
+                        tokens.Next();
                         var rightOperand = ParsePatternAtom(tokens, diagnostics);
                         pattern = new OrPatternSyntax(pattern, pipe, rightOperand);
                         break;
@@ -34,19 +34,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         private static PatternSyntax ParsePatternAtom(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             switch (tokens.Current)
             {
                 case IIdentifierToken identifier:
                 {
-                    tokens.MoveNext();
+                    tokens.Next();
                     return new AnyPatternSyntax(identifier);
                 }
                 case IDotToken dotToken:
                 {
-                    tokens.MoveNext();
+                    tokens.Next();
                     var identifier = tokens.ExpectIdentifier();
                     return new EnumValuePatternSyntax(dotToken, identifier);
                 }

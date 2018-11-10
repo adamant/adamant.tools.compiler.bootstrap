@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
     public abstract class MemberDeclarationAnalysis : DeclarationAnalysis, IDeclarationAnalysis
     {
         [NotNull] public new MemberDeclarationSyntax Syntax { get; }
-        [NotNull] public DiagnosticsBuilder Diagnostics { get; }
+        [NotNull] public Diagnostics Diagnostics { get; }
         [NotNull] public Name Name { get; }
         [CanBeNull, ItemNotNull] public IReadOnlyList<GenericParameterAnalysis> GenericParameters { get; }
         public bool IsGeneric => GenericParameters != null;
@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
         {
             Requires.NotNull(nameof(name), name);
             Syntax = syntax;
-            Diagnostics = new DiagnosticsBuilder();
+            Diagnostics = new Diagnostics();
             Name = name;
             GenericParameters = genericParameters?.ToReadOnlyList();
         }
@@ -46,12 +46,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
         }
 
         [CanBeNull]
-        public abstract Declaration Complete([NotNull] DiagnosticsBuilder diagnostics);
+        public abstract Declaration Complete([NotNull] Diagnostics diagnostics);
 
-        protected bool CompleteDiagnostics([NotNull] DiagnosticsBuilder diagnostics)
+        protected bool CompleteDiagnostics([NotNull] Diagnostics diagnostics)
         {
-            var errors = Diagnostics.Any(d => d.Level >= DiagnosticLevel.CompilationError);
-            diagnostics.Publish(Diagnostics.Build());
+            var myDiagnostics = Diagnostics.Build();
+            var errors = myDiagnostics.Any(d => d.Level >= DiagnosticLevel.CompilationError);
+            diagnostics.Add(myDiagnostics);
             return errors;
         }
     }

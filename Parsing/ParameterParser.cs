@@ -6,11 +6,14 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
-    public class ParameterParser : IParameterParser
+    public class ParameterParser : Parser, IParameterParser
     {
         [NotNull] private readonly IExpressionParser expressionParser;
 
-        public ParameterParser([NotNull] IExpressionParser expressionParser)
+        public ParameterParser(
+            [NotNull] ITokenIterator tokens,
+            [NotNull] IExpressionParser expressionParser)
+            : base(tokens)
         {
             this.expressionParser = expressionParser;
         }
@@ -18,19 +21,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         public ParameterSyntax ParseParameter(
-            [NotNull] ITokenStream tokens,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] ITokenIterator tokens,
+            [NotNull] Diagnostics diagnostics)
         {
             switch (tokens.Current)
             {
                 case IMutableKeywordToken mutableKeyword:
                 {
-                    tokens.MoveNext();
+                    tokens.Next();
                     var selfKeyword = tokens.Expect<ISelfKeywordTokenPlace>();
                     return new SelfParameterSyntax(mutableKeyword, selfKeyword);
                 }
                 case ISelfKeywordToken selfKeyword:
-                    tokens.MoveNext();
+                    tokens.Next();
                     return new SelfParameterSyntax(null, selfKeyword);
                 default:
                     var paramsKeyword = tokens.Accept<IParamsKeywordToken>();

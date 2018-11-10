@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             Requires.NotNull(nameof(rvalue), rvalue);
             var restrictions = new List<Restriction>();
             GatherRestrictions(rvalue, restrictions);
-            Restrictions = restrictions.AsReadOnly().AssertNotNull();
+            Restrictions = restrictions.AsReadOnly().NotNull();
         }
 
         public Loan(int variable, int @object)

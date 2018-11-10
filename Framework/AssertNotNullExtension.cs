@@ -8,21 +8,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
     public static class AssertNotNullExtension
     {
-        /// <summary>
-        /// Sometimes the system can't figure out that something isn't null.
-        /// This let's us tell it that it is.
-        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [NotNull]
-        public static T AssertNotNull<T>([CanBeNull] this T value)
+        public static T NotNull<T>([CanBeNull] this T value)
             where T : class
         {
-            return value ?? throw new InvalidOperationException();
+            return value ?? throw new ArgumentNullException();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [ContractAnnotation("null => null; notnull => notnull"), ItemNotNull]
-        public static IEnumerable<T> AssertItemNotNull<T>([CanBeNull, ItemCanBeNull] this IEnumerable<T> values)
+        public static IEnumerable<T> ItemsNotNull<T>([CanBeNull, ItemCanBeNull] this IEnumerable<T> values)
             where T : class
         {
             return values?.Select(value => value ?? throw new InvalidOperationException());

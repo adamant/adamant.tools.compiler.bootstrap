@@ -84,7 +84,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             typeof(OrKeywordToken),
             typeof(XorKeywordToken),
             typeof(NotKeywordToken),
-        }.AsReadOnly().AssertNotNull();
+        }.AsReadOnly().NotNull();
     }
 
     public static partial class TokenFactory

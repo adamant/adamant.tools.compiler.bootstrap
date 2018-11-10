@@ -10,11 +10,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     // Delegate needed so we can declare the arg as not null
     [NotNull]
-    public delegate T ParseFunction<out T>([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+    public delegate T ParseFunction<out T>([NotNull] ITokenIterator tokens, [NotNull] Diagnostics diagnostics)
         where T : NonTerminal;
 
     [CanBeNull]
-    public delegate T AcceptFunction<out T>([NotNull] ITokenStream tokens, [NotNull] IDiagnosticsCollector diagnostics)
+    public delegate T AcceptFunction<out T>([NotNull] ITokenIterator tokens, [NotNull] Diagnostics diagnostics)
         where T : NonTerminal;
 
     // TODO list parsing based on a terminator is problematic, it would be better to have the parse function decide if the next token was a start
@@ -23,18 +23,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         SyntaxList<T> ParseList<T>(
-            [NotNull] ITokenStream tokens,
+            [NotNull] ITokenIterator tokens,
             [NotNull] AcceptFunction<T> acceptItem,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] Diagnostics diagnostics)
             where T : NonTerminal;
 
         [MustUseReturnValue]
         [NotNull]
         SeparatedListSyntax<T> ParseSeparatedList<T, TSeparator>(
-            [NotNull] ITokenStream tokens,
+            [NotNull] ITokenIterator tokens,
             [NotNull] AcceptFunction<T> acceptItem,
             Type<TSeparator> separatorType,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] Diagnostics diagnostics)
             where T : NonTerminal
             where TSeparator : class, IToken;
 
@@ -42,10 +42,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         SyntaxList<T> ParseList<T, TTerminator>(
-            [NotNull] ITokenStream tokens,
+            [NotNull] ITokenIterator tokens,
             [NotNull] ParseFunction<T> parseItem,
             Type<TTerminator> terminatorType,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] Diagnostics diagnostics)
             where T : NonTerminal
             where TTerminator : class, IToken;
 
@@ -53,11 +53,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [MustUseReturnValue]
         [NotNull]
         SeparatedListSyntax<T> ParseSeparatedList<T, TSeparator, TTerminator>(
-            [NotNull] ITokenStream tokens,
+            [NotNull] ITokenIterator tokens,
             [NotNull] ParseFunction<T> parseItem,
             Type<TSeparator> separatorType,
             Type<TTerminator> terminatorType,
-            [NotNull] IDiagnosticsCollector diagnostics)
+            [NotNull] Diagnostics diagnostics)
             where T : NonTerminal
             where TSeparator : class, IToken
             where TTerminator : class, IToken;

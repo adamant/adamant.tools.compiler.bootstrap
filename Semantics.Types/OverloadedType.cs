@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
         public OverloadedType([NotNull, ItemNotNull] IEnumerable<DataType> types)
         {
             Requires.NotNull(nameof(types), types);
-            Types = types.AssertItemNotNull().ToReadOnlyList();
+            Types = types.ItemsNotNull().ToReadOnlyList();
         }
 
         [NotNull]
