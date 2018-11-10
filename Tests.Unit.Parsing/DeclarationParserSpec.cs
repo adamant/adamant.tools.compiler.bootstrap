@@ -17,17 +17,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Parsing
         [Fact]
         public void Function_declaration()
         {
-            var accessModifer = FakeSyntax.AccessModifier();
+            //var accessModifer = FakeSyntax.AccessModifier();
             var returnExpression = FakeSyntax.Expression();
             var genericParameters = FakeSyntax.GenericParameters();
             var parameters = FakeSyntax.SeparatedList<ParameterSyntax>();
             var block = FakeSyntax.Block();
-            var tokens = FakeTokenStream.From($"{accessModifer} fn function_name{genericParameters}({parameters}) -> {returnExpression} {block}");
+            var tokens = FakeTokenStream.From($"{null} fn function_name{genericParameters}({parameters}) -> {returnExpression} {block}");
 
             var d = ParseWithoutError(tokens);
 
             var f = Assert.IsType<NamedFunctionDeclarationSyntax>(d);
-            Assert.Single(f.Modifiers, accessModifer);
+            //Assert.Single(f.Modifiers, accessModifer);
             Assert.Equal(tokens[1], f.FunctionKeyword);
             Assert.Equal(tokens[2], f.Name);
             Assert.Equal(genericParameters, f.GenericParameters);
@@ -42,16 +42,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Parsing
         [Fact]
         public void Class_declaration()
         {
-            var accessModifer = FakeSyntax.AccessModifier();
             var genericParameters = FakeSyntax.GenericParameters();
             var invariants = FakeSyntax.List<InvariantSyntax>();
             var members = FakeSyntax.List<MemberDeclarationSyntax>();
-            var tokens = FakeTokenStream.From($"{accessModifer} class Class_Name{genericParameters}{invariants} {{{members}}}");
+            var tokens = FakeTokenStream.From($"{null} class Class_Name{genericParameters}{invariants} {{{members}}}");
 
             var d = ParseWithoutError(tokens);
 
             var c = Assert.IsType<ClassDeclarationSyntax>(d);
-            Assert.Single(c.Modifiers, accessModifer);
+            //Assert.Single(c.Modifiers, accessModifer);
             Assert.Equal(tokens[1], c.ClassKeyword);
             Assert.Equal(tokens[2], c.Name);
             Assert.Equal(genericParameters, c.GenericParameters);
@@ -66,7 +65,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Parsing
         {
             var parser = NewDeclarationParser();
             var diagnostics = new Diagnostics();
-            var declarationSyntax = parser.ParseDeclaration(tokenStream, diagnostics);
+            var declarationSyntax = parser.ParseDeclaration();
             Assert.Empty(diagnostics.Build());
             return declarationSyntax;
         }
@@ -83,6 +82,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Parsing
             var nameParser = FakeParser.ForNames();
             var usingDirectiveParser = FakeParser.ForUsingDirectives();
             return new DeclarationParser(
+                null,
                 listParser,
                 expressionParser,
                 blockParser,

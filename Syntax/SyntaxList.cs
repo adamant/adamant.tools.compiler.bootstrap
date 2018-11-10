@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -14,6 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     /// overhead.
     /// </summary>
     /// <typeparam name="TNode">Type of <see cref="NonTerminal"/>s in the list</typeparam>
+    [Obsolete("Use FixedList<T> instead")]
     public class SyntaxList<TNode> : IReadOnlyList<TNode>
         where TNode : NonTerminal
     {

@@ -18,8 +18,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var genericsParser = new GenericsParser(listParser, functionBodyParser);
             var usingDirectiveParser = new UsingDirectiveParser(functionBodyParser);
             var parameterParser = new ParameterParser(tokens, functionBodyParser);
-            var accessModifierParser = new ModifierParser();
-            var declarationParser = new DeclarationParser(listParser, functionBodyParser,
+            var accessModifierParser = new ModifierParser(tokens);
+            var declarationParser = new DeclarationParser(tokens, listParser, functionBodyParser,
                 functionBodyParser, parameterParser, accessModifierParser,
                 genericsParser, functionBodyParser, usingDirectiveParser);
             compilationUnitParser = new CompilationUnitParser(usingDirectiveParser, declarationParser, functionBodyParser);

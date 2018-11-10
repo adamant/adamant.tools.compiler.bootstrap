@@ -34,9 +34,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenIterator tokens,
             [NotNull] Diagnostics diagnostics)
         {
-            var usingKeyword = tokens.Expect<IUsingKeywordTokenPlace>();
+            var usingKeyword = tokens.Consume<IUsingKeywordTokenPlace>();
             var name = qualifiedNameParser.ParseName(tokens, diagnostics);
-            var semicolon = tokens.Expect<ISemicolonTokenPlace>();
+            var semicolon = tokens.Consume<ISemicolonTokenPlace>();
             return new UsingDirectiveSyntax(usingKeyword, name, semicolon);
         }
     }

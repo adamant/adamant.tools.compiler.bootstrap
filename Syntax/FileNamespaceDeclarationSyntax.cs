@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -11,9 +12,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [CanBeNull] INamespaceKeywordToken namespaceKeyword,
             [CanBeNull] NameSyntax name,
             [CanBeNull] ISemicolonTokenPlace semicolon,
-            [NotNull] SyntaxList<UsingDirectiveSyntax> usingDirectives,
-            [NotNull] SyntaxList<DeclarationSyntax> declarations)
-            : base(namespaceKeyword, name, usingDirectives, declarations)
+            [NotNull] FixedList<UsingDirectiveSyntax> usingDirectives,
+            [NotNull] FixedList<DeclarationSyntax> declarations)
+            : base(name, usingDirectives, declarations)
         {
             Semicolon = semicolon;
         }

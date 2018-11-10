@@ -20,12 +20,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         }
 
         [NotNull]
-        public static AccessModifierSyntax AccessModifier()
-        {
-            return new AccessModifierSyntax(Missing<IAccessModifierTokenPlace>());
-        }
-
-        [NotNull]
         public static BlockSyntax Block()
         {
             return new BlockSyntax(Missing<IOpenBraceTokenPlace>(), List<StatementSyntax>(), Missing<ICloseBraceTokenPlace>());
@@ -123,8 +117,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
             [NotNull] params DeclarationSyntax[] declarations)
         {
             var namespaceSyntax = new FileNamespaceDeclarationSyntax(
-                null, @namespace, null, SyntaxList<UsingDirectiveSyntax>.Empty,
-                new SyntaxList<DeclarationSyntax>(declarations)); ;
+                null, @namespace, null, FixedList<UsingDirectiveSyntax>.Empty,
+                declarations.ToFixedList());
             return new CompilationUnitSyntax(
                 FakeCodeFile.For(""),
                 namespaceSyntax,
@@ -141,7 +135,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         public static NamedFunctionDeclarationSyntax FunctionDeclaration([NotNull] string name)
         {
             return new NamedFunctionDeclarationSyntax(
-                AccessModifier().ToSyntaxList<ModifierSyntax>(),
+                SyntaxList<ModifierSyntax>.Empty,
                 TokenFactory.FunctionKeyword(FakeSpan),
                 Identifier(name),
                 null, // Generic Parameters
@@ -168,7 +162,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         public static EnumStructDeclarationSyntax EnumStructDeclaration([NotNull] string name)
         {
             return new EnumStructDeclarationSyntax(
-                AccessModifier().ToSyntaxList<ModifierSyntax>(),
+                SyntaxList<ModifierSyntax>.Empty,
                 TokenFactory.EnumKeyword(FakeSpan),
                 TokenFactory.StructKeyword(FakeSpan),
                 Identifier(name),

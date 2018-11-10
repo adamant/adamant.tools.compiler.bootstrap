@@ -1,10 +1,13 @@
-using System.Collections.Generic;
-using Adamant.Tools.Compiler.Bootstrap.Tokens;
-
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public abstract class ModifierSyntax : NonTerminal
+    public class ModifierSyntax : NonTerminal
     {
-        public abstract IEnumerable<ITokenPlace> Tokens();
+        public readonly AccessModifier Access;
+
+
+        public ModifierSyntax(AccessModifier access)
+        {
+            Access = access;
+        }
     }
 }

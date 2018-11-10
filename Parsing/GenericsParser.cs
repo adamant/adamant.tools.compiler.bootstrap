@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (openBracket == null) return null;
             var parameters = listParser.ParseSeparatedList(tokens, ParseGenericParameter,
                 TypeOf<ICommaToken>(), TypeOf<ICloseBracketToken>(), diagnostics);
-            var closeBracket = tokens.Expect<ICloseBracketTokenPlace>();
+            var closeBracket = tokens.Consume<ICloseBracketTokenPlace>();
             return new GenericParametersSyntax(openBracket, parameters, closeBracket);
         }
 

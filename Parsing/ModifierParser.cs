@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
@@ -6,50 +8,28 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
-    public class ModifierParser : IModifierParser
+    public class ModifierParser : Parser, IModifierParser
     {
-        [CanBeNull]
-        public ModifierSyntax AcceptModifier(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] Diagnostics diagnostics)
+        public ModifierParser([NotNull] ITokenIterator tokens)
+            : base(tokens)
         {
-            switch (tokens.Current)
-            {
-                case IImplicitKeywordToken implicitKeyword:
-                    tokens.Next();
-                    return new ImplicitModiferSyntax(implicitKeyword);
-                case IMoveKeywordToken moveKeyword:
-                    tokens.Next();
-                    return new MoveModifierSyntax(moveKeyword);
-                case IOverrideKeywordToken overrideKeyword:
-                    tokens.Next();
-                    return new OverrideModifierSyntax(overrideKeyword);
-                case IRefKeywordToken refKeyword:
-                    tokens.Next();
-                    return new RefModifierSyntax(refKeyword);
-                case IExtendKeywordToken extendKeyword:
-                    tokens.Next();
-                    return new ExtendModifierSyntax(extendKeyword);
-                case ISafeKeywordToken safeKeyword:
-                    tokens.Next();
-                    return new SafeModifierSyntax(safeKeyword);
-                case IUnsafeKeywordToken unsafeKeyword:
-                    tokens.Next();
-                    return new UnsafeModifierSyntax(unsafeKeyword);
-                case IAbstractKeywordToken abstractKeyword:
-                    tokens.Next();
-                    return new AbstractModifierSyntax(abstractKeyword);
-                case IMutableKeywordToken mutableKeyword:
-                    tokens.Next();
-                    return new MutableModifierSyntax(mutableKeyword);
-                case IPublicKeywordToken _:
-                case IProtectedKeywordToken _:
-                case IPrivateKeywordToken _:
-                case IInternalKeywordToken _:
-                    return new AccessModifierSyntax(tokens.Expect<IAccessModifierTokenPlace>());
-                default:
-                    return null; // This parser needs to be able to return null
-            }
         }
+
+        /// <summary>
+        /// This gathers up the modifiers and removes duplicate types. For example
+        /// there should be only one access modifer and only one of safe/unsafe.
+        /// </summary>
+        //[NotNull]
+        //public FixedList<IModiferToken> ParseModifiers()
+        //{
+        //    var modifiers = new List<IModiferToken>();
+        //    IModiferToken modifer;
+        //    while ((modifer = Accept<IModiferToken>()) != null)
+        //        modifiers.Add(modifer);
+
+        //    // TODO remove "duplicates"
+
+        //    return modifiers.ToFixedList();
+        //}
     }
 }

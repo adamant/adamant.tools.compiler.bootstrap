@@ -10,16 +10,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     // Delegate needed so we can declare the arg as not null
     [NotNull]
-    public delegate T ParseFunction<out T>([NotNull] ITokenIterator tokens, [NotNull] Diagnostics diagnostics)
-        where T : NonTerminal;
+    public delegate T ParseFunction<out T>([NotNull] ITokenIterator tokens, [NotNull] Diagnostics diagnostics);
 
     [CanBeNull]
-    public delegate T AcceptFunction<out T>([NotNull] ITokenIterator tokens, [NotNull] Diagnostics diagnostics)
-        where T : NonTerminal;
+    public delegate T AcceptFunction<out T>([NotNull] ITokenIterator tokens, [NotNull] Diagnostics diagnostics);
 
     // TODO list parsing based on a terminator is problematic, it would be better to have the parse function decide if the next token was a start
     public interface IListParser
     {
+        [MustUseReturnValue]
+        [NotNull, ItemNotNull]
+        FixedList<T> ParseList<T>([NotNull] Func<T> acceptItem)
+            where T : class;
+
         [MustUseReturnValue]
         [NotNull]
         SyntaxList<T> ParseList<T>(

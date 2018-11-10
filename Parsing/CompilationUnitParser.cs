@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
@@ -32,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             var diagnostics = tokens.Context.Diagnostics;
             var @namespace = ParseFileNamespaceDeclaration(tokens, diagnostics);
-            tokens.Consume<IEndOfFileToken>();
+            tokens.Required<IEndOfFileToken>();
 
             return new CompilationUnitSyntax(tokens.Context.File, @namespace, diagnostics.Build());
         }
@@ -49,10 +50,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (namespaceKeyword != null)
             {
                 name = nameParser.ParseName(tokens, diagnostics);
-                semicolon = tokens.Expect<ISemicolonTokenPlace>();
+                semicolon = tokens.Consume<ISemicolonTokenPlace>();
             }
-            var usingDirectives = usingDirectiveParser.ParseUsingDirectives(tokens, diagnostics).ToSyntaxList();
-            var declarations = declarationParser.ParseDeclarations(tokens, diagnostics).ToSyntaxList();
+            var usingDirectives = usingDirectiveParser.ParseUsingDirectives(tokens, diagnostics).ToFixedList();
+            var declarations = declarationParser.ParseDeclarations().ToFixedList();
             return new FileNamespaceDeclarationSyntax(namespaceKeyword, name, semicolon, usingDirectives, declarations);
         }
     }

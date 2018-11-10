@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IMutableKeywordToken mutableKeyword:
                 {
                     tokens.Next();
-                    var selfKeyword = tokens.Expect<ISelfKeywordTokenPlace>();
+                    var selfKeyword = tokens.Consume<ISelfKeywordTokenPlace>();
                     return new SelfParameterSyntax(mutableKeyword, selfKeyword);
                 }
                 case ISelfKeywordToken selfKeyword:
@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var paramsKeyword = tokens.Accept<IParamsKeywordToken>();
                     var varKeyword = tokens.Accept<IVarKeywordToken>();
                     var name = tokens.ExpectIdentifier();
-                    var colon = tokens.Expect<IColonTokenPlace>();
+                    var colon = tokens.Consume<IColonTokenPlace>();
                     // Need to not consume the assignment that separates the type from the default value,
                     // hence the min operator precedence.
                     var typeExpression = expressionParser.ParseExpression(tokens, diagnostics, OperatorPrecedence.AboveAssignment);

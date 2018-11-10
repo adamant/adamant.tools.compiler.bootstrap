@@ -30,9 +30,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             SimpleNameSyntax simpleName;
             if (tokens.Current is IOpenBracketToken)
             {
-                var openBracket = tokens.Expect<IOpenBracketTokenPlace>();
+                var openBracket = tokens.Consume<IOpenBracketTokenPlace>();
                 var arguments = ParseArgumentList(tokens, diagnostics);
-                var closeBracket = tokens.Expect<ICloseBracketTokenPlace>();
+                var closeBracket = tokens.Consume<ICloseBracketTokenPlace>();
                 simpleName = new GenericNameSyntax(identifier, openBracket, arguments, closeBracket);
             }
             else

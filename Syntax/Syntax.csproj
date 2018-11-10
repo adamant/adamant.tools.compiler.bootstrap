@@ -19,7 +19,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Framework\Framework.csproj" />
-    <ProjectReference Include="..\Lexing\Lexing.csproj" />
     <ProjectReference Include="..\Tokens\Tokens.csproj" />
   </ItemGroup>
 

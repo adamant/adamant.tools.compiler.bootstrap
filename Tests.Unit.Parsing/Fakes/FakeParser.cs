@@ -104,6 +104,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Parsing.Fakes
 
         private class ListParser : IListParser
         {
+            [NotNull]
+            public FixedList<T> ParseList<T>([NotNull] Func<T> acceptItem)
+                where T : class
+            {
+                throw new NotImplementedException();
+            }
+
             public SyntaxList<T> ParseList<T>(
                 ITokenIterator tokens,
                 AcceptFunction<T> acceptItem,
@@ -183,9 +190,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Parsing.Fakes
 
         private class DeclarationParser : IDeclarationParser
         {
-            public SyntaxList<DeclarationSyntax> ParseDeclarations(ITokenIterator tokens, Diagnostics diagnostics)
+            public FixedList<DeclarationSyntax> ParseDeclarations()
             {
-                return FakeParse<SyntaxList<DeclarationSyntax>>(tokens, diagnostics);
+                throw new NotImplementedException();
+                //return FakeParse<FixedList<DeclarationSyntax>>(tokens, diagnostics);
             }
         }
 

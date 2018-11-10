@@ -170,36 +170,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             }
             switch (typeDeclaration.Syntax)
             {
-                case ClassDeclarationSyntax classDeclaration:
-                    var classType = new ObjectType(typeDeclaration.Name, true,
-                        classDeclaration.Modifiers.Any(m => m is MutableModifierSyntax),
-                        genericParameterTypes);
-                    typeDeclaration.Type.Computed(new Metatype(classType));
-                    break;
-                case StructDeclarationSyntax structDeclaration:
-                    var structType = new ObjectType(typeDeclaration.Name, false,
-                        structDeclaration.Modifiers.Any(m => m is MutableModifierSyntax),
-                        genericParameterTypes);
-                    typeDeclaration.Type.Computed(new Metatype(structType));
-                    break;
-                case EnumStructDeclarationSyntax enumStructDeclaration:
-                    var enumStructType = new ObjectType(typeDeclaration.Name, false,
-                        enumStructDeclaration.Modifiers.Any(m => m is MutableModifierSyntax),
-                        genericParameterTypes);
-                    typeDeclaration.Type.Computed(new Metatype(enumStructType));
-                    break;
-                case EnumClassDeclarationSyntax enumStructDeclaration:
-                    var enumClassType = new ObjectType(typeDeclaration.Name, true,
-                        enumStructDeclaration.Modifiers.Any(m => m is MutableModifierSyntax),
-                        genericParameterTypes);
-                    typeDeclaration.Type.Computed(new Metatype(enumClassType));
-                    break;
-                case TypeDeclarationSyntax declarationSyntax:
-                    var type = new ObjectType(typeDeclaration.Name, true,
-                        declarationSyntax.Modifiers.Any(m => m is MutableModifierSyntax),
-                        genericParameterTypes);
-                    typeDeclaration.Type.Computed(new Metatype(type));
-                    break;
+                //case ClassDeclarationSyntax classDeclaration:
+                //    var classType = new ObjectType(typeDeclaration.Name, true,
+                //        classDeclaration.Modifiers.Any(m => m is MutableModifierSyntax),
+                //        genericParameterTypes);
+                //    typeDeclaration.Type.Computed(new Metatype(classType));
+                //    break;
+                //case StructDeclarationSyntax structDeclaration:
+                //    var structType = new ObjectType(typeDeclaration.Name, false,
+                //        structDeclaration.Modifiers.Any(m => m is MutableModifierSyntax),
+                //        genericParameterTypes);
+                //    typeDeclaration.Type.Computed(new Metatype(structType));
+                //    break;
+                //case EnumStructDeclarationSyntax enumStructDeclaration:
+                //    var enumStructType = new ObjectType(typeDeclaration.Name, false,
+                //        enumStructDeclaration.Modifiers.Any(m => m is MutableModifierSyntax),
+                //        genericParameterTypes);
+                //    typeDeclaration.Type.Computed(new Metatype(enumStructType));
+                //    break;
+                //case EnumClassDeclarationSyntax enumStructDeclaration:
+                //    var enumClassType = new ObjectType(typeDeclaration.Name, true,
+                //        enumStructDeclaration.Modifiers.Any(m => m is MutableModifierSyntax),
+                //        genericParameterTypes);
+                //    typeDeclaration.Type.Computed(new Metatype(enumClassType));
+                //    break;
+                //case TypeDeclarationSyntax declarationSyntax:
+                //    var type = new ObjectType(typeDeclaration.Name, true,
+                //        declarationSyntax.Modifiers.Any(m => m is MutableModifierSyntax),
+                //        genericParameterTypes);
+                //    typeDeclaration.Type.Computed(new Metatype(type));
+                //    break;
                 default:
                     throw NonExhaustiveMatchException.For(typeDeclaration.Syntax);
             }

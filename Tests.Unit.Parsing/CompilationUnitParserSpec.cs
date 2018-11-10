@@ -25,7 +25,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Parsing
 
             var ns = cu.Namespace;
             Assert.NotNull(ns);
-            Assert.Equal(tokens[0], ns.NamespaceKeyword);
             Assert.Equal(name, ns.Name);
             Assert.Equal(tokens[2], ns.Semicolon);
 

@@ -13,6 +13,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     public class ListParser : IListParser
     {
         [MustUseReturnValue]
+        [NotNull, ItemNotNull]
+        public FixedList<T> ParseList<T>([NotNull] Func<T> acceptItem)
+            where T : class
+        {
+            return new Generator<T>(acceptItem)
+                .TakeWhile(t => t != null).ToFixedList();
+        }
+
+        [MustUseReturnValue]
         [NotNull]
         public SyntaxList<T> ParseList<T>(
             [NotNull] ITokenIterator tokens,
@@ -132,7 +141,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 }
 
                 if (tokens.Current is TSeparator)
-                    yield return tokens.Expect<TSeparator>();
+                    yield return tokens.Consume<TSeparator>();
                 else
                     yield break;
             }

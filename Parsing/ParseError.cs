@@ -1,4 +1,7 @@
+using System;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
@@ -22,6 +25,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public static Diagnostic UnexpectedToken([NotNull] CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3002, $"Unexpected token `{file.Code[span]}`");
+        }
+
+        [NotNull]
+        public static Diagnostic MissingToken([NotNull] CodeFile file, [NotNull] Type expected, [NotNull] IToken found)
+        {
+            return new Diagnostic(file, found.Span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3003, $"Expected `{expected.GetFriendlyName()}` found `{found.Text(file.Code)}`");
+
         }
     }
 }
