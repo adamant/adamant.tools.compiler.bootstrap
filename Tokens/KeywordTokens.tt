@@ -80,6 +80,7 @@
         "Or",
         "Xor",
         "Not",
+        "Trait",
     }.AsReadOnly();
 #>
 using System;
@@ -98,7 +99,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 <# foreach(var keyword in keywords) {#>
             typeof(<#=keyword#>KeywordToken),
 <#}#>
-        }.AsReadOnly().AssertNotNull();
+        }.AsReadOnly().NotNull();
     }
 
     public static partial class TokenFactory

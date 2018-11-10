@@ -64,14 +64,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             {
                 case INamespaceKeywordToken _:
                     return ParseNamespaceDeclaration(attributes, modifiers);
-                //case IClassKeywordToken _:
-                //    return ParseClass(attributes, modifiers);
-                //case ITypeKeywordToken _:
-                //    return ParseType(attributes, modifiers);
-                //case IStructKeywordToken _:
-                //    return ParseStruct(attributes, modifiers);
-                //case IEnumKeywordToken _:
-                //    return ParseEnum(attributes, modifiers);
+                case IClassKeywordToken _:
+                    return ParseClass(attributes, modifiers);
+                case ITraitKeywordToken _:
+                    return ParseTrait(attributes, modifiers);
+                case IStructKeywordToken _:
+                    return ParseStruct(attributes, modifiers);
+                case IEnumKeywordToken _:
+                    return ParseEnum(attributes, modifiers);
                 case IFunctionKeywordToken _:
                     return ParseNamedFunction(attributes, modifiers);
                 //case IConstKeywordToken _:
@@ -85,48 +85,52 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
-        //[MustUseReturnValue]
-        //[NotNull]
-        //public MemberDeclarationSyntax ParseMemberDeclaration()
-        //{
-        //    var attributes = ParseAttributes(Tokens, Tokens.Context.Diagnostics);
-        //    var modifiers = listParser.ParseList(Tokens.Accept<IModiferToken>);
+        [MustUseReturnValue]
+        [NotNull]
+        public MemberDeclarationSyntax ParseMemberDeclaration()
+        {
+            var attributes = ParseAttributes();
+            var modifiers = listParser.ParseList(Tokens.Accept<IModiferToken>);
 
-        //    switch (Tokens.Current)
-        //    {
-        //        case IClassKeywordToken _:
-        //            return ParseClass(attributes, modifiers);
-        //        case ITypeKeywordToken _:
-        //            return ParseType(attributes, modifiers);
-        //        case IStructKeywordToken _:
-        //            return ParseStruct(attributes, modifiers);
-        //        case IEnumKeywordToken _:
-        //            return ParseEnum(attributes, modifiers);
-        //        case IFunctionKeywordToken _:
-        //            return ParseNamedFunction(attributes, modifiers);
-        //        case IOperatorKeywordToken _:
-        //            return ParseOperatorFunction(attributes, modifiers);
-        //        case INewKeywordToken _:
-        //            return ParseConstructor(attributes, modifiers);
-        //        case IInitKeywordToken _:
-        //            return ParseInitializer(attributes, modifiers);
-        //        case IDeleteKeywordToken _:
-        //            return ParseDestructor(attributes, modifiers);
-        //        case IGetKeywordToken _:
-        //            return ParseGetterFunction(attributes, modifiers);
-        //        case ISetKeywordToken _:
-        //            return ParseSetterFunction(attributes, modifiers);
-        //        case IVarKeywordToken _:
-        //        case ILetKeywordToken _:
-        //            return ParseField(attributes, modifiers);
-        //        case IConstKeywordToken _:
-        //            return ParseConst(attributes, modifiers);
-        //        default:
-        //            return ParseIncompleteDeclaration(attributes, modifiers);
-        //        case null:
-        //            throw new InvalidOperationException("Can't parse past end of file");
-        //    }
-        //}
+            switch (Tokens.Current)
+            {
+                //case IClassKeywordToken _:
+                //    return ParseClass(attributes, modifiers);
+                //case ITypeKeywordToken _:
+                //    return ParseType(attributes, modifiers);
+                case IStructKeywordToken _:
+                    return ParseStruct(attributes, modifiers);
+                //case IEnumKeywordToken _:
+                //    return ParseEnum(attributes, modifiers);
+                case IFunctionKeywordToken _:
+                    return ParseNamedFunction(attributes, modifiers);
+                case IOperatorKeywordToken _:
+                    return ParseOperatorFunction(attributes, modifiers);
+                case INewKeywordToken _:
+                    return ParseConstructor(attributes, modifiers);
+                case IInitKeywordToken _:
+                    return ParseInitializer(attributes, modifiers);
+                case IDeleteKeywordToken _:
+                    return ParseDestructor(attributes, modifiers);
+                //case IGetKeywordToken _:
+                //    return ParseGetterFunction(attributes, modifiers);
+                //case ISetKeywordToken _:
+                //    return ParseSetterFunction(attributes, modifiers);
+                case IVarKeywordToken _:
+                case ILetKeywordToken _:
+                    return ParseField(attributes, modifiers);
+                //case IConstKeywordToken _:
+                //    return ParseConst(attributes, modifiers);
+                //default:
+                //    return ParseIncompleteDeclaration(attributes, modifiers);
+                case ICloseBraceToken _:
+                    return null; // TODO clean up list parsing
+                case null:
+                    throw new InvalidOperationException("Can't parse past end of file");
+                default:
+                    throw NonExhaustiveMatchException.For(Tokens.Current);
+            }
+        }
 
         #region Parse Namespaces
         [MustUseReturnValue]
@@ -222,235 +226,216 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         //    return new SyntaxList<ModifierSyntax>(modifiers);
         //}
 
-        //[MustUseReturnValue]
-        //[CanBeNull]
-        //private BaseClassSyntax AcceptBaseClass(
-        //    [NotNull] ITokenIterator tokens,
-        //    [NotNull] Diagnostics diagnostics)
-        //{
-        //    var colon = tokens.Accept<IColonToken>();
-        //    if (colon == null) return null;
-        //    var typeExpression = expressionParser.ParseExpression(tokens, diagnostics);
-        //    return new BaseClassSyntax(colon, typeExpression);
-        //}
+        [MustUseReturnValue]
+        [CanBeNull]
+        private ExpressionSyntax AcceptBaseClass()
+        {
+            var colon = Tokens.Accept<IColonToken>();
+            if (colon == null) return null;
+            var typeExpression = expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics);
+            return typeExpression;
+        }
 
-        //[MustUseReturnValue]
-        //[CanBeNull]
-        //private BaseTypesSyntax AcceptBaseTypes(
-        //    [NotNull] ITokenIterator tokens,
-        //    [NotNull] Diagnostics diagnostics)
-        //{
-        //    var lessThanColon = tokens.Accept<ILessThanColonToken>();
-        //    if (lessThanColon == null) return null;
-        //    var typeExpressions = listParser.ParseSeparatedList(tokens, expressionParser.ParseExpression,
-        //        TypeOf<ICommaToken>(), TypeOf<IOpenBraceToken>(), diagnostics);
-        //    return new BaseTypesSyntax(lessThanColon, typeExpressions);
-        //}
+        [MustUseReturnValue]
+        [CanBeNull]
+        private FixedList<ExpressionSyntax> AcceptBaseTypes()
+        {
+            var lessThanColon = Tokens.Accept<ILessThanColonToken>();
+            if (lessThanColon == null) return null;
+            var typeExpressions = listParser.ParseSeparatedList<ExpressionSyntax, ICommaToken>(() => expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics));
+            return typeExpressions;
+        }
 
-        //[MustUseReturnValue]
-        //[NotNull]
-        //private SyntaxList<InvariantSyntax> ParseInvariants(
-        //    [NotNull] ITokenIterator tokens,
-        //    [NotNull] Diagnostics diagnostics)
-        //{
-        //    return listParser.ParseList(tokens, AcceptInvariant, diagnostics);
-        //}
+        [MustUseReturnValue]
+        [NotNull]
+        private FixedList<InvariantSyntax> ParseInvariants()
+        {
+            return listParser.ParseList(AcceptInvariant);
+        }
 
-        //[MustUseReturnValue]
-        //[CanBeNull]
-        //private InvariantSyntax AcceptInvariant(
-        //    [NotNull] ITokenIterator tokens,
-        //    [NotNull] Diagnostics diagnostics)
-        //{
-        //    var invariantKeyword = tokens.Accept<IInvariantKeywordToken>();
-        //    if (invariantKeyword == null) return null;
-        //    var condition = expressionParser.ParseExpression(tokens, diagnostics);
-        //    return new InvariantSyntax(invariantKeyword, condition);
-        //}
+        [MustUseReturnValue]
+        [CanBeNull]
+        private InvariantSyntax AcceptInvariant()
+        {
+            var invariantKeyword = Tokens.Accept<IInvariantKeywordToken>();
+            if (invariantKeyword == null) return null;
+            var condition = expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics);
+            return new InvariantSyntax(invariantKeyword, condition);
+        }
         #endregion
 
         #region Parse Type Declarations
-        //[MustUseReturnValue]
-        //[NotNull]
-        //private ClassDeclarationSyntax ParseClass(
-        //    [NotNull] FixedList<AttributeSyntax> attributes,
-        //    [NotNull] FixedList<IModiferToken> modifiers)
-        //{
-        //    var classKeyword = tokens.Take<IClassKeywordToken>();
-        //    var name = tokens.ExpectIdentifier();
-        //    var genericParameters = genericsParser.AcceptGenericParameters(tokens, diagnostics);
-        //    var baseClass = AcceptBaseClass(tokens, diagnostics);
-        //    var baseTypes = AcceptBaseTypes(tokens, diagnostics);
-        //    var genericConstraints = genericsParser.ParseGenericConstraints(tokens, diagnostics);
-        //    var invariants = ParseInvariants(tokens, diagnostics);
-        //    var openBrace = tokens.Expect<IOpenBraceTokenPlace>();
-        //    var members = listParser.ParseList(tokens, (tokens, diagnostics) => ParseMemberDeclaration(), TypeOf<ICloseBraceToken>(), diagnostics);
-        //    var closeBrace = tokens.Expect<ICloseBraceTokenPlace>();
-        //    return new ClassDeclarationSyntax(modifiers, classKeyword, name, genericParameters,
-        //        baseClass, baseTypes, genericConstraints, invariants, openBrace,
-        //        members, closeBrace);
-        //}
+        [MustUseReturnValue]
+        [NotNull]
+        private ClassDeclarationSyntax ParseClass(
+            [NotNull] FixedList<AttributeSyntax> attributes,
+            [NotNull] FixedList<IModiferToken> modifiers)
+        {
+            var classKeyword = Tokens.Required<IClassKeywordToken>();
+            var name = Tokens.ExpectIdentifier();
+            var genericParameters = genericsParser.AcceptGenericParameters(Tokens, Tokens.Context.Diagnostics);
+            var baseClass = AcceptBaseClass();
+            var baseTypes = AcceptBaseTypes();
+            var genericConstraints = genericsParser.ParseGenericConstraints(Tokens, Tokens.Context.Diagnostics);
+            var invariants = ParseInvariants();
+            Tokens.Expect<IOpenBraceToken>();
+            var members = listParser.ParseList(ParseMemberDeclaration);
+            Tokens.Expect<ICloseBraceToken>();
+            return new ClassDeclarationSyntax(modifiers, name, genericParameters,
+                baseClass, baseTypes, genericConstraints, invariants,
+                members);
+        }
 
-        //[MustUseReturnValue]
-        //[NotNull]
-        //private TypeDeclarationSyntax ParseType(
-        //    [NotNull] FixedList<AttributeSyntax> attributes,
-        //    [NotNull] FixedList<IModiferToken> modifiers)
-        //{
-        //    var typeKeyword = tokens.Take<ITypeKeywordToken>();
-        //    var name = tokens.ExpectIdentifier();
-        //    var genericParameters = genericsParser.AcceptGenericParameters(tokens, diagnostics);
-        //    var baseTypes = AcceptBaseTypes(tokens, diagnostics);
-        //    var genericConstraints = genericsParser.ParseGenericConstraints(tokens, diagnostics);
-        //    var invariants = ParseInvariants(tokens, diagnostics);
-        //    var openBrace = tokens.Expect<IOpenBraceTokenPlace>();
-        //    var members = listParser.ParseList(tokens, (tokens, diagnostics) => ParseMemberDeclaration(), TypeOf<ICloseBraceToken>(), diagnostics);
-        //    var closeBrace = tokens.Expect<ICloseBraceTokenPlace>();
-        //    return new TypeDeclarationSyntax(attributes, modifiers, typeKeyword, name,
-        //        genericParameters, baseTypes, genericConstraints, invariants, openBrace,
-        //        members, closeBrace);
-        //}
+        [MustUseReturnValue]
+        [NotNull]
+        private TraitDeclarationSyntax ParseTrait(
+            [NotNull] FixedList<AttributeSyntax> attributes,
+            [NotNull] FixedList<IModiferToken> modifiers)
+        {
+            var typeKeyword = Tokens.Required<ITraitKeywordToken>();
+            var name = Tokens.ExpectIdentifier();
+            var genericParameters = genericsParser.AcceptGenericParameters(Tokens, Tokens.Context.Diagnostics);
+            var baseTypes = AcceptBaseTypes();
+            var genericConstraints = genericsParser.ParseGenericConstraints(Tokens, Tokens.Context.Diagnostics);
+            var invariants = ParseInvariants();
+            Tokens.Expect<IOpenBraceToken>();
+            var members = listParser.ParseList(ParseMemberDeclaration);
+            Tokens.Expect<ICloseBraceToken>();
+            return new TraitDeclarationSyntax(attributes, modifiers, name,
+                genericParameters, baseTypes, genericConstraints, invariants,
+                members);
+        }
 
-        //[MustUseReturnValue]
-        //[NotNull]
-        //private StructDeclarationSyntax ParseStruct(
-        //    [NotNull] FixedList<AttributeSyntax> attributes,
-        //    [NotNull] FixedList<IModiferToken> modifiers)
-        //{
-        //    var structKeyword = tokens.Take<IStructKeywordToken>();
-        //    var name = tokens.Expect<IIdentifierOrPrimitiveTokenPlace>();
-        //    var genericParameters = genericsParser.AcceptGenericParameters(tokens, diagnostics);
-        //    var baseTypes = AcceptBaseTypes(tokens, diagnostics);
-        //    var genericConstraints = genericsParser.ParseGenericConstraints(tokens, diagnostics);
-        //    var invariants = ParseInvariants(tokens, diagnostics);
-        //    var openBrace = tokens.Expect<IOpenBraceTokenPlace>();
-        //    var members = listParser.ParseList(tokens, (tokens, diagnostics) => ParseMemberDeclaration(), TypeOf<ICloseBraceToken>(), diagnostics);
-        //    var closeBrace = tokens.Expect<ICloseBraceTokenPlace>();
-        //    return new StructDeclarationSyntax(attributes, modifiers, structKeyword, name, genericParameters,
-        //        baseTypes, genericConstraints, invariants, openBrace,
-        //        members, closeBrace);
-        //}
+        [MustUseReturnValue]
+        [NotNull]
+        private StructDeclarationSyntax ParseStruct(
+            [NotNull] FixedList<AttributeSyntax> attributes,
+            [NotNull] FixedList<IModiferToken> modifiers)
+        {
+            Tokens.Required<IStructKeywordToken>();
+            var name = Tokens.RequiredIdentifier();
+            var genericParameters = genericsParser.AcceptGenericParameters(Tokens, Tokens.Context.Diagnostics);
+            var baseTypes = AcceptBaseTypes();
+            var genericConstraints = genericsParser.ParseGenericConstraints(Tokens, Tokens.Context.Diagnostics);
+            var invariants = ParseInvariants();
+            Tokens.Expect<IOpenBraceToken>();
+            var members = listParser.ParseList(ParseMemberDeclaration);
+            Tokens.Expect<ICloseBraceToken>();
+            return new StructDeclarationSyntax(attributes, modifiers, name, genericParameters,
+                baseTypes, genericConstraints, invariants,
+                members);
+        }
 
-        //[MustUseReturnValue]
-        //[NotNull]
-        //private MemberDeclarationSyntax ParseEnum(
-        //    [NotNull] FixedList<AttributeSyntax> attributes,
-        //    [NotNull] FixedList<IModiferToken> modifiers)
-        //{
-        //    var enumKeyword = tokens.Take<IEnumKeywordToken>();
-        //    switch (tokens.Current)
-        //    {
-        //        case IStructKeywordToken _:
-        //        {
-        //            var structKeyword = tokens.Take<IStructKeywordToken>();
-        //            var name = tokens.ExpectIdentifier();
-        //            var genericParameters = genericsParser.AcceptGenericParameters(tokens, diagnostics);
-        //            var baseTypes = AcceptBaseTypes(tokens, diagnostics);
-        //            var genericConstraints = genericsParser.ParseGenericConstraints(tokens, diagnostics);
-        //            var invariants = ParseInvariants(tokens, diagnostics);
-        //            var openBrace = tokens.Expect<IOpenBraceTokenPlace>();
-        //            var variants = ParseEnumVariants(tokens, diagnostics);
-        //            var members = listParser.ParseList(tokens, (tokens, diagnostics) => ParseMemberDeclaration(),
-        //                TypeOf<ICloseBraceToken>(), diagnostics);
-        //            var closeBrace = tokens.Expect<ICloseBraceTokenPlace>();
-        //            return new EnumStructDeclarationSyntax(modifiers, enumKeyword, structKeyword,
-        //                name, genericParameters, baseTypes, genericConstraints,
-        //                invariants, openBrace, variants, members, closeBrace);
-        //        }
-        //        case IClassKeywordToken _:
-        //        {
-        //            var classKeyword = tokens.Expect<IClassKeywordToken>();
-        //            var name = tokens.ExpectIdentifier();
-        //            var genericParameters = genericsParser.AcceptGenericParameters(tokens, diagnostics);
-        //            var baseClass = AcceptBaseClass(tokens, diagnostics);
-        //            var baseTypes = AcceptBaseTypes(tokens, diagnostics);
-        //            var genericConstraints = genericsParser.ParseGenericConstraints(tokens, diagnostics);
-        //            var invariants = ParseInvariants(tokens, diagnostics);
-        //            var openBrace = tokens.Expect<IOpenBraceTokenPlace>();
-        //            var variants = ParseEnumVariants(tokens, diagnostics);
-        //            var members = listParser.ParseList(tokens, (tokens, diagnostics) => ParseMemberDeclaration(),
-        //                TypeOf<ICloseBraceToken>(), diagnostics);
-        //            var closeBrace = tokens.Expect<ICloseBraceTokenPlace>();
-        //            return new EnumClassDeclarationSyntax(modifiers, enumKeyword, classKeyword,
-        //                name, genericParameters, baseClass, baseTypes, genericConstraints,
-        //                invariants, openBrace, variants, members, closeBrace);
-        //        }
-        //        default:
-        //            return ParseIncompleteDeclaration(attributes, modifiers);
-        //    }
-        //}
+        [MustUseReturnValue]
+        [NotNull]
+        private MemberDeclarationSyntax ParseEnum(
+            [NotNull] FixedList<AttributeSyntax> attributes,
+            [NotNull] FixedList<IModiferToken> modifiers)
+        {
+            var enumKeyword = Tokens.Required<IEnumKeywordToken>();
+            switch (Tokens.Current)
+            {
+                case IStructKeywordToken _:
+                {
+                    var structKeyword = Tokens.Expect<IStructKeywordToken>();
+                    var name = Tokens.ExpectIdentifier();
+                    var genericParameters = genericsParser.AcceptGenericParameters(Tokens, Tokens.Context.Diagnostics);
+                    var baseTypes = AcceptBaseTypes();
+                    var genericConstraints = genericsParser.ParseGenericConstraints(Tokens, Tokens.Context.Diagnostics);
+                    var invariants = ParseInvariants();
+                    Tokens.Expect<IOpenBraceToken>();
+                    var variants = ParseEnumVariants();
+                    var members = listParser.ParseList(ParseMemberDeclaration);
+                    Tokens.Expect<ICloseBraceToken>();
+                    return new EnumStructDeclarationSyntax(modifiers,
+                        name, genericParameters, baseTypes, genericConstraints,
+                        invariants, variants, members);
+                }
+                case IClassKeywordToken _:
+                {
+                    var classKeyword = Tokens.Expect<IClassKeywordToken>();
+                    var name = Tokens.ExpectIdentifier();
+                    var genericParameters = genericsParser.AcceptGenericParameters(Tokens, Tokens.Context.Diagnostics);
+                    var baseClass = AcceptBaseClass();
+                    var baseTypes = AcceptBaseTypes();
+                    var genericConstraints = genericsParser.ParseGenericConstraints(Tokens, Tokens.Context.Diagnostics);
+                    var invariants = ParseInvariants();
+                    Tokens.Expect<IOpenBraceToken>();
+                    var variants = ParseEnumVariants();
+                    var members = listParser.ParseList(ParseMemberDeclaration);
+                    Tokens.Expect<ICloseBraceToken>();
+                    return new EnumClassDeclarationSyntax(modifiers,
+                        name, genericParameters, baseClass, baseTypes, genericConstraints,
+                        invariants, variants, members);
+                }
+                default:
+                    throw new ParseFailedException();
+            }
+        }
 
-        //[MustUseReturnValue]
-        //[NotNull]
-        //private EnumVariantsSyntax ParseEnumVariants(
-        //    [NotNull] ITokenIterator tokens,
-        //    [NotNull] Diagnostics diagnostics)
-        //{
-        //    var variants = new List<EnumVariantSyntax>();
-        //    while (tokens.Current is IIdentifierToken)
-        //        variants.Add(ParseEnumVariant(tokens, diagnostics));
+        [MustUseReturnValue]
+        [NotNull]
+        private EnumVariantsSyntax ParseEnumVariants()
+        {
+            var variants = new List<EnumVariantSyntax>();
+            while (Tokens.Current is IIdentifierToken)
+                variants.Add(ParseEnumVariant());
 
-        //    ISemicolonTokenPlace semicolon = null;
-        //    if (!(tokens.Current is ICloseBraceToken))
-        //        semicolon = tokens.Consume<ISemicolonTokenPlace>();
+            ISemicolonTokenPlace semicolon = null;
+            if (!(Tokens.Current is ICloseBraceToken))
+                semicolon = Tokens.Consume<ISemicolonTokenPlace>();
 
-        //    return new EnumVariantsSyntax(variants.ToSyntaxList(), semicolon);
-        //}
+            return new EnumVariantsSyntax(variants.ToSyntaxList(), semicolon);
+        }
 
-        //[MustUseReturnValue]
-        //[NotNull]
-        //private EnumVariantSyntax ParseEnumVariant(
-        //    [NotNull] ITokenIterator tokens,
-        //    [NotNull] Diagnostics diagnostics)
-        //{
-        //    var identifier = tokens.ExpectIdentifier();
-        //    var comma = tokens.Accept<ICommaToken>();
-        //    return new EnumVariantSyntax(identifier, comma);
-        //}
+        [MustUseReturnValue]
+        [NotNull]
+        private EnumVariantSyntax ParseEnumVariant()
+        {
+            var identifier = Tokens.ExpectIdentifier();
+            var comma = Tokens.Accept<ICommaToken>();
+            return new EnumVariantSyntax(identifier, comma);
+        }
         #endregion
 
         #region Parse Type Member Declarations
-        //[MustUseReturnValue]
-        //[NotNull]
-        //private FieldDeclarationSyntax ParseField(
-        //    [NotNull] FixedList<AttributeSyntax> attributes,
-        //    [NotNull] FixedList<IModiferToken> modifiers)
-        //{
-        //    var binding = tokens.Take<IBindingToken>();
-        //    var getter = AcceptFieldGetter(tokens, diagnostics);
-        //    var name = tokens.ExpectIdentifier();
-        //    IColonTokenPlace colon = null;
-        //    ExpressionSyntax typeExpression = null;
-        //    if (tokens.Current is IColonToken)
-        //    {
-        //        colon = tokens.Expect<IColonTokenPlace>();
-        //        // Need to not consume the assignment that separates the type from the initializer,
-        //        // hence the min operator precedence.
-        //        typeExpression = expressionParser.ParseExpression(tokens, diagnostics, OperatorPrecedence.AboveAssignment);
-        //    }
-        //    IEqualsToken equals = null;
-        //    ExpressionSyntax initializer = null;
-        //    if (tokens.Current is IEqualsToken)
-        //    {
-        //        equals = tokens.Take<IEqualsToken>();
-        //        initializer = expressionParser.ParseExpression(tokens, diagnostics);
-        //    }
-        //    var semicolon = tokens.Expect<ISemicolonTokenPlace>();
-        //    return new FieldDeclarationSyntax(modifiers, binding, getter, name, colon, typeExpression,
-        //        equals, initializer, semicolon);
-        //}
+        [MustUseReturnValue]
+        [NotNull]
+        private FieldDeclarationSyntax ParseField(
+            [NotNull] FixedList<AttributeSyntax> attributes,
+            [NotNull] FixedList<IModiferToken> modifiers)
+        {
+            var binding = Tokens.Required<IBindingToken>();
+            var getter = AcceptFieldGetter();
+            var name = Tokens.ExpectIdentifier();
+            ExpressionSyntax typeExpression = null;
+            if (Tokens.Current is IColonToken)
+            {
+                Tokens.Expect<IColonToken>();
+                // Need to not consume the assignment that separates the type from the initializer,
+                // hence the min operator precedence.
+                typeExpression = expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics, OperatorPrecedence.AboveAssignment);
+            }
+            ExpressionSyntax initializer = null;
+            if (Tokens.Current is IEqualsToken)
+            {
+                Tokens.Consume<IEqualsToken>();
+                initializer = expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics);
+            }
+            Tokens.Expect<ISemicolonToken>();
+            return new FieldDeclarationSyntax(modifiers, name, typeExpression, initializer);
+        }
 
-        //[MustUseReturnValue]
-        //[CanBeNull]
-        //private static FieldGetterSyntax AcceptFieldGetter(
-        //    [NotNull] ITokenIterator tokens,
-        //    [NotNull] Diagnostics diagnostics)
-        //{
-        //    var publicKeyword = tokens.Accept<IPublicKeywordToken>();
-        //    var getKeyword = tokens.Accept<IGetKeywordToken>();
-        //    if (publicKeyword == null && getKeyword == null) return null;
-        //    return new FieldGetterSyntax(publicKeyword, getKeyword);
-        //}
+        [MustUseReturnValue]
+        [CanBeNull]
+        private AccessModifier? AcceptFieldGetter()
+        {
+            // TODO allow other access modifiers
+            var publicKeyword = Tokens.Accept<IPublicKeywordToken>();
+            var getKeyword = Tokens.Accept<IGetKeywordToken>();
+            if (publicKeyword == null && getKeyword == null) return null;
+            return AccessModifier.Public;
+        }
         #endregion
 
         #region Parse Functions
@@ -475,122 +460,117 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
 
-        //[MustUseReturnValue]
-        //[NotNull]
-        //public OperatorFunctionDeclarationSyntax ParseOperatorFunction(
-        //    [NotNull] FixedList<AttributeSyntax> attributes,
-        //    [NotNull] FixedList<IModiferToken> modifiers)
-        //{
-        //    var operatorKeyword = tokens.Take<IOperatorKeywordToken>();
-        //    // TODO save the generic parameters
-        //    var genericParameters = genericsParser.AcceptGenericParameters(tokens, diagnostics);
-        //    IOperatorTokenPlace @operator;
-        //    // TODO correctly store these in the syntax class
-        //    switch (tokens.Current)
-        //    {
-        //        case IHashToken _:
-        //            @operator = tokens.Expect<IOperatorTokenPlace>();
-        //            tokens.Next();
-        //            switch (tokens.Current)
-        //            {
-        //                case IOpenParenToken _:
-        //                    tokens.Next();
-        //                    tokens.Expect<ICloseParenTokenPlace>();
-        //                    break;
-        //                case IOpenBracketToken _:
-        //                    tokens.Next();
-        //                    tokens.Expect<ICloseBracketTokenPlace>();
-        //                    break;
-        //                case IOpenBraceToken _:
-        //                    tokens.Next();
-        //                    tokens.Expect<ICloseBraceTokenPlace>();
-        //                    break;
-        //                default:
-        //                    tokens.Expect<IOpenBracketTokenPlace>();
-        //                    break;
-        //            }
-        //            break;
-        //        case IStringLiteralToken _:
-        //            @operator = tokens.Expect<IOperatorTokenPlace>();
-        //            tokens.Next();
-        //            // TODO need to check it is empty string
-        //            break;
-        //        // TODO case for user defined literals ''
-        //        default:
-        //            @operator = tokens.Expect<IOperatorTokenPlace>();
-        //            break;
-        //    }
-        //    var openParen = tokens.Expect<IOpenParenTokenPlace>();
-        //    var parameters = ParseParameterList(tokens, diagnostics);
-        //    var closeParen = tokens.Expect<ICloseParenTokenPlace>();
-        //    var arrow = tokens.Expect<IRightArrowTokenPlace>();
-        //    var returnTypeExpression = expressionParser.ParseExpression(tokens, diagnostics);
-        //    var genericConstraints = genericsParser.ParseGenericConstraints(tokens, diagnostics);
-        //    var effects = AcceptEffects(tokens, diagnostics);
-        //    var contracts = ParseFunctionContracts(tokens, diagnostics);
-        //    var (body, semicolon) = ParseFunctionBody(tokens, diagnostics);
-        //    return new OperatorFunctionDeclarationSyntax(modifiers, operatorKeyword, @operator,
-        //        openParen, parameters, closeParen, arrow, returnTypeExpression,
-        //        genericConstraints, effects, contracts, body, semicolon);
-        //}
+        [MustUseReturnValue]
+        [NotNull]
+        public OperatorFunctionDeclarationSyntax ParseOperatorFunction(
+            [NotNull] FixedList<AttributeSyntax> attributes,
+            [NotNull] FixedList<IModiferToken> modifiers)
+        {
+            var operatorKeywordSpan = Tokens.Required<IOperatorKeywordToken>();
+            // TODO save the generic parameters
+            var genericParameters = genericsParser.AcceptGenericParameters(Tokens, Tokens.Context.Diagnostics);
+            //IOperatorTokenPlace @operator;
+            // TODO correctly store these in the syntax class
+            switch (Tokens.Current)
+            {
+                case IHashToken _:
+                    Tokens.Expect<IOperatorToken>();
+                    Tokens.Next();
+                    switch (Tokens.Current)
+                    {
+                        case IOpenParenToken _:
+                            Tokens.Next();
+                            Tokens.Expect<ICloseParenToken>();
+                            break;
+                        case IOpenBracketToken _:
+                            Tokens.Next();
+                            Tokens.Expect<ICloseBracketToken>();
+                            break;
+                        case IOpenBraceToken _:
+                            Tokens.Next();
+                            Tokens.Expect<ICloseBraceToken>();
+                            break;
+                        default:
+                            Tokens.Expect<IOpenBracketToken>();
+                            break;
+                    }
+                    break;
+                case IStringLiteralToken _:
+                    Tokens.Expect<IOperatorToken>();
+                    // TODO need to check it is empty string
+                    break;
+                // TODO case for user defined literals ''
+                default:
+                    Tokens.Expect<IOperatorToken>();
+                    break;
+            }
+            var parameters = AcceptParameters();
+            Tokens.Expect<IRightArrowToken>();
+            var returnTypeExpression = expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics);
+            var genericConstraints = genericsParser.ParseGenericConstraints(Tokens, Tokens.Context.Diagnostics);
+            var mayEffects = ParseMayEffects();
+            var noEffects = ParseNoEffects();
+            var (requires, ensures) = ParseFunctionContracts();
+            var body = blockParser.ParseBlock(Tokens, Tokens.Context.Diagnostics);
+            return new OperatorFunctionDeclarationSyntax(modifiers, operatorKeywordSpan,
+                 parameters, returnTypeExpression,
+                genericConstraints, mayEffects, noEffects, requires, ensures, body);
+        }
 
-        //[MustUseReturnValue]
-        //[NotNull]
-        //public ConstructorFunctionDeclarationSyntax ParseConstructor(
-        //    [NotNull] FixedList<AttributeSyntax> attributes,
-        //    [NotNull] FixedList<IModiferToken> modifiers)
-        //{
-        //    var newKeyword = tokens.Take<INewKeywordToken>();
-        //    var name = tokens.Accept<IIdentifierToken>();
-        //    var genericParameters = genericsParser.AcceptGenericParameters(tokens, diagnostics);
-        //    var openParen = tokens.Expect<IOpenParenTokenPlace>();
-        //    var parameters = ParseParameterList(tokens, diagnostics);
-        //    var closeParen = tokens.Expect<ICloseParenTokenPlace>();
-        //    var genericConstraints = genericsParser.ParseGenericConstraints(tokens, diagnostics);
-        //    var effects = AcceptEffects(tokens, diagnostics);
-        //    var contracts = ParseFunctionContracts(tokens, diagnostics);
-        //    var body = blockParser.ParseBlock(tokens, diagnostics);
-        //    return new ConstructorFunctionDeclarationSyntax(modifiers, newKeyword, name,
-        //        genericParameters, openParen, parameters, closeParen, genericConstraints, effects, contracts, body);
-        //}
+        [MustUseReturnValue]
+        [NotNull]
+        public ConstructorFunctionDeclarationSyntax ParseConstructor(
+            [NotNull] FixedList<AttributeSyntax> attributes,
+            [NotNull] FixedList<IModiferToken> modifiers)
+        {
+            var newKeywordSpan = Tokens.Required<INewKeywordToken>();
+            var name = Tokens.Accept<IIdentifierToken>();
+            var genericParameters = genericsParser.AcceptGenericParameters(Tokens, Tokens.Context.Diagnostics);
+            var parameters = AcceptParameters();
+            var genericConstraints = genericsParser.ParseGenericConstraints(Tokens, Tokens.Context.Diagnostics);
+            var mayEffects = ParseMayEffects();
+            var noEffects = ParseNoEffects();
+            var (requires, ensures) = ParseFunctionContracts();
+            var body = blockParser.ParseBlock(Tokens, Tokens.Context.Diagnostics);
+            return new ConstructorFunctionDeclarationSyntax(modifiers, name, TextSpan.Covering(newKeywordSpan, name?.Span),
+                genericParameters, parameters, genericConstraints, mayEffects, noEffects, requires, ensures, body);
+        }
 
-        //[MustUseReturnValue]
-        //[NotNull]
-        //public InitializerFunctionDeclarationSyntax ParseInitializer(
-        //    [NotNull] FixedList<AttributeSyntax> attributes,
-        //    [NotNull] FixedList<IModiferToken> modifiers)
-        //{
-        //    var initKeyword = tokens.Take<IInitKeywordToken>();
-        //    var name = tokens.Accept<IIdentifierToken>();
-        //    var genericParameters = genericsParser.AcceptGenericParameters(tokens, diagnostics);
-        //    var openParen = tokens.Expect<IOpenParenTokenPlace>();
-        //    var parameters = ParseParameterList(tokens, diagnostics);
-        //    var closeParen = tokens.Expect<ICloseParenTokenPlace>();
-        //    var genericConstraints = genericsParser.ParseGenericConstraints(tokens, diagnostics);
-        //    var effects = AcceptEffects(tokens, diagnostics);
-        //    var contracts = ParseFunctionContracts(tokens, diagnostics);
-        //    var body = blockParser.ParseBlock(tokens, diagnostics);
-        //    return new InitializerFunctionDeclarationSyntax(modifiers, initKeyword, name,
-        //        genericParameters, openParen, parameters, closeParen, genericConstraints, effects, contracts, body);
-        //}
+        [MustUseReturnValue]
+        [NotNull]
+        public InitializerFunctionDeclarationSyntax ParseInitializer(
+            [NotNull] FixedList<AttributeSyntax> attributes,
+            [NotNull] FixedList<IModiferToken> modifiers)
+        {
+            var initKeywordSpan = Tokens.Required<IInitKeywordToken>();
+            var name = Tokens.Accept<IIdentifierToken>();
+            var genericParameters = genericsParser.AcceptGenericParameters(Tokens, Tokens.Context.Diagnostics);
+            var parameters = AcceptParameters();
+            var genericConstraints = genericsParser.ParseGenericConstraints(Tokens, Tokens.Context.Diagnostics);
+            var mayEffects = ParseMayEffects();
+            var noEffects = ParseNoEffects();
+            var (requires, ensures) = ParseFunctionContracts();
+            var body = blockParser.ParseBlock(Tokens, Tokens.Context.Diagnostics);
+            return new InitializerFunctionDeclarationSyntax(modifiers, name, TextSpan.Covering(initKeywordSpan, name?.Span),
+                genericParameters, parameters, genericConstraints, mayEffects, noEffects, requires, ensures, body);
+        }
 
 
-        //[MustUseReturnValue]
-        //[NotNull]
-        //public DestructorFunctionDeclarationSyntax ParseDestructor(
-        //    [NotNull] FixedList<AttributeSyntax> attributes,
-        //    [NotNull] FixedList<IModiferToken> modifiers)
-        //{
-        //    var deleteKeyword = tokens.Take<IDeleteKeywordToken>();
-        //    var openParen = tokens.Expect<IOpenParenTokenPlace>();
-        //    var parameters = ParseParameterList(tokens, diagnostics);
-        //    var closeParen = tokens.Expect<ICloseParenTokenPlace>();
-        //    var effects = AcceptEffects(tokens, diagnostics);
-        //    var contracts = ParseFunctionContracts(tokens, diagnostics);
-        //    var body = blockParser.ParseBlock(tokens, diagnostics);
-        //    return new DestructorFunctionDeclarationSyntax(modifiers, deleteKeyword,
-        //         openParen, parameters, closeParen, effects, contracts, body);
-        //}
+        [MustUseReturnValue]
+        [NotNull]
+        public DestructorFunctionDeclarationSyntax ParseDestructor(
+            [NotNull] FixedList<AttributeSyntax> attributes,
+            [NotNull] FixedList<IModiferToken> modifiers)
+        {
+            var deleteKeywordSpan = Tokens.Required<IDeleteKeywordToken>();
+            var parameters = AcceptParameters();
+            var mayEffects = ParseMayEffects();
+            var noEffects = ParseNoEffects();
+            var (requires, ensures) = ParseFunctionContracts();
+            var body = blockParser.ParseBlock(Tokens, Tokens.Context.Diagnostics);
+            return new DestructorFunctionDeclarationSyntax(modifiers, deleteKeywordSpan,
+                 parameters, mayEffects, noEffects, requires, ensures, body);
+        }
 
         //[MustUseReturnValue]
         //[NotNull]
@@ -642,6 +622,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             while (!Tokens.AtEndOfFile() && !(Tokens.Current is ICloseParenToken))
             {
                 parameters.Add(parameterParser.ParseParameter(Tokens, Tokens.Context.Diagnostics));
+                if (Tokens.Current is ICommaToken)
+                    Tokens.Expect<ICommaToken>();
             }
             Tokens.Expect<ICloseParenToken>();
             return parameters.ToFixedList();

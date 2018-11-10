@@ -23,11 +23,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [NotNull] ExpressionSyntax typeExpression,
             [CanBeNull] IEqualsToken equalsToken,
             [CanBeNull] ExpressionSyntax defaultValue)
-            : base(TextSpan.Covering(paramsKeyword?.Span, varKeyword?.Span, name.Span, typeExpression.Span))
+            : base(TextSpan.Covering(paramsKeyword?.Span, varKeyword?.Span, name?.Span, typeExpression.Span))
         {
-            Requires.NotNull(nameof(name), name);
-            Requires.NotNull(nameof(colon), colon);
-            Requires.NotNull(nameof(typeExpression), typeExpression);
             ParamsKeyword = paramsKeyword;
             VarKeyword = varKeyword;
             Name = name;

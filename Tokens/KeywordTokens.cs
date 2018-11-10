@@ -84,6 +84,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             typeof(OrKeywordToken),
             typeof(XorKeywordToken),
             typeof(NotKeywordToken),
+            typeof(TraitKeywordToken),
         }.AsReadOnly().NotNull();
     }
 
@@ -525,6 +526,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         public static INotKeywordToken NotKeyword(TextSpan span)
         {
             return new NotKeywordToken(span);
+        }
+
+        [NotNull]
+        public static ITraitKeywordToken TraitKeyword(TextSpan span)
+        {
+            return new TraitKeywordToken(span);
         }
 
     }
@@ -1258,6 +1265,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         {
         }
     }
+
+    public partial interface ITraitKeywordTokenPlace : IKeywordTokenPlace { }
+    public partial interface ITraitKeywordToken : IKeywordToken, ITraitKeywordTokenPlace { }
+    internal partial class TraitKeywordToken : Token, ITraitKeywordToken
+    {
+        public TraitKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
     public partial interface IMissingToken :
         IPublicKeywordTokenPlace,
         IProtectedKeywordTokenPlace,
@@ -1332,6 +1349,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         IOrKeywordTokenPlace,
         IXorKeywordTokenPlace,
         INotKeywordTokenPlace,
+        ITraitKeywordTokenPlace,
         IKeywordTokenPlace // Implied, but saves issues with commas
     { }
 }

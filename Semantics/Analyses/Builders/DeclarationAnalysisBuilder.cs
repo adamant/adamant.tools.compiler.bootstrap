@@ -84,7 +84,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
                     return BuildFunction(context, @namespace, function);
                 case ClassDeclarationSyntax @class:
                     return BuildClass(context, @namespace, @class);
-                case TypeDeclarationSyntax type:
+                case TraitDeclarationSyntax type:
                     return BuildType(context, @namespace, type);
                 case StructDeclarationSyntax @struct:
                     return BuildStruct(context, @namespace, @struct);
@@ -156,7 +156,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
         private TypeDeclarationAnalysis BuildType(
             [NotNull] AnalysisContext context,
             [NotNull] RootName @namespace,
-            [NotNull] TypeDeclarationSyntax syntax)
+            [NotNull] TraitDeclarationSyntax syntax)
         {
             // Skip any class that doesn't have a name
             if (!(syntax.Name.Value is string name)) return null;

@@ -14,8 +14,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 
         public InitializerFunctionDeclarationSyntax(
             [NotNull] FixedList<IModiferToken> modifiers,
-            [NotNull] IInitKeywordToken initKeyword,
             [CanBeNull] IIdentifierToken name,
+            TextSpan span,
             [CanBeNull] GenericParametersSyntax genericParameters,
             [NotNull] FixedList<ParameterSyntax> parameters,
             [NotNull] FixedList<GenericConstraintSyntax> genericConstraints,
@@ -24,10 +24,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [NotNull] FixedList<ExpressionSyntax> requires,
             [NotNull] FixedList<ExpressionSyntax> ensures,
             [NotNull] BlockSyntax body)
-            : base(TextSpan.Covering(initKeyword.Span, name?.Span), modifiers,
+            : base(span, modifiers,
                 parameters, mayEffects, noEffects, requires, ensures, body)
         {
-            InitKeyword = initKeyword;
             Name = name;
             GenericParameters = genericParameters;
             GenericConstraints = genericConstraints;

@@ -35,20 +35,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case ISelfKeywordToken selfKeyword:
                     tokens.Next();
                     return new SelfParameterSyntax(null, selfKeyword);
+                case IDotToken _:
+                {
+                    Tokens.Expect<IDotToken>();
+                    var name = tokens.ExpectIdentifier();
+                    var equals = tokens.Accept<IEqualsToken>();
+                    ExpressionSyntax defaultValue = null;
+                    if (equals != null)
+                        defaultValue = expressionParser.ParseExpression(tokens, diagnostics);
+                    // TODO capture correct values
+                    return new FieldParameterSyntax(name.Span);
+                }
                 default:
+                {
                     var paramsKeyword = tokens.Accept<IParamsKeywordToken>();
                     var varKeyword = tokens.Accept<IVarKeywordToken>();
                     var name = tokens.ExpectIdentifier();
                     var colon = tokens.Consume<IColonTokenPlace>();
                     // Need to not consume the assignment that separates the type from the default value,
                     // hence the min operator precedence.
-                    var typeExpression = expressionParser.ParseExpression(tokens, diagnostics, OperatorPrecedence.AboveAssignment);
+                    var typeExpression = expressionParser.ParseExpression(tokens, diagnostics,
+                        OperatorPrecedence.AboveAssignment);
                     var equals = tokens.Accept<IEqualsToken>();
                     ExpressionSyntax defaultValue = null;
                     if (equals != null)
                         defaultValue = expressionParser.ParseExpression(tokens, diagnostics);
                     return new NamedParameterSyntax(paramsKeyword, varKeyword, name,
                         colon, typeExpression, equals, defaultValue);
+                }
             }
         }
     }

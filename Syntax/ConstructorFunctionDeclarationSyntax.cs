@@ -7,15 +7,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class ConstructorFunctionDeclarationSyntax : FunctionDeclarationSyntax
     {
-        [NotNull] public INewKeywordToken NewKeyword { get; }
         [CanBeNull] public override IIdentifierTokenPlace Name { get; }
         [CanBeNull] public GenericParametersSyntax GenericParameters { get; }
         [NotNull] public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
 
         public ConstructorFunctionDeclarationSyntax(
             [NotNull] FixedList<IModiferToken> modifiers,
-            [NotNull] INewKeywordToken newKeyword,
             [CanBeNull] IIdentifierToken name,
+            TextSpan span,
             [CanBeNull] GenericParametersSyntax genericParameters,
             [NotNull] FixedList<ParameterSyntax> parameters,
             [NotNull] FixedList<GenericConstraintSyntax> genericConstraints,
@@ -24,10 +23,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [NotNull] FixedList<ExpressionSyntax> requires,
             [NotNull] FixedList<ExpressionSyntax> ensures,
             [NotNull] BlockSyntax body)
-            : base(TextSpan.Covering(newKeyword.Span, name?.Span), modifiers, parameters, mayEffects, noEffects, requires, ensures, body)
+            : base(span, modifiers, parameters, mayEffects, noEffects, requires, ensures, body)
         {
-
-            NewKeyword = newKeyword;
             Name = name;
             GenericParameters = genericParameters;
             GenericConstraints = genericConstraints;

@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public FileParser([NotNull] ITokenIterator tokens)
         {
             var listParser = new ListParser(tokens);
-            var functionBodyParser = new FunctionBodyParser(listParser);
+            var functionBodyParser = new FunctionBodyParser(tokens, listParser);
             var genericsParser = new GenericsParser(listParser, functionBodyParser);
             var usingDirectiveParser = new UsingDirectiveParser(functionBodyParser);
             var parameterParser = new ParameterParser(tokens, functionBodyParser);
