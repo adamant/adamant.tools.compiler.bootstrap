@@ -385,7 +385,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (!(Tokens.Current is ICloseBraceToken))
                 semicolon = Tokens.Consume<ISemicolonTokenPlace>();
 
-            return new EnumVariantsSyntax(variants.ToSyntaxList(), semicolon);
+            return new EnumVariantsSyntax(variants.ToFixedList(), semicolon);
         }
 
         [MustUseReturnValue]

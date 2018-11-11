@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
@@ -18,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        public SyntaxList<UsingDirectiveSyntax> ParseUsingDirectives(
+        public FixedList<UsingDirectiveSyntax> ParseUsingDirectives(
             [NotNull] ITokenIterator tokens,
             [NotNull] Diagnostics diagnostics)
         {
@@ -26,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             while (tokens.Current is IUsingKeywordToken)
                 directives.Add(ParseUsingDirective(tokens, diagnostics));
 
-            return directives.ToSyntaxList();
+            return directives.ToFixedList();
         }
 
         [NotNull]

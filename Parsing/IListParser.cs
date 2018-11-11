@@ -42,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [Obsolete("Use ParseList() taking an AcceptFunction instead")]
         [MustUseReturnValue]
         [NotNull]
-        SyntaxList<T> ParseList<T, TTerminator>(
+        FixedList<T> ParseList<T, TTerminator>(
             [NotNull] ITokenIterator tokens,
             [NotNull] ParseFunction<T> parseItem,
             Type<TTerminator> terminatorType,

@@ -13,6 +13,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         {
             Value = value;
         }
+
+        // Helpful for debugging
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
     }
 
     public static partial class TokenFactory

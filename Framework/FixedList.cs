@@ -1,10 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
+    // These attributes make it so FixedList<T> is displayed nicely in the debugger similar to List<T>
+    [DebuggerDisplay("Count = {" + nameof(Count) + "}")]
+    [DebuggerTypeProxy(typeof(FixedListDebugView<>))]
     public class FixedList<T> : IReadOnlyList<T>
         where T : class
     {
@@ -14,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
 
         public FixedList([NotNull, ItemNotNull] IEnumerable<T> items)
         {
-            this.items = items.ItemsNotNull().ToReadOnlyList();
+            this.items = items.ItemsNotNull().ToList().AsReadOnly().NotNull();
         }
 
         public IEnumerator<T> GetEnumerator()

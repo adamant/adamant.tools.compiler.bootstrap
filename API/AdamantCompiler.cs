@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
@@ -76,7 +77,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                     var tokens = lexer.Lex(context).WhereNotTrivia();
                     return new FileParser(tokens).Parse();
                 })
-                .ToSyntaxList();
+                .ToFixedList();
             var packageSyntax = new PackageSyntax(name, compilationUnits);
 
             var analyzer = new SemanticAnalyzer();

@@ -1,4 +1,3 @@
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
@@ -26,10 +25,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         }
 
         [NotNull]
-        public static SyntaxList<T> List<T>()
+        public static FixedList<T> List<T>()
             where T : NonTerminal
         {
-            return new SyntaxList<T>(Enumerable.Empty<T>());
+            return FixedList<T>.Empty;
         }
 
         [NotNull]

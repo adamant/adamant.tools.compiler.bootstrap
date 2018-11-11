@@ -50,7 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [Obsolete("Use ParseList() taking an AcceptFunction instead")]
         [MustUseReturnValue]
         [NotNull]
-        public SyntaxList<T> ParseList<T, TTerminator>(
+        public FixedList<T> ParseList<T, TTerminator>(
             [NotNull] ITokenIterator tokens,
             [NotNull] ParseFunction<T> parseItem,
             Type<TTerminator> terminatorType,
@@ -58,7 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             where T : NonTerminal
             where TTerminator : class, IToken
         {
-            return ParseEnumerable(tokens, parseItem, terminatorType, diagnostics).ToSyntaxList();
+            return ParseEnumerable(tokens, parseItem, terminatorType, diagnostics).ToFixedList();
         }
 
         [MustUseReturnValue]

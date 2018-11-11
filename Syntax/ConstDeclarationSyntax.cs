@@ -7,8 +7,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class ConstDeclarationSyntax : MemberDeclarationSyntax
     {
-        [NotNull] public SyntaxList<AttributeSyntax> Attributes { get; }
-        [NotNull] [ItemNotNull] public SyntaxList<ModifierSyntax> Modifiers { get; }
+        [NotNull] public FixedList<AttributeSyntax> Attributes { get; }
+        [NotNull] [ItemNotNull] public FixedList<ModifierSyntax> Modifiers { get; }
         [NotNull] public IConstKeywordToken ConstKeyword { get; }
         [NotNull] public IIdentifierTokenPlace Name { get; }
         [CanBeNull] public IColonTokenPlace Colon { get; }
@@ -18,8 +18,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         [NotNull] public ISemicolonTokenPlace Semicolon { get; }
 
         public ConstDeclarationSyntax(
-            [NotNull] SyntaxList<AttributeSyntax> attributes,
-            [NotNull] [ItemNotNull] SyntaxList<ModifierSyntax> modifiers,
+            [NotNull] FixedList<AttributeSyntax> attributes,
+            [NotNull, ItemNotNull] FixedList<ModifierSyntax> modifiers,
             [NotNull] IConstKeywordToken constKeyword,
             [NotNull] IIdentifierTokenPlace name,
             [CanBeNull] IColonTokenPlace colon,
@@ -29,11 +29,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [NotNull] ISemicolonTokenPlace semicolon)
             : base(TextSpan.Covering(constKeyword.Span, name.Span))
         {
-            Requires.NotNull(nameof(attributes), attributes);
-            Requires.NotNull(nameof(modifiers), modifiers);
-            Requires.NotNull(nameof(constKeyword), constKeyword);
-            Requires.NotNull(nameof(name), name);
-            Requires.NotNull(nameof(semicolon), semicolon);
             Attributes = attributes;
             Modifiers = modifiers;
             ConstKeyword = constKeyword;

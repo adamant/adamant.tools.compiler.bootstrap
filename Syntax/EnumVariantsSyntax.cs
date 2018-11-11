@@ -6,14 +6,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class EnumVariantsSyntax : NonTerminal
     {
-        [NotNull] public SyntaxList<EnumVariantSyntax> Variants { get; }
+        [NotNull] public FixedList<EnumVariantSyntax> Variants { get; }
         [CanBeNull] public ISemicolonTokenPlace Semicolon { get; }
 
         public EnumVariantsSyntax(
-            [NotNull] SyntaxList<EnumVariantSyntax> variants,
+            [NotNull] FixedList<EnumVariantSyntax> variants,
             [CanBeNull] ISemicolonTokenPlace semicolon)
         {
-            Requires.NotNull(nameof(variants), variants);
             Variants = variants;
             Semicolon = semicolon;
         }

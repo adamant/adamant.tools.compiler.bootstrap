@@ -14,5 +14,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             Requires.NotNull(nameof(value), value);
             Value = value;
         }
+
+        // Helpful for debugging
+        public override string ToString()
+        {
+            return Value;
+        }
     }
 }
