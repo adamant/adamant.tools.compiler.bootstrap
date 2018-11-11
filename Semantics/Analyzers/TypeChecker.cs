@@ -151,7 +151,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             switch (typeDeclaration.Type.State)
             {
                 case AnalysisState.BeingComputed:
-                    typeDeclaration.Diagnostics.Add(TypeError.CircularDefinition(typeDeclaration.Context.File, typeDeclaration.Syntax.SignatureSpan, typeDeclaration.Name));
+                    typeDeclaration.Diagnostics.Add(TypeError.CircularDefinition(typeDeclaration.Context.File, typeDeclaration.Syntax.NameSpan, typeDeclaration.Name));
                     return;
                 case AnalysisState.Computed:
                     return;   // We have already checked it

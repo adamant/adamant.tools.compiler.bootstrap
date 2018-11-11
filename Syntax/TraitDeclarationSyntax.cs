@@ -4,11 +4,11 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class TraitDeclarationSyntax : MemberDeclarationSyntax
+    public class TraitDeclarationSyntax : TypeDeclarationSyntax
     {
         [NotNull] public FixedList<AttributeSyntax> Attributes { get; }
         [NotNull] public FixedList<IModiferToken> Modifiers { get; }
-        [NotNull] public IIdentifierTokenPlace Name { get; }
+        [NotNull] public IIdentifierToken Name { get; }
         [CanBeNull] public FixedList<GenericParameterSyntax> GenericParameters { get; }
         [CanBeNull] public FixedList<ExpressionSyntax> BaseTypes { get; }
         [NotNull] public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         public TraitDeclarationSyntax(
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers,
-            [NotNull] IIdentifierTokenPlace name,
+            [NotNull] IIdentifierToken name,
             [CanBeNull] FixedList<GenericParameterSyntax> genericParameters,
             [CanBeNull] FixedList<ExpressionSyntax> baseTypes,
             [NotNull] FixedList<GenericConstraintSyntax> genericConstraints,

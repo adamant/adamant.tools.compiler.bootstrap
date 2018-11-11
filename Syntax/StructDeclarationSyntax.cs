@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class StructDeclarationSyntax : MemberDeclarationSyntax
+    public class StructDeclarationSyntax : TypeDeclarationSyntax
     {
         [NotNull] public FixedList<AttributeSyntax> Attributes { get; }
         [NotNull] public FixedList<IModiferToken> Modifiers { get; }

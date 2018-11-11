@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         [CanBeNull] public BlockSyntax Body { get; }
 
         protected FunctionDeclarationSyntax(
-            TextSpan signatureSpan,
+            TextSpan nameSpan,
             [NotNull] FixedList<IModiferToken> modifiers,
             [CanBeNull] FixedList<ParameterSyntax> parameters,
             [NotNull] FixedList<EffectSyntax> mayEffects,
@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [NotNull] FixedList<ExpressionSyntax> requires,
             [NotNull] FixedList<ExpressionSyntax> ensures,
             [CanBeNull] BlockSyntax body)
-            : base(signatureSpan)
+            : base(nameSpan)
         {
             Modifiers = modifiers;
             Parameters = parameters;
