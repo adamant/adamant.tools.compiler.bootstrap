@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         [NotNull] public FixedList<AttributeSyntax> Attributes { get; }
         [NotNull] public FixedList<IModiferToken> Modifiers { get; }
         [NotNull] public IIdentifierOrPrimitiveToken Name { get; }
-        [CanBeNull] public GenericParametersSyntax GenericParameters { get; }
+        [CanBeNull] public FixedList<GenericParameterSyntax> GenericParameters { get; }
         [CanBeNull] public FixedList<ExpressionSyntax> BaseTypes { get; }
         [NotNull] public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
         [NotNull] public FixedList<InvariantSyntax> Invariants { get; }
@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers,
             [NotNull] IIdentifierOrPrimitiveToken name,
-            [CanBeNull] GenericParametersSyntax genericParameters,
+            [CanBeNull] FixedList<GenericParameterSyntax> genericParameters,
             [CanBeNull] FixedList<ExpressionSyntax> baseTypes,
             [NotNull] FixedList<GenericConstraintSyntax> genericConstraints,
             [NotNull] FixedList<InvariantSyntax> invariants,

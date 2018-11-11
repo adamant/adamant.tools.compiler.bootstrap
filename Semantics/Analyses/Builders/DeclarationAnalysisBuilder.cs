@@ -223,9 +223,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
         private IEnumerable<GenericParameterAnalysis> BuildGenericParameters(
             [NotNull] AnalysisContext context,
             [NotNull] Name memberName,
-            [CanBeNull] GenericParametersSyntax syntax)
+            [CanBeNull] FixedList<GenericParameterSyntax> syntax)
         {
-            return syntax?.Parameters.Select(parameter => new GenericParameterAnalysis(context,
+            return syntax?.Select(parameter => new GenericParameterAnalysis(context,
                 parameter,
                 memberName.Qualify(parameter.Name.Value ?? "_"),
                 parameter.TypeExpression == null

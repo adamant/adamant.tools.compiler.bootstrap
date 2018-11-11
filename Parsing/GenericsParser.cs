@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
@@ -24,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [MustUseReturnValue]
         [CanBeNull]
-        public GenericParametersSyntax AcceptGenericParameters(
+        public FixedList<GenericParameterSyntax> AcceptGenericParameters(
             [NotNull] ITokenIterator tokens,
             [NotNull] Diagnostics diagnostics)
         {
@@ -33,7 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var parameters = listParser.ParseSeparatedList(tokens, ParseGenericParameter,
                 TypeOf<ICommaToken>(), TypeOf<ICloseBracketToken>(), diagnostics);
             var closeBracket = tokens.Consume<ICloseBracketTokenPlace>();
-            return new GenericParametersSyntax(openBracket, parameters, closeBracket);
+            return parameters.OfType<GenericParameterSyntax>().ToFixedList();
         }
 
         [MustUseReturnValue]

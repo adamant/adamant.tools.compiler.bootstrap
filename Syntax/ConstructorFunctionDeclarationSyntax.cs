@@ -8,14 +8,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     public class ConstructorFunctionDeclarationSyntax : FunctionDeclarationSyntax
     {
         [CanBeNull] public override IIdentifierTokenPlace Name { get; }
-        [CanBeNull] public GenericParametersSyntax GenericParameters { get; }
+        [CanBeNull] public FixedList<GenericParameterSyntax> GenericParameters { get; }
         [NotNull] public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
 
         public ConstructorFunctionDeclarationSyntax(
             [NotNull] FixedList<IModiferToken> modifiers,
             [CanBeNull] IIdentifierToken name,
             TextSpan span,
-            [CanBeNull] GenericParametersSyntax genericParameters,
+            [CanBeNull] FixedList<GenericParameterSyntax> genericParameters,
             [NotNull] FixedList<ParameterSyntax> parameters,
             [NotNull] FixedList<GenericConstraintSyntax> genericConstraints,
             [NotNull] FixedList<EffectSyntax> mayEffects,

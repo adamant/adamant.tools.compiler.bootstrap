@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     {
         [MustUseReturnValue]
         [CanBeNull]
-        GenericParametersSyntax AcceptGenericParameters(
+        FixedList<GenericParameterSyntax> AcceptGenericParameters(
             [NotNull] ITokenIterator tokens,
             [NotNull] Diagnostics diagnostics);
 

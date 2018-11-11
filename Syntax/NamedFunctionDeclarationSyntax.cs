@@ -7,14 +7,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     public class NamedFunctionDeclarationSyntax : FunctionDeclarationSyntax
     {
         [NotNull] public override IIdentifierTokenPlace Name { get; }
-        [CanBeNull] public GenericParametersSyntax GenericParameters { get; }
+        [CanBeNull] public FixedList<GenericParameterSyntax> GenericParameters { get; }
         [NotNull] public ExpressionSyntax ReturnTypeExpression { get; }
         [NotNull] public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
 
         public NamedFunctionDeclarationSyntax(
             [NotNull] FixedList<IModiferToken> modifiers,
             [NotNull] IIdentifierTokenPlace name,
-            [CanBeNull] GenericParametersSyntax genericParameters,
+            [CanBeNull] FixedList<GenericParameterSyntax> genericParameters,
             [CanBeNull] FixedList<ParameterSyntax> parameters,
             [NotNull] ExpressionSyntax returnTypeExpression,
             [NotNull] FixedList<GenericConstraintSyntax> genericConstraints,
