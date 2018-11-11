@@ -11,10 +11,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         [NotNull, ItemNotNull]
         private static readonly IReadOnlyList<Type> Keyword = new List<Type>()
         {
+            typeof(PublishedKeywordToken),
             typeof(PublicKeywordToken),
             typeof(ProtectedKeywordToken),
             typeof(PrivateKeywordToken),
-            typeof(InternalKeywordToken),
             typeof(LetKeywordToken),
             typeof(VarKeywordToken),
             typeof(VoidKeywordToken),
@@ -91,6 +91,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     public static partial class TokenFactory
     {
         [NotNull]
+        public static IPublishedKeywordToken PublishedKeyword(TextSpan span)
+        {
+            return new PublishedKeywordToken(span);
+        }
+
+        [NotNull]
         public static IPublicKeywordToken PublicKeyword(TextSpan span)
         {
             return new PublicKeywordToken(span);
@@ -106,12 +112,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         public static IPrivateKeywordToken PrivateKeyword(TextSpan span)
         {
             return new PrivateKeywordToken(span);
-        }
-
-        [NotNull]
-        public static IInternalKeywordToken InternalKeyword(TextSpan span)
-        {
-            return new InternalKeywordToken(span);
         }
 
         [NotNull]
@@ -536,6 +536,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 
     }
 
+    public partial interface IPublishedKeywordTokenPlace : IKeywordTokenPlace { }
+    public partial interface IPublishedKeywordToken : IKeywordToken, IPublishedKeywordTokenPlace { }
+    internal partial class PublishedKeywordToken : Token, IPublishedKeywordToken
+    {
+        public PublishedKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
     public partial interface IPublicKeywordTokenPlace : IKeywordTokenPlace { }
     public partial interface IPublicKeywordToken : IKeywordToken, IPublicKeywordTokenPlace { }
     internal partial class PublicKeywordToken : Token, IPublicKeywordToken
@@ -561,16 +571,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     internal partial class PrivateKeywordToken : Token, IPrivateKeywordToken
     {
         public PrivateKeywordToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
-    public partial interface IInternalKeywordTokenPlace : IKeywordTokenPlace { }
-    public partial interface IInternalKeywordToken : IKeywordToken, IInternalKeywordTokenPlace { }
-    internal partial class InternalKeywordToken : Token, IInternalKeywordToken
-    {
-        public InternalKeywordToken(TextSpan span)
             : base(span)
         {
         }
@@ -1276,10 +1276,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
     public partial interface IMissingToken :
+        IPublishedKeywordTokenPlace,
         IPublicKeywordTokenPlace,
         IProtectedKeywordTokenPlace,
         IPrivateKeywordTokenPlace,
-        IInternalKeywordTokenPlace,
         ILetKeywordTokenPlace,
         IVarKeywordTokenPlace,
         IVoidKeywordTokenPlace,

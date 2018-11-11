@@ -5,16 +5,16 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class ConstructorFunctionDeclarationSyntax : FunctionDeclarationSyntax
+    public class ConstructorDeclarationSyntax : FunctionDeclarationSyntax
     {
-        [CanBeNull] public override IIdentifierTokenPlace Name { get; }
+        [CanBeNull] public IIdentifierToken Name { get; }
         [CanBeNull] public FixedList<GenericParameterSyntax> GenericParameters { get; }
         [NotNull] public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
 
-        public ConstructorFunctionDeclarationSyntax(
+        public ConstructorDeclarationSyntax(
             [NotNull] FixedList<IModiferToken> modifiers,
             [CanBeNull] IIdentifierToken name,
-            TextSpan span,
+            TextSpan nameSpan,
             [CanBeNull] FixedList<GenericParameterSyntax> genericParameters,
             [NotNull] FixedList<ParameterSyntax> parameters,
             [NotNull] FixedList<GenericConstraintSyntax> genericConstraints,
@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [NotNull] FixedList<ExpressionSyntax> requires,
             [NotNull] FixedList<ExpressionSyntax> ensures,
             [NotNull] BlockSyntax body)
-            : base(span, modifiers, parameters, mayEffects, noEffects, requires, ensures, body)
+            : base(modifiers, nameSpan, parameters, mayEffects, noEffects, requires, ensures, body)
         {
             Name = name;
             GenericParameters = genericParameters;

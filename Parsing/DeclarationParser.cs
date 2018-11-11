@@ -462,7 +462,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        public OperatorFunctionDeclarationSyntax ParseOperatorFunction(
+        public OperatorDeclarationSyntax ParseOperatorFunction(
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers)
         {
@@ -510,14 +510,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
             var body = blockParser.ParseBlock(Tokens, Tokens.Context.Diagnostics);
-            return new OperatorFunctionDeclarationSyntax(modifiers, operatorKeywordSpan,
+            return new OperatorDeclarationSyntax(modifiers, operatorKeywordSpan, genericParameters,
                  parameters, returnTypeExpression,
                 genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
 
         [MustUseReturnValue]
         [NotNull]
-        public ConstructorFunctionDeclarationSyntax ParseConstructor(
+        public ConstructorDeclarationSyntax ParseConstructor(
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers)
         {
@@ -530,13 +530,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
             var body = blockParser.ParseBlock(Tokens, Tokens.Context.Diagnostics);
-            return new ConstructorFunctionDeclarationSyntax(modifiers, name, TextSpan.Covering(newKeywordSpan, name?.Span),
+            return new ConstructorDeclarationSyntax(modifiers, name, TextSpan.Covering(newKeywordSpan, name?.Span),
                 genericParameters, parameters, genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
 
         [MustUseReturnValue]
         [NotNull]
-        public InitializerFunctionDeclarationSyntax ParseInitializer(
+        public InitializerDeclarationSyntax ParseInitializer(
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers)
         {
@@ -549,14 +549,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
             var body = blockParser.ParseBlock(Tokens, Tokens.Context.Diagnostics);
-            return new InitializerFunctionDeclarationSyntax(modifiers, name, TextSpan.Covering(initKeywordSpan, name?.Span),
+            return new InitializerDeclarationSyntax(modifiers, name, TextSpan.Covering(initKeywordSpan, name?.Span),
                 genericParameters, parameters, genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
 
 
         [MustUseReturnValue]
         [NotNull]
-        public DestructorFunctionDeclarationSyntax ParseDestructor(
+        public DestructorDeclarationSyntax ParseDestructor(
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers)
         {
@@ -566,7 +566,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
             var body = blockParser.ParseBlock(Tokens, Tokens.Context.Diagnostics);
-            return new DestructorFunctionDeclarationSyntax(modifiers, deleteKeywordSpan,
+            return new DestructorDeclarationSyntax(modifiers, deleteKeywordSpan,
                  parameters, mayEffects, noEffects, requires, ensures, body);
         }
 

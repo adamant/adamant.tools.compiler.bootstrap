@@ -113,7 +113,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
             return new FunctionDeclarationAnalysis(
                 context, syntax, fullName, BuildGenericParameters(context, fullName, syntax.GenericParameters),
                 syntax.Parameters?.Select(p => BuildParameter(typesContext, fullName, p)),
-                expressionBuilder.BuildExpression(typesContext, fullName, syntax.ReturnTypeExpression),
+                expressionBuilder.BuildExpression(typesContext, fullName, syntax.ReturnType),
                 syntax.Body?.Statements.Select(statementSyntax => statementBuilder.Build(bodyContext, fullName, statementSyntax)));
         }
 

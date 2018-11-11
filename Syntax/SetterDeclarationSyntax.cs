@@ -4,20 +4,16 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class NamedFunctionDeclarationSyntax : FunctionDeclarationSyntax
+    public class SetterDeclarationSyntax : FunctionDeclarationSyntax
     {
         [NotNull] public IIdentifierToken Name { get; }
-        [CanBeNull] public FixedList<GenericParameterSyntax> GenericParameters { get; }
         [NotNull] public ExpressionSyntax ReturnType { get; }
-        [NotNull] public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
 
-        public NamedFunctionDeclarationSyntax(
+        public SetterDeclarationSyntax(
             [NotNull] FixedList<IModiferToken> modifiers,
             [NotNull] IIdentifierToken name,
-            [CanBeNull] FixedList<GenericParameterSyntax> genericParameters,
-            [NotNull] FixedList<ParameterSyntax> parameters, // For now we will not support pure meta functions
+            [NotNull] FixedList<ParameterSyntax> parameters,
             [NotNull] ExpressionSyntax returnType,
-            [NotNull] FixedList<GenericConstraintSyntax> genericConstraints,
             [NotNull] FixedList<EffectSyntax> mayEffects,
             [NotNull] FixedList<EffectSyntax> noEffects,
             [NotNull] FixedList<ExpressionSyntax> requires,
@@ -26,9 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             : base(modifiers, name.Span, parameters, mayEffects, noEffects, requires, ensures, body)
         {
             Name = name;
-            GenericParameters = genericParameters;
             ReturnType = returnType;
-            GenericConstraints = genericConstraints;
         }
     }
 }

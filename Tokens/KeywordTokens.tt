@@ -7,10 +7,10 @@
 <#
     var keywords = new List<string>()
     {
+        "Published",
         "Public",
         "Protected",
         "Private",
-        "Internal",
         "Let",
         "Var",
         "Void",

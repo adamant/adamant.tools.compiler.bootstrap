@@ -8,8 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     public abstract class FunctionDeclarationSyntax : MemberDeclarationSyntax
     {
         [NotNull] public FixedList<IModiferToken> Modifiers { get; }
-        [NotNull] public abstract IIdentifierTokenPlace Name { get; }
-        [CanBeNull] public FixedList<ParameterSyntax> Parameters { get; }
+        [NotNull] public FixedList<ParameterSyntax> Parameters { get; } // For now we will not support pure meta functions
         [NotNull] public FixedList<EffectSyntax> MayEffects { get; }
         [NotNull] public FixedList<EffectSyntax> NoEffects { get; }
         [NotNull] public FixedList<ExpressionSyntax> Requires { get; }
@@ -17,9 +16,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         [CanBeNull] public BlockSyntax Body { get; }
 
         protected FunctionDeclarationSyntax(
-            TextSpan nameSpan,
             [NotNull] FixedList<IModiferToken> modifiers,
-            [CanBeNull] FixedList<ParameterSyntax> parameters,
+            TextSpan nameSpan,
+            [NotNull] FixedList<ParameterSyntax> parameters,
             [NotNull] FixedList<EffectSyntax> mayEffects,
             [NotNull] FixedList<EffectSyntax> noEffects,
             [NotNull] FixedList<ExpressionSyntax> requires,

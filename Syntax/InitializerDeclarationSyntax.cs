@@ -5,27 +5,29 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class OperatorFunctionDeclarationSyntax : FunctionDeclarationSyntax
+    public class InitializerDeclarationSyntax : FunctionDeclarationSyntax
     {
-        public override IIdentifierTokenPlace Name => throw new System.NotImplementedException();
-        [NotNull] public ExpressionSyntax ReturnTypeExpression { get; }
+        [CanBeNull] public IIdentifierToken Name { get; }
+        [CanBeNull] public FixedList<GenericParameterSyntax> GenericParameters { get; }
         [NotNull] public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
 
-        public OperatorFunctionDeclarationSyntax(
+        public InitializerDeclarationSyntax(
             [NotNull] FixedList<IModiferToken> modifiers,
-            TextSpan span,
+            [CanBeNull] IIdentifierToken name,
+            TextSpan nameSpan,
+            [CanBeNull] FixedList<GenericParameterSyntax> genericParameters,
             [NotNull] FixedList<ParameterSyntax> parameters,
-            [NotNull] ExpressionSyntax returnTypeExpression,
             [NotNull] FixedList<GenericConstraintSyntax> genericConstraints,
             [NotNull] FixedList<EffectSyntax> mayEffects,
             [NotNull] FixedList<EffectSyntax> noEffects,
             [NotNull] FixedList<ExpressionSyntax> requires,
             [NotNull] FixedList<ExpressionSyntax> ensures,
-            [CanBeNull] BlockSyntax body)
-            : base(span,
-            modifiers, parameters, mayEffects, noEffects, requires, ensures, body)
+            [NotNull] BlockSyntax body)
+            : base(modifiers,
+                nameSpan, parameters, mayEffects, noEffects, requires, ensures, body)
         {
-            ReturnTypeExpression = returnTypeExpression;
+            Name = name;
+            GenericParameters = genericParameters;
             GenericConstraints = genericConstraints;
         }
     }
