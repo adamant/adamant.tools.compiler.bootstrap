@@ -6,7 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
     public class TextLines
     {
-        [NotNull] public readonly string Text;
+        [NotNull] public readonly string Text; // TODO don't keep a reference to the whole string, we only need the length
         public int Count => startOfLine.Count;
         [NotNull] public readonly IReadOnlyList<int> StartOfLine;
         [NotNull] private readonly List<int> startOfLine;

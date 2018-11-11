@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage;
@@ -128,7 +129,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
                     // Now we need to delete any owned variables
                     foreach (var variableDeclaration in block.Statements.OfType<VariableDeclarationStatementAnalysis>().Where(IsOwned))
-                        currentBlock.Add(new DeleteStatement(LookupVariable(cfg, variableDeclaration.Name.UnqualifiedName.Text).VariableNumber, block.Syntax.CloseBrace.Span));
+                        currentBlock.Add(new DeleteStatement(LookupVariable(cfg, variableDeclaration.Name.UnqualifiedName.Text).VariableNumber, new TextSpan(block.Syntax.Span.End, 0)));
 
                     break;
                 case ForeachExpressionAnalysis @foreach:

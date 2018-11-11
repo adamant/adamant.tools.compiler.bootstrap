@@ -63,7 +63,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (openBrace == null) return null;
             var statements = listParser.ParseList(tokens, ParseStatement, TypeOf<ICloseBraceToken>(), diagnostics);
             var closeBrace = tokens.Consume<ICloseBraceTokenPlace>();
-            return new BlockSyntax(openBrace, statements, closeBrace);
+            var span = TextSpan.Covering(openBrace.Span, closeBrace.Span);
+            return new BlockSyntax(span, statements);
         }
 
         [MustUseReturnValue]
@@ -75,7 +76,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var openBrace = tokens.Consume<IOpenBraceTokenPlace>();
             var statements = listParser.ParseList(tokens, ParseStatement, TypeOf<ICloseBraceToken>(), diagnostics);
             var closeBrace = tokens.Consume<ICloseBraceTokenPlace>();
-            return new BlockSyntax(openBrace, statements, closeBrace);
+            var span = TextSpan.Covering(openBrace.Span, closeBrace.Span);
+            return new BlockSyntax(span, statements);
         }
 
         [MustUseReturnValue]
