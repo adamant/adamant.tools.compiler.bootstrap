@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             [NotNull] WhileExpressionSyntax syntax,
             [NotNull] ExpressionAnalysis condition,
             [NotNull] BlockAnalysis block)
-            : base(context, syntax)
+            : base(context, syntax.Span)
         {
             Requires.NotNull(nameof(condition), condition);
             Requires.NotNull(nameof(block), block);

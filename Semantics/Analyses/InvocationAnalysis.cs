@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             [NotNull] InvocationSyntax syntax,
             [NotNull] ExpressionAnalysis callee,
             [NotNull] [ItemNotNull] IEnumerable<ArgumentAnalysis> arguments)
-            : base(context, syntax)
+            : base(context, syntax.Span)
         {
             Syntax = syntax;
             Callee = callee;

@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
         public PrimitiveTypeAnalysis(
             [NotNull] AnalysisContext context,
             [NotNull] PrimitiveTypeSyntax syntax)
-            : base(context, syntax)
+            : base(context, syntax.Span)
         {
             Syntax = syntax;
         }

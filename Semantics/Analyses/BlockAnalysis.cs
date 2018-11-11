@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             [NotNull] AnalysisContext context,
             [NotNull] BlockSyntax syntax,
             [NotNull] [ItemNotNull] IEnumerable<StatementAnalysis> statements)
-            : base(context, syntax)
+            : base(context, syntax.Span)
         {
             Requires.NotNull(nameof(statements), statements);
             Syntax = syntax;

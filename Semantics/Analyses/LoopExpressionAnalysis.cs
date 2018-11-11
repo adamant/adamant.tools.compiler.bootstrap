@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             [NotNull] AnalysisContext context,
             [NotNull] LoopExpressionSyntax syntax,
             [NotNull] BlockAnalysis block)
-            : base(context, syntax)
+            : base(context, syntax.Span)
         {
             Requires.NotNull(nameof(block), block);
             Syntax = syntax;

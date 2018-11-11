@@ -1,19 +1,19 @@
-using Adamant.Tools.Compiler.Bootstrap.Syntax;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
 {
     public class StringLiteralExpressionAnalysis : LiteralExpressionAnalysis
     {
-        [NotNull] public new StringLiteralExpressionSyntax Syntax { get; }
-        public string Value => Syntax.Literal.Value;
+        public string Value { get; }
 
         public StringLiteralExpressionAnalysis(
             [NotNull] AnalysisContext context,
-            [NotNull] StringLiteralExpressionSyntax syntax)
-            : base(context, syntax)
+            TextSpan span,
+            [NotNull] string value)
+            : base(context, span)
         {
-            Syntax = syntax;
+            Value = value;
         }
     }
 }

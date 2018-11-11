@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
-    public interface IBooleanLiteralToken : IKeywordToken
+    public partial interface IBooleanLiteralToken : IKeywordToken
     {
         bool Value { get; }
     }

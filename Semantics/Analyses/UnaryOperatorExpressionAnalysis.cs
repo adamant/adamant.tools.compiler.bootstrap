@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             [NotNull] AnalysisContext context,
             [NotNull] UnaryOperatorExpressionSyntax syntax,
             [NotNull] ExpressionAnalysis operand)
-            : base(context, syntax)
+            : base(context, syntax.Span)
         {
             Requires.NotNull(nameof(operand), operand);
             Syntax = syntax;

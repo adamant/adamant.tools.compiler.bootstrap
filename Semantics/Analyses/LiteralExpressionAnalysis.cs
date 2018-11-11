@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.Syntax;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
@@ -7,8 +7,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
     {
         protected LiteralExpressionAnalysis(
             [NotNull] AnalysisContext context,
-            [NotNull] LiteralExpressionSyntax syntax)
-            : base(context, syntax)
+            TextSpan span)
+            : base(context, span)
         {
         }
     }

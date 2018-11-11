@@ -3,6 +3,7 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
+using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
@@ -50,10 +51,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
                     return new ReturnExpressionAnalysis(context, returnExpression, returnValue);
                 case PrimitiveTypeSyntax primitiveType:
                     return new PrimitiveTypeAnalysis(context, primitiveType);
-                case IntegerLiteralExpressionSyntax integerLiteral:
-                    return new IntegerLiteralExpressionAnalysis(context, integerLiteral);
-                case StringLiteralExpressionSyntax stringLiteral:
-                    return new StringLiteralExpressionAnalysis(context, stringLiteral);
                 case BinaryOperatorExpressionSyntax binaryOperatorExpression:
                     var leftOperand = BuildExpression(context, functionName, binaryOperatorExpression.LeftOperand);
                     var rightOperand = BuildExpression(context, functionName, binaryOperatorExpression.RightOperand);
@@ -80,10 +77,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
                         BuildExpression(context, functionName, placementInitExpression.PlaceExpression),
                         BuildExpression(context, functionName, placementInitExpression.Initializer),
                         placementInitExpression.Arguments.Select(a => BuildArgument(context, functionName, a)));
-                case BooleanLiteralExpressionSyntax booleanLiteralExpression:
-                    return new BooleanLiteralExpressionAnalysis(context, booleanLiteralExpression);
-                case UninitializedExpressionSyntax uninitializedExpression:
-                    return new UninitializedExpressionAnalysis(context, uninitializedExpression);
+                case LiteralExpressionSyntax literalExpression:
+                    return BuildLiteralExpression(context, literalExpression.Literal);
                 case ForeachExpressionSyntax foreachExpression:
                     // New context because a variable is declared
                     var loopBodyContext = context.InLocalVariableScope(foreachExpression);
@@ -133,6 +128,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
                         BuildExpression(context, functionName, memberAccessExpression.Expression));
                 default:
                     throw NonExhaustiveMatchException.For(expression);
+            }
+        }
+
+        [NotNull]
+        private LiteralExpressionAnalysis BuildLiteralExpression(
+            [NotNull] AnalysisContext context,
+            [NotNull] ILiteralToken literal)
+        {
+            switch (literal)
+            {
+                case IBooleanLiteralToken booleanLiteral:
+                    return new BooleanLiteralExpressionAnalysis(context, literal.Span, booleanLiteral.Value);
+                case IIntegerLiteralToken integerLiteral:
+                    return new IntegerLiteralExpressionAnalysis(context, literal.Span, integerLiteral.Value);
+                case IStringLiteralToken stringLiteral:
+                    return new StringLiteralExpressionAnalysis(context, literal.Span, stringLiteral.Value);
+                case IUninitializedKeywordToken _:
+                    return new UninitializedExpressionAnalysis(context, literal.Span);
+                case INoneKeywordToken _:
+                    throw new NotImplementedException();
+                default:
+                    throw NonExhaustiveMatchException.For(literal);
             }
         }
 

@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             [NotNull] BinaryOperatorExpressionSyntax syntax,
             [NotNull] ExpressionAnalysis leftOperand,
             [NotNull] ExpressionAnalysis rightOperand)
-            : base(context, syntax)
+            : base(context, syntax.Span)
         {
             Requires.NotNull(nameof(leftOperand), leftOperand);
             Requires.NotNull(nameof(rightOperand), rightOperand);

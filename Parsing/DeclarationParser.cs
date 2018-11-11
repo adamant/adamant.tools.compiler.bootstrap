@@ -210,7 +210,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 argumentList = expressionParser.ParseArgumentList(Tokens, Tokens.Context.Diagnostics);
                 closeParen = Tokens.Consume<ICloseParenTokenPlace>();
             }
-            return new AttributeSyntax(hash, name, openParen, argumentList, closeParen);
+            return new AttributeSyntax(name, argumentList);
         }
 
         //[MustUseReturnValue]

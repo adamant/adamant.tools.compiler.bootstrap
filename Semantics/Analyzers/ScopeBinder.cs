@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         [NotNull] private readonly Dictionary<DeclarationSyntax, DeclarationAnalysis> declarations = new Dictionary<DeclarationSyntax, DeclarationAnalysis>();
         [NotNull] private readonly Dictionary<string, IDeclarationAnalysis> globalDeclarations;
         [NotNull] private readonly NameBuilder nameBuilder;
-        [NotNull] [ItemNotNull] private readonly IReadOnlyList<Declaration> referencedDeclarations;
+        [NotNull] [ItemNotNull] private readonly FixedList<Declaration> referencedDeclarations;
 
         public ScopeBinder(
             [NotNull] [ItemNotNull] IEnumerable<CompilationUnitAnalysis> compilationUnits,
@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             [NotNull] IReadOnlyDictionary<string, Package> references)
         {
             this.nameBuilder = nameBuilder;
-            referencedDeclarations = references.SelectMany(r => r.Value.Declarations).ToReadOnlyList();
+            referencedDeclarations = references.SelectMany(r => r.Value.Declarations).ToFixedList();
 
             foreach (var compilationUnit in compilationUnits)
                 GatherDeclarations(compilationUnit.Namespace);

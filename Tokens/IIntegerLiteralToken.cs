@@ -2,7 +2,7 @@ using System.Numerics;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
-    public interface IIntegerLiteralToken : IToken
+    public partial interface IIntegerLiteralToken : IToken
     {
         BigInteger Value { get; }
     }

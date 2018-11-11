@@ -1,12 +1,15 @@
-using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Tokens;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public abstract class LiteralExpressionSyntax : ExpressionSyntax
+    public class LiteralExpressionSyntax : ExpressionSyntax
     {
-        protected LiteralExpressionSyntax(TextSpan span)
-            : base(span)
+        [NotNull] public ILiteralToken Literal { get; }
+        public LiteralExpressionSyntax([NotNull] ILiteralToken literal)
+            : base(literal.Span)
         {
+            Literal = literal;
         }
     }
 }

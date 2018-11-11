@@ -1,18 +1,19 @@
-using Adamant.Tools.Compiler.Bootstrap.Syntax;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
 {
-    public class BooleanLiteralExpressionAnalysis : ExpressionAnalysis
+    public class BooleanLiteralExpressionAnalysis : LiteralExpressionAnalysis
     {
-        [NotNull] public new BooleanLiteralExpressionSyntax Syntax { get; }
+        public bool Value { get; }
 
         public BooleanLiteralExpressionAnalysis(
             [NotNull] AnalysisContext context,
-            [NotNull] BooleanLiteralExpressionSyntax syntax)
-            : base(context, syntax)
+            TextSpan span,
+            bool value)
+            : base(context, span)
         {
-            Syntax = syntax;
+            Value = value;
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             [NotNull] CompilationUnitScope globalScope,
             [NotNull] CompilationUnitSyntax syntax,
             [NotNull] NamespaceDeclarationAnalysis @namespace)
-            : base(new AnalysisContext(syntax.CodeFile, globalScope), syntax)
+            : base(new AnalysisContext(syntax.CodeFile, globalScope))
         {
             Requires.NotNull(nameof(globalScope), globalScope);
             Requires.NotNull(nameof(@namespace), @namespace);

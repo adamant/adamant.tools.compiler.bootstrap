@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             [NotNull] AnalysisContext context,
             [NotNull] MutableTypeSyntax syntax,
             [NotNull] ExpressionAnalysis referencedType)
-            : base(context, syntax)
+            : base(context, syntax.Span)
         {
             Requires.NotNull(nameof(referencedType), referencedType);
             Syntax = syntax;

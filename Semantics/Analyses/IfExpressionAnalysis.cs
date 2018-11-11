@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             [NotNull] ExpressionAnalysis condition,
             [NotNull] ExpressionAnalysis thenBlock,
             [CanBeNull] ExpressionAnalysis elseClause)
-            : base(context, syntax)
+            : base(context, syntax.Span)
         {
             Requires.NotNull(nameof(condition), condition);
             Requires.NotNull(nameof(thenBlock), thenBlock);

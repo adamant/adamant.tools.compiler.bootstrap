@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
         protected DeclarationAnalysis(
             [NotNull] AnalysisContext context,
             [NotNull] DeclarationSyntax syntax)
-            : base(context, syntax)
+            : base(context)
         {
             Syntax = syntax;
         }

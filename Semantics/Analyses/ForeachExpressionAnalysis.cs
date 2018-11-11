@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             [CanBeNull] ExpressionAnalysis typeExpression,
             [NotNull] ExpressionAnalysis inExpression,
             [NotNull] BlockAnalysis block)
-            : base(context, syntax)
+            : base(context, syntax.Span)
         {
             Requires.NotNull(nameof(variableName), variableName);
             Requires.NotNull(nameof(inExpression), inExpression);

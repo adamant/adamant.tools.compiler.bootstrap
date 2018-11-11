@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             [NotNull] AnalysisContext context,
             [NotNull] BreakExpressionSyntax syntax,
             [CanBeNull] ExpressionAnalysis expression)
-            : base(context, syntax)
+            : base(context, syntax.Span)
         {
             Syntax = syntax;
             Expression = expression;

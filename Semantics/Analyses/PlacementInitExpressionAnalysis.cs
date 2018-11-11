@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             [NotNull] ExpressionAnalysis placeExpression,
             [NotNull] ExpressionAnalysis initializerExpression,
             [NotNull, ItemNotNull] IEnumerable<ArgumentAnalysis> arguments)
-            : base(context, syntax)
+            : base(context, syntax.Span)
         {
             Requires.NotNull(nameof(placeExpression), placeExpression);
             Requires.NotNull(nameof(initializerExpression), initializerExpression);

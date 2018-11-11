@@ -1,20 +1,20 @@
 using System.Numerics;
-using Adamant.Tools.Compiler.Bootstrap.Syntax;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
 {
     public class IntegerLiteralExpressionAnalysis : LiteralExpressionAnalysis
     {
-        [NotNull] public new IntegerLiteralExpressionSyntax Syntax { get; }
-        public BigInteger Value => Syntax.Literal.Value;
+        public BigInteger Value { get; }
 
         public IntegerLiteralExpressionAnalysis(
             [NotNull] AnalysisContext context,
-            [NotNull] IntegerLiteralExpressionSyntax syntax)
-            : base(context, syntax)
+            TextSpan span,
+            BigInteger value)
+            : base(context, span)
         {
-            Syntax = syntax;
+            Value = value;
         }
     }
 }

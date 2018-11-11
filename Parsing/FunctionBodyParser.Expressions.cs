@@ -229,12 +229,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case ISelfTypeKeywordToken selfTypeKeyword:
                     tokens.Next();
                     return new SelfTypeExpressionSyntax(selfTypeKeyword);
-                case IUninitializedKeywordToken uninitializedKeyword:
-                    tokens.Next();
-                    return new UninitializedExpressionSyntax(uninitializedKeyword);
-                case INoneKeywordToken noneKeyword:
-                    tokens.Next();
-                    return new NoneExpressionSyntax(noneKeyword);
                 case ISelfKeywordToken selfKeyword:
                     tokens.Next();
                     return new SelfExpressionSyntax(selfKeyword);
@@ -289,20 +283,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var operand = ParseExpression(tokens, diagnostics, OperatorPrecedence.Unary);
                     return new UnaryOperatorExpressionSyntax(@operator, operand);
                 }
-                case IIntegerLiteralToken literal:
+                case IIntegerLiteralToken _:
+                case IStringLiteralToken _:
+                case IBooleanLiteralToken _:
+                case IUninitializedKeywordToken _:
+                case INoneKeywordToken noneKeyword:
                 {
-                    tokens.Next();
-                    return new IntegerLiteralExpressionSyntax(literal);
-                }
-                case IStringLiteralToken literal:
-                {
-                    tokens.Next();
-                    return new StringLiteralExpressionSyntax(literal);
-                }
-                case IBooleanLiteralToken literal:
-                {
-                    tokens.Next();
-                    return new BooleanLiteralExpressionSyntax(literal);
+                    var literal = tokens.Consume<ILiteralToken>();
+                    return new LiteralExpressionSyntax(literal);
                 }
                 case IVoidKeywordToken _:
                 case IIntKeywordToken _:

@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             [NotNull] NewObjectExpressionSyntax syntax,
             [NotNull] ExpressionAnalysis constructorExpression,
             [NotNull, ItemNotNull] IEnumerable<ArgumentAnalysis> arguments)
-            : base(context, syntax)
+            : base(context, syntax.Span)
         {
             Requires.NotNull(nameof(constructorExpression), constructorExpression);
             Requires.NotNull(nameof(arguments), arguments);

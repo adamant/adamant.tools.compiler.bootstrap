@@ -1,18 +1,15 @@
-using Adamant.Tools.Compiler.Bootstrap.Syntax;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
 {
-    public class UninitializedExpressionAnalysis : ExpressionAnalysis
+    public class UninitializedExpressionAnalysis : LiteralExpressionAnalysis
     {
-        [NotNull] public new UninitializedExpressionSyntax Syntax { get; }
-
         public UninitializedExpressionAnalysis(
             [NotNull] AnalysisContext context,
-            [NotNull] UninitializedExpressionSyntax syntax)
-            : base(context, syntax)
+            TextSpan span)
+            : base(context, span)
         {
-            Syntax = syntax;
         }
     }
 }

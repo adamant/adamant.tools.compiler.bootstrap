@@ -211,7 +211,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         {
             CheckExpression(expression, diagnostics);
             if (expression.Type.AssertComputed() != ObjectType.Bool)
-                diagnostics.Add(TypeError.MustBeABoolExpression(expression.Context.File, expression.Syntax.Span));
+                diagnostics.Add(TypeError.MustBeABoolExpression(expression.Context.File, expression.Span));
         }
 
         private void CheckExpression(
@@ -254,7 +254,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case LifetimeTypeAnalysis lifetimeType:
                     CheckExpression(lifetimeType.TypeName, diagnostics);
                     if (lifetimeType.TypeName.Type.AssertComputed() != ObjectType.Type)
-                        diagnostics.Add(TypeError.MustBeATypeExpression(expression.Context.File, lifetimeType.TypeName.Syntax.Span));
+                        diagnostics.Add(TypeError.MustBeATypeExpression(expression.Context.File, lifetimeType.TypeName.Span));
                     expression.Type.Computed(ObjectType.Type);
                     break;
                 case BlockAnalysis blockExpression:
@@ -702,8 +702,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             if (!(type is Metatype)
                 && type != ObjectType.Type)
             {
-                diagnostics.Add(TypeError.MustBeATypeExpression(typeExpression.Context.File,
-                    typeExpression.Syntax.Span));
+                diagnostics.Add(TypeError.MustBeATypeExpression(typeExpression.Context.File, typeExpression.Span));
                 return DataType.Unknown;
             }
 

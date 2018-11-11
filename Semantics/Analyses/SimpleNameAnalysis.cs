@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
         protected SimpleNameAnalysis(
             [NotNull] AnalysisContext context,
             [NotNull] SimpleNameSyntax syntax)
-            : base(context, syntax)
+            : base(context, syntax.Span)
         {
             Syntax = syntax;
         }

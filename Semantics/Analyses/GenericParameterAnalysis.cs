@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             [NotNull] GenericParameterSyntax syntax,
             [NotNull] Name name,
             [CanBeNull] ExpressionAnalysis typeExpression)
-            : base(context, syntax)
+            : base(context)
         {
             Requires.NotNull(nameof(syntax), syntax);
             Syntax = syntax;
