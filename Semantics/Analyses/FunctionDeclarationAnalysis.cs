@@ -13,8 +13,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
     public class FunctionDeclarationAnalysis : MemberDeclarationAnalysis
     {
         [NotNull] public new NamedFunctionDeclarationSyntax Syntax { get; }
-        [CanBeNull, ItemNotNull] public IReadOnlyList<ParameterAnalysis> Parameters { get; }
-        public int Arity => Parameters.Count;
+        [CanBeNull, ItemNotNull] public FixedList<ParameterAnalysis> Parameters { get; }
+        public int? Arity => Parameters?.Count;
         [NotNull] public ExpressionAnalysis ReturnTypeExpression { get; }
         [NotNull] public TypeAnalysis ReturnType { get; } = new TypeAnalysis();
         [NotNull, ItemNotNull] public IReadOnlyList<StatementAnalysis> Statements { get; }
@@ -30,12 +30,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             [CanBeNull] [ItemNotNull] IEnumerable<StatementAnalysis> statements)
             : base(context, syntax, name, genericParameters)
         {
-            Requires.NotNull(nameof(syntax), syntax);
-            Requires.NotNull(nameof(returnTypeExpression), returnTypeExpression);
             Syntax = syntax;
-            Parameters = parameters.ToReadOnlyList();
+            Parameters = parameters?.ToFixedList();
             ReturnTypeExpression = returnTypeExpression;
-            Statements = (statements ?? Enumerable.Empty<StatementAnalysis>()).ToReadOnlyList();
+            Statements = (statements ?? Enumerable.Empty<StatementAnalysis>()).ToFixedList();
         }
 
         [NotNull]
@@ -53,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
                 Context.File,
                 Name,
                 Type.AssertResolved(),
-                Parameters.Select(p => p.Complete()),
+                Parameters?.Select(p => p.Complete()),
                 ReturnType.AssertResolved(),
                 ControlFlow);
         }

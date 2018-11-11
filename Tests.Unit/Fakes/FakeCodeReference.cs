@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
@@ -9,7 +10,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
         [NotNull]
         public static readonly FakeCodeReference Instance = new FakeCodeReference();
 
-        private FakeCodeReference() { }
+        private FakeCodeReference()
+            : base(FixedList<string>.Empty)
+        { }
         #endregion
     }
 }

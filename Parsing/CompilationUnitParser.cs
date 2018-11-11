@@ -1,5 +1,4 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
@@ -27,8 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [NotNull]
         public CompilationUnitSyntax ParseCompilationUnit()
         {
-            // TODO actually pass in the correct implicit namespace name
-            var @namespace = declarationParser.ParseFileNamespace(FixedList<string>.Empty);
+            var @namespace = declarationParser.ParseFileNamespace(Tokens.Context.File.Reference.Namespace);
             Tokens.Required<IEndOfFileToken>();
 
             return new CompilationUnitSyntax(Tokens.Context.File, @namespace, Tokens.Context.Diagnostics.Build());

@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
         [NotNull] public new MemberDeclarationSyntax Syntax { get; }
         [NotNull] public Diagnostics Diagnostics { get; }
         [NotNull] public Name Name { get; }
-        [CanBeNull, ItemNotNull] public IReadOnlyList<GenericParameterAnalysis> GenericParameters { get; }
+        [CanBeNull, ItemNotNull] public FixedList<GenericParameterAnalysis> GenericParameters { get; }
         public bool IsGeneric => GenericParameters != null;
         public int? GenericArity => GenericParameters?.Count;
         // This is the type of the value provided by using the name. So for
@@ -34,7 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             Syntax = syntax;
             Diagnostics = new Diagnostics();
             Name = name;
-            GenericParameters = genericParameters?.ToReadOnlyList();
+            GenericParameters = genericParameters?.ToFixedList();
         }
 
         IEnumerable<DataType> ISymbol.Types => Type.DataType.YieldValue();

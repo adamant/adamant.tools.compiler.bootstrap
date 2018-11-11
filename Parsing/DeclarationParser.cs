@@ -47,7 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public FixedList<DeclarationSyntax> ParseDeclarations()
         {
             var declarations = new List<DeclarationSyntax>();
-            while (!Tokens.AtEndOfFile())
+            while (!Tokens.AtEndOfFile() && !(Tokens.Current is ICloseBraceToken))
                 declarations.Add(ParseDeclaration());
 
             return declarations.ToFixedList();
@@ -474,8 +474,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             switch (Tokens.Current)
             {
                 case IHashToken _:
-                    Tokens.Expect<IOperatorToken>();
-                    Tokens.Next();
+                    Tokens.Expect<IHashToken>();
                     switch (Tokens.Current)
                     {
                         case IOpenParenToken _:
@@ -491,12 +490,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                             Tokens.Expect<ICloseBraceToken>();
                             break;
                         default:
-                            Tokens.Expect<IOpenBracketToken>();
-                            break;
+                            throw NonExhaustiveMatchException.For(Tokens.Current);
                     }
                     break;
                 case IStringLiteralToken _:
-                    Tokens.Expect<IOperatorToken>();
+                    Tokens.Expect<IStringLiteralToken>();
                     // TODO need to check it is empty string
                     break;
                 // TODO case for user defined literals ''

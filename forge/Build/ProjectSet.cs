@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
         [NotNull]
         private Project GetOrAdd([NotNull] ProjectConfig config, [NotNull] ProjectConfigSet configs)
         {
-            var projectDir = Path.GetDirectoryName(config.FullPath);
+            var projectDir = System.IO.Path.GetDirectoryName(config.FullPath);
             if (projects.TryGetValue(projectDir, out var existingProject))
                 return existingProject;
 
@@ -96,7 +96,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             [NotNull] object consoleLock)
         {
             var projectBuilds = await projectBuildsTask;
-            var sourceDir = Path.Combine(project.Path, "src");
+            var sourceDir = Path.Combine(project.Path, "src").NotNull();
             var sourcePaths = Directory.EnumerateFiles(sourceDir, "*.ad", SearchOption.AllDirectories).NotNull();
             // Wait for the references, unfortunately, this requires an ugly loop.
             var referenceTasks = project.References.ToDictionary(r => r.Name, r => projectBuilds[r.Project]);
@@ -108,7 +108,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             {
                 Console.WriteLine($"Compiling {project.Name} ({project.Path})...");
             }
-            var codeFiles = sourcePaths.Select(CodeFile.Load).ToList();
+            var codeFiles = sourcePaths.Select(p => LoadCode(p, sourceDir)).ToList();
             var package = compiler.CompilePackage(project.Name, codeFiles, references);
             // TODO switch to the async version of the compiler
             //var codeFiles = sourcePaths.Select(p => new CodePath(p)).ToList();
@@ -132,9 +132,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
         }
 
         [NotNull]
+        private static CodeFile LoadCode([NotNull] string path, [NotNull] string sourceDir)
+        {
+            var relativeDirectory = Path.GetDirectoryName(Path.GetRelativePath(sourceDir, path)).NotNull();
+            var directories = relativeDirectory.Split(Path.DirectorySeparatorChar).NotNull();
+            var ns = string.IsNullOrEmpty(relativeDirectory)
+                ? FixedList<string>.Empty
+                : directories.ToFixedList();
+            return CodeFile.Load(path, ns);
+        }
+
+        [NotNull]
         private static string PrepareCacheDir([NotNull] Project project)
         {
-            var cacheDir = Path.Combine(project.Path, ".forge-cache").NotNull();
+            var cacheDir = System.IO.Path.Combine(project.Path, ".forge-cache").NotNull();
             Directory.CreateDirectory(cacheDir); // Ensure the cache directory exists
 
             // Clear the cache directory?
@@ -201,10 +212,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             switch (project.Template)
             {
                 case ProjectTemplate.App:
-                    outputPath = Path.Combine(cacheDir, "program.c").NotNull();
+                    outputPath = System.IO.Path.Combine(cacheDir, "program.c").NotNull();
                     break;
                 case ProjectTemplate.Lib:
-                    outputPath = Path.Combine(cacheDir, "lib.c").NotNull();
+                    outputPath = System.IO.Path.Combine(cacheDir, "lib.c").NotNull();
                     break;
                 default:
                     throw NonExhaustiveMatchException.ForEnum(project.Template);
@@ -223,9 +234,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
         {
             var compiler = new CLangCompiler();
 
-            var runtimeLibrarySourcePath = Path.Combine(cacheDir, CodeEmitter.RuntimeLibraryCodeFileName);
+            var runtimeLibrarySourcePath = System.IO.Path.Combine(cacheDir, CodeEmitter.RuntimeLibraryCodeFileName);
             File.WriteAllText(runtimeLibrarySourcePath, CodeEmitter.RuntimeLibraryCode, Encoding.UTF8);
-            var runtimeLibraryHeaderPath = Path.Combine(cacheDir, CodeEmitter.RuntimeLibraryHeaderFileName);
+            var runtimeLibraryHeaderPath = System.IO.Path.Combine(cacheDir, CodeEmitter.RuntimeLibraryHeaderFileName);
             File.WriteAllText(runtimeLibraryHeaderPath, CodeEmitter.RuntimeLibraryHeader, Encoding.UTF8);
 
             var sourceFiles = new[] { codePath, runtimeLibrarySourcePath };
@@ -234,10 +245,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             switch (project.Template)
             {
                 case ProjectTemplate.App:
-                    outputPath = Path.ChangeExtension(codePath, "exe").NotNull();
+                    outputPath = System.IO.Path.ChangeExtension(codePath, "exe").NotNull();
                     break;
                 case ProjectTemplate.Lib:
-                    outputPath = Path.ChangeExtension(codePath, "dll").NotNull();
+                    outputPath = System.IO.Path.ChangeExtension(codePath, "dll").NotNull();
                     break;
                 default:
                     throw NonExhaustiveMatchException.ForEnum(project.Template);

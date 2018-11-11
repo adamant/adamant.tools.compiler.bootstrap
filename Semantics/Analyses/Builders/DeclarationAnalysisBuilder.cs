@@ -33,16 +33,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
             Requires.That(nameof(fileNamespace), fileNamespace.InGlobalNamespace);
             RootName name = GlobalNamespaceName.Instance;
             var namespaceContext = context;
-            // TODO actually use the name of the declaration
-            //if (fileNamespace.Name != null)
-            //{
-            //    var namespaceName = nameBuilder.BuildName(fileNamespace.Name);
-            //    if (namespaceName != null)
-            //    {
-            //        namespaceContext = BuildNamespaceContext(namespaceContext, fileNamespace, namespaceName);
-            //        name = namespaceName;
-            //    }
-            //}
+            foreach (var ns in fileNamespace.Name)
+            {
+                var namespaceName = name.Qualify(ns);
+                namespaceContext = BuildNamespaceContext(namespaceContext, fileNamespace, namespaceName);
+                name = namespaceName;
+            }
+
             var bodyContext = namespaceContext.WithUsingDirectives(fileNamespace);
             var declarations = new List<DeclarationAnalysis>();
             foreach (var declaration in fileNamespace.Declarations)
@@ -84,8 +81,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
                     return BuildFunction(context, @namespace, function);
                 case ClassDeclarationSyntax @class:
                     return BuildClass(context, @namespace, @class);
-                case TraitDeclarationSyntax type:
-                    return BuildType(context, @namespace, type);
+                case TraitDeclarationSyntax trait:
+                    return BuildTrait(context, @namespace, trait);
                 case StructDeclarationSyntax @struct:
                     return BuildStruct(context, @namespace, @struct);
                 case EnumStructDeclarationSyntax enumStruct:
@@ -115,7 +112,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
             // For missing parameter names, use `_` to ignore them
             return new FunctionDeclarationAnalysis(
                 context, syntax, fullName, BuildGenericParameters(context, fullName, syntax.GenericParameters),
-                syntax.Parameters.Select(p => BuildParameter(typesContext, fullName, p)),
+                syntax.Parameters?.Select(p => BuildParameter(typesContext, fullName, p)),
                 expressionBuilder.BuildExpression(typesContext, fullName, syntax.ReturnTypeExpression),
                 syntax.Body?.Statements.Select(statementSyntax => statementBuilder.Build(bodyContext, fullName, statementSyntax)));
         }
@@ -153,7 +150,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
         }
 
         [CanBeNull]
-        private TypeDeclarationAnalysis BuildType(
+        private TypeDeclarationAnalysis BuildTrait(
             [NotNull] AnalysisContext context,
             [NotNull] RootName @namespace,
             [NotNull] TraitDeclarationSyntax syntax)
