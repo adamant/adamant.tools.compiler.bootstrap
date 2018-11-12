@@ -6,25 +6,17 @@ A bootstrap compiler for the [Adamant language](http://adamant-lang.org).  That 
 
 The compiler is under active development. It is in a very early stage, and there are likely issues and limitations. APIs are subject to frequent breaking changes.
 
-## Current Next Steps
+## Current Plan
 
-A rough plan of the next items to get working is:
+The current plan is to slowly build up functionality by getting a series of katas and small programs working. These will likely be included in the confromance tests. After some very basic programs, various versions of the Fizz Buzz kata will be worked on. As this process is carried out, the plan will be to:
 
-1. ~~Typecheck `int` vs `bool` expressions for basic operations.~~
-2. ~~Emit C code based on IL instead of semantic tree~~
-3. Checking binding mutability (`let` vs `var`) on `int` and `bool` variable types.
-4. Typecheck strings to handle overload of `+`?
-5. Optional types?
-6. ~~Add classes without members.~~
-7. Borrow checking on reference types.
-8. Destructors (Give a talk at the Rust meetup on drop order in Rust vs Adamant)s
-9. Interfaces
-10. Overload functions on # params
-11. Overload functions on types
+* Make the Adamant source code as correct as possible given all current ideas on the design of the language.
+* Ensure any language features used are in the language reference.
+* If needed, parts of what will be the standard library can be created as compiler intrinsics at first, but they could be replaced with correct standard library code as quickly as possible.
 
 ## Cleanup Tasks
 
-* Remove the deprecated `Match` and `MatchInto` classes.
+None Currently
 
 ## Conventions
 
