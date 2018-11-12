@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public CompilationUnitSyntax ParseCompilationUnit()
         {
             var @namespace = declarationParser.ParseFileNamespace(Tokens.Context.File.Reference.Namespace);
-            Tokens.Required<IEndOfFileToken>();
+            Tokens.AssertAndConsume<IEndOfFileToken>();
 
             return new CompilationUnitSyntax(Tokens.Context.File, @namespace, Tokens.Context.Diagnostics.Build());
         }

@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
         }
 
         [MustUseReturnValue]
-        [NotNull]
+        [NotNull, ItemNotNull]
         private static IEnumerable<IToken> Lex([NotNull] CodeFile file, [NotNull] Diagnostics diagnostics)
         {
             var code = file.Code;

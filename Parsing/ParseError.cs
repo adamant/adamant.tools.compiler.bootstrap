@@ -31,7 +31,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public static Diagnostic MissingToken([NotNull] CodeFile file, [NotNull] Type expected, [NotNull] IToken found)
         {
             return new Diagnostic(file, found.Span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3003, $"Expected `{expected.GetFriendlyName()}` found `{found.Text(file.Code)}`");
-
         }
     }
 }

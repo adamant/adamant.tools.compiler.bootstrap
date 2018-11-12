@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenIterator tokens,
             [NotNull] Diagnostics diagnostics)
         {
-            var openBracket = tokens.Accept<IOpenBracketToken>();
+            var openBracket = tokens.AcceptToken<IOpenBracketToken>();
             if (openBracket == null) return null;
             var parameters = listParser.ParseSeparatedList(tokens, ParseGenericParameter,
                 TypeOf<ICommaToken>(), TypeOf<ICloseBracketToken>(), diagnostics);
@@ -43,9 +43,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenIterator tokens,
             [NotNull] Diagnostics diagnostics)
         {
-            var paramsKeyword = tokens.Accept<IParamsKeywordToken>();
+            var paramsKeyword = tokens.AcceptToken<IParamsKeywordToken>();
             var name = tokens.ExpectIdentifier();
-            var colon = tokens.Accept<IColonToken>();
+            var colon = tokens.AcceptToken<IColonToken>();
             var typeExpression = colon != null ? expressionParser.ParseExpression(tokens, diagnostics) : null;
             return new GenericParameterSyntax(paramsKeyword, name, colon, typeExpression);
         }

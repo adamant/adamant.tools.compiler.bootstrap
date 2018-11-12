@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             while (item != null)
             {
                 items.Add(item);
-                if (Tokens.Accept<TSeparator>() == null)
+                if (Tokens.AcceptToken<TSeparator>() == null)
                     break;
 
                 item = acceptItem();
@@ -110,7 +110,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             TSeparator separator;
             do
             {
-                separator = tokens.Accept<TSeparator>();
+                separator = tokens.AcceptToken<TSeparator>();
                 if (separator != null) yield return separator;
                 item = acceptItem(tokens, diagnostics);
                 if (item != null) yield return item;

@@ -266,7 +266,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IReturnKeywordToken _:
                 {
                     var returnKeyword = tokens.Consume<IReturnKeywordTokenPlace>();
-                    var expression = tokens.AtTerminator<ISemicolonToken>() ? null : ParseExpression(tokens, diagnostics);
+                    var expression = tokens.AtEnd<ISemicolonToken>() ? null : ParseExpression(tokens, diagnostics);
                     return new ReturnExpressionSyntax(returnKeyword, expression);
                 }
                 case IEqualsGreaterThanToken _:
@@ -344,7 +344,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IRefKeywordToken refKeyword:
                 {
                     tokens.Next();
-                    var varKeyword = tokens.Accept<IVarKeywordToken>();
+                    var varKeyword = tokens.AcceptToken<IVarKeywordToken>();
                     var referencedType = ParseExpression(tokens, diagnostics);
                     return new RefTypeSyntax(refKeyword, varKeyword, referencedType);
                 }
@@ -384,9 +384,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] Diagnostics diagnostics)
         {
             var foreachKeyword = tokens.Consume<IForeachKeywordToken>();
-            var varKeyword = tokens.Accept<IVarKeywordToken>();
+            var varKeyword = tokens.AcceptToken<IVarKeywordToken>();
             var identifier = tokens.ExpectIdentifier();
-            var colon = tokens.Accept<IColonToken>();
+            var colon = tokens.AcceptToken<IColonToken>();
             ExpressionSyntax typeExpression = null;
             if (colon != null)
                 typeExpression = ParseExpression(tokens, diagnostics);
@@ -438,7 +438,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenIterator tokens,
             [NotNull] Diagnostics diagnostics)
         {
-            var elseKeyword = tokens.Accept<IElseKeywordToken>();
+            var elseKeyword = tokens.AcceptToken<IElseKeywordToken>();
             if (elseKeyword == null) return null;
             var expression = tokens.Current is IIfKeywordToken
                 ? ParseIf(tokens, diagnostics)
@@ -468,7 +468,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             var pattern = ParsePattern(tokens, diagnostics);
             var expression = ParseExpressionBlock(tokens, diagnostics);
-            var comma = tokens.Accept<ICommaToken>();
+            var comma = tokens.AcceptToken<ICommaToken>();
             return new MatchArmSyntax(pattern, expression, comma);
         }
 
@@ -500,7 +500,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenIterator tokens,
             [NotNull] Diagnostics diagnostics)
         {
-            var paramsKeyword = tokens.Accept<IParamsKeywordToken>();
+            var paramsKeyword = tokens.AcceptToken<IParamsKeywordToken>();
             var value = AcceptExpression(tokens, diagnostics);
             if (paramsKeyword == null && value == null) return null;
             return new ArgumentSyntax(paramsKeyword, value);

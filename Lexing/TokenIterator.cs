@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -11,10 +12,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
         [NotNull] public ParseContext Context { get; }
         [CanBeNull] private IEnumerator<IToken> tokens;
 
-        public TokenIterator([NotNull] ParseContext context, [NotNull] IEnumerable<IToken> tokens)
+        public TokenIterator([NotNull] ParseContext context, [NotNull, ItemNotNull] IEnumerable<IToken> tokens)
         {
-            Context = context.NotNull();
-            this.tokens = tokens.GetEnumerator().NotNull();
+            Context = context;
+            this.tokens = tokens.GetEnumerator();
             Next();
         }
 
@@ -26,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
             return tokens != null;
         }
 
-        [CanBeNull]
-        public IToken Current => tokens?.Current;
+        [NotNull]
+        public IToken Current => (tokens ?? throw new InvalidOperationException("Can't access `TokenIterator.Current` after `Next()` has returned false")).Current.NotNull();
     }
 }

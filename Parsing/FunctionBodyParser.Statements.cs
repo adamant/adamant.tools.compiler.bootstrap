@@ -59,7 +59,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenIterator tokens,
             [NotNull] Diagnostics diagnostics)
         {
-            var openBrace = tokens.Accept<IOpenBraceToken>();
+            var openBrace = tokens.AcceptToken<IOpenBraceToken>();
             if (openBrace == null) return null;
             var statements = listParser.ParseList(tokens, ParseStatement, TypeOf<ICloseBraceToken>(), diagnostics);
             var closeBrace = tokens.Consume<ICloseBraceTokenPlace>();

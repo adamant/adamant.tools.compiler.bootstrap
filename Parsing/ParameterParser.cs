@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 {
                     Tokens.Expect<IDotToken>();
                     var name = tokens.ExpectIdentifier();
-                    var equals = tokens.Accept<IEqualsToken>();
+                    var equals = tokens.AcceptToken<IEqualsToken>();
                     ExpressionSyntax defaultValue = null;
                     if (equals != null)
                         defaultValue = expressionParser.ParseExpression(tokens, diagnostics);
@@ -48,15 +48,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 }
                 default:
                 {
-                    var paramsKeyword = tokens.Accept<IParamsKeywordToken>();
-                    var varKeyword = tokens.Accept<IVarKeywordToken>();
+                    var paramsKeyword = tokens.AcceptToken<IParamsKeywordToken>();
+                    var varKeyword = tokens.AcceptToken<IVarKeywordToken>();
                     var name = tokens.ExpectIdentifier();
                     var colon = tokens.Consume<IColonTokenPlace>();
                     // Need to not consume the assignment that separates the type from the default value,
                     // hence the min operator precedence.
                     var typeExpression = expressionParser.ParseExpression(tokens, diagnostics,
                         OperatorPrecedence.AboveAssignment);
-                    var equals = tokens.Accept<IEqualsToken>();
+                    var equals = tokens.AcceptToken<IEqualsToken>();
                     ExpressionSyntax defaultValue = null;
                     if (equals != null)
                         defaultValue = expressionParser.ParseExpression(tokens, diagnostics);
