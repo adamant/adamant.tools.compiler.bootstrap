@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -47,8 +46,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public FixedList<DeclarationSyntax> ParseDeclarations()
         {
             var declarations = new List<DeclarationSyntax>();
+            // Stop at end of file or close brace that contains these declarations
             while (!Tokens.AtEnd<ICloseBraceToken>())
-                declarations.Add(ParseDeclaration());
+                try
+                {
+                    declarations.Add(ParseDeclaration());
+                }
+                catch (ParseFailedException)
+                {
+                    // Ignore: we would have consumed something before failing, try to get the next declaration
+                }
 
             return declarations.ToFixedList();
         }
@@ -74,15 +81,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     return ParseEnum(attributes, modifiers);
                 case IFunctionKeywordToken _:
                     return ParseNamedFunction(attributes, modifiers);
-                //case IConstKeywordToken _:
-                //    return ParseConst(attributes, modifiers);
-                //default:
-                //    return ParseIncompleteDeclaration(attributes, modifiers);
-                case null:
-                    throw new InvalidOperationException("Can't parse past end of file");
+                case IConstKeywordToken _:
+                    return ParseConst(attributes, modifiers);
                 default:
-                    throw NonExhaustiveMatchException.For(Tokens.Current);
+                    Tokens.UnexpectedToken();
+                    throw new ParseFailedException();
             }
+        }
+
+        /// <summary>
+        /// Skip tokens until we reach what we assume to be the end of a statement
+        /// </summary>
+        // TODO does this belong on a statement parser or something
+        private void SkipToEndOfStatement()
+        {
+            while (!Tokens.AtEnd<ISemicolonToken>())
+            {
+                Tokens.Next();
+            }
+            // Consume the semicolon is we aren't at the end of the file.
+            var _ = Tokens.Accept<ISemicolonToken>();
         }
 
         [MustUseReturnValue]
@@ -94,41 +112,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
             switch (Tokens.Current)
             {
-                //case IClassKeywordToken _:
-                //    return ParseClass(attributes, modifiers);
-                //case ITypeKeywordToken _:
-                //    return ParseType(attributes, modifiers);
+                case IClassKeywordToken _:
+                    return ParseClass(attributes, modifiers);
+                case ITraitKeywordToken _:
+                    return ParseTrait(attributes, modifiers);
                 case IStructKeywordToken _:
                     return ParseStruct(attributes, modifiers);
-                //case IEnumKeywordToken _:
-                //    return ParseEnum(attributes, modifiers);
+                case IEnumKeywordToken _:
+                    return ParseEnum(attributes, modifiers);
                 case IFunctionKeywordToken _:
                     return ParseNamedFunction(attributes, modifiers);
                 case IOperatorKeywordToken _:
-                    return ParseOperatorFunction(attributes, modifiers);
+                    return ParseOperator(attributes, modifiers);
                 case INewKeywordToken _:
                     return ParseConstructor(attributes, modifiers);
                 case IInitKeywordToken _:
                     return ParseInitializer(attributes, modifiers);
                 case IDeleteKeywordToken _:
                     return ParseDestructor(attributes, modifiers);
-                //case IGetKeywordToken _:
-                //    return ParseGetterFunction(attributes, modifiers);
-                //case ISetKeywordToken _:
-                //    return ParseSetterFunction(attributes, modifiers);
+                case IGetKeywordToken _:
+                    return ParseGetter(attributes, modifiers);
+                case ISetKeywordToken _:
+                    return ParseSetter(attributes, modifiers);
                 case IVarKeywordToken _:
                 case ILetKeywordToken _:
                     return ParseField(attributes, modifiers);
-                //case IConstKeywordToken _:
-                //    return ParseConst(attributes, modifiers);
-                //default:
-                //    return ParseIncompleteDeclaration(attributes, modifiers);
-                case ICloseBraceToken _:
-                    return null; // TODO clean up list parsing
-                case null:
-                    throw new InvalidOperationException("Can't parse past end of file");
+                case IConstKeywordToken _:
+                    return ParseConst(attributes, modifiers);
                 default:
-                    throw NonExhaustiveMatchException.For(Tokens.Current);
+                    Tokens.UnexpectedToken();
+                    throw new ParseFailedException();
             }
         }
 
@@ -137,8 +150,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [NotNull]
         public NamespaceDeclarationSyntax ParseFileNamespace([NotNull] FixedList<string> name)
         {
-            var usingDirectives = usingDirectiveParser.ParseUsingDirectives(Tokens, Tokens.Context.Diagnostics).ToFixedList();
-            var declarations = ParseDeclarations().ToFixedList();
+            var usingDirectives = usingDirectiveParser.ParseUsingDirectives(Tokens, Tokens.Context.Diagnostics);
+            var declarations = ParseDeclarations();
             return new NamespaceDeclarationSyntax(true, name, null, usingDirectives, declarations);
         }
 
@@ -149,12 +162,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<IModiferToken> modifiers)
         {
             // TODO generate errors for attributes or modifiers
-            Tokens.AssertAndConsume<INamespaceKeywordToken>();
+            Tokens.Expect<INamespaceKeywordToken>();
             var globalQualifier = Tokens.AcceptToken<IColonColonToken>();
             var (name, span) = ParseNamespaceName();
             span = TextSpan.Covering(span, globalQualifier?.Span);
             Tokens.Expect<IOpenBraceToken>();
-            var usingDirectives = usingDirectiveParser.ParseUsingDirectives(Tokens, Tokens.Context.Diagnostics).ToFixedList();
+            var usingDirectives = usingDirectiveParser.ParseUsingDirectives(Tokens, Tokens.Context.Diagnostics);
             var declarations = ParseDeclarations();
             Tokens.Expect<ICloseBraceToken>();
             return new NamespaceDeclarationSyntax(globalQualifier != null, name, span, usingDirectives, declarations);
@@ -165,13 +178,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             var name = new List<string>();
 
-            var nameSegment = Tokens.AssertAndConsumeIdentifier();
-            if (nameSegment == null)
-                return (FixedList<string>.Empty, Tokens.Current.NotNull().Span);
+            var nameSegment = Tokens.RequiredIdentifier();
             var span = nameSegment.Span;
             name.Add(nameSegment.Value);
 
-            while (Tokens.AcceptToken<IDotToken>() != null)
+            while (Tokens.Accept<IDotToken>())
             {
                 nameSegment = Tokens.ExpectIdentifier();
                 if (nameSegment == null) break;
@@ -199,68 +210,46 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [CanBeNull]
         private AttributeSyntax AcceptAttribute()
         {
-            var hash = Tokens.AcceptToken<IHashToken>();
-            if (hash == null) return null;
+            if (!Tokens.Accept<IHashHashToken>()) return null;
             var name = nameParser.ParseName(Tokens, Tokens.Context.Diagnostics);
-            var openParen = Tokens.AcceptToken<IOpenParenToken>();
             SeparatedListSyntax<ArgumentSyntax> argumentList = null;
-            ICloseParenTokenPlace closeParen = null;
-            if (openParen != null)
+            if (Tokens.Accept<IOpenParenToken>())
             {
                 argumentList = expressionParser.ParseArgumentList(Tokens, Tokens.Context.Diagnostics);
-                closeParen = Tokens.Consume<ICloseParenTokenPlace>();
+                Tokens.Expect<ICloseParenToken>();
             }
             return new AttributeSyntax(name, argumentList);
         }
-
-        //[MustUseReturnValue]
-        //[NotNull]
-        //private SyntaxList<ModifierSyntax> ParseModifiers(
-        //    [NotNull] ITokenIterator tokens,
-        //    [NotNull] Diagnostics diagnostics)
-        //{
-        //    var modifiers = new List<ModifierSyntax>();
-        //    // Take modifiers until null
-        //    while (modifierParser.AcceptModifier(tokens, diagnostics) is ModifierSyntax modifier)
-        //        modifiers.Add(modifier);
-        //    return new SyntaxList<ModifierSyntax>(modifiers);
-        //}
 
         [MustUseReturnValue]
         [CanBeNull]
         private ExpressionSyntax AcceptBaseClass()
         {
-            var colon = Tokens.AcceptToken<IColonToken>();
-            if (colon == null) return null;
-            var typeExpression = expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics);
-            return typeExpression;
+            if (!Tokens.Accept<IColonToken>()) return null;
+            return expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics);
         }
 
         [MustUseReturnValue]
         [CanBeNull]
         private FixedList<ExpressionSyntax> AcceptBaseTypes()
         {
-            var lessThanColon = Tokens.AcceptToken<ILessThanColonToken>();
-            if (lessThanColon == null) return null;
-            var typeExpressions = listParser.ParseSeparatedList<ExpressionSyntax, ICommaToken>(() => expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics));
-            return typeExpressions;
+            if (!Tokens.Accept<ILessThanColonToken>()) return null;
+            return listParser.ParseSeparatedList<ExpressionSyntax, ICommaToken>(() => expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics));
         }
 
         [MustUseReturnValue]
         [NotNull]
-        private FixedList<InvariantSyntax> ParseInvariants()
+        private FixedList<ExpressionSyntax> ParseInvariants()
         {
             return listParser.ParseList(AcceptInvariant);
         }
 
         [MustUseReturnValue]
         [CanBeNull]
-        private InvariantSyntax AcceptInvariant()
+        private ExpressionSyntax AcceptInvariant()
         {
-            var invariantKeyword = Tokens.AcceptToken<IInvariantKeywordToken>();
-            if (invariantKeyword == null) return null;
-            var condition = expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics);
-            return new InvariantSyntax(invariantKeyword, condition);
+            if (!Tokens.Accept<IInvariantKeywordToken>()) return null;
+            return expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics);
         }
         #endregion
 
@@ -271,8 +260,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers)
         {
-            var classKeyword = Tokens.AssertAndConsume<IClassKeywordToken>();
-            var name = Tokens.ExpectIdentifier();
+            Tokens.Expect<IClassKeywordToken>();
+            var name = Tokens.RequiredIdentifier();
             var genericParameters = genericsParser.AcceptGenericParameters(Tokens, Tokens.Context.Diagnostics);
             var baseClass = AcceptBaseClass();
             var baseTypes = AcceptBaseTypes();
@@ -292,8 +281,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers)
         {
-            var typeKeyword = Tokens.AssertAndConsume<ITraitKeywordToken>();
-            var name = Tokens.ExpectIdentifier();
+            Tokens.Expect<ITraitKeywordToken>();
+            var name = Tokens.RequiredIdentifier();
             var genericParameters = genericsParser.AcceptGenericParameters(Tokens, Tokens.Context.Diagnostics);
             var baseTypes = AcceptBaseTypes();
             var genericConstraints = genericsParser.ParseGenericConstraints(Tokens, Tokens.Context.Diagnostics);
@@ -312,8 +301,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers)
         {
-            Tokens.AssertAndConsume<IStructKeywordToken>();
-            var name = Tokens.AssertAndConsumeIdentifier();
+            Tokens.Expect<IStructKeywordToken>();
+            var name = Tokens.RequiredIdentifier();
             var genericParameters = genericsParser.AcceptGenericParameters(Tokens, Tokens.Context.Diagnostics);
             var baseTypes = AcceptBaseTypes();
             var genericConstraints = genericsParser.ParseGenericConstraints(Tokens, Tokens.Context.Diagnostics);
@@ -332,13 +321,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers)
         {
-            var enumKeyword = Tokens.AssertAndConsume<IEnumKeywordToken>();
+            Tokens.Expect<IEnumKeywordToken>();
             switch (Tokens.Current)
             {
                 case IStructKeywordToken _:
                 {
-                    var structKeyword = Tokens.Expect<IStructKeywordToken>();
-                    var name = Tokens.ExpectIdentifier();
+                    Tokens.Expect<IStructKeywordToken>();
+                    var name = Tokens.RequiredIdentifier();
                     var genericParameters = genericsParser.AcceptGenericParameters(Tokens, Tokens.Context.Diagnostics);
                     var baseTypes = AcceptBaseTypes();
                     var genericConstraints = genericsParser.ParseGenericConstraints(Tokens, Tokens.Context.Diagnostics);
@@ -353,8 +342,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 }
                 case IClassKeywordToken _:
                 {
-                    var classKeyword = Tokens.Expect<IClassKeywordToken>();
-                    var name = Tokens.ExpectIdentifier();
+                    Tokens.Expect<IClassKeywordToken>();
+                    var name = Tokens.RequiredIdentifier();
                     var genericParameters = genericsParser.AcceptGenericParameters(Tokens, Tokens.Context.Diagnostics);
                     var baseClass = AcceptBaseClass();
                     var baseTypes = AcceptBaseTypes();
@@ -375,24 +364,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        private EnumVariantsSyntax ParseEnumVariants()
+        private FixedList<EnumVariantSyntax> ParseEnumVariants()
         {
             var variants = new List<EnumVariantSyntax>();
             while (Tokens.Current is IIdentifierToken)
                 variants.Add(ParseEnumVariant());
 
-            ISemicolonTokenPlace semicolon = null;
-            if (!(Tokens.Current is ICloseBraceToken))
-                semicolon = Tokens.Consume<ISemicolonTokenPlace>();
+            // Semicolon is optional if there are no members
+            if (!Tokens.AtEnd<ICloseBraceToken>())
+                Tokens.Expect<ISemicolonToken>();
 
-            return new EnumVariantsSyntax(variants.ToFixedList(), semicolon);
+            return variants.ToFixedList();
         }
 
         [MustUseReturnValue]
         [NotNull]
         private EnumVariantSyntax ParseEnumVariant()
         {
-            var identifier = Tokens.ExpectIdentifier();
+            var identifier = Tokens.RequiredIdentifier();
+            // TODO we actually expect commas separating them, need to improve this
             var comma = Tokens.AcceptToken<ICommaToken>();
             return new EnumVariantSyntax(identifier, comma);
         }
@@ -405,25 +395,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers)
         {
-            var binding = Tokens.AssertAndConsume<IBindingToken>();
-            var getter = AcceptFieldGetter();
-            var name = Tokens.ExpectIdentifier();
+            // TODO include these in the syntax tree
+            var binding = Tokens.Expect<IBindingToken>();
+            var getterAccess = AcceptFieldGetter();
+            var name = Tokens.RequiredIdentifier();
             ExpressionSyntax typeExpression = null;
-            if (Tokens.Current is IColonToken)
+            if (Tokens.Accept<IColonToken>())
             {
-                Tokens.Expect<IColonToken>();
                 // Need to not consume the assignment that separates the type from the initializer,
                 // hence the min operator precedence.
                 typeExpression = expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics, OperatorPrecedence.AboveAssignment);
             }
             ExpressionSyntax initializer = null;
-            if (Tokens.Current is IEqualsToken)
-            {
-                Tokens.Consume<IEqualsToken>();
+            if (Tokens.Accept<IEqualsToken>())
                 initializer = expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics);
-            }
+
             Tokens.Expect<ISemicolonToken>();
-            return new FieldDeclarationSyntax(modifiers, name, typeExpression, initializer);
+            return new FieldDeclarationSyntax(attributes, modifiers, getterAccess, name, typeExpression, initializer);
         }
 
         [MustUseReturnValue]
@@ -445,31 +433,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers)
         {
-            Tokens.AssertAndConsume<IFunctionKeywordToken>();
-            var name = Tokens.AssertAndConsumeIdentifier();
+            Tokens.Expect<IFunctionKeywordToken>();
+            var name = Tokens.RequiredIdentifier();
             var genericParameters = genericsParser.AcceptGenericParameters(Tokens, Tokens.Context.Diagnostics);
-            var parameters = AcceptParameters();
-            Tokens.Expect<IRightArrowToken>();
-            var returnTypeExpression = expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics);
+            var parameters = ParseParameters();
+            ExpressionSyntax returnType = null;
+            if (Tokens.Accept<IRightArrowToken>())
+                returnType = expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics);
             var genericConstraints = genericsParser.ParseGenericConstraints(Tokens, Tokens.Context.Diagnostics);
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
             var body = ParseFunctionBody(Tokens, Tokens.Context.Diagnostics);
-            return new NamedFunctionDeclarationSyntax(modifiers, name, genericParameters, parameters, returnTypeExpression,
+            return new NamedFunctionDeclarationSyntax(modifiers, name, genericParameters, parameters, returnType,
                 genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
 
         [MustUseReturnValue]
         [NotNull]
-        public OperatorDeclarationSyntax ParseOperatorFunction(
+        public OperatorDeclarationSyntax ParseOperator(
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers)
         {
-            var operatorKeywordSpan = Tokens.AssertAndConsume<IOperatorKeywordToken>();
-            // TODO save the generic parameters
+            var operatorKeywordSpan = Tokens.Expect<IOperatorKeywordToken>();
             var genericParameters = genericsParser.AcceptGenericParameters(Tokens, Tokens.Context.Diagnostics);
-            //IOperatorTokenPlace @operator;
             // TODO correctly store these in the syntax class
             switch (Tokens.Current)
             {
@@ -502,17 +489,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     Tokens.Expect<IOperatorToken>();
                     break;
             }
-            var parameters = AcceptParameters();
-            Tokens.Expect<IRightArrowToken>();
-            var returnTypeExpression = expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics);
+            var parameters = ParseParameters();
+            ExpressionSyntax returnType = null;
+            if (Tokens.Accept<IRightArrowToken>())
+                returnType = expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics);
             var genericConstraints = genericsParser.ParseGenericConstraints(Tokens, Tokens.Context.Diagnostics);
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
             var body = blockParser.ParseBlock(Tokens, Tokens.Context.Diagnostics);
             return new OperatorDeclarationSyntax(modifiers, operatorKeywordSpan, genericParameters,
-                 parameters, returnTypeExpression,
-                genericConstraints, mayEffects, noEffects, requires, ensures, body);
+                 parameters, returnType, genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
 
         [MustUseReturnValue]
@@ -521,10 +508,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers)
         {
-            var newKeywordSpan = Tokens.AssertAndConsume<INewKeywordToken>();
+            var newKeywordSpan = Tokens.Expect<INewKeywordToken>();
             var name = Tokens.AcceptToken<IIdentifierToken>();
             var genericParameters = genericsParser.AcceptGenericParameters(Tokens, Tokens.Context.Diagnostics);
-            var parameters = AcceptParameters();
+            var parameters = ParseParameters();
             var genericConstraints = genericsParser.ParseGenericConstraints(Tokens, Tokens.Context.Diagnostics);
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
@@ -540,10 +527,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers)
         {
-            var initKeywordSpan = Tokens.AssertAndConsume<IInitKeywordToken>();
+            var initKeywordSpan = Tokens.Expect<IInitKeywordToken>();
             var name = Tokens.AcceptToken<IIdentifierToken>();
             var genericParameters = genericsParser.AcceptGenericParameters(Tokens, Tokens.Context.Diagnostics);
-            var parameters = AcceptParameters();
+            var parameters = ParseParameters();
             var genericConstraints = genericsParser.ParseGenericConstraints(Tokens, Tokens.Context.Diagnostics);
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
@@ -560,8 +547,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers)
         {
-            var deleteKeywordSpan = Tokens.AssertAndConsume<IDeleteKeywordToken>();
-            var parameters = AcceptParameters();
+            var deleteKeywordSpan = Tokens.Expect<IDeleteKeywordToken>();
+            var parameters = ParseParameters();
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
@@ -570,59 +557,75 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                  parameters, mayEffects, noEffects, requires, ensures, body);
         }
 
-        //[MustUseReturnValue]
-        //[NotNull]
-        //private GetterFunctionDeclarationSyntax ParseGetterFunction(
-        //    [NotNull] FixedList<AttributeSyntax> attributes,
-        //    [NotNull] FixedList<IModiferToken> modifiers)
-        //{
-        //    var getKeyword = tokens.Take<IGetKeywordToken>();
-        //    var name = tokens.ExpectIdentifier();
-        //    var openParen = tokens.Expect<IOpenParenTokenPlace>();
-        //    var parameters = ParseParameterList(tokens, diagnostics);
-        //    var closeParen = tokens.Expect<ICloseParenTokenPlace>();
-        //    var arrow = tokens.Expect<IRightArrowTokenPlace>();
-        //    var returnTypeExpression = expressionParser.ParseExpression(tokens, diagnostics);
-        //    var effects = AcceptEffects(tokens, diagnostics);
-        //    var contracts = ParseFunctionContracts(tokens, diagnostics);
-        //    var (body, semicolon) = ParseFunctionBody(tokens, diagnostics);
-        //    return new GetterFunctionDeclarationSyntax(modifiers, getKeyword, name,
-        //        openParen, parameters, closeParen, arrow, returnTypeExpression, effects, contracts, body, semicolon);
-        //}
+        [MustUseReturnValue]
+        [NotNull]
+        private GetterDeclarationSyntax ParseGetter(
+            [NotNull] FixedList<AttributeSyntax> attributes,
+            [NotNull] FixedList<IModiferToken> modifiers)
+        {
+            Tokens.Expect<IGetKeywordToken>();
+            var name = Tokens.RequiredIdentifier();
+            var parameters = ParseParameters();
+            Tokens.Expect<IRightArrowToken>();
+            var returnType = expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics);
+            var mayEffects = ParseMayEffects();
+            var noEffects = ParseNoEffects();
+            var (requires, ensures) = ParseFunctionContracts();
+            var body = blockParser.ParseBlock(Tokens, Tokens.Context.Diagnostics);
+            return new GetterDeclarationSyntax(attributes, modifiers, name,
+                parameters, returnType, mayEffects, noEffects, requires, ensures, body);
+        }
 
-        //[MustUseReturnValue]
-        //[NotNull]
-        //private SetterFunctionDeclarationSyntax ParseSetterFunction(
-        //    [NotNull] FixedList<AttributeSyntax> attributes,
-        //    [NotNull] FixedList<IModiferToken> modifiers)
-        //{
-        //    var setKeyword = tokens.Take<ISetKeywordToken>();
-        //    var name = tokens.ExpectIdentifier();
-        //    var openParen = tokens.Expect<IOpenParenTokenPlace>();
-        //    var parameters = ParseParameterList(tokens, diagnostics);
-        //    var closeParen = tokens.Expect<ICloseParenTokenPlace>();
-        //    var arrow = tokens.Expect<IRightArrowTokenPlace>();
-        //    var returnTypeExpression = expressionParser.ParseExpression(tokens, diagnostics);
-        //    var effects = AcceptEffects(tokens, diagnostics);
-        //    var contracts = ParseFunctionContracts(tokens, diagnostics);
-        //    var (body, semicolon) = ParseFunctionBody(tokens, diagnostics);
-        //    return new SetterFunctionDeclarationSyntax(modifiers, setKeyword, name,
-        //        openParen, parameters, closeParen, arrow, returnTypeExpression, effects, contracts, body, semicolon);
-        //}
+        [MustUseReturnValue]
+        [NotNull]
+        private SetterDeclarationSyntax ParseSetter(
+            [NotNull] FixedList<AttributeSyntax> attributes,
+            [NotNull] FixedList<IModiferToken> modifiers)
+        {
+            Tokens.Expect<ISetKeywordToken>();
+            var name = Tokens.RequiredIdentifier();
+            var parameters = ParseParameters();
+            var mayEffects = ParseMayEffects();
+            var noEffects = ParseNoEffects();
+            var (requires, ensures) = ParseFunctionContracts();
+            var body = blockParser.ParseBlock(Tokens, Tokens.Context.Diagnostics);
+            return new SetterDeclarationSyntax(attributes, modifiers, name,
+                 parameters, mayEffects, noEffects, requires, ensures, body);
+        }
 
         [MustUseReturnValue]
         [CanBeNull]
         private FixedList<ParameterSyntax> AcceptParameters()
         {
-            var parameters = new List<ParameterSyntax>();
-            if (Tokens.AcceptToken<IOpenParenToken>() == null)
+            if (!Tokens.Accept<IOpenParenToken>())
                 return null;
+            return ParseRestOfParameters();
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
+        private FixedList<ParameterSyntax> ParseParameters()
+        {
+            Tokens.Expect<IOpenParenToken>();
+            return ParseRestOfParameters();
+        }
+
+        /// <summary>
+        /// Requires that the open paren has already been consumed
+        /// </summary>
+        /// <returns></returns>
+        [NotNull]
+        [MustUseReturnValue]
+        private FixedList<ParameterSyntax> ParseRestOfParameters()
+        {
+            var parameters = new List<ParameterSyntax>();
             while (!Tokens.AtEnd<ICloseParenToken>())
             {
                 parameters.Add(parameterParser.ParseParameter(Tokens, Tokens.Context.Diagnostics));
                 if (Tokens.Current is ICommaToken)
                     Tokens.Expect<ICommaToken>();
             }
+
             Tokens.Expect<ICloseParenToken>();
             return parameters.ToFixedList();
         }
@@ -631,7 +634,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [NotNull]
         private FixedList<EffectSyntax> ParseMayEffects()
         {
-            if (Tokens.AcceptToken<IMayKeywordToken>() == null)
+            if (!Tokens.Accept<IMayKeywordToken>())
                 return FixedList<EffectSyntax>.Empty;
 
             return listParser.ParseSeparatedList<EffectSyntax, ICommaToken>(ParseEffect);
@@ -641,12 +644,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [NotNull]
         private FixedList<EffectSyntax> ParseNoEffects()
         {
-            if (Tokens.AcceptToken<INoKeywordToken>() == null)
+            if (!Tokens.Accept<INoKeywordToken>())
                 return FixedList<EffectSyntax>.Empty;
 
             return listParser.ParseSeparatedList<EffectSyntax, ICommaToken>(ParseEffect);
         }
-
 
         [MustUseReturnValue]
         [NotNull]
@@ -654,15 +656,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             switch (Tokens.Current)
             {
-                case IThrowKeywordToken throwKeyword:
-                    Tokens.Next();
+                case IThrowKeywordToken _:
+                    Tokens.Expect<IThrowKeywordToken>();
                     var exceptions = listParser.ParseSeparatedList<ThrowEffectEntrySyntax, ICommaToken>(ParseThrowEffectEntry);
                     return new ThrowEffectSyntax(exceptions);
-                case IIdentifierToken identifier:
-                    Tokens.Next();
-                    return new SimpleEffectSyntax(identifier);
+                case IIdentifierToken _:
+                    return new SimpleEffectSyntax(Tokens.RequiredIdentifier());
                 default:
-                    throw NonExhaustiveMatchException.For(Tokens.Current);
+                    Tokens.UnexpectedToken();
+                    throw new ParseFailedException();
             }
         }
 
@@ -670,9 +672,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [NotNull]
         private ThrowEffectEntrySyntax ParseThrowEffectEntry()
         {
-            var paramsKeyword = Tokens.AcceptToken<IParamsKeywordToken>();
+            var isParams = Tokens.Accept<IParamsKeywordToken>();
             var exceptionType = expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics);
-            return new ThrowEffectEntrySyntax(paramsKeyword, exceptionType);
+            return new ThrowEffectEntrySyntax(isParams, exceptionType);
         }
 
         [MustUseReturnValue]
@@ -699,7 +701,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [NotNull]
         private ExpressionSyntax ParseRequires()
         {
-            Tokens.AssertAndConsume<IRequiresKeywordToken>();
+            Tokens.Expect<IRequiresKeywordToken>();
             return expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics);
         }
 
@@ -707,7 +709,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [NotNull]
         private ExpressionSyntax ParseEnsures()
         {
-            Tokens.AssertAndConsume<IEnsuresKeywordToken>();
+            Tokens.Expect<IEnsuresKeywordToken>();
             return expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics);
         }
 
@@ -722,58 +724,38 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         }
         #endregion
 
-        //[MustUseReturnValue]
-        //[NotNull]
-        //private ConstDeclarationSyntax ParseConst(
-        //    [NotNull] FixedList<AttributeSyntax> attributes,
-        //    [NotNull] FixedList<IModiferToken> modifiers)
-        //{
-        //    var constKeyword = tokens.Take<IConstKeywordToken>();
-        //    var name = tokens.ExpectIdentifier();
-        //    IColonTokenPlace colon = null;
-        //    ExpressionSyntax typeExpression = null;
-        //    if (tokens.Current is IColonToken)
-        //    {
-        //        colon = tokens.Expect<IColonTokenPlace>();
-        //        // Need to not consume the assignment that separates the type from the initializer,
-        //        // hence the min operator precedence.
-        //        typeExpression = expressionParser.ParseExpression(tokens, diagnostics, OperatorPrecedence.AboveAssignment);
-        //    }
-        //    IEqualsToken equals = null;
-        //    ExpressionSyntax initializer = null;
-        //    if (tokens.Current is IEqualsToken)
-        //    {
-        //        equals = tokens.Take<IEqualsToken>();
-        //        initializer = expressionParser.ParseExpression(tokens, diagnostics);
-        //    }
-        //    var semicolon = tokens.Expect<ISemicolonTokenPlace>();
-        //    return new ConstDeclarationSyntax(attributes, modifiers, constKeyword, name, colon, typeExpression,
-        //        equals, initializer, semicolon);
-        //}
+        [MustUseReturnValue]
+        [NotNull]
+        private ConstDeclarationSyntax ParseConst(
+            [NotNull] FixedList<AttributeSyntax> attributes,
+            [NotNull] FixedList<IModiferToken> modifiers)
+        {
+            try
+            {
+                Tokens.Expect<IConstKeywordToken>();
+                var name = Tokens.RequiredIdentifier();
+                ExpressionSyntax type = null;
+                if (Tokens.Accept<IColonToken>())
+                {
+                    // Need to not consume the assignment that separates the type from the initializer,
+                    // hence the min operator precedence.
+                    type = expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics,
+                        OperatorPrecedence.AboveAssignment);
+                }
 
-        //[MustUseReturnValue]
-        //[NotNull]
-        //private static IncompleteDeclarationSyntax ParseIncompleteDeclaration(
-        //    [NotNull] FixedList<AttributeSyntax> attributes,
-        //    [NotNull] FixedList<IModiferToken> modifiers)
-        //{
-        //    var skipped = attributes.SelectMany(a => a.Tokens()).Concat(modifiers.SelectMany(m => m.Tokens())).ToList();
-        //    skipped.Add(tokens.ExpectIdentifier());    // The name we are expecting
+                ExpressionSyntax initializer = null;
+                if (Tokens.Accept<IEqualsToken>())
+                    initializer =
+                        expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics);
 
-        //    if (skipped.All(s => s is IMissingToken))
-        //    {
-        //        // We haven't consumed any tokens, we need to consume a token so
-        //        // we make progress.
-        //        skipped.Add(tokens.Current);
-        //        tokens.Next();
-        //    }
-
-        //    var span = TextSpan.Covering(
-        //        skipped.First(s => s != null).NotNull().Span,
-        //        skipped.Last(s => s != null).NotNull().Span);
-
-        //    diagnostics.Add(ParseError.IncompleteDeclaration(tokens.Context.File, span));
-        //    return new IncompleteDeclarationSyntax(skipped);
-        //}
+                Tokens.Expect<ISemicolonToken>();
+                return new ConstDeclarationSyntax(attributes, modifiers, name, type, initializer);
+            }
+            catch (ParseFailedException)
+            {
+                SkipToEndOfStatement();
+                throw;
+            }
+        }
     }
 }

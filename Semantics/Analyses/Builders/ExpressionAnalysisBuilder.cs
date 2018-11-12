@@ -36,11 +36,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
             this.statementBuilderProvider = statementBuilderProvider;
         }
 
-        [NotNull]
+        [ContractAnnotation("expression:null => null; expression:notnull => notnull")]
         public ExpressionAnalysis BuildExpression(
             [NotNull] AnalysisContext context,
             [NotNull] Name functionName,
-            [NotNull] ExpressionSyntax expression)
+            [CanBeNull] ExpressionSyntax expression)
         {
             switch (expression)
             {
@@ -126,6 +126,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
                 case MemberAccessExpressionSyntax memberAccessExpression:
                     return new MemberAccessExpressionAnalysis(context, memberAccessExpression,
                         BuildExpression(context, functionName, memberAccessExpression.Expression));
+                case null:
+                    return null;
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }

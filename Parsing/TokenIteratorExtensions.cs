@@ -8,11 +8,11 @@ using JetBrains.Annotations;
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     /// <summary>
-    /// * AssertAndConsume: Asserts the current token is of the given type and if it is, consumes it.
-    ///   Used when there must be a programmer mistake if the current token is not of the expected kind.
-    /// * Accept - If the current token is of the given type consume it, otherwise leave it.
-    /// * Expected - If the current token is of the given type consume it, otherwise leave it, but
-    ///   add a compiler error that an expected token is missing
+    /// * Required: If the current token is of the given type consume it, otherwise leave it, but
+    ///   add a compiler error that an expected token is missing AND throw a <see cref="ParseFailedException"/>.
+    /// * Expected: If the current token is of the given type consume it, otherwise leave it, but
+    ///   add a compiler error that an expected token is missing.
+    /// * Accept: If the current token is of the given type consume it, otherwise leave it.
     ///
     /// Old Stuff
     /// * Required - throws <see cref="InvalidOperationException"/> if that kind of token isn't found
@@ -22,8 +22,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     /// </summary>
     public static class TokenIteratorExtensions
     {
-        #region AssertAndConsume
-        public static TextSpan AssertAndConsume<T>([NotNull] this ITokenIterator tokens)
+        #region Required
+        public static TextSpan Required<T>([NotNull] this ITokenIterator tokens)
             where T : IToken
         {
             if (tokens.Current is T token)
@@ -32,11 +32,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 return token.Span;
             }
 
-            throw new InvalidOperationException($"Requires {typeof(T).GetFriendlyName()}, found {tokens.Current.GetType().NotNull().GetFriendlyName()}");
+            tokens.Context.Diagnostics.Add(
+                ParseError.MissingToken(tokens.Context.File, typeof(T), tokens.Current));
+            throw new ParseFailedException($"Requires {typeof(T).GetFriendlyName()}, found {tokens.Current.GetType().NotNull().GetFriendlyName()}");
         }
 
         [NotNull]
-        public static IIdentifierToken AssertAndConsumeIdentifier([NotNull] this ITokenIterator tokens)
+        public static IIdentifierToken RequiredIdentifier([NotNull] this ITokenIterator tokens)
         {
             if (tokens.Current is IIdentifierToken identifier)
             {
@@ -44,22 +46,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 return identifier;
             }
 
-            throw new InvalidOperationException($"Requires identifier, found {tokens.Current.GetType().NotNull().GetFriendlyName()}");
+            tokens.Context.Diagnostics.Add(
+                ParseError.MissingToken(tokens.Context.File, typeof(IIdentifierToken), tokens.Current));
+            throw new ParseFailedException($"Requires identifier, found {tokens.Current.GetType().NotNull().GetFriendlyName()}");
         }
         #endregion
 
         #region Accept
         [MustUseReturnValue]
-        public static TextSpan? Accept<T>([NotNull] this ITokenIterator tokens)
+        public static bool Accept<T>([NotNull] this ITokenIterator tokens)
             where T : class, IToken
         {
-            if (tokens.Current is T token)
+            if (tokens.Current is T)
             {
                 tokens.Next();
-                return token.Span;
+                return true;
             }
 
-            return null;
+            return false;
         }
 
         [MustUseReturnValue]
@@ -108,6 +112,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return null;
         }
         #endregion
+
+        /// <summary>
+        /// The current token is unexpected, report an error and consume it.
+        /// </summary>
+        public static TextSpan UnexpectedToken([NotNull] this ITokenIterator tokens)
+        {
+            // TODO shouldn't we ignore or combine unexpected token errors until we parse something successfully?
+            var span = tokens.Current.Span;
+            tokens.Context.Diagnostics.Add(
+                ParseError.UnexpectedToken(tokens.Context.File, span));
+            tokens.Next();
+            return span;
+        }
 
         [MustUseReturnValue]
         public static bool AtEnd<T>([NotNull] this ITokenIterator tokens)

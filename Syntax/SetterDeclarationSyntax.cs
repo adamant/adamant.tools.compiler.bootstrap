@@ -6,14 +6,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class SetterDeclarationSyntax : FunctionDeclarationSyntax
     {
+        [NotNull] public FixedList<AttributeSyntax> Attributes { get; }
         [NotNull] public IIdentifierToken Name { get; }
-        [NotNull] public ExpressionSyntax ReturnType { get; }
 
         public SetterDeclarationSyntax(
+            [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers,
             [NotNull] IIdentifierToken name,
             [NotNull] FixedList<ParameterSyntax> parameters,
-            [NotNull] ExpressionSyntax returnType,
             [NotNull] FixedList<EffectSyntax> mayEffects,
             [NotNull] FixedList<EffectSyntax> noEffects,
             [NotNull] FixedList<ExpressionSyntax> requires,
@@ -21,8 +21,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [CanBeNull] BlockSyntax body)
             : base(modifiers, name.Span, parameters, mayEffects, noEffects, requires, ensures, body)
         {
+            Attributes = attributes;
             Name = name;
-            ReturnType = returnType;
         }
     }
 }

@@ -2,6 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
+using ITriviaToken = Adamant.Tools.Compiler.Bootstrap.Tokens.ITriviaToken;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Lexing
 {
@@ -25,16 +26,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
             }
 
             [NotNull] public ParseContext Context => tokens.Context;
+
             public bool Next()
             {
                 do
                 {
-                    tokens.Next();
+                    if (!tokens.Next())
+                        return false;
                 } while (tokens.Current is ITriviaToken);
-                return tokens.Current != null;
+
+                return true;
             }
 
-            [CanBeNull]
+            [NotNull]
             public IToken Current => tokens.Current;
         }
     }

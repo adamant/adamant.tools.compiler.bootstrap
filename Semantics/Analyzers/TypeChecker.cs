@@ -45,13 +45,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 CheckGenericParameters(function.GenericParameters.NotNull(), function.Diagnostics);
             CheckParameters(function.Parameters, function.Diagnostics);
 
-            var returnType = EvaluateTypeExpression(function.ReturnTypeExpression, function.Diagnostics);
+            var returnType = function.ReturnTypeExpression != null
+                ? EvaluateTypeExpression(function.ReturnTypeExpression, function.Diagnostics)
+                : ObjectType.Void;
             function.ReturnType.Computed(returnType);
 
             var functionType = returnType;
-            // TODO better way to check for having regular arguments?
-            if (function.Parameters != null)
-                functionType = new FunctionType(function.Parameters.Select(p => p.Type.AssertComputed()), functionType);
+            functionType = new FunctionType(function.Parameters.Select(p => p.Type.AssertComputed()), functionType);
 
             if (function.IsGeneric && function.GenericParameters.NotNull().Any())
                 functionType = new MetaFunctionType(function.GenericParameters.NotNull().Select(p => p.Type.AssertComputed()), functionType);

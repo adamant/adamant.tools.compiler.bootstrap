@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         [CanBeNull] public FixedList<GenericParameterSyntax> GenericParameters { get; }
         [CanBeNull] public FixedList<ExpressionSyntax> BaseTypes { get; }
         [NotNull] public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
-        [NotNull] public FixedList<InvariantSyntax> Invariants { get; }
+        [NotNull] public FixedList<ExpressionSyntax> Invariants { get; }
         [NotNull] public FixedList<MemberDeclarationSyntax> Members { get; }
 
         public StructDeclarationSyntax(
@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [CanBeNull] FixedList<GenericParameterSyntax> genericParameters,
             [CanBeNull] FixedList<ExpressionSyntax> baseTypes,
             [NotNull] FixedList<GenericConstraintSyntax> genericConstraints,
-            [NotNull] FixedList<InvariantSyntax> invariants,
+            [NotNull] FixedList<ExpressionSyntax> invariants,
             [NotNull] FixedList<MemberDeclarationSyntax> members)
             : base(name.Span)
         {

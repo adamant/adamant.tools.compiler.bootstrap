@@ -12,8 +12,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         [CanBeNull] public FixedList<GenericParameterSyntax> GenericParameters { get; }
         [CanBeNull] public FixedList<ExpressionSyntax> BaseTypes { get; }
         [NotNull] public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
-        [NotNull] public FixedList<InvariantSyntax> Invariants { get; }
-        [NotNull] public EnumVariantsSyntax Variants { get; }
+        [NotNull] public FixedList<ExpressionSyntax> Invariants { get; }
+        [NotNull] public FixedList<EnumVariantSyntax> Variants { get; }
         [NotNull] public FixedList<MemberDeclarationSyntax> Members { get; }
 
         public EnumStructDeclarationSyntax(
@@ -23,8 +23,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [CanBeNull] FixedList<GenericParameterSyntax> genericParameters,
             [CanBeNull] FixedList<ExpressionSyntax> baseTypes,
             [NotNull] FixedList<GenericConstraintSyntax> genericConstraints,
-            [NotNull] FixedList<InvariantSyntax> invariants,
-            [NotNull] EnumVariantsSyntax variants,
+            [NotNull] FixedList<ExpressionSyntax> invariants,
+            [NotNull] FixedList<EnumVariantSyntax> variants,
             [NotNull] FixedList<MemberDeclarationSyntax> members)
             : base(name.Span)
         {

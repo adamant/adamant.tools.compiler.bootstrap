@@ -4,12 +4,12 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
-    public class Parser
+    public abstract class Parser
     {
         [NotNull] protected readonly CodeFile File;
         [NotNull] protected readonly ITokenIterator Tokens;
 
-        public Parser([NotNull] ITokenIterator tokens)
+        protected Parser([NotNull] ITokenIterator tokens)
         {
             File = tokens.Context.File;
 

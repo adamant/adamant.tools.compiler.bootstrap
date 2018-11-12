@@ -6,9 +6,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public class FileParser
     {
-        [NotNull] private readonly CompilationUnitParser compilationUnitParser;
-
-        public FileParser([NotNull] ITokenIterator tokens)
+        [MustUseReturnValue]
+        public CompilationUnitSyntax Parse([NotNull] ITokenIterator tokens)
         {
             var listParser = new ListParser(tokens);
             var functionBodyParser = new FunctionBodyParser(tokens, listParser);
@@ -19,12 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var declarationParser = new DeclarationParser(tokens, listParser, functionBodyParser,
                 functionBodyParser, parameterParser, accessModifierParser,
                 genericsParser, functionBodyParser, usingDirectiveParser);
-            compilationUnitParser = new CompilationUnitParser(tokens, declarationParser);
-        }
-
-        [MustUseReturnValue]
-        public CompilationUnitSyntax Parse()
-        {
+            var compilationUnitParser = new CompilationUnitParser(tokens, declarationParser);
             return compilationUnitParser.ParseCompilationUnit();
         }
     }

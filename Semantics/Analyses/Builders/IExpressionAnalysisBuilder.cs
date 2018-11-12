@@ -6,10 +6,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
 {
     public interface IExpressionAnalysisBuilder
     {
-        [NotNull]
+        [ContractAnnotation("expression:null => null; expression:notnull => notnull")]
         ExpressionAnalysis BuildExpression(
             [NotNull] AnalysisContext context,
             [NotNull] Name functionName,
-            [NotNull] ExpressionSyntax expression);
+            [CanBeNull] ExpressionSyntax expression);
     }
 }

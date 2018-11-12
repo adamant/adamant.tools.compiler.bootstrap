@@ -13,9 +13,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
     public class FunctionDeclarationAnalysis : MemberDeclarationAnalysis
     {
         [NotNull] public new NamedFunctionDeclarationSyntax Syntax { get; }
-        [CanBeNull, ItemNotNull] public FixedList<ParameterAnalysis> Parameters { get; }
+        [NotNull, ItemNotNull] public FixedList<ParameterAnalysis> Parameters { get; }
         public int? Arity => Parameters?.Count;
-        [NotNull] public ExpressionAnalysis ReturnTypeExpression { get; }
+        [CanBeNull] public ExpressionAnalysis ReturnTypeExpression { get; }
         [NotNull] public TypeAnalysis ReturnType { get; } = new TypeAnalysis();
         [NotNull, ItemNotNull] public IReadOnlyList<StatementAnalysis> Statements { get; }
         [CanBeNull] public ControlFlowGraph ControlFlow { get; private set; }
@@ -25,8 +25,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             [NotNull] NamedFunctionDeclarationSyntax syntax,
             [NotNull] Name name,
             [CanBeNull, ItemNotNull] IEnumerable<GenericParameterAnalysis> genericParameters,
-            [CanBeNull, ItemNotNull] IEnumerable<ParameterAnalysis> parameters,
-            [NotNull] ExpressionAnalysis returnTypeExpression,
+            [NotNull, ItemNotNull] IEnumerable<ParameterAnalysis> parameters,
+            [CanBeNull] ExpressionAnalysis returnTypeExpression,
             [CanBeNull] [ItemNotNull] IEnumerable<StatementAnalysis> statements)
             : base(context, syntax, name, genericParameters)
         {

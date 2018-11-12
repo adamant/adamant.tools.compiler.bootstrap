@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     public class OperatorDeclarationSyntax : FunctionDeclarationSyntax
     {
         [CanBeNull] public FixedList<GenericParameterSyntax> GenericParameters { get; }
-        [NotNull] public ExpressionSyntax ReturnType { get; }
+        [CanBeNull] public ExpressionSyntax ReturnType { get; }
         [NotNull] public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
 
         public OperatorDeclarationSyntax(
@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             TextSpan nameSpan,
             [CanBeNull] FixedList<GenericParameterSyntax> genericParameters,
             [NotNull] FixedList<ParameterSyntax> parameters,
-            [NotNull] ExpressionSyntax returnType,
+            [CanBeNull] ExpressionSyntax returnType,
             [NotNull] FixedList<GenericConstraintSyntax> genericConstraints,
             [NotNull] FixedList<EffectSyntax> mayEffects,
             [NotNull] FixedList<EffectSyntax> noEffects,

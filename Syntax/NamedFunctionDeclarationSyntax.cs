@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     {
         [NotNull] public IIdentifierToken Name { get; }
         [CanBeNull] public FixedList<GenericParameterSyntax> GenericParameters { get; }
-        [NotNull] public ExpressionSyntax ReturnType { get; }
+        [CanBeNull] public ExpressionSyntax ReturnType { get; }
         [NotNull] public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
 
         public NamedFunctionDeclarationSyntax(
@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [NotNull] IIdentifierToken name,
             [CanBeNull] FixedList<GenericParameterSyntax> genericParameters,
             [NotNull] FixedList<ParameterSyntax> parameters, // For now we will not support pure meta functions
-            [NotNull] ExpressionSyntax returnType,
+            [CanBeNull] ExpressionSyntax returnType,
             [NotNull] FixedList<GenericConstraintSyntax> genericConstraints,
             [NotNull] FixedList<EffectSyntax> mayEffects,
             [NotNull] FixedList<EffectSyntax> noEffects,

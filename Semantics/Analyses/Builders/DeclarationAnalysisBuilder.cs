@@ -89,9 +89,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
                     return BuildEnumStruct(context, @namespace, enumStruct);
                 case EnumClassDeclarationSyntax enumClass:
                     return BuildEnumClass(context, @namespace, enumClass);
-                case IncompleteDeclarationSyntax _:
-                    // Since it is incomplete, we can't do any analysis on it
-                    return null;
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
             }
@@ -113,7 +110,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
             return new FunctionDeclarationAnalysis(
                 context, syntax, fullName, BuildGenericParameters(context, fullName, syntax.GenericParameters),
                 syntax.Parameters?.Select(p => BuildParameter(typesContext, fullName, p)),
-                expressionBuilder.BuildExpression(typesContext, fullName, syntax.ReturnType),
+                 expressionBuilder.BuildExpression(typesContext, fullName, syntax.ReturnType),
                 syntax.Body?.Statements.Select(statementSyntax => statementBuilder.Build(bodyContext, fullName, statementSyntax)));
         }
 
