@@ -14,11 +14,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
     {
         [NotNull] public new NamedFunctionDeclarationSyntax Syntax { get; }
         [NotNull, ItemNotNull] public FixedList<ParameterAnalysis> Parameters { get; }
-        public int? Arity => Parameters?.Count;
+        public int? Arity => Parameters.Count;
         [CanBeNull] public ExpressionAnalysis ReturnTypeExpression { get; }
         [NotNull] public TypeAnalysis ReturnType { get; } = new TypeAnalysis();
         [NotNull, ItemNotNull] public IReadOnlyList<StatementAnalysis> Statements { get; }
-        [CanBeNull] public ControlFlowGraph ControlFlow { get; private set; }
+        [CanBeNull] private ControlFlowGraph controlFlow;
+
+        [CanBeNull]
+        public ControlFlowGraph ControlFlow
+        {
+            get => controlFlow;
+            set
+            {
+                // Needs to not be already set
+                Requires.Null(nameof(ControlFlow), controlFlow);
+                controlFlow = value;
+            }
+        }
 
         public FunctionDeclarationAnalysis(
             [NotNull] AnalysisContext context,
@@ -34,13 +46,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             Parameters = parameters?.ToFixedList();
             ReturnTypeExpression = returnTypeExpression;
             Statements = (statements ?? Enumerable.Empty<StatementAnalysis>()).ToFixedList();
-        }
-
-        [NotNull]
-        public ControlFlowGraph CreateControlFlowGraph()
-        {
-            Requires.Null(nameof(ControlFlow), ControlFlow);
-            return ControlFlow = new ControlFlowGraph();
         }
 
         [CanBeNull]

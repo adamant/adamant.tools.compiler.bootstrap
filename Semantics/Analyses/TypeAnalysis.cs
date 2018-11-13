@@ -64,5 +64,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
 
             return DataType.NotNull().AssertResolved();
         }
+
+        // Useful for debugging
+        public override string ToString()
+        {
+            switch (State)
+            {
+                case AnalysisState.NotComputed:
+                    return "⧼not computed⧽";
+                case AnalysisState.BeingComputed:
+                    return "⧼being computed⧽";
+                case AnalysisState.Computed:
+                    return DataType.NotNull().ToString();
+                default:
+                    throw NonExhaustiveMatchException.ForEnum(State);
+            }
+        }
     }
 }

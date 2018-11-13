@@ -13,67 +13,110 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 {
     public class ControlFlowGraphBuilder
     {
-        public void BuildGraph([NotNull][ItemNotNull] IEnumerable<FunctionDeclarationAnalysis> functions)
+        public static void BuildGraphs([NotNull, ItemNotNull] IEnumerable<FunctionDeclarationAnalysis> functions)
         {
             Requires.NotNull(nameof(functions), functions);
 
             foreach (var function in functions.Where(f => !f.Diagnostics.Any() // It has errors, can't generate intermediate code
                                                           && f.Syntax.Body != null // It is abstract
                                                           && !f.IsGeneric)) // It is not generic, generic functions need monomorphized
-                BuildGraph(function);
+            {
+                var builder = new ControlFlowGraphBuilder();
+                builder.BuildGraph(function);
+            }
+        }
+
+        [NotNull, ItemNotNull] private readonly List<LocalVariableDeclaration> variables = new List<LocalVariableDeclaration>();
+        [NotNull] private LocalVariableDeclaration ReturnVariable => variables.First().NotNull();
+        [NotNull, ItemNotNull] private readonly List<BasicBlock> blocks = new List<BasicBlock>();
+
+        [NotNull]
+        public LocalVariableDeclaration AddParameter(bool mutableBinding, [NotNull] DataType type, [CanBeNull] string name)
+        {
+            var variable = new LocalVariableDeclaration(true, mutableBinding, type, variables.Count)
+            {
+                Name = name
+            };
+            variables.Add(variable);
+            return variable;
+        }
+
+        [NotNull]
+        public LocalVariableDeclaration AddVariable(bool mutableBinding, [NotNull] DataType type, [CanBeNull] string name = null)
+        {
+            var variable = new LocalVariableDeclaration(false, mutableBinding, type, variables.Count)
+            {
+                Name = name
+            };
+            variables.Add(variable);
+            return variable;
+        }
+
+        [NotNull]
+        public LocalVariableDeclaration Let([NotNull] DataType type)
+        {
+            return AddVariable(false, type);
+        }
+
+        [NotNull]
+        public LocalVariableDeclaration Var([NotNull] DataType type)
+        {
+            return AddVariable(true, type);
+        }
+
+        [NotNull]
+        public BasicBlock AddBlock()
+        {
+            var block = new BasicBlock(blocks.Count);
+            blocks.Add(block);
+            return block;
         }
 
         private void BuildGraph([NotNull] FunctionDeclarationAnalysis function)
         {
             Requires.NotNull(nameof(function), function);
 
-            var cfg = function.CreateControlFlowGraph();
-
             // Temp Variable for return
-            cfg.Let(function.ReturnType.AssertResolved());
+            Let(function.ReturnType.AssertResolved());
             foreach (var parameter in function.Parameters)
-                cfg.AddParameter(parameter.MutableBinding, parameter.Type.AssertResolved(), parameter.Name.UnqualifiedName.Text);
+                AddParameter(parameter.MutableBinding, parameter.Type.AssertResolved(), parameter.Name.UnqualifiedName.Text);
 
-            var blocks = new Dictionary<NonTerminal, BasicBlock>();
-            var entryBlock = cfg.EntryBlock;
-            blocks.Add(function.Syntax.Body, entryBlock);
+            var blockMap = new Dictionary<NonTerminal, BasicBlock>();
+            var entryBlock = AddBlock();
+            blockMap.Add(function.Syntax.Body, entryBlock);
             var currentBlock = entryBlock;
             foreach (var statement in function.Statements)
-                ConvertStatementAnalysisToStatement(cfg, currentBlock, statement);
+                ConvertStatementAnalysisToStatement(currentBlock, statement);
 
             // Generate the implicit return statement
             if (currentBlock.Number == 0 && currentBlock.Terminator == null)
                 currentBlock.End(new ReturnTerminator());
+
+            function.ControlFlow = new ControlFlowGraph(variables, blocks);
         }
 
         [NotNull]
-        private VariableReference LookupVariable([NotNull] ControlFlowGraph cfg, [NotNull] string name)
+        private VariableReference LookupVariable([NotNull] string name)
         {
-            Requires.NotNull(nameof(name), name);
-            return cfg.VariableDeclarations.Single(v => v.Name == name).NotNull().Reference;
+            return variables.Single(v => v.Name == name).NotNull().Reference;
         }
 
         private void ConvertStatementAnalysisToStatement(
-            [NotNull] ControlFlowGraph cfg,
             [NotNull] BasicBlock currentBlock,
             [NotNull] StatementAnalysis statement)
         {
-            Requires.NotNull(nameof(cfg), cfg);
-            Requires.NotNull(nameof(statement), statement);
-            Requires.NotNull(nameof(currentBlock), currentBlock);
-
             switch (statement)
             {
                 case VariableDeclarationStatementAnalysis variableDeclaration:
-                    var variable = cfg.AddVariable(variableDeclaration.MutableBinding,
+                    var variable = AddVariable(variableDeclaration.MutableBinding,
                         variableDeclaration.Type.AssertResolved(),
                         variableDeclaration.Name.UnqualifiedName.Text);
                     if (variableDeclaration.Initializer != null)
-                        ConvertToAssignmentStatement(cfg, variable.Reference, variableDeclaration.Initializer, currentBlock);
+                        ConvertToAssignmentStatement(variable.Reference, variableDeclaration.Initializer, currentBlock);
                     break;
 
                 case ExpressionStatementAnalysis expressionStatement:
-                    ConvertExpressionAnalysisToStatement(cfg, currentBlock, expressionStatement.Expression);
+                    ConvertExpressionAnalysisToStatement(currentBlock, expressionStatement.Expression);
                     break;
 
                 default:
@@ -91,14 +134,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         }
 
         private void ConvertExpressionAnalysisToStatement(
-            [NotNull] ControlFlowGraph cfg,
             [NotNull] BasicBlock currentBlock,
             [NotNull] ExpressionAnalysis expression)
         {
-            Requires.NotNull(nameof(cfg), cfg);
-            Requires.NotNull(nameof(expression), expression);
-            Requires.NotNull(nameof(currentBlock), currentBlock);
-
             switch (expression)
             {
                 case IdentifierNameAnalysis _:
@@ -108,28 +146,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     switch (binaryOperatorExpression.Operator)
                     {
                         case IEqualsToken _:
-                            var lvalue = ConvertToLValue(cfg, binaryOperatorExpression.LeftOperand);
-                            ConvertToAssignmentStatement(cfg, lvalue, binaryOperatorExpression.RightOperand, currentBlock);
+                            var lvalue = ConvertToLValue(binaryOperatorExpression.LeftOperand);
+                            ConvertToAssignmentStatement(lvalue, binaryOperatorExpression.RightOperand, currentBlock);
                             break;
                         default:
                             // Could be side effects possibly.
-                            var temp = cfg.Let(binaryOperatorExpression.Type.AssertResolved());
-                            ConvertToAssignmentStatement(cfg, temp.Reference, expression, currentBlock);
+                            var temp = Let(binaryOperatorExpression.Type.AssertResolved());
+                            ConvertToAssignmentStatement(temp.Reference, expression, currentBlock);
                             break;
                     }
                     break;
                 case ReturnExpressionAnalysis returnExpression:
                     if (returnExpression.ReturnExpression != null)
-                        ConvertToAssignmentStatement(cfg, cfg.ReturnVariable.Reference, returnExpression.ReturnExpression, currentBlock);
+                        ConvertToAssignmentStatement(ReturnVariable.Reference, returnExpression.ReturnExpression, currentBlock);
                     currentBlock.End(new ReturnTerminator());
                     break;
                 case BlockAnalysis block:
                     foreach (var statementInBlock in block.Statements)
-                        ConvertStatementAnalysisToStatement(cfg, currentBlock, statementInBlock);
+                        ConvertStatementAnalysisToStatement(currentBlock, statementInBlock);
 
                     // Now we need to delete any owned variables
                     foreach (var variableDeclaration in block.Statements.OfType<VariableDeclarationStatementAnalysis>().Where(IsOwned))
-                        currentBlock.Add(new DeleteStatement(LookupVariable(cfg, variableDeclaration.Name.UnqualifiedName.Text).VariableNumber, new TextSpan(block.Syntax.Span.End, 0)));
+                        currentBlock.Add(new DeleteStatement(LookupVariable(variableDeclaration.Name.UnqualifiedName.Text).VariableNumber, new TextSpan(block.Syntax.Span.End, 0)));
 
                     break;
                 case ForeachExpressionAnalysis @foreach:
@@ -142,7 +180,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     // TODO actually convert the expression
                     break;
                 case UnsafeExpressionAnalysis unsafeExpression:
-                    ConvertExpressionAnalysisToStatement(cfg, currentBlock, unsafeExpression.Expression);
+                    ConvertExpressionAnalysisToStatement(currentBlock, unsafeExpression.Expression);
                     break;
                 case InvocationAnalysis invocation:
                     // TODO actually convert the expression
@@ -153,38 +191,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         }
 
         private void ConvertToAssignmentStatement(
-            [NotNull] ControlFlowGraph cfg,
             [NotNull] Place place,
             [NotNull] ExpressionAnalysis value,
             [NotNull] BasicBlock currentBlock)
         {
-            Requires.NotNull(nameof(cfg), cfg);
-            Requires.NotNull(nameof(place), place);
-            Requires.NotNull(nameof(value), value);
-            Requires.NotNull(nameof(currentBlock), currentBlock);
-
             switch (value)
             {
                 case NewObjectExpressionAnalysis newObjectExpression:
-                    var args = newObjectExpression.Arguments.Select(a => ConvertToLValue(cfg, a.Value));
+                    var args = newObjectExpression.Arguments.Select(a => ConvertToLValue(a.Value));
                     currentBlock.Add(new NewObjectStatement(place, newObjectExpression.Type.AssertResolved(), args));
                     break;
                 case IdentifierNameAnalysis identifier:
-                    currentBlock.Add(new AssignmentStatement(place, new CopyPlace(LookupVariable(cfg, identifier.Name.NotNull()))));
+                    currentBlock.Add(new AssignmentStatement(place, new CopyPlace(LookupVariable(identifier.Name.NotNull()))));
                     break;
                 case BinaryOperatorExpressionAnalysis binaryOperator:
-                    ConvertOperator(cfg, place, binaryOperator, currentBlock);
+                    ConvertOperator(place, binaryOperator, currentBlock);
                     break;
                 case IntegerLiteralExpressionAnalysis v:
                     var constant = new IntegerConstant(v.Value, v.Type);
                     currentBlock.Add(new AssignmentStatement(place, constant));
                     break;
                 case IfExpressionAnalysis ifExpression:
-                    ConvertExpressionAnalysisToStatement(cfg, currentBlock, ifExpression.Condition);
+                    ConvertExpressionAnalysisToStatement(currentBlock, ifExpression.Condition);
                     // TODO assign the result into the temp, branch and execute then or else, assign result
                     break;
                 case UnsafeExpressionAnalysis unsafeExpression:
-                    ConvertExpressionAnalysisToStatement(cfg, currentBlock, unsafeExpression.Expression);
+                    ConvertExpressionAnalysisToStatement(currentBlock, unsafeExpression.Expression);
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(value);
@@ -192,7 +224,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         }
 
         private void ConvertOperator(
-            [NotNull] ControlFlowGraph cfg,
             [NotNull] Place lvalue,
             [NotNull] BinaryOperatorExpressionAnalysis binaryOperator,
             [NotNull] BasicBlock currentBlock)
@@ -211,7 +242,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     // TODO generate the correct statement
                     break;
                 case IAsKeywordToken _:
-                    ConvertExpressionAnalysisToStatement(cfg, currentBlock, binaryOperator.LeftOperand);
+                    ConvertExpressionAnalysisToStatement(currentBlock, binaryOperator.LeftOperand);
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(binaryOperator.Operator);
@@ -219,13 +250,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         }
 
         [NotNull]
-        private Place ConvertToLValue([NotNull] ControlFlowGraph cfg, [NotNull] ExpressionAnalysis value)
+        private Place ConvertToLValue([NotNull] ExpressionAnalysis value)
         {
             Requires.NotNull(nameof(value), value);
             switch (value)
             {
                 case IdentifierNameAnalysis identifier:
-                    return LookupVariable(cfg, identifier.Name.NotNull());
+                    return LookupVariable(identifier.Name.NotNull());
                 //case VariableExpression variableExpression:
                 //    return LookupVariable(variableExpression.Name);
                 default:

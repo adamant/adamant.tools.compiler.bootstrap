@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
     // These attributes make it so FixedList<T> is displayed nicely in the debugger similar to List<T>
     [DebuggerDisplay("Count = {" + nameof(Count) + "}")]
-    [DebuggerTypeProxy(typeof(FixedListDebugView<>))]
+    [DebuggerTypeProxy(typeof(CollectionDebugView<>))]
     public class FixedList<T> : IReadOnlyList<T>
         where T : class
     {

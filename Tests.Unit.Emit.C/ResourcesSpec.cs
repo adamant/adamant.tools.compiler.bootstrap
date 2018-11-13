@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
 using JetBrains.Annotations;
 using Xunit;
@@ -15,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C
     public class ResourcesSpec
     {
         [NotNull]
-        private readonly IReadOnlyList<byte> byteOrderMarkUtf8 = Encoding.UTF8.GetPreamble().ToList().AsReadOnly();
+        private readonly IReadOnlyList<byte> byteOrderMarkUtf8 = Encoding.UTF8.GetPreamble().NotNull().ToList().AsReadOnly().NotNull();
 
         /// <summary>
         /// In order for .NET to read the resources files as UTF-8 they must have a BOM. Otherwise,
@@ -28,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C
         {
             var projectDir = Path.Combine(SolutionDirectory.Get(), "Emit.C");
 
-            var codeFileBytes = File.ReadAllBytes(Path.Combine(projectDir, filename));
+            var codeFileBytes = File.ReadAllBytes(Path.Combine(projectDir, filename)).NotNull();
             AssertStartsWithUtf8Bom(codeFileBytes);
         }
 

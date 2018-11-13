@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
@@ -10,12 +11,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
     /// display purposes. It just exposes the collection items as an array at the root.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal sealed class FixedListDebugView<T>
+    public sealed class CollectionDebugView<T>
         where T : class
     {
-        [NotNull] private readonly FixedList<T> collection;
+        [NotNull] private readonly IEnumerable<T> collection;
 
-        public FixedListDebugView(FixedList<T> collection)
+        public CollectionDebugView(IEnumerable<T> collection)
         {
             this.collection = collection ?? throw new ArgumentNullException(nameof(collection));
         }

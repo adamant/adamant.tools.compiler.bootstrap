@@ -1,14 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 {
+    [DebuggerDisplay("Entries = {values.Count}, Variables = {VariableCount}")]
     public class LiveVariables
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public int VariableCount { get; }
+        [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         [NotNull] private readonly Dictionary<Statement, BitArray> values = new Dictionary<Statement, BitArray>();
 
         public LiveVariables([NotNull] ControlFlowGraph graph)

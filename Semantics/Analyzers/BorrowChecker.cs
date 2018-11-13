@@ -46,7 +46,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             // TODO we need to check definite assignment as well
 
             var diagnostics = function.Diagnostics;
-            var edges = function.ControlFlow.Edges();
+            var edges = function.ControlFlow.Edges;
 
             // Compute aliveness at point after each statement
             var liveBefore = ComputeLiveness(function.ControlFlow, edges);
@@ -170,9 +170,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             var liveVariables = new LiveVariables(function);
             var numberOfVariables = function.VariableDeclarations.Count;
 
-            while (blocks.Any())
+            while (blocks.TryDequeue(out var block))
             {
-                var block = blocks.Dequeue();
                 var liveBeforeBlock = new BitArray(liveVariables.Before(block.Statements.First()));
 
                 var liveAfterStatement = new BitArray(numberOfVariables);

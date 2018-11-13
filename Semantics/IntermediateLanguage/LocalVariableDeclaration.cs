@@ -26,5 +26,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
             Type = type;
             Reference = new VariableReference(number);
         }
+
+        // Useful for debugging
+        public override string ToString()
+        {
+            var binding = MutableBinding ? "var" : "let";
+            var result = $"{binding} %{Number}: {Type};";
+            if (Name != null)
+                result += $" // {Name}";
+            return result;
+        }
     }
 }
