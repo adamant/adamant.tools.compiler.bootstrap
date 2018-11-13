@@ -108,7 +108,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             {
                 Console.WriteLine($"Compiling {project.Name} ({project.Path})...");
             }
-            var codeFiles = sourcePaths.Select(p => LoadCode(p, sourceDir)).ToList();
+            var codeFiles = sourcePaths.Select(p => LoadCode(p, sourceDir, project.RootNamespace)).ToList();
             var package = compiler.CompilePackage(project.Name, codeFiles, references);
             // TODO switch to the async version of the compiler
             //var codeFiles = sourcePaths.Select(p => new CodePath(p)).ToList();
@@ -132,20 +132,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
         }
 
         [NotNull]
-        private static CodeFile LoadCode([NotNull] string path, [NotNull] string sourceDir)
+        private static CodeFile LoadCode(
+            [NotNull] string path,
+            [NotNull] string sourceDir,
+            [NotNull, ItemNotNull] FixedList<string> rootNamespace)
         {
             var relativeDirectory = Path.GetDirectoryName(Path.GetRelativePath(sourceDir, path)).NotNull();
-            var directories = relativeDirectory.Split(Path.DirectorySeparatorChar).NotNull();
-            var ns = string.IsNullOrEmpty(relativeDirectory)
-                ? FixedList<string>.Empty
-                : directories.ToFixedList();
+            var ns = rootNamespace.Concat(relativeDirectory.SplitOrEmpty(Path.DirectorySeparatorChar)).ToFixedList();
             return CodeFile.Load(path, ns);
         }
 
         [NotNull]
         private static string PrepareCacheDir([NotNull] Project project)
         {
-            var cacheDir = System.IO.Path.Combine(project.Path, ".forge-cache").NotNull();
+            var cacheDir = Path.Combine(project.Path, ".forge-cache").NotNull();
             Directory.CreateDirectory(cacheDir); // Ensure the cache directory exists
 
             // Clear the cache directory?

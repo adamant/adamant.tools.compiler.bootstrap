@@ -9,10 +9,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
     internal class Project
     {
         [NotNull] public string Path { get; }
+        [NotNull] public FixedList<string> RootNamespace { get; }
         [NotNull] public string Name { get; }
-        [NotNull] public IReadOnlyList<string> Authors { get; }
+        [NotNull] public FixedList<string> Authors { get; }
         public ProjectTemplate Template { get; }
-        [NotNull] [ItemNotNull] public IReadOnlyList<ProjectReference> References { get; }
+        [NotNull] [ItemNotNull] public FixedList<ProjectReference> References { get; }
 
         public Project(
             [NotNull] ProjectConfig file,
@@ -21,9 +22,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             Requires.NotNull(nameof(file), file);
             Path = System.IO.Path.GetDirectoryName(file.FullPath).NotNull();
             Name = file.Name ?? throw new InvalidOperationException();
-            Authors = (file.Authors ?? throw new InvalidOperationException()).ToReadOnlyList();
+            RootNamespace = (file.RootNamespace ?? "").SplitOrEmpty('.');
+            Authors = (file.Authors ?? throw new InvalidOperationException()).ToFixedList();
             Template = file.Template;
-            References = references.ToReadOnlyList();
+            References = references.ToFixedList();
         }
     }
 }

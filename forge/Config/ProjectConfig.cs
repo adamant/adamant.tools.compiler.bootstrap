@@ -17,6 +17,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Config
         [JsonProperty("name")]
         public string Name { get; set; }
 
+        [JsonProperty("root_namespace")]
+        public string RootNamespace { get; set; }
+
         [JsonProperty("authors")]
         public List<string> Authors { get; set; }
 

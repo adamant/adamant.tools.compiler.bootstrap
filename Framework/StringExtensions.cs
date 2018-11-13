@@ -63,5 +63,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
             }
             return escaped.ToString().NotNull();
         }
+
+        [NotNull]
+        public static FixedList<string> SplitOrEmpty([CanBeNull] this string value, params char[] separators)
+        {
+            if (string.IsNullOrEmpty(value)) return FixedList<string>.Empty;
+            return value.Split(separators).NotNull().ToFixedList();
+        }
     }
 }
