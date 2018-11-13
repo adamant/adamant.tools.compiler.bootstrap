@@ -63,16 +63,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 var claimsBeforeStatement = new HashSet<Claim>();
 
                 if (block == function.ControlFlow.EntryBlock)
-                {
-                    foreach (var parameter in function.ControlFlow.VariableDeclarations.Where(v => v.IsParameter))
+                    foreach (var parameter in function.ControlFlow.VariableDeclarations.Where(v =>
+                        v.IsParameter))
                     {
                         claimsBeforeStatement.Add(new Loan(parameter.Number, nextObject));
                         nextObject += 1;
                     }
-                }
 
-                //foreach (var predecessor in edges.To(block).Select(b => b.Terminator))
-                //    claimsBeforeStatement.UnionWith(claims.After(predecessor));
+                foreach (var predecessor in edges.To(block).Select(b => b.Terminator))
+                    claimsBeforeStatement.UnionWith(claims.After(predecessor.NotNull()));
 
                 foreach (var statement in block.ExpressionStatements)
                 {
@@ -89,18 +88,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                             claimsAfterStatement.Add(title);
                             break;
                         }
-                        //case AssignmentStatement assignmentStatement:
-                        //{
-                        //    var claim = GetClaim(assignmentStatement.Value, claimsBeforeStatement);
-                        //    if (claim != null) // copy types don't have claims right now
-                        //    {
-                        //        var loan = new Loan(assignmentStatement.Place.CoreVariable(),
-                        //            assignmentStatement.Value,
-                        //            claim.Object);
-                        //        claimsAfterStatement.Add(loan);
-                        //    }
-                        //    break;
-                        //}
+                        case AssignmentStatement assignmentStatement:
+                            AcquireLoans(assignmentStatement.Value, claimsBeforeStatement);
+                            break;
                         case DeleteStatement deleteStatement:
                         {
                             var title = GetTitle(deleteStatement.VariableNumber, claimsBeforeStatement);
@@ -142,13 +132,44 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 diagnostics.Add(BorrowError.BorrowedValueDoesNotLiveLongEnough(function.Context.File, span));
         }
 
-        //[CanBeNull]
-        //private static Claim GetClaim([NotNull] IValue value, [NotNull, ItemNotNull] HashSet<Claim> claims)
-        //{
-        //    var coreVariable = value.CoreVariable();
-        //    // Copy types don't have claims right now
-        //    return claims.SingleOrDefault(t => t.Variable == coreVariable);
-        //}
+        [CanBeNull]
+        private static void AcquireLoans([NotNull] IValue value, [NotNull, ItemNotNull] HashSet<Claim> claims)
+        {
+            switch (value)
+            {
+                case IntegerOperation operation:
+                    AcquireLoan(operation.LeftOperand, claims);
+                    AcquireLoan(operation.RightOperand, claims);
+                    break;
+                case IntegerConstant _:
+                    // no loans to acquire
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.For(value);
+            }
+        }
+
+        private static void AcquireLoan(Operand operand, HashSet<Claim> claims)
+        {
+            switch (operand)
+            {
+                case IntegerConstant _:
+                    // no loans to acquire
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.For(operand);
+            }
+            //var coreVariable = value.CoreVariable();
+            //// Copy types don't have claims right now
+            //return claims.SingleOrDefault(t => t.Variable == coreVariable);
+            //if (claim != null) // copy types don't have claims right now
+            //{
+            //    var loan = new Loan(assignmentStatement.Place.CoreVariable(),
+            //        assignmentStatement.Value,
+            //        claim.Object);
+            //    claimsAfterStatement.Add(loan);
+            //}
+        }
 
         //private static Title GetTitle([NotNull] RValue rvalue, [NotNull] HashSet<Claim> claims)
         //{

@@ -265,9 +265,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 }
                 case IReturnKeywordToken _:
                 {
-                    var returnKeyword = tokens.Consume<IReturnKeywordTokenPlace>();
+                    var returnKeywordSpan = tokens.Expect<IReturnKeywordToken>();
                     var expression = tokens.AtEnd<ISemicolonToken>() ? null : ParseExpression(tokens, diagnostics);
-                    return new ReturnExpressionSyntax(returnKeyword, expression);
+                    var span = TextSpan.Covering(returnKeywordSpan, expression?.Span);
+                    return new ReturnExpressionSyntax(span, expression);
                 }
                 case IEqualsGreaterThanToken _:
                     return ParseExpressionBlock(tokens, diagnostics);

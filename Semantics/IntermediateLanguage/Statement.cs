@@ -17,6 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
             Number = number;
         }
 
+        // Useful for debugging
         public abstract override string ToString();
     }
 }

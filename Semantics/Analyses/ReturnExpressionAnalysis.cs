@@ -6,16 +6,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
     public class ReturnExpressionAnalysis : ExpressionAnalysis
     {
         [NotNull] public new ReturnExpressionSyntax Syntax { get; }
-        [CanBeNull] public ExpressionAnalysis ReturnExpression { get; }
+        [CanBeNull] public ExpressionAnalysis ReturnValue { get; }
 
         public ReturnExpressionAnalysis(
             [NotNull] AnalysisContext context,
             [NotNull] ReturnExpressionSyntax syntax,
-            [CanBeNull] ExpressionAnalysis returnExpression)
+            [CanBeNull] ExpressionAnalysis returnValue)
             : base(context, syntax.Span)
         {
             Syntax = syntax;
-            ReturnExpression = returnExpression;
+            ReturnValue = returnValue;
         }
     }
 }

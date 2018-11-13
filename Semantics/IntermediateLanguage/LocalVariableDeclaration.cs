@@ -12,6 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
         public readonly bool IsParameter;
         public readonly bool MutableBinding;
         [NotNull] public readonly DataType Type;
+        public bool Exists => Type != ObjectType.Void && Type != ObjectType.Never;
         [NotNull] public readonly VariableReference Reference;
 
         public LocalVariableDeclaration(

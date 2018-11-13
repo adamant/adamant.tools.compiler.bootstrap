@@ -23,10 +23,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             var definitions = code.Definitions;
 
-            foreach (var variable in cfg.VariableDeclarations)
+            foreach (var variable in cfg.VariableDeclarations.Where(v => v.Exists))
                 Emit(variable, definitions);
 
-            if (cfg.VariableDeclarations.Any(v => v.Type != ObjectType.Void))
+            if (cfg.VariableDeclarations.Any(v => v.Exists))
                 definitions.BlankLine();
 
             // TODO assign parameters to temp variables?
@@ -38,9 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
         private void Emit([NotNull] LocalVariableDeclaration variable, [NotNull] CCodeBuilder code)
         {
-            // Skip void variables
-            if (variable.Type == ObjectType.Void) return;
-
+            Requires.That(nameof(variable), variable.Exists);
             var initializer = variable.IsParameter ? $" = {nameMangler.Mangle(variable.Name.NotNull())}" : "";
             code.AppendLine($"{typeConverter.Convert(variable.Type)} ₜ{NameOf(variable.Reference)}{initializer};");
         }
@@ -50,11 +48,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             return variable.VariableNumber == 0 ? "result" : variable.VariableNumber.ToString();
         }
 
-        private static void Emit([NotNull] BasicBlock block, bool voidReturn, [NotNull] CCodeBuilder code)
+        private void Emit([NotNull] BasicBlock block, bool voidReturn, [NotNull] CCodeBuilder code)
         {
             code.AppendLine($"bb{block.Number}:");
             code.BeginBlock();
-            foreach (var statement in block.ExpressionStatements)
+            foreach (var statement in block.Statements)
                 switch (statement)
                 {
                     //case AddStatement a:
@@ -65,12 +63,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     //    // TODO this could be of a different type
                     //    code.AppendLine($"{Convert(s.Place)} = (ₐint){{{s.Value}}};");
                     //    break;
-                    //case ReturnTerminator _:
-                    //    code.AppendLine(voidReturn ? "return;" : "return ₜresult;");
-                    //    break;
-                    //case AssignmentStatement assignment:
-                    //    code.AppendLine($"{Convert(assignment.Place)} = {Convert(assignment.RValue)};");
-                    //    break;
+                    case ReturnStatement _:
+                        code.AppendLine(voidReturn ? "return;" : "return ₜresult;");
+                        break;
+                    case AssignmentStatement assignment:
+                        code.AppendLine($"{Convert(assignment.Place)} = {Convert(assignment.Value)};");
+                        break;
                     case NewObjectStatement newObjectStatement:
                         // TODO implement this
                         break;
@@ -80,14 +78,40 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.EndBlock();
         }
 
-        private static string Convert(IValue value)
+        private string Convert(Place place)
+        {
+            switch (place)
+            {
+                case VariableReference variable:
+                    return "ₜ" + NameOf(variable);
+                default:
+                    throw NonExhaustiveMatchException.For(place);
+            }
+        }
+
+        private string Convert(IValue value)
         {
             switch (value)
             {
+                case IntegerConstant integer:
+                    return $"({Convert(integer.Type)}){{{integer.Value}}}";
                 //case VariableReference variable:
                 //    return "ₜ" + NameOf(variable);
                 default:
                     throw NonExhaustiveMatchException.For(value);
+            }
+        }
+
+        private string Convert(DataType type)
+        {
+            switch (type)
+            {
+                case ObjectType objectType:
+                    return nameMangler.Mangle(objectType);
+                case PrimitiveFixedIntegerType integerType:
+                    return nameMangler.Mangle(integerType.Name);
+                default:
+                    throw NonExhaustiveMatchException.For(type);
             }
         }
     }

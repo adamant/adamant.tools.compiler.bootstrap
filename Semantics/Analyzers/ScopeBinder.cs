@@ -180,8 +180,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     GetVariableScopes(block.Statements, scopes);
                     break;
                 case ReturnExpressionAnalysis returnExpression:
-                    if (returnExpression.ReturnExpression != null)
-                        GetVariableScopes(returnExpression.ReturnExpression, scopes);
+                    if (returnExpression.ReturnValue != null)
+                        GetVariableScopes(returnExpression.ReturnValue, scopes);
                     break;
                 case BinaryOperatorExpressionAnalysis binaryOperatorExpression:
                     GetVariableScopes(binaryOperatorExpression.LeftOperand, scopes);

@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
@@ -29,7 +30,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
             [CanBeNull] DataType leftOperandType,
             [CanBeNull] DataType rightOperandType)
         {
-            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3001, $"Operator `{@operator.Text(file.Code)}` cannot be applied to operands of type `{leftOperandType}` and `{rightOperandType}`.");
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3001,
+                $"Operator `{@operator.Text(file.Code)}` cannot be applied to operands of type `{leftOperandType}` and `{rightOperandType}`.");
         }
 
         [NotNull]
@@ -39,32 +41,43 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
             [NotNull] IOperatorToken @operator,
             [CanBeNull] DataType operandType)
         {
-            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3002, $"Operator `{@operator.Text(file.Code)}` cannot be applied to operand of type `{operandType}`.");
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3002,
+                $"Operator `{@operator.Text(file.Code)}` cannot be applied to operand of type `{operandType}`.");
         }
 
         [NotNull]
         public static Diagnostic MustBeATypeExpression([NotNull] CodeFile file, TextSpan span)
         {
-            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3003, "Expression must be of type `type` (i.e. it must evaluate to a type)");
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3003,
+                "Expression must be of type `type` (i.e. it must evaluate to a type)");
         }
 
         [NotNull]
         public static Diagnostic NameRefersToFunctionNotType([NotNull] CodeFile file, TextSpan span, string name)
         {
-            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3004, $"The name `{name}` refers to a function not a type.");
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3004,
+                $"The name `{name}` refers to a function not a type.");
         }
 
         [NotNull]
         public static Diagnostic MustBeABoolExpression([NotNull] CodeFile file, TextSpan span)
         {
-            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3005, "Expression must be of type `bool`");
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3005,
+                "Expression must be of type `bool`");
         }
 
         [NotNull]
         public static Diagnostic CircularDefinition([NotNull] CodeFile file, TextSpan span, Name typeDeclarationName)
         {
-            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3006, $"Declaration of type `{typeDeclarationName}` is part of a circular definition");
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3006,
+                $"Declaration of type `{typeDeclarationName}` is part of a circular definition");
+        }
 
+        [NotNull]
+        public static Diagnostic CannotConvert(CodeFile file, ExpressionAnalysis expression, DataType type)
+        {
+            return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3007,
+                $"Cannot convert expression `{file.Code[expression.Span]}` to type `{type}`");
         }
     }
 }

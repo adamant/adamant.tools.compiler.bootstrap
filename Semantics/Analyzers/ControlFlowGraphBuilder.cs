@@ -156,8 +156,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     }
                     break;
                 case ReturnExpressionAnalysis returnExpression:
-                    if (returnExpression.ReturnExpression != null)
-                        ConvertToAssignmentStatement(ReturnVariable.Reference, returnExpression.ReturnExpression, statements);
+                    if (returnExpression.ReturnValue != null)
+                        ConvertToAssignmentStatement(ReturnVariable.Reference, returnExpression.ReturnValue, statements);
                     AddBlock(statements, new ReturnStatement(CurrentBlockNumber, statements.Count));
                     break;
                 case BlockAnalysis block:

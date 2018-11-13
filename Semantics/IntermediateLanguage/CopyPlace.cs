@@ -11,6 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
             Place = place;
         }
 
+        // Useful for debugging
         public override string ToString()
         {
             return $"copy {Place}";

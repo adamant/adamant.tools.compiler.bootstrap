@@ -15,5 +15,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
             Requires.NotNull(nameof(type), type);
             Value = value;
         }
+
+        // Useful for debugging
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
     }
 }

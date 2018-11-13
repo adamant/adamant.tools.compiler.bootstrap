@@ -7,10 +7,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
     public class Claims
     {
         [NotNull]
-        private readonly Dictionary<ExpressionStatement, HashSet<Claim>> claims = new Dictionary<ExpressionStatement, HashSet<Claim>>();
+        private readonly Dictionary<Statement, HashSet<Claim>> claims = new Dictionary<Statement, HashSet<Claim>>();
 
         [NotNull]
-        public HashSet<Claim> After([NotNull] ExpressionStatement statement)
+        public HashSet<Claim> After([NotNull] Statement statement)
         {
             if (claims.TryGetValue(statement, out var existingClaims))
                 return existingClaims;
