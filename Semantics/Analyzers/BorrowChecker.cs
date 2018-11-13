@@ -172,15 +172,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
             while (blocks.TryDequeue(out var block))
             {
-                var liveBeforeBlock = new BitArray(liveVariables.Before(block.Statements.First()));
+                var liveBeforeBlock = new BitArray(liveVariables.Before(block.Number, 0));
 
-                var liveAfterStatement = new BitArray(numberOfVariables);
-                foreach (var successor in edges.From(block).Select(b => b.Statements.First()))
-                    liveAfterStatement.Or(liveVariables.Before(successor));
+                var liveAfterBlock = new BitArray(numberOfVariables);
+                foreach (var successor in edges.From(block))
+                    liveAfterBlock.Or(liveVariables.Before(successor.Number, 0));
 
-                foreach (var statement in block.Statements.Reverse())
+                var liveAfterStatement = liveAfterBlock;
                 {
-                    var liveSet = liveVariables.Before(statement);
+                    // Handle the terminator
+                    var liveSet = liveVariables.Before(block.Number, block.Statements.Count);
+                    liveSet.Or(liveAfterBlock);
+                    switch (block.Terminator)
+                    {
+                        case ReturnTerminator _:
+                            // No affect on variables?
+                            // TODO should we check the liveSet is empty?
+                            break;
+                        default:
+                            throw NonExhaustiveMatchException.For(block.Terminator);
+                    }
+                }
+
+                foreach (var (statement, i) in block.Statements.Select((s, i) => (s, i)).Reverse())
+                {
+                    var liveSet = liveVariables.Before(block.Number, i);
                     liveSet.Or(liveAfterStatement);
                     switch (statement)
                     {
@@ -220,7 +236,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                         throw NonExhaustiveMatchException.For(block.Terminator);
                 }
 
-                if (!liveBeforeBlock.Equals(liveVariables.Before(block.Statements.First())))
+                if (!liveBeforeBlock.Equals(liveVariables.Before(block.Number, 0)))
                     foreach (var basicBlock in edges.To(block)
                         .Where(fromBlock => !blocks.Contains(fromBlock)).ToList())
                         blocks.Enqueue(basicBlock);
