@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
 
@@ -9,12 +10,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
     {
         [NotNull]
         [ItemCanBeNull]
+        [DebuggerStepThrough]
         public static IEnumerable<T> Yield<T>([CanBeNull] this T value)
         {
             yield return value;
         }
 
         [NotNull, ItemNotNull]
+        [DebuggerStepThrough]
         public static IEnumerable<T> YieldValue<T>([CanBeNull] this T value)
             where T : class
         {
@@ -23,6 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         }
 
         [NotNull]
+        [DebuggerStepThrough]
         public static IEnumerable<T> YieldValue<T>(this T? value)
             where T : struct
         {
@@ -38,6 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         }
 
         [NotNull]
+        [DebuggerStepThrough]
         public static FixedList<T> ToFixedList<T>([NotNull] this IEnumerable<T> values)
             where T : class
         {
@@ -45,6 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         }
 
         [NotNull]
+        [DebuggerStepThrough]
         public static IEnumerable<Tuple<TFirst, TSecond>> Zip<TFirst, TSecond>(
             [NotNull] this IEnumerable<TFirst> first,
             [NotNull] IEnumerable<TSecond> second)
@@ -53,6 +59,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         }
 
         [NotNull]
+        [DebuggerStepThrough]
         public static IEnumerable<TResult> CrossJoin<TFirst, TSecond, TResult>(
             [NotNull] this IEnumerable<TFirst> first,
             [NotNull] IEnumerable<TSecond> second,
@@ -62,6 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         }
 
         [NotNull]
+        [DebuggerStepThrough]
         public static IEnumerable<Tuple<TFirst, TSecond>> CrossJoin<TFirst, TSecond>(
             [NotNull] this IEnumerable<TFirst> first,
             [NotNull] IEnumerable<TSecond> second)

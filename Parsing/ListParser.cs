@@ -19,11 +19,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [MustUseReturnValue]
         [NotNull, ItemNotNull]
-        public FixedList<T> ParseList<T>([NotNull] Func<T> acceptItem)
+        public FixedList<T> AcceptList<T>([NotNull] Func<T> acceptItem)
             where T : class
         {
             return new Generator<T>(acceptItem)
                 .TakeWhile(t => t != null).ToFixedList();
+        }
+
+        [MustUseReturnValue]
+        [NotNull, ItemNotNull]
+        public FixedList<T> ParseList<T, TTerminator>([NotNull] Func<T> parseItem)
+            where T : class
+            where TTerminator : IToken
+        {
+            var items = new List<T>();
+            while (!Tokens.AtEnd<TTerminator>())
+                items.Add(parseItem());
+
+            return items.ToFixedList();
         }
 
         [MustUseReturnValue]

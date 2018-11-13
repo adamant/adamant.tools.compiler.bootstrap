@@ -65,7 +65,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public DeclarationSyntax ParseDeclaration()
         {
             var attributes = ParseAttributes();
-            var modifiers = listParser.ParseList(Tokens.AcceptToken<IModiferToken>);
+            var modifiers = listParser.AcceptList(Tokens.AcceptToken<IModiferToken>);
 
             switch (Tokens.Current)
             {
@@ -108,7 +108,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public MemberDeclarationSyntax ParseMemberDeclaration()
         {
             var attributes = ParseAttributes();
-            var modifiers = listParser.ParseList(Tokens.AcceptToken<IModiferToken>);
+            var modifiers = listParser.AcceptList(Tokens.AcceptToken<IModiferToken>);
 
             switch (Tokens.Current)
             {
@@ -241,7 +241,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [NotNull]
         private FixedList<ExpressionSyntax> ParseInvariants()
         {
-            return listParser.ParseList(AcceptInvariant);
+            return listParser.AcceptList(AcceptInvariant);
         }
 
         [MustUseReturnValue]
@@ -250,6 +250,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             if (!Tokens.Accept<IInvariantKeywordToken>()) return null;
             return expressionParser.ParseExpression(Tokens, Tokens.Context.Diagnostics);
+        }
+
+        [NotNull]
+        private FixedList<MemberDeclarationSyntax> ParseMemberDeclarations()
+        {
+            return listParser.ParseList<MemberDeclarationSyntax, ICloseBraceToken>(ParseMemberDeclaration);
+        }
+
+        [NotNull]
+        private FixedList<MemberDeclarationSyntax> ParseTypeBody()
+        {
+            Tokens.Expect<IOpenBraceToken>();
+            var members = ParseMemberDeclarations();
+            Tokens.Expect<ICloseBraceToken>();
+            return members;
         }
         #endregion
 
@@ -267,9 +282,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var baseTypes = AcceptBaseTypes();
             var genericConstraints = genericsParser.ParseGenericConstraints(Tokens, Tokens.Context.Diagnostics);
             var invariants = ParseInvariants();
-            Tokens.Expect<IOpenBraceToken>();
-            var members = listParser.ParseList(ParseMemberDeclaration);
-            Tokens.Expect<ICloseBraceToken>();
+            var members = ParseTypeBody();
             return new ClassDeclarationSyntax(attributes, modifiers, name, genericParameters,
                 baseClass, baseTypes, genericConstraints, invariants,
                 members);
@@ -287,9 +300,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var baseTypes = AcceptBaseTypes();
             var genericConstraints = genericsParser.ParseGenericConstraints(Tokens, Tokens.Context.Diagnostics);
             var invariants = ParseInvariants();
-            Tokens.Expect<IOpenBraceToken>();
-            var members = listParser.ParseList(ParseMemberDeclaration);
-            Tokens.Expect<ICloseBraceToken>();
+            var members = ParseTypeBody();
             return new TraitDeclarationSyntax(attributes, modifiers, name,
                 genericParameters, baseTypes, genericConstraints, invariants,
                 members);
@@ -307,9 +318,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var baseTypes = AcceptBaseTypes();
             var genericConstraints = genericsParser.ParseGenericConstraints(Tokens, Tokens.Context.Diagnostics);
             var invariants = ParseInvariants();
-            Tokens.Expect<IOpenBraceToken>();
-            var members = listParser.ParseList(ParseMemberDeclaration);
-            Tokens.Expect<ICloseBraceToken>();
+            var members = ParseTypeBody();
             return new StructDeclarationSyntax(attributes, modifiers, name, genericParameters,
                 baseTypes, genericConstraints, invariants,
                 members);
@@ -334,7 +343,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var invariants = ParseInvariants();
                     Tokens.Expect<IOpenBraceToken>();
                     var variants = ParseEnumVariants();
-                    var members = listParser.ParseList(ParseMemberDeclaration);
+                    var members = ParseMemberDeclarations();
                     Tokens.Expect<ICloseBraceToken>();
                     return new EnumStructDeclarationSyntax(attributes, modifiers,
                         name, genericParameters, baseTypes, genericConstraints,
@@ -351,7 +360,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var invariants = ParseInvariants();
                     Tokens.Expect<IOpenBraceToken>();
                     var variants = ParseEnumVariants();
-                    var members = listParser.ParseList(ParseMemberDeclaration);
+                    var members = ParseMemberDeclarations();
                     Tokens.Expect<ICloseBraceToken>();
                     return new EnumClassDeclarationSyntax(attributes, modifiers,
                         name, genericParameters, baseClass, baseTypes, genericConstraints,

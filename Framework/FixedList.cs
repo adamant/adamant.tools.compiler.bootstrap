@@ -16,6 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
 
         [NotNull, ItemNotNull] private readonly IReadOnlyList<T> items;
 
+        [DebuggerStepThrough]
         public FixedList([NotNull, ItemNotNull] IEnumerable<T> items)
         {
             this.items = items.ItemsNotNull().ToList().AsReadOnly().NotNull();
