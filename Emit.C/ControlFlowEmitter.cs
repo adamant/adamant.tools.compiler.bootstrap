@@ -54,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             code.AppendLine($"bb{block.Number}:");
             code.BeginBlock();
-            foreach (var statement in block.Statements)
+            foreach (var statement in block.ExpressionStatements)
                 switch (statement)
                 {
                     //case AddStatement a:

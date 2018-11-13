@@ -28,6 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         [NotNull, ItemNotNull] private readonly List<LocalVariableDeclaration> variables = new List<LocalVariableDeclaration>();
         [NotNull] private LocalVariableDeclaration ReturnVariable => variables.First().NotNull();
         [NotNull, ItemNotNull] private readonly List<BasicBlock> blocks = new List<BasicBlock>();
+        private int CurrentBlockNumber => blocks.Count;
 
         [NotNull]
         public LocalVariableDeclaration AddParameter(bool mutableBinding, [NotNull] DataType type, [CanBeNull] string name)
@@ -65,10 +66,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
         [NotNull]
         public BasicBlock AddBlock(
-            [NotNull] IEnumerable<Statement> statements,
-            [NotNull] BlockTerminator terminator)
+            [NotNull] IEnumerable<ExpressionStatement> statements,
+            [NotNull] BlockTerminatorStatement terminator)
         {
-            var block = new BasicBlock(blocks.Count, statements, terminator);
+            var block = new BasicBlock(CurrentBlockNumber, statements, terminator);
             blocks.Add(block);
             return block;
         }
@@ -82,13 +83,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             foreach (var parameter in function.Parameters)
                 AddParameter(parameter.MutableBinding, parameter.Type.AssertResolved(), parameter.Name.UnqualifiedName.Text);
 
-            var entryBlockStatements = new List<Statement>();
+            var entryBlockStatements = new List<ExpressionStatement>();
             foreach (var statement in function.Statements)
                 ConvertStatementAnalysisToStatement(entryBlockStatements, statement);
 
             // Generate the implicit return statement
             if (!blocks.Any())
-                AddBlock(entryBlockStatements, new ReturnTerminator());
+                AddBlock(entryBlockStatements, new ReturnStatement(CurrentBlockNumber, entryBlockStatements.Count));
 
             function.ControlFlow = new ControlFlowGraph(variables, blocks);
         }
@@ -100,7 +101,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         }
 
         private void ConvertStatementAnalysisToStatement(
-            [NotNull, ItemNotNull] List<Statement> currentBlock,
+            [NotNull, ItemNotNull] List<ExpressionStatement> currentBlock,
             [NotNull] StatementAnalysis statement)
         {
             switch (statement)
@@ -133,7 +134,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
         private void ConvertExpressionAnalysisToStatement(
             [NotNull] ExpressionAnalysis expression,
-            [NotNull] [ItemNotNull] List<Statement> statements)
+            [NotNull] [ItemNotNull] List<ExpressionStatement> statements)
         {
             switch (expression)
             {
@@ -157,7 +158,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case ReturnExpressionAnalysis returnExpression:
                     if (returnExpression.ReturnExpression != null)
                         ConvertToAssignmentStatement(ReturnVariable.Reference, returnExpression.ReturnExpression, statements);
-                    AddBlock(statements, new ReturnTerminator());
+                    AddBlock(statements, new ReturnStatement(CurrentBlockNumber, statements.Count));
                     break;
                 case BlockAnalysis block:
                     foreach (var statementInBlock in block.Statements)
@@ -165,7 +166,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
                     // Now we need to delete any owned variables
                     foreach (var variableDeclaration in block.Statements.OfType<VariableDeclarationStatementAnalysis>().Where(IsOwned))
-                        statements.Add(new DeleteStatement(LookupVariable(variableDeclaration.Name.UnqualifiedName.Text).VariableNumber, new TextSpan(block.Syntax.Span.End, 0)));
+                        statements.Add(new DeleteStatement(CurrentBlockNumber, statements.Count, LookupVariable(variableDeclaration.Name.UnqualifiedName.Text).VariableNumber, new TextSpan(block.Syntax.Span.End, 0)));
 
                     break;
                 case ForeachExpressionAnalysis @foreach:
@@ -191,7 +192,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         private void ConvertToAssignmentStatement(
             [NotNull] Place place,
             [NotNull] ExpressionAnalysis value,
-            [NotNull, ItemNotNull] List<Statement> statements)
+            [NotNull, ItemNotNull] List<ExpressionStatement> statements)
         {
             switch (value)
             {
@@ -200,14 +201,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 //    statements.Add(new NewObjectStatement(place, newObjectExpression.Type.AssertResolved(), args));
                 //    break;
                 case IdentifierNameAnalysis identifier:
-                    statements.Add(new AssignmentStatement(place, new CopyPlace(LookupVariable(identifier.Name.NotNull()))));
+                    statements.Add(new AssignmentStatement(CurrentBlockNumber, statements.Count, place, new CopyPlace(LookupVariable(identifier.Name.NotNull()))));
                     break;
                 case BinaryOperatorExpressionAnalysis binaryOperator:
                     ConvertOperator(place, binaryOperator, statements);
                     break;
                 case IntegerLiteralExpressionAnalysis v:
                     var constant = new IntegerConstant(v.Value, v.Type);
-                    statements.Add(new AssignmentStatement(place, constant));
+                    statements.Add(new AssignmentStatement(CurrentBlockNumber, statements.Count, place, constant));
                     break;
                 case IfExpressionAnalysis ifExpression:
                     ConvertExpressionAnalysisToStatement(ifExpression.Condition, statements);
@@ -224,7 +225,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         private void ConvertOperator(
             [NotNull] Place lvalue,
             [NotNull] BinaryOperatorExpressionAnalysis binaryOperator,
-            [NotNull] List<Statement> statements)
+            [NotNull] List<ExpressionStatement> statements)
         {
             switch (binaryOperator.Operator)
             {

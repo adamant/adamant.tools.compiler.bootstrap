@@ -4,10 +4,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
 {
     public struct Transition
     {
-        public readonly Statement From;
-        public readonly Statement To;
+        public readonly ExpressionStatement From;
+        public readonly ExpressionStatement To;
 
-        public Transition(Statement from, Statement to)
+        public Transition(ExpressionStatement from, ExpressionStatement to)
         {
             From = from;
             To = to;

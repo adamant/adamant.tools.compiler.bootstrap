@@ -22,29 +22,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             Requires.NotNull(nameof(graph), graph);
             VariableCount = graph.VariableDeclarations.Count;
             values = graph.BasicBlocks.Select(block =>
-                block.Statements.Append<object>(block.Terminator).NotNull()
+                block.ExpressionStatements.Append<object>(block.Terminator).NotNull()
                     .Select(s => new BitArray(VariableCount)).ToFixedList()).ToFixedList();
         }
-
-        //[NotNull]
-        //public BitArray Before([NotNull] Statement statement)
-        //{
-        //    if (values.TryGetValue(statement, out var existingValue))
-        //        return existingValue;
-
-        //    var newValue = new BitArray(VariableCount);
-        //    values.Add(statement, newValue);
-        //    return newValue;
-        //}
 
         /// <summary>
         /// Note, this will allow you to ask for the live variables before the
         /// block terminator as if it were a statement.
         /// </summary>
         [NotNull]
-        public BitArray Before(int block, int statement)
+        public BitArray Before([NotNull] Statement statement)
         {
-            return values[block][statement].NotNull();
+            return values[statement.BlockNumber][statement.Number].NotNull();
         }
     }
 }

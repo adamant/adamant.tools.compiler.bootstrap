@@ -5,20 +5,29 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
 {
-    public class NewObjectStatement : Statement
+    public class NewObjectStatement : ExpressionStatement
     {
         [NotNull] public readonly Place ResultInto;
         [NotNull] public readonly ObjectType Type;
         [NotNull] public FixedList<IValue> Arguments { get; }
 
         public NewObjectStatement(
+            int blockNumber,
+            int number,
             [NotNull] Place resultInto,
             [NotNull] ObjectType type,
-            [NotNull, ItemNotNull] IEnumerable<IValue> arguments)
+            [NotNull] [ItemNotNull] IEnumerable<IValue> arguments)
+            : base(blockNumber, number)
         {
             ResultInto = resultInto;
             Type = type;
             Arguments = arguments.ToFixedList();
+        }
+
+        // Useful for debugging
+        public override string ToString()
+        {
+            return $"{ResultInto} = new {Type}({string.Join(", ", Arguments)});";
         }
     }
 }

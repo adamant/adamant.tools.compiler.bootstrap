@@ -71,10 +71,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     }
                 }
 
-                //foreach (var predecessor in edges.To(block).Select(b => b.Terminator.AssertNotNull()))
+                //foreach (var predecessor in edges.To(block).Select(b => b.Terminator))
                 //    claimsBeforeStatement.UnionWith(claims.After(predecessor));
 
-                foreach (var statement in block.Statements)
+                foreach (var statement in block.ExpressionStatements)
                 {
                     var claimsAfterStatement = claims.After(statement);
                     claimsAfterStatement.UnionWith(claimsBeforeStatement);
@@ -103,8 +103,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                         //}
                         case DeleteStatement deleteStatement:
                         {
-                            var title = GetTitle(deleteStatement.VariableNumber,
-                                claimsBeforeStatement);
+                            var title = GetTitle(deleteStatement.VariableNumber, claimsBeforeStatement);
                             CheckCanMove(title.Object, claimsBeforeStatement, function, deleteStatement.Span, diagnostics);
                             claimsAfterStatement.RemoveWhere(c => c.Variable == title.Variable);
                             break;
@@ -121,7 +120,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
                 switch (block.Terminator)
                 {
-                    case ReturnTerminator _: // Add only applies to copy types so no loans
+                    case ReturnStatement _: // Add only applies to copy types so no loans
                         break;
                     default:
                         throw NonExhaustiveMatchException.For(block.Terminator);
@@ -144,7 +143,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         }
 
         //[CanBeNull]
-        //private static Claim GetClaim([NotNull] IValue value, [NotNull][ItemNotNull] HashSet<Claim> claims)
+        //private static Claim GetClaim([NotNull] IValue value, [NotNull, ItemNotNull] HashSet<Claim> claims)
         //{
         //    var coreVariable = value.CoreVariable();
         //    // Copy types don't have claims right now
@@ -172,31 +171,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
             while (blocks.TryDequeue(out var block))
             {
-                var liveBeforeBlock = new BitArray(liveVariables.Before(block.Number, 0));
+                var liveBeforeBlock = new BitArray(liveVariables.Before(block.Statements.First()));
 
                 var liveAfterBlock = new BitArray(numberOfVariables);
                 foreach (var successor in edges.From(block))
-                    liveAfterBlock.Or(liveVariables.Before(successor.Number, 0));
+                    liveAfterBlock.Or(liveVariables.Before(successor.Statements.Last()));
 
                 var liveAfterStatement = liveAfterBlock;
-                {
-                    // Handle the terminator
-                    var liveSet = liveVariables.Before(block.Number, block.Statements.Count);
-                    liveSet.Or(liveAfterBlock);
-                    switch (block.Terminator)
-                    {
-                        case ReturnTerminator _:
-                            // No affect on variables?
-                            // TODO should we check the liveSet is empty?
-                            break;
-                        default:
-                            throw NonExhaustiveMatchException.For(block.Terminator);
-                    }
-                }
 
-                foreach (var (statement, i) in block.Statements.Select((s, i) => (s, i)).Reverse())
+                foreach (var statement in block.Statements.Reverse())
                 {
-                    var liveSet = liveVariables.Before(block.Number, i);
+                    var liveSet = liveVariables.Before(statement);
                     liveSet.Or(liveAfterStatement);
                     switch (statement)
                     {
@@ -220,6 +205,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                         //case IntegerLiteralStatement integerLiteralStatement:
                         //    EnlivenVariables(liveSet, integerLiteralStatement.Place);
                         //    break;
+                        case ReturnStatement _:
+                            // No affect on variables?
+                            // TODO should we check the liveSet is empty?
+                            break;
                         default:
                             throw NonExhaustiveMatchException.For(statement);
                     }
@@ -230,13 +219,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
                 switch (block.Terminator)
                 {
-                    case ReturnTerminator _:
+                    case ReturnStatement _:
                         break;
                     default:
                         throw NonExhaustiveMatchException.For(block.Terminator);
                 }
 
-                if (!liveBeforeBlock.Equals(liveVariables.Before(block.Number, 0)))
+                if (!liveBeforeBlock.Equals(liveVariables.Before(block.Statements.First())))
                     foreach (var basicBlock in edges.To(block)
                         .Where(fromBlock => !blocks.Contains(fromBlock)).ToList())
                         blocks.Enqueue(basicBlock);

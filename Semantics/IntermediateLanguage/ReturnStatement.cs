@@ -1,25 +1,23 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
 {
-    public class GotoStatement : BlockTerminatorStatement
+    public class ReturnStatement : BlockTerminatorStatement
     {
-        public readonly int GotoBlockNumber;
-
-        public GotoStatement(int blockNumber, int number, int gotoBlockNumber)
+        public ReturnStatement(int blockNumber, int number)
             : base(blockNumber, number)
         {
-            GotoBlockNumber = gotoBlockNumber;
         }
 
         public override IEnumerable<int> OutBlocks()
         {
-            yield return GotoBlockNumber;
+            return Enumerable.Empty<int>();
         }
 
         public override string ToString()
         {
-            return $"goto bb{GotoBlockNumber};";
+            return "return;";
         }
     }
 }
