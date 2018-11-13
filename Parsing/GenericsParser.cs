@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -29,11 +28,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenIterator tokens,
             [NotNull] Diagnostics diagnostics)
         {
-            var openBracket = tokens.AcceptToken<IOpenBracketToken>();
-            if (openBracket == null) return null;
+            if (!tokens.Accept<IOpenBracketToken>()) return null;
             var parameters = listParser.ParseSeparatedList(tokens, ParseGenericParameter,
                 TypeOf<ICommaToken>(), TypeOf<ICloseBracketToken>(), diagnostics);
-            var closeBracket = tokens.Consume<ICloseBracketTokenPlace>();
+            tokens.Expect<ICloseBracketToken>();
             return parameters.OfType<GenericParameterSyntax>().ToFixedList();
         }
 
@@ -43,11 +41,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenIterator tokens,
             [NotNull] Diagnostics diagnostics)
         {
-            var paramsKeyword = tokens.AcceptToken<IParamsKeywordToken>();
-            var name = tokens.ExpectIdentifier();
-            var colon = tokens.AcceptToken<IColonToken>();
-            var typeExpression = colon != null ? expressionParser.ParseExpression(tokens, diagnostics) : null;
-            return new GenericParameterSyntax(paramsKeyword, name, colon, typeExpression);
+            var isParams = tokens.Accept<IParamsKeywordToken>();
+            var name = tokens.RequiredIdentifier();
+            ExpressionSyntax typeExpression = null;
+            if (tokens.Accept<IColonToken>())
+                typeExpression = expressionParser.ParseExpression(tokens, diagnostics);
+            return new GenericParameterSyntax(isParams, name, typeExpression);
         }
 
         [MustUseReturnValue]
@@ -56,22 +55,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenIterator tokens,
             [NotNull] Diagnostics diagnostics)
         {
-            var constraints = new List<GenericConstraintSyntax>();
-            while (tokens.Current is IWhereKeywordToken)
-                constraints.Add(ParseGenericConstraint(tokens, diagnostics));
-
-            return constraints.ToFixedList();
+            return listParser.AcceptList(() => AcceptGenericConstraint(tokens, diagnostics));
         }
 
         [MustUseReturnValue]
-        [NotNull]
-        public GenericConstraintSyntax ParseGenericConstraint(
+        [CanBeNull]
+        public GenericConstraintSyntax AcceptGenericConstraint(
             [NotNull] ITokenIterator tokens,
             [NotNull] Diagnostics diagnostics)
         {
-            var whereKeyword = tokens.Take<IWhereKeywordToken>();
+            if (!tokens.Accept<IWhereKeywordToken>()) return null;
             var expression = expressionParser.ParseExpression(tokens, diagnostics);
-            return new GenericConstraintSyntax(whereKeyword, expression);
+            return new GenericConstraintSyntax(expression);
         }
     }
 }

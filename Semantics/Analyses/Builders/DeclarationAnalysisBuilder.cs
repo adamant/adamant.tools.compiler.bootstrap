@@ -225,10 +225,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
             return syntax?.Select(parameter => new GenericParameterAnalysis(context,
                 parameter,
                 memberName.Qualify(parameter.Name.Value ?? "_"),
-                parameter.TypeExpression == null
+                parameter.Type == null
                     ? null
                     : expressionBuilder.BuildExpression(context, memberName,
-                        parameter.TypeExpression)));
+                        parameter.Type)));
         }
     }
 }

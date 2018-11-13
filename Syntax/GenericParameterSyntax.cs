@@ -1,4 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -6,22 +5,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class GenericParameterSyntax : NonTerminal
     {
-        [CanBeNull] public IParamsKeywordToken ParamsKeyword { get; }
+        public bool IsParams { get; }
         [NotNull] public IIdentifierTokenPlace Name { get; }
-        [CanBeNull] public IColonTokenPlace Colon { get; }
-        [CanBeNull] public ExpressionSyntax TypeExpression { get; }
+        [CanBeNull] public ExpressionSyntax Type { get; }
 
         public GenericParameterSyntax(
-            [CanBeNull] IParamsKeywordToken paramsKeyword,
+            bool isParams,
             [NotNull] IIdentifierTokenPlace name,
-            [CanBeNull] IColonTokenPlace colon,
-            [CanBeNull] ExpressionSyntax typeExpression)
+            [CanBeNull] ExpressionSyntax type)
         {
-            Requires.NotNull(nameof(name), name);
-            ParamsKeyword = paramsKeyword;
             Name = name;
-            Colon = colon;
-            TypeExpression = typeExpression;
+            Type = type;
+            IsParams = isParams;
         }
     }
 }
