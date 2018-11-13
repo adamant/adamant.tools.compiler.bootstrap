@@ -10,30 +10,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public readonly int Number; // The block number is used as its name in IR
-        [NotNull, ItemNotNull] public IReadOnlyList<Statement> Statements { get; }
-        [NotNull, ItemNotNull] private readonly List<Statement> statements = new List<Statement>();
-        [CanBeNull] public BlockTerminator Terminator { get; private set; }
+        [NotNull, ItemNotNull] public FixedList<Statement> Statements { get; }
+        [NotNull] public BlockTerminator Terminator { get; }
 
-        public BasicBlock(int number)
+        public BasicBlock(int number,
+            [NotNull, ItemNotNull] IEnumerable<Statement> statements,
+            [NotNull] BlockTerminator terminator)
         {
             Number = number;
-            Statements = statements.AsReadOnly().NotNull();
-        }
-
-        public void Add([NotNull] Statement statement)
-        {
-            statements.Add(statement);
-        }
-
-        public void End([NotNull] BlockTerminator terminator)
-        {
-            // Can only set an terminator if there isn't already one
-            Requires.Null(nameof(Terminator), Terminator);
+            Statements = statements.ToFixedList();
             Terminator = terminator;
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string DebuggerDisplay =>
-            $"BB #{Number}, Statements={Statements.Count} {(Terminator != null ? ", Terminated" : "")}";
+            $"BB #{Number}, Statements={Statements.Count}";
     }
 }

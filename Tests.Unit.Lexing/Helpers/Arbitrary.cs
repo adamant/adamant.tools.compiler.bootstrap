@@ -69,7 +69,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
                 case ">":
                     return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == "=>";
                 case "<":
-                    return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == "=>" || t2.Text == ":"
+                    return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == "=>"
+                        || t2.Text == ":" || t2.Text == "::"
                         || t2.Text == ".." || t2.Text == "..<";
                 case "-":
                     return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == "=>"

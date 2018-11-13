@@ -1,19 +1,23 @@
 using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
 {
     public class CallStatement : Statement
     {
-        public readonly Place Place;
-        public readonly string FunctionName;
-        public IReadOnlyList<Place> Arguments { get; }
-        private readonly List<Place> arguments = new List<Place>();
+        [NotNull] public readonly Place Place;
+        [NotNull] public readonly string FunctionName;
+        [NotNull, ItemNotNull] public FixedList<IValue> Arguments { get; }
 
-        public CallStatement(Place lvalue, string functionName)
+        public CallStatement(
+            [NotNull] Place lvalue,
+            [NotNull] string functionName,
+            [NotNull, ItemNotNull] IEnumerable<IValue> arguments)
         {
             Place = lvalue;
             FunctionName = functionName;
-            Arguments = arguments.AsReadOnly();
+            Arguments = arguments.ToFixedList();
         }
     }
 }
