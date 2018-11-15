@@ -26,15 +26,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             switch (tokens.Current)
             {
-                case IMutableKeywordToken mutableKeyword:
+                case IRefKeywordToken _:
+                case IMutableKeywordToken _:
+                case ISelfKeywordToken _:
                 {
-                    tokens.Next();
-                    var selfKeyword = tokens.Consume<ISelfKeywordTokenPlace>();
-                    return new SelfParameterSyntax(mutableKeyword, selfKeyword);
+                    var span = tokens.Current.Span;
+                    var isRef = tokens.Accept<IRefKeywordToken>();
+                    var mutableBinding = tokens.Accept<IMutableKeywordToken>();
+                    var selfSpan = tokens.Expect<ISelfKeywordToken>();
+                    span = TextSpan.Covering(span, selfSpan);
+                    return new SelfParameterSyntax(span, isRef, mutableBinding);
                 }
-                case ISelfKeywordToken selfKeyword:
-                    tokens.Next();
-                    return new SelfParameterSyntax(null, selfKeyword);
                 case IDotToken _:
                 {
                     Tokens.Expect<IDotToken>();

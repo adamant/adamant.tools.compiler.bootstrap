@@ -726,7 +726,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenIterator tokens,
             [NotNull] Diagnostics diagnostics)
         {
-            var body = blockParser.AcceptBlock(tokens, diagnostics);
+            var body = blockParser.AcceptBlock();
             if (body == null)
                 tokens.Expect<ISemicolonToken>();
             return body;

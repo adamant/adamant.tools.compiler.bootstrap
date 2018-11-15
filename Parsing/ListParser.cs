@@ -41,6 +41,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [MustUseReturnValue]
         [NotNull, ItemNotNull]
+        public FixedList<T> AcceptSeparatedList<T, TSeparator>([NotNull] Func<T> acceptItem)
+            where T : class
+            where TSeparator : class, IToken
+        {
+            var items = new List<T>();
+            var item = acceptItem();
+            while (item != null)
+            {
+                items.Add(item);
+                if (!Tokens.Accept<TSeparator>())
+                    break;
+
+                item = acceptItem();
+            }
+            return items.ToFixedList();
+        }
+
+        [MustUseReturnValue]
+        [NotNull, ItemNotNull]
         public FixedList<T> ParseSeparatedList<T, TSeparator>([NotNull] Func<T> acceptItem)
             where T : class
             where TSeparator : class, IToken
@@ -52,7 +71,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             while (item != null)
             {
                 items.Add(item);
-                if (Tokens.AcceptToken<TSeparator>() == null)
+                if (Tokens.Accept<TSeparator>())
                     break;
 
                 item = acceptItem();

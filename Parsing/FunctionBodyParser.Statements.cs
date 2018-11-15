@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             {
                 case IOpenBraceToken _:
                     // To simplify things later, we wrap blocks in an expression statement syntax w/o a semicolon
-                    return new ExpressionStatementSyntax(ParseBlock(tokens, diagnostics), null);
+                    return new ExpressionStatementSyntax(ParseBlock(tokens, diagnostics));
                 case ILetKeywordToken _:
                 case IVarKeywordToken _:
                 {
@@ -47,24 +47,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 default:
                 {
                     var expression = ParseExpression(tokens, diagnostics);
-                    var semicolon = tokens.Consume<ISemicolonTokenPlace>();
-                    return new ExpressionStatementSyntax(expression, semicolon);
+                    tokens.Expect<ISemicolonToken>();
+                    return new ExpressionStatementSyntax(expression);
                 }
             }
         }
 
         [MustUseReturnValue]
         [CanBeNull]
-        public BlockSyntax AcceptBlock(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] Diagnostics diagnostics)
+        public BlockSyntax AcceptBlock()
         {
-            var openBrace = tokens.AcceptToken<IOpenBraceToken>();
-            if (openBrace == null) return null;
-            var statements = listParser.ParseList(tokens, ParseStatement, TypeOf<ICloseBraceToken>(), diagnostics);
-            var closeBrace = tokens.Consume<ICloseBraceTokenPlace>();
-            var span = TextSpan.Covering(openBrace.Span, closeBrace.Span);
-            return new BlockSyntax(span, statements);
+            var openBrace = Tokens.Current.Span;
+            if (!Tokens.Accept<IOpenBraceToken>()) return null;
+            var statements = listParser.ParseList(Tokens, ParseStatement, TypeOf<ICloseBraceToken>(), Tokens.Context.Diagnostics);
+            var closeBrace = Tokens.Expect<ICloseBraceToken>();
+            openBrace = TextSpan.Covering(openBrace, closeBrace);
+            return new BlockSyntax(openBrace, statements);
         }
 
         [MustUseReturnValue]
@@ -73,10 +71,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] ITokenIterator tokens,
             [NotNull] Diagnostics diagnostics)
         {
-            var openBrace = tokens.Consume<IOpenBraceTokenPlace>();
+            var openBrace = tokens.Expect<IOpenBraceToken>();
             var statements = listParser.ParseList(tokens, ParseStatement, TypeOf<ICloseBraceToken>(), diagnostics);
-            var closeBrace = tokens.Consume<ICloseBraceTokenPlace>();
-            var span = TextSpan.Covering(openBrace.Span, closeBrace.Span);
+            var closeBrace = tokens.Expect<ICloseBraceToken>();
+            var span = TextSpan.Covering(openBrace, closeBrace);
             return new BlockSyntax(span, statements);
         }
 

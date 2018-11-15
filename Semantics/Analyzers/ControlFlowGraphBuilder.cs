@@ -5,6 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
+using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -144,10 +145,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case BinaryOperatorExpressionAnalysis binaryOperatorExpression:
                     switch (binaryOperatorExpression.Operator)
                     {
-                        case IEqualsToken _:
-                            var lvalue = ConvertToLValue(binaryOperatorExpression.LeftOperand);
-                            ConvertToAssignmentStatement(lvalue, binaryOperatorExpression.RightOperand, statements);
-                            break;
+                        //case BinaryOperator. EqualsToken _:
+                        //    var lvalue = ConvertToLValue(binaryOperatorExpression.LeftOperand);
+                        //    ConvertToAssignmentStatement(lvalue, binaryOperatorExpression.RightOperand, statements);
+                        //    break;
                         default:
                             // Could be side effects possibly.
                             var temp = Let(binaryOperatorExpression.Type.AssertResolved());
@@ -234,15 +235,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 //        ConvertToLValue(cfg, binaryOperator.LeftOperand),
                 //        ConvertToLValue(cfg, binaryOperator.RightOperand)));
                 //    break;
-                case ILessThanToken _:
-                case ILessThanOrEqualToken _:
-                case IGreaterThanToken _:
-                case IGreaterThanOrEqualToken _:
+                case BinaryOperator.LessThan:
+                case BinaryOperator.LessThanOrEqual:
+                case BinaryOperator.GreaterThan:
+                case BinaryOperator.GreaterThanOrEqual:
                     // TODO generate the correct statement
                     break;
-                case IAsKeywordToken _:
-                    ConvertExpressionAnalysisToStatement(binaryOperator.LeftOperand, statements);
-                    break;
+                //case IAsKeywordToken _:
+                //    ConvertExpressionAnalysisToStatement(binaryOperator.LeftOperand, statements);
+                //    break;
                 default:
                     throw NonExhaustiveMatchException.For(binaryOperator.Operator);
             }

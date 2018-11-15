@@ -1,9 +1,9 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
-    public interface IMemberNameTokenPlace : IKeywordTokenPlace { }
+    public interface IMemberNameToken : IKeywordToken { }
 
-    public partial interface IIdentifierTokenPlace : IMemberNameTokenPlace { }
-    public partial interface INewKeywordTokenPlace : IMemberNameTokenPlace { }
-    public partial interface IInitKeywordTokenPlace : IMemberNameTokenPlace { }
-    public partial interface IDeleteKeywordTokenPlace : IMemberNameTokenPlace { }
+    public partial interface IIdentifierToken : IMemberNameToken { }
+    public partial interface INewKeywordToken : IMemberNameToken { }
+    public partial interface IInitKeywordToken : IMemberNameToken { }
+    public partial interface IDeleteKeywordToken : IMemberNameToken { }
 }

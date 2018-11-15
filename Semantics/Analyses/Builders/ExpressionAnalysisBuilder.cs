@@ -51,11 +51,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
                     return new ReturnExpressionAnalysis(context, returnExpression, returnValue);
                 case PrimitiveTypeSyntax primitiveType:
                     return new PrimitiveTypeAnalysis(context, primitiveType);
-                case BinaryOperatorExpressionSyntax binaryOperatorExpression:
+                case BinaryExpressionSyntax binaryOperatorExpression:
                     var leftOperand = BuildExpression(context, functionName, binaryOperatorExpression.LeftOperand);
                     var rightOperand = BuildExpression(context, functionName, binaryOperatorExpression.RightOperand);
                     return new BinaryOperatorExpressionAnalysis(context, binaryOperatorExpression, leftOperand, rightOperand);
-                case UnaryOperatorExpressionSyntax unaryOperatorExpression:
+                case UnaryExpressionSyntax unaryOperatorExpression:
                     var operand = BuildExpression(context, functionName, unaryOperatorExpression.Operand);
                     return new UnaryOperatorExpressionAnalysis(context, unaryOperatorExpression, operand);
                 case IdentifierNameSyntax identifierName:
@@ -111,15 +111,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
                 case UnsafeExpressionSyntax unsafeExpression:
                     return new UnsafeExpressionAnalysis(context, unsafeExpression,
                         BuildExpression(context, functionName, unsafeExpression.Expression));
-                case ParenthesizedExpressionSyntax parenthesizedExpression:
-                    return BuildExpression(context, functionName, parenthesizedExpression.Expression);
                 case MutableTypeSyntax mutableType:
                     return new MutableTypeAnalysis(context, mutableType, BuildExpression(context, functionName, mutableType.ReferencedType));
                 case IfExpressionSyntax ifExpression:
                     return new IfExpressionAnalysis(context, ifExpression,
                         BuildExpression(context, functionName, ifExpression.Condition),
                         BuildExpressionBlock(context, functionName, ifExpression.ThenBlock),
-                        BuildElseClause(context, functionName, ifExpression.ElseClause));
+                        BuildExpression(context, functionName, ifExpression.ElseClause));
                 case ResultExpressionSyntax resultExpression:
                     return new ResultExpressionAnalysis(context, resultExpression,
                         BuildExpression(context, functionName, resultExpression.Expression));
@@ -191,16 +189,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
             [NotNull] ArgumentSyntax argument)
         {
             return new ArgumentAnalysis(context, argument, BuildExpression(context, functionName, argument.Value));
-        }
-
-        [CanBeNull]
-        private ExpressionAnalysis BuildElseClause(
-            [NotNull] AnalysisContext context,
-            [NotNull] Name functionName,
-            [CanBeNull] ElseClauseSyntax elseClause)
-        {
-            if (elseClause == null) return null;
-            return BuildExpression(context, functionName, elseClause.Expression);
         }
     }
 }

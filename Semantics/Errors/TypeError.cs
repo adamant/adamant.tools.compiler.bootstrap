@@ -2,6 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
+using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -26,12 +27,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
         public static Diagnostic OperatorCannotBeAppliedToOperandsOfType(
             [NotNull] CodeFile file,
             TextSpan span,
-            [NotNull] IOperatorToken @operator,
+            [NotNull] BinaryOperator @operator,
             [CanBeNull] DataType leftOperandType,
             [CanBeNull] DataType rightOperandType)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3001,
-                $"Operator `{@operator.Text(file.Code)}` cannot be applied to operands of type `{leftOperandType}` and `{rightOperandType}`.");
+                $"Operator `{@operator}` cannot be applied to operands of type `{leftOperandType}` and `{rightOperandType}`.");
         }
 
         [NotNull]

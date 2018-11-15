@@ -1,18 +1,17 @@
-using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class ArgumentSyntax : NonTerminal
     {
-        [CanBeNull] public IParamsKeywordToken ParamsKeyword { get; }
+        public bool IsParams { get; }
         [CanBeNull] public ExpressionSyntax Value { get; }
 
         public ArgumentSyntax(
-            [CanBeNull] IParamsKeywordToken paramsKeyword,
+            bool isParams,
             [CanBeNull] ExpressionSyntax value)
         {
-            ParamsKeyword = paramsKeyword;
+            IsParams = isParams;
             Value = value;
         }
     }

@@ -1,22 +1,15 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
+    // TODO just make expressions into statements
     public class ExpressionStatementSyntax : StatementSyntax
     {
         [NotNull] public ExpressionSyntax Expression { get; }
-        // Block statements are expression statements without a semicolon
-        [CanBeNull] public ISemicolonTokenPlace Semicolon { get; }
 
-        public ExpressionStatementSyntax(
-            [NotNull] ExpressionSyntax expression,
-            [CanBeNull] ISemicolonTokenPlace semicolon)
+        public ExpressionStatementSyntax([NotNull] ExpressionSyntax expression)
         {
-            Requires.NotNull(nameof(expression), expression);
             Expression = expression;
-            Semicolon = semicolon;
         }
     }
 }

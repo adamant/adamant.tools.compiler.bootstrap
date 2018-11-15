@@ -6,6 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
+using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -358,14 +359,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             {
                 switch (@operator)
                 {
-                    case IEqualsEqualsToken _:
-                    case ILessThanToken _:
-                    case ILessThanOrEqualToken _:
-                    case IGreaterThanToken _:
-                    case IGreaterThanOrEqualToken _:
-                    case IAndKeywordToken _:
-                    case IOrKeywordToken _:
-                    case IXorKeywordToken _:
+                    case BinaryOperator.EqualsEquals:
+                    case BinaryOperator.NotEqual:
+                    case BinaryOperator.LessThan:
+                    case BinaryOperator.LessThanOrEqual:
+                    case BinaryOperator.GreaterThan:
+                    case BinaryOperator.GreaterThanOrEqual:
+                    case BinaryOperator.And:
+                    case BinaryOperator.Or:
+                    case BinaryOperator.Xor:
                         binaryOperatorExpression.Type.Computed(ObjectType.Bool);
                         break;
                     default:
@@ -378,67 +380,61 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             bool typeError;
             switch (@operator)
             {
-                case IPlusToken _:
+                case BinaryOperator.Plus:
                     typeError = CheckNumericOperator(
                         binaryOperatorExpression.LeftOperand,
                         binaryOperatorExpression.RightOperand,
                         null);
                     binaryOperatorExpression.Type.Computed(!typeError ? leftOperand : DataType.Unknown);
                     break;
-                case IPlusEqualsToken _:
-                    typeError = CheckNumericOperator(
-                        binaryOperatorExpression.LeftOperand,
-                        binaryOperatorExpression.RightOperand,
-                        binaryOperatorExpression.LeftOperand.Type.AssertComputed());
-                    //typeError = (leftOperand != rightOperand || leftOperand == ObjectType.Bool)
-                    //    // TODO really pointer arithmetic should allow `size` and `offset`, but we don't have constants working correct yet
-                    //    && !(leftOperand is PointerType && (rightOperand == ObjectType.Size || rightOperand == ObjectType.Int));
-                    binaryOperatorExpression.Type.Computed(!typeError ? leftOperand : DataType.Unknown);
-                    break;
-                case IAsteriskEqualsToken _:
-                    typeError = leftOperand != rightOperand || leftOperand == ObjectType.Bool;
-                    binaryOperatorExpression.Type.Computed(!typeError ? leftOperand : DataType.Unknown);
-                    break;
-                case IEqualsEqualsToken _:
-                case INotEqualToken _:
-                case ILessThanToken _:
-                case ILessThanOrEqualToken _:
-                case IGreaterThanToken _:
-                case IGreaterThanOrEqualToken _:
+                //case IPlusEqualsToken _:
+                //    typeError = CheckNumericOperator(
+                //        binaryOperatorExpression.LeftOperand,
+                //        binaryOperatorExpression.RightOperand,
+                //        binaryOperatorExpression.LeftOperand.Type.AssertComputed());
+                //    //typeError = (leftOperand != rightOperand || leftOperand == ObjectType.Bool)
+                //    //    // TODO really pointer arithmetic should allow `size` and `offset`, but we don't have constants working correct yet
+                //    //    && !(leftOperand is PointerType && (rightOperand == ObjectType.Size || rightOperand == ObjectType.Int));
+                //    binaryOperatorExpression.Type.Computed(!typeError ? leftOperand : DataType.Unknown);
+                //    break;
+                //case IAsteriskEqualsToken _:
+                //    typeError = leftOperand != rightOperand || leftOperand == ObjectType.Bool;
+                //    binaryOperatorExpression.Type.Computed(!typeError ? leftOperand : DataType.Unknown);
+                //    break;
+                case BinaryOperator.EqualsEquals:
+                case BinaryOperator.NotEqual:
+                case BinaryOperator.LessThan:
+                case BinaryOperator.LessThanOrEqual:
+                case BinaryOperator.GreaterThan:
+                case BinaryOperator.GreaterThanOrEqual:
                     typeError = leftOperandCore != rightOperandCore;
                     binaryOperatorExpression.Type.Computed(ObjectType.Bool);
                     break;
-                case IEqualsToken _:
-                    typeError = leftOperandCore != rightOperandCore;
-                    if (!typeError)
-                        binaryOperatorExpression.Type.Computed(leftOperand);
-                    break;
-                case IAndKeywordToken _:
-                case IOrKeywordToken _:
-                case IXorKeywordToken _:
+                //case IEqualsToken _:
+                //    typeError = leftOperandCore != rightOperandCore;
+                //    if (!typeError)
+                //        binaryOperatorExpression.Type.Computed(leftOperand);
+                //    break;
+                case BinaryOperator.And:
+                case BinaryOperator.Or:
+                case BinaryOperator.Xor:
                     typeError = leftOperand != ObjectType.Bool || rightOperand != ObjectType.Bool;
 
                     binaryOperatorExpression.Type.Computed(ObjectType.Bool);
                     break;
-                case IDotDotToken _:
-                case IDotToken _:
-                case ICaretDotToken _:
-                    // TODO type check this
-                    typeError = false;
-                    break;
-                case IDollarToken _:
-                case IDollarLessThanToken _:
-                case IDollarLessThanNotEqualToken _:
-                case IDollarGreaterThanToken _:
-                case IDollarGreaterThanNotEqualToken _:
-                    typeError = leftOperand != ObjectType.Type;
-                    break;
-                case IAsKeywordToken _:
-                    var asType = EvaluateCheckedTypeExpression(binaryOperatorExpression.RightOperand);
-                    // TODO check that left operand can be converted to this
-                    typeError = false;
-                    binaryOperatorExpression.Type.Computed(asType);
-                    break;
+                //case IDollarToken _:
+                //case IDollarLessThanToken _:
+                //case IDollarLessThanNotEqualToken _:
+                //case IDollarGreaterThanToken _:
+                //case IDollarGreaterThanNotEqualToken _:
+                //    typeError = leftOperand != ObjectType.Type;
+                //    break;
+                //case IAsKeywordToken _:
+                //    var asType = EvaluateCheckedTypeExpression(binaryOperatorExpression.RightOperand);
+                //    // TODO check that left operand can be converted to this
+                //    typeError = false;
+                //    binaryOperatorExpression.Type.Computed(asType);
+                //    break;
                 default:
                     throw NonExhaustiveMatchException.For(@operator);
             }

@@ -1,23 +1,17 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class SelfParameterSyntax : ParameterSyntax
     {
-        [CanBeNull] public IMutableKeywordToken MutableKeyword { get; }
-        [NotNull] public ISelfKeywordTokenPlace SelfKeyword { get; }
+        public bool IsRef { get; }
+        public bool MutableBinding { get; }
 
-        public SelfParameterSyntax(
-            [CanBeNull] IMutableKeywordToken mutableKeyword,
-            [NotNull] ISelfKeywordTokenPlace selfKeyword)
-            : base(TextSpan.Covering(mutableKeyword?.Span, selfKeyword.Span))
+        public SelfParameterSyntax(in TextSpan span, bool isRef, bool mutableBinding)
+            : base(span)
         {
-            Requires.NotNull(nameof(selfKeyword), selfKeyword);
-            SelfKeyword = selfKeyword;
-            MutableKeyword = mutableKeyword;
+            IsRef = isRef;
+            MutableBinding = mutableBinding;
         }
     }
 }

@@ -31,9 +31,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [MustUseReturnValue]
         [NotNull, ItemNotNull]
-        FixedList<T> ParseSeparatedList<T, TSeparator>(Func<T> acceptItem)
+        FixedList<T> AcceptSeparatedList<T, TSeparator>([NotNull] Func<T> acceptItem)
             where T : class
             where TSeparator : class, IToken;
+
+        [MustUseReturnValue]
+        [NotNull, ItemNotNull]
+        FixedList<T> ParseSeparatedList<T, TSeparator>(Func<T> acceptItem)
+                    where T : class
+                    where TSeparator : class, IToken;
 
         [MustUseReturnValue]
         [NotNull]

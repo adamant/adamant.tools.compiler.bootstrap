@@ -1,24 +1,21 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class IfExpressionSyntax : ExpressionSyntax
     {
-        [NotNull] public IIfKeywordToken IfKeyword { get; }
         [NotNull] public ExpressionSyntax Condition { get; }
         [NotNull] public ExpressionBlockSyntax ThenBlock { get; }
-        [CanBeNull] public ElseClauseSyntax ElseClause { get; }
+        [CanBeNull] public ExpressionSyntax ElseClause { get; }
 
         public IfExpressionSyntax(
-            [NotNull] IIfKeywordToken ifKeyword,
+            TextSpan span,
             [NotNull] ExpressionSyntax condition,
             [NotNull] ExpressionBlockSyntax thenBlock,
-            [CanBeNull] ElseClauseSyntax elseClause)
-            : base(TextSpan.Covering(ifKeyword.Span, thenBlock.Span, elseClause?.Span))
+            [CanBeNull] ExpressionSyntax elseClause)
+            : base(span)
         {
-            IfKeyword = ifKeyword;
             Condition = condition;
             ThenBlock = thenBlock;
             ElseClause = elseClause;
@@ -27,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         public override string ToString()
         {
             if (ElseClause != null)
-                return $"if {Condition} {ThenBlock} {ElseClause}";
+                return $"if {Condition} {ThenBlock} else {ElseClause}";
             return $"if {Condition} {ThenBlock}";
         }
     }

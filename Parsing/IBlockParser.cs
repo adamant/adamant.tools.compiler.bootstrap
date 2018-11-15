@@ -9,9 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     {
         [MustUseReturnValue]
         [CanBeNull]
-        BlockSyntax AcceptBlock(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] Diagnostics diagnostics);
+        BlockSyntax AcceptBlock();
 
         [NotNull]
         [MustUseReturnValue]
