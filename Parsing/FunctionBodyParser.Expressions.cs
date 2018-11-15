@@ -62,14 +62,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         {
                             precedence = OperatorPrecedence.Assignment;
                             leftAssociative = false;
-                            @operator = tokens.TakeOperator();
+                            @operator = tokens.RequiredToken<IOperatorToken>();
                         }
                         break;
                     case IQuestionQuestionToken _:
                         if (minPrecedence <= OperatorPrecedence.Coalesce)
                         {
                             precedence = OperatorPrecedence.Coalesce;
-                            @operator = tokens.TakeOperator();
+                            @operator = tokens.RequiredToken<IOperatorToken>();
                         }
                         break;
                     case IOrKeywordToken _:
@@ -77,14 +77,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         if (minPrecedence <= OperatorPrecedence.LogicalOr)
                         {
                             precedence = OperatorPrecedence.LogicalOr;
-                            @operator = tokens.TakeOperator();
+                            @operator = tokens.RequiredToken<IOperatorToken>();
                         }
                         break;
                     case IAndKeywordToken _:
                         if (minPrecedence <= OperatorPrecedence.LogicalAnd)
                         {
                             precedence = OperatorPrecedence.LogicalAnd;
-                            @operator = tokens.TakeOperator();
+                            @operator = tokens.RequiredToken<IOperatorToken>();
                         }
                         break;
                     case IEqualsEqualsToken _:
@@ -92,7 +92,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         if (minPrecedence <= OperatorPrecedence.Equality)
                         {
                             precedence = OperatorPrecedence.Equality;
-                            @operator = tokens.TakeOperator();
+                            @operator = tokens.RequiredToken<IOperatorToken>();
                         }
                         break;
                     case ILessThanToken _:
@@ -104,7 +104,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         if (minPrecedence <= OperatorPrecedence.Relational)
                         {
                             precedence = OperatorPrecedence.Relational;
-                            @operator = tokens.TakeOperator();
+                            @operator = tokens.RequiredToken<IOperatorToken>();
                         }
                         break;
                     case IColonToken _: // type kind
@@ -123,7 +123,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         if (minPrecedence <= OperatorPrecedence.Range)
                         {
                             precedence = OperatorPrecedence.Range;
-                            @operator = tokens.TakeOperator();
+                            @operator = tokens.RequiredToken<IOperatorToken>();
                         }
                         break;
                     case IPlusToken _:
@@ -131,7 +131,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         if (minPrecedence <= OperatorPrecedence.Additive)
                         {
                             precedence = OperatorPrecedence.Additive;
-                            @operator = tokens.TakeOperator();
+                            @operator = tokens.RequiredToken<IOperatorToken>();
                         }
                         break;
                     case IAsteriskToken _:
@@ -139,7 +139,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         if (minPrecedence <= OperatorPrecedence.Multiplicative)
                         {
                             precedence = OperatorPrecedence.Multiplicative;
-                            @operator = tokens.TakeOperator();
+                            @operator = tokens.RequiredToken<IOperatorToken>();
                         }
                         break;
                     case IDollarToken _:
@@ -209,13 +209,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         operatorPrecedence += 1;
 
                     var rightOperand = ParseExpression(tokens, diagnostics, operatorPrecedence);
-                    expression = new BinaryOperatorExpressionSyntax(expression, @operatorToken, rightOperand);
+                    BuildOperatorExpression(expression, operatorToken, rightOperand);
                 }
                 else
                 {
                     // if we didn't match any operator
                     return expression;
                 }
+            }
+        }
+
+        [NotNull]
+        private static ExpressionSyntax BuildOperatorExpression(
+            [NotNull] ExpressionSyntax left,
+            [NotNull] IOperatorToken operatorToken,
+            [NotNull] ExpressionSyntax right)
+        {
+            switch (operatorToken)
+            {
+                case IEqualsToken _:
+                    return new AssignmentExpressionSyntax(left, AssignmentOperation.Direct, right);
+                case IPlusEqualsToken _:
+                    return new AssignmentExpressionSyntax(left, AssignmentOperation.Direct, right);
+                case IMinusEqualsToken _:
+                    return new AssignmentExpressionSyntax(left, AssignmentOperation.Direct, right);
+                case IAsteriskEqualsToken _:
+                    return new AssignmentExpressionSyntax(left, AssignmentOperation.Direct, right);
+                case ISlashEqualsToken _:
+                    return new AssignmentExpressionSyntax(left, AssignmentOperation.Direct, right);
+                default:
+                    return new BinaryOperatorExpressionSyntax(left, operatorToken, right);
             }
         }
 

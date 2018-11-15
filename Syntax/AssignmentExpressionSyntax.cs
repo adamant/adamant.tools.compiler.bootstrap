@@ -1,22 +1,23 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public class BinaryOperatorExpressionSyntax : OperatorExpressionSyntax
+    public class AssignmentExpressionSyntax : ExpressionSyntax
     {
         [NotNull] public ExpressionSyntax LeftOperand { get; }
+        public AssignmentOperation Operation { get; }
         [NotNull] public ExpressionSyntax RightOperand { get; }
 
-        public BinaryOperatorExpressionSyntax(
+        public AssignmentExpressionSyntax(
             [NotNull] ExpressionSyntax leftOperand,
-            [NotNull] IOperatorToken @operator,
+            AssignmentOperation operation,
             [NotNull] ExpressionSyntax rightOperand)
-            : base(@operator, TextSpan.Covering(leftOperand.Span, rightOperand.Span))
+            : base(TextSpan.Covering(leftOperand.Span, rightOperand.Span))
         {
             LeftOperand = leftOperand;
             RightOperand = rightOperand;
+            Operation = operation;
         }
     }
 }

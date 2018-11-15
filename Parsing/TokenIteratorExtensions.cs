@@ -37,6 +37,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             throw new ParseFailedException($"Requires {typeof(T).GetFriendlyName()}, found {tokens.Current.GetType().NotNull().GetFriendlyName()}");
         }
 
+        public static T RequiredToken<T>([NotNull] this ITokenIterator tokens)
+            where T : IToken
+        {
+            if (tokens.Current is T token)
+            {
+                tokens.Next();
+                return token;
+            }
+
+            tokens.Context.Diagnostics.Add(
+                ParseError.MissingToken(tokens.Context.File, typeof(T), tokens.Current));
+            throw new ParseFailedException($"Requires {typeof(T).GetFriendlyName()}, found {tokens.Current.GetType().NotNull().GetFriendlyName()}");
+        }
+
         [NotNull]
         public static IIdentifierToken RequiredIdentifier([NotNull] this ITokenIterator tokens)
         {

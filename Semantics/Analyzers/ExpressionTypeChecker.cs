@@ -52,8 +52,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
             if (variableDeclaration.TypeExpression != null)
             {
-                variableDeclaration.Type.Computed(
-                    EvaluateTypeExpression(variableDeclaration.TypeExpression));
+                var type = EvaluateTypeExpression(variableDeclaration.TypeExpression);
+                variableDeclaration.Type.Computed(type);
+                if (variableDeclaration.Initializer != null)
+                    ImposeIntegerConstantType(type, variableDeclaration.Initializer);
                 // TODO check that the initializer type is compatible with the variable type
             }
             else if (variableDeclaration.Initializer != null)
