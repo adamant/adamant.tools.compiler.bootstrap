@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using JetBrains.Annotations;
@@ -22,6 +23,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
         public override ISymbol Lookup(string name)
         {
             return base.Lookup(name) ?? ContainingScope.Lookup(name);
+        }
+
+        [CanBeNull]
+        public override ISymbol LookupGlobal([NotNull] Name name)
+        {
+            return ContainingScope.LookupGlobal(name);
         }
     }
 }

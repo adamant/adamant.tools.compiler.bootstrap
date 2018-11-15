@@ -40,6 +40,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             throw new System.NotImplementedException();
         }
 
+        [CanBeNull]
+        public ISymbol Lookup([NotNull] SimpleName name)
+        {
+            throw new System.NotImplementedException();
+        }
+
         [NotNull]
         public Parameter Complete()
         {

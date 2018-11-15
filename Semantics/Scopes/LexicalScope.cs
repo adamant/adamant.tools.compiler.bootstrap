@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using JetBrains.Annotations;
@@ -11,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
         [NotNull] public NonTerminal Syntax { get; }
         [NotNull] [ItemNotNull] public IReadOnlyList<LexicalScope> NestedScopes { get; }
         [NotNull] [ItemNotNull] private readonly List<LexicalScope> nestedScopes = new List<LexicalScope>();
-        [CanBeNull] private IReadOnlyDictionary<string, ISymbol> declarations;
+        [CanBeNull] private FixedDictionary<string, ISymbol> declarations;
 
         protected LexicalScope([NotNull] NonTerminal syntax)
         {
@@ -26,17 +27,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
             nestedScopes.Add(nestedScope);
         }
 
-        public void Bind([NotNull] Dictionary<string, ISymbol> declarations)
+        public void Bind([NotNull] Dictionary<string, ISymbol> symbolDeclarations)
         {
-            Requires.NotNull(nameof(declarations), declarations);
-            this.declarations = new Dictionary<string, ISymbol>(declarations).AsReadOnly();
+            declarations = symbolDeclarations.ToFixedDictionary();
         }
 
         [CanBeNull]
         public virtual ISymbol Lookup([NotNull] string name)
         {
-            Requires.NotNull(nameof(name), name);
             return declarations.NotNull().TryGetValue(name, out var declaration) ? declaration : null;
         }
+
+        [CanBeNull]
+        public abstract ISymbol LookupGlobal([NotNull] Name name);
     }
 }

@@ -34,5 +34,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
                 return composite.ComposeWith(this);
             return new CompositeSymbol(this, symbol);
         }
+
+        [CanBeNull]
+        public abstract ISymbol Lookup([NotNull] SimpleName name);
     }
 }

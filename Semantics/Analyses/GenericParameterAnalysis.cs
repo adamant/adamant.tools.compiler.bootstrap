@@ -38,6 +38,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             return new CompositeSymbol(this, symbol);
         }
 
+        [CanBeNull]
+        public ISymbol Lookup([NotNull] SimpleName name)
+        {
+            throw new System.NotImplementedException();
+        }
+
         [NotNull]
         public GenericParameter Complete()
         {

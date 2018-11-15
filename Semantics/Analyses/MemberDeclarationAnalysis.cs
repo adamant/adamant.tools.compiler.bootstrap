@@ -46,6 +46,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
         }
 
         [CanBeNull]
+        public ISymbol Lookup([NotNull] SimpleName name)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        [CanBeNull]
         public abstract Declaration Complete([NotNull] Diagnostics diagnostics);
 
         protected bool CompleteDiagnostics([NotNull] Diagnostics diagnostics)

@@ -10,5 +10,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols
         [NotNull] Name Name { get; }
         [NotNull] [ItemNotNull] IEnumerable<DataType> Types { get; }
         [NotNull] ISymbol ComposeWith([NotNull] ISymbol symbol);
+        [CanBeNull] ISymbol Lookup([NotNull] SimpleName name);
     }
 }

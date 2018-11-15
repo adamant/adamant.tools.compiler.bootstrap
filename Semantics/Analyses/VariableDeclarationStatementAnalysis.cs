@@ -34,11 +34,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
         }
 
         IEnumerable<DataType> ISymbol.Types => Type.DataType.YieldValue();
-        ISymbol ISymbol.ComposeWith(ISymbol symbol)
+
+        [NotNull]
+        ISymbol ISymbol.ComposeWith([NotNull] ISymbol symbol)
         {
             if (symbol is CompositeSymbol composite)
                 return composite.ComposeWith(this);
             return new CompositeSymbol(this, symbol);
+        }
+
+        [CanBeNull]
+        public ISymbol Lookup([NotNull] SimpleName name)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

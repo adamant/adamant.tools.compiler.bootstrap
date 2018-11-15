@@ -50,7 +50,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
         public void BindCompilationUnitScope([NotNull] CompilationUnitScope scope)
         {
-            Requires.NotNull(nameof(scope), scope);
             scope.Bind(globalDeclarations.ToDictionary(i => i.Key, i => i.Value as ISymbol));
             foreach (var nestedScope in scope.NestedScopes)
                 BindScope(nestedScope);

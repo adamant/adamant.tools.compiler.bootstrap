@@ -81,16 +81,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 diagnostics.Add(TypeError.MustBeABoolExpression(expression.Context.File, expression.Span));
         }
 
-        public void CheckExpression([CanBeNull] ExpressionAnalysis expression)
+        public DataType CheckExpression([CanBeNull] ExpressionAnalysis expression)
         {
-            if (expression == null) return;
+            if (expression == null) return DataType.Unknown;
 
             expression.Type.BeginComputing();
             switch (expression)
             {
                 case PrimitiveTypeAnalysis primitive:
-                    expression.Type.Computed(new Metatype(GetPrimitiveType(primitive)));
-                    break;
+                    return expression.Type.Computed(new Metatype(GetPrimitiveType(primitive)));
                 case ReturnExpressionAnalysis returnExpression:
                     if (returnExpression.ReturnValue != null)
                     {
@@ -103,55 +102,42 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     {
                         // TODO a void or never function shouldn't have this
                     }
-                    expression.Type.Computed(ObjectType.Never);
-                    break;
+                    return expression.Type.Computed(ObjectType.Never);
                 case IntegerLiteralExpressionAnalysis _:
-                    expression.Type.Computed(DataType.IntegerConstant);
-                    break;
+                    return expression.Type.Computed(DataType.IntegerConstant);
                 case StringLiteralExpressionAnalysis _:
                     // TODO what about interpolated expressions?
-                    expression.Type.Computed(ObjectType.String);
-                    break;
+                    return expression.Type.Computed(ObjectType.String);
                 case BooleanLiteralExpressionAnalysis _:
-                    expression.Type.Computed(ObjectType.Bool);
-                    break;
+                    return expression.Type.Computed(ObjectType.Bool);
                 case BinaryOperatorExpressionAnalysis binaryOperatorExpression:
-                    CheckBinaryOperator(binaryOperatorExpression);
-                    break;
+                    return CheckBinaryOperator(binaryOperatorExpression);
                 case IdentifierNameAnalysis identifierName:
-                    identifierName.Type.Computed(CheckName(expression.Context, identifierName.Syntax.Name));
-                    break;
+                    return identifierName.Type.Computed(CheckName(expression.Context, identifierName.Syntax.Name));
                 case UnaryOperatorExpressionAnalysis unaryOperatorExpression:
-                    CheckUnaryOperator(unaryOperatorExpression);
-                    break;
+                    return CheckUnaryOperator(unaryOperatorExpression);
                 case LifetimeTypeAnalysis lifetimeType:
                     CheckExpression(lifetimeType.TypeName);
                     if (lifetimeType.TypeName.Type.AssertComputed() != ObjectType.Type)
                         diagnostics.Add(TypeError.MustBeATypeExpression(expression.Context.File, lifetimeType.TypeName.Span));
-                    expression.Type.Computed(ObjectType.Type);
-                    break;
+                    return expression.Type.Computed(ObjectType.Type);
                 case BlockAnalysis blockExpression:
                     foreach (var statement in blockExpression.Statements)
                         CheckStatement(statement);
 
-                    expression.Type.Computed(ObjectType.Void);// TODO assign the correct type to the block
-                    break;
+                    return expression.Type.Computed(ObjectType.Void);// TODO assign the correct type to the block
                 case NewObjectExpressionAnalysis newObjectExpression:
                     foreach (var argument in newObjectExpression.Arguments)
                         CheckArgument(argument);
-
-                    expression.Type.Computed(EvaluateTypeExpression(newObjectExpression.ConstructorExpression));
-
                     // TODO verify argument types against called function
-                    break;
+                    return expression.Type.Computed(EvaluateTypeExpression(newObjectExpression.ConstructorExpression));
                 case PlacementInitExpressionAnalysis placementInitExpression:
                     foreach (var argument in placementInitExpression.Arguments)
                         CheckArgument(argument);
 
                     // TODO verify argument types against called function
 
-                    placementInitExpression.Type.Computed(EvaluateTypeExpression(placementInitExpression.InitializerExpression));
-                    break;
+                    return placementInitExpression.Type.Computed(EvaluateTypeExpression(placementInitExpression.InitializerExpression));
                 case ForeachExpressionAnalysis foreachExpression:
                     foreachExpression.VariableType.Computed(
                         EvaluateTypeExpression(foreachExpression.TypeExpression));
@@ -160,27 +146,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     // TODO check the break types
                     CheckExpression(foreachExpression.Block);
                     // TODO assign correct type to the expression
-                    expression.Type.Computed(DataType.Unknown);
-                    break;
+                    return expression.Type.Computed(DataType.Unknown);
                 case WhileExpressionAnalysis whileExpression:
                     CheckExpressionTypeIsBool(whileExpression.Condition);
                     CheckExpression(whileExpression.Block);
                     // TODO assign correct type to the expression
-                    expression.Type.Computed(DataType.Unknown);
-                    break;
+                    return expression.Type.Computed(DataType.Unknown);
                 case LoopExpressionAnalysis loopExpression:
                     CheckExpression(loopExpression.Block);
                     // TODO assign correct type to the expression
-                    expression.Type.Computed(DataType.Unknown);
-                    break;
+                    return expression.Type.Computed(DataType.Unknown);
                 case InvocationAnalysis invocation:
-                    CheckExpression(invocation.Callee);
-                    // TODO the callee needs to be something callable
-                    foreach (var argument in invocation.Arguments)
-                        CheckExpression(argument.Value);
-                    // TODO assign correct return type
-                    expression.Type.Computed(DataType.Unknown);
-                    break;
+                {
+                    var callee = CheckExpression(invocation.Callee);
+                    foreach (var argument in invocation.Arguments) CheckExpression(argument.Value);
+                    if (callee is FunctionType functionType)
+                    {
+                        // TODO check argument types
+                        return expression.Type.Computed(functionType.ResultType);
+                    }
+
+                    diagnostics.Add(TypeError.MustBeCallable(invocation.Context.File, invocation.Callee));
+                    return expression.Type.Computed(DataType.Unknown);
+                }
                 case GenericInvocationAnalysis genericInvocation:
                 {
                     foreach (var argument in genericInvocation.Arguments)
@@ -192,7 +180,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     {
                         genericInvocation.Callee.Type.Resolve(calleeType = overloadedType.Types
                             .OfType<GenericType>()
-                            .Single(t => t.GenericArity == genericInvocation.GenericArity));
+                            .Single(t => t.GenericArity == genericInvocation.GenericArity)
+                            .NotNull());
                     }
 
                     // TODO check that argument types match function type
@@ -205,16 +194,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                         //            genericInvocation.Arguments.Select(a => a.Value.Type.AssertComputed())));
                         //    break;
                         case MetaFunctionType metaFunctionType:
-                            genericInvocation.Type.Computed(metaFunctionType.ResultType);
-                            break;
+                            return genericInvocation.Type.Computed(metaFunctionType.ResultType);
                         case UnknownType _:
-                            genericInvocation.Type.Computed(DataType.Unknown);
-                            break;
+                            return genericInvocation.Type.Computed(DataType.Unknown);
                         default:
                             throw NonExhaustiveMatchException.For(calleeType);
                     }
                 }
-                break;
                 case GenericNameAnalysis genericName:
                 {
                     foreach (var argument in genericName.Arguments)
@@ -239,52 +225,72 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                         //            genericName.Arguments.Select(a => a.Value.Type.AssertComputed())));
                         //    break;
                         case UnknownType _:
-                            genericName.Type.Computed(DataType.Unknown);
-                            break;
+                            return genericName.Type.Computed(DataType.Unknown);
                         default:
                             throw NonExhaustiveMatchException.For(genericName.NameType);
                     }
                 }
-                break;
                 case RefTypeAnalysis refType:
                     EvaluateTypeExpression(refType.ReferencedType);
-                    refType.Type.Computed(ObjectType.Type);
-                    break;
+                    return refType.Type.Computed(ObjectType.Type);
                 case UnsafeExpressionAnalysis unsafeExpression:
                     CheckExpression(unsafeExpression.Expression);
-                    unsafeExpression.Type.Computed(unsafeExpression.Expression.Type);
-                    break;
+                    return unsafeExpression.Type.Computed(unsafeExpression.Expression.Type);
                 case MutableTypeAnalysis mutableType:
-                    mutableType.Type.Computed(EvaluateTypeExpression(mutableType.ReferencedType));// TODO make that type mutable
-                    break;
+                    return mutableType.Type.Computed(EvaluateTypeExpression(mutableType.ReferencedType));// TODO make that type mutable
                 case IfExpressionAnalysis ifExpression:
                     CheckExpressionTypeIsBool(ifExpression.Condition);
                     CheckExpression(ifExpression.ThenBlock);
                     CheckExpression(ifExpression.ElseClause);
                     // TODO assign a type to the expression
-                    ifExpression.Type.Computed(DataType.Unknown);
-                    break;
+                    return ifExpression.Type.Computed(DataType.Unknown);
                 case ResultExpressionAnalysis resultExpression:
                     CheckExpression(resultExpression.Expression);
-                    resultExpression.Type.Computed(ObjectType.Never);
-                    break;
+                    return resultExpression.Type.Computed(ObjectType.Never);
                 case UninitializedExpressionAnalysis uninitializedExpression:
                     // TODO assign a type to the expression
-                    uninitializedExpression.Type.Computed(DataType.Unknown);
-                    break;
+                    return uninitializedExpression.Type.Computed(DataType.Unknown);
                 case MemberAccessExpressionAnalysis memberAccess:
-                    CheckExpression(memberAccess.Expression);
-                    // TODO look up the member
-                    // TODO assign a type to the expression
-                    memberAccess.Type.Computed(DataType.Unknown);
-                    break;
+                    return CheckMemberAccess(memberAccess);
                 case BreakExpressionAnalysis breakExpression:
                     CheckExpression(breakExpression.Expression);
-                    breakExpression.Type.Computed(ObjectType.Never);
-                    break;
+                    return breakExpression.Type.Computed(ObjectType.Never);
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
+        }
+
+        [NotNull]
+        private DataType CheckMemberAccess([NotNull] MemberAccessExpressionAnalysis memberAccess)
+        {
+            var left = CheckExpression(memberAccess.Expression);
+            ISymbol symbol;
+            switch (left)
+            {
+                case UnknownType _:
+                    return DataType.Unknown;
+                case ObjectType objectType:
+                    symbol = memberAccess.Expression.Context.Scope.LookupGlobal(objectType.Name);
+                    break;
+                case PrimitiveFixedIntegerType fixedInteger:
+                    symbol = memberAccess.Expression.Context.Scope.LookupGlobal(fixedInteger.Name);
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.For(left);
+            }
+
+            if (symbol == null) return DataType.Unknown;
+
+            DataType type;
+            switch (memberAccess.Syntax.Member)
+            {
+                case IIdentifierToken identifier:
+                    type = symbol.Lookup(identifier.Value)?.Types.Single();
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.For(memberAccess.Syntax.Member);
+            }
+            return memberAccess.Type.Computed(type ?? DataType.Unknown);
         }
 
         [NotNull]
@@ -292,10 +298,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             [NotNull] AnalysisContext context,
             [NotNull] IIdentifierTokenPlace name)
         {
-            Requires.NotNull(nameof(context), context);
-            Requires.NotNull(nameof(name), name);
-            Requires.NotNull(nameof(diagnostics), diagnostics);
-
             // Missing name, just use unknown
             // Error should already be emitted
             if (name.Value == null)
@@ -340,7 +342,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             CheckExpression(argument.Value);
         }
 
-        private void CheckBinaryOperator(
+        private DataType CheckBinaryOperator(
             [NotNull] BinaryOperatorExpressionAnalysis binaryOperatorExpression)
         {
             CheckExpression(binaryOperatorExpression.LeftOperand);
@@ -368,13 +370,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     case BinaryOperator.And:
                     case BinaryOperator.Or:
                     case BinaryOperator.Xor:
-                        binaryOperatorExpression.Type.Computed(ObjectType.Bool);
-                        break;
+                        return binaryOperatorExpression.Type.Computed(ObjectType.Bool);
                     default:
-                        binaryOperatorExpression.Type.Computed(DataType.Unknown);
-                        break;
+                        return binaryOperatorExpression.Type.Computed(DataType.Unknown);
                 }
-                return;
             }
 
             bool typeError;
@@ -443,6 +442,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     binaryOperatorExpression.Syntax.Span, @operator,
                     binaryOperatorExpression.LeftOperand.Type,
                     binaryOperatorExpression.RightOperand.Type));
+
+            return binaryOperatorExpression.Type.AssertComputed();
         }
 
         private bool CheckNumericOperator(
@@ -506,7 +507,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                    || type == ObjectType.Offset;
         }
 
-        private void CheckUnaryOperator(
+        private DataType CheckUnaryOperator(
             [NotNull] UnaryOperatorExpressionAnalysis unaryOperatorExpression)
         {
             CheckExpression(unaryOperatorExpression.Operand);
@@ -517,10 +518,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             // (technically not true, for example, we could know that one arg should
             // be a bool and isn't)
             if (operand == DataType.Unknown)
-            {
-                unaryOperatorExpression.Type.Computed(DataType.Unknown);
-                return;
-            }
+                return unaryOperatorExpression.Type.Computed(DataType.Unknown);
 
             bool typeError;
             switch (@operator)
@@ -559,6 +557,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             if (typeError)
                 diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandOfType(unaryOperatorExpression.Context.File,
                     unaryOperatorExpression.Syntax.Span, @operator, operand));
+
+            return unaryOperatorExpression.Type.AssertComputed();
         }
 
         /// <summary>

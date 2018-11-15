@@ -68,17 +68,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
         }
 
         [NotNull]
-        public static Diagnostic CircularDefinition([NotNull] CodeFile file, TextSpan span, Name typeDeclarationName)
+        public static Diagnostic CircularDefinition([NotNull] CodeFile file, TextSpan span, [NotNull] Name typeDeclarationName)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3006,
                 $"Declaration of type `{typeDeclarationName}` is part of a circular definition");
         }
 
         [NotNull]
-        public static Diagnostic CannotConvert(CodeFile file, ExpressionAnalysis expression, DataType type)
+        public static Diagnostic CannotConvert([NotNull] CodeFile file, [NotNull] ExpressionAnalysis expression, [NotNull] DataType type)
         {
             return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3007,
                 $"Cannot convert expression `{file.Code[expression.Span]}` to type `{type}`");
+        }
+
+        [NotNull]
+        public static Diagnostic MustBeCallable([NotNull] CodeFile file, [NotNull] ExpressionAnalysis expression)
+        {
+            return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3008,
+                $"Expression must be of callable type to be invoked `{file.Code[expression.Span]}`");
         }
     }
 }

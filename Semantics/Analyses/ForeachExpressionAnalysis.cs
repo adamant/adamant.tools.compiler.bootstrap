@@ -10,10 +10,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
 {
     public class ForeachExpressionAnalysis : ExpressionAnalysis, IDeclarationAnalysis, ILocalVariableScopeAnalysis
     {
-        [NotNull] public new ForeachExpressionSyntax Syntax { get; }
+        [NotNull] public ForeachExpressionSyntax Syntax { get; }
         [NotNull] public Name VariableName { get; }
         [CanBeNull] public ExpressionAnalysis TypeExpression { get; set; }
-        [CanBeNull] public TypeAnalysis VariableType { get; set; }
+        [NotNull] public TypeAnalysis VariableType { get; } = new TypeAnalysis();
         [NotNull] public ExpressionAnalysis InExpression { get; }
         [NotNull] public BlockAnalysis Block { get; }
 
@@ -26,9 +26,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             [NotNull] BlockAnalysis block)
             : base(context, syntax.Span)
         {
-            Requires.NotNull(nameof(variableName), variableName);
-            Requires.NotNull(nameof(inExpression), inExpression);
-            Requires.NotNull(nameof(block), block);
             Syntax = syntax;
             Block = block;
             TypeExpression = typeExpression;
@@ -48,6 +45,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             if (symbol is CompositeSymbol composite)
                 return composite.ComposeWith(this);
             return new CompositeSymbol(this, symbol);
+        }
+
+        [CanBeNull]
+        public ISymbol Lookup([NotNull] SimpleName name)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
