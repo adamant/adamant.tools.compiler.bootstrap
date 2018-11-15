@@ -1,5 +1,4 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -15,10 +14,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [NotNull] ExpressionSyntax expression)
             : base(TextSpan.Covering(unsafeKeyword.Span, expression.Span))
         {
-            Requires.NotNull(nameof(unsafeKeyword), unsafeKeyword);
-            Requires.NotNull(nameof(expression), expression);
             UnsafeKeyword = unsafeKeyword;
             Expression = expression;
+        }
+
+        public override string ToString()
+        {
+            return $"unsafe ({Expression})";
         }
     }
 }

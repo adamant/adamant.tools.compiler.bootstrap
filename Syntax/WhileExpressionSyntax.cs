@@ -1,5 +1,4 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -17,12 +16,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [NotNull] BlockSyntax block)
             : base(TextSpan.Covering(whileKeyword.Span, block.Span))
         {
-            Requires.NotNull(nameof(whileKeyword), whileKeyword);
-            Requires.NotNull(nameof(condition), condition);
-            Requires.NotNull(nameof(block), block);
             WhileKeyword = whileKeyword;
             Condition = condition;
             Block = block;
+        }
+
+        public override string ToString()
+        {
+            return $"while {Condition} {Block}";
         }
     }
 }

@@ -19,5 +19,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             BreakKeyword = breakKeyword;
             Expression = expression;
         }
+
+        public override string ToString()
+        {
+            if (Expression != null) return $"break {Expression}";
+            return "break";
+        }
     }
 }

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -29,14 +28,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [NotNull] ICloseParenTokenPlace argumentsCloseParen)
             : base(TextSpan.Covering(initKeyword.Span, argumentsCloseParen.Span))
         {
-            Requires.NotNull(nameof(initKeyword), initKeyword);
-            Requires.NotNull(nameof(openParen), openParen);
-            Requires.NotNull(nameof(placeExpression), placeExpression);
-            Requires.NotNull(nameof(closeParen), closeParen);
-            Requires.NotNull(nameof(initializer), initializer);
-            Requires.NotNull(nameof(argumentsOpenParen), argumentsOpenParen);
-            Requires.NotNull(nameof(argumentList), argumentList);
-            Requires.NotNull(nameof(argumentsCloseParen), argumentsCloseParen);
             InitKeyword = initKeyword;
             OpenParen = openParen;
             PlaceExpression = placeExpression;
@@ -45,6 +36,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             ArgumentsOpenParen = argumentsOpenParen;
             ArgumentList = argumentList;
             ArgumentsCloseParen = argumentsCloseParen;
+        }
+
+        public override string ToString()
+        {
+            return $"init({PlaceExpression}) {Initializer}({Arguments})";
         }
     }
 }

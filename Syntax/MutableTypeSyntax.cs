@@ -15,5 +15,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             RefKeyword = refKeyword;
             ReferencedType = referencedType;
         }
+
+        public override string ToString()
+        {
+            return $"ref {ReferencedType}";
+        }
     }
 }

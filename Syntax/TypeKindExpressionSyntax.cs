@@ -18,5 +18,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             Colon = colon;
             TypeKind = typeKind;
         }
+
+        public override string ToString()
+        {
+            return $": {TypeKind}";
+        }
     }
 }

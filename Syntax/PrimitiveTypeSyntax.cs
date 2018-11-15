@@ -14,5 +14,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             Requires.NotNull(nameof(keyword), keyword);
             Keyword = keyword;
         }
+
+        public override string ToString()
+        {
+            return Keyword.ToString();
+        }
     }
 }

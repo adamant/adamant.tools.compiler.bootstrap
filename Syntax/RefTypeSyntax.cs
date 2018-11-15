@@ -20,5 +20,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             VarKeyword = varKeyword;
             ReferencedType = referencedType;
         }
+
+        public override string ToString()
+        {
+            return $"ref var {ReferencedType}";
+        }
     }
 }

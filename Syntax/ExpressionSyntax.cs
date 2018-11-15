@@ -10,5 +10,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         {
             Span = span;
         }
+
+        // Useful for debugging
+        public abstract override string ToString();
     }
 }

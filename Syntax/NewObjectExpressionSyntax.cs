@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -23,16 +22,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [NotNull] ICloseParenTokenPlace closeParen)
             : base(TextSpan.Covering(newKeyword.Span, closeParen.Span))
         {
-            Requires.NotNull(nameof(newKeyword), newKeyword);
-            Requires.NotNull(nameof(constructor), constructor);
-            Requires.NotNull(nameof(openParen), openParen);
-            Requires.NotNull(nameof(argumentList), argumentList);
-            Requires.NotNull(nameof(closeParen), closeParen);
             NewKeyword = newKeyword;
             Constructor = constructor;
             OpenParen = openParen;
             ArgumentList = argumentList;
             CloseParen = closeParen;
+        }
+
+        public override string ToString()
+        {
+            return $"new {Constructor}({Arguments})";
         }
     }
 }

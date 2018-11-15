@@ -14,5 +14,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         {
             ReturnValue = returnValue;
         }
+
+        public override string ToString()
+        {
+            if (ReturnValue != null) return $"return {ReturnValue}";
+            return "return";
+        }
     }
 }

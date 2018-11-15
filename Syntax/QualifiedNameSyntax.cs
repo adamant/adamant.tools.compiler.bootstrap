@@ -24,5 +24,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             Dot = dot;
             Name = name;
         }
+
+        public override string ToString()
+        {
+            return $"{Qualifier}.{Name}";
+        }
     }
 }

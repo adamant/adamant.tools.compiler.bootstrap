@@ -1,5 +1,4 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -27,11 +26,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [NotNull] BlockSyntax block)
             : base(TextSpan.Covering(foreachKeyword.Span, block.Span))
         {
-            Requires.NotNull(nameof(foreachKeyword), foreachKeyword);
-            Requires.NotNull(nameof(identifier), identifier);
-            Requires.NotNull(nameof(inKeyword), inKeyword);
-            Requires.NotNull(nameof(inExpression), inExpression);
-            Requires.NotNull(nameof(block), block);
             ForeachKeyword = foreachKeyword;
             VarKeyword = varKeyword;
             Identifier = identifier;
@@ -40,6 +34,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             Block = block;
             Colon = colon;
             TypeExpression = typeExpression;
+        }
+
+        public override string ToString()
+        {
+            // TODO var keyword
+            return $"foreach {Identifier}: {TypeExpression} in {InExpression} {Block}";
         }
     }
 }

@@ -24,5 +24,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             Operator = @operator;
             Lifetime = lifetime;
         }
+
+        public override string ToString()
+        {
+            return $"{TypeExpression}{Operator}{Lifetime}";
+        }
     }
 }

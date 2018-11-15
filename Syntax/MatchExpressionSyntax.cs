@@ -27,5 +27,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             Arms = arms;
             CloseBrace = closeBrace;
         }
+
+        public override string ToString()
+        {
+            return $"match {Value} {{{Arms}}}";
+        }
     }
 }

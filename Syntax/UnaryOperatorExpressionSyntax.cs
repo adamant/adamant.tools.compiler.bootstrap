@@ -17,5 +17,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             Requires.NotNull(nameof(operand), operand);
             Operand = operand;
         }
+
+        public override string ToString()
+        {
+            return $"{Operator}{Operand}";
+        }
     }
 }

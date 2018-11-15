@@ -9,5 +9,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             : base(name, name.Span)
         {
         }
+
+        public override string ToString()
+        {
+            return Name.ToString();
+        }
     }
 }

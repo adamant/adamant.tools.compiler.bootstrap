@@ -20,5 +20,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             ElseKeyword = elseKeyword;
             Expression = expression;
         }
+
+        public override string ToString()
+        {
+            return $"else {Expression}";
+        }
     }
 }

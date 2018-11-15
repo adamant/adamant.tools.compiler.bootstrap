@@ -20,5 +20,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             LoopKeyword = loopKeyword;
             Block = block;
         }
+
+        public override string ToString()
+        {
+            return $"loop {Block}";
+        }
     }
 }

@@ -197,7 +197,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     // TODO check that argument types match function type
                     switch (calleeType)
                     {
-                        // TODO implemet
+                        // TODO implement
                         //case Metatype metatype:
                         //    genericInvocation.Type.Computed(
                         //        metatype.WithGenericArguments(

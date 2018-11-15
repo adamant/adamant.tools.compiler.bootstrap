@@ -1,5 +1,4 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -19,13 +18,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [CanBeNull] ElseClauseSyntax elseClause)
             : base(TextSpan.Covering(ifKeyword.Span, thenBlock.Span, elseClause?.Span))
         {
-            Requires.NotNull(nameof(ifKeyword), ifKeyword);
-            Requires.NotNull(nameof(condition), condition);
-            Requires.NotNull(nameof(thenBlock), thenBlock);
             IfKeyword = ifKeyword;
             Condition = condition;
             ThenBlock = thenBlock;
             ElseClause = elseClause;
+        }
+
+        public override string ToString()
+        {
+            if (ElseClause != null)
+                return $"if {Condition} {ThenBlock} {ElseClause}";
+            return $"if {Condition} {ThenBlock}";
         }
     }
 }

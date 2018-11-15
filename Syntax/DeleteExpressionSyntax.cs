@@ -20,5 +20,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             DeleteKeyword = deleteKeyword;
             Expression = expression;
         }
+
+        public override string ToString()
+        {
+            return $"delete {Expression}";
+        }
     }
 }

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -21,14 +20,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [NotNull] ICloseParenTokenPlace closeParen)
             : base(TextSpan.Covering(callee.Span, closeParen.Span))
         {
-            Requires.NotNull(nameof(callee), callee);
-            Requires.NotNull(nameof(openParen), openParen);
-            Requires.NotNull(nameof(argumentList), argumentList);
-            Requires.NotNull(nameof(closeParen), closeParen);
             Callee = callee;
             OpenParen = openParen;
             ArgumentList = argumentList;
             CloseParen = closeParen;
+        }
+
+        public override string ToString()
+        {
+            return $"{Callee}({Arguments})";
         }
     }
 }

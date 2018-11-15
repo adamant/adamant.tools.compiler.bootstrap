@@ -18,5 +18,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             LeftOperand = leftOperand;
             RightOperand = rightOperand;
         }
+
+        public override string ToString()
+        {
+            return $"{LeftOperand} {Operator} {RightOperand}";
+        }
     }
 }

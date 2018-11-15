@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -21,14 +20,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [NotNull] ICloseBracketTokenPlace closeBracket)
             : base(TextSpan.Covering(callee.Span, closeBracket.Span))
         {
-            Requires.NotNull(nameof(callee), callee);
-            Requires.NotNull(nameof(openBracket), openBracket);
-            Requires.NotNull(nameof(argumentList), argumentList);
-            Requires.NotNull(nameof(closeBracket), closeBracket);
             Callee = callee;
             OpenBracket = openBracket;
             ArgumentList = argumentList;
             CloseBracket = closeBracket;
+        }
+
+        public override string ToString()
+        {
+            return $"{Callee}[{Arguments}]";
         }
     }
 }

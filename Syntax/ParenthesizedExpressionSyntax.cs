@@ -24,5 +24,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             Expression = expression;
             CloseParen = closeParen;
         }
+
+        public override string ToString()
+        {
+            return $"({Expression})";
+        }
     }
 }

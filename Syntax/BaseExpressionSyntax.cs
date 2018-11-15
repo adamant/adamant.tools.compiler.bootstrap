@@ -12,5 +12,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         {
             Token = token;
         }
+
+        public override string ToString()
+        {
+            return "base";
+        }
     }
 }

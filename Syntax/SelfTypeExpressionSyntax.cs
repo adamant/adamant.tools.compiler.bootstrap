@@ -14,5 +14,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             Requires.NotNull(nameof(selfTypeKeyword), selfTypeKeyword);
             SelfTypeKeyword = selfTypeKeyword;
         }
+
+        public override string ToString()
+        {
+            return "Self";
+        }
     }
 }

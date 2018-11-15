@@ -15,5 +15,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         {
             Statements = statements;
         }
+
+        public override string ToString()
+        {
+            return $"{{{Statements}}}";
+        }
     }
 }
