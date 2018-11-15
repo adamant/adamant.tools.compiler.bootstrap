@@ -48,20 +48,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 }
                 default:
                 {
-                    var paramsKeyword = tokens.AcceptToken<IParamsKeywordToken>();
-                    var varKeyword = tokens.AcceptToken<IVarKeywordToken>();
-                    var name = tokens.ExpectIdentifier();
-                    var colon = tokens.Consume<IColonTokenPlace>();
+                    var span = tokens.Current.Span;
+                    var isParams = tokens.Accept<IParamsKeywordToken>();
+                    var mutableBinding = tokens.Accept<IVarKeywordToken>();
+                    var name = tokens.RequiredIdentifier();
+                    tokens.Expect<IColonToken>();
                     // Need to not consume the assignment that separates the type from the default value,
                     // hence the min operator precedence.
-                    var typeExpression = expressionParser.ParseExpression(tokens, diagnostics,
+                    var type = expressionParser.ParseExpression(tokens, diagnostics,
                         OperatorPrecedence.AboveAssignment);
-                    var equals = tokens.AcceptToken<IEqualsToken>();
                     ExpressionSyntax defaultValue = null;
-                    if (equals != null)
+                    if (tokens.Accept<IEqualsToken>())
                         defaultValue = expressionParser.ParseExpression(tokens, diagnostics);
-                    return new NamedParameterSyntax(paramsKeyword, varKeyword, name,
-                        colon, typeExpression, equals, defaultValue);
+                    span = TextSpan.Covering(span, type.Span, defaultValue?.Span);
+                    return new NamedParameterSyntax(span, isParams, mutableBinding, name, type, defaultValue);
                 }
             }
         }

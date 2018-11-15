@@ -30,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
             Syntax = syntax;
             Name = name;
             TypeExpression = typeExpression;
-            MutableBinding = syntax is NamedParameterSyntax np && np.VarKeyword != null;
+            MutableBinding = syntax is NamedParameterSyntax np && np.MutableBinding;
         }
 
         IEnumerable<DataType> ISymbol.Types => throw new System.NotImplementedException();

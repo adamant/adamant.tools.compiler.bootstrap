@@ -10,7 +10,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         public ThrowEffectSyntax(
             [NotNull] FixedList<ThrowEffectEntrySyntax> exceptions)
         {
-            Requires.NotNull(nameof(exceptions), exceptions);
             Exceptions = exceptions;
         }
     }

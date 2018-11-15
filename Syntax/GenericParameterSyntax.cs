@@ -6,12 +6,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     public class GenericParameterSyntax : NonTerminal
     {
         public bool IsParams { get; }
-        [NotNull] public IIdentifierTokenPlace Name { get; }
+        [NotNull] public IIdentifierToken Name { get; }
         [CanBeNull] public ExpressionSyntax Type { get; }
 
         public GenericParameterSyntax(
             bool isParams,
-            [NotNull] IIdentifierTokenPlace name,
+            [NotNull] IIdentifierToken name,
             [CanBeNull] ExpressionSyntax type)
         {
             Name = name;

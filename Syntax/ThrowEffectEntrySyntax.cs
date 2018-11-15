@@ -1,4 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
@@ -12,7 +11,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             bool isParams,
             [NotNull] ExpressionSyntax exceptionType)
         {
-            Requires.NotNull(nameof(exceptionType), exceptionType);
             IsParams = isParams;
             ExceptionType = exceptionType;
         }

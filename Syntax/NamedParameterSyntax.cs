@@ -6,30 +6,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class NamedParameterSyntax : ParameterSyntax
     {
-        [CanBeNull] public IParamsKeywordToken ParamsKeyword { get; }
-        [CanBeNull] public IVarKeywordToken VarKeyword { get; }
-        [NotNull] public IIdentifierTokenPlace Name { get; }
-        [NotNull] public IColonTokenPlace Colon { get; }
-        [NotNull] public ExpressionSyntax TypeExpression { get; }
-        [CanBeNull] public IEqualsToken EqualsToken { get; }
+        public bool IsParams { get; }
+        public bool MutableBinding { get; }
+        [NotNull] public IIdentifierToken Name { get; }
+        [NotNull] public ExpressionSyntax Type { get; }
         [CanBeNull] public ExpressionSyntax DefaultValue { get; }
 
         public NamedParameterSyntax(
-            [CanBeNull] IParamsKeywordToken paramsKeyword,
-            [CanBeNull] IVarKeywordToken varKeyword,
-            [NotNull] IIdentifierTokenPlace name,
-            [NotNull] IColonTokenPlace colon,
-            [NotNull] ExpressionSyntax typeExpression,
-            [CanBeNull] IEqualsToken equalsToken,
+            TextSpan span,
+            bool isParams,
+            bool mutableBinding,
+            [NotNull] IIdentifierToken name,
+            [NotNull] ExpressionSyntax type,
             [CanBeNull] ExpressionSyntax defaultValue)
-            : base(TextSpan.Covering(paramsKeyword?.Span, varKeyword?.Span, name?.Span, typeExpression.Span))
+            : base(span)
         {
-            ParamsKeyword = paramsKeyword;
-            VarKeyword = varKeyword;
+            IsParams = isParams;
+            MutableBinding = mutableBinding;
             Name = name;
-            Colon = colon;
-            TypeExpression = typeExpression;
-            EqualsToken = equalsToken;
+            Type = type;
             DefaultValue = defaultValue;
         }
     }
