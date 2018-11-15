@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             {
                 case IOpenBraceToken _:
                     // To simplify things later, we wrap blocks in an expression statement syntax w/o a semicolon
-                    return new ExpressionStatementSyntax(ParseBlock(tokens, diagnostics));
+                    return new ExpressionStatementSyntax(ParseBlock());
                 case ILetKeywordToken _:
                 case IVarKeywordToken _:
                 {
@@ -67,32 +67,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        public BlockSyntax ParseBlock(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] Diagnostics diagnostics)
+        public BlockSyntax ParseBlock()
         {
-            var openBrace = tokens.Expect<IOpenBraceToken>();
-            var statements = listParser.ParseList(tokens, ParseStatement, TypeOf<ICloseBraceToken>(), diagnostics);
-            var closeBrace = tokens.Expect<ICloseBraceToken>();
+            var openBrace = Tokens.Expect<IOpenBraceToken>();
+            var statements = listParser.ParseList(Tokens, ParseStatement, TypeOf<ICloseBraceToken>(), Tokens.Context.Diagnostics);
+            var closeBrace = Tokens.Expect<ICloseBraceToken>();
             var span = TextSpan.Covering(openBrace, closeBrace);
             return new BlockSyntax(span, statements);
         }
 
         [MustUseReturnValue]
         [NotNull]
-        public ExpressionBlockSyntax ParseExpressionBlock(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] Diagnostics diagnostics)
+        public ExpressionBlockSyntax ParseExpressionBlock()
         {
-            switch (tokens.Current)
+            switch (Tokens.Current)
             {
-                case IEqualsGreaterThanToken equalsGreaterThan:
-                    tokens.Next();
-                    var expression = ParseExpression(tokens, diagnostics);
-                    return new ResultExpressionSyntax(equalsGreaterThan, expression);
                 case IOpenBraceToken _:
+                    return ParseBlock();
+                case IEqualsGreaterThanToken _:
                 default:
-                    return ParseBlock(tokens, diagnostics);
+                    var equalsGreaterThan = Tokens.Expect<IEqualsGreaterThanToken>();
+                    var expression = ParseExpression(Tokens, Tokens.Context.Diagnostics);
+                    var span = TextSpan.Covering(equalsGreaterThan, expression.Span);
+                    return new ResultExpressionSyntax(span, expression);
             }
         }
     }

@@ -506,7 +506,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
-            var body = blockParser.ParseBlock(Tokens, Tokens.Context.Diagnostics);
+            var body = blockParser.ParseBlock();
             return new OperatorDeclarationSyntax(modifiers, operatorKeywordSpan, genericParameters,
                  parameters, returnType, genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
@@ -525,7 +525,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
-            var body = blockParser.ParseBlock(Tokens, Tokens.Context.Diagnostics);
+            var body = blockParser.ParseBlock();
             return new ConstructorDeclarationSyntax(modifiers, name, TextSpan.Covering(newKeywordSpan, name?.Span),
                 genericParameters, parameters, genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
@@ -544,7 +544,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
-            var body = blockParser.ParseBlock(Tokens, Tokens.Context.Diagnostics);
+            var body = blockParser.ParseBlock();
             return new InitializerDeclarationSyntax(modifiers, name, TextSpan.Covering(initKeywordSpan, name?.Span),
                 genericParameters, parameters, genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
@@ -561,7 +561,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
-            var body = blockParser.ParseBlock(Tokens, Tokens.Context.Diagnostics);
+            var body = blockParser.ParseBlock();
             return new DestructorDeclarationSyntax(modifiers, deleteKeywordSpan,
                  parameters, mayEffects, noEffects, requires, ensures, body);
         }
@@ -580,7 +580,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
-            var body = blockParser.ParseBlock(Tokens, Tokens.Context.Diagnostics);
+            var body = blockParser.ParseBlock();
             return new GetterDeclarationSyntax(attributes, modifiers, name,
                 parameters, returnType, mayEffects, noEffects, requires, ensures, body);
         }
@@ -597,7 +597,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
-            var body = blockParser.ParseBlock(Tokens, Tokens.Context.Diagnostics);
+            var body = blockParser.ParseBlock();
             return new SetterDeclarationSyntax(attributes, modifiers, name,
                  parameters, mayEffects, noEffects, requires, ensures, body);
         }

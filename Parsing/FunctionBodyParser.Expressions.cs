@@ -342,7 +342,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     return new ReturnExpressionSyntax(span, expression);
                 }
                 case IEqualsGreaterThanToken _:
-                    return ParseExpressionBlock(tokens, diagnostics);
+                    return ParseExpressionBlock();
                 case IOpenParenToken _:
                     return ParseParenthesizedExpression(tokens, diagnostics);
                 case IMinusToken _:
@@ -399,16 +399,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     return ParseLoop(tokens, diagnostics);
                 case IBreakKeywordToken _:
                 {
-                    var breakKeyword = tokens.Consume<IBreakKeywordTokenPlace>();
+                    var breakKeyword = tokens.Expect<IBreakKeywordToken>();
                     // TODO parse label
                     var expression = AcceptExpression(tokens, diagnostics);
-                    return new BreakExpressionSyntax(breakKeyword, expression);
+                    var span = TextSpan.Covering(breakKeyword, expression?.Span);
+                    return new BreakExpressionSyntax(span, expression);
                 }
                 case IUnsafeKeywordToken unsafeKeyword:
                 {
                     tokens.Next();
                     var expression = tokens.Current is IOpenBraceToken ?
-                        ParseBlock(tokens, diagnostics)
+                        ParseBlock()
                         : ParseParenthesizedExpression(tokens, diagnostics);
 
                     return new UnsafeExpressionSyntax(unsafeKeyword, expression);
@@ -464,7 +465,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 typeExpression = ParseExpression(tokens, diagnostics);
             var inKeyword = tokens.Consume<IInKeywordToken>();
             var expression = ParseExpression(tokens, diagnostics);
-            var block = ParseBlock(tokens, diagnostics);
+            var block = ParseBlock();
             return new ForeachExpressionSyntax(foreachKeyword, varKeyword, identifier,
                 colon, typeExpression, inKeyword, expression, block);
         }
@@ -477,7 +478,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             var whileKeyword = tokens.Consume<IWhileKeywordToken>();
             var condition = ParseExpression(tokens, diagnostics);
-            var block = ParseBlock(tokens, diagnostics);
+            var block = ParseBlock();
             return new WhileExpressionSyntax(whileKeyword, condition, block);
         }
 
@@ -488,7 +489,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] Diagnostics diagnostics)
         {
             var loopKeyword = tokens.Consume<ILoopKeywordToken>();
-            var block = ParseBlock(tokens, diagnostics);
+            var block = ParseBlock();
             return new LoopExpressionSyntax(loopKeyword, block);
         }
 
@@ -500,7 +501,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             var span = tokens.Expect<IIfKeywordToken>();
             var condition = ParseExpression(tokens, diagnostics);
-            var thenBlock = ParseExpressionBlock(tokens, diagnostics);
+            var thenBlock = ParseExpressionBlock();
             var elseClause = AcceptElse();
             span = TextSpan.Covering(span, thenBlock.Span, elseClause?.Span);
             return new IfExpressionSyntax(span, condition, thenBlock, elseClause);
@@ -512,7 +513,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (!Tokens.Accept<IElseKeywordToken>()) return null;
             var expression = Tokens.Current is IIfKeywordToken
                 ? ParseIf(Tokens, Tokens.Context.Diagnostics)
-                : ParseExpressionBlock(Tokens, Tokens.Context.Diagnostics);
+                : ParseExpressionBlock();
             return expression;
         }
 
@@ -537,7 +538,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] Diagnostics diagnostics)
         {
             var pattern = ParsePattern(tokens, diagnostics);
-            var expression = ParseExpressionBlock(tokens, diagnostics);
+            var expression = ParseExpressionBlock();
             var comma = tokens.AcceptToken<ICommaToken>();
             return new MatchArmSyntax(pattern, expression, comma);
         }

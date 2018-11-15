@@ -1,20 +1,17 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class ResultExpressionSyntax : ExpressionBlockSyntax
     {
-        [NotNull] public IEqualsGreaterThanToken EqualsGreaterThan { get; }
         [NotNull] public ExpressionSyntax Expression { get; }
 
         public ResultExpressionSyntax(
-            [NotNull] IEqualsGreaterThanToken equalsGreaterThan,
+            TextSpan span,
             [NotNull] ExpressionSyntax expression)
-            : base(TextSpan.Covering(equalsGreaterThan.Span, expression.Span))
+            : base(span)
         {
-            EqualsGreaterThan = equalsGreaterThan;
             Expression = expression;
         }
 
