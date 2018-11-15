@@ -46,10 +46,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Unit.Emit.C", "Tests.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Unit.Framework", "Tests.Unit.Framework\Tests.Unit.Framework.csproj", "{0C355843-45E6-4531-8044-5E4423DAAE53}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Unit.Semantics", "Tests.Unit.Semantics\Tests.Unit.Semantics.csproj", "{83E71120-56E7-499E-88B6-98BDEDEE6593}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Unit.Syntax", "Tests.Unit.Syntax\Tests.Unit.Syntax.csproj", "{A146ABDB-73CF-4EEA-AE85-DF79EA5E8A3E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Semantics.Names", "Semantics.Names\Semantics.Names.csproj", "{EADD0595-2A21-4CBB-BD51-360942E49266}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Semantics.Types", "Semantics.Types\Semantics.Types.csproj", "{1C0B0F09-F0B9-4C07-BC35-4273796C1888}"
@@ -60,11 +56,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parsing", "Parsing\Parsing.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tokens", "Tokens\Tokens.csproj", "{2F5A2A61-05AB-4E97-A6E9-CC79E7A5DE2D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Unit.Tokens", "Tests.Unit.Tokens\Tests.Unit.Tokens.csproj", "{DB8D03B2-78CB-4DCF-A35C-3518DCF845DE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Unit.Lexing", "Tests.Unit.Lexing\Tests.Unit.Lexing.csproj", "{D10C503D-AD29-4845-827A-054D8FA6F384}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Unit.Parsing", "Tests.Unit.Parsing\Tests.Unit.Parsing.csproj", "{AC445567-725A-4E5C-A3FC-AD05A35018B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Unit.Lexing", "Tests.Unit.Lexing\Tests.Unit.Lexing.csproj", "{D10C503D-AD29-4845-827A-054D8FA6F384}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -128,14 +120,6 @@ Global
 		{0C355843-45E6-4531-8044-5E4423DAAE53}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0C355843-45E6-4531-8044-5E4423DAAE53}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C355843-45E6-4531-8044-5E4423DAAE53}.Release|Any CPU.Build.0 = Release|Any CPU
-		{83E71120-56E7-499E-88B6-98BDEDEE6593}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{83E71120-56E7-499E-88B6-98BDEDEE6593}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{83E71120-56E7-499E-88B6-98BDEDEE6593}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{83E71120-56E7-499E-88B6-98BDEDEE6593}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A146ABDB-73CF-4EEA-AE85-DF79EA5E8A3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A146ABDB-73CF-4EEA-AE85-DF79EA5E8A3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A146ABDB-73CF-4EEA-AE85-DF79EA5E8A3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A146ABDB-73CF-4EEA-AE85-DF79EA5E8A3E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EADD0595-2A21-4CBB-BD51-360942E49266}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EADD0595-2A21-4CBB-BD51-360942E49266}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EADD0595-2A21-4CBB-BD51-360942E49266}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -156,18 +140,10 @@ Global
 		{2F5A2A61-05AB-4E97-A6E9-CC79E7A5DE2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F5A2A61-05AB-4E97-A6E9-CC79E7A5DE2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F5A2A61-05AB-4E97-A6E9-CC79E7A5DE2D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DB8D03B2-78CB-4DCF-A35C-3518DCF845DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DB8D03B2-78CB-4DCF-A35C-3518DCF845DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DB8D03B2-78CB-4DCF-A35C-3518DCF845DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DB8D03B2-78CB-4DCF-A35C-3518DCF845DE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D10C503D-AD29-4845-827A-054D8FA6F384}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D10C503D-AD29-4845-827A-054D8FA6F384}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D10C503D-AD29-4845-827A-054D8FA6F384}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D10C503D-AD29-4845-827A-054D8FA6F384}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AC445567-725A-4E5C-A3FC-AD05A35018B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AC445567-725A-4E5C-A3FC-AD05A35018B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AC445567-725A-4E5C-A3FC-AD05A35018B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AC445567-725A-4E5C-A3FC-AD05A35018B0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
