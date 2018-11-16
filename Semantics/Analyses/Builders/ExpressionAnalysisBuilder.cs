@@ -57,7 +57,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
                         BuildExpression(context, functionName, binaryOperatorExpression.RightOperand));
                 case UnaryExpressionSyntax unaryOperatorExpression:
                     var operand = BuildExpression(context, functionName, unaryOperatorExpression.Operand);
-                    return new UnaryOperatorExpressionAnalysis(context, unaryOperatorExpression, operand);
+                    return new UnaryExpressionAnalysis(context, unaryOperatorExpression, operand);
                 case IdentifierNameSyntax identifierName:
                     return new IdentifierNameAnalysis(context, identifierName);
                 case GenericNameSyntax genericName:

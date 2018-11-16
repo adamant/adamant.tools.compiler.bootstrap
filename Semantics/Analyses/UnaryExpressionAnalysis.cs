@@ -4,12 +4,12 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
 {
-    public class UnaryOperatorExpressionAnalysis : ExpressionAnalysis
+    public class UnaryExpressionAnalysis : ExpressionAnalysis
     {
         [NotNull] public new UnaryExpressionSyntax Syntax { get; }
         [NotNull] public ExpressionAnalysis Operand { get; }
 
-        public UnaryOperatorExpressionAnalysis(
+        public UnaryExpressionAnalysis(
             [NotNull] AnalysisContext context,
             [NotNull] UnaryExpressionSyntax syntax,
             [NotNull] ExpressionAnalysis operand)

@@ -117,7 +117,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     return CheckBinaryOperator(binaryOperatorExpression);
                 case IdentifierNameAnalysis identifierName:
                     return identifierName.Type.Computed(CheckName(expression.Context, identifierName.Syntax.Name, identifierName.Syntax.Span));
-                case UnaryOperatorExpressionAnalysis unaryOperatorExpression:
+                case UnaryExpressionAnalysis unaryOperatorExpression:
                     return CheckUnaryOperator(unaryOperatorExpression);
                 case LifetimeTypeAnalysis lifetimeType:
                     CheckExpression(lifetimeType.TypeName);
@@ -514,45 +514,45 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
         [NotNull]
         private DataType CheckUnaryOperator(
-            [NotNull] UnaryOperatorExpressionAnalysis unaryOperatorExpression)
+            [NotNull] UnaryExpressionAnalysis unaryExpression)
         {
-            CheckExpression(unaryOperatorExpression.Operand);
-            var operand = unaryOperatorExpression.Operand.Type.AssertComputed();
-            var @operator = unaryOperatorExpression.Syntax.Operator;
+            CheckExpression(unaryExpression.Operand);
+            var operand = unaryExpression.Operand.Type.AssertComputed();
+            var @operator = unaryExpression.Syntax.Operator;
 
             // If either is unknown, then we can't know whether there is a a problem
             // (technically not true, for example, we could know that one arg should
             // be a bool and isn't)
             if (operand == DataType.Unknown)
-                return unaryOperatorExpression.Type.Computed(DataType.Unknown);
+                return unaryExpression.Type.Computed(DataType.Unknown);
 
             bool typeError;
             switch (@operator)
             {
                 case INotKeywordToken _:
                     typeError = operand != ObjectType.Bool;
-                    unaryOperatorExpression.Type.Computed(ObjectType.Bool);
+                    unaryExpression.Type.Computed(ObjectType.Bool);
                     break;
                 case IAtSignToken _:
                     typeError = false; // TODO check that the expression can have a pointer taken
                     if (operand is Metatype)
-                        unaryOperatorExpression.Type.Computed(ObjectType.Type); // constructing a type
+                        unaryExpression.Type.Computed(ObjectType.Type); // constructing a type
                     else
-                        unaryOperatorExpression.Type.Computed(new PointerType(operand)); // taking the address of something
+                        unaryExpression.Type.Computed(new PointerType(operand)); // taking the address of something
                     break;
                 case IQuestionToken _:
                     typeError = false; // TODO check that the expression can have a pointer taken
-                    unaryOperatorExpression.Type.Computed(new PointerType(operand));
+                    unaryExpression.Type.Computed(new PointerType(operand));
                     break;
                 case ICaretToken _:
                     switch (operand)
                     {
                         case PointerType pointerType:
-                            unaryOperatorExpression.Type.Computed(pointerType.Referent);
+                            unaryExpression.Type.Computed(pointerType.Referent);
                             typeError = false;
                             break;
                         default:
-                            unaryOperatorExpression.Type.Computed(DataType.Unknown);
+                            unaryExpression.Type.Computed(DataType.Unknown);
                             typeError = true;
                             break;
                     }
@@ -561,10 +561,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     throw NonExhaustiveMatchException.For(@operator);
             }
             if (typeError)
-                diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandOfType(unaryOperatorExpression.Context.File,
-                    unaryOperatorExpression.Syntax.Span, @operator, operand));
+                diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandOfType(unaryExpression.Context.File,
+                    unaryExpression.Syntax.Span, @operator, operand));
 
-            return unaryOperatorExpression.Type.AssertComputed();
+            return unaryExpression.Type.AssertComputed();
         }
 
         /// <summary>
@@ -647,7 +647,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                         return new RefType(objectType);
                     return DataType.Unknown;
                 }
-                case UnaryOperatorExpressionAnalysis unaryOperatorExpression:
+                case UnaryExpressionAnalysis unaryOperatorExpression:
                     switch (unaryOperatorExpression.Syntax.Operator)
                     {
                         case IAtSignToken _:

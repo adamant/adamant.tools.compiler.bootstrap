@@ -186,7 +186,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     GetVariableScopes(binaryOperatorExpression.LeftOperand, scopes);
                     GetVariableScopes(binaryOperatorExpression.RightOperand, scopes);
                     break;
-                case UnaryOperatorExpressionAnalysis unaryOperatorExpression:
+                case UnaryExpressionAnalysis unaryOperatorExpression:
                     GetVariableScopes(unaryOperatorExpression.Operand, scopes);
                     break;
                 case ForeachExpressionAnalysis foreachExpression:
