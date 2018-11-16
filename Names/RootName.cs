@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
+namespace Adamant.Tools.Compiler.Bootstrap.Names
 {
     /// <summary>
     /// A root name is a name one can use to qualify a simple name. It may be

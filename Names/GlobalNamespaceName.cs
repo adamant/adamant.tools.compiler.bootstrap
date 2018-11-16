@@ -1,7 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
+namespace Adamant.Tools.Compiler.Bootstrap.Names
 {
     /// <summary>
     /// Represents the "name" of the global namespace i.e. nothing

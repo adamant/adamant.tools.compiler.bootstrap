@@ -19,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Framework\Framework.csproj" />
+    <ProjectReference Include="..\Names\Names.csproj" />
     <ProjectReference Include="..\Tokens\Tokens.csproj" />
   </ItemGroup>
 

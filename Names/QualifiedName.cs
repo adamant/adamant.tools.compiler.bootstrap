@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
+namespace Adamant.Tools.Compiler.Bootstrap.Names
 {
     /// <summary>
     /// A qualified name doesn't include the package. This is because the

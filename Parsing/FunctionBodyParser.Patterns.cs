@@ -34,7 +34,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             switch (Tokens.Current)
             {
                 case IIdentifierToken _:
-                    return new AnyPatternSyntax(Tokens.RequiredToken<IIdentifierToken>());
+                {
+                    var identifier = Tokens.RequiredToken<IIdentifierToken>();
+                    return new AnyPatternSyntax(identifier.Value);
+                }
                 case IDotToken _:
                 {
                     Tokens.Expect<IDotToken>();

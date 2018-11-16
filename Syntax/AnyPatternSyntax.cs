@@ -1,17 +1,15 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Tokens;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class AnyPatternSyntax : PatternSyntax
     {
-        [NotNull] public IIdentifierToken Identifier { get; }
+        [NotNull] public SimpleName Name { get; }
 
-        public AnyPatternSyntax([NotNull] IIdentifierToken identifier)
+        public AnyPatternSyntax([NotNull] string name)
         {
-            Requires.NotNull(nameof(identifier), identifier);
-            Identifier = identifier;
+            Name = new SimpleName(name);
         }
     }
 }

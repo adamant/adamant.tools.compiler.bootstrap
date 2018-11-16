@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
+namespace Adamant.Tools.Compiler.Bootstrap.Names
 {
     public class SimpleName : Name, IEquatable<SimpleName>
     {

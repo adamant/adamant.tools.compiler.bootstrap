@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Semantics.Names</AssemblyName>
-    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Semantics.Names</RootNamespace>
+    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Names</AssemblyName>
+    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Names</RootNamespace>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
