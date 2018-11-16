@@ -35,5 +35,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             Invariants = invariants;
             Members = members;
         }
+
+        public override string ToString()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

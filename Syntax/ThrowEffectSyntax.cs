@@ -12,5 +12,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         {
             Exceptions = exceptions;
         }
+
+        public override string ToString()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

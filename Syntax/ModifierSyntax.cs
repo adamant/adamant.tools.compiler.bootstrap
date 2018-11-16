@@ -9,5 +9,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         {
             Access = access;
         }
+
+        public override string ToString()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

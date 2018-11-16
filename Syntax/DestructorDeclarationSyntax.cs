@@ -20,5 +20,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
                 parameters, mayEffects, noEffects, requires, ensures, body)
         {
         }
+
+        public override string ToString()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

@@ -1,5 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -7,13 +8,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class ConstructorDeclarationSyntax : FunctionDeclarationSyntax
     {
-        [CanBeNull] public IIdentifierToken Name { get; }
+        [CanBeNull] public SimpleName Name { get; }
         [CanBeNull] public FixedList<GenericParameterSyntax> GenericParameters { get; }
         [NotNull] public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
 
         public ConstructorDeclarationSyntax(
             [NotNull] FixedList<IModiferToken> modifiers,
-            [CanBeNull] IIdentifierToken name,
+            [CanBeNull] string name,
             TextSpan nameSpan,
             [CanBeNull] FixedList<GenericParameterSyntax> genericParameters,
             [NotNull] FixedList<ParameterSyntax> parameters,
@@ -25,9 +26,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [NotNull] BlockSyntax body)
             : base(modifiers, nameSpan, parameters, mayEffects, noEffects, requires, ensures, body)
         {
-            Name = name;
+            if (name != null) Name = new SimpleName(name);
             GenericParameters = genericParameters;
             GenericConstraints = genericConstraints;
+        }
+
+        public override string ToString()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

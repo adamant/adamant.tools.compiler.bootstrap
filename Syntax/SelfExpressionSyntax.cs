@@ -1,16 +1,12 @@
-using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using JetBrains.Annotations;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class SelfExpressionSyntax : InstanceExpressionSyntax
     {
-        [NotNull] public ISelfKeywordToken Token { get; }
-
-        public SelfExpressionSyntax([NotNull] ISelfKeywordToken token)
-            : base(token.Span)
+        public SelfExpressionSyntax(TextSpan span)
+            : base(span)
         {
-            Token = token;
         }
 
         public override string ToString()

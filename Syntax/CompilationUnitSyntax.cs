@@ -22,5 +22,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             Diagnostics = diagnostics;
             CodeFile = codeFile;
         }
+
+        public override string ToString()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

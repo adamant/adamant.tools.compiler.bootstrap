@@ -14,5 +14,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             Pattern = pattern;
             Expression = expression;
         }
+
+        public override string ToString()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

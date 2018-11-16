@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
             switch (statement)
             {
                 case VariableDeclarationStatementSyntax variableDeclaration:
-                    var name = functionName.Qualify((SimpleName)variableDeclaration.Name.Value);
+                    var name = functionName.Qualify(variableDeclaration.Name);
                     var type = variableDeclaration.TypeExpression != null ? expressionBuilder.BuildExpression(context, functionName, variableDeclaration.TypeExpression) : null;
                     var initializer = variableDeclaration.Initializer != null ? expressionBuilder.BuildExpression(context, functionName, variableDeclaration.Initializer) : null;
                     return new VariableDeclarationStatementAnalysis(context, variableDeclaration, name, type, initializer);

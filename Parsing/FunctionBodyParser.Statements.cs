@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (Tokens.Accept<IEqualsToken>()) initializer = ParseExpression();
 
             Tokens.Expect<ISemicolonToken>();
-            return new VariableDeclarationStatementSyntax(mutableBinding, name, type,
+            return new VariableDeclarationStatementSyntax(mutableBinding, name.Value, name.Span, type,
                 initializer);
         }
 

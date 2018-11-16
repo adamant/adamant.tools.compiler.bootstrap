@@ -1,5 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Tokens;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     public class ForeachExpressionSyntax : ExpressionSyntax
     {
         public bool MutableBinding { get; }
-        [NotNull] public IIdentifierToken Identifier { get; }
+        [NotNull] public SimpleName VariableName { get; }
         [CanBeNull] public ExpressionSyntax Type { get; }
         [NotNull] public ExpressionSyntax InExpression { get; }
         [NotNull] public BlockSyntax Block { get; }
@@ -15,14 +15,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         public ForeachExpressionSyntax(
             TextSpan span,
             bool mutableBinding,
-            [NotNull] IIdentifierToken identifier,
+            [NotNull] string variableName,
             [CanBeNull] ExpressionSyntax type,
             [NotNull] ExpressionSyntax inExpression,
             [NotNull] BlockSyntax block)
             : base(span)
         {
             MutableBinding = mutableBinding;
-            Identifier = identifier;
+            VariableName = new SimpleName(variableName);
             InExpression = inExpression;
             Block = block;
             Type = type;
@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         public override string ToString()
         {
             var binding = MutableBinding ? "var " : "";
-            return $"foreach {binding}{Identifier}: {Type} in {InExpression} {Block}";
+            return $"foreach {binding}{VariableName}: {Type} in {InExpression} {Block}";
         }
     }
 }

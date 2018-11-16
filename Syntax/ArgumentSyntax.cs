@@ -14,5 +14,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             IsParams = isParams;
             Value = value;
         }
+
+        [NotNull]
+        public override string ToString()
+        {
+            if (IsParams) return $"params {Value}";
+            return Value?.ToString() ?? "";
+        }
     }
 }

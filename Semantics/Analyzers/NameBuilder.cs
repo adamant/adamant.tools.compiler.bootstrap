@@ -15,13 +15,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case QualifiedNameSyntax qualifiedNameSyntax:
                 {
                     var qualifier = BuildName(qualifiedNameSyntax.Qualifier);
-                    var name = qualifiedNameSyntax.Name.Name.Value;
-                    return qualifier.Qualify((SimpleName)name);
+                    var name = qualifiedNameSyntax.Name.Name;
+                    return qualifier.Qualify(name);
                 }
                 case IdentifierNameSyntax identifierNameSyntax:
                 {
-                    var name = identifierNameSyntax.Name.Value;
-                    return new SimpleName(name);
+                    return identifierNameSyntax.Name;
                 }
                 default:
                     throw NonExhaustiveMatchException.For(nameSyntax);

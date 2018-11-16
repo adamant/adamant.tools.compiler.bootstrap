@@ -69,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             else
             {
                 diagnostics.Add(TypeError.NotImplemented(variableDeclaration.Context.File,
-                    variableDeclaration.Syntax.Name.Span,
+                    variableDeclaration.Syntax.NameSpan,
                     "Inference of local variable types not implemented"));
                 variableDeclaration.Type.Computed(DataType.Unknown);
             }
@@ -116,7 +116,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case BinaryExpressionAnalysis binaryOperatorExpression:
                     return CheckBinaryOperator(binaryOperatorExpression);
                 case IdentifierNameAnalysis identifierName:
-                    return identifierName.Type.Computed(CheckName(expression.Context, identifierName.Syntax.Name));
+                    return identifierName.Type.Computed(CheckName(expression.Context, identifierName.Syntax.Name, identifierName.Syntax.Span));
                 case UnaryOperatorExpressionAnalysis unaryOperatorExpression:
                     return CheckUnaryOperator(unaryOperatorExpression);
                 case LifetimeTypeAnalysis lifetimeType:
@@ -209,7 +209,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     foreach (var argument in genericName.Arguments)
                         CheckExpression(argument.Value);
 
-                    var nameType = CheckName(genericName.Context, genericName.Syntax.Name);
+                    var nameType = CheckName(genericName.Context, genericName.Syntax.Name, genericName.Syntax.Span);
                     if (nameType is OverloadedType overloadedType)
                     {
                         nameType = overloadedType.Types.OfType<GenericType>()
@@ -304,9 +304,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         [NotNull]
         private DataType CheckName(
             [NotNull] AnalysisContext context,
-            [NotNull] IIdentifierToken name)
+            [NotNull] SimpleName name,
+            TextSpan span)
         {
-            var declaration = context.Scope.Lookup((SimpleName)name.Value);
+            var declaration = context.Scope.Lookup(name);
             switch (declaration)
             {
                 case TypeDeclarationAnalysis typeDeclaration:
@@ -323,7 +324,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case FunctionDeclarationAnalysis functionDeclaration:
                     return functionDeclaration.Type.AssertComputed();
                 case null:
-                    diagnostics.Add(NameBindingError.CouldNotBindName(context.File, name));
+                    diagnostics.Add(NameBindingError.CouldNotBindName(context.File, span));
                     return DataType.Unknown; // unknown
                 case TypeDeclaration typeDeclaration:
                     return typeDeclaration.Type.AssertResolved();

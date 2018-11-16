@@ -1,5 +1,6 @@
 using System.Numerics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
@@ -15,9 +16,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
 
         // Helpful for debugging
+        [NotNull]
         public override string ToString()
         {
-            return Value.ToString();
+            return Value.ToString().NotNull();
         }
     }
 

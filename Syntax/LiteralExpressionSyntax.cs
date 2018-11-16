@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -13,9 +14,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             Literal = literal;
         }
 
+        [NotNull]
         public override string ToString()
         {
-            return Literal.ToString();
+            return Literal.ToString().NotNull();
         }
     }
 }

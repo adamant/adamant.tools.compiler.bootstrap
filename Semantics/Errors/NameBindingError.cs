@@ -1,5 +1,4 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
@@ -15,9 +14,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
     public static class NameBindingError
     {
         [NotNull]
-        public static Diagnostic CouldNotBindName([NotNull] CodeFile file, [NotNull] IIdentifierToken name)
+        public static Diagnostic CouldNotBindName([NotNull] CodeFile file, TextSpan span)
         {
-            return new Diagnostic(file, name.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5001, $"The name `{name.Value}` is not defined in this scope.");
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5001,
+                $"The name `{file.Code[span]}` is not defined in this scope.");
         }
     }
 }

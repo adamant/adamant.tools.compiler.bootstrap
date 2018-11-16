@@ -326,14 +326,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             switch (Tokens.Current)
             {
-                case ISelfTypeKeywordToken selfTypeKeyword:
-                    Tokens.Next();
+                case ISelfTypeKeywordToken _:
+                    var selfTypeKeyword = Tokens.Expect<ISelfTypeKeywordToken>();
                     return new SelfTypeExpressionSyntax(selfTypeKeyword);
-                case ISelfKeywordToken selfKeyword:
-                    Tokens.Next();
+                case ISelfKeywordToken _:
+                    var selfKeyword = Tokens.Expect<ISelfKeywordToken>();
                     return new SelfExpressionSyntax(selfKeyword);
-                case IBaseKeywordToken baseKeyword:
-                    Tokens.Next();
+                case IBaseKeywordToken _:
+                    var baseKeyword = Tokens.Expect<IBaseKeywordToken>();
                     return new BaseExpressionSyntax(baseKeyword);
                 case INewKeywordToken _:
                 {
@@ -412,7 +412,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IIdentifierToken _:
                 {
                     var identifier = Tokens.RequiredToken<IIdentifierToken>();
-                    var name = new IdentifierNameSyntax(identifier);
+                    var name = new IdentifierNameSyntax(identifier.Span, identifier.Value);
                     if (!Tokens.Accept<IDollarToken>()) return name;
                     return ParseRestOfLifetimeType(name, LifetimeOperator.Equal) ?? name;
                 }
@@ -469,8 +469,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IQuestionToken _:
                 case ISemicolonToken _:
                 case ICloseParenToken _:
+                {
                     // If it is one of these, we assume there is a missing identifier
-                    return new IdentifierNameSyntax(Tokens.ExpectIdentifier());
+                    var identifier = Tokens.ExpectIdentifier();
+                    return new IdentifierNameSyntax(identifier.Span, identifier.Value);
+                }
                 default:
                     throw NonExhaustiveMatchException.For(Tokens.Current);
             }
@@ -510,7 +513,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var expression = ParseExpression();
             var block = ParseBlock();
             var span = TextSpan.Covering(foreachKeyword, block.Span);
-            return new ForeachExpressionSyntax(span, mutableBinding, identifier, type, expression, block);
+            return new ForeachExpressionSyntax(span, mutableBinding, identifier.Value, type, expression, block);
         }
 
         [MustUseReturnValue]

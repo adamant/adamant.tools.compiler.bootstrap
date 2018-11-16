@@ -283,7 +283,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var genericConstraints = genericsParser.ParseGenericConstraints();
             var invariants = ParseInvariants();
             var members = ParseTypeBody();
-            return new ClassDeclarationSyntax(attributes, modifiers, name, genericParameters,
+            return new ClassDeclarationSyntax(attributes, modifiers, name.Value, name.Span, genericParameters,
                 baseClass, baseTypes, genericConstraints, invariants,
                 members);
         }
@@ -301,7 +301,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var genericConstraints = genericsParser.ParseGenericConstraints();
             var invariants = ParseInvariants();
             var members = ParseTypeBody();
-            return new TraitDeclarationSyntax(attributes, modifiers, name,
+            return new TraitDeclarationSyntax(attributes, modifiers, name.Value, name.Span,
                 genericParameters, baseTypes, genericConstraints, invariants,
                 members);
         }
@@ -346,7 +346,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var members = ParseMemberDeclarations();
                     Tokens.Expect<ICloseBraceToken>();
                     return new EnumStructDeclarationSyntax(attributes, modifiers,
-                        name, genericParameters, baseTypes, genericConstraints,
+                        name.Value, name.Span, genericParameters, baseTypes, genericConstraints,
                         invariants, variants, members);
                 }
                 case IClassKeywordToken _:
@@ -363,7 +363,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var members = ParseMemberDeclarations();
                     Tokens.Expect<ICloseBraceToken>();
                     return new EnumClassDeclarationSyntax(attributes, modifiers,
-                        name, genericParameters, baseClass, baseTypes, genericConstraints,
+                        name.Value, name.Span, genericParameters, baseClass, baseTypes, genericConstraints,
                         invariants, variants, members);
                 }
                 default:
@@ -393,7 +393,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             // TODO we actually expect commas separating them, need to improve this
             var comma = Tokens.AcceptToken<ICommaToken>();
-            return new EnumVariantSyntax(identifier);
+            return new EnumVariantSyntax(identifier.Value);
         }
         #endregion
 
@@ -420,7 +420,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 initializer = expressionParser.ParseExpression();
 
             Tokens.Expect<ISemicolonToken>();
-            return new FieldDeclarationSyntax(attributes, modifiers, getterAccess, name, typeExpression, initializer);
+            return new FieldDeclarationSyntax(attributes, modifiers, getterAccess, name.Value, name.Span, typeExpression, initializer);
         }
 
         [MustUseReturnValue]
@@ -454,7 +454,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
             var body = ParseFunctionBody(Tokens, Tokens.Context.Diagnostics);
-            return new NamedFunctionDeclarationSyntax(modifiers, name, genericParameters, parameters, returnType,
+            return new NamedFunctionDeclarationSyntax(modifiers, name.Value, name.Span, genericParameters, parameters, returnType,
                 genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
 
@@ -526,7 +526,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
             var body = blockParser.ParseBlock();
-            return new ConstructorDeclarationSyntax(modifiers, name, TextSpan.Covering(newKeywordSpan, name?.Span),
+            return new ConstructorDeclarationSyntax(modifiers, name?.Value, TextSpan.Covering(newKeywordSpan, name?.Span),
                 genericParameters, parameters, genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
 
@@ -545,7 +545,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
             var body = blockParser.ParseBlock();
-            return new InitializerDeclarationSyntax(modifiers, name, TextSpan.Covering(initKeywordSpan, name?.Span),
+            return new InitializerDeclarationSyntax(modifiers, name?.Value, TextSpan.Covering(initKeywordSpan, name?.Span),
                 genericParameters, parameters, genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
 
@@ -581,7 +581,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
             var body = blockParser.ParseBlock();
-            return new GetterDeclarationSyntax(attributes, modifiers, name,
+            return new GetterDeclarationSyntax(attributes, modifiers, name.Value, name.Span,
                 parameters, returnType, mayEffects, noEffects, requires, ensures, body);
         }
 
@@ -598,7 +598,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
             var body = blockParser.ParseBlock();
-            return new SetterDeclarationSyntax(attributes, modifiers, name,
+            return new SetterDeclarationSyntax(attributes, modifiers, name.Value, name.Span,
                  parameters, mayEffects, noEffects, requires, ensures, body);
         }
 
@@ -670,7 +670,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var exceptions = listParser.ParseSeparatedList<ThrowEffectEntrySyntax, ICommaToken>(ParseThrowEffectEntry);
                     return new ThrowEffectSyntax(exceptions);
                 case IIdentifierToken _:
-                    return new SimpleEffectSyntax(Tokens.RequiredToken<IIdentifierToken>());
+                    return new SimpleEffectSyntax(Tokens.RequiredToken<IIdentifierToken>().Value);
                 default:
                     Tokens.UnexpectedToken();
                     throw new ParseFailedException();
@@ -753,11 +753,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
                 ExpressionSyntax initializer = null;
                 if (Tokens.Accept<IEqualsToken>())
-                    initializer =
-                        expressionParser.ParseExpression();
+                    initializer = expressionParser.ParseExpression();
 
                 Tokens.Expect<ISemicolonToken>();
-                return new ConstDeclarationSyntax(attributes, modifiers, name, type, initializer);
+                return new ConstDeclarationSyntax(attributes, modifiers, name.Value, name.Span, type, initializer);
             }
             catch (ParseFailedException)
             {

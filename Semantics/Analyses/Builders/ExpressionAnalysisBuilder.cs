@@ -83,7 +83,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
                     // New context because a variable is declared
                     var loopBodyContext = context.InLocalVariableScope(foreachExpression);
                     return new ForeachExpressionAnalysis(context, foreachExpression,
-                        functionName.Qualify((SimpleName)foreachExpression.Identifier.Value),
+                        functionName.Qualify(foreachExpression.VariableName),
                         foreachExpression.Type != null ?
                             BuildExpression(context, functionName, foreachExpression.Type) : null,
                         BuildExpression(context, functionName, foreachExpression.InExpression),

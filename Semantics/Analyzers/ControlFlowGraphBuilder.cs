@@ -6,7 +6,6 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
-using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
@@ -202,7 +201,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 //    statements.Add(new NewObjectStatement(place, newObjectExpression.Type.AssertResolved(), args));
                 //    break;
                 case IdentifierNameAnalysis identifier:
-                    statements.Add(new AssignmentStatement(CurrentBlockNumber, statements.Count, place, new CopyPlace(LookupVariable(identifier.Name.NotNull()))));
+                    statements.Add(new AssignmentStatement(CurrentBlockNumber, statements.Count, place, new CopyPlace(LookupVariable(identifier.Name.Text))));
                     break;
                 case BinaryExpressionAnalysis binaryOperator:
                     ConvertOperator(place, binaryOperator, statements);
@@ -256,7 +255,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             switch (value)
             {
                 case IdentifierNameAnalysis identifier:
-                    return LookupVariable(identifier.Name.NotNull());
+                    return LookupVariable(identifier.Name.Text);
                 //case VariableExpression variableExpression:
                 //    return LookupVariable(variableExpression.Name);
                 default:

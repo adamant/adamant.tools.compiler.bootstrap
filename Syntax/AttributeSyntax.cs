@@ -13,7 +13,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [CanBeNull] FixedList<ArgumentSyntax> arguments)
         {
             Name = name;
-            Arguments = arguments;
+            Arguments = arguments ?? FixedList<ArgumentSyntax>.Empty;
+        }
+
+        public override string ToString()
+        {
+
+            return $"{Name}({string.Join(", ", Arguments)})";
         }
     }
 }

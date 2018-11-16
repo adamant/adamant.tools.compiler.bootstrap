@@ -14,5 +14,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             LeftAlternative = leftAlternative;
             RightAlternative = rightAlternative;
         }
+
+        public override string ToString()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

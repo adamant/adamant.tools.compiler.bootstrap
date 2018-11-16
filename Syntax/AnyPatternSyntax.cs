@@ -11,5 +11,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         {
             Name = new SimpleName(name);
         }
+
+        public override string ToString()
+        {
+            return Name.ToString();
+        }
     }
 }

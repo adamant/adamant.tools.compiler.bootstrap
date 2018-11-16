@@ -40,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             ExpressionSyntax typeExpression = null;
             if (Tokens.Accept<IColonToken>())
                 typeExpression = expressionParser.ParseExpression();
-            return new GenericParameterSyntax(isParams, name, typeExpression);
+            return new GenericParameterSyntax(isParams, name.Value, typeExpression);
         }
 
         [MustUseReturnValue]

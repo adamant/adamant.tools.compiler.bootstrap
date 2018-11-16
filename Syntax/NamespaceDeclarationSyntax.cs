@@ -34,5 +34,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             InGlobalNamespace = inGlobalNamespace;
             Span = span;
         }
+
+        public override string ToString()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

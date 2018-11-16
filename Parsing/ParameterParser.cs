@@ -44,7 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     if (equals != null)
                         defaultValue = expressionParser.ParseExpression();
                     var span = TextSpan.Covering(dot, name.Span, defaultValue?.Span);
-                    return new FieldParameterSyntax(span, name, defaultValue);
+                    return new FieldParameterSyntax(span, name.Value, defaultValue);
                 }
                 default:
                 {
@@ -60,7 +60,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     if (Tokens.Accept<IEqualsToken>())
                         defaultValue = expressionParser.ParseExpression();
                     span = TextSpan.Covering(span, type.Span, defaultValue?.Span);
-                    return new NamedParameterSyntax(span, isParams, mutableBinding, name, type, defaultValue);
+                    return new NamedParameterSyntax(span, isParams, mutableBinding, name.Value, type, defaultValue);
                 }
             }
         }

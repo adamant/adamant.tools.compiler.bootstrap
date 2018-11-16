@@ -42,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 {
                     Tokens.Expect<IDotToken>();
                     var identifier = Tokens.RequiredToken<IIdentifierToken>();
-                    return new EnumValuePatternSyntax(identifier);
+                    return new EnumValuePatternSyntax(identifier.Value);
                 }
                 default:
                     throw NonExhaustiveMatchException.For(Tokens.Current);

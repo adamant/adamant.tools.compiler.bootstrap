@@ -14,5 +14,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             IsParams = isParams;
             ExceptionType = exceptionType;
         }
+
+        public override string ToString()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

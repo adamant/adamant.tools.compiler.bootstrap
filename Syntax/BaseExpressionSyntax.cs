@@ -1,16 +1,12 @@
-using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using JetBrains.Annotations;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class BaseExpressionSyntax : InstanceExpressionSyntax
     {
-        [NotNull] public IBaseKeywordToken Token { get; }
-
-        public BaseExpressionSyntax([NotNull] IBaseKeywordToken token)
-            : base(token.Span)
+        public BaseExpressionSyntax(TextSpan span)
+            : base(span)
         {
-            Token = token;
         }
 
         public override string ToString()

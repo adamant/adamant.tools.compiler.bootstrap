@@ -1,18 +1,16 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Tokens;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public abstract class SimpleNameSyntax : NameSyntax
     {
-        [NotNull] public IIdentifierToken Name { get; }
+        [NotNull] public SimpleName Name { get; }
 
-        protected SimpleNameSyntax([NotNull] IIdentifierToken name, TextSpan span)
+        protected SimpleNameSyntax([NotNull] SimpleName name, TextSpan span)
             : base(span)
         {
-            Requires.NotNull(nameof(name), name);
             Name = name;
         }
     }

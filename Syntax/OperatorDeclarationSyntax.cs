@@ -29,5 +29,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             ReturnType = returnType;
             GenericConstraints = genericConstraints;
         }
+
+        public override string ToString()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

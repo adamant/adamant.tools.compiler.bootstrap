@@ -11,5 +11,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         {
             Name = name;
         }
+
+        public override string ToString()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

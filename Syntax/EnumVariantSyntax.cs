@@ -1,15 +1,20 @@
-using Adamant.Tools.Compiler.Bootstrap.Tokens;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class EnumVariantSyntax : NonTerminal
     {
-        [NotNull] public IIdentifierToken Identifier { get; }
+        [NotNull] public SimpleName Name { get; }
 
-        public EnumVariantSyntax([NotNull] IIdentifierToken identifier)
+        public EnumVariantSyntax([NotNull] string name)
         {
-            Identifier = identifier;
+            Name = new SimpleName(name);
+        }
+
+        public override string ToString()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

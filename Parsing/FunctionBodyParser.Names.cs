@@ -31,10 +31,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 var arguments = ParseArguments();
                 var closeBracket = Tokens.Expect<ICloseBracketToken>();
                 var span = TextSpan.Covering(identifier.Span, closeBracket);
-                simpleName = new GenericNameSyntax(span, identifier, arguments);
+                simpleName = new GenericNameSyntax(span, identifier.Value, arguments);
             }
             else
-                simpleName = new IdentifierNameSyntax(identifier);
+                simpleName = new IdentifierNameSyntax(identifier.Span, identifier.Value);
             return simpleName;
         }
     }

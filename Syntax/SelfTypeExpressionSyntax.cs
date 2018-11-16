@@ -1,18 +1,12 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using JetBrains.Annotations;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class SelfTypeExpressionSyntax : TypeSyntax
     {
-        [NotNull] public ISelfTypeKeywordToken SelfTypeKeyword { get; }
-
-        public SelfTypeExpressionSyntax([NotNull] ISelfTypeKeywordToken selfTypeKeyword)
-            : base(selfTypeKeyword.Span)
+        public SelfTypeExpressionSyntax(TextSpan span)
+            : base(span)
         {
-            Requires.NotNull(nameof(selfTypeKeyword), selfTypeKeyword);
-            SelfTypeKeyword = selfTypeKeyword;
         }
 
         public override string ToString()

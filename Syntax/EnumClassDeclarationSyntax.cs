@@ -1,4 +1,6 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -8,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     {
         [NotNull] public FixedList<AttributeSyntax> Attributes { get; }
         [NotNull] public FixedList<IModiferToken> Modifiers { get; }
-        [NotNull] public IIdentifierToken Name { get; }
+        [NotNull] public SimpleName Name { get; }
         [CanBeNull] public FixedList<GenericParameterSyntax> GenericParameters { get; }
         [CanBeNull] public ExpressionSyntax BaseClass { get; }
         [CanBeNull] public FixedList<ExpressionSyntax> BaseTypes { get; }
@@ -20,7 +22,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         public EnumClassDeclarationSyntax(
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers,
-            [NotNull] IIdentifierToken name,
+            [NotNull] string name,
+            TextSpan nameSpan,
             [CanBeNull] FixedList<GenericParameterSyntax> genericParameters,
             [CanBeNull] ExpressionSyntax baseClass,
             [CanBeNull] FixedList<ExpressionSyntax> baseTypes,
@@ -28,11 +31,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [NotNull] FixedList<ExpressionSyntax> invariants,
             [NotNull] FixedList<EnumVariantSyntax> variants,
             [NotNull] FixedList<MemberDeclarationSyntax> members)
-            : base(name.Span)
+            : base(nameSpan)
         {
             Attributes = attributes;
             Modifiers = modifiers;
-            Name = name;
+            Name = new SimpleName(name);
             GenericParameters = genericParameters;
             BaseClass = baseClass;
             BaseTypes = baseTypes;
@@ -40,6 +43,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             Invariants = invariants;
             Variants = variants;
             Members = members;
+        }
+
+        public override string ToString()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
