@@ -20,48 +20,45 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        public ParameterSyntax ParseParameter(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] Diagnostics diagnostics)
+        public ParameterSyntax ParseParameter()
         {
-            switch (tokens.Current)
+            switch (Tokens.Current)
             {
                 case IRefKeywordToken _:
                 case IMutableKeywordToken _:
                 case ISelfKeywordToken _:
                 {
-                    var span = tokens.Current.Span;
-                    var isRef = tokens.Accept<IRefKeywordToken>();
-                    var mutableBinding = tokens.Accept<IMutableKeywordToken>();
-                    var selfSpan = tokens.Expect<ISelfKeywordToken>();
+                    var span = Tokens.Current.Span;
+                    var isRef = Tokens.Accept<IRefKeywordToken>();
+                    var mutableBinding = Tokens.Accept<IMutableKeywordToken>();
+                    var selfSpan = Tokens.Expect<ISelfKeywordToken>();
                     span = TextSpan.Covering(span, selfSpan);
                     return new SelfParameterSyntax(span, isRef, mutableBinding);
                 }
                 case IDotToken _:
                 {
                     Tokens.Expect<IDotToken>();
-                    var name = tokens.ExpectIdentifier();
-                    var equals = tokens.AcceptToken<IEqualsToken>();
+                    var name = Tokens.ExpectIdentifier();
+                    var equals = Tokens.AcceptToken<IEqualsToken>();
                     ExpressionSyntax defaultValue = null;
                     if (equals != null)
-                        defaultValue = expressionParser.ParseExpression(tokens, diagnostics);
+                        defaultValue = expressionParser.ParseExpression();
                     // TODO capture correct values
                     return new FieldParameterSyntax(name.Span);
                 }
                 default:
                 {
-                    var span = tokens.Current.Span;
-                    var isParams = tokens.Accept<IParamsKeywordToken>();
-                    var mutableBinding = tokens.Accept<IVarKeywordToken>();
-                    var name = tokens.RequiredIdentifier();
-                    tokens.Expect<IColonToken>();
+                    var span = Tokens.Current.Span;
+                    var isParams = Tokens.Accept<IParamsKeywordToken>();
+                    var mutableBinding = Tokens.Accept<IVarKeywordToken>();
+                    var name = Tokens.RequiredIdentifier();
+                    Tokens.Expect<IColonToken>();
                     // Need to not consume the assignment that separates the type from the default value,
                     // hence the min operator precedence.
-                    var type = expressionParser.ParseExpression(tokens, diagnostics,
-                        OperatorPrecedence.AboveAssignment);
+                    var type = expressionParser.ParseExpression(OperatorPrecedence.AboveAssignment);
                     ExpressionSyntax defaultValue = null;
-                    if (tokens.Accept<IEqualsToken>())
-                        defaultValue = expressionParser.ParseExpression(tokens, diagnostics);
+                    if (Tokens.Accept<IEqualsToken>())
+                        defaultValue = expressionParser.ParseExpression();
                     span = TextSpan.Covering(span, type.Span, defaultValue?.Span);
                     return new NamedParameterSyntax(span, isParams, mutableBinding, name, type, defaultValue);
                 }

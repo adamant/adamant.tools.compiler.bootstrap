@@ -1,5 +1,4 @@
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
@@ -9,14 +8,16 @@ using static Adamant.Tools.Compiler.Bootstrap.Framework.TypeOperations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
-    public class GenericsParser : IGenericsParser
+    public class GenericsParser : Parser, IGenericsParser
     {
         [NotNull] private readonly IListParser listParser;
         [NotNull] private readonly IExpressionParser expressionParser;
 
         public GenericsParser(
+            [NotNull] ITokenIterator tokens,
             [NotNull] IListParser listParser,
             [NotNull] IExpressionParser expressionParser)
+            : base(tokens)
         {
             this.listParser = listParser;
             this.expressionParser = expressionParser;
@@ -24,48 +25,40 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [MustUseReturnValue]
         [CanBeNull]
-        public FixedList<GenericParameterSyntax> AcceptGenericParameters(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] Diagnostics diagnostics)
+        public FixedList<GenericParameterSyntax> AcceptGenericParameters()
         {
-            if (!tokens.Accept<IOpenBracketToken>()) return null;
-            var parameters = listParser.ParseSeparatedList(tokens, ParseGenericParameter,
-                TypeOf<ICommaToken>(), TypeOf<ICloseBracketToken>(), diagnostics);
-            tokens.Expect<ICloseBracketToken>();
+            if (!Tokens.Accept<IOpenBracketToken>()) return null;
+            var parameters = listParser.ParseSeparatedList(Tokens, (tokens1, diagnostics1) => ParseGenericParameter(),
+                TypeOf<ICommaToken>(), TypeOf<ICloseBracketToken>(), Tokens.Context.Diagnostics);
+            Tokens.Expect<ICloseBracketToken>();
             return parameters.OfType<GenericParameterSyntax>().ToFixedList();
         }
 
         [MustUseReturnValue]
         [NotNull]
-        public GenericParameterSyntax ParseGenericParameter(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] Diagnostics diagnostics)
+        public GenericParameterSyntax ParseGenericParameter()
         {
-            var isParams = tokens.Accept<IParamsKeywordToken>();
-            var name = tokens.RequiredIdentifier();
+            var isParams = Tokens.Accept<IParamsKeywordToken>();
+            var name = Tokens.RequiredIdentifier();
             ExpressionSyntax typeExpression = null;
-            if (tokens.Accept<IColonToken>())
-                typeExpression = expressionParser.ParseExpression(tokens, diagnostics);
+            if (Tokens.Accept<IColonToken>())
+                typeExpression = expressionParser.ParseExpression();
             return new GenericParameterSyntax(isParams, name, typeExpression);
         }
 
         [MustUseReturnValue]
         [NotNull]
-        public FixedList<GenericConstraintSyntax> ParseGenericConstraints(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] Diagnostics diagnostics)
+        public FixedList<GenericConstraintSyntax> ParseGenericConstraints()
         {
-            return listParser.AcceptList(() => AcceptGenericConstraint(tokens, diagnostics));
+            return listParser.AcceptList(AcceptGenericConstraint);
         }
 
         [MustUseReturnValue]
         [CanBeNull]
-        public GenericConstraintSyntax AcceptGenericConstraint(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] Diagnostics diagnostics)
+        public GenericConstraintSyntax AcceptGenericConstraint()
         {
-            if (!tokens.Accept<IWhereKeywordToken>()) return null;
-            var expression = expressionParser.ParseExpression(tokens, diagnostics);
+            if (!Tokens.Accept<IWhereKeywordToken>()) return null;
+            var expression = expressionParser.ParseExpression();
             return new GenericConstraintSyntax(expression);
         }
     }

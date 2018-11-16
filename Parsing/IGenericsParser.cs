@@ -1,6 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using JetBrains.Annotations;
 
@@ -10,14 +8,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     {
         [MustUseReturnValue]
         [CanBeNull]
-        FixedList<GenericParameterSyntax> AcceptGenericParameters(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] Diagnostics diagnostics);
+        FixedList<GenericParameterSyntax> AcceptGenericParameters();
 
         [MustUseReturnValue]
         [NotNull]
-        FixedList<GenericConstraintSyntax> ParseGenericConstraints(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] Diagnostics diagnostics);
+        FixedList<GenericConstraintSyntax> ParseGenericConstraints();
     }
 }

@@ -9,8 +9,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     {
         [MustUseReturnValue]
         [NotNull]
-        ParameterSyntax ParseParameter(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] Diagnostics diagnostics);
+        ParameterSyntax ParseParameter();
     }
 }

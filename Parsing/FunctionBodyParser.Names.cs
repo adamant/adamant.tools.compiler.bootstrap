@@ -1,5 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
@@ -10,13 +8,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     {
         [MustUseReturnValue]
         [NotNull]
-        public NameSyntax ParseName([NotNull] ITokenIterator tokens, [NotNull] Diagnostics diagnostics)
+        public NameSyntax ParseName()
         {
-            NameSyntax name = ParseSimpleName(tokens, diagnostics);
-            while (tokens.Current is IDotToken)
+            NameSyntax name = ParseSimpleName();
+            while (Tokens.Current is IDotToken)
             {
-                var dot = tokens.Take<IDotToken>();
-                var simpleName = ParseSimpleName(tokens, diagnostics);
+                var dot = Tokens.Take<IDotToken>();
+                var simpleName = ParseSimpleName();
                 name = new QualifiedNameSyntax(name, dot, simpleName);
             }
             return name;
@@ -24,15 +22,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        private SimpleNameSyntax ParseSimpleName([NotNull]ITokenIterator tokens, [NotNull] Diagnostics diagnostics)
+        private SimpleNameSyntax ParseSimpleName()
         {
-            var identifier = tokens.ExpectIdentifier();
+            var identifier = Tokens.ExpectIdentifier();
             SimpleNameSyntax simpleName;
-            if (tokens.Current is IOpenBracketToken)
+            if (Tokens.Current is IOpenBracketToken)
             {
-                var openBracket = tokens.Consume<IOpenBracketTokenPlace>();
-                var arguments = ParseArgumentList(tokens, diagnostics);
-                var closeBracket = tokens.Consume<ICloseBracketTokenPlace>();
+                var openBracket = Tokens.Consume<IOpenBracketTokenPlace>();
+                var arguments = ParseArgumentList();
+                var closeBracket = Tokens.Consume<ICloseBracketTokenPlace>();
                 simpleName = new GenericNameSyntax(identifier, openBracket, arguments, closeBracket);
             }
             else

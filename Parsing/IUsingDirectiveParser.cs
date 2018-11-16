@@ -10,8 +10,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     {
         [MustUseReturnValue]
         [NotNull]
-        FixedList<UsingDirectiveSyntax> ParseUsingDirectives(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] Diagnostics diagnostics);
+        FixedList<UsingDirectiveSyntax> ParseUsingDirectives();
     }
 }

@@ -1,6 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
@@ -11,18 +9,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     {
         [MustUseReturnValue]
         [NotNull]
-        private static PatternSyntax ParsePattern(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] Diagnostics diagnostics)
+        private PatternSyntax ParsePattern()
         {
-            var pattern = ParsePatternAtom(tokens, diagnostics);
+            var pattern = ParsePatternAtom();
             for (; ; )
             {
-                switch (tokens.Current)
+                switch (Tokens.Current)
                 {
                     case IPipeToken pipe:
-                        tokens.Next();
-                        var rightOperand = ParsePatternAtom(tokens, diagnostics);
+                        Tokens.Next();
+                        var rightOperand = ParsePatternAtom();
                         pattern = new OrPatternSyntax(pattern, pipe, rightOperand);
                         break;
                     default:
@@ -33,25 +29,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        private static PatternSyntax ParsePatternAtom(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] Diagnostics diagnostics)
+        private PatternSyntax ParsePatternAtom()
         {
-            switch (tokens.Current)
+            switch (Tokens.Current)
             {
                 case IIdentifierToken identifier:
                 {
-                    tokens.Next();
+                    Tokens.Next();
                     return new AnyPatternSyntax(identifier);
                 }
                 case IDotToken dotToken:
                 {
-                    tokens.Next();
-                    var identifier = tokens.ExpectIdentifier();
+                    Tokens.Next();
+                    var identifier = Tokens.ExpectIdentifier();
                     return new EnumValuePatternSyntax(dotToken, identifier);
                 }
                 default:
-                    throw NonExhaustiveMatchException.For(tokens.Current);
+                    throw NonExhaustiveMatchException.For(Tokens.Current);
             }
         }
     }

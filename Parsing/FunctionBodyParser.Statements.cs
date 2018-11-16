@@ -1,5 +1,4 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
@@ -11,11 +10,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     {
         [MustUseReturnValue]
         [NotNull]
-        public StatementSyntax ParseStatement(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] Diagnostics diagnostics)
+        public StatementSyntax ParseStatement()
         {
-            switch (tokens.Current)
+            switch (Tokens.Current)
             {
                 case IOpenBraceToken _:
                     // To simplify things later, we wrap blocks in an expression statement syntax w/o a semicolon
@@ -23,31 +20,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case ILetKeywordToken _:
                 case IVarKeywordToken _:
                 {
-                    var binding = tokens.Take<IBindingToken>();
-                    var name = tokens.ExpectIdentifier();
+                    var binding = Tokens.Take<IBindingToken>();
+                    var name = Tokens.ExpectIdentifier();
                     IColonTokenPlace colon = null;
                     ExpressionSyntax typeExpression = null;
-                    if (tokens.Current is IColonToken)
+                    if (Tokens.Current is IColonToken)
                     {
-                        colon = tokens.Consume<IColonTokenPlace>();
+                        colon = Tokens.Consume<IColonTokenPlace>();
                         // Need to not consume the assignment that separates the type from the initializer,
                         // hence the min operator precedence.
-                        typeExpression = ParseExpression(tokens, diagnostics, OperatorPrecedence.LogicalOr);
+                        typeExpression = ParseExpression(OperatorPrecedence.LogicalOr);
                     }
                     IEqualsToken equals = null;
                     ExpressionSyntax initializer = null;
-                    if (tokens.Current is IEqualsToken)
+                    if (Tokens.Current is IEqualsToken)
                     {
-                        equals = tokens.Take<IEqualsToken>();
-                        initializer = ParseExpression(tokens, diagnostics);
+                        equals = Tokens.Take<IEqualsToken>();
+                        initializer = ParseExpression();
                     }
-                    var semicolon = tokens.Consume<ISemicolonTokenPlace>();
+                    var semicolon = Tokens.Consume<ISemicolonTokenPlace>();
                     return new VariableDeclarationStatementSyntax(binding, name, colon, typeExpression, equals, initializer, semicolon);
                 }
                 default:
                 {
-                    var expression = ParseExpression(tokens, diagnostics);
-                    tokens.Expect<ISemicolonToken>();
+                    var expression = ParseExpression();
+                    Tokens.Expect<ISemicolonToken>();
                     return new ExpressionStatementSyntax(expression);
                 }
             }
@@ -59,7 +56,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             var openBrace = Tokens.Current.Span;
             if (!Tokens.Accept<IOpenBraceToken>()) return null;
-            var statements = listParser.ParseList(Tokens, ParseStatement, TypeOf<ICloseBraceToken>(), Tokens.Context.Diagnostics);
+            var statements = listParser.ParseList(Tokens, (tokens, diagnostics) => ParseStatement(), TypeOf<ICloseBraceToken>(), Tokens.Context.Diagnostics);
             var closeBrace = Tokens.Expect<ICloseBraceToken>();
             openBrace = TextSpan.Covering(openBrace, closeBrace);
             return new BlockSyntax(openBrace, statements);
@@ -70,7 +67,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public BlockSyntax ParseBlock()
         {
             var openBrace = Tokens.Expect<IOpenBraceToken>();
-            var statements = listParser.ParseList(Tokens, ParseStatement, TypeOf<ICloseBraceToken>(), Tokens.Context.Diagnostics);
+            var statements = listParser.ParseList(Tokens, (tokens, diagnostics) => ParseStatement(), TypeOf<ICloseBraceToken>(), Tokens.Context.Diagnostics);
             var closeBrace = Tokens.Expect<ICloseBraceToken>();
             var span = TextSpan.Covering(openBrace, closeBrace);
             return new BlockSyntax(span, statements);
@@ -87,7 +84,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IEqualsGreaterThanToken _:
                 default:
                     var equalsGreaterThan = Tokens.Expect<IEqualsGreaterThanToken>();
-                    var expression = ParseExpression(Tokens, Tokens.Context.Diagnostics);
+                    var expression = ParseExpression();
                     var span = TextSpan.Covering(equalsGreaterThan, expression.Span);
                     return new ResultExpressionSyntax(span, expression);
             }

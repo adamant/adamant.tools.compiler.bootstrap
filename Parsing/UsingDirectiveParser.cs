@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
@@ -8,36 +7,36 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
-    public class UsingDirectiveParser : IUsingDirectiveParser
+    public class UsingDirectiveParser : Parser, IUsingDirectiveParser
     {
         [NotNull] private readonly INameParser qualifiedNameParser;
 
-        public UsingDirectiveParser([NotNull] INameParser qualifiedNameParser)
+        public UsingDirectiveParser(
+            [NotNull] ITokenIterator tokens,
+            [NotNull] INameParser qualifiedNameParser)
+            : base(tokens)
         {
             this.qualifiedNameParser = qualifiedNameParser;
         }
 
         [MustUseReturnValue]
         [NotNull]
-        public FixedList<UsingDirectiveSyntax> ParseUsingDirectives(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] Diagnostics diagnostics)
+        public FixedList<UsingDirectiveSyntax> ParseUsingDirectives()
         {
+            // TODO use list parser instead
             var directives = new List<UsingDirectiveSyntax>();
-            while (tokens.Current is IUsingKeywordToken)
-                directives.Add(ParseUsingDirective(tokens, diagnostics));
+            while (Tokens.Current is IUsingKeywordToken)
+                directives.Add(ParseUsingDirective());
 
             return directives.ToFixedList();
         }
 
         [NotNull]
-        public UsingDirectiveSyntax ParseUsingDirective(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] Diagnostics diagnostics)
+        public UsingDirectiveSyntax ParseUsingDirective()
         {
-            tokens.Expect<IUsingKeywordToken>();
-            var name = qualifiedNameParser.ParseName(tokens, diagnostics);
-            tokens.Expect<ISemicolonToken>();
+            Tokens.Expect<IUsingKeywordToken>();
+            var name = qualifiedNameParser.ParseName();
+            Tokens.Expect<ISemicolonToken>();
             return new UsingDirectiveSyntax(name);
         }
     }
