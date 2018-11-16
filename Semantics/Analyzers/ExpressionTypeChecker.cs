@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -81,6 +82,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 diagnostics.Add(TypeError.MustBeABoolExpression(expression.Context.File, expression.Span));
         }
 
+        [NotNull]
         public DataType CheckExpression([CanBeNull] ExpressionAnalysis expression)
         {
             if (expression == null) return DataType.Unknown;
@@ -110,7 +112,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     return expression.Type.Computed(ObjectType.String);
                 case BooleanLiteralExpressionAnalysis _:
                     return expression.Type.Computed(ObjectType.Bool);
-                case BinaryOperatorExpressionAnalysis binaryOperatorExpression:
+                case BinaryExpressionAnalysis binaryOperatorExpression:
                     return CheckBinaryOperator(binaryOperatorExpression);
                 case IdentifierNameAnalysis identifierName:
                     return identifierName.Type.Computed(CheckName(expression.Context, identifierName.Syntax.Name));
@@ -255,6 +257,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case BreakExpressionAnalysis breakExpression:
                     CheckExpression(breakExpression.Expression);
                     return breakExpression.Type.Computed(ObjectType.Never);
+                case AssignmentExpressionAnalysis assignmentExpression:
+                    var left = CheckExpression(assignmentExpression.LeftOperand);
+                    CheckExpression(assignmentExpression.RightOperand);
+                    var right = ImposeIntegerConstantType(left, assignmentExpression.RightOperand);
+                    throw new NotImplementedException("Check compability of types");
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
@@ -337,15 +344,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             CheckExpression(argument.Value);
         }
 
+        [NotNull]
         private DataType CheckBinaryOperator(
-            [NotNull] BinaryOperatorExpressionAnalysis binaryOperatorExpression)
+            [NotNull] BinaryExpressionAnalysis binaryExpression)
         {
-            CheckExpression(binaryOperatorExpression.LeftOperand);
-            var leftOperand = binaryOperatorExpression.LeftOperand.Type.AssertComputed();
+            CheckExpression(binaryExpression.LeftOperand);
+            var leftOperand = binaryExpression.LeftOperand.Type.AssertComputed();
             var leftOperandCore = leftOperand is LifetimeType l ? l.Referent : leftOperand;
-            var @operator = binaryOperatorExpression.Syntax.Operator;
-            CheckExpression(binaryOperatorExpression.RightOperand);
-            var rightOperand = binaryOperatorExpression.RightOperand.Type.AssertComputed();
+            var @operator = binaryExpression.Syntax.Operator;
+            CheckExpression(binaryExpression.RightOperand);
+            var rightOperand = binaryExpression.RightOperand.Type.AssertComputed();
             var rightOperandCore = rightOperand is LifetimeType r ? r.Referent : rightOperand;
 
             // If either is unknown, then we can't know whether there is a a problem
@@ -365,9 +373,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     case BinaryOperator.And:
                     case BinaryOperator.Or:
                     case BinaryOperator.Xor:
-                        return binaryOperatorExpression.Type.Computed(ObjectType.Bool);
+                        return binaryExpression.Type.Computed(ObjectType.Bool);
                     default:
-                        return binaryOperatorExpression.Type.Computed(DataType.Unknown);
+                        return binaryExpression.Type.Computed(DataType.Unknown);
                 }
             }
 
@@ -376,10 +384,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             {
                 case BinaryOperator.Plus:
                     typeError = CheckNumericOperator(
-                        binaryOperatorExpression.LeftOperand,
-                        binaryOperatorExpression.RightOperand,
+                        binaryExpression.LeftOperand,
+                        binaryExpression.RightOperand,
                         null);
-                    binaryOperatorExpression.Type.Computed(!typeError ? leftOperand : DataType.Unknown);
+                    binaryExpression.Type.Computed(!typeError ? leftOperand : DataType.Unknown);
                     break;
                 //case IPlusEqualsToken _:
                 //    typeError = CheckNumericOperator(
@@ -402,7 +410,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case BinaryOperator.GreaterThan:
                 case BinaryOperator.GreaterThanOrEqual:
                     typeError = leftOperandCore != rightOperandCore;
-                    binaryOperatorExpression.Type.Computed(ObjectType.Bool);
+                    binaryExpression.Type.Computed(ObjectType.Bool);
                     break;
                 //case IEqualsToken _:
                 //    typeError = leftOperandCore != rightOperandCore;
@@ -414,7 +422,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case BinaryOperator.Xor:
                     typeError = leftOperand != ObjectType.Bool || rightOperand != ObjectType.Bool;
 
-                    binaryOperatorExpression.Type.Computed(ObjectType.Bool);
+                    binaryExpression.Type.Computed(ObjectType.Bool);
                     break;
                 //case IDollarToken _:
                 //case IDollarLessThanToken _:
@@ -433,12 +441,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     throw NonExhaustiveMatchException.For(@operator);
             }
             if (typeError)
-                diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandsOfType(binaryOperatorExpression.Context.File,
-                    binaryOperatorExpression.Syntax.Span, @operator,
-                    binaryOperatorExpression.LeftOperand.Type,
-                    binaryOperatorExpression.RightOperand.Type));
+                diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandsOfType(binaryExpression.Context.File,
+                    binaryExpression.Syntax.Span, @operator,
+                    binaryExpression.LeftOperand.Type,
+                    binaryExpression.RightOperand.Type));
 
-            return binaryOperatorExpression.Type.AssertComputed();
+            return binaryExpression.Type.AssertComputed();
         }
 
         private bool CheckNumericOperator(
@@ -476,19 +484,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             }
         }
 
-        private void ImposeIntegerConstantType([NotNull] DataType expectedType, [NotNull] ExpressionAnalysis expression)
+        [NotNull]
+        private DataType ImposeIntegerConstantType([NotNull] DataType expectedType, [NotNull] ExpressionAnalysis expression)
         {
-            // Don't impose a non-integer type
-            if (!IsIntegerType(expectedType)) return;
             var currentType = expression.Type.AssertComputed();
-            // If it isn't an integer constant, nothing to do
-            if (currentType != DataType.IntegerConstant) return;
+
+            if (!IsIntegerType(expectedType) // Don't impose a non-integer type
+                || currentType != DataType.IntegerConstant) // If it isn't an integer constant, nothing to do
+                return currentType;
 
             switch (expression)
             {
                 case LiteralExpressionAnalysis _:
-                    expression.Type.Resolve(expectedType);
-                    break;
+                    return expression.Type.Resolve(expectedType);
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
@@ -502,6 +510,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                    || type == ObjectType.Offset;
         }
 
+        [NotNull]
         private DataType CheckUnaryOperator(
             [NotNull] UnaryOperatorExpressionAnalysis unaryOperatorExpression)
         {
@@ -658,7 +667,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     // TODO evaluate to type
                     return DataType.Unknown;
                 }
-                case BinaryOperatorExpressionAnalysis _:
+                case BinaryExpressionAnalysis _:
                     // TODO evaluate to type
                     return DataType.Unknown;
                 case MutableTypeAnalysis mutableType:

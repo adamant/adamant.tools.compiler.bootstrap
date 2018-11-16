@@ -52,9 +52,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
                 case PrimitiveTypeSyntax primitiveType:
                     return new PrimitiveTypeAnalysis(context, primitiveType);
                 case BinaryExpressionSyntax binaryOperatorExpression:
-                    var leftOperand = BuildExpression(context, functionName, binaryOperatorExpression.LeftOperand);
-                    var rightOperand = BuildExpression(context, functionName, binaryOperatorExpression.RightOperand);
-                    return new BinaryOperatorExpressionAnalysis(context, binaryOperatorExpression, leftOperand, rightOperand);
+                    return new BinaryExpressionAnalysis(context, binaryOperatorExpression,
+                        BuildExpression(context, functionName, binaryOperatorExpression.LeftOperand),
+                        BuildExpression(context, functionName, binaryOperatorExpression.RightOperand));
                 case UnaryExpressionSyntax unaryOperatorExpression:
                     var operand = BuildExpression(context, functionName, unaryOperatorExpression.Operand);
                     return new UnaryOperatorExpressionAnalysis(context, unaryOperatorExpression, operand);
@@ -124,6 +124,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
                 case MemberAccessExpressionSyntax memberAccessExpression:
                     return new MemberAccessExpressionAnalysis(context, memberAccessExpression,
                         BuildExpression(context, functionName, memberAccessExpression.Expression));
+                case AssignmentExpressionSyntax assignmentExpression:
+                {
+                    return new AssignmentExpressionAnalysis(context, assignmentExpression,
+                        BuildExpression(context, functionName, assignmentExpression.LeftOperand),
+                        BuildExpression(context, functionName, assignmentExpression.RightOperand));
+                }
                 case null:
                     return null;
                 default:

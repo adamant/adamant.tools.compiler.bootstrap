@@ -182,7 +182,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     if (returnExpression.ReturnValue != null)
                         GetVariableScopes(returnExpression.ReturnValue, scopes);
                     break;
-                case BinaryOperatorExpressionAnalysis binaryOperatorExpression:
+                case BinaryExpressionAnalysis binaryOperatorExpression:
                     GetVariableScopes(binaryOperatorExpression.LeftOperand, scopes);
                     GetVariableScopes(binaryOperatorExpression.RightOperand, scopes);
                     break;
@@ -236,6 +236,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case BreakExpressionAnalysis breakExpression:
                     if (breakExpression.Expression != null)
                         GetVariableScopes(breakExpression.Expression, scopes);
+                    break;
+                case AssignmentExpressionAnalysis assignmentExpression:
+                    GetVariableScopes(assignmentExpression.LeftOperand, scopes);
+                    GetVariableScopes(assignmentExpression.RightOperand, scopes);
                     break;
                 case IntegerLiteralExpressionAnalysis _:
                 case IdentifierNameAnalysis _:

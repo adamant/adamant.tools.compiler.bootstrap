@@ -142,7 +142,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case IdentifierNameAnalysis _:
                     // Ignore, reading from variable does nothing.
                     break;
-                case BinaryOperatorExpressionAnalysis binaryOperatorExpression:
+                case BinaryExpressionAnalysis binaryOperatorExpression:
                     switch (binaryOperatorExpression.Operator)
                     {
                         //case BinaryOperator. EqualsToken _:
@@ -204,7 +204,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case IdentifierNameAnalysis identifier:
                     statements.Add(new AssignmentStatement(CurrentBlockNumber, statements.Count, place, new CopyPlace(LookupVariable(identifier.Name.NotNull()))));
                     break;
-                case BinaryOperatorExpressionAnalysis binaryOperator:
+                case BinaryExpressionAnalysis binaryOperator:
                     ConvertOperator(place, binaryOperator, statements);
                     break;
                 case IntegerLiteralExpressionAnalysis v:
@@ -225,10 +225,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
         private void ConvertOperator(
             [NotNull] Place lvalue,
-            [NotNull] BinaryOperatorExpressionAnalysis binaryOperator,
+            [NotNull] BinaryExpressionAnalysis binary,
             [NotNull] List<ExpressionStatement> statements)
         {
-            switch (binaryOperator.Operator)
+            switch (binary.Operator)
             {
                 //case PlusToken _:
                 //    currentBlock.Add(new AddStatement(lvalue,
@@ -245,7 +245,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 //    ConvertExpressionAnalysisToStatement(binaryOperator.LeftOperand, statements);
                 //    break;
                 default:
-                    throw NonExhaustiveMatchException.For(binaryOperator.Operator);
+                    throw NonExhaustiveMatchException.For(binary.Operator);
             }
         }
 
