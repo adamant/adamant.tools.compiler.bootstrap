@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
             var namespaceContext = context;
             foreach (var ns in fileNamespace.Name)
             {
-                var namespaceName = name.Qualify(ns);
+                var namespaceName = name.Qualify((SimpleName)ns);
                 namespaceContext = BuildNamespaceContext(namespaceContext, fileNamespace, namespaceName);
                 name = namespaceName;
             }
@@ -94,16 +94,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
             }
         }
 
-        [CanBeNull]
+        [NotNull]
         private FunctionDeclarationAnalysis BuildFunction(
             [NotNull] AnalysisContext context,
             [NotNull] RootName @namespace,
             [NotNull] NamedFunctionDeclarationSyntax syntax)
         {
-            // Skip any function that doesn't have a name
-            if (!(syntax.Name.Value is string name)) return null;
-
-            var fullName = @namespace.Qualify(name);
+            var fullName = @namespace.Qualify((SimpleName)syntax.Name.Value);
             var typesContext = syntax.GenericParameters != null ? context.WithGenericParameters(syntax) : context;
             var bodyContext = typesContext.InFunctionBody(syntax);
             // For missing parameter names, use `_` to ignore them
@@ -123,7 +120,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
             switch (parameter)
             {
                 case NamedParameterSyntax namedParameter:
-                    return new ParameterAnalysis(context, namedParameter, functionName.Qualify(namedParameter.Name.Value ?? "_"),
+                    return new ParameterAnalysis(context, namedParameter, functionName.Qualify((SimpleName)namedParameter.Name.Value),
                         expressionBuilder.BuildExpression(context, functionName, namedParameter.Type));
                 case SelfParameterSyntax selfParameter:
                     return new ParameterAnalysis(context, selfParameter, functionName.Qualify(new SimpleName("self", true)), null);
@@ -132,35 +129,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
             }
         }
 
-        [CanBeNull]
+        [NotNull]
         private TypeDeclarationAnalysis BuildClass(
             [NotNull] AnalysisContext context,
             [NotNull] RootName @namespace,
             [NotNull] ClassDeclarationSyntax syntax)
         {
-            // Skip any class that doesn't have a name
-            if (!(syntax.Name.Value is string name)) return null;
-
-            var fullName = @namespace.Qualify(name);
+            var fullName = @namespace.Qualify((SimpleName)syntax.Name.Value);
             return new TypeDeclarationAnalysis(context, syntax, fullName,
                 BuildGenericParameters(context, fullName, syntax.GenericParameters));
         }
 
-        [CanBeNull]
+        [NotNull]
         private TypeDeclarationAnalysis BuildTrait(
             [NotNull] AnalysisContext context,
             [NotNull] RootName @namespace,
             [NotNull] TraitDeclarationSyntax syntax)
         {
-            // Skip any class that doesn't have a name
-            if (!(syntax.Name.Value is string name)) return null;
-
-            var fullName = @namespace.Qualify(name);
+            var fullName = @namespace.Qualify((SimpleName)syntax.Name.Value);
             return new TypeDeclarationAnalysis(context, syntax, fullName,
                 BuildGenericParameters(context, fullName, syntax.GenericParameters));
         }
 
-        [CanBeNull]
+        [NotNull]
         private TypeDeclarationAnalysis BuildStruct(
             [NotNull] AnalysisContext context,
             [NotNull] RootName @namespace,
@@ -170,7 +161,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
             {
                 case IIdentifierToken identifier:
                 {
-                    var fullName = @namespace.Qualify(identifier.Value);
+                    var fullName = @namespace.Qualify((SimpleName)identifier.Value);
                     return new TypeDeclarationAnalysis(context, syntax, fullName,
                         BuildGenericParameters(context, fullName, syntax.GenericParameters));
                 }
@@ -182,35 +173,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
                         BuildGenericParameters(context, name, syntax.GenericParameters));
                 }
                 default:
-                    // Skip any struct that doesn't have a name
-                    return null;
+                    throw NonExhaustiveMatchException.For(syntax.Name);
             }
         }
 
-        [CanBeNull]
+        [NotNull]
         private TypeDeclarationAnalysis BuildEnumStruct(
             [NotNull] AnalysisContext context,
             [NotNull] RootName @namespace,
             [NotNull] EnumStructDeclarationSyntax syntax)
         {
-            // Skip any struct that doesn't have a name
-            if (!(syntax.Name.Value is string name)) return null;
-
-            var fullName = @namespace.Qualify(name);
+            var fullName = @namespace.Qualify((SimpleName)syntax.Name.Value);
             return new TypeDeclarationAnalysis(context, syntax, fullName,
                 BuildGenericParameters(context, fullName, syntax.GenericParameters));
         }
 
-        [CanBeNull]
+        [NotNull]
         private TypeDeclarationAnalysis BuildEnumClass(
             [NotNull] AnalysisContext context,
             [NotNull] RootName @namespace,
             [NotNull] EnumClassDeclarationSyntax syntax)
         {
-            // Skip any struct that doesn't have a name
-            if (!(syntax.Name.Value is string name)) return null;
-
-            var fullName = @namespace.Qualify(name);
+            var fullName = @namespace.Qualify((SimpleName)syntax.Name.Value);
             return new TypeDeclarationAnalysis(context, syntax, fullName,
                 BuildGenericParameters(context, fullName, syntax.GenericParameters));
         }
@@ -222,12 +206,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
             [CanBeNull] FixedList<GenericParameterSyntax> syntax)
         {
             return syntax?.Select(parameter => new GenericParameterAnalysis(context,
-                parameter,
-                memberName.Qualify(parameter.Name.Value ?? "_"),
-                parameter.Type == null
+                parameter.NotNull(),
+                memberName.Qualify((SimpleName)parameter.NotNull().Name.Value),
+                parameter.NotNull().Type == null
                     ? null
                     : expressionBuilder.BuildExpression(context, memberName,
-                        parameter.Type)));
+                        parameter.NotNull().Type)));
         }
     }
 }

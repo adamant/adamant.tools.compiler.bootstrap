@@ -20,13 +20,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
         /// </summary>
         [NotNull]
         public static Name From(
-            [NotNull] SimpleName firstSegment,
-            [NotNull] [ItemNotNull] params SimpleName[] segments)
+            [NotNull] string firstSegment,
+            [NotNull, ItemNotNull] params string[] segments)
         {
             Requires.NotNull(nameof(firstSegment), firstSegment);
-            Name name = firstSegment;
+            Name name = ((SimpleName)firstSegment);
             foreach (var segment in segments)
-                name = name.Qualify(segment);
+                name = name.Qualify((SimpleName)segment);
             return name;
         }
 

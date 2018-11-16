@@ -20,7 +20,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
             containingScope.Add(this);
         }
 
-        public override ISymbol Lookup(string name)
+        [CanBeNull]
+        public override ISymbol Lookup([NotNull] SimpleName name)
         {
             return base.Lookup(name) ?? ContainingScope.Lookup(name);
         }

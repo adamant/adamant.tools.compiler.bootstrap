@@ -5,6 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Types;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
@@ -292,7 +293,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             switch (memberAccess.Syntax.Member)
             {
                 case IIdentifierToken identifier:
-                    type = symbol.Lookup(identifier.Value)?.Types.Single();
+                    type = symbol.Lookup((SimpleName)identifier.Value)?.Types.Single();
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(memberAccess.Syntax.Member);
@@ -305,7 +306,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             [NotNull] AnalysisContext context,
             [NotNull] IIdentifierToken name)
         {
-            var declaration = context.Scope.Lookup(name.Value);
+            var declaration = context.Scope.Lookup((SimpleName)name.Value);
             switch (declaration)
             {
                 case TypeDeclarationAnalysis typeDeclaration:

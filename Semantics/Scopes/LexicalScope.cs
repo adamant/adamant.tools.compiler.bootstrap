@@ -10,9 +10,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
     public abstract class LexicalScope
     {
         [NotNull] public NonTerminal Syntax { get; }
-        [NotNull] [ItemNotNull] public IReadOnlyList<LexicalScope> NestedScopes { get; }
-        [NotNull] [ItemNotNull] private readonly List<LexicalScope> nestedScopes = new List<LexicalScope>();
-        [CanBeNull] private FixedDictionary<string, ISymbol> declarations;
+        [NotNull, ItemNotNull] public IReadOnlyList<LexicalScope> NestedScopes { get; }
+        [NotNull, ItemNotNull] private readonly List<LexicalScope> nestedScopes = new List<LexicalScope>();
+        [CanBeNull] private FixedDictionary<SimpleName, ISymbol> declarations;
 
         protected LexicalScope([NotNull] NonTerminal syntax)
         {
@@ -27,13 +27,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
             nestedScopes.Add(nestedScope);
         }
 
-        public void Bind([NotNull] Dictionary<string, ISymbol> symbolDeclarations)
+        public void Bind([NotNull] Dictionary<SimpleName, ISymbol> symbolDeclarations)
         {
             declarations = symbolDeclarations.ToFixedDictionary();
         }
 
         [CanBeNull]
-        public virtual ISymbol Lookup([NotNull] string name)
+        public virtual ISymbol Lookup([NotNull] SimpleName name)
         {
             return declarations.NotNull().TryGetValue(name, out var declaration) ? declaration : null;
         }

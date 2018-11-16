@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
     public class ScopeBinder
     {
         [NotNull] private readonly Dictionary<DeclarationSyntax, DeclarationAnalysis> declarations = new Dictionary<DeclarationSyntax, DeclarationAnalysis>();
-        [NotNull] private readonly Dictionary<string, IDeclarationAnalysis> globalDeclarations;
+        [NotNull] private readonly Dictionary<SimpleName, IDeclarationAnalysis> globalDeclarations;
         [NotNull] private readonly NameBuilder nameBuilder;
         [NotNull] [ItemNotNull] private readonly FixedList<Declaration> referencedDeclarations;
 
@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             globalDeclarations = declarations.Values.NotNull()
                 .OfType<IDeclarationAnalysis>()
                 .Where(IsGlobalDeclaration)
-                .ToDictionary(d => d.Name.UnqualifiedName.Text, d => d);
+                .ToDictionary(d => d.Name.UnqualifiedName, d => d);
         }
 
         private void GatherDeclarations([NotNull] DeclarationAnalysis declaration)
@@ -58,7 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         private void BindScope([NotNull] LexicalScope scope)
         {
             Requires.NotNull(nameof(scope), scope);
-            var symbols = new Dictionary<string, ISymbol>();
+            var symbols = new Dictionary<SimpleName, ISymbol>();
             switch (scope)
             {
                 case FunctionScope functionScope:
@@ -124,9 +124,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             }
         }
 
-        private void AddSymbolsInNamespace([NotNull] Dictionary<string, ISymbol> symbols, [NotNull]  Name namespaceName)
+        private void AddSymbolsInNamespace([NotNull] Dictionary<SimpleName, ISymbol> symbols, [NotNull]  Name namespaceName)
         {
-            foreach (var importedDeclaration in declarations.Values
+            foreach (var importedDeclaration in declarations.Values.NotNull()
                 .OfType<IDeclarationAnalysis>()
                 .Where(d => d.Name.HasQualifier(namespaceName)))
             {
@@ -140,9 +140,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             }
         }
 
-        private static void AddSymbol([NotNull] Dictionary<string, ISymbol> symbols, [NotNull] ISymbol symbol)
+        private static void AddSymbol([NotNull] Dictionary<SimpleName, ISymbol> symbols, [NotNull] ISymbol symbol)
         {
-            var name = symbol.Name.UnqualifiedName.Text;
+            var name = symbol.Name.UnqualifiedName;
             if (symbols.TryGetValue(name, out var existingSymbol))
                 symbols[name] = existingSymbol.ComposeWith(symbol);
             else
@@ -262,7 +262,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             Requires.NotNull(nameof(scopes), scopes);
 
             var scopeAnalysis = scopes[scope.Syntax].NotNull();
-            var variableDeclarations = new Dictionary<string, ISymbol>();
+            var variableDeclarations = new Dictionary<SimpleName, ISymbol>();
             foreach (var declaration in scopeAnalysis.LocalVariableDeclarations())
                 AddSymbol(variableDeclarations, declaration);
 

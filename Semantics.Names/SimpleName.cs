@@ -23,7 +23,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Names
             IsSpecial = isSpecial;
         }
 
-        public static implicit operator SimpleName([NotNull] string text)
+        [NotNull]
+        public static explicit operator SimpleName([NotNull] string text)
         {
             return new SimpleName(text);
         }

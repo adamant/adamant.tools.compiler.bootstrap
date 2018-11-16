@@ -42,10 +42,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
                         return Declarations.TryGetValue(simpleName.Text, out var symbol)
                             ? symbol
                             : null;
-                    return Lookup(simpleName.Text);
+                    return Lookup(simpleName);
                 case QualifiedName qualifiedName:
                     var qualifier = LookupGlobal(qualifiedName.Qualifier);
-                    return qualifier?.Lookup(qualifiedName.UnqualifiedName.Text);
+                    return qualifier?.Lookup(qualifiedName.UnqualifiedName);
                 default:
                     throw NonExhaustiveMatchException.For(name);
             }
