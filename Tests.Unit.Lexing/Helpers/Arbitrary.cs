@@ -100,11 +100,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
                 case ":":
                     return t2.Text == ":" || t2.Text == "::";
                 default:
-                    if (typeof(IKeywordTokenPlace).IsAssignableFrom(t1.TokenType)
-                        || typeof(IIdentifierTokenPlace).IsAssignableFrom(t1.TokenType)
+                    if (typeof(IKeywordToken).IsAssignableFrom(t1.TokenType)
+                        || typeof(IIdentifierToken).IsAssignableFrom(t1.TokenType)
                         )
-                        return typeof(IIdentifierTokenPlace).IsAssignableFrom(t2.TokenType)
-                            || typeof(IKeywordTokenPlace).IsAssignableFrom(t2.TokenType)
+                        return typeof(IIdentifierToken).IsAssignableFrom(t2.TokenType)
+                            || typeof(IKeywordToken).IsAssignableFrom(t2.TokenType)
                             || t2.TokenType == typeof(IIntegerLiteralToken);
                     else if (t1.TokenType == typeof(IIntegerLiteralToken))
                         return t2.TokenType == typeof(IIntegerLiteralToken);
@@ -307,8 +307,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             { "extend", typeof(IExtendKeywordToken) },
             { "type", typeof(ITypeKeywordToken) },
             { "metatype", typeof(IMetatypeKeywordToken) },
-            { "true", typeof(ITrueKeywordTokenPlace) },
-            { "false", typeof(IFalseKeywordTokenPlace) },
+            { "true", typeof(ITrueKeywordToken) },
+            { "false", typeof(IFalseKeywordToken) },
             { "mut", typeof(IMutableKeywordToken) },
             { "params", typeof(IParamsKeywordToken) },
             { "may", typeof(IMayKeywordToken) },

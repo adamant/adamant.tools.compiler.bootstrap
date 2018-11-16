@@ -27,9 +27,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
                     var type = variableDeclaration.TypeExpression != null ? expressionBuilder.BuildExpression(context, functionName, variableDeclaration.TypeExpression) : null;
                     var initializer = variableDeclaration.Initializer != null ? expressionBuilder.BuildExpression(context, functionName, variableDeclaration.Initializer) : null;
                     return new VariableDeclarationStatementAnalysis(context, variableDeclaration, name, type, initializer);
-                case ExpressionStatementSyntax expressionStatement:
+                case ExpressionSyntax expressionStatement:
                     return new ExpressionStatementAnalysis(context, expressionStatement,
-                        expressionBuilder.BuildExpression(context, functionName, expressionStatement.Expression));
+                        expressionBuilder.BuildExpression(context, functionName, expressionStatement));
                 default:
                     throw NonExhaustiveMatchException.For(statement);
             }

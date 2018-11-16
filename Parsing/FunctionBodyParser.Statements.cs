@@ -2,7 +2,6 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
-using static Adamant.Tools.Compiler.Bootstrap.Framework.TypeOperations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
@@ -14,40 +13,46 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             switch (Tokens.Current)
             {
+                // TODO handle cases like if, loop, foreach etc.
                 case IOpenBraceToken _:
-                    // To simplify things later, we wrap blocks in an expression statement syntax w/o a semicolon
-                    return new ExpressionStatementSyntax(ParseBlock());
+                    return ParseBlock();
                 case ILetKeywordToken _:
+                {
+                    Tokens.Expect<IBindingToken>();
+                    return ParseRestOfVariableDeclaration(false);
+                }
                 case IVarKeywordToken _:
                 {
-                    var binding = Tokens.Take<IBindingToken>();
-                    var name = Tokens.ExpectIdentifier();
-                    IColonTokenPlace colon = null;
-                    ExpressionSyntax typeExpression = null;
-                    if (Tokens.Current is IColonToken)
-                    {
-                        colon = Tokens.Consume<IColonTokenPlace>();
-                        // Need to not consume the assignment that separates the type from the initializer,
-                        // hence the min operator precedence.
-                        typeExpression = ParseExpression(OperatorPrecedence.LogicalOr);
-                    }
-                    IEqualsToken equals = null;
-                    ExpressionSyntax initializer = null;
-                    if (Tokens.Current is IEqualsToken)
-                    {
-                        equals = Tokens.Take<IEqualsToken>();
-                        initializer = ParseExpression();
-                    }
-                    var semicolon = Tokens.Consume<ISemicolonTokenPlace>();
-                    return new VariableDeclarationStatementSyntax(binding, name, colon, typeExpression, equals, initializer, semicolon);
+                    Tokens.Expect<IBindingToken>();
+                    return ParseRestOfVariableDeclaration(true);
                 }
                 default:
                 {
                     var expression = ParseExpression();
                     Tokens.Expect<ISemicolonToken>();
-                    return new ExpressionStatementSyntax(expression);
+                    return expression;
                 }
             }
+        }
+
+        // Requires the binding has already been consumed
+        [MustUseReturnValue]
+        [NotNull]
+        private StatementSyntax ParseRestOfVariableDeclaration(bool mutableBinding)
+        {
+            var name = Tokens.RequiredToken<IIdentifierToken>();
+            ExpressionSyntax type = null;
+            if (Tokens.Accept<IColonToken>())
+                // Need to not consume the assignment that separates the type from the initializer,
+                // hence the min operator precedence.
+                type = ParseExpression(OperatorPrecedence.LogicalOr);
+
+            ExpressionSyntax initializer = null;
+            if (Tokens.Accept<IEqualsToken>()) initializer = ParseExpression();
+
+            Tokens.Expect<ISemicolonToken>();
+            return new VariableDeclarationStatementSyntax(mutableBinding, name, type,
+                initializer);
         }
 
         [MustUseReturnValue]
@@ -56,10 +61,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             var openBrace = Tokens.Current.Span;
             if (!Tokens.Accept<IOpenBraceToken>()) return null;
-            var statements = listParser.ParseList(Tokens, (tokens, diagnostics) => ParseStatement(), TypeOf<ICloseBraceToken>(), Tokens.Context.Diagnostics);
-            var closeBrace = Tokens.Expect<ICloseBraceToken>();
-            openBrace = TextSpan.Covering(openBrace, closeBrace);
-            return new BlockSyntax(openBrace, statements);
+            return ParseRestOfBlock(openBrace);
         }
 
         [MustUseReturnValue]
@@ -67,10 +69,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public BlockSyntax ParseBlock()
         {
             var openBrace = Tokens.Expect<IOpenBraceToken>();
-            var statements = listParser.ParseList(Tokens, (tokens, diagnostics) => ParseStatement(), TypeOf<ICloseBraceToken>(), Tokens.Context.Diagnostics);
+            return ParseRestOfBlock(openBrace);
+        }
+
+        // Requires the open brace has already been consumed
+        [NotNull]
+        private BlockSyntax ParseRestOfBlock(TextSpan openBrace)
+        {
+            var statements = listParser.ParseList<StatementSyntax, ICloseBraceToken>(ParseStatement);
             var closeBrace = Tokens.Expect<ICloseBraceToken>();
-            var span = TextSpan.Covering(openBrace, closeBrace);
-            return new BlockSyntax(span, statements);
+            openBrace = TextSpan.Covering(openBrace, closeBrace);
+            return new BlockSyntax(openBrace, statements);
         }
 
         [MustUseReturnValue]

@@ -1,5 +1,4 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -7,27 +6,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class LifetimeTypeSyntax : TypeSyntax
     {
-        [NotNull] public ExpressionSyntax TypeExpression { get; }
-        [NotNull] public ILifetimeOperatorToken Operator { get; }
-        [NotNull] public ILifetimeNameTokenPlace Lifetime { get; }
+        [NotNull] public ExpressionSyntax Type { get; }
+        [NotNull] public LifetimeOperator Operator { get; }
+        [NotNull] public ILifetimeNameToken Lifetime { get; }
 
         public LifetimeTypeSyntax(
-            [NotNull] ExpressionSyntax typeExpression,
-            [NotNull] ILifetimeOperatorToken @operator,
-            [NotNull] ILifetimeNameTokenPlace lifetime)
-            : base(TextSpan.Covering(typeExpression.Span, lifetime.Span))
+            [NotNull] ExpressionSyntax type,
+            LifetimeOperator lifetimeOperator,
+            [NotNull] ILifetimeNameToken lifetime)
+            : base(TextSpan.Covering(type.Span, lifetime.Span))
         {
-            Requires.NotNull(nameof(typeExpression), typeExpression);
-            Requires.NotNull(nameof(@operator), @operator);
-            Requires.NotNull(nameof(lifetime), lifetime);
-            TypeExpression = typeExpression;
-            Operator = @operator;
+            Type = type;
+            Operator = lifetimeOperator;
             Lifetime = lifetime;
         }
 
         public override string ToString()
         {
-            return $"{TypeExpression}{Operator}{Lifetime}";
+            return $"{Type}{Operator}{Lifetime}";
         }
     }
 }

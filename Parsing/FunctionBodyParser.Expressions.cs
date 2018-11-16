@@ -1,10 +1,9 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
-using static Adamant.Tools.Compiler.Bootstrap.Framework.TypeOperations;
+using ILifetimeNameToken = Adamant.Tools.Compiler.Bootstrap.Tokens.ILifetimeNameToken;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
@@ -103,9 +102,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     case IColonToken _: // type kind
                         if (minPrecedence <= OperatorPrecedence.Relational)
                         {
-                            var colon = Tokens.RequiredToken<IColonToken>();
-                            var typeKind = Tokens.Consume<ITypeKindKeywordTokenPlace>();
-                            expression = new TypeKindExpressionSyntax(colon, typeKind);
+                            var colon = Tokens.Expect<IColonToken>();
+                            TypeKind typeKind;
+                            switch (Tokens.Current)
+                            {
+                                case IClassKeywordToken _:
+                                    typeKind = TypeKind.Class;
+                                    break;
+                                case IStructKeywordToken _:
+                                    typeKind = TypeKind.Struct;
+                                    break;
+                                default:
+                                    Tokens.Expect<ITypeKindKeywordToken>();
+                                    // We saw a colon without what we expected after, just assume it is missing
+                                    continue;
+                            }
+                            var typeKindSpan = Tokens.Expect<ITypeKindKeywordToken>();
+                            var span = TextSpan.Covering(colon, typeKindSpan);
+                            expression = new TypeKindExpressionSyntax(span, typeKind);
                             continue;
                         }
                         break;
@@ -136,23 +150,44 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         }
                         break;
                     case IDollarToken _:
+                        if (minPrecedence <= OperatorPrecedence.Lifetime)
+                        {
+                            expression = ParseRestOfLifetimeType(expression, LifetimeOperator.Equal) ?? expression;
+                            continue;
+                        }
+                        break;
                     case IDollarLessThanToken _:
+                        if (minPrecedence <= OperatorPrecedence.Lifetime)
+                        {
+                            expression = ParseRestOfLifetimeType(expression, LifetimeOperator.LessThanOrEqualTo) ?? expression;
+                            continue;
+                        }
+                        break;
                     case IDollarLessThanNotEqualToken _:
+                        if (minPrecedence <= OperatorPrecedence.Lifetime)
+                        {
+                            expression = ParseRestOfLifetimeType(expression, LifetimeOperator.StrictlyLessThan) ?? expression;
+                            continue;
+                        }
+                        break;
                     case IDollarGreaterThanToken _:
+                        if (minPrecedence <= OperatorPrecedence.Lifetime)
+                        {
+                            expression = ParseRestOfLifetimeType(expression, LifetimeOperator.GreaterThanOrEqualTo) ?? expression;
+                            continue;
+                        }
+                        break;
                     case IDollarGreaterThanNotEqualToken _:
                         if (minPrecedence <= OperatorPrecedence.Lifetime)
                         {
-                            var leftOperand = expression;
-                            var lifetimeOperator = Tokens.Take<ILifetimeOperatorToken>();
-                            var name = Tokens.Consume<ILifetimeNameTokenPlace>();
-                            expression = new LifetimeTypeSyntax(leftOperand, lifetimeOperator, name);
+                            expression = ParseRestOfLifetimeType(expression, LifetimeOperator.StrictlyGreaterThan) ?? expression;
                             continue;
                         }
                         break;
                     case IQuestionToken _:
                         if (minPrecedence <= OperatorPrecedence.Unary)
                         {
-                            @operator = Tokens.TakeOperator();
+                            @operator = Tokens.RequiredToken<IOperatorToken>();
                             expression = new UnaryExpressionSyntax(@operator, expression);
                             continue;
                         }
@@ -173,10 +208,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         if (minPrecedence <= OperatorPrecedence.Primary)
                         {
                             var callee = expression;
-                            var openBracket = Tokens.Consume<IOpenBracketTokenPlace>();
-                            var arguments = ParseArgumentList();
-                            var closeBracket = Tokens.Consume<ICloseBracketTokenPlace>();
-                            expression = new GenericsInvocationSyntax(callee, openBracket, arguments, closeBracket);
+                            Tokens.Expect<IOpenBracketToken>();
+                            var arguments = ParseArguments();
+                            var closeBracket = Tokens.Expect<ICloseBracketToken>();
+                            var span = TextSpan.Covering(callee.Span, closeBracket);
+                            expression = new GenericsInvocationSyntax(span, callee, arguments);
                             continue;
                         }
                         break;
@@ -301,37 +337,39 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     return new BaseExpressionSyntax(baseKeyword);
                 case INewKeywordToken _:
                 {
-                    var newKeyword = Tokens.Consume<INewKeywordTokenPlace>();
+                    var newKeyword = Tokens.Expect<INewKeywordToken>();
                     var type = ParseName();
-                    var openParen = Tokens.Consume<IOpenParenTokenPlace>();
-                    var arguments = ParseArgumentList();
-                    var closeParen = Tokens.Consume<ICloseParenTokenPlace>();
-                    return new NewObjectExpressionSyntax(newKeyword, type, openParen, arguments, closeParen);
+                    Tokens.Expect<IOpenParenToken>();
+                    var arguments = ParseArguments();
+                    var closeParen = Tokens.Expect<ICloseParenToken>();
+                    var span = TextSpan.Covering(newKeyword, closeParen);
+                    return new NewObjectExpressionSyntax(span, type, arguments);
                 }
                 case IInitKeywordToken _:
                 {
-                    var initKeyword = Tokens.Consume<IInitKeywordTokenPlace>();
-                    var openParen = Tokens.Consume<IOpenParenTokenPlace>();
+                    var initKeyword = Tokens.Expect<IInitKeywordToken>();
+                    Tokens.Expect<IOpenParenToken>();
                     var placeExpression = ParseExpression();
-                    var closeParen = Tokens.Consume<ICloseParenTokenPlace>();
+                    Tokens.Expect<ICloseParenToken>();
                     var initializer = ParseName();
-                    var argumentsOpenParen = Tokens.Consume<IOpenParenTokenPlace>();
-                    var arguments = ParseArgumentList();
-                    var argumentsCloseParen = Tokens.Consume<ICloseParenTokenPlace>();
-                    return new PlacementInitExpressionSyntax(initKeyword, openParen, placeExpression,
-                        closeParen, initializer, argumentsOpenParen, arguments, argumentsCloseParen);
+                    Tokens.Expect<IOpenParenToken>();
+                    var arguments = ParseArguments();
+                    var argumentsCloseParen = Tokens.Expect<ICloseParenToken>();
+                    var span = TextSpan.Covering(initKeyword, argumentsCloseParen);
+                    return new PlacementInitExpressionSyntax(span, placeExpression, initializer, arguments);
                 }
-                case IDeleteKeywordToken deleteKeyword:
+                case IDeleteKeywordToken _:
                 {
-                    Tokens.Next();
+                    var deleteKeyword = Tokens.Expect<IDeleteKeywordToken>();
                     var expression = ParseExpression();
-                    return new DeleteExpressionSyntax(deleteKeyword, expression);
+                    var span = TextSpan.Covering(deleteKeyword, expression.Span);
+                    return new DeleteExpressionSyntax(span, expression);
                 }
                 case IReturnKeywordToken _:
                 {
-                    var returnKeywordSpan = Tokens.Expect<IReturnKeywordToken>();
+                    var returnKeyword = Tokens.Expect<IReturnKeywordToken>();
                     var expression = Tokens.AtEnd<ISemicolonToken>() ? null : ParseExpression();
-                    var span = TextSpan.Covering(returnKeywordSpan, expression?.Span);
+                    var span = TextSpan.Covering(returnKeyword, expression?.Span);
                     return new ReturnExpressionSyntax(span, expression);
                 }
                 case IEqualsGreaterThanToken _:
@@ -344,7 +382,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case ICaretToken _:
                 case INotKeywordToken _:
                 {
-                    var @operator = Tokens.TakeOperator();
+                    var @operator = Tokens.RequiredToken<IOperatorToken>();
                     var operand = ParseExpression(OperatorPrecedence.Unary);
                     return new UnaryExpressionSyntax(@operator, operand);
                 }
@@ -354,7 +392,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IUninitializedKeywordToken _:
                 case INoneKeywordToken _:
                 {
-                    var literal = Tokens.Consume<ILiteralToken>();
+                    var literal = Tokens.RequiredToken<ILiteralToken>();
                     return new LiteralExpressionSyntax(literal);
                 }
                 case IVoidKeywordToken _:
@@ -368,21 +406,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case ITypeKeywordToken _:
                 case IAnyKeywordToken _:
                 {
-                    var keyword = Tokens.Take<IPrimitiveTypeToken>();
+                    var keyword = Tokens.RequiredToken<IPrimitiveTypeToken>();
                     return new PrimitiveTypeSyntax(keyword);
                 }
                 case IIdentifierToken _:
                 {
-                    var identifier = Tokens.ExpectIdentifier();
+                    var identifier = Tokens.RequiredToken<IIdentifierToken>();
                     var name = new IdentifierNameSyntax(identifier);
-                    if (Tokens.Current is IDollarToken)
-                    {
-                        var dollar = Tokens.Take<IDollarToken>();
-                        var lifetime = Tokens.Consume<ILifetimeNameTokenPlace>();
-                        return new LifetimeTypeSyntax(name, dollar, lifetime);
-                    }
-
-                    return name;
+                    if (!Tokens.Accept<IDollarToken>()) return name;
+                    return ParseRestOfLifetimeType(name, LifetimeOperator.Equal) ?? name;
                 }
                 case IForeachKeywordToken _:
                     return ParseForeach();
@@ -398,27 +430,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var span = TextSpan.Covering(breakKeyword, expression?.Span);
                     return new BreakExpressionSyntax(span, expression);
                 }
-                case IUnsafeKeywordToken unsafeKeyword:
+                case IUnsafeKeywordToken _:
                 {
-                    Tokens.Next();
+                    var unsafeKeyword = Tokens.Expect<IUnsafeKeywordToken>();
                     var expression = Tokens.Current is IOpenBraceToken ?
                         ParseBlock()
                         : ParseParenthesizedExpression();
-
-                    return new UnsafeExpressionSyntax(unsafeKeyword, expression);
+                    var span = TextSpan.Covering(unsafeKeyword, expression.Span);
+                    return new UnsafeExpressionSyntax(span, expression);
                 }
-                case IRefKeywordToken refKeyword:
+                case IRefKeywordToken _:
                 {
-                    Tokens.Next();
-                    var varKeyword = Tokens.AcceptToken<IVarKeywordToken>();
+                    var refKeyword = Tokens.Expect<IRefKeywordToken>();
                     var referencedType = ParseExpression();
-                    return new RefTypeSyntax(refKeyword, varKeyword, referencedType);
+                    var span = TextSpan.Covering(refKeyword, referencedType.Span);
+                    return new RefTypeSyntax(span, referencedType);
                 }
-                case IMutableKeywordToken mutableKeyword:
+                case IMutableKeywordToken _:
                 {
-                    Tokens.Next();
+                    var mutableKeyword = Tokens.Expect<IMutableKeywordToken>();
                     var referencedType = ParseExpression();
-                    return new MutableTypeSyntax(mutableKeyword, referencedType);
+                    var span = TextSpan.Covering(mutableKeyword, referencedType.Span);
+                    return new MutableTypeSyntax(span, referencedType);
                 }
                 case IIfKeywordToken _:
                     return ParseIf();
@@ -427,7 +460,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IDotToken _:
                 {
                     // implicit self etc.
-                    var @operator = Tokens.TakeOperator();
+                    var @operator = Tokens.RequiredToken<IOperatorToken>();
                     var operand = ParseExpression(OperatorPrecedence.Unary);
                     return new UnaryExpressionSyntax(@operator, operand);
                 }
@@ -443,52 +476,73 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
+        [CanBeNull]
+        private ExpressionSyntax ParseRestOfLifetimeType([NotNull] ExpressionSyntax expression, LifetimeOperator lifetimeOperator)
+        {
+            switch (Tokens.Current)
+            {
+                case IIdentifierToken _:
+                    var identifier = Tokens.RequiredToken<IIdentifierToken>();
+                    return new LifetimeTypeSyntax(expression, lifetimeOperator, identifier);
+                case IOwnedKeywordToken _:
+                    var ownedKeyword = Tokens.RequiredToken<IOwnedKeywordToken>();
+                    return new LifetimeTypeSyntax(expression, lifetimeOperator, ownedKeyword);
+                case IRefKeywordToken _:
+                    var refKeyword = Tokens.RequiredToken<IRefKeywordToken>();
+                    return new LifetimeTypeSyntax(expression, lifetimeOperator, refKeyword);
+                default:
+                    Tokens.Expect<ILifetimeNameToken>();
+                    return null;
+            }
+        }
+
         [MustUseReturnValue]
         [NotNull]
         private ExpressionSyntax ParseForeach()
         {
-            var foreachKeyword = Tokens.Consume<IForeachKeywordToken>();
-            var varKeyword = Tokens.AcceptToken<IVarKeywordToken>();
-            var identifier = Tokens.ExpectIdentifier();
-            var colon = Tokens.AcceptToken<IColonToken>();
-            ExpressionSyntax typeExpression = null;
-            if (colon != null)
-                typeExpression = ParseExpression();
-            var inKeyword = Tokens.Consume<IInKeywordToken>();
+            var foreachKeyword = Tokens.Expect<IForeachKeywordToken>();
+            var mutableBinding = Tokens.Accept<IVarKeywordToken>();
+            var identifier = Tokens.RequiredToken<IIdentifierToken>();
+            ExpressionSyntax type = null;
+            if (Tokens.Accept<IColonToken>())
+                type = ParseExpression();
+            var inKeyword = Tokens.Expect<IInKeywordToken>();
             var expression = ParseExpression();
             var block = ParseBlock();
-            return new ForeachExpressionSyntax(foreachKeyword, varKeyword, identifier,
-                colon, typeExpression, inKeyword, expression, block);
+            var span = TextSpan.Covering(foreachKeyword, block.Span);
+            return new ForeachExpressionSyntax(span, mutableBinding, identifier, type, expression, block);
         }
 
         [MustUseReturnValue]
         [NotNull]
         private WhileExpressionSyntax ParseWhile()
         {
-            var whileKeyword = Tokens.Consume<IWhileKeywordToken>();
+            var whileKeyword = Tokens.Expect<IWhileKeywordToken>();
             var condition = ParseExpression();
             var block = ParseBlock();
-            return new WhileExpressionSyntax(whileKeyword, condition, block);
+            var span = TextSpan.Covering(whileKeyword, block.Span);
+            return new WhileExpressionSyntax(span, condition, block);
         }
 
         [MustUseReturnValue]
         [NotNull]
         private LoopExpressionSyntax ParseLoop()
         {
-            var loopKeyword = Tokens.Consume<ILoopKeywordToken>();
+            var loopKeyword = Tokens.Expect<ILoopKeywordToken>();
             var block = ParseBlock();
-            return new LoopExpressionSyntax(loopKeyword, block);
+            var span = TextSpan.Covering(loopKeyword, block.Span);
+            return new LoopExpressionSyntax(span, block);
         }
 
         [MustUseReturnValue]
         [NotNull]
         private ExpressionSyntax ParseIf()
         {
-            var span = Tokens.Expect<IIfKeywordToken>();
+            var @if = Tokens.Expect<IIfKeywordToken>();
             var condition = ParseExpression();
             var thenBlock = ParseExpressionBlock();
             var elseClause = AcceptElse();
-            span = TextSpan.Covering(span, thenBlock.Span, elseClause?.Span);
+            var span = TextSpan.Covering(@if, thenBlock.Span, elseClause?.Span);
             return new IfExpressionSyntax(span, condition, thenBlock, elseClause);
         }
 
@@ -506,12 +560,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [NotNull]
         private ExpressionSyntax ParseMatch()
         {
-            var matchKeyword = Tokens.Take<IMatchKeywordToken>();
+            var matchKeyword = Tokens.Expect<IMatchKeywordToken>();
             var value = ParseExpression();
-            var openBrace = Tokens.Consume<IOpenBraceTokenPlace>();
-            var arms = listParser.ParseList(Tokens, (t, d) => ParseMatchArm(), TypeOf<ICloseBraceToken>(), Tokens.Context.Diagnostics);
-            var closeBrace = Tokens.Consume<ICloseBraceTokenPlace>();
-            return new MatchExpressionSyntax(matchKeyword, value, openBrace, arms, closeBrace);
+            Tokens.Expect<IOpenBraceToken>();
+            var arms = listParser.ParseSeparatedList<MatchArmSyntax, ICommaToken, ICloseBraceToken>(ParseMatchArm);
+            var closeBrace = Tokens.Expect<ICloseBraceToken>();
+            var span = TextSpan.Covering(matchKeyword, closeBrace);
+            return new MatchExpressionSyntax(span, value, arms);
         }
 
         [MustUseReturnValue]
@@ -540,14 +595,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public FixedList<ArgumentSyntax> ParseArguments()
         {
             return listParser.AcceptSeparatedList<ArgumentSyntax, ICommaToken>(AcceptArgument);
-        }
-
-        [MustUseReturnValue]
-        [NotNull]
-        public SeparatedListSyntax<ArgumentSyntax> ParseArgumentList()
-        {
-            var arguments = listParser.ParseSeparatedList(Tokens, (t, d) => AcceptArgument(), TypeOf<ICommaToken>(), Tokens.Context.Diagnostics);
-            return new SeparatedListSyntax<ArgumentSyntax>(arguments);
         }
 
         [MustUseReturnValue]

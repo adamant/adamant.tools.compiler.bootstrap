@@ -1,4 +1,3 @@
-using System;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
@@ -13,12 +12,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     /// * Expected: If the current token is of the given type consume it, otherwise leave it, but
     ///   add a compiler error that an expected token is missing.
     /// * Accept: If the current token is of the given type consume it, otherwise leave it.
-    ///
-    /// Old Stuff
-    /// * Required - throws <see cref="InvalidOperationException"/> if that kind of token isn't found
-    /// * Take - throws InvalidOperationException if that kind of token isn't find
-    /// * Accept - returns null if that kind of token isn't find
-    /// * Expect - returns MissingToken if that kind of token isn't find
     /// </summary>
     public static class TokenIteratorExtensions
     {
@@ -37,6 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             throw new ParseFailedException($"Requires {typeof(T).GetFriendlyName()}, found {tokens.Current.GetType().NotNull().GetFriendlyName()}");
         }
 
+        [NotNull]
         public static T RequiredToken<T>([NotNull] this ITokenIterator tokens)
             where T : IToken
         {
@@ -49,20 +43,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             tokens.Context.Diagnostics.Add(
                 ParseError.MissingToken(tokens.Context.File, typeof(T), tokens.Current));
             throw new ParseFailedException($"Requires {typeof(T).GetFriendlyName()}, found {tokens.Current.GetType().NotNull().GetFriendlyName()}");
-        }
-
-        [NotNull]
-        public static IIdentifierToken RequiredIdentifier([NotNull] this ITokenIterator tokens)
-        {
-            if (tokens.Current is IIdentifierToken identifier)
-            {
-                tokens.Next();
-                return identifier;
-            }
-
-            tokens.Context.Diagnostics.Add(
-                ParseError.MissingToken(tokens.Context.File, typeof(IIdentifierToken), tokens.Current));
-            throw new ParseFailedException($"Requires identifier, found {tokens.Current.GetType().NotNull().GetFriendlyName()}");
         }
         #endregion
 
@@ -153,62 +133,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     return false;
             }
         }
-
-        #region Obsolete
-        [Obsolete("Use AssertAndConsume() instead")]
-        [MustUseReturnValue]
-        [NotNull]
-        public static T Take<T>([NotNull] this ITokenIterator tokens)
-            where T : IToken
-        {
-            if (tokens.Current is T token)
-            {
-                tokens.Next();
-                return token;
-            }
-
-            throw new InvalidOperationException($"Expected {typeof(T).GetFriendlyName()}, found {tokens.Current.GetType().GetFriendlyName()}");
-        }
-
-        [Obsolete("Use AssertAndConsume() instead")]
-        [MustUseReturnValue]
-        [NotNull]
-        public static IOperatorToken TakeOperator([NotNull] this ITokenIterator tokens)
-        {
-            return Take<IOperatorToken>(tokens);
-        }
-
-        [Obsolete("Use Expect() instead")]
-        [MustUseReturnValue]
-        [NotNull]
-        public static T Consume<T>([NotNull] this ITokenIterator tokens)
-            where T : ITokenPlace
-        {
-            if (tokens.Current is T token)
-            {
-                tokens.Next();
-                return token;
-            }
-
-            return Missing<T>(tokens);
-        }
-
-        [Obsolete("Avoid use of IMissingToken, use null and span instead")]
-        [MustUseReturnValue]
-        [NotNull]
-        public static T Missing<T>([NotNull] this ITokenIterator tokens)
-            where T : ITokenPlace
-        {
-            return (T)Missing(tokens);
-        }
-
-        [Obsolete("Avoid use of IMissingToken, use null and span instead")]
-        [MustUseReturnValue]
-        [NotNull]
-        public static IMissingToken Missing([NotNull] this ITokenIterator tokens)
-        {
-            return TokenFactory.Missing(new TextSpan(tokens.Current.NotNull().Span.Start, 0));
-        }
-        #endregion
     }
 }

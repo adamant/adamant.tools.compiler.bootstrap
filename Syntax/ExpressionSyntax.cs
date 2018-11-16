@@ -2,7 +2,8 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
-    public abstract class ExpressionSyntax : NonTerminal
+    // An expression is also a statement
+    public abstract class ExpressionSyntax : StatementSyntax
     {
         public TextSpan Span { get; }
 

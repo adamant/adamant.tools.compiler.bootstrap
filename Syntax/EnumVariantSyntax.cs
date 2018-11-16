@@ -1,4 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -6,16 +5,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class EnumVariantSyntax : NonTerminal
     {
-        [NotNull] public IIdentifierTokenPlace Identifier { get; }
-        [CanBeNull] public ICommaToken Comma { get; }
+        [NotNull] public IIdentifierToken Identifier { get; }
 
-        public EnumVariantSyntax(
-            [NotNull] IIdentifierTokenPlace identifier,
-            [CanBeNull] ICommaToken comma)
+        public EnumVariantSyntax([NotNull] IIdentifierToken identifier)
         {
-            Requires.NotNull(nameof(identifier), identifier);
             Identifier = identifier;
-            Comma = comma;
         }
     }
 }

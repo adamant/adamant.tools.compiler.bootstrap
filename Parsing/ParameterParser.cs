@@ -37,21 +37,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 }
                 case IDotToken _:
                 {
-                    Tokens.Expect<IDotToken>();
-                    var name = Tokens.ExpectIdentifier();
+                    var dot = Tokens.Expect<IDotToken>();
+                    var name = Tokens.RequiredToken<IIdentifierToken>();
                     var equals = Tokens.AcceptToken<IEqualsToken>();
                     ExpressionSyntax defaultValue = null;
                     if (equals != null)
                         defaultValue = expressionParser.ParseExpression();
-                    // TODO capture correct values
-                    return new FieldParameterSyntax(name.Span);
+                    var span = TextSpan.Covering(dot, name.Span, defaultValue?.Span);
+                    return new FieldParameterSyntax(span, name, defaultValue);
                 }
                 default:
                 {
                     var span = Tokens.Current.Span;
                     var isParams = Tokens.Accept<IParamsKeywordToken>();
                     var mutableBinding = Tokens.Accept<IVarKeywordToken>();
-                    var name = Tokens.RequiredIdentifier();
+                    var name = Tokens.RequiredToken<IIdentifierToken>();
                     Tokens.Expect<IColonToken>();
                     // Need to not consume the assignment that separates the type from the default value,
                     // hence the min operator precedence.

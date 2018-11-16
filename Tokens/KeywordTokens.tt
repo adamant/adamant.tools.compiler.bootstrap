@@ -115,8 +115,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     }
 <# foreach(var keyword in keywords) {#>
 
-    public partial interface I<#=keyword#>KeywordTokenPlace : IKeywordTokenPlace { }
-    public partial interface I<#=keyword#>KeywordToken : IKeywordToken, I<#=keyword#>KeywordTokenPlace { }
+    public partial interface I<#=keyword#>KeywordToken : IKeywordToken { }
     internal partial class <#=keyword#>KeywordToken : Token, I<#=keyword#>KeywordToken
     {
         public <#=keyword#>KeywordToken(TextSpan span)
@@ -125,10 +124,4 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 <#}#>
-    public partial interface IMissingToken :
-<# foreach(var keyword in keywords) {#>
-        I<#=keyword#>KeywordTokenPlace,
-<#}#>
-        IKeywordTokenPlace // Implied, but saves issues with commas
-    { }
 }

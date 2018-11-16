@@ -6,8 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
 {
     public class RefTypeAnalysis : ExpressionAnalysis
     {
-        [NotNull] public new RefTypeSyntax Syntax { get; }
-        public bool VariableBinding => Syntax.VarKeyword != null;
+        [NotNull] public RefTypeSyntax Syntax { get; }
         [NotNull] public ExpressionAnalysis ReferencedType { get; }
 
         public RefTypeAnalysis(

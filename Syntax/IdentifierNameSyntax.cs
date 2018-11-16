@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class IdentifierNameSyntax : SimpleNameSyntax
     {
-        public IdentifierNameSyntax([NotNull] IIdentifierTokenPlace name)
+        public IdentifierNameSyntax([NotNull] IIdentifierToken name)
             : base(name, name.Span)
         {
         }

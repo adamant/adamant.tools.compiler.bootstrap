@@ -296,13 +296,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         [NotNull]
         private DataType CheckName(
             [NotNull] AnalysisContext context,
-            [NotNull] IIdentifierTokenPlace name)
+            [NotNull] IIdentifierToken name)
         {
-            // Missing name, just use unknown
-            // Error should already be emitted
-            if (name.Value == null)
-                return DataType.Unknown; // unknown
-
             var declaration = context.Scope.Lookup(name.Value);
             switch (declaration)
             {
@@ -638,7 +633,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 {
                     var referent = EvaluateCheckedTypeExpression(refType.ReferencedType);
                     if (referent is ObjectType objectType)
-                        return new RefType(refType.VariableBinding, objectType);
+                        return new RefType(objectType);
                     return DataType.Unknown;
                 }
                 case UnaryOperatorExpressionAnalysis unaryOperatorExpression:

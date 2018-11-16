@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
         [NotNull] public FixedList<AttributeSyntax> Attributes { get; }
         [NotNull] [ItemNotNull] public FixedList<IModiferToken> Modifiers { get; }
         public AccessModifier? GetterAccess { get; }
-        [NotNull] public IIdentifierTokenPlace Name { get; }
+        [NotNull] public IIdentifierToken Name { get; }
         [CanBeNull] public ExpressionSyntax TypeExpression { get; }
         [CanBeNull] public ExpressionSyntax Initializer { get; }
 
@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] [ItemNotNull] FixedList<IModiferToken> modifiers,
             AccessModifier? getterAccess,
-            [NotNull] IIdentifierTokenPlace name,
+            [NotNull] IIdentifierToken name,
             [CanBeNull] ExpressionSyntax typeExpression,
             [CanBeNull] ExpressionSyntax initializer)
             : base(name.Span)

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Syntax
@@ -6,15 +6,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
     public class AttributeSyntax : NonTerminal
     {
         [NotNull] public NameSyntax Name { get; }
-        [NotNull] public SeparatedListSyntax<ArgumentSyntax> ArgumentList { get; }
-        [NotNull] public IEnumerable<ArgumentSyntax> Arguments => ArgumentList.Nodes();
+        [NotNull] public FixedList<ArgumentSyntax> Arguments { get; }
 
         public AttributeSyntax(
             [NotNull] NameSyntax name,
-            [CanBeNull] SeparatedListSyntax<ArgumentSyntax> argumentList)
+            [CanBeNull] FixedList<ArgumentSyntax> arguments)
         {
             Name = name;
-            ArgumentList = argumentList ?? SeparatedListSyntax<ArgumentSyntax>.Empty;
+            Arguments = arguments;
         }
     }
 }

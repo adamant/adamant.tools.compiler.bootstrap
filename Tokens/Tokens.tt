@@ -78,8 +78,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     }
 <# foreach(var token in tokens) {#>
 
-    public partial interface I<#=token#>TokenPlace : ITokenPlace { }
-    public partial interface I<#=token#>Token : IToken, I<#=token#>TokenPlace { }
+    public partial interface I<#=token#>Token : IToken { }
     internal partial class <#=token#>Token : Token, I<#=token#>Token
     {
         public <#=token#>Token(TextSpan span)
@@ -88,11 +87,4 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 <#}#>
-
-    public partial interface IMissingToken :
-<# foreach(var token in tokens) {#>
-        I<#=token#>TokenPlace,
-<#}#>
-        ITokenPlace // Implied, but saves issues with commas
-    { }
 }

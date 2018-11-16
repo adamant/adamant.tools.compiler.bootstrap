@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
@@ -10,31 +9,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     public class UsingDirectiveParser : Parser, IUsingDirectiveParser
     {
         [NotNull] private readonly INameParser qualifiedNameParser;
+        [NotNull] private readonly IListParser listParser;
 
         public UsingDirectiveParser(
             [NotNull] ITokenIterator tokens,
-            [NotNull] INameParser qualifiedNameParser)
+            [NotNull] INameParser qualifiedNameParser,
+            [NotNull] IListParser listParser)
             : base(tokens)
         {
             this.qualifiedNameParser = qualifiedNameParser;
+            this.listParser = listParser;
         }
 
         [MustUseReturnValue]
         [NotNull]
         public FixedList<UsingDirectiveSyntax> ParseUsingDirectives()
         {
-            // TODO use list parser instead
-            var directives = new List<UsingDirectiveSyntax>();
-            while (Tokens.Current is IUsingKeywordToken)
-                directives.Add(ParseUsingDirective());
-
-            return directives.ToFixedList();
+            return listParser.AcceptList(AcceptUsingDirective);
         }
 
-        [NotNull]
-        public UsingDirectiveSyntax ParseUsingDirective()
+        [CanBeNull]
+        public UsingDirectiveSyntax AcceptUsingDirective()
         {
-            Tokens.Expect<IUsingKeywordToken>();
+            if (!Tokens.Accept<IUsingKeywordToken>()) return null;
             var name = qualifiedNameParser.ParseName();
             Tokens.Expect<ISemicolonToken>();
             return new UsingDirectiveSyntax(name);

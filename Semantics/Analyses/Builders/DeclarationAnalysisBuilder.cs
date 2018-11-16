@@ -174,10 +174,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
                     return new TypeDeclarationAnalysis(context, syntax, fullName,
                         BuildGenericParameters(context, fullName, syntax.GenericParameters));
                 }
-                case IMissingToken _:
-                default:
-                    // Skip any struct that doesn't have a name
-                    return null;
                 case IPrimitiveTypeToken primitive:
                 {
                     var name = new SimpleName(context.File.Code[primitive.Span], true);
@@ -185,6 +181,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
                         name,
                         BuildGenericParameters(context, name, syntax.GenericParameters));
                 }
+                default:
+                    // Skip any struct that doesn't have a name
+                    return null;
             }
         }
 

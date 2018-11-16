@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
@@ -11,11 +12,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public NameSyntax ParseName()
         {
             NameSyntax name = ParseSimpleName();
-            while (Tokens.Current is IDotToken)
+            while (Tokens.Accept<IDotToken>())
             {
-                var dot = Tokens.Take<IDotToken>();
                 var simpleName = ParseSimpleName();
-                name = new QualifiedNameSyntax(name, dot, simpleName);
+                name = new QualifiedNameSyntax(name, simpleName);
             }
             return name;
         }
@@ -24,14 +24,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [NotNull]
         private SimpleNameSyntax ParseSimpleName()
         {
-            var identifier = Tokens.ExpectIdentifier();
+            var identifier = Tokens.RequiredToken<IIdentifierToken>();
             SimpleNameSyntax simpleName;
-            if (Tokens.Current is IOpenBracketToken)
+            if (Tokens.Accept<IOpenBracketToken>())
             {
-                var openBracket = Tokens.Consume<IOpenBracketTokenPlace>();
-                var arguments = ParseArgumentList();
-                var closeBracket = Tokens.Consume<ICloseBracketTokenPlace>();
-                simpleName = new GenericNameSyntax(identifier, openBracket, arguments, closeBracket);
+                var arguments = ParseArguments();
+                var closeBracket = Tokens.Expect<ICloseBracketToken>();
+                var span = TextSpan.Covering(identifier.Span, closeBracket);
+                simpleName = new GenericNameSyntax(span, identifier, arguments);
             }
             else
                 simpleName = new IdentifierNameSyntax(identifier);

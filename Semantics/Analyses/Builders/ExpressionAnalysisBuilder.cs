@@ -64,7 +64,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
                     return new GenericNameAnalysis(context, genericName,
                         genericName.Arguments.Select(a => BuildArgument(context, functionName, a)));
                 case LifetimeTypeSyntax lifetimeType:
-                    var typeName = BuildExpression(context, functionName, lifetimeType.TypeExpression);
+                    var typeName = BuildExpression(context, functionName, lifetimeType.Type);
                     return new LifetimeTypeAnalysis(context, lifetimeType, typeName);
                 case BlockSyntax blockExpression:
                     return BuildBlock(context, functionName, blockExpression);
@@ -84,8 +84,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
                     var loopBodyContext = context.InLocalVariableScope(foreachExpression);
                     return new ForeachExpressionAnalysis(context, foreachExpression,
                         functionName.Qualify(foreachExpression.Identifier.Value ?? "_"),
-                        foreachExpression.TypeExpression != null ?
-                            BuildExpression(context, functionName, foreachExpression.TypeExpression) : null,
+                        foreachExpression.Type != null ?
+                            BuildExpression(context, functionName, foreachExpression.Type) : null,
                         BuildExpression(context, functionName, foreachExpression.InExpression),
                         BuildBlock(loopBodyContext, functionName, foreachExpression.Block));
                 case WhileExpressionSyntax whileExpression:

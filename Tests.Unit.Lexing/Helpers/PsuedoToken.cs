@@ -30,18 +30,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             return new PsuedoToken(typeof(IEndOfFileToken), "");
         }
 
-        public static PsuedoToken For([NotNull] ITokenPlace token, [NotNull] CodeText code)
+        public static PsuedoToken For([NotNull] IToken token, [NotNull] CodeText code)
         {
             var tokenType = token.GetType().NotNull();
             switch (token)
             {
-                case IIdentifierTokenPlace identifier:
+                case IIdentifierToken identifier:
                     return new PsuedoToken(tokenType, token.Text(code), identifier.Value);
                 case IStringLiteralToken stringLiteral:
                     return new PsuedoToken(tokenType, token.Text(code), stringLiteral.Value);
                 case IIntegerLiteralToken integerLiteral:
                     return new PsuedoToken(tokenType, token.Text(code), integerLiteral.Value);
-                case ITokenPlace _:
+                case IToken _:
                     return new PsuedoToken(tokenType, token.Text(code));
                 default:
                     throw NonExhaustiveMatchException.For(token);

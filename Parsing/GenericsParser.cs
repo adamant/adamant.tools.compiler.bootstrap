@@ -1,10 +1,8 @@
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
-using static Adamant.Tools.Compiler.Bootstrap.Framework.TypeOperations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
@@ -28,10 +26,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public FixedList<GenericParameterSyntax> AcceptGenericParameters()
         {
             if (!Tokens.Accept<IOpenBracketToken>()) return null;
-            var parameters = listParser.ParseSeparatedList(Tokens, (tokens1, diagnostics1) => ParseGenericParameter(),
-                TypeOf<ICommaToken>(), TypeOf<ICloseBracketToken>(), Tokens.Context.Diagnostics);
+            var parameters = listParser.ParseSeparatedList<GenericParameterSyntax, ICommaToken, ICloseBracketToken>(ParseGenericParameter);
             Tokens.Expect<ICloseBracketToken>();
-            return parameters.OfType<GenericParameterSyntax>().ToFixedList();
+            return parameters;
         }
 
         [MustUseReturnValue]
@@ -39,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public GenericParameterSyntax ParseGenericParameter()
         {
             var isParams = Tokens.Accept<IParamsKeywordToken>();
-            var name = Tokens.RequiredIdentifier();
+            var name = Tokens.RequiredToken<IIdentifierToken>();
             ExpressionSyntax typeExpression = null;
             if (Tokens.Accept<IColonToken>())
                 typeExpression = expressionParser.ParseExpression();

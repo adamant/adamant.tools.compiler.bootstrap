@@ -1,4 +1,4 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
-    public interface IKeywordToken : IToken, IKeywordTokenPlace { }
+    public interface IKeywordToken : IToken { }
 }

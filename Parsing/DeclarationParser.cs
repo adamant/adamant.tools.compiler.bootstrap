@@ -178,7 +178,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             var name = new List<string>();
 
-            var nameSegment = Tokens.RequiredIdentifier();
+            var nameSegment = Tokens.RequiredToken<IIdentifierToken>();
             var span = nameSegment.Span;
             name.Add(nameSegment.Value);
 
@@ -212,13 +212,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             if (!Tokens.Accept<IHashHashToken>()) return null;
             var name = nameParser.ParseName();
-            SeparatedListSyntax<ArgumentSyntax> argumentList = null;
+            FixedList<ArgumentSyntax> arguments = null;
             if (Tokens.Accept<IOpenParenToken>())
             {
-                argumentList = expressionParser.ParseArgumentList();
+                arguments = expressionParser.ParseArguments();
                 Tokens.Expect<ICloseParenToken>();
             }
-            return new AttributeSyntax(name, argumentList);
+            return new AttributeSyntax(name, arguments);
         }
 
         [MustUseReturnValue]
@@ -276,7 +276,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<IModiferToken> modifiers)
         {
             Tokens.Expect<IClassKeywordToken>();
-            var name = Tokens.RequiredIdentifier();
+            var name = Tokens.RequiredToken<IIdentifierToken>();
             var genericParameters = genericsParser.AcceptGenericParameters();
             var baseClass = AcceptBaseClass();
             var baseTypes = AcceptBaseTypes();
@@ -295,7 +295,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<IModiferToken> modifiers)
         {
             Tokens.Expect<ITraitKeywordToken>();
-            var name = Tokens.RequiredIdentifier();
+            var name = Tokens.RequiredToken<IIdentifierToken>();
             var genericParameters = genericsParser.AcceptGenericParameters();
             var baseTypes = AcceptBaseTypes();
             var genericConstraints = genericsParser.ParseGenericConstraints();
@@ -313,7 +313,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<IModiferToken> modifiers)
         {
             Tokens.Expect<IStructKeywordToken>();
-            var name = Tokens.RequiredIdentifier();
+            var name = Tokens.RequiredToken<IIdentifierToken>();
             var genericParameters = genericsParser.AcceptGenericParameters();
             var baseTypes = AcceptBaseTypes();
             var genericConstraints = genericsParser.ParseGenericConstraints();
@@ -336,7 +336,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IStructKeywordToken _:
                 {
                     Tokens.Expect<IStructKeywordToken>();
-                    var name = Tokens.RequiredIdentifier();
+                    var name = Tokens.RequiredToken<IIdentifierToken>();
                     var genericParameters = genericsParser.AcceptGenericParameters();
                     var baseTypes = AcceptBaseTypes();
                     var genericConstraints = genericsParser.ParseGenericConstraints();
@@ -352,7 +352,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IClassKeywordToken _:
                 {
                     Tokens.Expect<IClassKeywordToken>();
-                    var name = Tokens.RequiredIdentifier();
+                    var name = Tokens.RequiredToken<IIdentifierToken>();
                     var genericParameters = genericsParser.AcceptGenericParameters();
                     var baseClass = AcceptBaseClass();
                     var baseTypes = AcceptBaseTypes();
@@ -390,10 +390,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [NotNull]
         private EnumVariantSyntax ParseEnumVariant()
         {
-            var identifier = Tokens.RequiredIdentifier();
+            var identifier = Tokens.RequiredToken<IIdentifierToken>();
             // TODO we actually expect commas separating them, need to improve this
             var comma = Tokens.AcceptToken<ICommaToken>();
-            return new EnumVariantSyntax(identifier, comma);
+            return new EnumVariantSyntax(identifier);
         }
         #endregion
 
@@ -407,7 +407,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             // TODO include these in the syntax tree
             var binding = Tokens.Expect<IBindingToken>();
             var getterAccess = AcceptFieldGetter();
-            var name = Tokens.RequiredIdentifier();
+            var name = Tokens.RequiredToken<IIdentifierToken>();
             ExpressionSyntax typeExpression = null;
             if (Tokens.Accept<IColonToken>())
             {
@@ -443,7 +443,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<IModiferToken> modifiers)
         {
             Tokens.Expect<IFunctionKeywordToken>();
-            var name = Tokens.RequiredIdentifier();
+            var name = Tokens.RequiredToken<IIdentifierToken>();
             var genericParameters = genericsParser.AcceptGenericParameters();
             var parameters = ParseParameters();
             ExpressionSyntax returnType = null;
@@ -573,7 +573,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<IModiferToken> modifiers)
         {
             Tokens.Expect<IGetKeywordToken>();
-            var name = Tokens.RequiredIdentifier();
+            var name = Tokens.RequiredToken<IIdentifierToken>();
             var parameters = ParseParameters();
             Tokens.Expect<IRightArrowToken>();
             var returnType = expressionParser.ParseExpression();
@@ -592,7 +592,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<IModiferToken> modifiers)
         {
             Tokens.Expect<ISetKeywordToken>();
-            var name = Tokens.RequiredIdentifier();
+            var name = Tokens.RequiredToken<IIdentifierToken>();
             var parameters = ParseParameters();
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
@@ -670,7 +670,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var exceptions = listParser.ParseSeparatedList<ThrowEffectEntrySyntax, ICommaToken>(ParseThrowEffectEntry);
                     return new ThrowEffectSyntax(exceptions);
                 case IIdentifierToken _:
-                    return new SimpleEffectSyntax(Tokens.RequiredIdentifier());
+                    return new SimpleEffectSyntax(Tokens.RequiredToken<IIdentifierToken>());
                 default:
                     Tokens.UnexpectedToken();
                     throw new ParseFailedException();
@@ -742,7 +742,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             try
             {
                 Tokens.Expect<IConstKeywordToken>();
-                var name = Tokens.RequiredIdentifier();
+                var name = Tokens.RequiredToken<IIdentifierToken>();
                 ExpressionSyntax type = null;
                 if (Tokens.Accept<IColonToken>())
                 {

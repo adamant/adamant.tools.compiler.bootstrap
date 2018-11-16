@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
-    public interface IOperatorToken : IToken, IOperatorTokenPlace { }
+    public interface IOperatorToken : IToken { }
 
     public partial interface IDotToken : IOperatorToken { }
     public partial interface IDotDotToken : IOperatorToken { }

@@ -6,40 +6,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Syntax
 {
     public class ForeachExpressionSyntax : ExpressionSyntax
     {
-        [NotNull] public IForeachKeywordToken ForeachKeyword { get; }
-        [CanBeNull] public IVarKeywordToken VarKeyword { get; }
-        [NotNull] public IIdentifierTokenPlace Identifier { get; }
-        [CanBeNull] public IColonToken Colon { get; }
-        [CanBeNull] public ExpressionSyntax TypeExpression { get; }
-        [NotNull] public IInKeywordTokenPlace InKeyword { get; }
+        public bool MutableBinding { get; }
+        [NotNull] public IIdentifierToken Identifier { get; }
+        [CanBeNull] public ExpressionSyntax Type { get; }
         [NotNull] public ExpressionSyntax InExpression { get; }
         [NotNull] public BlockSyntax Block { get; }
 
         public ForeachExpressionSyntax(
-            [NotNull] IForeachKeywordToken foreachKeyword,
-            [CanBeNull] IVarKeywordToken varKeyword,
-            [NotNull] IIdentifierTokenPlace identifier,
-            [CanBeNull] IColonToken colon,
-            [CanBeNull] ExpressionSyntax typeExpression,
-            [NotNull] IInKeywordTokenPlace inKeyword,
+            TextSpan span,
+            bool mutableBinding,
+            [NotNull] IIdentifierToken identifier,
+            [CanBeNull] ExpressionSyntax type,
             [NotNull] ExpressionSyntax inExpression,
             [NotNull] BlockSyntax block)
-            : base(TextSpan.Covering(foreachKeyword.Span, block.Span))
+            : base(span)
         {
-            ForeachKeyword = foreachKeyword;
-            VarKeyword = varKeyword;
+            MutableBinding = mutableBinding;
             Identifier = identifier;
-            InKeyword = inKeyword;
             InExpression = inExpression;
             Block = block;
-            Colon = colon;
-            TypeExpression = typeExpression;
+            Type = type;
         }
 
         public override string ToString()
         {
-            // TODO var keyword
-            return $"foreach {Identifier}: {TypeExpression} in {InExpression} {Block}";
+            var binding = MutableBinding ? "var " : "";
+            return $"foreach {binding}{Identifier}: {Type} in {InExpression} {Block}";
         }
     }
 }

@@ -16,10 +16,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             {
                 switch (Tokens.Current)
                 {
-                    case IPipeToken pipe:
-                        Tokens.Next();
+                    case IPipeToken _:
+                        Tokens.Expect<IPipeToken>();
                         var rightOperand = ParsePatternAtom();
-                        pattern = new OrPatternSyntax(pattern, pipe, rightOperand);
+                        pattern = new OrPatternSyntax(pattern, rightOperand);
                         break;
                     default:
                         return pattern;
@@ -33,16 +33,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             switch (Tokens.Current)
             {
-                case IIdentifierToken identifier:
+                case IIdentifierToken _:
+                    return new AnyPatternSyntax(Tokens.RequiredToken<IIdentifierToken>());
+                case IDotToken _:
                 {
-                    Tokens.Next();
-                    return new AnyPatternSyntax(identifier);
-                }
-                case IDotToken dotToken:
-                {
-                    Tokens.Next();
-                    var identifier = Tokens.ExpectIdentifier();
-                    return new EnumValuePatternSyntax(dotToken, identifier);
+                    Tokens.Expect<IDotToken>();
+                    var identifier = Tokens.RequiredToken<IIdentifierToken>();
+                    return new EnumValuePatternSyntax(identifier);
                 }
                 default:
                     throw NonExhaustiveMatchException.For(Tokens.Current);
