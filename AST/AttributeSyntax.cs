@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class AttributeSyntax : NonTerminal
+    public class AttributeSyntax : Syntax
     {
         [NotNull] public NameSyntax Name { get; }
         [NotNull] public FixedList<ArgumentSyntax> Arguments { get; }

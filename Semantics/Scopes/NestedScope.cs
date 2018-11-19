@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 
         protected NestedScope(
             [NotNull] LexicalScope containingScope,
-            [NotNull] NonTerminal syntax)
+            [NotNull] Syntax syntax)
             : base(syntax)
         {
             Requires.NotNull(nameof(containingScope), containingScope);

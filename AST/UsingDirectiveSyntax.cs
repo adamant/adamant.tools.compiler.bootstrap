@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     // TODO maybe this class should be removed in favor of just using NameSyntax?
-    public class UsingDirectiveSyntax : NonTerminal
+    public class UsingDirectiveSyntax : Syntax
     {
         [NotNull] public NameSyntax Name { get; }
 

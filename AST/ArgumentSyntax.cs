@@ -2,7 +2,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class ArgumentSyntax : NonTerminal
+    public class ArgumentSyntax : Syntax
     {
         public bool IsParams { get; }
         [CanBeNull] public ExpressionSyntax Value { get; }

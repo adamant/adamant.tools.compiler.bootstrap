@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class ModifierSyntax : NonTerminal
+    public class ModifierSyntax : Syntax
     {
         public readonly AccessModifier Access;
 

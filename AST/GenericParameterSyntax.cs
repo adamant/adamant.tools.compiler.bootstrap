@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class GenericParameterSyntax : NonTerminal
+    public class GenericParameterSyntax : Syntax
     {
         public bool IsParams { get; }
         [NotNull] public SimpleName Name { get; }

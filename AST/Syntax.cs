@@ -2,8 +2,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    /// Note: Naming this `Syntax` would conflict with the `Syntax` namespace
-    public abstract class NonTerminal
+    public abstract class Syntax
     {
         [NotNull] public abstract override string ToString();
     }

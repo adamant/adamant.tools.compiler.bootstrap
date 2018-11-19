@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public abstract class PatternSyntax : NonTerminal
+    public abstract class PatternSyntax : Syntax
     {
     }
 }

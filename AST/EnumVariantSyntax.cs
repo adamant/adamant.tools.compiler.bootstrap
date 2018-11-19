@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class EnumVariantSyntax : NonTerminal
+    public class EnumVariantSyntax : Syntax
     {
         [NotNull] public SimpleName Name { get; }
 
