@@ -148,15 +148,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         #region Parse Namespaces
         [MustUseReturnValue]
         [NotNull]
-        public NamespaceDeclarationSyntax ParseFileNamespace([NotNull] FixedList<string> name)
-        {
-            var usingDirectives = usingDirectiveParser.ParseUsingDirectives();
-            var declarations = ParseDeclarations();
-            return new NamespaceDeclarationSyntax(true, name, null, usingDirectives, declarations);
-        }
-
-        [MustUseReturnValue]
-        [NotNull]
         public NamespaceDeclarationSyntax ParseNamespaceDeclaration(
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers)

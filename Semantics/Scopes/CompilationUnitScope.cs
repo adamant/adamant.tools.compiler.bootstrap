@@ -20,6 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
             Syntax = compilationUnit;
         }
 
+        [NotNull]
         private static FixedDictionary<string, ISymbol> GetPrimitiveSymbols()
         {
             return PrimitiveSymbols.Instance

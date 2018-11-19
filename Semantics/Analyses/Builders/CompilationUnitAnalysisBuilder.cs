@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.AST;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using JetBrains.Annotations;
 
@@ -20,12 +21,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
         public IEnumerable<CompilationUnitAnalysis> BuildPackage([NotNull] PackageSyntax packageSyntax)
         {
             foreach (var compilationUnit in packageSyntax.CompilationUnits)
+                yield return BuildCompilationUnit(compilationUnit);
+        }
+
+        [NotNull]
+        private CompilationUnitAnalysis BuildCompilationUnit([NotNull] CompilationUnitSyntax compilationUnit)
+        {
+            var scope = new CompilationUnitScope(compilationUnit);
+            var context = new AnalysisContext(compilationUnit.CodeFile, scope);
+            var name = compilationUnit.ImplicitNamespaceName;
+            var declarations = new List<DeclarationAnalysis>();
+            foreach (var declaration in compilationUnit.Declarations)
             {
-                var scope = new CompilationUnitScope(compilationUnit);
-                var context = new AnalysisContext(compilationUnit.CodeFile, scope);
-                var fileNamespace = declarationBuilder.BuildFileNamespace(context, compilationUnit.FileNamespace);
-                yield return new CompilationUnitAnalysis(scope, compilationUnit, fileNamespace);
+                var analysis = declarationBuilder.BuildDeclaration(context, name, declaration);
+                if (analysis != null)
+                    declarations.Add(analysis);
             }
+            return new CompilationUnitAnalysis(scope, compilationUnit, declarations.ToFixedList());
         }
     }
 }

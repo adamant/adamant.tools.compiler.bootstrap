@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
@@ -9,30 +10,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
     public class CompilationUnitAnalysis : SyntaxAnalysis
     {
         [NotNull] public CompilationUnitScope GlobalScope { get; }
-        [NotNull] public new CompilationUnitSyntax Syntax { get; }
-        [NotNull] public NamespaceDeclarationAnalysis Namespace { get; }
-        [NotNull] public IReadOnlyList<MemberDeclarationAnalysis> MemberDeclarations { get; }
+        [NotNull] public CompilationUnitSyntax Syntax { get; }
+        [NotNull] [ItemNotNull] public FixedList<DeclarationAnalysis> Declarations { get; }
+        [NotNull] public FixedList<MemberDeclarationAnalysis> MemberDeclarations { get; }
 
         public CompilationUnitAnalysis(
             [NotNull] CompilationUnitScope globalScope,
             [NotNull] CompilationUnitSyntax syntax,
-            [NotNull] NamespaceDeclarationAnalysis @namespace)
+            [NotNull, ItemNotNull] FixedList<DeclarationAnalysis> declarations)
             : base(new AnalysisContext(syntax.CodeFile, globalScope))
         {
-            Requires.NotNull(nameof(globalScope), globalScope);
-            Requires.NotNull(nameof(@namespace), @namespace);
             GlobalScope = globalScope;
             Syntax = syntax;
-            Namespace = @namespace;
-            MemberDeclarations = GatherMemberDeclarations(@namespace).ToReadOnlyList();
+            Declarations = declarations;
+            MemberDeclarations = GatherMemberDeclarations(declarations).ToFixedList();
         }
 
-        private static List<MemberDeclarationAnalysis> GatherMemberDeclarations(NamespaceDeclarationAnalysis namespaceDeclaration)
+        [NotNull]
+        private static List<MemberDeclarationAnalysis> GatherMemberDeclarations(
+            [NotNull, ItemNotNull] FixedList<DeclarationAnalysis> declarations)
         {
             var memberDeclarations = new List<MemberDeclarationAnalysis>();
+            memberDeclarations.AddRange(declarations.OfType<MemberDeclarationAnalysis>());
             var namespaces = new Queue<NamespaceDeclarationAnalysis>();
-            namespaces.Enqueue(namespaceDeclaration);
-            while (namespaces.TryDequeue(out namespaceDeclaration))
+            namespaces.EnqueueRange(declarations.OfType<NamespaceDeclarationAnalysis>());
+            while (namespaces.TryDequeue(out var namespaceDeclaration))
                 foreach (var declaration in namespaceDeclaration.Declarations)
                     switch (declaration)
                     {

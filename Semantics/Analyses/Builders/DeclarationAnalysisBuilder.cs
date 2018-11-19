@@ -21,49 +21,49 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
             this.expressionBuilder = expressionBuilder;
         }
 
-        [NotNull]
-        public NamespaceDeclarationAnalysis BuildFileNamespace(
-            [NotNull] AnalysisContext context,
-            [NotNull] NamespaceDeclarationSyntax fileNamespace)
-        {
-            Requires.That(nameof(fileNamespace), fileNamespace.InGlobalNamespace);
-            RootName name = GlobalNamespaceName.Instance;
-            var namespaceContext = context;
-            foreach (var ns in fileNamespace.Name)
-            {
-                var namespaceName = name.Qualify((SimpleName)ns);
-                namespaceContext = BuildNamespaceContext(namespaceContext, fileNamespace, namespaceName);
-                name = namespaceName;
-            }
+        //[NotNull]
+        //public NamespaceDeclarationAnalysis BuildFileNamespace(
+        //    [NotNull] AnalysisContext context,
+        //    [NotNull] NamespaceDeclarationSyntax fileNamespace)
+        //{
+        //    Requires.That(nameof(fileNamespace), fileNamespace.InGlobalNamespace);
+        //    RootName name = GlobalNamespaceName.Instance;
+        //    var namespaceContext = context;
+        //    foreach (var ns in fileNamespace.Name)
+        //    {
+        //        var namespaceName = name.Qualify((SimpleName)ns);
+        //        namespaceContext = BuildNamespaceContext(namespaceContext, fileNamespace, namespaceName);
+        //        name = namespaceName;
+        //    }
 
-            var bodyContext = namespaceContext.WithUsingDirectives(fileNamespace);
-            var declarations = new List<DeclarationAnalysis>();
-            foreach (var declaration in fileNamespace.Declarations)
-            {
-                var analysis = BuildDeclaration(bodyContext, name, declaration);
-                if (analysis != null)
-                    declarations.Add(analysis);
-            }
-            return new NamespaceDeclarationAnalysis(context, fileNamespace, declarations);
-        }
+        //    var bodyContext = namespaceContext.WithUsingDirectives(fileNamespace);
+        //    var declarations = new List<DeclarationAnalysis>();
+        //    foreach (var declaration in fileNamespace.Declarations)
+        //    {
+        //        var analysis = BuildDeclaration(bodyContext, name, declaration);
+        //        if (analysis != null)
+        //            declarations.Add(analysis);
+        //    }
+        //    return new NamespaceDeclarationAnalysis(context, fileNamespace, declarations);
+        //}
 
-        [NotNull]
-        private AnalysisContext BuildNamespaceContext(
-            [NotNull] AnalysisContext context,
-            [NotNull] NamespaceDeclarationSyntax @namespace,
-            [NotNull] Name name)
-        {
-            switch (name)
-            {
-                case SimpleName simpleName:
-                    return context.InNamespace(@namespace, simpleName);
-                case QualifiedName qualifiedName:
-                    context = BuildNamespaceContext(context, @namespace, qualifiedName.Qualifier);
-                    return context.InNamespace(@namespace, qualifiedName);
-                default:
-                    throw NonExhaustiveMatchException.For(name);
-            }
-        }
+        //[NotNull]
+        //private AnalysisContext BuildNamespaceContext(
+        //    [NotNull] AnalysisContext context,
+        //    [NotNull] NamespaceDeclarationSyntax @namespace,
+        //    [NotNull] Name name)
+        //{
+        //    switch (name)
+        //    {
+        //        case SimpleName simpleName:
+        //            return context.InNamespace(@namespace, simpleName);
+        //        case QualifiedName qualifiedName:
+        //            context = BuildNamespaceContext(context, @namespace, qualifiedName.Qualifier);
+        //            return context.InNamespace(@namespace, qualifiedName);
+        //        default:
+        //            throw NonExhaustiveMatchException.For(name);
+        //    }
+        //}
 
         [CanBeNull]
         public MemberDeclarationAnalysis BuildDeclaration(

@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var declarationParser = new DeclarationParser(tokens, listParser, parser,
                 parser, parameterParser, accessModifierParser,
                 genericsParser, parser, usingDirectiveParser);
-            var compilationUnitParser = new CompilationUnitParser(tokens, declarationParser);
+            var compilationUnitParser = new CompilationUnitParser(tokens, declarationParser, usingDirectiveParser);
             return compilationUnitParser.ParseCompilationUnit();
         }
     }

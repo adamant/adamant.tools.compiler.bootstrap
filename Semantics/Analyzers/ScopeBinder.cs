@@ -27,7 +27,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             referencedDeclarations = references.SelectMany(r => r.Value.Declarations).ToFixedList();
 
             foreach (var compilationUnit in compilationUnits)
-                GatherDeclarations(compilationUnit.Namespace);
+                foreach (var declaration in compilationUnit.Declarations)
+                    GatherDeclarations(declaration);
 
             globalDeclarations = declarations.Values.NotNull()
                 .OfType<IDeclarationAnalysis>()

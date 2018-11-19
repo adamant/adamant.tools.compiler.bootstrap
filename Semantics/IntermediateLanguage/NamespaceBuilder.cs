@@ -19,13 +19,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage
 
         [NotNull]
         [ItemNotNull]
-        public IReadOnlyList<Namespace> GatherNamespaces([NotNull] PackageSyntax packageSyntax)
+        public FixedList<Namespace> GatherNamespaces([NotNull] PackageSyntax packageSyntax)
         {
             var namespaces = new HashSet<Name>();
             foreach (var compilationUnit in packageSyntax.CompilationUnits)
-                GatherNamespaces(GlobalNamespaceName.Instance, compilationUnit.FileNamespace, namespaces);
+                // TODO We need to gather the namespace of the file?
+                foreach (var declaration in compilationUnit.Declarations)
+                    GatherNamespaces(GlobalNamespaceName.Instance, declaration, namespaces);
 
-            return namespaces.Select(ns => new Namespace(ns)).ToReadOnlyList();
+            return namespaces.Select(ns => new Namespace(ns)).ToFixedList();
         }
 
         private void GatherNamespaces(
