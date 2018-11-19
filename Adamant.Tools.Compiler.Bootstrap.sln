@@ -58,6 +58,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Names", "Names\Names.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AST", "AST\AST.csproj", "{9BB1E4FE-D7B8-4864-9C50-6F960F2543E2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Symbols", "Symbols\Symbols.csproj", "{0889E61A-990F-49DF-9029-4368D3EA2825}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -144,6 +146,10 @@ Global
 		{9BB1E4FE-D7B8-4864-9C50-6F960F2543E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9BB1E4FE-D7B8-4864-9C50-6F960F2543E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9BB1E4FE-D7B8-4864-9C50-6F960F2543E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0889E61A-990F-49DF-9029-4368D3EA2825}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0889E61A-990F-49DF-9029-4368D3EA2825}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0889E61A-990F-49DF-9029-4368D3EA2825}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0889E61A-990F-49DF-9029-4368D3EA2825}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
