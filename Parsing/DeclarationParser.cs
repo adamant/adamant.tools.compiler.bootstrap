@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
-    public class DeclarationParser : Parser, IDeclarationParser
+    public class DeclarationParser : ParserBase, IDeclarationParser
     {
         [NotNull] private readonly IListParser listParser;
         [NotNull] private readonly IExpressionParser expressionParser;

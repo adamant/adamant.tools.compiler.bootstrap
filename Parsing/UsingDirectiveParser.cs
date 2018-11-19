@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
-    public class UsingDirectiveParser : Parser, IUsingDirectiveParser
+    public class UsingDirectiveParser : ParserBase, IUsingDirectiveParser
     {
         [NotNull] private readonly INameParser qualifiedNameParser;
         [NotNull] private readonly IListParser listParser;

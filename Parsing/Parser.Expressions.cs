@@ -7,7 +7,7 @@ using ILifetimeNameToken = Adamant.Tools.Compiler.Bootstrap.Tokens.ILifetimeName
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
-    public partial class FunctionBodyParser : IExpressionParser
+    public partial class Parser : IExpressionParser
     {
         [CanBeNull]
         public ExpressionSyntax AcceptExpression()

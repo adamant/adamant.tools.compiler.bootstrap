@@ -1,10 +1,14 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
-    public class ModifierParser : Parser, IModifierParser
+    public class ModifierParser : ParserBase, IModifierParser
     {
+        [NotNull] protected CodeFile File;
+        [NotNull] protected ITokenIterator Tokens;
+
         public ModifierParser([NotNull] ITokenIterator tokens)
             : base(tokens)
         {
@@ -26,5 +30,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         //    return modifiers.ToFixedList();
         //}
+        protected void Add([NotNull] Diagnostic diagnostic)
+        {
+            Tokens.Context.Diagnostics.Add(diagnostic);
+        }
     }
 }

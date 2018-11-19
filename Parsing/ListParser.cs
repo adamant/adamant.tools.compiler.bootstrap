@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
-    public class ListParser : Parser, IListParser
+    public class ListParser : ParserBase, IListParser
     {
         public ListParser([NotNull] ITokenIterator tokens)
             : base(tokens)

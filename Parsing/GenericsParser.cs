@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
-    public class GenericsParser : Parser, IGenericsParser
+    public class GenericsParser : ParserBase, IGenericsParser
     {
         [NotNull] private readonly IListParser listParser;
         [NotNull] private readonly IExpressionParser expressionParser;
