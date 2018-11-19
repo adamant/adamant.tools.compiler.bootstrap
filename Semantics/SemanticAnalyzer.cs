@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             var namespacesInPackage = new NamespaceBuilder(nameBuilder).GatherNamespaces(packageSyntax).ToList();
 
             // Gather all the declarations and simultaneously build up trees of lexical scopes
-            var compilationUnits = new AnalysisBuilder(nameBuilder).Build(packageSyntax).ToList();
+            var compilationUnits = new AnalysisBuilder().Build(packageSyntax).ToList();
 
             // Check lexical scopes and attach to entities etc.
             var scopeBinder = new ScopeBinder(compilationUnits, nameBuilder, references);

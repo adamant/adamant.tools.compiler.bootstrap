@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers;
 using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
@@ -13,15 +12,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
     {
         [NotNull] private readonly IExpressionAnalysisBuilder expressionBuilder;
         [NotNull] private readonly IStatementAnalysisBuilder statementBuilder;
-        [NotNull] private readonly NameBuilder nameBuilder;
 
         public DeclarationAnalysisBuilder(
             [NotNull] IExpressionAnalysisBuilder expressionBuilder,
-            [NotNull] IStatementAnalysisBuilder statementBuilder,
-            [NotNull] NameBuilder nameBuilder)
+            [NotNull] IStatementAnalysisBuilder statementBuilder)
         {
             this.statementBuilder = statementBuilder;
-            this.nameBuilder = nameBuilder;
             this.expressionBuilder = expressionBuilder;
         }
 

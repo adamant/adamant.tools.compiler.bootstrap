@@ -10,12 +10,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
     {
         [NotNull] private readonly CompilationUnitAnalysisBuilder compilationUnitAnalysisBuilder;
 
-        public AnalysisBuilder([NotNull] NameBuilder nameBuilder)
+        public AnalysisBuilder()
         {
             StatementAnalysisBuilder statementBuilder = null;
             var expressionBuilder = new ExpressionAnalysisBuilder(() => statementBuilder);
             statementBuilder = new StatementAnalysisBuilder(expressionBuilder);
-            var declarationBuilder = new DeclarationAnalysisBuilder(expressionBuilder, statementBuilder, nameBuilder);
+            var declarationBuilder = new DeclarationAnalysisBuilder(expressionBuilder, statementBuilder);
             compilationUnitAnalysisBuilder = new CompilationUnitAnalysisBuilder(declarationBuilder);
         }
 

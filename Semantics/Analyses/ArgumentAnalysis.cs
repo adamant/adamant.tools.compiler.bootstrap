@@ -6,7 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
 {
     public class ArgumentAnalysis : SyntaxAnalysis
     {
-        [NotNull] public new ArgumentSyntax Syntax { get; }
+        [NotNull] public ArgumentSyntax Syntax { get; }
         [NotNull] public ExpressionAnalysis Value { get; }
 
         public ArgumentAnalysis(

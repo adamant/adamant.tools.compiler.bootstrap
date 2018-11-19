@@ -36,7 +36,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols
         [NotNull]
         public ISymbol ComposeWith([NotNull] ISymbol symbol)
         {
-            Requires.NotNull(nameof(symbol), symbol);
             Requires.That(nameof(symbol), Name.Equals(symbol.Name));
             return new CompositeSymbol(Name, Symbols.Append(symbol).NotNull());
         }

@@ -32,6 +32,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return ParseExpression(OperatorPrecedence.Min);
         }
 
+        /// <summary>
+        /// For expressions, we switch to a precedence climbing parser.
+        /// </summary>
         [MustUseReturnValue]
         [NotNull]
         public ExpressionSyntax ParseExpression(OperatorPrecedence minPrecedence)

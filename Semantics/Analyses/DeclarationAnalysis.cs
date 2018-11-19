@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses
 {
     public abstract class DeclarationAnalysis : SyntaxAnalysis
     {
-        [NotNull] public new DeclarationSyntax Syntax { get; }
+        [NotNull] public DeclarationSyntax Syntax { get; }
 
         protected DeclarationAnalysis(
             [NotNull] AnalysisContext context,
