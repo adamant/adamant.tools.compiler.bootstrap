@@ -18,8 +18,8 @@
   <ItemGroup>
     <ProjectReference Include="..\AST\AST.csproj" />
     <ProjectReference Include="..\Core\Core.csproj" />
-    <ProjectReference Include="..\Semantics.Types\Semantics.Types.csproj" />
     <ProjectReference Include="..\Symbols\Symbols.csproj" />
+    <ProjectReference Include="..\Types\Types.csproj" />
   </ItemGroup>
 
 </Project>

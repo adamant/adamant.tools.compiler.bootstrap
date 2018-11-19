@@ -1,14 +1,14 @@
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
-    public class RefLifetime : Lifetime
+    public class OwnedLifetime : Lifetime
     {
         #region Singleton
         [NotNull]
-        public static readonly RefLifetime Instance = new RefLifetime();
+        public static readonly OwnedLifetime Instance = new OwnedLifetime();
 
-        private RefLifetime() { }
+        private OwnedLifetime() { }
         #endregion
 
         public override bool IsOwned => true;
@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
         [NotNull]
         public override string ToString()
         {
-            return "ref";
+            return "owned";
         }
     }
 }

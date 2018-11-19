@@ -1,4 +1,4 @@
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
     /// <summary>
     /// An unresolved type is a type that represents an unresolved type. That is,
