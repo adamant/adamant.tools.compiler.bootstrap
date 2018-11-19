@@ -1,0 +1,18 @@
+# Adamant.Tools.Compiler.Bootstrap.AST
+
+The design of the compiler abstract syntax tree (AST) has gone through many revisions. Initially, it was hoped there could be support for incremental compilation through reuse of unchanged portions of the syntax tree. That is the strategy taken by the Roslyn C# compiler. Eventually, it was decided that this was too complex. It is more important to get a compiler up and working. Even after this change of direction, the syntax tree was still very concrete, containing every token from the source file except whitespace, comments and unexpected tokens. In time it was realized that was a hold over and not needed. It was creating a lot of boilerplate code that wasn't being used by later phases. The Rust compiler throws way as much information as possible in the parsing phase and builds a fairly abstract syntax tree with file positions for only the most important elements.
+
+At that time, there was still a separate "analysis" tree that largly mirrored the syntax tree. This was used for name binding, type checking and any other analysis. The purpose of this was to make the analysis phase more strongly typed. However, all of these fields still had to be nullable so that the analysis could fill them in. Looking at the Rust compiler, it performs name binding on the syntax tree (except for member accesses etc. that require type information to resolved). They then transform to to their
+"high-level IR" for type checking. This tree simplifies a number of things like loops etc. Then they transform to "mid-level IR" for borrow checking. That means lots of types that mirror existing types. In C# just declaring types like that has a lot of boilerplate. It was decided that rather than separate these out for the sake of "purity" or incremental compilation that probably won't be done in this compiler, they should be collapsed for speed of development.
+
+The current archtecture uses a single AST that results from parsing for name binding and type checking. It follows the strategy of transforming toward higher level representations as fast as possible. The parser generates things needed for later analysis like names and also simplifies slightly. For example, the parser drops parentheses out of the tree. Borrow checking is performed on an intermediate language (IR) representation of functions. However, this is attached directly to the AST nodes for functions.
+
+## Design Goals
+
+### Adaptability to Syntax Changes
+
+As the language is still being designed, it is important that the lexer, parser and concrete syntax tree be easy to modify. This is supported by keeping them as simple as possible. Code generation is used around tokens so that tokens can be easily added and removed. Several points in the lexer use generated lists of all tokens of a given type to guide the lexing process.
+
+### Correct by Construction
+
+Use of the nullability attributes and `Requires` preconditions aid in ensuring the lexer and parser are correct. Originally, tokens were not as strongly typed. They were using several struct types with an enum for the token type. This performance optimization was modelled on the Roslyn C# compiler. However, it was decided that having strongly typed tokens was more valuable and the transition was made to the current set of classes. This also allowed for more sophisticated type relationships such as a base class for keywords and a base class for operators. Ideally, missing tokens would be represented with a special token that included the type and position of the missing token. However, the C# type system didn't offer good options for representing that in a strongly typed way. It was decided to use `null` to represent missing tokens and accept the limitations that might imply.

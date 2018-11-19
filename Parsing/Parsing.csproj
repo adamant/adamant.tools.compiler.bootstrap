@@ -16,8 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AST\AST.csproj" />
     <ProjectReference Include="..\Lexing\Lexing.csproj" />
-    <ProjectReference Include="..\Syntax\Syntax.csproj" />
   </ItemGroup>
 
 </Project>

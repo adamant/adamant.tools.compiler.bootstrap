@@ -1,7 +1,7 @@
 using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders;
-using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers

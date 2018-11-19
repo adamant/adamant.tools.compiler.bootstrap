@@ -20,7 +20,6 @@
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Parsing\Parsing.csproj" />
     <ProjectReference Include="..\Semantics\Semantics.csproj" />
-    <ProjectReference Include="..\Syntax\Syntax.csproj" />
   </ItemGroup>
 
 </Project>

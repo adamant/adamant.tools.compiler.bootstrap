@@ -1,5 +1,5 @@
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
-using Adamant.Tools.Compiler.Bootstrap.Syntax;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing

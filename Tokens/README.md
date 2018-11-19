@@ -10,7 +10,7 @@ There are a number of reasons that token naming is challenging:
 
 So while the temptation to name tokens after what they mean is strong, the policy adapted by the Roslyn project makes more sense. Tokens are named after their characters. All keyword tokens are simply the keyword followed by "KeywordToken". All tokens composed of symbols are just the concatenation of the names of the individual characters followed by "Token". For characters, the Unicode official name is generally used. Filler words like "sign" are dropped unless they are needed to disambiguate from another token. However, occasionally, the unicode character names are very strange and a more common name is used.
 
-Some tokens in Adamant have multiple acceptable character sequences. For example, both `->` (U+002D, U+003E) and `→` (U+2192) are acceptable. In these cases, the token is named after the shorter character the longer sequence is meant to be evocative of.
+Some tokens in Adamant have multiple acceptable character sequences. For example, both "`->`" (U+002D, U+003E) and "`→`" (U+2192) are acceptable. In these cases, the token is named after the shorter character the longer sequence is meant to be evocative of.
 
 ## Software Architecture
 
