@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Semantics</AssemblyName>
-    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Semantics</RootNamespace>
+    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Scopes</AssemblyName>
+    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Scopes</RootNamespace>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
@@ -17,14 +17,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AST\AST.csproj" />
-    <ProjectReference Include="..\Core\Core.csproj" />
-    <ProjectReference Include="..\Scopes\Scopes.csproj" />
+    <ProjectReference Include="..\Primitives\Primitives.csproj" />
     <ProjectReference Include="..\Symbols\Symbols.csproj" />
-    <ProjectReference Include="..\Types\Types.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Scopes\" />
   </ItemGroup>
 
 </Project>
