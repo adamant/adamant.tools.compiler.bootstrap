@@ -9,10 +9,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
     public abstract class RootName
     {
         /// <summary>
-        /// Construct a new name by qualifying the given simple name with this
-        /// one.
+        /// Construct a new name by qualifying the given name with this one.
         /// </summary>
         [NotNull]
-        public abstract Name Qualify([NotNull] SimpleName name);
+        public abstract Name Qualify([NotNull] Name name);
     }
 }

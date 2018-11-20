@@ -1,5 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
@@ -12,27 +13,33 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         /// declared using the package qualifier `namespace ::example { }`.
         /// </summary>
         public bool InGlobalNamespace { get; }
-        [NotNull] public FixedList<string> Name { get; }
+        [NotNull] public Name Name { get; }
+        [NotNull] public Name FullName { get; }
 
         /// <summary>
         /// The implicit file namespace doesn't have a span.
         /// </summary>
-        public TextSpan? Span { get; }
+        public TextSpan? NameSpan { get; }
+
+        [NotNull] public RootName InNamespaceName { get; }
         [NotNull] public FixedList<UsingDirectiveSyntax> UsingDirectives { get; }
         [NotNull] public FixedList<DeclarationSyntax> Declarations { get; }
 
         public NamespaceDeclarationSyntax(
             bool inGlobalNamespace,
-            [NotNull] FixedList<string> name,
-            TextSpan? span,
+            [NotNull] Name name,
+            TextSpan? nameSpan,
+            [NotNull] RootName inNamespaceName,
             [NotNull] FixedList<UsingDirectiveSyntax> usingDirectives,
             [NotNull] FixedList<DeclarationSyntax> declarations)
         {
             Name = name;
+            FullName = inNamespaceName.Qualify(name);
             UsingDirectives = usingDirectives;
             Declarations = declarations;
             InGlobalNamespace = inGlobalNamespace;
-            Span = span;
+            NameSpan = nameSpan;
+            InNamespaceName = inNamespaceName;
         }
 
         public override string ToString()

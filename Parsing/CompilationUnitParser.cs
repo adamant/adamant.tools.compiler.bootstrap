@@ -37,6 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 Tokens.Context.Diagnostics.Build());
         }
 
+        [NotNull]
         private RootName ParseImplicitNamespaceName()
         {
             RootName name = GlobalNamespaceName.Instance;

@@ -1,5 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
@@ -17,7 +18,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var accessModifierParser = new ModifierParser(tokens);
             var declarationParser = new DeclarationParser(tokens, listParser, parser,
                 parser, parameterParser, accessModifierParser,
-                genericsParser, parser, usingDirectiveParser);
+                genericsParser, parser, usingDirectiveParser,
+                GlobalNamespaceName.Instance);
             var compilationUnitParser = new CompilationUnitParser(tokens, declarationParser, usingDirectiveParser);
             return compilationUnitParser.ParseCompilationUnit();
         }

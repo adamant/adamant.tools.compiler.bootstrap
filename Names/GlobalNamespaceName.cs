@@ -1,4 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Names
@@ -15,9 +14,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         #endregion
 
         [NotNull]
-        public override Name Qualify([NotNull] SimpleName name)
+        public override Name Qualify([NotNull] Name name)
         {
-            Requires.NotNull(nameof(name), name);
             return name;
         }
     }

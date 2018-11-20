@@ -3,6 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -10,6 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public class DeclarationParser : ParserBase, IDeclarationParser
     {
+        [NotNull] private readonly RootName contextName;
         [NotNull] private readonly IListParser listParser;
         [NotNull] private readonly IExpressionParser expressionParser;
         [NotNull] private readonly IBlockParser blockParser;
@@ -28,7 +30,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] IModifierParser modifierParser,
             [NotNull] IGenericsParser genericsParser,
             [NotNull] INameParser nameParser,
-            [NotNull] IUsingDirectiveParser usingDirectiveParser)
+            [NotNull] IUsingDirectiveParser usingDirectiveParser,
+            [NotNull] RootName contextName)
             : base(tokens)
         {
             this.listParser = listParser;
@@ -39,6 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             this.genericsParser = genericsParser;
             this.nameParser = nameParser;
             this.usingDirectiveParser = usingDirectiveParser;
+            this.contextName = contextName;
         }
 
         [MustUseReturnValue]
@@ -161,27 +165,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var usingDirectives = usingDirectiveParser.ParseUsingDirectives();
             var declarations = ParseDeclarations();
             Tokens.Expect<ICloseBraceToken>();
-            return new NamespaceDeclarationSyntax(globalQualifier != null, name, span, usingDirectives, declarations);
+            return new NamespaceDeclarationSyntax(globalQualifier != null, name, span, contextName, usingDirectives, declarations);
         }
 
         [MustUseReturnValue]
-        private (FixedList<string>, TextSpan) ParseNamespaceName()
+        private (Name, TextSpan) ParseNamespaceName()
         {
-            var name = new List<string>();
-
             var nameSegment = Tokens.RequiredToken<IIdentifierToken>();
             var span = nameSegment.Span;
-            name.Add(nameSegment.Value);
+            Name name = new SimpleName(nameSegment.Value);
 
             while (Tokens.Accept<IDotToken>())
             {
                 nameSegment = Tokens.ExpectIdentifier();
                 if (nameSegment == null) break;
                 span = TextSpan.Covering(span, nameSegment.Span);
-                name.Add(nameSegment.Value);
+                name = name.Qualify(new SimpleName(nameSegment.Value));
             }
 
-            return (name.ToFixedList(), span);
+            return (name, span);
         }
         #endregion
 

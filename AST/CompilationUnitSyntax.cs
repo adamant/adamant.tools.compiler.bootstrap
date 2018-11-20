@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         [NotNull] public CodeFile CodeFile { get; }
         [NotNull] public RootName ImplicitNamespaceName { get; }
-        [NotNull, ItemNotNull] public FixedList<UsingDirectiveSyntax> UsingDirectives { get; }  
+        [NotNull, ItemNotNull] public FixedList<UsingDirectiveSyntax> UsingDirectives { get; }
         [NotNull, ItemNotNull] public FixedList<DeclarationSyntax> Declarations { get; }
         [NotNull, ItemNotNull] public FixedList<Diagnostic> Diagnostics { get; }
 

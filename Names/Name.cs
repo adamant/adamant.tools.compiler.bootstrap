@@ -23,7 +23,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
             [NotNull] string firstSegment,
             [NotNull, ItemNotNull] params string[] segments)
         {
-            Requires.NotNull(nameof(firstSegment), firstSegment);
             Name name = ((SimpleName)firstSegment);
             foreach (var segment in segments)
                 name = name.Qualify((SimpleName)segment);
@@ -31,10 +30,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         }
 
         [NotNull]
-        public override Name Qualify([NotNull] SimpleName name)
+        public override Name Qualify([NotNull] Name name)
         {
-            Requires.NotNull(nameof(name), name);
-            return new QualifiedName(this, name);
+            switch (name)
+            {
+                case SimpleName simpleName:
+                    return new QualifiedName(this, simpleName);
+                case QualifiedName qualifiedName:
+                    return new QualifiedName(Qualify(qualifiedName.Qualifier), qualifiedName.UnqualifiedName);
+                default:
+                    throw NonExhaustiveMatchException.For(name);
+            }
         }
 
         public abstract bool HasQualifier([NotNull] Name name);
