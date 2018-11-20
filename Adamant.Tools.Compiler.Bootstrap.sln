@@ -60,6 +60,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Symbols", "Symbols\Symbols.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Types", "Types\Types.csproj", "{1E83FFEC-140B-4D70-B507-6D4873792FF6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Primitives", "Primitives\Primitives.csproj", "{847178B8-0137-48B3-8B05-B3EFDA1C90D8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -150,6 +152,10 @@ Global
 		{1E83FFEC-140B-4D70-B507-6D4873792FF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E83FFEC-140B-4D70-B507-6D4873792FF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E83FFEC-140B-4D70-B507-6D4873792FF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{847178B8-0137-48B3-8B05-B3EFDA1C90D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{847178B8-0137-48B3-8B05-B3EFDA1C90D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{847178B8-0137-48B3-8B05-B3EFDA1C90D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{847178B8-0137-48B3-8B05-B3EFDA1C90D8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

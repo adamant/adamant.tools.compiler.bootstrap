@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             var references = new Dictionary<string, Package>();
 
             // Analyze
-            var package = compiler.CompilePackage("testPackage", codeFile.Yield(), references);
+            var package = compiler.CompilePackage("testPackage", codeFile.Yield(), references.ToFixedDictionary());
 
             // Check for compiler errors
             var expectedCompileErrorLines = ExpectedCompileErrorLines(codeFile, code);

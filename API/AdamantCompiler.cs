@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         public Task<Package> CompilePackageAsync(
             [NotNull] string name,
             [NotNull] [ItemNotNull] IEnumerable<ICodeFileSource> files,
-            Dictionary<string, Task<Package>> references)
+            FixedDictionary<string, Task<Package>> references)
         {
             return CompilePackageAsync(name, files, references, TaskScheduler.Default);
         }
@@ -28,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         public Task<Package> CompilePackageAsync(
             [NotNull] string name,
             [NotNull] [ItemNotNull] IEnumerable<ICodeFileSource> fileSources,
-            Dictionary<string, Task<Package>> references,
+            FixedDictionary<string, Task<Package>> references,
             [CanBeNull] TaskScheduler taskScheduler)
         {
             var lexer = new Lexer();
@@ -58,7 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         public Package CompilePackage(
             [NotNull] string name,
             [NotNull][ItemNotNull] IEnumerable<ICodeFileSource> fileSources,
-            [NotNull] IReadOnlyDictionary<string, Package> references)
+            [NotNull] FixedDictionary<string, Package> references)
         {
             return CompilePackage(name, fileSources.Select(s => s.Load()), references);
         }
@@ -67,7 +67,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         public Package CompilePackage(
             [NotNull] string name,
             [NotNull] [ItemNotNull] IEnumerable<CodeFile> files,
-            [NotNull] IReadOnlyDictionary<string, Package> references)
+            [NotNull] FixedDictionary<string, Package> references)
         {
             var lexer = new Lexer();
             var parser = new CompilationUnitParser();

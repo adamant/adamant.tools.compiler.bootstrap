@@ -109,7 +109,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
                 Console.WriteLine($"Compiling {project.Name} ({project.Path})...");
             }
             var codeFiles = sourcePaths.Select(p => LoadCode(p, sourceDir, project.RootNamespace)).ToList();
-            var package = compiler.CompilePackage(project.Name, codeFiles, references);
+            var package = compiler.CompilePackage(project.Name, codeFiles, references.ToFixedDictionary());
             // TODO switch to the async version of the compiler
             //var codeFiles = sourcePaths.Select(p => new CodePath(p)).ToList();
             //var references = project.References.ToDictionary(r => r.Name, r => projectBuilds[r.Project]);

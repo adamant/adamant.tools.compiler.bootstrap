@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage;
@@ -14,12 +15,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         [NotNull]
         public Package Analyze(
             [NotNull] PackageSyntax packageSyntax,
-            [NotNull] IReadOnlyDictionary<string, Package> references)
+            [NotNull] FixedDictionary<string, Package> references)
         {
             var nameBuilder = new NameBuilder();
 
+            // TODO do we need a list of all the namespaces for validating using statements?
             // Gather a list of all the namespaces for validating using statements
-            var namespacesInPackage = new NamespaceBuilder(nameBuilder).GatherNamespaces(packageSyntax).ToList();
 
             // Gather all the declarations and simultaneously build up trees of lexical scopes
             var compilationUnits = new AnalysisBuilder().Build(packageSyntax).ToList();
@@ -52,7 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             var declarations = declarationAnalyses.Select(d => d.Complete(diagnostics)).Where(d => d != null).ToList();
             var entryPoint = DetermineEntryPoint(declarations, diagnostics);
-            return new Package(packageSyntax.Name, diagnostics.Build(), references, namespacesInPackage, declarations, entryPoint);
+            return new Package(packageSyntax.Name, diagnostics.Build(), references, declarations, entryPoint);
         }
 
         [CanBeNull]

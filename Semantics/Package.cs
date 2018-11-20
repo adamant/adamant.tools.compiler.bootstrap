@@ -10,29 +10,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
     {
         [NotNull] public string Name { get; }
         [NotNull, ItemNotNull] public FixedList<Diagnostic> Diagnostics { get; internal set; }
-        [NotNull] public IReadOnlyDictionary<string, Package> References { get; }
-        [NotNull, ItemNotNull] public IReadOnlyList<Namespace> Namespaces { get; }
-        [NotNull, ItemNotNull] public IReadOnlyList<Declaration> Declarations { get; }
+        [NotNull] public FixedDictionary<string, Package> References { get; }
+        [NotNull, ItemNotNull] public FixedList<Declaration> Declarations { get; }
         [CanBeNull] public FunctionDeclaration EntryPoint { get; internal set; }
 
         public Package(
             [NotNull] string name,
             [NotNull] FixedList<Diagnostic> diagnostics,
             [NotNull] IReadOnlyDictionary<string, Package> references,
-            [NotNull, ItemNotNull] IEnumerable<Namespace> namespaces,
-            [NotNull, ItemNotNull] IEnumerable<Declaration> declarations,
+            [NotNull] [ItemNotNull] IEnumerable<Declaration> declarations,
             [CanBeNull] FunctionDeclaration entryPoint)
         {
-            Requires.NotNull(nameof(name), name);
-            Requires.NotNull(nameof(diagnostics), diagnostics);
-            Requires.NotNull(nameof(references), references);
-            Requires.NotNull(nameof(declarations), declarations);
             Name = name;
             Diagnostics = diagnostics;
-            References = new Dictionary<string, Package>(references).AsReadOnly();
+            References = new Dictionary<string, Package>(references).ToFixedDictionary();
             EntryPoint = entryPoint;
-            Namespaces = namespaces.ToReadOnlyList();
-            Declarations = declarations.ToReadOnlyList();
+            Declarations = declarations.ToFixedList();
         }
     }
 }
