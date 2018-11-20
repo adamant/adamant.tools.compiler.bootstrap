@@ -11,14 +11,14 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 {
-    public class ScopeBinder
+    public class OldScopeBinder
     {
         [NotNull] private readonly Dictionary<DeclarationSyntax, DeclarationAnalysis> declarations = new Dictionary<DeclarationSyntax, DeclarationAnalysis>();
         [NotNull] private readonly Dictionary<SimpleName, IDeclarationAnalysis> globalDeclarations;
         [NotNull] private readonly NameBuilder nameBuilder;
         [NotNull] [ItemNotNull] private readonly FixedList<Declaration> referencedDeclarations;
 
-        public ScopeBinder(
+        public OldScopeBinder(
             [NotNull] [ItemNotNull] IEnumerable<CompilationUnitAnalysis> compilationUnits,
             [NotNull] NameBuilder nameBuilder,
             [NotNull] IReadOnlyDictionary<string, Package> references)

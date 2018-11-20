@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             var compilationUnits = new AnalysisBuilder().Build(packageSyntax).ToList();
 
             // Check lexical scopes and attach to entities etc.
-            var scopeBinder = new ScopeBinder(compilationUnits, nameBuilder, references);
+            var scopeBinder = new OldScopeBinder(compilationUnits, nameBuilder, references);
             foreach (var scope in compilationUnits.Select(cu => cu.GlobalScope))
                 scopeBinder.BindCompilationUnitScope(scope);
 
