@@ -10,7 +10,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         [NotNull] public FixedList<AttributeSyntax> Attributes { get; }
         [NotNull] public FixedList<IModiferToken> Modifiers { get; }
-        [NotNull] public SimpleName Name { get; }
+        [NotNull] public Name FullName { get; }
+        [NotNull] public SimpleName Name => FullName.UnqualifiedName;
         [CanBeNull] public FixedList<GenericParameterSyntax> GenericParameters { get; }
         [CanBeNull] public FixedList<ExpressionSyntax> BaseTypes { get; }
         [NotNull] public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
@@ -20,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public TraitDeclarationSyntax(
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers,
-            [NotNull] string name,
+            [NotNull] Name fullName,
             TextSpan nameSpan,
             [CanBeNull] FixedList<GenericParameterSyntax> genericParameters,
             [CanBeNull] FixedList<ExpressionSyntax> baseTypes,
@@ -31,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         {
             Attributes = attributes;
             Modifiers = modifiers;
-            Name = new SimpleName(name);
+            FullName = fullName;
             GenericParameters = genericParameters;
             BaseTypes = baseTypes;
             GenericConstraints = genericConstraints;

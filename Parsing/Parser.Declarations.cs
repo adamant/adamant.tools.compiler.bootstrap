@@ -148,7 +148,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 nameSegment = Tokens.ExpectIdentifier();
                 if (nameSegment == null) break;
                 span = TextSpan.Covering(span, nameSegment.Span);
-                name = name.Qualify(new SimpleName(nameSegment.Value));
+                name = name.Qualify(nameSegment.Value);
             }
 
             return (name, span);
@@ -195,7 +195,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private FixedList<ExpressionSyntax> AcceptBaseTypes()
         {
             if (!Tokens.Accept<ILessThanColonToken>()) return null;
-            return ParseSeparatedList<ExpressionSyntax, ICommaToken>(() => ParseExpression());
+            return ParseSeparatedList<ExpressionSyntax, ICommaToken>(ParseExpression);
         }
 
         [MustUseReturnValue]
@@ -237,14 +237,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<IModiferToken> modifiers)
         {
             Tokens.Expect<IClassKeywordToken>();
-            var name = Tokens.RequiredToken<IIdentifierToken>();
+            var identifier = Tokens.RequiredToken<IIdentifierToken>();
+            var name = nameContext.Qualify(identifier.Value);
             var genericParameters = AcceptGenericParameters();
             var baseClass = AcceptBaseClass();
             var baseTypes = AcceptBaseTypes();
             var genericConstraints = ParseGenericConstraints();
             var invariants = ParseInvariants();
             var members = ParseTypeBody();
-            return new ClassDeclarationSyntax(attributes, modifiers, name.Value, name.Span, genericParameters,
+            return new ClassDeclarationSyntax(attributes, modifiers, name, identifier.Span, genericParameters,
                 baseClass, baseTypes, genericConstraints, invariants,
                 members);
         }
@@ -256,13 +257,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<IModiferToken> modifiers)
         {
             Tokens.Expect<ITraitKeywordToken>();
-            var name = Tokens.RequiredToken<IIdentifierToken>();
+            var identifier = Tokens.RequiredToken<IIdentifierToken>();
+            var name = nameContext.Qualify(identifier.Value);
             var genericParameters = AcceptGenericParameters();
             var baseTypes = AcceptBaseTypes();
             var genericConstraints = ParseGenericConstraints();
             var invariants = ParseInvariants();
             var members = ParseTypeBody();
-            return new TraitDeclarationSyntax(attributes, modifiers, name.Value, name.Span,
+            return new TraitDeclarationSyntax(attributes, modifiers, name, identifier.Span,
                 genericParameters, baseTypes, genericConstraints, invariants,
                 members);
         }

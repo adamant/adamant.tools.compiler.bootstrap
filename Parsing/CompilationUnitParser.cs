@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             RootName name = GlobalNamespaceName.Instance;
             foreach (var segment in tokens.Context.File.Reference.Namespace)
-                name = name.Qualify(new SimpleName(segment));
+                name = name.Qualify(segment);
 
             return name;
         }

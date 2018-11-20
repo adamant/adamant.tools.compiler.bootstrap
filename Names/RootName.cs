@@ -13,5 +13,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         /// </summary>
         [NotNull]
         public abstract Name Qualify([NotNull] Name name);
+
+        [NotNull]
+        public Name Qualify([NotNull] string name)
+        {
+            return Qualify(new SimpleName(name));
+        }
     }
 }

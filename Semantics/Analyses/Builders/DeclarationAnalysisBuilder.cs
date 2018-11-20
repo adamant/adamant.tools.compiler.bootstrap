@@ -157,7 +157,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses.Builders
             {
                 case IIdentifierToken identifier:
                 {
-                    var fullName = @namespace.Qualify((SimpleName)identifier.Value);
+                    var fullName = @namespace.Qualify(identifier.Value);
                     return new TypeDeclarationAnalysis(context, syntax, fullName,
                         BuildGenericParameters(context, fullName, syntax.GenericParameters));
                 }

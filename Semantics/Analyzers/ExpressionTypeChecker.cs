@@ -293,7 +293,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             switch (memberAccess.Syntax.Member)
             {
                 case IIdentifierToken identifier:
-                    type = symbol.Lookup((SimpleName)identifier.Value)?.Types.Single();
+                    type = symbol.Lookup(new SimpleName(identifier.Value))?.Types.Single();
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(memberAccess.Syntax.Member);

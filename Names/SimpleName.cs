@@ -23,12 +23,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
             IsSpecial = isSpecial;
         }
 
-        [NotNull]
-        public static explicit operator SimpleName([NotNull] string text)
-        {
-            return new SimpleName(text);
-        }
-
         public override bool HasQualifier([NotNull] Name name)
         {
             Requires.NotNull(nameof(name), name);

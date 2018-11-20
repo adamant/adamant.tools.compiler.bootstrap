@@ -23,9 +23,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
             [NotNull] string firstSegment,
             [NotNull, ItemNotNull] params string[] segments)
         {
-            Name name = ((SimpleName)firstSegment);
+            Name name = new SimpleName(firstSegment);
             foreach (var segment in segments)
-                name = name.Qualify((SimpleName)segment);
+                name = name.Qualify(segment);
             return name;
         }
 
