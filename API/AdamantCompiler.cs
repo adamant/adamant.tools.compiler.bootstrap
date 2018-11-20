@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             [CanBeNull] TaskScheduler taskScheduler)
         {
             var lexer = new Lexer();
-            var parser = new FileParser();
+            var parser = new CompilationUnitParser();
             var parseBlock = new TransformBlock<ICodeFileSource, CompilationUnitSyntax>(
                 async (fileSource) =>
                 {
@@ -70,7 +70,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             [NotNull] IReadOnlyDictionary<string, Package> references)
         {
             var lexer = new Lexer();
-            var parser = new FileParser();
+            var parser = new CompilationUnitParser();
             var compilationUnits = files
                 .Select(file =>
                 {

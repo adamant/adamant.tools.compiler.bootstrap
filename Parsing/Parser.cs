@@ -22,5 +22,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             Tokens.Context.Diagnostics.Add(diagnostic);
         }
+
+        [NotNull]
+        protected Parser NestedParser([NotNull] Name name)
+        {
+            return new Parser(Tokens, nameContext.Qualify(name));
+        }
     }
 }

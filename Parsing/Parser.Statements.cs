@@ -76,7 +76,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [NotNull]
         private BlockSyntax ParseRestOfBlock(TextSpan openBrace)
         {
-            var statements = listParser.ParseList<StatementSyntax, ICloseBraceToken>(ParseStatement);
+            var statements = ParseList<StatementSyntax, ICloseBraceToken>(ParseStatement);
             var closeBrace = Tokens.Expect<ICloseBraceToken>();
             openBrace = TextSpan.Covering(openBrace, closeBrace);
             return new BlockSyntax(openBrace, statements);

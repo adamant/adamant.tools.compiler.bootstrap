@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public FixedList<GenericParameterSyntax> AcceptGenericParameters()
         {
             if (!Tokens.Accept<IOpenBracketToken>()) return null;
-            var parameters = listParser.ParseSeparatedList<GenericParameterSyntax, ICommaToken, ICloseBracketToken>(ParseGenericParameter);
+            var parameters = ParseSeparatedList<GenericParameterSyntax, ICommaToken, ICloseBracketToken>(ParseGenericParameter);
             Tokens.Expect<ICloseBracketToken>();
             return parameters;
         }
@@ -33,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [NotNull]
         public FixedList<GenericConstraintSyntax> ParseGenericConstraints()
         {
-            return listParser.AcceptList(AcceptGenericConstraint);
+            return AcceptList(AcceptGenericConstraint);
         }
 
         [MustUseReturnValue]

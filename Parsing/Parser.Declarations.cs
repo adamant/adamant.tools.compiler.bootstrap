@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public DeclarationSyntax ParseDeclaration()
         {
             var attributes = ParseAttributes();
-            var modifiers = listParser.AcceptList(Tokens.AcceptToken<IModiferToken>);
+            var modifiers = AcceptList(Tokens.AcceptToken<IModiferToken>);
 
             switch (Tokens.Current)
             {
@@ -78,7 +78,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public MemberDeclarationSyntax ParseMemberDeclaration()
         {
             var attributes = ParseAttributes();
-            var modifiers = listParser.AcceptList(Tokens.AcceptToken<IModiferToken>);
+            var modifiers = AcceptList(Tokens.AcceptToken<IModiferToken>);
 
             switch (Tokens.Current)
             {
@@ -128,8 +128,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var (name, span) = ParseNamespaceName();
             span = TextSpan.Covering(span, globalQualifier?.Span);
             Tokens.Expect<IOpenBraceToken>();
-            var usingDirectives = ParseUsingDirectives();
-            var declarations = ParseDeclarations();
+            var bodyParser = NestedParser(name);
+            var usingDirectives = bodyParser.ParseUsingDirectives();
+            var declarations = bodyParser.ParseDeclarations();
             Tokens.Expect<ICloseBraceToken>();
             return new NamespaceDeclarationSyntax(globalQualifier != null, name,
                 span, nameContext, usingDirectives, declarations);
@@ -194,14 +195,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private FixedList<ExpressionSyntax> AcceptBaseTypes()
         {
             if (!Tokens.Accept<ILessThanColonToken>()) return null;
-            return listParser.ParseSeparatedList<ExpressionSyntax, ICommaToken>(() => ParseExpression());
+            return ParseSeparatedList<ExpressionSyntax, ICommaToken>(() => ParseExpression());
         }
 
         [MustUseReturnValue]
         [NotNull]
         private FixedList<ExpressionSyntax> ParseInvariants()
         {
-            return listParser.AcceptList(AcceptInvariant);
+            return AcceptList(AcceptInvariant);
         }
 
         [MustUseReturnValue]
@@ -215,7 +216,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [NotNull]
         private FixedList<MemberDeclarationSyntax> ParseMemberDeclarations()
         {
-            return listParser.ParseList<MemberDeclarationSyntax, ICloseBraceToken>(ParseMemberDeclaration);
+            return ParseList<MemberDeclarationSyntax, ICloseBraceToken>(ParseMemberDeclaration);
         }
 
         [NotNull]
@@ -606,7 +607,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (!Tokens.Accept<IMayKeywordToken>())
                 return FixedList<EffectSyntax>.Empty;
 
-            return listParser.ParseSeparatedList<EffectSyntax, ICommaToken>(ParseEffect);
+            return ParseSeparatedList<EffectSyntax, ICommaToken>(ParseEffect);
         }
 
         [MustUseReturnValue]
@@ -616,7 +617,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (!Tokens.Accept<INoKeywordToken>())
                 return FixedList<EffectSyntax>.Empty;
 
-            return listParser.ParseSeparatedList<EffectSyntax, ICommaToken>(ParseEffect);
+            return ParseSeparatedList<EffectSyntax, ICommaToken>(ParseEffect);
         }
 
         [MustUseReturnValue]
@@ -627,7 +628,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             {
                 case IThrowKeywordToken _:
                     Tokens.Expect<IThrowKeywordToken>();
-                    var exceptions = listParser.ParseSeparatedList<ThrowEffectEntrySyntax, ICommaToken>(ParseThrowEffectEntry);
+                    var exceptions = ParseSeparatedList<ThrowEffectEntrySyntax, ICommaToken>(ParseThrowEffectEntry);
                     return new ThrowEffectSyntax(exceptions);
                 case IIdentifierToken _:
                     return new SimpleEffectSyntax(Tokens.RequiredToken<IIdentifierToken>().Value);
