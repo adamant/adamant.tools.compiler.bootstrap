@@ -1,26 +1,12 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
-    public class GenericsParser : ParserBase, IGenericsParser
+    public partial class Parser
     {
-        [NotNull] private readonly IListParser listParser;
-        [NotNull] private readonly IExpressionParser expressionParser;
-
-        public GenericsParser(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] IListParser listParser,
-            [NotNull] IExpressionParser expressionParser)
-            : base(tokens)
-        {
-            this.listParser = listParser;
-            this.expressionParser = expressionParser;
-        }
-
         [MustUseReturnValue]
         [CanBeNull]
         public FixedList<GenericParameterSyntax> AcceptGenericParameters()
@@ -39,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var name = Tokens.RequiredToken<IIdentifierToken>();
             ExpressionSyntax typeExpression = null;
             if (Tokens.Accept<IColonToken>())
-                typeExpression = expressionParser.ParseExpression();
+                typeExpression = ParseExpression();
             return new GenericParameterSyntax(isParams, name.Value, typeExpression);
         }
 
@@ -55,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public GenericConstraintSyntax AcceptGenericConstraint()
         {
             if (!Tokens.Accept<IWhereKeywordToken>()) return null;
-            var expression = expressionParser.ParseExpression();
+            var expression = ParseExpression();
             return new GenericConstraintSyntax(expression);
         }
     }

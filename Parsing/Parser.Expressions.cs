@@ -3,11 +3,10 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
-using ILifetimeNameToken = Adamant.Tools.Compiler.Bootstrap.Tokens.ILifetimeNameToken;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
-    public partial class Parser : IExpressionParser
+    public partial class Parser
     {
         [CanBeNull]
         public ExpressionSyntax AcceptExpression()
@@ -569,7 +568,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var matchKeyword = Tokens.Expect<IMatchKeywordToken>();
             var value = ParseExpression();
             Tokens.Expect<IOpenBraceToken>();
-            var arms = listParser.ParseSeparatedList<MatchArmSyntax, ICommaToken, ICloseBraceToken>(ParseMatchArm);
+            var arms = ParseSeparatedList<MatchArmSyntax, ICommaToken, ICloseBraceToken>(ParseMatchArm);
             var closeBrace = Tokens.Expect<ICloseBraceToken>();
             var span = TextSpan.Covering(matchKeyword, closeBrace);
             return new MatchExpressionSyntax(span, value, arms);
@@ -600,7 +599,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [NotNull]
         public FixedList<ArgumentSyntax> ParseArguments()
         {
-            return listParser.AcceptSeparatedList<ArgumentSyntax, ICommaToken>(AcceptArgument);
+            return AcceptSeparatedList<ArgumentSyntax, ICommaToken>(AcceptArgument);
         }
 
         [MustUseReturnValue]

@@ -2,19 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
-    public class ListParser : ParserBase, IListParser
+    public partial class Parser
     {
-        public ListParser([NotNull] ITokenIterator tokens)
-            : base(tokens)
-        {
-        }
-
         [MustUseReturnValue]
         [NotNull, ItemNotNull]
         public FixedList<T> AcceptList<T>([NotNull] Func<T> acceptItem)

@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
-    public partial class Parser : INameParser
+    public partial class Parser
     {
         [MustUseReturnValue]
         [NotNull]

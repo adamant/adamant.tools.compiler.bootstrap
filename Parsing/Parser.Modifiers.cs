@@ -1,19 +1,7 @@
-using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Lexing;
-using JetBrains.Annotations;
-
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
-    public class ModifierParser : ParserBase, IModifierParser
+    public partial class Parser
     {
-        [NotNull] protected CodeFile File;
-        [NotNull] protected ITokenIterator Tokens;
-
-        public ModifierParser([NotNull] ITokenIterator tokens)
-            : base(tokens)
-        {
-        }
-
         /// <summary>
         /// This gathers up the modifiers and removes duplicate types. For example
         /// there should be only one access modifer and only one of safe/unsafe.
@@ -30,9 +18,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         //    return modifiers.ToFixedList();
         //}
-        protected void Add([NotNull] Diagnostic diagnostic)
-        {
-            Tokens.Context.Diagnostics.Add(diagnostic);
-        }
     }
 }

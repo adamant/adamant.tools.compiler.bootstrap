@@ -9,42 +9,8 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
-    public class DeclarationParser : ParserBase, IDeclarationParser
+    public partial class Parser
     {
-        [NotNull] private readonly RootName contextName;
-        [NotNull] private readonly IListParser listParser;
-        [NotNull] private readonly IExpressionParser expressionParser;
-        [NotNull] private readonly IBlockParser blockParser;
-        [NotNull] private readonly IParameterParser parameterParser;
-        [NotNull] private readonly IModifierParser modifierParser;
-        [NotNull] private readonly IGenericsParser genericsParser;
-        [NotNull] private readonly INameParser nameParser;
-        [NotNull] private readonly IUsingDirectiveParser usingDirectiveParser;
-
-        public DeclarationParser(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] IListParser listParser,
-            [NotNull] IExpressionParser expressionParser,
-            [NotNull] IBlockParser blockParser,
-            [NotNull] IParameterParser parameterParser,
-            [NotNull] IModifierParser modifierParser,
-            [NotNull] IGenericsParser genericsParser,
-            [NotNull] INameParser nameParser,
-            [NotNull] IUsingDirectiveParser usingDirectiveParser,
-            [NotNull] RootName contextName)
-            : base(tokens)
-        {
-            this.listParser = listParser;
-            this.expressionParser = expressionParser;
-            this.blockParser = blockParser;
-            this.parameterParser = parameterParser;
-            this.modifierParser = modifierParser;
-            this.genericsParser = genericsParser;
-            this.nameParser = nameParser;
-            this.usingDirectiveParser = usingDirectiveParser;
-            this.contextName = contextName;
-        }
-
         [MustUseReturnValue]
         [NotNull, ItemNotNull]
         public FixedList<DeclarationSyntax> ParseDeclarations()
@@ -162,10 +128,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var (name, span) = ParseNamespaceName();
             span = TextSpan.Covering(span, globalQualifier?.Span);
             Tokens.Expect<IOpenBraceToken>();
-            var usingDirectives = usingDirectiveParser.ParseUsingDirectives();
+            var usingDirectives = ParseUsingDirectives();
             var declarations = ParseDeclarations();
             Tokens.Expect<ICloseBraceToken>();
-            return new NamespaceDeclarationSyntax(globalQualifier != null, name, span, contextName, usingDirectives, declarations);
+            return new NamespaceDeclarationSyntax(globalQualifier != null, name,
+                span, nameContext, usingDirectives, declarations);
         }
 
         [MustUseReturnValue]
@@ -204,11 +171,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private AttributeSyntax AcceptAttribute()
         {
             if (!Tokens.Accept<IHashHashToken>()) return null;
-            var name = nameParser.ParseName();
+            var name = ParseName();
             FixedList<ArgumentSyntax> arguments = null;
             if (Tokens.Accept<IOpenParenToken>())
             {
-                arguments = expressionParser.ParseArguments();
+                arguments = ParseArguments();
                 Tokens.Expect<ICloseParenToken>();
             }
             return new AttributeSyntax(name, arguments);
@@ -219,7 +186,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private ExpressionSyntax AcceptBaseClass()
         {
             if (!Tokens.Accept<IColonToken>()) return null;
-            return expressionParser.ParseExpression();
+            return ParseExpression();
         }
 
         [MustUseReturnValue]
@@ -227,7 +194,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private FixedList<ExpressionSyntax> AcceptBaseTypes()
         {
             if (!Tokens.Accept<ILessThanColonToken>()) return null;
-            return listParser.ParseSeparatedList<ExpressionSyntax, ICommaToken>(() => expressionParser.ParseExpression());
+            return listParser.ParseSeparatedList<ExpressionSyntax, ICommaToken>(() => ParseExpression());
         }
 
         [MustUseReturnValue]
@@ -242,7 +209,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private ExpressionSyntax AcceptInvariant()
         {
             if (!Tokens.Accept<IInvariantKeywordToken>()) return null;
-            return expressionParser.ParseExpression();
+            return ParseExpression();
         }
 
         [NotNull]
@@ -270,10 +237,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             Tokens.Expect<IClassKeywordToken>();
             var name = Tokens.RequiredToken<IIdentifierToken>();
-            var genericParameters = genericsParser.AcceptGenericParameters();
+            var genericParameters = AcceptGenericParameters();
             var baseClass = AcceptBaseClass();
             var baseTypes = AcceptBaseTypes();
-            var genericConstraints = genericsParser.ParseGenericConstraints();
+            var genericConstraints = ParseGenericConstraints();
             var invariants = ParseInvariants();
             var members = ParseTypeBody();
             return new ClassDeclarationSyntax(attributes, modifiers, name.Value, name.Span, genericParameters,
@@ -289,9 +256,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             Tokens.Expect<ITraitKeywordToken>();
             var name = Tokens.RequiredToken<IIdentifierToken>();
-            var genericParameters = genericsParser.AcceptGenericParameters();
+            var genericParameters = AcceptGenericParameters();
             var baseTypes = AcceptBaseTypes();
-            var genericConstraints = genericsParser.ParseGenericConstraints();
+            var genericConstraints = ParseGenericConstraints();
             var invariants = ParseInvariants();
             var members = ParseTypeBody();
             return new TraitDeclarationSyntax(attributes, modifiers, name.Value, name.Span,
@@ -307,9 +274,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             Tokens.Expect<IStructKeywordToken>();
             var name = Tokens.RequiredToken<IIdentifierToken>();
-            var genericParameters = genericsParser.AcceptGenericParameters();
+            var genericParameters = AcceptGenericParameters();
             var baseTypes = AcceptBaseTypes();
-            var genericConstraints = genericsParser.ParseGenericConstraints();
+            var genericConstraints = ParseGenericConstraints();
             var invariants = ParseInvariants();
             var members = ParseTypeBody();
             return new StructDeclarationSyntax(attributes, modifiers, name, genericParameters,
@@ -330,9 +297,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 {
                     Tokens.Expect<IStructKeywordToken>();
                     var name = Tokens.RequiredToken<IIdentifierToken>();
-                    var genericParameters = genericsParser.AcceptGenericParameters();
+                    var genericParameters = AcceptGenericParameters();
                     var baseTypes = AcceptBaseTypes();
-                    var genericConstraints = genericsParser.ParseGenericConstraints();
+                    var genericConstraints = ParseGenericConstraints();
                     var invariants = ParseInvariants();
                     Tokens.Expect<IOpenBraceToken>();
                     var variants = ParseEnumVariants();
@@ -346,10 +313,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 {
                     Tokens.Expect<IClassKeywordToken>();
                     var name = Tokens.RequiredToken<IIdentifierToken>();
-                    var genericParameters = genericsParser.AcceptGenericParameters();
+                    var genericParameters = AcceptGenericParameters();
                     var baseClass = AcceptBaseClass();
                     var baseTypes = AcceptBaseTypes();
-                    var genericConstraints = genericsParser.ParseGenericConstraints();
+                    var genericConstraints = ParseGenericConstraints();
                     var invariants = ParseInvariants();
                     Tokens.Expect<IOpenBraceToken>();
                     var variants = ParseEnumVariants();
@@ -406,11 +373,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             {
                 // Need to not consume the assignment that separates the type from the initializer,
                 // hence the min operator precedence.
-                typeExpression = expressionParser.ParseExpression(OperatorPrecedence.AboveAssignment);
+                typeExpression = ParseExpression(OperatorPrecedence.AboveAssignment);
             }
             ExpressionSyntax initializer = null;
             if (Tokens.Accept<IEqualsToken>())
-                initializer = expressionParser.ParseExpression();
+                initializer = ParseExpression();
 
             Tokens.Expect<ISemicolonToken>();
             return new FieldDeclarationSyntax(attributes, modifiers, getterAccess, name.Value, name.Span, typeExpression, initializer);
@@ -437,12 +404,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             Tokens.Expect<IFunctionKeywordToken>();
             var name = Tokens.RequiredToken<IIdentifierToken>();
-            var genericParameters = genericsParser.AcceptGenericParameters();
+            var genericParameters = AcceptGenericParameters();
             var parameters = ParseParameters();
             ExpressionSyntax returnType = null;
             if (Tokens.Accept<IRightArrowToken>())
-                returnType = expressionParser.ParseExpression();
-            var genericConstraints = genericsParser.ParseGenericConstraints();
+                returnType = ParseExpression();
+            var genericConstraints = ParseGenericConstraints();
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
@@ -458,7 +425,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<IModiferToken> modifiers)
         {
             var operatorKeywordSpan = Tokens.Expect<IOperatorKeywordToken>();
-            var genericParameters = genericsParser.AcceptGenericParameters();
+            var genericParameters = AcceptGenericParameters();
             // TODO correctly store these in the syntax class
             switch (Tokens.Current)
             {
@@ -494,12 +461,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var parameters = ParseParameters();
             ExpressionSyntax returnType = null;
             if (Tokens.Accept<IRightArrowToken>())
-                returnType = expressionParser.ParseExpression();
-            var genericConstraints = genericsParser.ParseGenericConstraints();
+                returnType = ParseExpression();
+            var genericConstraints = ParseGenericConstraints();
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
-            var body = blockParser.ParseBlock();
+            var body = ParseBlock();
             return new OperatorDeclarationSyntax(modifiers, operatorKeywordSpan, genericParameters,
                  parameters, returnType, genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
@@ -512,13 +479,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             var newKeywordSpan = Tokens.Expect<INewKeywordToken>();
             var name = Tokens.AcceptToken<IIdentifierToken>();
-            var genericParameters = genericsParser.AcceptGenericParameters();
+            var genericParameters = AcceptGenericParameters();
             var parameters = ParseParameters();
-            var genericConstraints = genericsParser.ParseGenericConstraints();
+            var genericConstraints = ParseGenericConstraints();
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
-            var body = blockParser.ParseBlock();
+            var body = ParseBlock();
             return new ConstructorDeclarationSyntax(modifiers, name?.Value, TextSpan.Covering(newKeywordSpan, name?.Span),
                 genericParameters, parameters, genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
@@ -531,13 +498,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             var initKeywordSpan = Tokens.Expect<IInitKeywordToken>();
             var name = Tokens.AcceptToken<IIdentifierToken>();
-            var genericParameters = genericsParser.AcceptGenericParameters();
+            var genericParameters = AcceptGenericParameters();
             var parameters = ParseParameters();
-            var genericConstraints = genericsParser.ParseGenericConstraints();
+            var genericConstraints = ParseGenericConstraints();
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
-            var body = blockParser.ParseBlock();
+            var body = ParseBlock();
             return new InitializerDeclarationSyntax(modifiers, name?.Value, TextSpan.Covering(initKeywordSpan, name?.Span),
                 genericParameters, parameters, genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
@@ -554,7 +521,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
-            var body = blockParser.ParseBlock();
+            var body = ParseBlock();
             return new DestructorDeclarationSyntax(modifiers, deleteKeywordSpan,
                  parameters, mayEffects, noEffects, requires, ensures, body);
         }
@@ -569,11 +536,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var name = Tokens.RequiredToken<IIdentifierToken>();
             var parameters = ParseParameters();
             Tokens.Expect<IRightArrowToken>();
-            var returnType = expressionParser.ParseExpression();
+            var returnType = ParseExpression();
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
-            var body = blockParser.ParseBlock();
+            var body = ParseBlock();
             return new GetterDeclarationSyntax(attributes, modifiers, name.Value, name.Span,
                 parameters, returnType, mayEffects, noEffects, requires, ensures, body);
         }
@@ -590,7 +557,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
-            var body = blockParser.ParseBlock();
+            var body = ParseBlock();
             return new SetterDeclarationSyntax(attributes, modifiers, name.Value, name.Span,
                  parameters, mayEffects, noEffects, requires, ensures, body);
         }
@@ -623,7 +590,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var parameters = new List<ParameterSyntax>();
             while (!Tokens.AtEnd<ICloseParenToken>())
             {
-                parameters.Add(parameterParser.ParseParameter());
+                parameters.Add(ParseParameter());
                 if (Tokens.Current is ICommaToken)
                     Tokens.Expect<ICommaToken>();
             }
@@ -675,7 +642,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private ThrowEffectEntrySyntax ParseThrowEffectEntry()
         {
             var isParams = Tokens.Accept<IParamsKeywordToken>();
-            var exceptionType = expressionParser.ParseExpression();
+            var exceptionType = ParseExpression();
             return new ThrowEffectEntrySyntax(isParams, exceptionType);
         }
 
@@ -704,7 +671,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private ExpressionSyntax ParseRequires()
         {
             Tokens.Expect<IRequiresKeywordToken>();
-            return expressionParser.ParseExpression();
+            return ParseExpression();
         }
 
         [MustUseReturnValue]
@@ -712,14 +679,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private ExpressionSyntax ParseEnsures()
         {
             Tokens.Expect<IEnsuresKeywordToken>();
-            return expressionParser.ParseExpression();
+            return ParseExpression();
         }
 
         private BlockSyntax ParseFunctionBody(
             [NotNull] ITokenIterator tokens,
             [NotNull] Diagnostics diagnostics)
         {
-            var body = blockParser.AcceptBlock();
+            var body = AcceptBlock();
             if (body == null)
                 tokens.Expect<ISemicolonToken>();
             return body;
@@ -741,12 +708,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 {
                     // Need to not consume the assignment that separates the type from the initializer,
                     // hence the min operator precedence.
-                    type = expressionParser.ParseExpression(OperatorPrecedence.AboveAssignment);
+                    type = ParseExpression(OperatorPrecedence.AboveAssignment);
                 }
 
                 ExpressionSyntax initializer = null;
                 if (Tokens.Accept<IEqualsToken>())
-                    initializer = expressionParser.ParseExpression();
+                    initializer = ParseExpression();
 
                 Tokens.Expect<ISemicolonToken>();
                 return new ConstDeclarationSyntax(attributes, modifiers, name.Value, name.Span, type, initializer);
