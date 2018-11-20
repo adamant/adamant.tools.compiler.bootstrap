@@ -5,17 +5,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class MutableTypeSyntax : TypeSyntax
     {
-        [NotNull] public ExpressionSyntax ReferencedType { get; }
+        [NotNull] public ExpressionSyntax ReferencedTypeExpression { get; }
 
-        public MutableTypeSyntax(TextSpan span, [NotNull] ExpressionSyntax referencedType)
+        public MutableTypeSyntax(TextSpan span, [NotNull] ExpressionSyntax referencedTypeExpression)
             : base(span)
         {
-            ReferencedType = referencedType;
+            ReferencedTypeExpression = referencedTypeExpression;
         }
 
         public override string ToString()
         {
-            return $"ref {ReferencedType}";
+            return $"ref {ReferencedTypeExpression}";
         }
     }
 }

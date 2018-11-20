@@ -18,7 +18,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
                     InnerNamespace.TestClass t1 = new TestClass();
                     OuterNamespace.TestClass<int> t2 = new TestClass<int>();
                 }
-
             }
         }
     }

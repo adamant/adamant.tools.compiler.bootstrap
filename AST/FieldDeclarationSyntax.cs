@@ -6,13 +6,13 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class FieldDeclarationSyntax : MemberDeclarationSyntax
+    public class FieldDeclarationSyntax : DeclarationSyntax, IMemberDeclarationSyntax
     {
         [NotNull] public FixedList<AttributeSyntax> Attributes { get; }
         [NotNull] [ItemNotNull] public FixedList<IModiferToken> Modifiers { get; }
         public AccessModifier? GetterAccess { get; }
         [NotNull] public SimpleName Name { get; }
-        [CanBeNull] public ExpressionSyntax Type { get; }
+        [CanBeNull] public ExpressionSyntax TypeExpression { get; }
         [CanBeNull] public ExpressionSyntax Initializer { get; }
 
         public FieldDeclarationSyntax(
@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             AccessModifier? getterAccess,
             [NotNull] string name,
             TextSpan nameSpan,
-            [CanBeNull] ExpressionSyntax type,
+            [CanBeNull] ExpressionSyntax typeExpression,
             [CanBeNull] ExpressionSyntax initializer)
             : base(nameSpan)
         {
@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             Modifiers = modifiers;
             GetterAccess = getterAccess;
             Name = new SimpleName(name);
-            Type = type;
+            TypeExpression = typeExpression;
             Initializer = initializer;
         }
 

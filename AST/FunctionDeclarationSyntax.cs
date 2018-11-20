@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public abstract class FunctionDeclarationSyntax : MemberDeclarationSyntax
+    public abstract class FunctionDeclarationSyntax : DeclarationSyntax, IMemberDeclarationSyntax
     {
         [NotNull] public FixedList<IModiferToken> Modifiers { get; }
         [NotNull] public FixedList<ParameterSyntax> Parameters { get; } // For now we will not support pure meta functions

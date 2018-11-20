@@ -1,6 +1,6 @@
 using System;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C.Fakes
 {

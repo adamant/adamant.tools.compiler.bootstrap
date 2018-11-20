@@ -1,11 +1,9 @@
-using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Model;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
@@ -17,48 +15,76 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             [NotNull] PackageSyntax packageSyntax,
             [NotNull] FixedDictionary<string, Package> references)
         {
-            var nameBuilder = new NameBuilder();
+            // First pull over all the lexer and parser errors from the compilation units
+            var diagnostics = AllDiagnostics(packageSyntax);
+            //var nameBuilder = new NameBuilder();
 
             // TODO do we need a list of all the namespaces for validating using statements?
             // Gather a list of all the namespaces for validating using statements
 
-            // Gather all the declarations and simultaneously build up trees of lexical scopes
-            var compilationUnits = new AnalysisBuilder().Build(packageSyntax).ToList();
+            var nameBinder = new NameBinder(packageSyntax, references);
+            nameBinder.BindNames(packageSyntax);
 
-            // Check lexical scopes and attach to entities etc.
-            var scopeBinder = new OldScopeBinder(compilationUnits, nameBuilder, references);
-            foreach (var scope in compilationUnits.Select(cu => cu.GlobalScope))
-                scopeBinder.BindCompilationUnitScope(scope);
+            // Make a list of all the non-member declarations
+            var nonMemberDeclarations = packageSyntax.CompilationUnits
+                .SelectMany(cu => cu.AllNonMemberDeclarations).ToFixedList();
 
-            // Make a list of all the member declarations
-            var declarationAnalyses = compilationUnits.SelectMany(cu => cu.MemberDeclarations).ToList();
+            // Build final declaration objects and find the entry point
+            var declarationBuilder = new DeclarationBuilder();
+            var declarations = declarationBuilder.Build(nonMemberDeclarations);
+            var entryPoint = DetermineEntryPoint(declarations, diagnostics);
 
-            // Do name binding, type checking, IL statement generation and compile time code execution
-            // They are all interdependent to some degree
-            TypeChecker.CheckDeclarations(declarationAnalyses);
+            return new Package(packageSyntax.Name, diagnostics.Build(), references, declarations, entryPoint);
 
-            // At this point, some but not all of the functions will have IL statements generated,
-            // now generate the rest
-            ControlFlowGraphBuilder.BuildGraphs(declarationAnalyses.OfType<FunctionDeclarationAnalysis>());
+            // -----------------------------------------------
+            // Old Analysis
 
-            // Only borrow checking left
-            var borrowChecker = new BorrowChecker();
-            borrowChecker.Check(declarationAnalyses);
+            //// Gather all the declarations and simultaneously build up trees of lexical scopes
+            //var compilationUnits = new AnalysisBuilder().Build(packageSyntax).ToList();
 
-            // Gather the diagnostics and declarations into a package
+            //// Check lexical scopes and attach to entities etc.
+            ////var oldScopeBinder = new OldScopeBinder(compilationUnits, nameBuilder, references);
+            ////foreach (var scope in compilationUnits.Select(cu => cu.GlobalScope))
+            ////    oldScopeBinder.BindCompilationUnitScope(scope);
+
+            //// Make a list of all the member declarations
+            //var declarationAnalyses = compilationUnits.SelectMany(cu => cu.MemberDeclarations).ToList();
+
+            //// Do name binding, type checking, IL statement generation and compile time code execution
+            //// They are all interdependent to some degree
+            //TypeChecker.CheckDeclarations(declarationAnalyses);
+
+            //// At this point, some but not all of the functions will have IL statements generated,
+            //// now generate the rest
+            //ControlFlowGraphBuilder.BuildGraphs(declarationAnalyses.OfType<FunctionDeclarationAnalysis>());
+
+            //// Only borrow checking left
+            //var borrowChecker = new BorrowChecker();
+            //borrowChecker.Check(declarationAnalyses);
+
+            //// Gather the diagnostics and declarations into a package
+            //var diagnostics = new Diagnostics();
+            //// First pull over all the lexer and parser errors from the compilation units
+            //foreach (var compilationUnit in packageSyntax.CompilationUnits)
+            //    diagnostics.Add(compilationUnit.Diagnostics);
+
+            //var declarations = declarationAnalyses.Select(d => d.Complete(diagnostics)).Where(d => d != null).ToList();
+            //var entryPoint = DetermineEntryPoint(declarations, diagnostics);
+            //return new Package(packageSyntax.Name, diagnostics.Build(), references, declarations, entryPoint);
+        }
+
+        [NotNull]
+        private static Diagnostics AllDiagnostics([NotNull] PackageSyntax packageSyntax)
+        {
             var diagnostics = new Diagnostics();
-            // First pull over all the lexer and parser errors from the compilation units
             foreach (var compilationUnit in packageSyntax.CompilationUnits)
                 diagnostics.Add(compilationUnit.Diagnostics);
-
-            var declarations = declarationAnalyses.Select(d => d.Complete(diagnostics)).Where(d => d != null).ToList();
-            var entryPoint = DetermineEntryPoint(declarations, diagnostics);
-            return new Package(packageSyntax.Name, diagnostics.Build(), references, declarations, entryPoint);
+            return diagnostics;
         }
 
         [CanBeNull]
         private static FunctionDeclaration DetermineEntryPoint(
-            [NotNull] List<Declaration> declarations,
+            [NotNull] FixedList<Declaration> declarations,
             [NotNull] Diagnostics diagnostics)
         {
             var mainFunctions = declarations.OfType<FunctionDeclaration>()

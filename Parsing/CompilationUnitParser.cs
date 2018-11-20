@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         }
 
         [NotNull]
-        private RootName ParseImplicitNamespaceName([NotNull] ITokenIterator tokens)
+        private static RootName ParseImplicitNamespaceName([NotNull] ITokenIterator tokens)
         {
             RootName name = GlobalNamespaceName.Instance;
             foreach (var segment in tokens.Context.File.Reference.Namespace)

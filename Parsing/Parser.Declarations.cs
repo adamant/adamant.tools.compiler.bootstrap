@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public DeclarationSyntax ParseDeclaration()
         {
             var attributes = ParseAttributes();
-            var modifiers = AcceptList(Tokens.AcceptToken<IModiferToken>);
+            var modifiers = AcceptMany(Tokens.AcceptToken<IModiferToken>);
 
             switch (Tokens.Current)
             {
@@ -75,10 +75,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        public MemberDeclarationSyntax ParseMemberDeclaration()
+        public IMemberDeclarationSyntax ParseMemberDeclaration()
         {
             var attributes = ParseAttributes();
-            var modifiers = AcceptList(Tokens.AcceptToken<IModiferToken>);
+            var modifiers = AcceptMany(Tokens.AcceptToken<IModiferToken>);
 
             switch (Tokens.Current)
             {
@@ -195,14 +195,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private FixedList<ExpressionSyntax> AcceptBaseTypes()
         {
             if (!Tokens.Accept<ILessThanColonToken>()) return null;
-            return ParseSeparatedList<ExpressionSyntax, ICommaToken>(ParseExpression);
+            return AcceptOneOrMore<ExpressionSyntax, ICommaToken>(ParseExpression);
         }
 
         [MustUseReturnValue]
         [NotNull]
         private FixedList<ExpressionSyntax> ParseInvariants()
         {
-            return AcceptList(AcceptInvariant);
+            return AcceptMany(AcceptInvariant);
         }
 
         [MustUseReturnValue]
@@ -214,13 +214,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         }
 
         [NotNull]
-        private FixedList<MemberDeclarationSyntax> ParseMemberDeclarations()
+        private FixedList<IMemberDeclarationSyntax> ParseMemberDeclarations()
         {
-            return ParseList<MemberDeclarationSyntax, ICloseBraceToken>(ParseMemberDeclaration);
+            return ParseMany<IMemberDeclarationSyntax, ICloseBraceToken>(ParseMemberDeclaration);
         }
 
         [NotNull]
-        private FixedList<MemberDeclarationSyntax> ParseTypeBody()
+        private FixedList<IMemberDeclarationSyntax> ParseTypeBody()
         {
             Tokens.Expect<IOpenBraceToken>();
             var members = ParseMemberDeclarations();
@@ -289,7 +289,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        private MemberDeclarationSyntax ParseEnum(
+        private TypeDeclarationSyntax ParseEnum(
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers)
         {
@@ -609,7 +609,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (!Tokens.Accept<IMayKeywordToken>())
                 return FixedList<EffectSyntax>.Empty;
 
-            return ParseSeparatedList<EffectSyntax, ICommaToken>(ParseEffect);
+            return AcceptOneOrMore<EffectSyntax, ICommaToken>(ParseEffect);
         }
 
         [MustUseReturnValue]
@@ -619,7 +619,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (!Tokens.Accept<INoKeywordToken>())
                 return FixedList<EffectSyntax>.Empty;
 
-            return ParseSeparatedList<EffectSyntax, ICommaToken>(ParseEffect);
+            return AcceptOneOrMore<EffectSyntax, ICommaToken>(ParseEffect);
         }
 
         [MustUseReturnValue]
@@ -630,7 +630,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             {
                 case IThrowKeywordToken _:
                     Tokens.Expect<IThrowKeywordToken>();
-                    var exceptions = ParseSeparatedList<ThrowEffectEntrySyntax, ICommaToken>(ParseThrowEffectEntry);
+                    var exceptions = AcceptOneOrMore<ThrowEffectEntrySyntax, ICommaToken>(ParseThrowEffectEntry);
                     return new ThrowEffectSyntax(exceptions);
                 case IIdentifierToken _:
                     return new SimpleEffectSyntax(Tokens.RequiredToken<IIdentifierToken>().Value);

@@ -5,19 +5,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class BreakExpressionSyntax : ExpressionSyntax
     {
-        [CanBeNull] public ExpressionSyntax Expression { get; }
+        [CanBeNull] public ExpressionSyntax Value { get; }
 
         public BreakExpressionSyntax(
             TextSpan span,
-            [CanBeNull] ExpressionSyntax expression)
+            [CanBeNull] ExpressionSyntax value)
             : base(span)
         {
-            Expression = expression;
+            Value = value;
         }
 
         public override string ToString()
         {
-            if (Expression != null) return $"break {Expression}";
+            if (Value != null) return $"break {Value}";
             return "break";
         }
     }

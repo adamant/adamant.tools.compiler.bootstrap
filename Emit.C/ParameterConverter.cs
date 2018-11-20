@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using JetBrains.Annotations;
 

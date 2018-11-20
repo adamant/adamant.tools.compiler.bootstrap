@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     {
         [MustUseReturnValue]
         [NotNull, ItemNotNull]
-        public FixedList<T> AcceptList<T>([NotNull] Func<T> acceptItem)
+        public FixedList<T> AcceptMany<T>([NotNull] Func<T> acceptItem)
             where T : class
         {
             return new Generator<T>(acceptItem)
@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [MustUseReturnValue]
         [NotNull, ItemNotNull]
-        public FixedList<T> ParseList<T, TTerminator>([NotNull] Func<T> parseItem)
+        public FixedList<T> ParseMany<T, TTerminator>([NotNull] Func<T> parseItem)
             where T : class
             where TTerminator : IToken
         {
@@ -50,10 +50,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return items.ToFixedList();
         }
 
-        // TODO this method isn't correct. It should be named Accept... and what it should do is expect the first item but not the rest
         [MustUseReturnValue]
         [NotNull, ItemNotNull]
-        public FixedList<T> ParseSeparatedList<T, TSeparator>([NotNull] Func<T> acceptItem)
+        public FixedList<T> AcceptOneOrMore<T, TSeparator>([NotNull] Func<T> acceptItem)
             where T : class
             where TSeparator : class, IToken
         {
@@ -74,7 +73,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        public FixedList<T> ParseSeparatedList<T, TSeparator, TTerminator>([NotNull] Func<T> parseItem)
+        public FixedList<T> ParseMany<T, TSeparator, TTerminator>([NotNull] Func<T> parseItem)
             where T : class
             where TSeparator : class, IToken
             where TTerminator : IToken

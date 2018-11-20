@@ -1,7 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using JetBrains.Annotations;
@@ -75,14 +74,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
         }
 
         [NotNull]
-        public static Diagnostic CannotConvert([NotNull] CodeFile file, [NotNull] ExpressionAnalysis expression, [NotNull] DataType type)
+        public static Diagnostic CannotConvert([NotNull] CodeFile file, [NotNull] ExpressionSyntax expression, [NotNull] DataType type)
         {
             return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3007,
                 $"Cannot convert expression `{file.Code[expression.Span]}` to type `{type}`");
         }
 
         [NotNull]
-        public static Diagnostic MustBeCallable([NotNull] CodeFile file, [NotNull] ExpressionAnalysis expression)
+        public static Diagnostic MustBeCallable([NotNull] CodeFile file, [NotNull] ExpressionSyntax expression)
         {
             return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3008,
                 $"Expression must be of callable type to be invoked `{file.Code[expression.Span]}`");

@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [NotNull] public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
         [NotNull] public FixedList<ExpressionSyntax> Invariants { get; }
         [NotNull] public FixedList<EnumVariantSyntax> Variants { get; }
-        [NotNull] public FixedList<MemberDeclarationSyntax> Members { get; }
+        [NotNull] public FixedList<IMemberDeclarationSyntax> Members { get; }
 
         public EnumClassDeclarationSyntax(
             [NotNull] FixedList<AttributeSyntax> attributes,
@@ -30,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             [NotNull] FixedList<GenericConstraintSyntax> genericConstraints,
             [NotNull] FixedList<ExpressionSyntax> invariants,
             [NotNull] FixedList<EnumVariantSyntax> variants,
-            [NotNull] FixedList<MemberDeclarationSyntax> members)
+            [NotNull] FixedList<IMemberDeclarationSyntax> members)
             : base(nameSpan)
         {
             Attributes = attributes;

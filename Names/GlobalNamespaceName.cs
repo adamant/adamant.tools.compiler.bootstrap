@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Names
@@ -12,6 +14,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
 
         private GlobalNamespaceName() { }
         #endregion
+
+        public override IEnumerable<SimpleName> Segments => Enumerable.Empty<SimpleName>();
 
         [NotNull]
         public override Name Qualify([NotNull] Name name)

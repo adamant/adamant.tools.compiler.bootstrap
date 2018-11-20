@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Model;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using JetBrains.Annotations;
 

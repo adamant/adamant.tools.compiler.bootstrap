@@ -1,23 +1,20 @@
-using Adamant.Tools.Compiler.Bootstrap.AST;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
+using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Scopes
 {
-    public abstract class NestedScope : LexicalScope
+    public class NestedScope : LexicalScope
     {
         [NotNull] public LexicalScope ContainingScope { get; }
 
-        protected NestedScope(
+        public NestedScope(
             [NotNull] LexicalScope containingScope,
-            [NotNull] Syntax syntax)
-            : base(syntax)
+            [NotNull, ItemNotNull] IEnumerable<ISymbol> symbols)
+            : base(symbols)
         {
-            Requires.NotNull(nameof(containingScope), containingScope);
             ContainingScope = containingScope;
-            containingScope.Add(this);
         }
 
         [CanBeNull]
@@ -27,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Scopes
         }
 
         [CanBeNull]
-        public override ISymbol LookupGlobal([NotNull] Name name)
+        public override ISymbol LookupGlobal([NotNull] SimpleName name)
         {
             return ContainingScope.LookupGlobal(name);
         }

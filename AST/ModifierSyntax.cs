@@ -4,7 +4,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         public readonly AccessModifier Access;
 
-
         public ModifierSyntax(AccessModifier access)
         {
             Access = access;

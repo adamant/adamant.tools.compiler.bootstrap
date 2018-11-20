@@ -16,8 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AST\AST.csproj" />
-    <ProjectReference Include="..\Primitives\Primitives.csproj" />
     <ProjectReference Include="..\Symbols\Symbols.csproj" />
   </ItemGroup>
 

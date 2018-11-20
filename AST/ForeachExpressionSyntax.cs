@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         public bool MutableBinding { get; }
         [NotNull] public SimpleName VariableName { get; }
-        [CanBeNull] public ExpressionSyntax Type { get; }
+        [CanBeNull] public ExpressionSyntax TypeExpression { get; }
         [NotNull] public ExpressionSyntax InExpression { get; }
         [NotNull] public BlockSyntax Block { get; }
 
@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             TextSpan span,
             bool mutableBinding,
             [NotNull] string variableName,
-            [CanBeNull] ExpressionSyntax type,
+            [CanBeNull] ExpressionSyntax typeExpression,
             [NotNull] ExpressionSyntax inExpression,
             [NotNull] BlockSyntax block)
             : base(span)
@@ -25,13 +25,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             VariableName = new SimpleName(variableName);
             InExpression = inExpression;
             Block = block;
-            Type = type;
+            TypeExpression = typeExpression;
         }
 
         public override string ToString()
         {
             var binding = MutableBinding ? "var " : "";
-            return $"foreach {binding}{VariableName}: {Type} in {InExpression} {Block}";
+            return $"foreach {binding}{VariableName}: {TypeExpression} in {InExpression} {Block}";
         }
     }
 }

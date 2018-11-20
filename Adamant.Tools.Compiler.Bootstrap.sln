@@ -60,9 +60,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Symbols", "Symbols\Symbols.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Types", "Types\Types.csproj", "{1E83FFEC-140B-4D70-B507-6D4873792FF6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Primitives", "Primitives\Primitives.csproj", "{847178B8-0137-48B3-8B05-B3EFDA1C90D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Primitives", "Primitives\Primitives.csproj", "{847178B8-0137-48B3-8B05-B3EFDA1C90D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scopes", "Scopes\Scopes.csproj", "{BC8CB599-72D7-4494-8CD7-F6661599AEBD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Scopes", "Scopes\Scopes.csproj", "{BC8CB599-72D7-4494-8CD7-F6661599AEBD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntermediateLanguage", "IntermediateLanguage\IntermediateLanguage.csproj", "{C8CA4E6C-305E-406A-8BED-2B8605F1867C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -162,6 +164,10 @@ Global
 		{BC8CB599-72D7-4494-8CD7-F6661599AEBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BC8CB599-72D7-4494-8CD7-F6661599AEBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BC8CB599-72D7-4494-8CD7-F6661599AEBD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8CA4E6C-305E-406A-8BED-2B8605F1867C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8CA4E6C-305E-406A-8BED-2B8605F1867C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8CA4E6C-305E-406A-8BED-2B8605F1867C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8CA4E6C-305E-406A-8BED-2B8605F1867C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

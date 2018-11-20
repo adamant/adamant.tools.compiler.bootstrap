@@ -15,31 +15,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public bool InGlobalNamespace { get; }
         [NotNull] public Name Name { get; }
         [NotNull] public Name FullName { get; }
-
-        /// <summary>
-        /// The implicit file namespace doesn't have a span.
-        /// </summary>
-        public TextSpan? NameSpan { get; }
-
-        [NotNull] public RootName InNamespaceName { get; }
+        [NotNull] public RootName NameContext { get; }
         [NotNull] public FixedList<UsingDirectiveSyntax> UsingDirectives { get; }
         [NotNull] public FixedList<DeclarationSyntax> Declarations { get; }
 
         public NamespaceDeclarationSyntax(
             bool inGlobalNamespace,
             [NotNull] Name name,
-            TextSpan? nameSpan,
-            [NotNull] RootName inNamespaceName,
+            TextSpan nameSpan,
+            [NotNull] RootName nameContext,
             [NotNull] FixedList<UsingDirectiveSyntax> usingDirectives,
             [NotNull] FixedList<DeclarationSyntax> declarations)
+            : base(nameSpan)
         {
             Name = name;
-            FullName = inNamespaceName.Qualify(name);
+            FullName = nameContext.Qualify(name);
             UsingDirectives = usingDirectives;
             Declarations = declarations;
             InGlobalNamespace = inGlobalNamespace;
-            NameSpan = nameSpan;
-            InNamespaceName = inNamespaceName;
+            NameContext = nameContext;
         }
 
         public override string ToString()

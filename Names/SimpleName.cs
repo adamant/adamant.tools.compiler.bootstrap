@@ -23,6 +23,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
             IsSpecial = isSpecial;
         }
 
+        public override IEnumerable<SimpleName> Segments => this.Yield();
+
         public override bool HasQualifier([NotNull] Name name)
         {
             Requires.NotNull(nameof(name), name);

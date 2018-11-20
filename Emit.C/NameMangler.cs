@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Model;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using JetBrains.Annotations;
 

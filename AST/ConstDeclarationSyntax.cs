@@ -6,12 +6,12 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class ConstDeclarationSyntax : MemberDeclarationSyntax
+    public class ConstDeclarationSyntax : DeclarationSyntax, IMemberDeclarationSyntax
     {
         [NotNull] public FixedList<AttributeSyntax> Attributes { get; }
         [NotNull] [ItemNotNull] public FixedList<IModiferToken> Modifiers { get; }
         [NotNull] public SimpleName Name { get; }
-        [CanBeNull] public ExpressionSyntax Type { get; }
+        [CanBeNull] public ExpressionSyntax TypeExpression { get; }
         [CanBeNull] public ExpressionSyntax Initializer { get; }
 
         public ConstDeclarationSyntax(
@@ -19,14 +19,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             [NotNull] [ItemNotNull] FixedList<IModiferToken> modifiers,
             [NotNull] string name,
             TextSpan nameSpan,
-            [CanBeNull] ExpressionSyntax type,
+            [CanBeNull] ExpressionSyntax typeExpression,
             [CanBeNull] ExpressionSyntax initializer)
             : base(nameSpan)
         {
             Attributes = attributes;
             Modifiers = modifiers;
             Name = new SimpleName(name);
-            Type = type;
+            TypeExpression = typeExpression;
             Initializer = initializer;
         }
 

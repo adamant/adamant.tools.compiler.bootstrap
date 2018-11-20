@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Adamant.Tools.Compiler.Bootstrap.AST;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols;
@@ -9,36 +9,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Scopes
 {
     public abstract class LexicalScope
     {
-        [NotNull] public Syntax Syntax { get; }
-        [NotNull, ItemNotNull] public IReadOnlyList<LexicalScope> NestedScopes { get; }
-        [NotNull, ItemNotNull] private readonly List<LexicalScope> nestedScopes = new List<LexicalScope>();
-        [CanBeNull] private FixedDictionary<SimpleName, ISymbol> declarations;
+        [NotNull] private readonly FixedDictionary<SimpleName, ISymbol> symbols;
 
-        protected LexicalScope([NotNull] Syntax syntax)
+        protected LexicalScope([NotNull, ItemNotNull] IEnumerable<ISymbol> symbols)
         {
-            Requires.NotNull(nameof(syntax), syntax);
-            Syntax = syntax;
-            NestedScopes = nestedScopes.AsReadOnly().NotNull();
-        }
-
-        internal void Add([NotNull] NestedScope nestedScope)
-        {
-            Requires.That(nameof(nestedScope), nestedScope.ContainingScope == this);
-            nestedScopes.Add(nestedScope);
-        }
-
-        public void Bind([NotNull] Dictionary<SimpleName, ISymbol> symbolDeclarations)
-        {
-            declarations = symbolDeclarations.ToFixedDictionary();
+            this.symbols = symbols.ToDictionary(s => s.Name.UnqualifiedName, s => s)
+                .ToFixedDictionary();
         }
 
         [CanBeNull]
         public virtual ISymbol Lookup([NotNull] SimpleName name)
         {
-            return declarations.NotNull().TryGetValue(name, out var declaration) ? declaration : null;
+            return symbols.TryGetValue(name, out var declaration) ? declaration : null;
         }
 
         [CanBeNull]
-        public abstract ISymbol LookupGlobal([NotNull] Name name);
+        public abstract ISymbol LookupGlobal([NotNull] SimpleName name);
     }
 }

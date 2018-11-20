@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Names
@@ -8,6 +9,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
     /// </summary>
     public abstract class RootName
     {
+        [NotNull, ItemNotNull] public abstract IEnumerable<SimpleName> Segments { get; }
+
         /// <summary>
         /// Construct a new name by qualifying the given name with this one.
         /// </summary>

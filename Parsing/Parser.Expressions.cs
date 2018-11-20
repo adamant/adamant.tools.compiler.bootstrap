@@ -568,7 +568,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var matchKeyword = Tokens.Expect<IMatchKeywordToken>();
             var value = ParseExpression();
             Tokens.Expect<IOpenBraceToken>();
-            var arms = ParseSeparatedList<MatchArmSyntax, ICommaToken, ICloseBraceToken>(ParseMatchArm);
+            var arms = ParseMany<MatchArmSyntax, ICommaToken, ICloseBraceToken>(ParseMatchArm);
             var closeBrace = Tokens.Expect<ICloseBraceToken>();
             var span = TextSpan.Covering(matchKeyword, closeBrace);
             return new MatchExpressionSyntax(span, value, arms);

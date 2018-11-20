@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public bool IsParams { get; }
         public bool MutableBinding { get; }
         [NotNull] public SimpleName Name { get; }
-        [NotNull] public ExpressionSyntax Type { get; }
+        [NotNull] public ExpressionSyntax TypeExpression { get; }
         [CanBeNull] public ExpressionSyntax DefaultValue { get; }
 
         public NamedParameterSyntax(
@@ -17,14 +17,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             bool isParams,
             bool mutableBinding,
             [NotNull] string name,
-            [NotNull] ExpressionSyntax type,
+            [NotNull] ExpressionSyntax typeExpression,
             [CanBeNull] ExpressionSyntax defaultValue)
             : base(span)
         {
             IsParams = isParams;
             MutableBinding = mutableBinding;
             Name = new SimpleName(name);
-            Type = type;
+            TypeExpression = typeExpression;
             DefaultValue = defaultValue;
         }
 

@@ -1,20 +1,21 @@
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    // TODO maybe this class should be removed in favor of just using NameSyntax?
     public class UsingDirectiveSyntax : Syntax
     {
-        [NotNull] public NameSyntax Name { get; }
+        // For now, we only support namespace names
+        [NotNull] public Name Name { get; }
 
-        public UsingDirectiveSyntax([NotNull] NameSyntax name)
+        public UsingDirectiveSyntax([NotNull] Name name)
         {
             Name = name;
         }
 
         public override string ToString()
         {
-            throw new System.NotImplementedException();
+            return $"using {Name};";
         }
     }
 }

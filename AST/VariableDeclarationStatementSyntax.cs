@@ -20,7 +20,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             [CanBeNull] ExpressionSyntax initializer)
         {
             MutableBinding = mutableBinding;
-       
             Name = new SimpleName(name);
             NameSpan = nameSpan;
             TypeExpression = typeExpression;

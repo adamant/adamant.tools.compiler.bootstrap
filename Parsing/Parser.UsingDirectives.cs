@@ -1,5 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -11,16 +12,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [NotNull]
         public FixedList<UsingDirectiveSyntax> ParseUsingDirectives()
         {
-            return AcceptList(AcceptUsingDirective);
+            return AcceptMany(AcceptUsingDirective);
         }
 
         [CanBeNull]
         public UsingDirectiveSyntax AcceptUsingDirective()
         {
             if (!Tokens.Accept<IUsingKeywordToken>()) return null;
-            var name = ParseName();
+            var identifiers = AcceptOneOrMore<IIdentifierToken, IDotToken>(
+                () => Tokens.AcceptToken<IIdentifierToken>());
+            RootName name = GlobalNamespaceName.Instance;
+            foreach (var identifier in identifiers)
+                name = name.Qualify(identifier.Value);
             Tokens.Expect<ISemicolonToken>();
-            return new UsingDirectiveSyntax(name);
+            return new UsingDirectiveSyntax((Name)name);
         }
     }
 }
