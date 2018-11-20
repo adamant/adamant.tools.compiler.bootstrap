@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Primitives
+namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 {
     public class PrimitiveMemberSymbol : ISymbol
     {

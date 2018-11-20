@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
+namespace Adamant.Tools.Compiler.Bootstrap.Scopes
 {
     public class NamespaceScope : NestedScope
     {

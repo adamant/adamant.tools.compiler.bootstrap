@@ -4,7 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Primitives
+namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 {
     /// <summary>
     /// Provides a declaration of the primitives for use when name binding etc.

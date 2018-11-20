@@ -1,7 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
+namespace Adamant.Tools.Compiler.Bootstrap.Scopes
 {
     public class LocalVariableScope : NestedScope
     {

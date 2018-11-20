@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
+namespace Adamant.Tools.Compiler.Bootstrap.Scopes
 {
     public abstract class LexicalScope
     {
