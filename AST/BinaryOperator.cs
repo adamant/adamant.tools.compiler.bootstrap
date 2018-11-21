@@ -11,6 +11,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         GreaterThanOrEqual,
         And,
         Or,
-        Xor
     }
 }

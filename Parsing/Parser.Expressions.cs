@@ -67,7 +67,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         }
                         break;
                     case IOrKeywordToken _:
-                    case IXorKeywordToken _:
                         if (minPrecedence <= OperatorPrecedence.LogicalOr)
                         {
                             precedence = OperatorPrecedence.LogicalOr;
@@ -312,9 +311,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IOrKeywordToken _:
                     binaryOperator = BinaryOperator.Or;
                     break;
-                case IXorKeywordToken _:
-                    binaryOperator = BinaryOperator.Xor;
-                    break;
                 default:
                     throw NonExhaustiveMatchException.For(operatorToken);
             }
@@ -402,7 +398,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IUIntKeywordToken _:
                 case IBoolKeywordToken _:
                 case IByteKeywordToken _:
-                case IStringKeywordToken _:
                 case INeverKeywordToken _:
                 case ISizeKeywordToken _:
                 case ITypeKeywordToken _:

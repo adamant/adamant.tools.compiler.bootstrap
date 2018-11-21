@@ -9,7 +9,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     public partial interface IUIntKeywordToken : IPrimitiveTypeToken { }
     public partial interface IBoolKeywordToken : IPrimitiveTypeToken { }
     public partial interface IByteKeywordToken : IPrimitiveTypeToken { }
-    public partial interface IStringKeywordToken : IPrimitiveTypeToken { }
     public partial interface INeverKeywordToken : IPrimitiveTypeToken { }
     public partial interface ISizeKeywordToken : IPrimitiveTypeToken { }
     public partial interface ITypeKeywordToken : IPrimitiveTypeToken { }

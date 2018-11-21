@@ -37,6 +37,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     public partial interface IEqualsGreaterThanToken : IOperatorToken { }
     public partial interface IAndKeywordToken : IOperatorToken { }
     public partial interface IOrKeywordToken : IOperatorToken { }
-    public partial interface IXorKeywordToken : IOperatorToken { }
     public partial interface INotKeywordToken : IOperatorToken { }
 }

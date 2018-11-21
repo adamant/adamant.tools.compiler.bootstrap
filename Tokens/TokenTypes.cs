@@ -40,6 +40,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
                     case "MutableKeywordToken":
                         keyword = "mut";
                         break;
+                    case "AnyKeywordToken":
+                        keyword = "Any";
+                        break;
                     default:
                         keyword = tokenTypeName
                             .Substring(0, tokenTypeName.Length - KeywordTokenLength)

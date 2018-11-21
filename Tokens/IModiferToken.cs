@@ -6,7 +6,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     public partial interface IAbstractKeywordToken : IModiferToken { }
     public partial interface IImplicitKeywordToken : IModiferToken { }
     public partial interface IExplicitKeywordToken : IModiferToken { }
-    public partial interface IExtendKeywordToken : IModiferToken { }
     public partial interface IMutableKeywordToken : IModiferToken { }
     public partial interface IOverrideKeywordToken : IModiferToken { }
     public partial interface IMoveKeywordToken : IModiferToken { }

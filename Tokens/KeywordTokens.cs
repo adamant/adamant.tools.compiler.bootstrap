@@ -14,16 +14,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             typeof(PublishedKeywordToken),
             typeof(PublicKeywordToken),
             typeof(ProtectedKeywordToken),
-            typeof(PrivateKeywordToken),
             typeof(LetKeywordToken),
             typeof(VarKeywordToken),
             typeof(VoidKeywordToken),
             typeof(IntKeywordToken),
+            typeof(Int8KeywordToken),
+            typeof(Int16KeywordToken),
+            typeof(Int64KeywordToken),
             typeof(UIntKeywordToken),
+            typeof(UInt16KeywordToken),
+            typeof(UInt64KeywordToken),
             typeof(ByteKeywordToken),
             typeof(SizeKeywordToken),
             typeof(BoolKeywordToken),
-            typeof(StringKeywordToken),
             typeof(NeverKeywordToken),
             typeof(ReturnKeywordToken),
             typeof(ClassKeywordToken),
@@ -45,7 +48,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             typeof(SelfKeywordToken),
             typeof(SelfTypeKeywordToken),
             typeof(BaseKeywordToken),
-            typeof(ExtendKeywordToken),
             typeof(TypeKeywordToken),
             typeof(MetatypeKeywordToken),
             typeof(MutableKeywordToken),
@@ -62,7 +64,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             typeof(InvariantKeywordToken),
             typeof(WhereKeywordToken),
             typeof(ConstKeywordToken),
-            typeof(AliasKeywordToken),
             typeof(UninitializedKeywordToken),
             typeof(NoneKeywordToken),
             typeof(OperatorKeywordToken),
@@ -82,9 +83,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             typeof(AsKeywordToken),
             typeof(AndKeywordToken),
             typeof(OrKeywordToken),
-            typeof(XorKeywordToken),
             typeof(NotKeywordToken),
             typeof(TraitKeywordToken),
+            typeof(FloatKeywordToken),
+            typeof(Float32KeywordToken),
+            typeof(OffsetKeywordToken),
         }.AsReadOnly().NotNull();
     }
 
@@ -106,12 +109,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         public static IProtectedKeywordToken ProtectedKeyword(TextSpan span)
         {
             return new ProtectedKeywordToken(span);
-        }
-
-        [NotNull]
-        public static IPrivateKeywordToken PrivateKeyword(TextSpan span)
-        {
-            return new PrivateKeywordToken(span);
         }
 
         [NotNull]
@@ -139,9 +136,39 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
 
         [NotNull]
+        public static IInt8KeywordToken Int8Keyword(TextSpan span)
+        {
+            return new Int8KeywordToken(span);
+        }
+
+        [NotNull]
+        public static IInt16KeywordToken Int16Keyword(TextSpan span)
+        {
+            return new Int16KeywordToken(span);
+        }
+
+        [NotNull]
+        public static IInt64KeywordToken Int64Keyword(TextSpan span)
+        {
+            return new Int64KeywordToken(span);
+        }
+
+        [NotNull]
         public static IUIntKeywordToken UIntKeyword(TextSpan span)
         {
             return new UIntKeywordToken(span);
+        }
+
+        [NotNull]
+        public static IUInt16KeywordToken UInt16Keyword(TextSpan span)
+        {
+            return new UInt16KeywordToken(span);
+        }
+
+        [NotNull]
+        public static IUInt64KeywordToken UInt64Keyword(TextSpan span)
+        {
+            return new UInt64KeywordToken(span);
         }
 
         [NotNull]
@@ -160,12 +187,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         public static IBoolKeywordToken BoolKeyword(TextSpan span)
         {
             return new BoolKeywordToken(span);
-        }
-
-        [NotNull]
-        public static IStringKeywordToken StringKeyword(TextSpan span)
-        {
-            return new StringKeywordToken(span);
         }
 
         [NotNull]
@@ -295,12 +316,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
 
         [NotNull]
-        public static IExtendKeywordToken ExtendKeyword(TextSpan span)
-        {
-            return new ExtendKeywordToken(span);
-        }
-
-        [NotNull]
         public static ITypeKeywordToken TypeKeyword(TextSpan span)
         {
             return new TypeKeywordToken(span);
@@ -394,12 +409,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         public static IConstKeywordToken ConstKeyword(TextSpan span)
         {
             return new ConstKeywordToken(span);
-        }
-
-        [NotNull]
-        public static IAliasKeywordToken AliasKeyword(TextSpan span)
-        {
-            return new AliasKeywordToken(span);
         }
 
         [NotNull]
@@ -517,12 +526,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
 
         [NotNull]
-        public static IXorKeywordToken XorKeyword(TextSpan span)
-        {
-            return new XorKeywordToken(span);
-        }
-
-        [NotNull]
         public static INotKeywordToken NotKeyword(TextSpan span)
         {
             return new NotKeywordToken(span);
@@ -532,6 +535,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         public static ITraitKeywordToken TraitKeyword(TextSpan span)
         {
             return new TraitKeywordToken(span);
+        }
+
+        [NotNull]
+        public static IFloatKeywordToken FloatKeyword(TextSpan span)
+        {
+            return new FloatKeywordToken(span);
+        }
+
+        [NotNull]
+        public static IFloat32KeywordToken Float32Keyword(TextSpan span)
+        {
+            return new Float32KeywordToken(span);
+        }
+
+        [NotNull]
+        public static IOffsetKeywordToken OffsetKeyword(TextSpan span)
+        {
+            return new OffsetKeywordToken(span);
         }
 
     }
@@ -558,15 +579,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     internal partial class ProtectedKeywordToken : Token, IProtectedKeywordToken
     {
         public ProtectedKeywordToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
-    public partial interface IPrivateKeywordToken : IKeywordToken { }
-    internal partial class PrivateKeywordToken : Token, IPrivateKeywordToken
-    {
-        public PrivateKeywordToken(TextSpan span)
             : base(span)
         {
         }
@@ -608,10 +620,55 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
+    public partial interface IInt8KeywordToken : IKeywordToken { }
+    internal partial class Int8KeywordToken : Token, IInt8KeywordToken
+    {
+        public Int8KeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface IInt16KeywordToken : IKeywordToken { }
+    internal partial class Int16KeywordToken : Token, IInt16KeywordToken
+    {
+        public Int16KeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface IInt64KeywordToken : IKeywordToken { }
+    internal partial class Int64KeywordToken : Token, IInt64KeywordToken
+    {
+        public Int64KeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
     public partial interface IUIntKeywordToken : IKeywordToken { }
     internal partial class UIntKeywordToken : Token, IUIntKeywordToken
     {
         public UIntKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface IUInt16KeywordToken : IKeywordToken { }
+    internal partial class UInt16KeywordToken : Token, IUInt16KeywordToken
+    {
+        public UInt16KeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface IUInt64KeywordToken : IKeywordToken { }
+    internal partial class UInt64KeywordToken : Token, IUInt64KeywordToken
+    {
+        public UInt64KeywordToken(TextSpan span)
             : base(span)
         {
         }
@@ -639,15 +696,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     internal partial class BoolKeywordToken : Token, IBoolKeywordToken
     {
         public BoolKeywordToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
-    public partial interface IStringKeywordToken : IKeywordToken { }
-    internal partial class StringKeywordToken : Token, IStringKeywordToken
-    {
-        public StringKeywordToken(TextSpan span)
             : base(span)
         {
         }
@@ -842,15 +890,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IExtendKeywordToken : IKeywordToken { }
-    internal partial class ExtendKeywordToken : Token, IExtendKeywordToken
-    {
-        public ExtendKeywordToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
     public partial interface ITypeKeywordToken : IKeywordToken { }
     internal partial class TypeKeywordToken : Token, ITypeKeywordToken
     {
@@ -990,15 +1029,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     internal partial class ConstKeywordToken : Token, IConstKeywordToken
     {
         public ConstKeywordToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
-    public partial interface IAliasKeywordToken : IKeywordToken { }
-    internal partial class AliasKeywordToken : Token, IAliasKeywordToken
-    {
-        public AliasKeywordToken(TextSpan span)
             : base(span)
         {
         }
@@ -1175,15 +1205,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IXorKeywordToken : IKeywordToken { }
-    internal partial class XorKeywordToken : Token, IXorKeywordToken
-    {
-        public XorKeywordToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
     public partial interface INotKeywordToken : IKeywordToken { }
     internal partial class NotKeywordToken : Token, INotKeywordToken
     {
@@ -1197,6 +1218,33 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     internal partial class TraitKeywordToken : Token, ITraitKeywordToken
     {
         public TraitKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface IFloatKeywordToken : IKeywordToken { }
+    internal partial class FloatKeywordToken : Token, IFloatKeywordToken
+    {
+        public FloatKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface IFloat32KeywordToken : IKeywordToken { }
+    internal partial class Float32KeywordToken : Token, IFloat32KeywordToken
+    {
+        public Float32KeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface IOffsetKeywordToken : IKeywordToken { }
+    internal partial class OffsetKeywordToken : Token, IOffsetKeywordToken
+    {
+        public OffsetKeywordToken(TextSpan span)
             : base(span)
         {
         }
