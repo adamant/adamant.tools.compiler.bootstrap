@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -8,7 +9,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
 {
     public class NameBinder
     {
@@ -19,15 +20,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             [NotNull] PackageSyntax packageSyntax,
             [NotNull] FixedDictionary<string, Package> references)
         {
-            symbols = references.Values.NotNull()
-                .SelectMany(p => p.Declarations).NotNull().Cast<ISymbol>()
-                .Concat(packageSyntax.CompilationUnits.SelectMany(cu => cu.NotNull().AllNonMemberDeclarations))
-                .ToFixedList();
+            symbols = GetAllSymbols(packageSyntax, references);
+            globalScope = new GlobalScope(GetAllGlobalSymbols());
+        }
 
-            var globalSymbols = symbols.Where(s => s.NotNull().IsGlobal())
+        [NotNull]
+        private static FixedList<ISymbol> GetAllSymbols(
+            [NotNull] PackageSyntax packageSyntax,
+            [NotNull] FixedDictionary<string, Package> references)
+        {
+            return references.Values.NotNull()
+                    .SelectMany(p => p.Declarations).NotNull().Cast<ISymbol>()
+                    .Concat(packageSyntax.CompilationUnits.SelectMany(cu => cu.NotNull().AllNamespacedDeclarations))
+                    .ToFixedList();
+        }
+
+        [NotNull, ItemNotNull]
+        private IEnumerable<ISymbol> GetAllGlobalSymbols()
+        {
+            return symbols.Where(s => s.NotNull().IsGlobal())
                 .Concat(PrimitiveSymbols.Instance);
-
-            globalScope = new GlobalScope(globalSymbols);
         }
 
         public void BindNames([NotNull] PackageSyntax package)

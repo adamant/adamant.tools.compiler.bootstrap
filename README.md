@@ -8,11 +8,35 @@ The compiler is under active development. It is in a very early stage, and there
 
 ## Current Plan
 
-The current plan is to slowly build up functionality by getting a series of katas and small programs working. These will likely be included in the confromance tests. After some very basic programs, various versions of the Fizz Buzz kata will be worked on. As this process is carried out, the plan will be to:
+The current plan is to slowly build up functionality by getting a series of katas and small programs working. These will likely be included in the conformance tests. After some very basic programs, various versions of the Fizz Buzz kata will be worked on. As this process is carried out, the plan will be to:
 
-* Make the Adamant source code as correct as possible given all current ideas on the design of the language.
+* Make the Adamant source code as correct as possible given all current ideas on the design of the language with the exception of specific features listed below.
 * Ensure any language features used are in the language reference.
 * If needed, parts of what will be the standard library can be created as compiler intrinsics at first, but they could be replaced with correct standard library code as quickly as possible.
+
+### Excluded Language Features
+
+The following features will not be implemented by this compiler even though they are described in the [language reference](https://github.com/adamant/adamant.language.reference/blob/master/src/book.md).
+
+* [Loop Labels](https://github.com/adamant/adamant.language.reference/blob/master/src/loop-expressions.md#loop-labels)
+* [Document Comment Validation](https://github.com/adamant/adamant.language.reference/blob/master/src/documentation-comments.md#supported-markdown)
+
+### Features Planned for After v1.0
+
+A number of language features are planned for the future but not yet included in the language. For quick reference, SOME of those features are:
+
+* Types
+  * [128-bit Integer Types](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-features.md#128-bit-integer-types)
+  * [128-bit Floating Point Type](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-features.md#128-bit-floating-point-type)
+  * [Fixed Point Types](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-features.md#fixed-point-types)
+  * [Decimal Types](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-features.md#decimal-types)
+  * [Real Types](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-features.md#real-types)
+* Using Directives
+  * [Global and Package Qualified Using Directives](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-features.md#global-and-package-qualified-using-directives)
+  * [Using Type Members](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-features.md#using-type-members)
+* [Aliases](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-features.md#aliases)
+* Expressions
+  * [Multiline String Literals](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-features.md#multiline-string-literals)
 
 ## Cleanup Tasks
 

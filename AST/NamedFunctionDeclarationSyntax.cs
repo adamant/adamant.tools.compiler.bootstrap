@@ -9,7 +9,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class NamedFunctionDeclarationSyntax : FunctionDeclarationSyntax, INonMemberDeclarationSyntax
+    public class NamedFunctionDeclarationSyntax : FunctionDeclarationSyntax, INamespacedDeclarationSyntax
     {
         [NotNull] public SimpleName Name { get; }
 

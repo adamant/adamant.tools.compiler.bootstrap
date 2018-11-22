@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [NotNull] public RootName ImplicitNamespaceName { get; }
         [NotNull, ItemNotNull] public FixedList<UsingDirectiveSyntax> UsingDirectives { get; }
         [NotNull, ItemNotNull] public FixedList<DeclarationSyntax> Declarations { get; }
-        [NotNull, ItemNotNull] public FixedList<INonMemberDeclarationSyntax> AllNonMemberDeclarations { get; }
+        [NotNull, ItemNotNull] public FixedList<INamespacedDeclarationSyntax> AllNamespacedDeclarations { get; }
         [NotNull, ItemNotNull] public FixedList<Diagnostic> Diagnostics { get; }
 
         public CompilationUnitSyntax(
@@ -27,21 +27,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             ImplicitNamespaceName = implicitNamespaceName;
             UsingDirectives = usingDirectives;
             Declarations = declarations;
-            AllNonMemberDeclarations = GetAllNonMemberDeclarations(declarations);
+            AllNamespacedDeclarations = GetAllNamespacedDeclarations(declarations);
             Diagnostics = diagnostics;
         }
 
         [NotNull]
-        private static FixedList<INonMemberDeclarationSyntax> GetAllNonMemberDeclarations(
+        private static FixedList<INamespacedDeclarationSyntax> GetAllNamespacedDeclarations(
             [NotNull, ItemNotNull] FixedList<DeclarationSyntax> declarations)
         {
-            var memberDeclarations = new List<INonMemberDeclarationSyntax>();
-            memberDeclarations.AddRange(declarations.OfType<INonMemberDeclarationSyntax>());
+            var memberDeclarations = new List<INamespacedDeclarationSyntax>();
+            memberDeclarations.AddRange(declarations.OfType<INamespacedDeclarationSyntax>());
             var namespaces = new Queue<NamespaceDeclarationSyntax>();
             namespaces.EnqueueRange(declarations.OfType<NamespaceDeclarationSyntax>());
             while (namespaces.TryDequeue(out var ns))
             {
-                memberDeclarations.AddRange(ns.Declarations.OfType<INonMemberDeclarationSyntax>());
+                memberDeclarations.AddRange(ns.Declarations.OfType<INamespacedDeclarationSyntax>());
                 namespaces.EnqueueRange(ns.Declarations.OfType<NamespaceDeclarationSyntax>());
             }
 

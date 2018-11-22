@@ -1,4 +1,4 @@
-# Adamant.Tools.Compiler.Bootstrap.Semantics
+# Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 
 The Adamant Intermediate Language (IL) is both an intermediate representation (IR) for the compiler and the format for distributing machine independent Adamant libraries.
 

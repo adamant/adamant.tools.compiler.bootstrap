@@ -4,6 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Model;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
@@ -26,12 +27,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             nameBinder.BindNames(packageSyntax);
 
             // Make a list of all the non-member declarations
-            var nonMemberDeclarations = packageSyntax.CompilationUnits
-                .SelectMany(cu => cu.AllNonMemberDeclarations).ToFixedList();
+            var namespacedDeclarations = packageSyntax.CompilationUnits
+                .SelectMany(cu => cu.AllNamespacedDeclarations).ToFixedList();
+
+            // Do type checking
+            DeclarationTypeChecker.Check(namespacedDeclarations);
 
             // Build final declaration objects and find the entry point
             var declarationBuilder = new DeclarationBuilder();
-            var declarations = declarationBuilder.Build(nonMemberDeclarations);
+            var declarations = declarationBuilder.Build(namespacedDeclarations);
             var entryPoint = DetermineEntryPoint(declarations, diagnostics);
 
             return new Package(packageSyntax.Name, diagnostics.Build(), references, declarations, entryPoint);

@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public abstract class TypeDeclarationSyntax : DeclarationSyntax, INonMemberDeclarationSyntax, IMemberDeclarationSyntax, ISymbol
+    public abstract class TypeDeclarationSyntax : DeclarationSyntax, INamespacedDeclarationSyntax, IMemberDeclarationSyntax, ISymbol
     {
         protected TypeDeclarationSyntax(TextSpan nameSpan)
             : base(nameSpan)
