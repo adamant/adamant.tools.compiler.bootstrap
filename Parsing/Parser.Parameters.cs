@@ -40,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var span = Tokens.Current.Span;
                     var isParams = Tokens.Accept<IParamsKeywordToken>();
                     var mutableBinding = Tokens.Accept<IVarKeywordToken>();
-                    var name = Tokens.RequiredToken<IIdentifierToken>();
+                    var name = Tokens.RequiredToken<IIdentifierOrUnderscoreToken>();
                     Tokens.Expect<IColonToken>();
                     // Need to not consume the assignment that separates the type from the default value,
                     // hence the min operator precedence.
