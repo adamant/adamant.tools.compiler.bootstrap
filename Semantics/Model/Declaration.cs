@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
@@ -9,18 +7,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Model
 {
     public abstract class Declaration : ISymbol
     {
-        [NotNull] public Name Name { get; }
+        [NotNull] public Name FullName { get; }
         [NotNull] public DataType Type { get; }
 
         protected Declaration(
-            [NotNull] Name name,
+            [NotNull] Name fullName,
             [NotNull] DataType type)
         {
-            Name = name;
+            FullName = fullName;
             Type = type;
         }
 
-        IEnumerable<DataType> ISymbol.Types => Type.Yield();
         ISymbol ISymbol.ComposeWith([NotNull] ISymbol symbol)
         {
             if (symbol is CompositeSymbol composite)

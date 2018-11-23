@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     {
         public static bool IsGlobal([NotNull] this ISymbol symbol)
         {
-            return symbol.Name is SimpleName;
+            return symbol.FullName is SimpleName;
         }
     }
 }

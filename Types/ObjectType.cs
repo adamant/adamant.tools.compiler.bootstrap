@@ -19,7 +19,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         [NotNull] public static readonly ObjectType Size = new ObjectType(new SimpleName("size", true), false, false);
         [NotNull] public static readonly ObjectType Offset = new ObjectType(new SimpleName("offset", true), false, false);
         [NotNull] public static readonly ObjectType Bool = new ObjectType(new SimpleName("bool", true), false, false);
-        [NotNull] public static readonly ObjectType String = new ObjectType(new SimpleName("string", true), false, false);
         [NotNull] public static readonly ObjectType Type = new ObjectType(new SimpleName("type", true), true, false);
         [NotNull] public static readonly ObjectType Metatype = new ObjectType(new SimpleName("metatype", true), true, false);
         [NotNull] public static readonly ObjectType Any = new ObjectType(new SimpleName("any", true), true, false);

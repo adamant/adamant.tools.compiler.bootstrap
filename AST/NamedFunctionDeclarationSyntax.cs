@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -13,8 +12,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         [NotNull] public SimpleName Name { get; }
 
-        IEnumerable<DataType> ISymbol.Types => throw new System.NotImplementedException();
-
         ISymbol ISymbol.ComposeWith(ISymbol symbol)
         {
             throw new System.NotImplementedException();
@@ -26,6 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         }
 
         [CanBeNull] public ExpressionSyntax ReturnTypeExpression { get; }
+        DataType ISymbol.Type => Type.Fulfilled();
 
         public NamedFunctionDeclarationSyntax(
             [NotNull] CodeFile file,
@@ -53,6 +51,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             throw new System.NotImplementedException();
         }
 
-        Name ISymbol.Name => Name;
+        Name ISymbol.FullName => Name;
     }
 }

@@ -10,19 +10,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         [NotNull] public FixedList<AttributeSyntax> Attributes { get; }
         [NotNull] public FixedList<IModiferToken> Modifiers { get; }
-        [NotNull] public SimpleName Name { get; }
-        [CanBeNull] public FixedList<GenericParameterSyntax> GenericParameters { get; }
         [CanBeNull] public FixedList<ExpressionSyntax> BaseTypes { get; }
         [NotNull] public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
         [NotNull] public FixedList<ExpressionSyntax> Invariants { get; }
         [NotNull] public FixedList<EnumVariantSyntax> Variants { get; }
-        [NotNull] public FixedList<IMemberDeclarationSyntax> Members { get; }
 
         public EnumStructDeclarationSyntax(
             [NotNull] CodeFile file,
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers,
-            [NotNull] string name,
+            [NotNull] Name fullName,
             TextSpan nameSpan,
             [CanBeNull] FixedList<GenericParameterSyntax> genericParameters,
             [CanBeNull] FixedList<ExpressionSyntax> baseTypes,
@@ -30,17 +27,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             [NotNull] FixedList<ExpressionSyntax> invariants,
             [NotNull] FixedList<EnumVariantSyntax> variants,
             [NotNull] FixedList<IMemberDeclarationSyntax> members)
-            : base(file, nameSpan)
+            : base(file, nameSpan, fullName, genericParameters, members)
         {
             Attributes = attributes;
             Modifiers = modifiers;
-            Name = new SimpleName(name);
-            GenericParameters = genericParameters;
             BaseTypes = baseTypes;
             GenericConstraints = genericConstraints;
             Invariants = invariants;
             Variants = variants;
-            Members = members;
         }
 
         public override string ToString()

@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
+using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using JetBrains.Annotations;
 
@@ -113,153 +115,160 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 //        ConvertToAssignmentStatement(variable.Reference, variableDeclaration.Initializer, currentBlock);
                 //    break;
 
-                //case ExpressionSyntax expression:
-                //    ConvertExpressionAnalysisToStatement(expression, currentBlock);
-                //    break;
+                case ExpressionSyntax expression:
+                    ConvertExpressionAnalysisToStatement(expression, currentBlock);
+                    break;
 
                 default:
                     throw NonExhaustiveMatchException.For(statement);
             }
         }
 
-        //        private static bool IsOwned([NotNull] VariableDeclarationStatementAnalysis declaration)
-        //        {
-        //            Requires.NotNull(nameof(declaration), declaration);
-        //            if (declaration.Type.AssertResolved() is LifetimeType type)
-        //                return type.IsOwned;
+        private static bool IsOwned([NotNull] VariableDeclarationStatementSyntax declaration)
+        {
+            Requires.NotNull(nameof(declaration), declaration);
+            if (declaration.Type.Resolved() is LifetimeType type)
+                return type.IsOwned;
 
-        //            return false;
-        //        }
+            return false;
+        }
 
-        //        private void ConvertExpressionAnalysisToStatement(
-        //            [NotNull] ExpressionAnalysis expression,
-        //            [NotNull] [ItemNotNull] List<ExpressionStatement> statements)
-        //        {
-        //            switch (expression)
-        //            {
-        //                case IdentifierNameAnalysis _:
-        //                    // Ignore, reading from variable does nothing.
-        //                    break;
-        //                case BinaryExpressionAnalysis binaryOperatorExpression:
-        //                    switch (binaryOperatorExpression.Operator)
-        //                    {
-        //                        //case BinaryOperator. EqualsToken _:
-        //                        //    var lvalue = ConvertToLValue(binaryOperatorExpression.LeftOperand);
-        //                        //    ConvertToAssignmentStatement(lvalue, binaryOperatorExpression.RightOperand, statements);
-        //                        //    break;
-        //                        default:
-        //                            // Could be side effects possibly.
-        //                            var temp = Let(binaryOperatorExpression.Type.AssertResolved());
-        //                            ConvertToAssignmentStatement(temp.Reference, expression, statements);
-        //                            break;
-        //                    }
-        //                    break;
-        //                case ReturnExpressionAnalysis returnExpression:
-        //                    if (returnExpression.ReturnValue != null)
-        //                        ConvertToAssignmentStatement(ReturnVariable.Reference, returnExpression.ReturnValue, statements);
-        //                    AddBlock(statements, new ReturnStatement(CurrentBlockNumber, statements.Count));
-        //                    break;
-        //                case BlockAnalysis block:
-        //                    foreach (var statementInBlock in block.Statements)
-        //                        ConvertStatementAnalysisToStatement(statements, statementInBlock);
+        private void ConvertExpressionAnalysisToStatement(
+            [NotNull] ExpressionSyntax expression,
+            [NotNull] [ItemNotNull] List<ExpressionStatement> statements)
+        {
+            switch (expression)
+            {
+                case IdentifierNameSyntax _:
+                    // Ignore, reading from variable does nothing.
+                    break;
+                case BinaryExpressionSyntax binaryOperatorExpression:
+                    switch (binaryOperatorExpression.Operator)
+                    {
+                        //case BinaryOperator. EqualsToken _:
+                        //    var lvalue = ConvertToLValue(binaryOperatorExpression.LeftOperand);
+                        //    ConvertToAssignmentStatement(lvalue, binaryOperatorExpression.RightOperand, statements);
+                        //    break;
+                        default:
+                            // Could be side effects possibly.
+                            var temp = Let(binaryOperatorExpression.Type.Resolved());
+                            ConvertToAssignmentStatement(temp.Reference, expression, statements);
+                            break;
+                    }
+                    break;
+                case ReturnExpressionSyntax returnExpression:
+                    if (returnExpression.ReturnValue != null)
+                        ConvertToAssignmentStatement(ReturnVariable.Reference, returnExpression.ReturnValue, statements);
+                    AddBlock(statements, new ReturnStatement(CurrentBlockNumber, statements.Count));
+                    break;
+                case BlockSyntax block:
+                    foreach (var statementInBlock in block.Statements)
+                        ConvertStatementAnalysisToStatement(statements, statementInBlock);
 
-        //                    // Now we need to delete any owned variables
-        //                    foreach (var variableDeclaration in block.Statements.OfType<VariableDeclarationStatementAnalysis>().Where(IsOwned))
-        //                        statements.Add(new DeleteStatement(CurrentBlockNumber, statements.Count, LookupVariable(variableDeclaration.Name.UnqualifiedName.Text).VariableNumber, new TextSpan(block.Syntax.Span.End, 0)));
+                    // Now we need to delete any owned variables
+                    foreach (var variableDeclaration in block.Statements.OfType<VariableDeclarationStatementSyntax>().Where(IsOwned))
+                        statements.Add(new DeleteStatement(CurrentBlockNumber, statements.Count, LookupVariable(variableDeclaration.Name.UnqualifiedName.Text).VariableNumber, new TextSpan(block.Span.End, 0)));
 
-        //                    break;
-        //                case ForeachExpressionAnalysis @foreach:
-        //                    // TODO actually convert the expression
-        //                    break;
-        //                case WhileExpressionAnalysis @while:
-        //                    // TODO actually convert the expression
-        //                    break;
-        //                case LoopExpressionAnalysis loop:
-        //                    // TODO actually convert the expression
-        //                    break;
-        //                case UnsafeExpressionAnalysis unsafeExpression:
-        //                    ConvertExpressionAnalysisToStatement(unsafeExpression.Expression, statements);
-        //                    break;
-        //                case InvocationAnalysis invocation:
-        //                    // TODO actually convert the expression
-        //                    break;
-        //                default:
-        //                    throw NonExhaustiveMatchException.For(expression);
-        //            }
-        //        }
+                    break;
+                case ForeachExpressionSyntax @foreach:
+                    // TODO actually convert the expression
+                    break;
+                case WhileExpressionSyntax @while:
+                    // TODO actually convert the expression
+                    break;
+                case LoopExpressionSyntax loop:
+                    // TODO actually convert the expression
+                    break;
+                case UnsafeExpressionSyntax unsafeExpression:
+                    ConvertExpressionAnalysisToStatement(unsafeExpression.Expression, statements);
+                    break;
+                case InvocationSyntax invocation:
+                    // TODO actually convert the expression
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.For(expression);
+            }
+        }
 
-        //        private void ConvertToAssignmentStatement(
-        //            [NotNull] Place place,
-        //            [NotNull] ExpressionAnalysis value,
-        //            [NotNull, ItemNotNull] List<ExpressionStatement> statements)
-        //        {
-        //            switch (value)
-        //            {
-        //                //case NewObjectExpressionAnalysis newObjectExpression:
-        //                //    var args = newObjectExpression.Arguments.Select(a => ConvertToLValue(a.Value));
-        //                //    statements.Add(new NewObjectStatement(place, newObjectExpression.Type.AssertResolved(), args));
-        //                //    break;
-        //                case IdentifierNameAnalysis identifier:
-        //                    statements.Add(new AssignmentStatement(CurrentBlockNumber, statements.Count, place, new CopyPlace(LookupVariable(identifier.Name.Text))));
-        //                    break;
-        //                case BinaryExpressionAnalysis binaryOperator:
-        //                    ConvertOperator(place, binaryOperator, statements);
-        //                    break;
-        //                case IntegerLiteralExpressionAnalysis v:
-        //                    var constant = new IntegerConstant(v.Value, v.Type);
-        //                    statements.Add(new AssignmentStatement(CurrentBlockNumber, statements.Count, place, constant));
-        //                    break;
-        //                case IfExpressionAnalysis ifExpression:
-        //                    ConvertExpressionAnalysisToStatement(ifExpression.Condition, statements);
-        //                    // TODO assign the result into the temp, branch and execute then or else, assign result
-        //                    break;
-        //                case UnsafeExpressionAnalysis unsafeExpression:
-        //                    ConvertExpressionAnalysisToStatement(unsafeExpression.Expression, statements);
-        //                    break;
-        //                default:
-        //                    throw NonExhaustiveMatchException.For(value);
-        //            }
-        //        }
+        private void ConvertToAssignmentStatement(
+            [NotNull] Place place,
+            [NotNull] ExpressionSyntax value,
+            [NotNull, ItemNotNull] List<ExpressionStatement> statements)
+        {
+            switch (value)
+            {
+                //case NewObjectExpressionAnalysis newObjectExpression:
+                //    var args = newObjectExpression.Arguments.Select(a => ConvertToLValue(a.Value));
+                //    statements.Add(new NewObjectStatement(place, newObjectExpression.Type.AssertResolved(), args));
+                //    break;
+                case IdentifierNameSyntax identifier:
+                    statements.Add(new AssignmentStatement(CurrentBlockNumber, statements.Count, place, new CopyPlace(LookupVariable(identifier.Name.Text))));
+                    break;
+                case BinaryExpressionSyntax binaryOperator:
+                    ConvertOperator(place, binaryOperator, statements);
+                    break;
+                case LiteralExpressionSyntax literalExpression:
+                    switch (literalExpression.Literal)
+                    {
+                        case IIntegerLiteralToken integerLiteral:
+                            var constant = new IntegerConstant(integerLiteral.Value, literalExpression.Type.Resolved());
+                            statements.Add(new AssignmentStatement(CurrentBlockNumber, statements.Count, place, constant));
+                            break;
+                        default:
+                            throw NonExhaustiveMatchException.For(literalExpression.Literal);
+                    }
+                    break;
+                case IfExpressionSyntax ifExpression:
+                    ConvertExpressionAnalysisToStatement(ifExpression.Condition, statements);
+                    // TODO assign the result into the temp, branch and execute then or else, assign result
+                    break;
+                case UnsafeExpressionSyntax unsafeExpression:
+                    ConvertExpressionAnalysisToStatement(unsafeExpression.Expression, statements);
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.For(value);
+            }
+        }
 
-        //        private void ConvertOperator(
-        //            [NotNull] Place lvalue,
-        //            [NotNull] BinaryExpressionAnalysis binary,
-        //            [NotNull] List<ExpressionStatement> statements)
-        //        {
-        //            switch (binary.Operator)
-        //            {
-        //                //case PlusToken _:
-        //                //    currentBlock.Add(new AddStatement(lvalue,
-        //                //        ConvertToLValue(cfg, binaryOperator.LeftOperand),
-        //                //        ConvertToLValue(cfg, binaryOperator.RightOperand)));
-        //                //    break;
-        //                case BinaryOperator.LessThan:
-        //                case BinaryOperator.LessThanOrEqual:
-        //                case BinaryOperator.GreaterThan:
-        //                case BinaryOperator.GreaterThanOrEqual:
-        //                    // TODO generate the correct statement
-        //                    break;
-        //                //case IAsKeywordToken _:
-        //                //    ConvertExpressionAnalysisToStatement(binaryOperator.LeftOperand, statements);
-        //                //    break;
-        //                default:
-        //                    throw NonExhaustiveMatchException.For(binary.Operator);
-        //            }
-        //        }
+        private void ConvertOperator(
+            [NotNull] Place lvalue,
+            [NotNull] BinaryExpressionSyntax binary,
+            [NotNull] List<ExpressionStatement> statements)
+        {
+            switch (binary.Operator)
+            {
+                //case PlusToken _:
+                //    currentBlock.Add(new AddStatement(lvalue,
+                //        ConvertToLValue(cfg, binaryOperator.LeftOperand),
+                //        ConvertToLValue(cfg, binaryOperator.RightOperand)));
+                //    break;
+                case BinaryOperator.LessThan:
+                case BinaryOperator.LessThanOrEqual:
+                case BinaryOperator.GreaterThan:
+                case BinaryOperator.GreaterThanOrEqual:
+                    // TODO generate the correct statement
+                    break;
+                //case IAsKeywordToken _:
+                //    ConvertExpressionAnalysisToStatement(binaryOperator.LeftOperand, statements);
+                //    break;
+                default:
+                    throw NonExhaustiveMatchException.For(binary.Operator);
+            }
+        }
 
-        //        [NotNull]
-        //        private Place ConvertToLValue([NotNull] ExpressionAnalysis value)
-        //        {
-        //            Requires.NotNull(nameof(value), value);
-        //            switch (value)
-        //            {
-        //                case IdentifierNameAnalysis identifier:
-        //                    return LookupVariable(identifier.Name.Text);
-        //                //case VariableExpression variableExpression:
-        //                //    return LookupVariable(variableExpression.Name);
-        //                default:
-        //                    throw NonExhaustiveMatchException.For(value);
-        //            }
-        //        }
+        [NotNull]
+        private Place ConvertToLValue([NotNull] ExpressionSyntax value)
+        {
+            Requires.NotNull(nameof(value), value);
+            switch (value)
+            {
+                case IdentifierNameSyntax identifier:
+                    return LookupVariable(identifier.Name.Text);
+                //case VariableExpression variableExpression:
+                //    return LookupVariable(variableExpression.Name);
+                default:
+                    throw NonExhaustiveMatchException.For(value);
+            }
+        }
     }
 }

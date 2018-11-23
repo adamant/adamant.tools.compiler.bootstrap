@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
@@ -12,6 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
     {
         [NotNull] private readonly PrimitiveFixedIntegerType type;
         [NotNull] private readonly PrimitiveMemberSymbol remainderMethod;
+        DataType ISymbol.Type => type;
 
         public FixedIntegerSymbol([NotNull] PrimitiveFixedIntegerType type)
         {
@@ -19,9 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             remainderMethod = new PrimitiveMemberSymbol("remainder", new FunctionType(new[] { type }, type));
         }
 
-        public Name Name => type.Name;
-
-        public IEnumerable<DataType> Types => type.Yield();
+        public Name FullName => type.Name;
 
         public ISymbol ComposeWith(ISymbol symbol)
         {

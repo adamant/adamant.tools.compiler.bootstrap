@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             var diagnostics = AllDiagnostics(packageSyntax);
 
             var nameBinder = new NameBinder(packageSyntax, references);
-            nameBinder.BindNames(packageSyntax);
+            nameBinder.BindNamesInPackage(packageSyntax);
 
             // Make a list of all the non-member declarations
             var namespacedDeclarations = packageSyntax.CompilationUnits
@@ -60,7 +60,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             [NotNull] Diagnostics diagnostics)
         {
             var mainFunctions = declarations.OfType<FunctionDeclaration>()
-                .Where(f => f.Name.UnqualifiedName.Text == "main" && !f.Name.UnqualifiedName.IsSpecial)
+                .Where(f => f.FullName.UnqualifiedName.Text == "main" && !f.FullName.UnqualifiedName.IsSpecial)
                 .ToList();
 
             // TODO warn on and remove main functions that don't have correct parameters or types

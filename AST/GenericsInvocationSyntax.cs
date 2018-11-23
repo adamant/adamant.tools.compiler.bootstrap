@@ -8,6 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         [NotNull] public ExpressionSyntax Callee { get; set; }
         [NotNull] public FixedList<ArgumentSyntax> Arguments { get; }
+        public int Arity => Arguments.Count;
 
         public GenericsInvocationSyntax(
             TextSpan span,

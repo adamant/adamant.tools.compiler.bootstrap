@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
@@ -10,16 +8,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 {
     public class PrimitiveMemberSymbol : ISymbol
     {
-        public Name Name { get; }
-        private readonly FunctionType type;
+        public Name FullName { get; }
+        [NotNull] private readonly FunctionType type;
+        DataType ISymbol.Type => type;
 
         public PrimitiveMemberSymbol([NotNull] string name, [NotNull] FunctionType type)
         {
-            Name = new SimpleName(name);
+            FullName = new SimpleName(name);
             this.type = type;
         }
-
-        public IEnumerable<DataType> Types => type.Yield();
 
         public ISymbol ComposeWith(ISymbol symbol)
         {

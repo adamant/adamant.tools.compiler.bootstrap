@@ -48,12 +48,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
             return type;
         }
 
-        [CanBeNull]
-        public static implicit operator DataType([NotNull] TypePromise promise)
-        {
-            return promise.DataType;
-        }
-
         [NotNull]
         public DataType Fulfilled()
         {

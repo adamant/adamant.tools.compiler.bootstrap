@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
+using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using JetBrains.Annotations;
 
@@ -66,10 +68,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             var parameterTypes = ResolveTypesInParameters(function, expressionChecker);
 
             var returnType = ResolveReturnType(function, expressionChecker);
-            var functionType = new FunctionType(parameterTypes, returnType);
+            DataType functionType = new FunctionType(parameterTypes, returnType);
 
-            //if (function.IsGeneric && function.GenericParameters.NotNull().Any())
-            //    functionType = new MetaFunctionType(function.GenericParameters.NotNull().Select(p => p.Type.AssertComputed()), functionType);
+            if (function.GenericParameters?.Any() ?? false)
+                functionType = new MetaFunctionType(function.GenericParameters.NotNull().Select(p => p.Type.Fulfilled()), functionType);
 
             function.Type.Fulfill(functionType);
         }
@@ -156,45 +158,45 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
             var expressionChecker = new ExpressionTypeChecker(declaration.File, diagnostics);
 
-            //FixedList<DataType> genericParameterTypes = null;
-            //if (declaration.GenericParameters != null)
-            //{
-            //    var genericParameters = declaration.GenericParameters.NotNull();
-            //    CheckGenericParameters(genericParameters, expressionChecker);
-            //    genericParameterTypes = genericParameters.Select(p => p.Type.AssertComputed()).ToFixedList();
-            //}
+            FixedList<DataType> genericParameterTypes = null;
+            if (declaration.GenericParameters != null)
+            {
+                var genericParameters = declaration.GenericParameters.NotNull();
+                ResolveTypesInGenericParameters(genericParameters, expressionChecker);
+                genericParameterTypes = genericParameters.Select(p => p.Type.Fulfilled()).ToFixedList();
+            }
             switch (declaration)
             {
-                //case ClassDeclarationSyntax classDeclaration:
-                //    var classType = new ObjectType(declaration.Name, true,
-                //        classDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
-                //        genericParameterTypes);
-                //    declaration.Type.Computed(new Metatype(classType));
-                //    break;
-                //case StructDeclarationSyntax structDeclaration:
-                //    var structType = new ObjectType(declaration.Name, false,
-                //        structDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
-                //        genericParameterTypes);
-                //    declaration.Type.Computed(new Metatype(structType));
-                //    break;
-                //case EnumStructDeclarationSyntax enumStructDeclaration:
-                //    var enumStructType = new ObjectType(declaration.Name, false,
-                //        enumStructDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
-                //        genericParameterTypes);
-                //    declaration.Type.Computed(new Metatype(enumStructType));
-                //    break;
-                //case EnumClassDeclarationSyntax enumStructDeclaration:
-                //    var enumClassType = new ObjectType(declaration.Name, true,
-                //        enumStructDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
-                //        genericParameterTypes);
-                //    declaration.Type.Computed(new Metatype(enumClassType));
-                //    break;
-                //case TraitDeclarationSyntax declarationSyntax:
-                //    var type = new ObjectType(declaration.Name, true,
-                //        declarationSyntax.Modifiers.Any(m => m is IMutableKeywordToken),
-                //        genericParameterTypes);
-                //    declaration.Type.Computed(new Metatype(type));
-                //    break;
+                case ClassDeclarationSyntax classDeclaration:
+                    var classType = new ObjectType(declaration.Name, true,
+                        classDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
+                        genericParameterTypes);
+                    declaration.Type.Fulfill(new Metatype(classType));
+                    break;
+                case StructDeclarationSyntax structDeclaration:
+                    var structType = new ObjectType(declaration.Name, false,
+                        structDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
+                        genericParameterTypes);
+                    declaration.Type.Fulfill(new Metatype(structType));
+                    break;
+                case EnumStructDeclarationSyntax enumStructDeclaration:
+                    var enumStructType = new ObjectType(declaration.Name, false,
+                        enumStructDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
+                        genericParameterTypes);
+                    declaration.Type.Fulfill(new Metatype(enumStructType));
+                    break;
+                case EnumClassDeclarationSyntax enumStructDeclaration:
+                    var enumClassType = new ObjectType(declaration.Name, true,
+                        enumStructDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
+                        genericParameterTypes);
+                    declaration.Type.Fulfill(new Metatype(enumClassType));
+                    break;
+                case TraitDeclarationSyntax declarationSyntax:
+                    var type = new ObjectType(declaration.Name, true,
+                        declarationSyntax.Modifiers.Any(m => m is IMutableKeywordToken),
+                        genericParameterTypes);
+                    declaration.Type.Fulfill(new Metatype(type));
+                    break;
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
             }

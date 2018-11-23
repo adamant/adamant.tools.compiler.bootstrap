@@ -12,11 +12,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [NotNull] public FixedList<IModiferToken> Modifiers { get; }
         [NotNull] public Name FullName { get; }
         [NotNull] public SimpleName Name => FullName.UnqualifiedName;
-        [CanBeNull] public FixedList<GenericParameterSyntax> GenericParameters { get; }
         [CanBeNull] public FixedList<ExpressionSyntax> BaseTypes { get; }
         [NotNull] public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
         [NotNull] public FixedList<ExpressionSyntax> Invariants { get; }
-        [NotNull] public FixedList<IMemberDeclarationSyntax> Members { get; }
 
         public TraitDeclarationSyntax(
             [NotNull] CodeFile file,
@@ -29,16 +27,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             [NotNull] FixedList<GenericConstraintSyntax> genericConstraints,
             [NotNull] FixedList<ExpressionSyntax> invariants,
             [NotNull] FixedList<IMemberDeclarationSyntax> members)
-            : base(file, nameSpan)
+            : base(file, nameSpan, fullName, genericParameters, members)
         {
             Attributes = attributes;
             Modifiers = modifiers;
             FullName = fullName;
-            GenericParameters = genericParameters;
             BaseTypes = baseTypes;
             GenericConstraints = genericConstraints;
             Invariants = invariants;
-            Members = members;
         }
 
         public override string ToString()

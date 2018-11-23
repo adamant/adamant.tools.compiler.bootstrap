@@ -276,13 +276,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<IModiferToken> modifiers)
         {
             Tokens.Expect<IStructKeywordToken>();
-            var name = Tokens.RequiredToken<IIdentifierToken>();
+            var identifier = Tokens.RequiredToken<IIdentifierToken>();
+            var name = nameContext.Qualify(identifier.Value);
             var genericParameters = AcceptGenericParameters();
             var baseTypes = AcceptBaseTypes();
             var genericConstraints = ParseGenericConstraints();
             var invariants = ParseInvariants();
             var members = ParseTypeBody();
-            return new StructDeclarationSyntax(File, attributes, modifiers, name, genericParameters,
+            return new StructDeclarationSyntax(File, attributes, modifiers, name, identifier.Span, genericParameters,
                 baseTypes, genericConstraints, invariants,
                 members);
         }
@@ -299,7 +300,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IStructKeywordToken _:
                 {
                     Tokens.Expect<IStructKeywordToken>();
-                    var name = Tokens.RequiredToken<IIdentifierToken>();
+                    var identifier = Tokens.RequiredToken<IIdentifierToken>();
+                    var name = nameContext.Qualify(identifier.Value);
                     var genericParameters = AcceptGenericParameters();
                     var baseTypes = AcceptBaseTypes();
                     var genericConstraints = ParseGenericConstraints();
@@ -309,13 +311,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var members = ParseMemberDeclarations();
                     Tokens.Expect<ICloseBraceToken>();
                     return new EnumStructDeclarationSyntax(File, attributes, modifiers,
-                        name.Value, name.Span, genericParameters, baseTypes, genericConstraints,
+                        name, identifier.Span, genericParameters, baseTypes, genericConstraints,
                         invariants, variants, members);
                 }
                 case IClassKeywordToken _:
                 {
                     Tokens.Expect<IClassKeywordToken>();
-                    var name = Tokens.RequiredToken<IIdentifierToken>();
+                    var identifier = Tokens.RequiredToken<IIdentifierToken>();
+                    var name = nameContext.Qualify(identifier.Value);
                     var genericParameters = AcceptGenericParameters();
                     var baseClass = AcceptBaseClass();
                     var baseTypes = AcceptBaseTypes();
@@ -326,7 +329,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var members = ParseMemberDeclarations();
                     Tokens.Expect<ICloseBraceToken>();
                     return new EnumClassDeclarationSyntax(File, attributes, modifiers,
-                        name.Value, name.Span, genericParameters, baseClass, baseTypes, genericConstraints,
+                        name, identifier.Span, genericParameters, baseClass, baseTypes, genericConstraints,
                         invariants, variants, members);
                 }
                 default:

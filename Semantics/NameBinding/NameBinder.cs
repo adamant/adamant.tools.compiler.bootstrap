@@ -17,14 +17,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
         // Gather a list of all the namespaces for validating using statements
         // Also need to account for empty directories?
 
-        [NotNull, ItemNotNull] private readonly FixedList<ISymbol> symbols;
+        [NotNull, ItemNotNull] private readonly FixedList<ISymbol> allSymbols;
         [NotNull] private readonly GlobalScope globalScope;
 
         public NameBinder(
             [NotNull] PackageSyntax packageSyntax,
             [NotNull] FixedDictionary<string, Package> references)
         {
-            symbols = GetAllSymbols(packageSyntax, references);
+            allSymbols = GetAllSymbols(packageSyntax, references);
             globalScope = new GlobalScope(GetAllGlobalSymbols());
         }
 
@@ -42,25 +42,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
         [NotNull, ItemNotNull]
         private IEnumerable<ISymbol> GetAllGlobalSymbols()
         {
-            return symbols.Where(s => s.NotNull().IsGlobal())
+            return allSymbols.Where(s => s.NotNull().IsGlobal())
                 .Concat(PrimitiveSymbols.Instance);
         }
 
-        public void BindNames([NotNull] PackageSyntax package)
+        public void BindNamesInPackage([NotNull] PackageSyntax package)
         {
             foreach (var compilationUnit in package.CompilationUnits)
-                BindNames(compilationUnit);
+                BindNamesInCompilationUnit(compilationUnit);
         }
 
-        private void BindNames([NotNull] CompilationUnitSyntax compilationUnit)
+        private void BindNamesInCompilationUnit([NotNull] CompilationUnitSyntax compilationUnit)
         {
             var containingScope = BuildNamespaceScopes(globalScope, compilationUnit.ImplicitNamespaceName);
             containingScope = BuildUsingDirectivesScope(containingScope, compilationUnit.UsingDirectives);
             foreach (var declaration in compilationUnit.Declarations)
-                BindNames(containingScope, declaration);
+                BindNamesInDeclaration(containingScope, declaration);
         }
 
-        private void BindNames(
+        private void BindNamesInDeclaration(
             [NotNull] LexicalScope containingScope,
             [NotNull] DeclarationSyntax declaration)
         {
@@ -74,16 +74,74 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
                     containingScope = BuildNamespaceScopes(containingScope, ns.Name);
                     containingScope = BuildUsingDirectivesScope(containingScope, ns.UsingDirectives);
                     foreach (var nestedDeclaration in ns.Declarations)
-                        BindNames(containingScope, nestedDeclaration);
+                        BindNamesInDeclaration(containingScope, nestedDeclaration);
                 }
                 break;
                 case NamedFunctionDeclarationSyntax namedFunction:
                 {
-                    // TODO implement
+                    var symbols = new List<ISymbol>();
+                    foreach (var parameter in namedFunction.Parameters)
+                        symbols.Add(parameter);
+
+                    containingScope = new NestedScope(containingScope, symbols);
+                    BindNamesInBlock(containingScope, namedFunction.Body);
                 }
                 break;
+                case TypeDeclarationSyntax typeDeclaration:
+                    // TODO name scope for type declaration
+                    foreach (var nestedDeclaration in typeDeclaration.Members)
+                        BindNamesInDeclaration(containingScope, (DeclarationSyntax)nestedDeclaration);
+                    break;
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
+            }
+        }
+
+        private void BindNamesInBlock([NotNull] LexicalScope containingScope, [CanBeNull] BlockSyntax block)
+        {
+            if (block == null) return;
+
+            var symbols = new List<ISymbol>();
+
+            foreach (var variableDeclaration in block.Statements
+                .OfType<VariableDeclarationStatementSyntax>())
+                symbols.Add(variableDeclaration);
+
+            containingScope = new NestedScope(containingScope, symbols);
+
+            foreach (var statement in block.Statements)
+                BindNamesInStatement(containingScope, statement);
+        }
+
+        private void BindNamesInStatement([NotNull] LexicalScope containingScope, [NotNull] StatementSyntax statement)
+        {
+            switch (statement)
+            {
+                case VariableDeclarationStatementSyntax variableDeclaration:
+                    BindNamesInExpression(containingScope, variableDeclaration.Initializer);
+                    break;
+                case ExpressionSyntax expression:
+                    BindNamesInExpression(containingScope, expression);
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.For(statement);
+            }
+        }
+
+        private void BindNamesInExpression([NotNull] LexicalScope containingScope, [CanBeNull] ExpressionSyntax expression)
+        {
+            if (expression == null) return;
+
+            switch (expression)
+            {
+                case ReturnExpressionSyntax returnExpression:
+                    BindNamesInExpression(containingScope, returnExpression.ReturnValue);
+                    break;
+                case LiteralExpressionSyntax _:
+                    // No names to bind or expressions to recurse on
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.For(expression);
             }
         }
 
@@ -108,7 +166,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
                     throw NonExhaustiveMatchException.For(ns);
             }
 
-            var symbolsInNamespace = symbols.Where(s => s.Name.HasQualifier(name));
+            var symbolsInNamespace = allSymbols.Where(s => s.FullName.HasQualifier(name));
             return new NestedScope(containingScope, symbolsInNamespace);
         }
 
@@ -120,7 +178,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
             if (!usingDirectives.Any()) return containingScope;
 
             var importedSymbols = usingDirectives
-                .SelectMany(d => symbols.Where(s => s.Name.HasQualifier(d.Name)));
+                .SelectMany(d => allSymbols.Where(s => s.FullName.HasQualifier(d.Name)));
             return new NestedScope(containingScope, importedSymbols);
         }
     }
