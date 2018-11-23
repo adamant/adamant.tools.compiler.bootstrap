@@ -25,29 +25,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             throw new System.NotImplementedException();
         }
 
-        [CanBeNull] public FixedList<GenericParameterSyntax> GenericParameters { get; }
-        [CanBeNull] public ExpressionSyntax ReturnType { get; }
-        [NotNull] public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
+        [CanBeNull] public ExpressionSyntax ReturnTypeExpression { get; }
 
         public NamedFunctionDeclarationSyntax(
+            [NotNull] CodeFile file,
             [NotNull] FixedList<IModiferToken> modifiers,
             [NotNull] string name,
             TextSpan nameSpan,
             [CanBeNull] FixedList<GenericParameterSyntax> genericParameters,
             [NotNull] FixedList<ParameterSyntax> parameters, // For now we will not support pure meta functions
-            [CanBeNull] ExpressionSyntax returnType,
+            [CanBeNull] ExpressionSyntax returnTypeExpression,
             [NotNull] FixedList<GenericConstraintSyntax> genericConstraints,
             [NotNull] FixedList<EffectSyntax> mayEffects,
             [NotNull] FixedList<EffectSyntax> noEffects,
             [NotNull] FixedList<ExpressionSyntax> requires,
             [NotNull] FixedList<ExpressionSyntax> ensures,
             [CanBeNull] BlockSyntax body)
-            : base(modifiers, nameSpan, parameters, mayEffects, noEffects, requires, ensures, body)
+            : base(file, modifiers, nameSpan, genericParameters, parameters,
+                genericConstraints, mayEffects, noEffects, requires, ensures, body)
         {
             Name = new SimpleName(name);
-            GenericParameters = genericParameters;
-            ReturnType = returnType;
-            GenericConstraints = genericConstraints;
+            ReturnTypeExpression = returnTypeExpression;
         }
 
         public override string ToString()

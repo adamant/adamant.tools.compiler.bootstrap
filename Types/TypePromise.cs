@@ -19,9 +19,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
     public class TypePromise
     {
         public PromiseState State { get; private set; }
-        [CanBeNull] public DataType DataType { get; private set; }
+        [CanBeNull] private DataType DataType { get; set; }
 
-        public void Begin()
+        public void BeginFulfilling()
         {
             Requires.That(nameof(State), State == PromiseState.Pending);
             State = PromiseState.InProgress;
@@ -49,7 +49,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         }
 
         [CanBeNull]
-        public static implicit operator DataType(TypePromise promise)
+        public static implicit operator DataType([NotNull] TypePromise promise)
         {
             return promise.DataType;
         }

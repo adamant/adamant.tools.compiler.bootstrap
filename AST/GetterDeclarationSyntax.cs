@@ -10,25 +10,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         [NotNull] public FixedList<AttributeSyntax> Attributes { get; }
         [NotNull] public SimpleName Name { get; }
-        [NotNull] public ExpressionSyntax ReturnType { get; }
+        [NotNull] public ExpressionSyntax ReturnTypeExpression { get; }
 
         public GetterDeclarationSyntax(
+            [NotNull] CodeFile file,
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers,
             [NotNull] string name,
             TextSpan nameSpan,
             [NotNull] FixedList<ParameterSyntax> parameters,
-            [NotNull] ExpressionSyntax returnType,
+            [NotNull] ExpressionSyntax returnTypeExpression,
             [NotNull] FixedList<EffectSyntax> mayEffects,
             [NotNull] FixedList<EffectSyntax> noEffects,
             [NotNull] FixedList<ExpressionSyntax> requires,
             [NotNull] FixedList<ExpressionSyntax> ensures,
             [CanBeNull] BlockSyntax body)
-            : base(modifiers, nameSpan, parameters, mayEffects, noEffects, requires, ensures, body)
+            : base(file, modifiers, nameSpan, null, parameters,
+                FixedList<GenericConstraintSyntax>.Empty, mayEffects, noEffects, requires, ensures, body)
         {
             Attributes = attributes;
             Name = new SimpleName(name);
-            ReturnType = returnType;
+            ReturnTypeExpression = returnTypeExpression;
         }
 
         public override string ToString()

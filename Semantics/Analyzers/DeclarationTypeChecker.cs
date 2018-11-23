@@ -1,197 +1,237 @@
 using System;
+using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.AST;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
+using Adamant.Tools.Compiler.Bootstrap.Types;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 {
+    /// <summary>
+    /// Terminology:
+    ///
+    /// * Resolve: includes type inference, checking and evaluation, whichever is appropriate
+    /// * Check: there is a type something is expected to be compatible with, check that it is
+    /// * Infer:
+    /// </summary>
     public class DeclarationTypeChecker
     {
-        public static void Check([NotNull, ItemNotNull] FixedList<INamespacedDeclarationSyntax> declarations)
+        [NotNull] private readonly Diagnostics diagnostics;
+
+        public DeclarationTypeChecker([NotNull] Diagnostics diagnostics)
         {
-            CheckSignatures(declarations);
-            // Function bodies are checked after signatures to ensure that all function invocations
-            // expressions can get a type for the invoked function.
-            CheckBodies(declarations);
+            this.diagnostics = diagnostics;
         }
 
-        private static void CheckSignatures([NotNull, ItemNotNull] FixedList<INamespacedDeclarationSyntax> declarations)
+        public void ResolveTypesInDeclarations([NotNull, ItemNotNull] FixedList<INamespacedDeclarationSyntax> declarations)
+        {
+            ResolveSignatureTypesInDeclarations(declarations);
+            // Function bodies are checked after signatures to ensure that all function invocation
+            // expressions can get a type for the invoked function.
+            ResolveBodyTypesInDeclarations(declarations);
+        }
+
+        private void ResolveSignatureTypesInDeclarations([NotNull, ItemNotNull] FixedList<INamespacedDeclarationSyntax> declarations)
         {
             foreach (var declaration in declarations)
-                CheckDeclarationSignatures(declaration);
+                ResolveSignatureTypesInDeclaration(declaration);
         }
 
-        private static void CheckDeclarationSignatures([NotNull] INamespacedDeclarationSyntax declaration)
+        private void ResolveSignatureTypesInDeclaration([NotNull] INamespacedDeclarationSyntax declaration)
         {
             switch (declaration)
             {
                 case FunctionDeclarationSyntax f:
-                    CheckFunctionSignature(f);
+                    ResolveSignatureTypesInFunction(f);
                     break;
                 case TypeDeclarationSyntax t:
-                    CheckTypeSignatures(t);
+                    ResolveSignatureTypesInTypeDeclaration(t);
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
             }
         }
 
-        private static void CheckFunctionSignature([NotNull] FunctionDeclarationSyntax function)
+        private void ResolveSignatureTypesInFunction([NotNull] FunctionDeclarationSyntax function)
         {
-            //            // Check the signature first
-            //            function.Type.BeginComputing();
-            //            function.ReturnType.BeginComputing();
+            function.Type.BeginFulfilling();
 
-            //            var expressionChecker = new ExpressionTypeChecker(function.Context.File, DataType.Unknown, function.Diagnostics);
+            var expressionChecker = new ExpressionTypeChecker(function.File, diagnostics);
 
-            //            if (function.IsGeneric)
-            //                CheckGenericParameters(function.GenericParameters.NotNull(), expressionChecker);
-            //            CheckParameters(function, expressionChecker);
+            if (function.GenericParameters != null)
+                ResolveTypesInGenericParameters(function.GenericParameters, expressionChecker);
 
-            //            var returnType = function.ReturnTypeExpression != null
-            //                ? expressionChecker.EvaluateTypeExpression(function.ReturnTypeExpression)
-            //                : ObjectType.Void;
-            //            function.ReturnType.Computed(returnType);
+            var parameterTypes = ResolveTypesInParameters(function, expressionChecker);
 
-            //            var functionType = returnType;
-            //            functionType = new FunctionType(function.Parameters.Select(p => p.Type.AssertComputed()), functionType);
+            var returnType = ResolveReturnType(function, expressionChecker);
+            var functionType = new FunctionType(parameterTypes, returnType);
 
-            //            if (function.IsGeneric && function.GenericParameters.NotNull().Any())
-            //                functionType = new MetaFunctionType(function.GenericParameters.NotNull().Select(p => p.Type.AssertComputed()), functionType);
+            //if (function.IsGeneric && function.GenericParameters.NotNull().Any())
+            //    functionType = new MetaFunctionType(function.GenericParameters.NotNull().Select(p => p.Type.AssertComputed()), functionType);
 
-            //            function.Type.Computed(functionType);
-            throw new NotImplementedException();
+            function.Type.Fulfill(functionType);
         }
 
-        //        private static void CheckGenericParameters(
-        //            [NotNull, ItemNotNull] FixedList<GenericParameterAnalysis> genericParameters,
-        //            [NotNull] ExpressionTypeChecker expressionChecker)
-        //        {
-        //            foreach (var parameter in genericParameters)
-        //            {
-        //                parameter.Type.BeginComputing();
-        //                parameter.Type.Computed(parameter.TypeExpression == null ?
-        //                    ObjectType.Type
-        //                    : expressionChecker.EvaluateTypeExpression(parameter.TypeExpression));
-        //            }
-        //        }
+        private static void ResolveTypesInGenericParameters(
+            [NotNull, ItemNotNull] FixedList<GenericParameterSyntax> genericParameters,
+            [NotNull] ExpressionTypeChecker expressionChecker)
+        {
+            foreach (var parameter in genericParameters)
+            {
+                parameter.Type.BeginFulfilling();
+                var type = parameter.TypeExpression == null ?
+                    ObjectType.Type
+                    : expressionChecker.CheckAndEvaluateTypeExpression(parameter.TypeExpression);
+                parameter.Type.Fulfill(type);
+            }
+        }
 
-        //        private static void CheckParameters(
-        //            [NotNull] FunctionDeclarationAnalysis function,
-        //            [NotNull] ExpressionTypeChecker expressionChecker)
-        //        {
-        //            foreach (var parameter in function.Parameters)
-        //            {
-        //                parameter.Type.BeginComputing();
-        //                if (parameter.TypeExpression != null)
-        //                    parameter.Type.Computed(expressionChecker.EvaluateTypeExpression(parameter.TypeExpression));
-        //                else
-        //                {
-        //                    function.Diagnostics.Add(TypeError.NotImplemented(parameter.Context.File,
-        //                        parameter.Syntax.Span, "Self parameters not implemented"));
-        //                    parameter.Type.Computed(DataType.Unknown);
-        //                }
-        //            }
-        //        }
+        [NotNull, ItemNotNull]
+        private FixedList<DataType> ResolveTypesInParameters(
+            [NotNull] FunctionDeclarationSyntax function,
+            [NotNull] ExpressionTypeChecker expressionChecker)
+        {
+            var types = new List<DataType>();
+            foreach (var parameter in function.Parameters)
+            {
+                parameter.Type.BeginFulfilling();
+                switch (parameter)
+                {
+                    case NamedParameterSyntax namedParameter:
+                        var type = expressionChecker.CheckAndEvaluateTypeExpression(namedParameter.TypeExpression);
+                        types.Add(parameter.Type.Fulfill(type));
+                        break;
+                    case SelfParameterSyntax selfParameter:
+                        diagnostics.Add(TypeError.NotImplemented(function.File,
+                            parameter.Span, "Self parameters not implemented"));
+                        types.Add(parameter.Type.Fulfill(DataType.Unknown));
+                        break;
+                    default:
+                        throw NonExhaustiveMatchException.For(parameter);
+                }
+            }
+
+            return types.ToFixedList();
+        }
+
+        [NotNull]
+        private static DataType ResolveReturnType(
+            [NotNull] FunctionDeclarationSyntax function,
+            [NotNull] ExpressionTypeChecker expressionChecker)
+        {
+            function.ReturnType.BeginFulfilling();
+            switch (function)
+            {
+                case NamedFunctionDeclarationSyntax namedFunction:
+                    var returnType = namedFunction.ReturnTypeExpression != null
+                        ? expressionChecker.CheckAndEvaluateTypeExpression(namedFunction.ReturnTypeExpression)
+                        : ObjectType.Void;
+                    return function.ReturnType.Fulfill(returnType);
+                default:
+                    throw NonExhaustiveMatchException.For(function);
+            }
+        }
 
         /// <summary>
         /// If the type has not been checked, this checks it and returns it.
         /// Also watches for type cycles
         /// </summary>
-        private static void CheckTypeSignatures([NotNull] TypeDeclarationSyntax type)
+        private void ResolveSignatureTypesInTypeDeclaration([NotNull] TypeDeclarationSyntax declaration)
         {
-            //switch (declaration.Type.State)
-            //            {
-            //                case AnalysisState.BeingComputed:
-            //                    declaration.Diagnostics.Add(TypeError.CircularDefinition(declaration.Context.File, declaration.Syntax.NameSpan, declaration.Name));
-            //                    return;
-            //                case AnalysisState.Computed:
-            //                    return;   // We have already checked it
-            //                case AnalysisState.NotComputed:
-            //                    // we need to compute it
-            //                    break;
-            //            }
+            switch (declaration.Type.State)
+            {
+                case PromiseState.InProgress:
+                    diagnostics.Add(TypeError.CircularDefinition(declaration.File, declaration.NameSpan, declaration.Name));
+                    return;
+                case PromiseState.Fulfilled:
+                    return;   // We have already resolved it
+                case PromiseState.Pending:
+                    // we need to compute it
+                    break;
+            }
 
-            //            declaration.Type.BeginComputing();
+            declaration.Type.BeginFulfilling();
 
-            //            var expressionChecker = new ExpressionTypeChecker(declaration.Context.File, DataType.Unknown, declaration.Diagnostics);
+            var expressionChecker = new ExpressionTypeChecker(declaration.File, diagnostics);
 
-            //            FixedList<DataType> genericParameterTypes = null;
-            //            if (declaration.IsGeneric)
-            //            {
-            //                var genericParameters = declaration.GenericParameters.NotNull();
-            //                CheckGenericParameters(genericParameters, expressionChecker);
-            //                genericParameterTypes = genericParameters.Select(p => p.Type.AssertComputed()).ToFixedList();
-            //            }
-            //            switch (declaration.Syntax)
-            //            {
-            //                case ClassDeclarationSyntax classDeclaration:
-            //                    var classType = new ObjectType(declaration.Name, true,
-            //                        classDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
-            //                        genericParameterTypes);
-            //                    declaration.Type.Computed(new Metatype(classType));
-            //                    break;
-            //                case StructDeclarationSyntax structDeclaration:
-            //                    var structType = new ObjectType(declaration.Name, false,
-            //                        structDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
-            //                        genericParameterTypes);
-            //                    declaration.Type.Computed(new Metatype(structType));
-            //                    break;
-            //                case EnumStructDeclarationSyntax enumStructDeclaration:
-            //                    var enumStructType = new ObjectType(declaration.Name, false,
-            //                        enumStructDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
-            //                        genericParameterTypes);
-            //                    declaration.Type.Computed(new Metatype(enumStructType));
-            //                    break;
-            //                case EnumClassDeclarationSyntax enumStructDeclaration:
-            //                    var enumClassType = new ObjectType(declaration.Name, true,
-            //                        enumStructDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
-            //                        genericParameterTypes);
-            //                    declaration.Type.Computed(new Metatype(enumClassType));
-            //                    break;
-            //                case TraitDeclarationSyntax declarationSyntax:
-            //                    var type = new ObjectType(declaration.Name, true,
-            //                        declarationSyntax.Modifiers.Any(m => m is IMutableKeywordToken),
-            //                        genericParameterTypes);
-            //                    declaration.Type.Computed(new Metatype(type));
-            //                    break;
-            //                default:
-            //                    throw NonExhaustiveMatchException.For(declaration.Syntax);
-            //            }
-            throw new NotImplementedException();
+            //FixedList<DataType> genericParameterTypes = null;
+            //if (declaration.GenericParameters != null)
+            //{
+            //    var genericParameters = declaration.GenericParameters.NotNull();
+            //    CheckGenericParameters(genericParameters, expressionChecker);
+            //    genericParameterTypes = genericParameters.Select(p => p.Type.AssertComputed()).ToFixedList();
+            //}
+            switch (declaration)
+            {
+                //case ClassDeclarationSyntax classDeclaration:
+                //    var classType = new ObjectType(declaration.Name, true,
+                //        classDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
+                //        genericParameterTypes);
+                //    declaration.Type.Computed(new Metatype(classType));
+                //    break;
+                //case StructDeclarationSyntax structDeclaration:
+                //    var structType = new ObjectType(declaration.Name, false,
+                //        structDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
+                //        genericParameterTypes);
+                //    declaration.Type.Computed(new Metatype(structType));
+                //    break;
+                //case EnumStructDeclarationSyntax enumStructDeclaration:
+                //    var enumStructType = new ObjectType(declaration.Name, false,
+                //        enumStructDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
+                //        genericParameterTypes);
+                //    declaration.Type.Computed(new Metatype(enumStructType));
+                //    break;
+                //case EnumClassDeclarationSyntax enumStructDeclaration:
+                //    var enumClassType = new ObjectType(declaration.Name, true,
+                //        enumStructDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
+                //        genericParameterTypes);
+                //    declaration.Type.Computed(new Metatype(enumClassType));
+                //    break;
+                //case TraitDeclarationSyntax declarationSyntax:
+                //    var type = new ObjectType(declaration.Name, true,
+                //        declarationSyntax.Modifiers.Any(m => m is IMutableKeywordToken),
+                //        genericParameterTypes);
+                //    declaration.Type.Computed(new Metatype(type));
+                //    break;
+                default:
+                    throw NonExhaustiveMatchException.For(declaration);
+            }
         }
 
-        private static void CheckBodies([NotNull, ItemNotNull] FixedList<INamespacedDeclarationSyntax> declarations)
+        private void ResolveBodyTypesInDeclarations([NotNull, ItemNotNull] FixedList<INamespacedDeclarationSyntax> declarations)
         {
             foreach (var declaration in declarations)
-                CheckDeclarationBodies(declaration);
+                ResolveBodyTypesInDeclaration(declaration);
         }
 
-        private static void CheckDeclarationBodies(INamespacedDeclarationSyntax declaration)
+        private void ResolveBodyTypesInDeclaration(INamespacedDeclarationSyntax declaration)
         {
             switch (declaration)
             {
                 case FunctionDeclarationSyntax f:
-                    CheckFunctionBody(f);
+                    ResolveBodyTypesInFunction(f);
                     break;
                 case TypeDeclarationSyntax t:
-                    CheckTypeBodies(t);
+                    ResolveBodyTypesInTypeDeclaration(t);
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
             }
         }
 
-        private static void CheckFunctionBody(FunctionDeclarationSyntax function)
+        private void ResolveBodyTypesInFunction([NotNull] FunctionDeclarationSyntax function)
         {
-            //            var expressionChecker = new ExpressionTypeChecker(function.Context.File, function.ReturnType.AssertComputed(), function.Diagnostics);
+            if (function.Body == null) return;
 
-            //            foreach (var statement in function.Statements)
-            //                expressionChecker.CheckStatement(statement);
-            throw new NotImplementedException();
+            var expressionChecker = new ExpressionTypeChecker(function.File, diagnostics, function.ReturnType.Fulfilled());
+            // The body of a function shouldn't itself evaluate to anything.
+            // There should be no `=> value` for the block, so the type is `void`.
+            expressionChecker.CheckExpressionType(function.Body, ObjectType.Void);
         }
 
-        private static void CheckTypeBodies(TypeDeclarationSyntax typeDeclarationSyntax)
+        private static void ResolveBodyTypesInTypeDeclaration(TypeDeclarationSyntax typeDeclaration)
         {
             throw new NotImplementedException();
         }

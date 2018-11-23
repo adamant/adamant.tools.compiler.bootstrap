@@ -1,9 +1,12 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public abstract class DeclarationSyntax : Syntax
     {
+        [NotNull] public CodeFile File { get; }
+
         /// <summary>
         /// The span of whatever would count as the "name" of this declaration
         /// for things like operator overloads, constructors and destructors,
@@ -14,9 +17,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         /// </summary>
         public TextSpan NameSpan { get; }
 
-        protected DeclarationSyntax(TextSpan nameSpan)
+        protected DeclarationSyntax([NotNull] CodeFile file, TextSpan nameSpan)
         {
             NameSpan = nameSpan;
+            File = file;
         }
     }
 }

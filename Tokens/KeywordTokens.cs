@@ -88,6 +88,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             typeof(FloatKeywordToken),
             typeof(Float32KeywordToken),
             typeof(OffsetKeywordToken),
+            typeof(UnderscoreKeywordToken),
         }.AsReadOnly().NotNull();
     }
 
@@ -553,6 +554,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         public static IOffsetKeywordToken OffsetKeyword(TextSpan span)
         {
             return new OffsetKeywordToken(span);
+        }
+
+        [NotNull]
+        public static IUnderscoreKeywordToken UnderscoreKeyword(TextSpan span)
+        {
+            return new UnderscoreKeywordToken(span);
         }
 
     }
@@ -1245,6 +1252,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     internal partial class OffsetKeywordToken : Token, IOffsetKeywordToken
     {
         public OffsetKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface IUnderscoreKeywordToken : IKeywordToken { }
+    internal partial class UnderscoreKeywordToken : Token, IUnderscoreKeywordToken
+    {
+        public UnderscoreKeywordToken(TextSpan span)
             : base(span)
         {
         }

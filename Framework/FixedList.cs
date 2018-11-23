@@ -22,11 +22,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
             this.items = items.ItemsNotNull().ToList().AsReadOnly().NotNull();
         }
 
+        [DebuggerStepThrough]
         public IEnumerator<T> GetEnumerator()
         {
             return items.GetEnumerator();
         }
 
+        [DebuggerStepThrough]
         IEnumerator IEnumerable.GetEnumerator()
         {
             return ((IEnumerable)items).GetEnumerator();

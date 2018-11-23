@@ -18,6 +18,7 @@ The current plan is to slowly build up functionality by getting a series of kata
 
 The following features will not be implemented by this compiler even though they are described in the [language reference](https://github.com/adamant/adamant.language.reference/blob/master/src/book.md).
 
+* Meta Functions: Functions which have generic parameters but not regular parameters and are evaluated only at compilet time.
 * [Loop Labels](https://github.com/adamant/adamant.language.reference/blob/master/src/loop-expressions.md#loop-labels)
 * [Document Comment Validation](https://github.com/adamant/adamant.language.reference/blob/master/src/documentation-comments.md#supported-markdown)
 

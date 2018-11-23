@@ -18,11 +18,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case ISelfKeywordToken _:
                 {
                     var span = Tokens.Current.Span;
-                    var isRef = Tokens.Accept<IRefKeywordToken>();
-                    var mutableBinding = Tokens.Accept<IMutableKeywordToken>();
+                    var refSelf = Tokens.Accept<IRefKeywordToken>();
+                    var mutableSelf = Tokens.Accept<IMutableKeywordToken>();
                     var selfSpan = Tokens.Expect<ISelfKeywordToken>();
                     span = TextSpan.Covering(span, selfSpan);
-                    return new SelfParameterSyntax(span, isRef, mutableBinding);
+                    return new SelfParameterSyntax(span, refSelf, mutableSelf);
                 }
                 case IDotToken _:
                 {

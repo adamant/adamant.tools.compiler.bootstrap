@@ -18,10 +18,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         {
             // First pull over all the lexer and parser errors from the compilation units
             var diagnostics = AllDiagnostics(packageSyntax);
-            //var nameBuilder = new NameBuilder();
-
-            // TODO do we need a list of all the namespaces for validating using statements?
-            // Gather a list of all the namespaces for validating using statements
 
             var nameBinder = new NameBinder(packageSyntax, references);
             nameBinder.BindNames(packageSyntax);
@@ -30,8 +26,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             var namespacedDeclarations = packageSyntax.CompilationUnits
                 .SelectMany(cu => cu.AllNamespacedDeclarations).ToFixedList();
 
+            // TODO we can't do full type checking without some IL gen and code execution, how to handle that?
+
             // Do type checking
-            DeclarationTypeChecker.Check(namespacedDeclarations);
+            var typeChecker = new DeclarationTypeChecker(diagnostics);
+            typeChecker.ResolveTypesInDeclarations(namespacedDeclarations);
+
+            ControlFlowGraphBuilder.BuildGraphs(namespacedDeclarations.OfType<FunctionDeclarationSyntax>());
+
+            //var borrowChecker = new BorrowChecker();
+            //borrowChecker.Check(declarationAnalyses);
 
             // Build final declaration objects and find the entry point
             var declarationBuilder = new DeclarationBuilder();
@@ -39,42 +43,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             var entryPoint = DetermineEntryPoint(declarations, diagnostics);
 
             return new Package(packageSyntax.Name, diagnostics.Build(), references, declarations, entryPoint);
-
-            // -----------------------------------------------
-            // Old Analysis
-
-            //// Gather all the declarations and simultaneously build up trees of lexical scopes
-            //var compilationUnits = new AnalysisBuilder().Build(packageSyntax).ToList();
-
-            //// Check lexical scopes and attach to entities etc.
-            ////var oldScopeBinder = new OldScopeBinder(compilationUnits, nameBuilder, references);
-            ////foreach (var scope in compilationUnits.Select(cu => cu.GlobalScope))
-            ////    oldScopeBinder.BindCompilationUnitScope(scope);
-
-            //// Make a list of all the member declarations
-            //var declarationAnalyses = compilationUnits.SelectMany(cu => cu.MemberDeclarations).ToList();
-
-            //// Do name binding, type checking, IL statement generation and compile time code execution
-            //// They are all interdependent to some degree
-            //TypeChecker.CheckDeclarations(declarationAnalyses);
-
-            //// At this point, some but not all of the functions will have IL statements generated,
-            //// now generate the rest
-            //ControlFlowGraphBuilder.BuildGraphs(declarationAnalyses.OfType<FunctionDeclarationAnalysis>());
-
-            //// Only borrow checking left
-            //var borrowChecker = new BorrowChecker();
-            //borrowChecker.Check(declarationAnalyses);
-
-            //// Gather the diagnostics and declarations into a package
-            //var diagnostics = new Diagnostics();
-            //// First pull over all the lexer and parser errors from the compilation units
-            //foreach (var compilationUnit in packageSyntax.CompilationUnits)
-            //    diagnostics.Add(compilationUnit.Diagnostics);
-
-            //var declarations = declarationAnalyses.Select(d => d.Complete(diagnostics)).Where(d => d != null).ToList();
-            //var entryPoint = DetermineEntryPoint(declarations, diagnostics);
-            //return new Package(packageSyntax.Name, diagnostics.Build(), references, declarations, entryPoint);
         }
 
         [NotNull]

@@ -343,6 +343,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             { "float", typeof(IFloatKeywordToken) },
             { "float32", typeof(IFloat32KeywordToken) },
             { "offset", typeof(IOffsetKeywordToken) },
+            { "_", typeof(IUnderscoreKeywordToken) },
         }.ToFixedDictionary();
     }
 }

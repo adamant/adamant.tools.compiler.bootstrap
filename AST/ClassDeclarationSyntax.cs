@@ -21,6 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [NotNull] public FixedList<IMemberDeclarationSyntax> Members { get; }
 
         public ClassDeclarationSyntax(
+            [NotNull] CodeFile file,
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers,
             [NotNull] Name fullName,
@@ -31,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             [NotNull] FixedList<GenericConstraintSyntax> genericConstraints,
             [NotNull] FixedList<ExpressionSyntax> invariants,
             [NotNull] FixedList<IMemberDeclarationSyntax> members)
-            : base(nameSpan)
+            : base(file, nameSpan)
         {
             Attributes = attributes;
             Modifiers = modifiers;

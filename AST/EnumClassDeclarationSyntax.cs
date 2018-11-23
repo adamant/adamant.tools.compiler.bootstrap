@@ -20,6 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [NotNull] public FixedList<IMemberDeclarationSyntax> Members { get; }
 
         public EnumClassDeclarationSyntax(
+            [NotNull] CodeFile file,
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers,
             [NotNull] string name,
@@ -31,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             [NotNull] FixedList<ExpressionSyntax> invariants,
             [NotNull] FixedList<EnumVariantSyntax> variants,
             [NotNull] FixedList<IMemberDeclarationSyntax> members)
-            : base(nameSpan)
+            : base(file, nameSpan)
         {
             Attributes = attributes;
             Modifiers = modifiers;

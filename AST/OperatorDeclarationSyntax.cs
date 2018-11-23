@@ -7,27 +7,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class OperatorDeclarationSyntax : FunctionDeclarationSyntax
     {
-        [CanBeNull] public FixedList<GenericParameterSyntax> GenericParameters { get; }
-        [CanBeNull] public ExpressionSyntax ReturnType { get; }
-        [NotNull] public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
+        [CanBeNull] public ExpressionSyntax ReturnTypeExpression { get; }
 
         public OperatorDeclarationSyntax(
+            [NotNull] CodeFile file,
             [NotNull] FixedList<IModiferToken> modifiers,
             TextSpan nameSpan,
             [CanBeNull] FixedList<GenericParameterSyntax> genericParameters,
             [NotNull] FixedList<ParameterSyntax> parameters,
-            [CanBeNull] ExpressionSyntax returnType,
+            [CanBeNull] ExpressionSyntax returnTypeExpression,
             [NotNull] FixedList<GenericConstraintSyntax> genericConstraints,
             [NotNull] FixedList<EffectSyntax> mayEffects,
             [NotNull] FixedList<EffectSyntax> noEffects,
             [NotNull] FixedList<ExpressionSyntax> requires,
             [NotNull] FixedList<ExpressionSyntax> ensures,
             [CanBeNull] BlockSyntax body)
-            : base(modifiers, nameSpan, parameters, mayEffects, noEffects, requires, ensures, body)
+            : base(file, modifiers, nameSpan, genericParameters, parameters, genericConstraints, mayEffects, noEffects, requires, ensures, body)
         {
-            GenericParameters = genericParameters;
-            ReturnType = returnType;
-            GenericConstraints = genericConstraints;
+            ReturnTypeExpression = returnTypeExpression;
         }
 
         public override string ToString()

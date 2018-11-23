@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
@@ -16,6 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [NotNull] public FixedList<IMemberDeclarationSyntax> Members { get; }
 
         public StructDeclarationSyntax(
+            [NotNull] CodeFile file,
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers,
             [NotNull] IIdentifierOrPrimitiveToken name,
@@ -24,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             [NotNull] FixedList<GenericConstraintSyntax> genericConstraints,
             [NotNull] FixedList<ExpressionSyntax> invariants,
             [NotNull] FixedList<IMemberDeclarationSyntax> members)
-            : base(name.Span)
+            : base(file, name.Span)
         {
             Attributes = attributes;
             Modifiers = modifiers;

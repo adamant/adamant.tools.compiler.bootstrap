@@ -132,7 +132,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var usingDirectives = bodyParser.ParseUsingDirectives();
             var declarations = bodyParser.ParseDeclarations();
             Tokens.Expect<ICloseBraceToken>();
-            return new NamespaceDeclarationSyntax(globalQualifier != null, name,
+            return new NamespaceDeclarationSyntax(File, globalQualifier != null, name,
                 span, nameContext, usingDirectives, declarations);
         }
 
@@ -245,7 +245,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var genericConstraints = ParseGenericConstraints();
             var invariants = ParseInvariants();
             var members = ParseTypeBody();
-            return new ClassDeclarationSyntax(attributes, modifiers, name, identifier.Span, genericParameters,
+            return new ClassDeclarationSyntax(File, attributes, modifiers, name, identifier.Span, genericParameters,
                 baseClass, baseTypes, genericConstraints, invariants,
                 members);
         }
@@ -264,7 +264,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var genericConstraints = ParseGenericConstraints();
             var invariants = ParseInvariants();
             var members = ParseTypeBody();
-            return new TraitDeclarationSyntax(attributes, modifiers, name, identifier.Span,
+            return new TraitDeclarationSyntax(File, attributes, modifiers, name, identifier.Span,
                 genericParameters, baseTypes, genericConstraints, invariants,
                 members);
         }
@@ -282,7 +282,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var genericConstraints = ParseGenericConstraints();
             var invariants = ParseInvariants();
             var members = ParseTypeBody();
-            return new StructDeclarationSyntax(attributes, modifiers, name, genericParameters,
+            return new StructDeclarationSyntax(File, attributes, modifiers, name, genericParameters,
                 baseTypes, genericConstraints, invariants,
                 members);
         }
@@ -308,7 +308,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var variants = ParseEnumVariants();
                     var members = ParseMemberDeclarations();
                     Tokens.Expect<ICloseBraceToken>();
-                    return new EnumStructDeclarationSyntax(attributes, modifiers,
+                    return new EnumStructDeclarationSyntax(File, attributes, modifiers,
                         name.Value, name.Span, genericParameters, baseTypes, genericConstraints,
                         invariants, variants, members);
                 }
@@ -325,7 +325,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var variants = ParseEnumVariants();
                     var members = ParseMemberDeclarations();
                     Tokens.Expect<ICloseBraceToken>();
-                    return new EnumClassDeclarationSyntax(attributes, modifiers,
+                    return new EnumClassDeclarationSyntax(File, attributes, modifiers,
                         name.Value, name.Span, genericParameters, baseClass, baseTypes, genericConstraints,
                         invariants, variants, members);
                 }
@@ -383,7 +383,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 initializer = ParseExpression();
 
             Tokens.Expect<ISemicolonToken>();
-            return new FieldDeclarationSyntax(attributes, modifiers, getterAccess, name.Value, name.Span, typeExpression, initializer);
+            return new FieldDeclarationSyntax(File, attributes, modifiers, getterAccess, name.Value, name.Span, typeExpression, initializer);
         }
 
         [MustUseReturnValue]
@@ -417,7 +417,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
             var body = ParseFunctionBody(Tokens, Tokens.Context.Diagnostics);
-            return new NamedFunctionDeclarationSyntax(modifiers, name.Value, name.Span, genericParameters, parameters, returnType,
+            return new NamedFunctionDeclarationSyntax(File, modifiers, name.Value, name.Span, genericParameters, parameters, returnType,
                 genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
 
@@ -470,7 +470,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
             var body = ParseBlock();
-            return new OperatorDeclarationSyntax(modifiers, operatorKeywordSpan, genericParameters,
+            return new OperatorDeclarationSyntax(File, modifiers, operatorKeywordSpan, genericParameters,
                  parameters, returnType, genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
 
@@ -489,7 +489,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
             var body = ParseBlock();
-            return new ConstructorDeclarationSyntax(modifiers, name?.Value, TextSpan.Covering(newKeywordSpan, name?.Span),
+            return new ConstructorDeclarationSyntax(File, modifiers, name?.Value, TextSpan.Covering(newKeywordSpan, name?.Span),
                 genericParameters, parameters, genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
 
@@ -508,7 +508,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
             var body = ParseBlock();
-            return new InitializerDeclarationSyntax(modifiers, name?.Value, TextSpan.Covering(initKeywordSpan, name?.Span),
+            return new InitializerDeclarationSyntax(File, modifiers, name?.Value, TextSpan.Covering(initKeywordSpan, name?.Span),
                 genericParameters, parameters, genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
 
@@ -525,7 +525,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
             var body = ParseBlock();
-            return new DestructorDeclarationSyntax(modifiers, deleteKeywordSpan,
+            return new DestructorDeclarationSyntax(File, modifiers, deleteKeywordSpan,
                  parameters, mayEffects, noEffects, requires, ensures, body);
         }
 
@@ -544,7 +544,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
             var body = ParseBlock();
-            return new GetterDeclarationSyntax(attributes, modifiers, name.Value, name.Span,
+            return new GetterDeclarationSyntax(File, attributes, modifiers, name.Value, name.Span,
                 parameters, returnType, mayEffects, noEffects, requires, ensures, body);
         }
 
@@ -561,7 +561,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
             var body = ParseBlock();
-            return new SetterDeclarationSyntax(attributes, modifiers, name.Value, name.Span,
+            return new SetterDeclarationSyntax(File, attributes, modifiers, name.Value, name.Span,
                  parameters, mayEffects, noEffects, requires, ensures, body);
         }
 
@@ -719,7 +719,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     initializer = ParseExpression();
 
                 Tokens.Expect<ISemicolonToken>();
-                return new ConstDeclarationSyntax(attributes, modifiers, name.Value, name.Span, type, initializer);
+                return new ConstDeclarationSyntax(File, attributes, modifiers, name.Value, name.Span, type, initializer);
             }
             catch (ParseFailedException)
             {

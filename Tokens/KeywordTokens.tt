@@ -84,6 +84,7 @@
         "Float",
         "Float32",
         "Offset",
+        "Underscore",
     }.AsReadOnly();
 #>
 using System;

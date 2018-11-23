@@ -1,17 +1,18 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class SelfParameterSyntax : ParameterSyntax
     {
-        public bool IsRef { get; }
-        public bool MutableBinding { get; }
+        public bool RefSelf { get; }
+        public bool MutableSelf { get; }
 
-        public SelfParameterSyntax(TextSpan span, bool isRef, bool mutableBinding)
-            : base(span)
+        public SelfParameterSyntax(TextSpan span, bool refSelf, bool mutableSelf)
+            : base(span, false, SpecialName.Self)
         {
-            IsRef = isRef;
-            MutableBinding = mutableBinding;
+            RefSelf = refSelf;
+            MutableSelf = mutableSelf;
         }
 
         public override string ToString()

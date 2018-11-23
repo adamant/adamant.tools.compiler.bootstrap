@@ -9,10 +9,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public class ConstructorDeclarationSyntax : FunctionDeclarationSyntax
     {
         [CanBeNull] public SimpleName Name { get; }
-        [CanBeNull] public FixedList<GenericParameterSyntax> GenericParameters { get; }
-        [NotNull] public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
 
         public ConstructorDeclarationSyntax(
+            [NotNull] CodeFile file,
             [NotNull] FixedList<IModiferToken> modifiers,
             [CanBeNull] string name,
             TextSpan nameSpan,
@@ -24,11 +23,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             [NotNull] FixedList<ExpressionSyntax> requires,
             [NotNull] FixedList<ExpressionSyntax> ensures,
             [NotNull] BlockSyntax body)
-            : base(modifiers, nameSpan, parameters, mayEffects, noEffects, requires, ensures, body)
+            : base(file, modifiers, nameSpan, genericParameters, parameters, genericConstraints,
+                mayEffects, noEffects, requires, ensures, body)
         {
             if (name != null) Name = new SimpleName(name);
-            GenericParameters = genericParameters;
-            GenericConstraints = genericConstraints;
         }
 
         public override string ToString()

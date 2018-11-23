@@ -12,6 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [NotNull] public SimpleName Name { get; }
 
         public SetterDeclarationSyntax(
+            [NotNull] CodeFile file,
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers,
             [NotNull] string name,
@@ -22,7 +23,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             [NotNull] FixedList<ExpressionSyntax> requires,
             [NotNull] FixedList<ExpressionSyntax> ensures,
             [CanBeNull] BlockSyntax body)
-            : base(modifiers, nameSpan, parameters, mayEffects, noEffects, requires, ensures, body)
+            : base(file, modifiers, nameSpan, null, parameters,
+                FixedList<GenericConstraintSyntax>.Empty, mayEffects, noEffects, requires, ensures, body)
         {
             Attributes = attributes;
             Name = new SimpleName(name);

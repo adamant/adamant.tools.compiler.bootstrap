@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -18,12 +17,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Model
         public FunctionDeclaration(
             [NotNull] Name name,
             [NotNull] DataType type,
-            [NotNull, ItemNotNull] IEnumerable<Parameter> parameters,
+            [NotNull, ItemNotNull] FixedList<Parameter> parameters,
             [NotNull] DataType returnType,
             [CanBeNull] ControlFlowGraph controlFlow)
             : base(name, type)
         {
-            Parameters = parameters.ToFixedList();
+            Parameters = parameters;
             ReturnType = returnType;
             ControlFlow = controlFlow;
         }

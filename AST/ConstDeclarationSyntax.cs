@@ -15,13 +15,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [CanBeNull] public ExpressionSyntax Initializer { get; }
 
         public ConstDeclarationSyntax(
+            [NotNull] CodeFile file,
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] [ItemNotNull] FixedList<IModiferToken> modifiers,
             [NotNull] string name,
             TextSpan nameSpan,
             [CanBeNull] ExpressionSyntax typeExpression,
             [CanBeNull] ExpressionSyntax initializer)
-            : base(nameSpan)
+            : base(file, nameSpan)
         {
             Attributes = attributes;
             Modifiers = modifiers;

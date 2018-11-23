@@ -43,6 +43,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
                     case "AnyKeywordToken":
                         keyword = "Any";
                         break;
+                    case "UnderscoreKeywordToken":
+                        keyword = "_";
+                        break;
                     default:
                         keyword = tokenTypeName
                             .Substring(0, tokenTypeName.Length - KeywordTokenLength)

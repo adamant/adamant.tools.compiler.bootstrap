@@ -3,13 +3,16 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Types;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public abstract class TypeDeclarationSyntax : DeclarationSyntax, INamespacedDeclarationSyntax, IMemberDeclarationSyntax, ISymbol
     {
-        protected TypeDeclarationSyntax(TextSpan nameSpan)
-            : base(nameSpan)
+        [NotNull] public TypePromise Type { get; } = new TypePromise();
+
+        protected TypeDeclarationSyntax([NotNull] CodeFile file, TextSpan nameSpan)
+            : base(file, nameSpan)
         {
         }
 

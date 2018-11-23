@@ -13,6 +13,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
 {
     public class NameBinder
     {
+        // TODO do we need a list of all the namespaces for validating using statements?
+        // Gather a list of all the namespaces for validating using statements
+        // Also need to account for empty directories?
+
         [NotNull, ItemNotNull] private readonly FixedList<ISymbol> symbols;
         [NotNull] private readonly GlobalScope globalScope;
 

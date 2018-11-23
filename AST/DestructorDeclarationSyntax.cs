@@ -8,6 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public class DestructorDeclarationSyntax : FunctionDeclarationSyntax
     {
         public DestructorDeclarationSyntax(
+            [NotNull] CodeFile file,
             [NotNull] FixedList<IModiferToken> modifiers,
             TextSpan nameSpan,
             [NotNull] FixedList<ParameterSyntax> parameters,
@@ -16,8 +17,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             [NotNull] FixedList<ExpressionSyntax> requires,
             [NotNull] FixedList<ExpressionSyntax> ensures,
             [NotNull] BlockSyntax body)
-            : base(modifiers, nameSpan,
-                parameters, mayEffects, noEffects, requires, ensures, body)
+            : base(file, modifiers, nameSpan, null, parameters,
+                FixedList<GenericConstraintSyntax>.Empty, mayEffects, noEffects, requires, ensures, body)
         {
         }
 
