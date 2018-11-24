@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         protected PrimitiveType([NotNull] string name)
         {
             Requires.NotNull(nameof(name), name);
-            Name = new SimpleName(name, true);
+            Name = SimpleName.Special(name);
         }
     }
 }

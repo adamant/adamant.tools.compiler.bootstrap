@@ -14,14 +14,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
     // arguments supplied is *partially bound*.
     public class ObjectType : GenericType
     {
-        [NotNull] public static readonly ObjectType Void = new ObjectType(new SimpleName("void", true), false, false);
-        [NotNull] public static readonly ObjectType Never = new ObjectType(new SimpleName("never", true), false, false);
-        [NotNull] public static readonly ObjectType Size = new ObjectType(new SimpleName("size", true), false, false);
-        [NotNull] public static readonly ObjectType Offset = new ObjectType(new SimpleName("offset", true), false, false);
-        [NotNull] public static readonly ObjectType Bool = new ObjectType(new SimpleName("bool", true), false, false);
-        [NotNull] public static readonly ObjectType Type = new ObjectType(new SimpleName("type", true), true, false);
-        [NotNull] public static readonly ObjectType Metatype = new ObjectType(new SimpleName("metatype", true), true, false);
-        [NotNull] public static readonly ObjectType Any = new ObjectType(new SimpleName("any", true), true, false);
+        [NotNull] public static readonly ObjectType Void = new ObjectType(SimpleName.Special("void"), false, false);
+        [NotNull] public static readonly ObjectType Never = new ObjectType(SimpleName.Special("never"), false, false);
+        [NotNull] public static readonly ObjectType Size = new ObjectType(SimpleName.Special("size"), false, false);
+        [NotNull] public static readonly ObjectType Offset = new ObjectType(SimpleName.Special("offset"), false, false);
+        [NotNull] public static readonly ObjectType Bool = new ObjectType(SimpleName.Special("bool"), false, false);
+        [NotNull] public static readonly ObjectType Type = new ObjectType(SimpleName.Special("type"), false, false);
+        [NotNull] public static readonly ObjectType Metatype = new ObjectType(SimpleName.Special("metatype"), false, false);
+        [NotNull] public static readonly ObjectType Any = new ObjectType(SimpleName.Special("Any"), true, false);
 
         [NotNull] public Name Name { get; }
         public bool IsReferenceType { get; }

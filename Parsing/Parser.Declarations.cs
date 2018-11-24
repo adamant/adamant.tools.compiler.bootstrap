@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
@@ -419,7 +418,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
-            var body = ParseFunctionBody(Tokens, Tokens.Context.Diagnostics);
+            var body = ParseFunctionBody();
             return new NamedFunctionDeclarationSyntax(File, modifiers, name.Value, name.Span, genericParameters, parameters, returnType,
                 genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
@@ -688,13 +687,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return ParseExpression();
         }
 
-        private BlockSyntax ParseFunctionBody(
-            [NotNull] ITokenIterator tokens,
-            [NotNull] Diagnostics diagnostics)
+        private BlockSyntax ParseFunctionBody()
         {
             var body = AcceptBlock();
             if (body == null)
-                tokens.Expect<ISemicolonToken>();
+                Tokens.Expect<ISemicolonToken>();
             return body;
         }
         #endregion

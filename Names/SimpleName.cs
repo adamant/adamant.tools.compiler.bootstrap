@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
@@ -7,20 +8,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
 {
     public class SimpleName : Name, IEquatable<SimpleName>
     {
+        [NotNull] private static readonly Regex NeedsQuoted = new Regex(@"[\ ]", RegexOptions.Compiled);
+
         [NotNull] public override SimpleName UnqualifiedName => this;
         [NotNull] public readonly string Text;
+        public readonly int? Number;
         [NotNull] public readonly bool IsSpecial;
 
         public SimpleName([NotNull] string text)
-            : this(text, false)
+            : this(text, false, null)
         {
         }
 
-        public SimpleName([NotNull] string text, bool isSpecial)
+        public static SimpleName Variable([NotNull] string text, int number)
+        {
+            return new SimpleName(text, false, number);
+        }
+
+        [NotNull]
+        public static SimpleName Special([NotNull] string text)
+        {
+            return new SimpleName(text, true, null);
+        }
+
+        private SimpleName([NotNull] string text, bool isSpecial, int? number)
         {
             Requires.NotNull(nameof(text), text);
             Text = text;
             IsSpecial = isSpecial;
+            Number = number;
         }
 
         public override IEnumerable<SimpleName> Segments => this.Yield();
@@ -34,8 +50,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
 
         public override string ToString()
         {
-            // TODO deal with IsSpecial and Special chars like space
-            return Text;
+            var escapedName = Text.Escape();
+            if (NeedsQuoted.IsMatch(escapedName))
+                escapedName += $@"""{escapedName}""";
+            if (Number != null) escapedName += "#" + Number;
+
+            return escapedName;
         }
 
         #region Equals
@@ -46,14 +66,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
 
         public bool Equals(SimpleName other)
         {
-            return other != null &&
-                   Text == other.Text &&
-                   IsSpecial == other.IsSpecial;
+            return other != null
+                && Text == other.Text
+                && IsSpecial == other.IsSpecial
+                && Number == other.Number;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Text, IsSpecial);
+            return HashCode.Combine(Text, IsSpecial, Number);
         }
 
         public static bool operator ==(SimpleName name1, SimpleName name2)
