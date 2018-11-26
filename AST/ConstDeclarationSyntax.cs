@@ -31,6 +31,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             Initializer = initializer;
         }
 
+        DeclarationSyntax IDeclarationSyntax.AsDeclarationSyntax => this;
+
         public override string ToString()
         {
             throw new System.NotImplementedException();

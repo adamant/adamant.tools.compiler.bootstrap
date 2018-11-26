@@ -6,7 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     /// Declarations that can be a member of a namespace. Except that namespace
     /// declarations are NOT included here.
     /// </summary>
-    public interface INamespacedDeclarationSyntax : ISymbol
+    public interface INamespacedDeclarationSyntax : ISymbol, IDeclarationSyntax
     {
     }
 }

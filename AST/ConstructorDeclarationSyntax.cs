@@ -32,7 +32,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public override string ToString()
         {
-            throw new System.NotImplementedException();
+            if (GenericParameters != null)
+                return $"{FullName}[{string.Join(", ", GenericParameters)}]({string.Join(", ", Parameters)})";
+
+            return $"{FullName}({string.Join(", ", Parameters)})";
         }
     }
 }

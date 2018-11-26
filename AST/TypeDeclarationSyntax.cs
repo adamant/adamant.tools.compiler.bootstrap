@@ -29,6 +29,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             GenericParameters = genericParameters;
         }
 
+        DeclarationSyntax IDeclarationSyntax.AsDeclarationSyntax => this;
+
         public ISymbol ComposeWith(ISymbol symbol)
         {
             throw new System.NotImplementedException();
@@ -48,5 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         {
             throw new System.NotImplementedException();
         }
+
+
     }
 }

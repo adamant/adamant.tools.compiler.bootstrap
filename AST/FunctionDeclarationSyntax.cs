@@ -47,5 +47,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             GenericParameters = genericParameters;
             GenericConstraints = genericConstraints;
         }
+
+        DeclarationSyntax IDeclarationSyntax.AsDeclarationSyntax => this;
+
     }
 }

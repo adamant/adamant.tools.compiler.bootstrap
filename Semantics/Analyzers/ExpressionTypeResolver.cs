@@ -12,13 +12,13 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 {
-    public class ExpressionTypeChecker
+    public class ExpressionTypeResolver
     {
         [NotNull] private readonly CodeFile file;
         [CanBeNull] private readonly DataType returnType;
         [NotNull] private readonly Diagnostics diagnostics;
 
-        public ExpressionTypeChecker(
+        public ExpressionTypeResolver(
             [NotNull] CodeFile file,
             [NotNull] Diagnostics diagnostics,
             [CanBeNull] DataType returnType = null)
@@ -28,13 +28,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             this.diagnostics = diagnostics;
         }
 
-        public void CheckStatement(
-            [NotNull] StatementSyntax statement)
+        public void InferStatementType([NotNull] StatementSyntax statement)
         {
             switch (statement)
             {
                 case VariableDeclarationStatementSyntax variableDeclaration:
-                    CheckVariableDeclaration(variableDeclaration);
+                    ResolveVariableDeclarationType(variableDeclaration);
                     break;
                 case ExpressionSyntax expression:
                     InferExpressionType(expression);
@@ -44,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             }
         }
 
-        private void CheckVariableDeclaration(
+        private void ResolveVariableDeclarationType(
             [NotNull] VariableDeclarationStatementSyntax variableDeclaration)
         {
             variableDeclaration.Type.BeginFulfilling();
@@ -74,7 +73,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         }
 
         // Checks the expression is well typed, and that the type of the expression is `bool`
-        private void InferExpressionTypeTypeIsBool([NotNull] ExpressionSyntax expression)
+        private void CheckExpressionTypeIsBool([NotNull] ExpressionSyntax expression)
         {
             InferExpressionType(expression);
             if (expression.Type.Fulfilled() != ObjectType.Bool)
@@ -133,11 +132,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                             throw NonExhaustiveMatchException.For(literalExpression.Literal);
                     }
                 case BinaryExpressionSyntax binaryOperatorExpression:
-                    return CheckBinaryOperator(binaryOperatorExpression);
+                    return InferBinaryExpressionType(binaryOperatorExpression);
                 case IdentifierNameSyntax identifierName:
                     return identifierName.Type.Fulfill(identifierName.ReferencedSymbol.NotNull().Type);
                 case UnaryExpressionSyntax unaryOperatorExpression:
-                    return CheckUnaryOperator(unaryOperatorExpression);
+                    return InferUnaryExpressionType(unaryOperatorExpression);
                 case LifetimeTypeSyntax lifetimeType:
                     InferExpressionType(lifetimeType.TypeExpression);
                     if (lifetimeType.TypeExpression.Type.Fulfilled() != ObjectType.Type)
@@ -145,7 +144,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     return expression.Type.Fulfill(ObjectType.Type);
                 case BlockSyntax blockExpression:
                     foreach (var statement in blockExpression.Statements)
-                        CheckStatement(statement);
+                        InferStatementType(statement);
 
                     return expression.Type.Fulfill(ObjectType.Void);// TODO assign the correct type to the block
                 case NewObjectExpressionSyntax newObjectExpression:
@@ -170,7 +169,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     // TODO assign correct type to the expression
                     return expression.Type.Fulfill(DataType.Unknown);
                 case WhileExpressionSyntax whileExpression:
-                    InferExpressionTypeTypeIsBool(whileExpression.Condition);
+                    CheckExpressionTypeIsBool(whileExpression.Condition);
                     InferExpressionType(whileExpression.Block);
                     // TODO assign correct type to the expression
                     return expression.Type.Fulfill(DataType.Unknown);
@@ -229,7 +228,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                         InferExpressionType(argument.Value);
 
                     genericName.NameType.BeginFulfilling();
-                    var nameType = CheckName(genericName.Name, genericName.Span);
+                    var nameType = InferNameType(genericName.Name, genericName.Span);
                     if (nameType is OverloadedType overloadedType)
                     {
                         nameType = overloadedType.Types.OfType<GenericType>()
@@ -262,7 +261,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case MutableTypeSyntax mutableType:
                     return mutableType.Type.Fulfill(CheckAndEvaluateTypeExpression(mutableType.ReferencedTypeExpression));// TODO make that type mutable
                 case IfExpressionSyntax ifExpression:
-                    InferExpressionTypeTypeIsBool(ifExpression.Condition);
+                    CheckExpressionTypeIsBool(ifExpression.Condition);
                     InferExpressionType(ifExpression.ThenBlock);
                     InferExpressionType(ifExpression.ElseClause);
                     // TODO assign a type to the expression
@@ -274,7 +273,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 //                    // TODO assign a type to the expression
                 //                    return uninitializedExpression.Type.Computed(DataType.Unknown);
                 case MemberAccessExpressionSyntax memberAccess:
-                    return CheckMemberAccess(memberAccess);
+                    return InferMemberAccessType(memberAccess);
                 case BreakExpressionSyntax breakExpression:
                     InferExpressionType(breakExpression.Value);
                     return breakExpression.Type.Fulfill(ObjectType.Never);
@@ -289,7 +288,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         }
 
         [NotNull]
-        private DataType CheckMemberAccess([NotNull] MemberAccessExpressionSyntax memberAccess)
+        private DataType InferMemberAccessType([NotNull] MemberAccessExpressionSyntax memberAccess)
         {
             var left = InferExpressionType(memberAccess.Expression);
             ISymbol symbol;
@@ -323,7 +322,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         }
 
         [NotNull]
-        private DataType CheckName(
+        private DataType InferNameType(
             //[NotNull] AnalysisContext context,
             [NotNull] SimpleName name,
             TextSpan span)
@@ -370,7 +369,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         }
 
         [NotNull]
-        private DataType CheckBinaryOperator(
+        private DataType InferBinaryExpressionType(
             [NotNull] BinaryExpressionSyntax binaryExpression)
         {
             InferExpressionType(binaryExpression.LeftOperand);
@@ -534,7 +533,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         }
 
         [NotNull]
-        private DataType CheckUnaryOperator(
+        private DataType InferUnaryExpressionType(
             [NotNull] UnaryExpressionSyntax unaryExpression)
         {
             InferExpressionType(unaryExpression.Operand);

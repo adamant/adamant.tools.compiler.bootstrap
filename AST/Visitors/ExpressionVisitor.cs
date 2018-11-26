@@ -6,7 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 {
     public class ExpressionVisitor<A, R>
     {
-        public virtual R GetDefaultReturn(A args) => default;
+        public virtual R DefaultResult(A args) => default;
 
         public virtual R CombineResults(A result, params R[] results) => default;
 
@@ -96,7 +96,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 
         public virtual R VisitPrimitiveType(PrimitiveTypeSyntax primitiveType, A args)
         {
-            return GetDefaultReturn(args);
+            return DefaultResult(args);
         }
 
         public virtual R VisitUnaryExpression([NotNull] UnaryExpressionSyntax unaryExpression, A args)
@@ -106,17 +106,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 
         public virtual R VisitIdentifierName([NotNull] IdentifierNameSyntax identifierName, A args)
         {
-            return GetDefaultReturn(args);
+            return DefaultResult(args);
         }
 
         public virtual R VisitNull(A args)
         {
-            return GetDefaultReturn(args);
+            return DefaultResult(args);
         }
 
         public virtual R VisitLiteralExpression([NotNull] LiteralExpressionSyntax literalExpression, A args)
         {
-            return GetDefaultReturn(args);
+            return DefaultResult(args);
         }
 
         public virtual R VisitInvocation([NotNull] InvocationSyntax invocation, A args)

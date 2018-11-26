@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // TODO we can't do full type checking without some IL gen and code execution, how to handle that?
 
             // Do type checking
-            var typeChecker = new DeclarationTypeChecker(diagnostics);
+            var typeChecker = new DeclarationTypeResolver(diagnostics);
             typeChecker.ResolveTypesInDeclarations(namespacedDeclarations);
 
             ControlFlowGraphBuilder.BuildGraphs(namespacedDeclarations.OfType<FunctionDeclarationSyntax>());
