@@ -1,5 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -7,9 +8,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class DestructorDeclarationSyntax : FunctionDeclarationSyntax
     {
+        [NotNull] public Name FullName { get; }
+        [NotNull] public SimpleName Name => FullName.UnqualifiedName;
+
         public DestructorDeclarationSyntax(
             [NotNull] CodeFile file,
             [NotNull] FixedList<IModiferToken> modifiers,
+            [NotNull] Name fullName,
             TextSpan nameSpan,
             [NotNull] FixedList<ParameterSyntax> parameters,
             [NotNull] FixedList<EffectSyntax> mayEffects,
@@ -20,6 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             : base(file, modifiers, nameSpan, null, parameters,
                 FixedList<GenericConstraintSyntax>.Empty, mayEffects, noEffects, requires, ensures, body)
         {
+            FullName = fullName;
         }
 
         public override string ToString()

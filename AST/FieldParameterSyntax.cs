@@ -10,9 +10,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public FieldParameterSyntax(
             TextSpan span,
-            [NotNull] string value,
+            [NotNull] Name fullName,
             [CanBeNull] ExpressionSyntax defaultValue)
-            : base(span, false, new SimpleName(value))
+            : base(span, false, fullName)
         {
             DefaultValue = defaultValue;
         }

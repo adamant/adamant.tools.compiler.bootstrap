@@ -10,11 +10,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         public TextSpan Span { get; }
         public bool MutableBinding { get; }
-        [NotNull] public SimpleName Name { get; }
-
+        [NotNull] public Name FullName { get; }
+        [NotNull] public SimpleName Name => FullName.UnqualifiedName;
         [NotNull] public TypePromise Type { get; } = new TypePromise();
-
-        public Name FullName => throw new System.NotImplementedException();
 
         DataType ISymbol.Type => Type.Resolved();
 
@@ -28,11 +26,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             throw new System.NotImplementedException();
         }
 
-        protected ParameterSyntax(TextSpan span, bool mutableBinding, [NotNull] SimpleName name)
+        protected ParameterSyntax(TextSpan span, bool mutableBinding, [NotNull] Name fullName)
         {
             Span = span;
             MutableBinding = mutableBinding;
-            Name = name;
+            FullName = fullName;
         }
     }
 }

@@ -15,10 +15,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             TextSpan span,
             bool isParams,
             bool mutableBinding,
-            [NotNull] string name,
+            [NotNull] Name fullName,
             [NotNull] ExpressionSyntax typeExpression,
             [CanBeNull] ExpressionSyntax defaultValue)
-            : base(span, mutableBinding, new SimpleName(name))
+            : base(span, mutableBinding, fullName)
         {
             IsParams = isParams;
             TypeExpression = typeExpression;

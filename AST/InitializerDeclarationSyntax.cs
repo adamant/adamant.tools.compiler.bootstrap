@@ -8,12 +8,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class InitializerDeclarationSyntax : FunctionDeclarationSyntax
     {
-        [CanBeNull] public SimpleName Name { get; }
+        [NotNull] public Name FullName { get; }
+        [NotNull] public SimpleName Name => FullName.UnqualifiedName;
 
         public InitializerDeclarationSyntax(
             [NotNull] CodeFile file,
             [NotNull] FixedList<IModiferToken> modifiers,
-            [CanBeNull] string name,
+            [NotNull] Name fullName,
             TextSpan nameSpan,
             [CanBeNull] FixedList<GenericParameterSyntax> genericParameters,
             [NotNull] FixedList<ParameterSyntax> parameters,
@@ -26,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             : base(file, modifiers, nameSpan, genericParameters, parameters,
                 genericConstraints, mayEffects, noEffects, requires, ensures, body)
         {
-            if (name != null) Name = new SimpleName(name);
+            FullName = fullName;
         }
 
         public override string ToString()

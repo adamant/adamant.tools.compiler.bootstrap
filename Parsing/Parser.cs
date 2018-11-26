@@ -10,6 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [NotNull] protected readonly CodeFile File;
         [NotNull] protected readonly ITokenIterator Tokens;
         [NotNull] private readonly RootName nameContext;
+        [NotNull] private readonly VariableNumbers variableNumbers = new VariableNumbers();
 
         public Parser([NotNull] ITokenIterator tokens, [NotNull] RootName nameContext)
         {
@@ -26,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [NotNull]
         protected Parser NestedParser([NotNull] Name name)
         {
-            return new Parser(Tokens, nameContext.Qualify(name));
+            return new Parser(Tokens, name);
         }
     }
 }

@@ -10,7 +10,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class NamedFunctionDeclarationSyntax : FunctionDeclarationSyntax, INamespacedDeclarationSyntax
     {
-        [NotNull] public SimpleName Name { get; }
+        [NotNull] public Name FullName { get; }
+        [NotNull] public SimpleName Name => FullName.UnqualifiedName;
 
         ISymbol ISymbol.ComposeWith(ISymbol symbol)
         {
@@ -28,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public NamedFunctionDeclarationSyntax(
             [NotNull] CodeFile file,
             [NotNull] FixedList<IModiferToken> modifiers,
-            [NotNull] string name,
+            [NotNull] Name fullName,
             TextSpan nameSpan,
             [CanBeNull] FixedList<GenericParameterSyntax> genericParameters,
             [NotNull] FixedList<ParameterSyntax> parameters, // For now we will not support pure meta functions
@@ -42,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             : base(file, modifiers, nameSpan, genericParameters, parameters,
                 genericConstraints, mayEffects, noEffects, requires, ensures, body)
         {
-            Name = new SimpleName(name);
+            FullName = fullName;
             ReturnTypeExpression = returnTypeExpression;
         }
 
@@ -50,7 +51,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         {
             throw new System.NotImplementedException();
         }
-
-        Name ISymbol.FullName => Name;
     }
 }

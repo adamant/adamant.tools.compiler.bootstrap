@@ -9,14 +9,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public class GetterDeclarationSyntax : FunctionDeclarationSyntax
     {
         [NotNull] public FixedList<AttributeSyntax> Attributes { get; }
-        [NotNull] public SimpleName Name { get; }
+        [NotNull] public Name PropertyName { get; }
+        [NotNull] public Name FullName { get; }
+        [NotNull] public SimpleName Name => Name.UnqualifiedName;
         [NotNull] public ExpressionSyntax ReturnTypeExpression { get; }
 
         public GetterDeclarationSyntax(
             [NotNull] CodeFile file,
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers,
-            [NotNull] string name,
+            [NotNull] Name propertyName,
+            [NotNull] Name fullName,
             TextSpan nameSpan,
             [NotNull] FixedList<ParameterSyntax> parameters,
             [NotNull] ExpressionSyntax returnTypeExpression,
@@ -29,7 +32,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
                 FixedList<GenericConstraintSyntax>.Empty, mayEffects, noEffects, requires, ensures, body)
         {
             Attributes = attributes;
-            Name = new SimpleName(name);
+            PropertyName = propertyName;
+            FullName = fullName;
             ReturnTypeExpression = returnTypeExpression;
         }
 

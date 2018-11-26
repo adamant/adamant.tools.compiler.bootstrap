@@ -127,7 +127,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var (name, span) = ParseNamespaceName();
             span = TextSpan.Covering(span, globalQualifier?.Span);
             Tokens.Expect<IOpenBraceToken>();
-            var bodyParser = NestedParser(name);
+            var bodyParser = NestedParser(nameContext.Qualify(name));
             var usingDirectives = bodyParser.ParseUsingDirectives();
             var declarations = bodyParser.ParseDeclarations();
             Tokens.Expect<ICloseBraceToken>();
@@ -408,9 +408,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<IModiferToken> modifiers)
         {
             Tokens.Expect<IFunctionKeywordToken>();
-            var name = Tokens.RequiredToken<IIdentifierToken>();
+            var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var genericParameters = AcceptGenericParameters();
-            var parameters = ParseParameters();
+            var name = nameContext.Qualify(identifier.Value);
+            var bodyParser = NestedParser(name);
+            var parameters = bodyParser.ParseParameters();
             ExpressionSyntax returnType = null;
             if (Tokens.Accept<IRightArrowToken>())
                 returnType = ParseExpression();
@@ -418,8 +420,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
-            var body = ParseFunctionBody();
-            return new NamedFunctionDeclarationSyntax(File, modifiers, name.Value, name.Span, genericParameters, parameters, returnType,
+            var body = bodyParser.ParseFunctionBody();
+            return new NamedFunctionDeclarationSyntax(File, modifiers, name, identifier.Span, genericParameters, parameters, returnType,
                 genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
 
@@ -483,15 +485,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<IModiferToken> modifiers)
         {
             var newKeywordSpan = Tokens.Expect<INewKeywordToken>();
-            var name = Tokens.AcceptToken<IIdentifierToken>();
+            var identifier = Tokens.AcceptToken<IIdentifierToken>();
+            var name = nameContext.Qualify(SimpleName.Special("new" + (identifier != null ? "_" + identifier.Value : "")));
+            var bodyParser = NestedParser(name);
             var genericParameters = AcceptGenericParameters();
-            var parameters = ParseParameters();
+            var parameters = bodyParser.ParseParameters();
             var genericConstraints = ParseGenericConstraints();
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
-            var body = ParseBlock();
-            return new ConstructorDeclarationSyntax(File, modifiers, name?.Value, TextSpan.Covering(newKeywordSpan, name?.Span),
+            var body = bodyParser.ParseBlock();
+            return new ConstructorDeclarationSyntax(File, modifiers, name, TextSpan.Covering(newKeywordSpan, identifier?.Span),
                 genericParameters, parameters, genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
 
@@ -502,15 +506,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<IModiferToken> modifiers)
         {
             var initKeywordSpan = Tokens.Expect<IInitKeywordToken>();
-            var name = Tokens.AcceptToken<IIdentifierToken>();
+            var identifier = Tokens.AcceptToken<IIdentifierToken>();
+            var name = nameContext.Qualify(SimpleName.Special("init" + (identifier != null ? "_" + identifier.Value : "")));
+            var bodyParser = NestedParser(name);
             var genericParameters = AcceptGenericParameters();
-            var parameters = ParseParameters();
+            var parameters = bodyParser.ParseParameters();
             var genericConstraints = ParseGenericConstraints();
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
-            var body = ParseBlock();
-            return new InitializerDeclarationSyntax(File, modifiers, name?.Value, TextSpan.Covering(initKeywordSpan, name?.Span),
+            var body = bodyParser.ParseBlock();
+            return new InitializerDeclarationSyntax(File, modifiers, name, TextSpan.Covering(initKeywordSpan, identifier?.Span),
                 genericParameters, parameters, genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
 
@@ -522,12 +528,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<IModiferToken> modifiers)
         {
             var deleteKeywordSpan = Tokens.Expect<IDeleteKeywordToken>();
-            var parameters = ParseParameters();
+            var name = nameContext.Qualify(SpecialName.Delete);
+            var bodyParser = NestedParser(name);
+            var parameters = bodyParser.ParseParameters();
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
-            var body = ParseBlock();
-            return new DestructorDeclarationSyntax(File, modifiers, deleteKeywordSpan,
+            var body = bodyParser.ParseBlock();
+            return new DestructorDeclarationSyntax(File, modifiers, name, deleteKeywordSpan,
                  parameters, mayEffects, noEffects, requires, ensures, body);
         }
 
@@ -538,15 +546,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<IModiferToken> modifiers)
         {
             Tokens.Expect<IGetKeywordToken>();
-            var name = Tokens.RequiredToken<IIdentifierToken>();
-            var parameters = ParseParameters();
+            var identifier = Tokens.RequiredToken<IIdentifierToken>();
+            var propertyName = nameContext.Qualify(identifier.Value);
+            var name = nameContext.Qualify(SimpleName.Special("get_" + identifier.Value));
+            var bodyParser = NestedParser(name);
+            var parameters = bodyParser.ParseParameters();
             Tokens.Expect<IRightArrowToken>();
             var returnType = ParseExpression();
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
-            var body = ParseBlock();
-            return new GetterDeclarationSyntax(File, attributes, modifiers, name.Value, name.Span,
+            var body = bodyParser.ParseBlock();
+            return new GetterDeclarationSyntax(File, attributes, modifiers, propertyName, name, identifier.Span,
                 parameters, returnType, mayEffects, noEffects, requires, ensures, body);
         }
 
@@ -557,13 +568,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<IModiferToken> modifiers)
         {
             Tokens.Expect<ISetKeywordToken>();
-            var name = Tokens.RequiredToken<IIdentifierToken>();
-            var parameters = ParseParameters();
+            var identifier = Tokens.RequiredToken<IIdentifierToken>();
+            var propertyName = nameContext.Qualify(identifier.Value);
+            var name = nameContext.Qualify(SimpleName.Special("get_" + identifier.Value));
+            var bodyParser = NestedParser(name);
+            var parameters = bodyParser.ParseParameters();
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
-            var body = ParseBlock();
-            return new SetterDeclarationSyntax(File, attributes, modifiers, name.Value, name.Span,
+            var body = bodyParser.ParseBlock();
+            return new SetterDeclarationSyntax(File, attributes, modifiers, propertyName, name, identifier.Span,
                  parameters, mayEffects, noEffects, requires, ensures, body);
         }
 

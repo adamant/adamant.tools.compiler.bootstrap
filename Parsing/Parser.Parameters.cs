@@ -1,5 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -22,25 +23,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var mutableSelf = Tokens.Accept<IMutableKeywordToken>();
                     var selfSpan = Tokens.Expect<ISelfKeywordToken>();
                     span = TextSpan.Covering(span, selfSpan);
-                    return new SelfParameterSyntax(span, refSelf, mutableSelf);
+                    var name = nameContext.Qualify(SpecialName.Self);
+                    return new SelfParameterSyntax(span, name, refSelf, mutableSelf);
                 }
                 case IDotToken _:
                 {
                     var dot = Tokens.Expect<IDotToken>();
-                    var name = Tokens.RequiredToken<IIdentifierToken>();
+                    var identifier = Tokens.RequiredToken<IIdentifierToken>();
                     var equals = Tokens.AcceptToken<IEqualsToken>();
                     ExpressionSyntax defaultValue = null;
                     if (equals != null)
                         defaultValue = ParseExpression();
-                    var span = TextSpan.Covering(dot, name.Span, defaultValue?.Span);
-                    return new FieldParameterSyntax(span, name.Value, defaultValue);
+                    var span = TextSpan.Covering(dot, identifier.Span, defaultValue?.Span);
+                    var name = nameContext.Qualify(SimpleName.Special("field_" + identifier.Value));
+                    return new FieldParameterSyntax(span, name, defaultValue);
                 }
                 default:
                 {
                     var span = Tokens.Current.Span;
                     var isParams = Tokens.Accept<IParamsKeywordToken>();
                     var mutableBinding = Tokens.Accept<IVarKeywordToken>();
-                    var name = Tokens.RequiredToken<IIdentifierOrUnderscoreToken>();
+                    var identifier = Tokens.RequiredToken<IIdentifierOrUnderscoreToken>();
+                    var name = nameContext.Qualify(variableNumbers.VariableName(identifier.Value));
                     Tokens.Expect<IColonToken>();
                     // Need to not consume the assignment that separates the type from the default value,
                     // hence the min operator precedence.
@@ -49,7 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     if (Tokens.Accept<IEqualsToken>())
                         defaultValue = ParseExpression();
                     span = TextSpan.Covering(span, type.Span, defaultValue?.Span);
-                    return new NamedParameterSyntax(span, isParams, mutableBinding, name.Value, type, defaultValue);
+                    return new NamedParameterSyntax(span, isParams, mutableBinding, name, type, defaultValue);
                 }
             }
         }

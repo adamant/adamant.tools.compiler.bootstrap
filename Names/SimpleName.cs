@@ -20,6 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         {
         }
 
+        [NotNull]
         public static SimpleName Variable([NotNull] string text, int number)
         {
             return new SimpleName(text, false, number);
@@ -39,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
             Number = number;
         }
 
-        public override IEnumerable<SimpleName> Segments => this.Yield();
+        [NotNull] public override IEnumerable<SimpleName> Segments => this.Yield();
 
         public override bool HasQualifier([NotNull] Name name)
         {

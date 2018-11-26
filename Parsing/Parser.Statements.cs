@@ -40,7 +40,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [NotNull]
         private StatementSyntax ParseRestOfVariableDeclaration(bool mutableBinding)
         {
-            var name = Tokens.RequiredToken<IIdentifierToken>();
+            var identifier = Tokens.RequiredToken<IIdentifierToken>();
+            var name = this.nameContext.Qualify(variableNumbers.VariableName(identifier.Value));
             ExpressionSyntax type = null;
             if (Tokens.Accept<IColonToken>())
                 // Need to not consume the assignment that separates the type from the initializer,
@@ -51,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (Tokens.Accept<IEqualsToken>()) initializer = ParseExpression();
 
             Tokens.Expect<ISemicolonToken>();
-            return new VariableDeclarationStatementSyntax(mutableBinding, name.Value, name.Span, type,
+            return new VariableDeclarationStatementSyntax(mutableBinding, name, identifier.Span, type,
                 initializer);
         }
 

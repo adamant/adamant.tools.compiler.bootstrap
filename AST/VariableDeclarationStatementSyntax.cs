@@ -9,13 +9,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public class VariableDeclarationStatementSyntax : StatementSyntax, ISymbol
     {
         public bool MutableBinding { get; }
-        [NotNull] public SimpleName Name { get; }
+        [NotNull] public Name FullName { get; }
+        [NotNull] public SimpleName Name => FullName.UnqualifiedName;
         public TextSpan NameSpan { get; }
         [CanBeNull] public ExpressionSyntax TypeExpression { get; }
         [CanBeNull] public ExpressionSyntax Initializer { get; }
         [NotNull] public TypePromise Type { get; } = new TypePromise();
-
-        public Name FullName => throw new System.NotImplementedException();
 
         DataType ISymbol.Type => Type.Resolved();
 
@@ -31,13 +30,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public VariableDeclarationStatementSyntax(
             bool mutableBinding,
-            [NotNull] string name,
+            [NotNull] Name fullName,
             TextSpan nameSpan,
             [CanBeNull] ExpressionSyntax typeExpression,
             [CanBeNull] ExpressionSyntax initializer)
         {
             MutableBinding = mutableBinding;
-            Name = new SimpleName(name);
+            FullName = fullName;
             NameSpan = nameSpan;
             TypeExpression = typeExpression;
             Initializer = initializer;
