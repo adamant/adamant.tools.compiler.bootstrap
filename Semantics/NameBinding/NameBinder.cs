@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
+using Adamant.Tools.Compiler.Bootstrap.AST.Visitors;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Primitives;
@@ -11,7 +12,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
 {
-    public class NameBinder
+    public class NameBinder : ExpressionVisitor<LexicalScope, Void>
     {
         // TODO do we need a list of all the namespaces for validating using statements?
         // Gather a list of all the namespaces for validating using statements
@@ -77,14 +78,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
                         BindNamesInDeclaration(containingScope, nestedDeclaration);
                 }
                 break;
-                case NamedFunctionDeclarationSyntax namedFunction:
+                case FunctionDeclarationSyntax function:
                 {
                     var symbols = new List<ISymbol>();
-                    foreach (var parameter in namedFunction.Parameters)
+                    foreach (var parameter in function.Parameters)
                         symbols.Add(parameter);
 
                     containingScope = new NestedScope(containingScope, symbols);
-                    BindNamesInBlock(containingScope, namedFunction.Body);
+                    BindNamesInBlock(containingScope, function.Body);
                 }
                 break;
                 case TypeDeclarationSyntax typeDeclaration:
@@ -110,39 +111,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
             containingScope = new NestedScope(containingScope, symbols);
 
             foreach (var statement in block.Statements)
-                BindNamesInStatement(containingScope, statement);
+                VisitStatement(statement, containingScope);
         }
 
-        private void BindNamesInStatement([NotNull] LexicalScope containingScope, [NotNull] StatementSyntax statement)
+        public override Void VisitExpression([CanBeNull] ExpressionSyntax expression, LexicalScope containingScope)
         {
-            switch (statement)
-            {
-                case VariableDeclarationStatementSyntax variableDeclaration:
-                    BindNamesInExpression(containingScope, variableDeclaration.Initializer);
-                    break;
-                case ExpressionSyntax expression:
-                    BindNamesInExpression(containingScope, expression);
-                    break;
-                default:
-                    throw NonExhaustiveMatchException.For(statement);
-            }
-        }
-
-        private void BindNamesInExpression([NotNull] LexicalScope containingScope, [CanBeNull] ExpressionSyntax expression)
-        {
-            if (expression == null) return;
-
-            switch (expression)
-            {
-                case ReturnExpressionSyntax returnExpression:
-                    BindNamesInExpression(containingScope, returnExpression.ReturnValue);
-                    break;
-                case LiteralExpressionSyntax _:
-                    // No names to bind or expressions to recurse on
-                    break;
-                default:
-                    throw NonExhaustiveMatchException.For(expression);
-            }
+            return expression == null ? default : base.VisitExpression(expression, containingScope);
         }
 
         [NotNull]
