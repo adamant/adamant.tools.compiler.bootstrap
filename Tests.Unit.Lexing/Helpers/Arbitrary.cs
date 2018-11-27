@@ -305,6 +305,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             { "Self", typeof(ISelfTypeKeywordToken) },
             { "init", typeof(IInitKeywordToken) },
             { "owned", typeof(IOwnedKeywordToken) },
+            { "forever", typeof(IForeverKeywordToken) },
             { "self", typeof(ISelfKeywordToken) },
             { "type", typeof(ITypeKeywordToken) },
             { "metatype", typeof(IMetatypeKeywordToken) },

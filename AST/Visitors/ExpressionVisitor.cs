@@ -58,11 +58,48 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                     return VisitNewObjectExpression(newObjectExpression, args);
                 case MemberAccessExpressionSyntax memberAccessExpression:
                     return VisitMemberAccessExpression(memberAccessExpression, args);
+                case UnsafeExpressionSyntax unsafeExpression:
+                    return VisitUnsafeExpression(unsafeExpression, args);
+                case GenericsInvocationSyntax genericsInvocation:
+                    return VisitGenericInvocation(genericsInvocation, args);
+                case LifetimeNameSyntax lifetimeName:
+                    return VisitLifetimeName(lifetimeName, args);
+                case SelfExpressionSyntax selfExpression:
+                    return VisitSelfExpression(selfExpression, args);
+                case BaseExpressionSyntax baseExpression:
+                    return VisitBaseExpression(baseExpression, args);
                 case null:
                     return VisitNull(args);
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
+        }
+
+        public virtual R VisitBaseExpression(BaseExpressionSyntax baseExpression, A args)
+        {
+            return DefaultResult(args);
+        }
+
+        public virtual R VisitSelfExpression(SelfExpressionSyntax selfExpression, A args)
+        {
+            return DefaultResult(args);
+        }
+
+        public virtual R VisitLifetimeName(LifetimeNameSyntax lifetimeName, A args)
+        {
+            return DefaultResult(args);
+        }
+
+        public virtual R VisitGenericInvocation([NotNull] GenericsInvocationSyntax genericsInvocation, A args)
+        {
+            var r = VisitExpression(genericsInvocation.Callee, args);
+            var argumentResults = genericsInvocation.Arguments.Select(a => VisitExpression(a.Value, args));
+            return CombineResults(args, r.Yield().Concat(argumentResults).ToArray());
+        }
+
+        public virtual R VisitUnsafeExpression([NotNull] UnsafeExpressionSyntax unsafeExpression, A args)
+        {
+            return VisitExpression(unsafeExpression.Expression, args);
         }
 
         public virtual R VisitMemberAccessExpression([NotNull] MemberAccessExpressionSyntax memberAccessExpression, A args)

@@ -6,15 +6,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class MemberAccessExpressionSyntax : ExpressionSyntax
     {
-        [NotNull] public ExpressionSyntax Expression { get; }
+        /// <summary>
+        /// This expression is null for implicit member access i.e. self and enums
+        /// </summary>
+        [CanBeNull] public ExpressionSyntax Expression { get; }
         public AccessOperator AccessOperator { get; }
         [NotNull] public IMemberNameToken Member { get; }
 
         public MemberAccessExpressionSyntax(
-            [NotNull] ExpressionSyntax expression,
+            TextSpan span,
+            [CanBeNull] ExpressionSyntax expression,
             AccessOperator accessOperator,
             [NotNull] IMemberNameToken member)
-            : base(TextSpan.Covering(expression.Span, member.Span))
+            : base(span)
         {
             Expression = expression;
             AccessOperator = accessOperator;

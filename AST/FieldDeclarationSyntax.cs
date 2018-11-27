@@ -2,6 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
+using Adamant.Tools.Compiler.Bootstrap.Types;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
@@ -14,6 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [NotNull] public SimpleName Name { get; }
         [CanBeNull] public ExpressionSyntax TypeExpression { get; }
         [CanBeNull] public ExpressionSyntax Initializer { get; }
+        [NotNull] public TypePromise Type { get; } = new TypePromise();
 
         public FieldDeclarationSyntax(
             [NotNull] CodeFile file,

@@ -93,6 +93,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
                     foreach (var nestedDeclaration in typeDeclaration.Members)
                         BindNamesInDeclaration(containingScope, (DeclarationSyntax)nestedDeclaration);
                     break;
+                case FieldDeclarationSyntax fieldDeclaration:
+                    VisitExpression(fieldDeclaration.TypeExpression, containingScope);
+                    VisitExpression(fieldDeclaration.Initializer, containingScope);
+                    break;
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
             }

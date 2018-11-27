@@ -1,6 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -188,8 +189,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     case IQuestionToken _:
                         if (minPrecedence <= OperatorPrecedence.Unary)
                         {
-                            @operator = Tokens.RequiredToken<IOperatorToken>();
-                            expression = new UnaryExpressionSyntax(@operator, expression);
+                            var question = Tokens.Required<IQuestionToken>();
+                            var span = TextSpan.Covering(expression.Span, question);
+                            expression = new UnaryExpressionSyntax(span, UnaryOperatorFixity.Postfix, UnaryOperator.Question, expression);
                             continue;
                         }
                         break;
@@ -225,7 +227,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                             // Member Access
                             var accessOperator = BuildAccessOperator(Tokens.RequiredToken<IAccessOperatorToken>());
                             var member = Tokens.RequiredToken<IMemberNameToken>();
-                            expression = new MemberAccessExpressionSyntax(expression, accessOperator, member);
+                            var span = TextSpan.Covering(expression.Span, member.Span);
+                            expression = new MemberAccessExpressionSyntax(span, expression, accessOperator, member);
                             continue;
                         }
                         break;
@@ -375,15 +378,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IOpenParenToken _:
                     return ParseParenthesizedExpression();
                 case IMinusToken _:
+                    return ParsePrefixUnaryOperator(UnaryOperator.Minus);
                 case IPlusToken _:
+                    return ParsePrefixUnaryOperator(UnaryOperator.Plus);
                 case IAtSignToken _:
+                    return ParsePrefixUnaryOperator(UnaryOperator.At);
                 case ICaretToken _:
+                    return ParsePrefixUnaryOperator(UnaryOperator.Caret);
                 case INotKeywordToken _:
-                {
-                    var @operator = Tokens.RequiredToken<IOperatorToken>();
-                    var operand = ParseExpression(OperatorPrecedence.Unary);
-                    return new UnaryExpressionSyntax(@operator, operand);
-                }
+                    return ParsePrefixUnaryOperator(UnaryOperator.Not);
                 case IIntegerLiteralToken _:
                 case IStringLiteralToken _:
                 case IBooleanLiteralToken _:
@@ -457,9 +460,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IDotToken _:
                 {
                     // implicit self etc.
-                    var @operator = Tokens.RequiredToken<IOperatorToken>();
-                    var operand = ParseExpression(OperatorPrecedence.Unary);
-                    return new UnaryExpressionSyntax(@operator, operand);
+                    var dot = Tokens.Required<IDotToken>();
+                    var member = Tokens.RequiredToken<IMemberNameToken>();
+                    var span = TextSpan.Covering(dot, member.Span);
+                    return new MemberAccessExpressionSyntax(span, null, AccessOperator.Standard, member);
+                }
+                case IDollarToken _:
+                {
+                    var dollar = Tokens.Expect<IDollarToken>();
+                    var lifetimeName = Tokens.RequiredToken<ILifetimeNameToken>();
+                    var span = TextSpan.Covering(dollar, lifetimeName.Span);
+                    SimpleName name;
+                    switch (lifetimeName)
+                    {
+                        case IIdentifierToken identifier:
+                            name = new SimpleName(identifier.Value);
+                            break;
+                        case IRefKeywordToken _:
+                            name = SpecialName.Ref;
+                            break;
+                        case IOwnedKeywordToken _:
+                            name = SpecialName.Owned;
+                            break;
+                        case IForeverKeywordToken _:
+                            name = SpecialName.Forever;
+                            break;
+                        default:
+                            throw NonExhaustiveMatchException.For(lifetimeName);
+                    }
+                    return new LifetimeNameSyntax(span, name);
                 }
                 case IAsteriskToken _:
                 case ISlashToken _:
@@ -468,12 +497,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case ICloseParenToken _:
                 {
                     // If it is one of these, we assume there is a missing identifier
-                    var identifier = Tokens.ExpectIdentifier();
-                    return new IdentifierNameSyntax(identifier.Span, identifier.Value);
+                    var identifierSpan = Tokens.Expect<IIdentifierToken>();
+                    return new IdentifierNameSyntax(identifierSpan, "_");
                 }
                 default:
                     throw NonExhaustiveMatchException.For(Tokens.Current);
             }
+        }
+
+        [NotNull]
+        private ExpressionSyntax ParsePrefixUnaryOperator(UnaryOperator @operator)
+        {
+            var operatorSpan = Tokens.Required<IOperatorToken>();
+            var operand = ParseExpression(OperatorPrecedence.Unary);
+            var span = TextSpan.Covering(operatorSpan, operand.Span);
+            return new UnaryExpressionSyntax(span, UnaryOperatorFixity.Prefix, @operator, operand);
         }
 
         [CanBeNull]

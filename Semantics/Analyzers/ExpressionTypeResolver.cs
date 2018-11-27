@@ -188,7 +188,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case BinaryExpressionSyntax binaryOperatorExpression:
                     return InferBinaryExpressionType(binaryOperatorExpression);
                 case IdentifierNameSyntax identifierName:
-                    return identifierName.Type.Fulfill(identifierName.ReferencedSymbol.NotNull().Type);
+                {
+                    var type = identifierName.ReferencedSymbol != null ? identifierName.ReferencedSymbol.Type : DataType.Unknown;
+                    return identifierName.Type.Fulfill(type);
+                }
                 case UnaryExpressionSyntax unaryOperatorExpression:
                     return InferUnaryExpressionType(unaryOperatorExpression);
                 case LifetimeTypeSyntax lifetimeType:
@@ -583,22 +586,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             bool typeError;
             switch (@operator)
             {
-                case INotKeywordToken _:
+                case UnaryOperator.Not:
                     typeError = operand != ObjectType.Bool;
                     unaryExpression.Type.Fulfill(ObjectType.Bool);
                     break;
-                case IAtSignToken _:
+                case UnaryOperator.At:
                     typeError = false; // TODO check that the expression can have a pointer taken
                     if (operand is Metatype)
                         unaryExpression.Type.Fulfill(ObjectType.Type); // constructing a type
                     else
                         unaryExpression.Type.Fulfill(new PointerType(operand)); // taking the address of something
                     break;
-                case IQuestionToken _:
+                case UnaryOperator.Question:
                     typeError = false; // TODO check that the expression can have a pointer taken
                     unaryExpression.Type.Fulfill(new PointerType(operand));
                     break;
-                case ICaretToken _:
+                case UnaryOperator.Caret:
                     switch (operand)
                     {
                         case PointerType pointerType:
@@ -703,7 +706,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case UnaryExpressionSyntax unaryOperatorExpression:
                     switch (unaryOperatorExpression.Operator)
                     {
-                        case IAtSignToken _:
+                        case UnaryOperator.At:
                             if (unaryOperatorExpression.Operand.Type.Fulfilled() is Metatype metatype)
                                 return new PointerType(metatype.Instance);
                             // TODO evaluate to type

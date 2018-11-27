@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
@@ -34,28 +35,37 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             ResolveBodyTypesInDeclarations(declarations);
         }
 
-        private void ResolveSignatureTypesInDeclarations([NotNull, ItemNotNull] IEnumerable<DeclarationSyntax> declarations)
+        private void ResolveSignatureTypesInDeclarations(
+            [NotNull] [ItemNotNull] IEnumerable<DeclarationSyntax> declarations,
+            [CanBeNull] TypeDeclarationSyntax declaringType = null)
         {
             foreach (var declaration in declarations)
-                ResolveSignatureTypesInDeclaration(declaration);
+                ResolveSignatureTypesInDeclaration(declaration, declaringType);
         }
 
-        private void ResolveSignatureTypesInDeclaration([NotNull] DeclarationSyntax declaration)
+        private void ResolveSignatureTypesInDeclaration(
+            [NotNull] DeclarationSyntax declaration,
+            [CanBeNull] TypeDeclarationSyntax declaringType)
         {
             switch (declaration)
             {
                 case FunctionDeclarationSyntax f:
-                    ResolveSignatureTypesInFunction(f);
+                    ResolveSignatureTypesInFunction(f, declaringType);
                     break;
                 case TypeDeclarationSyntax t:
                     ResolveSignatureTypesInTypeDeclaration(t);
+                    break;
+                case FieldDeclarationSyntax f:
+                    ResolveSignatureTypesInField(f);
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
             }
         }
 
-        private void ResolveSignatureTypesInFunction([NotNull] FunctionDeclarationSyntax function)
+        private void ResolveSignatureTypesInFunction(
+            [NotNull] FunctionDeclarationSyntax function,
+            [CanBeNull] TypeDeclarationSyntax declaringType)
         {
             function.Type.BeginFulfilling();
 
@@ -66,7 +76,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
             var parameterTypes = ResolveTypesInParameters(function, resolver);
 
-            var returnType = ResolveReturnType(function, resolver);
+            var returnType = ResolveReturnType(function, resolver, declaringType);
             DataType functionType = new FunctionType(parameterTypes, returnType);
 
             if (function.GenericParameters?.Any() ?? false)
@@ -109,6 +119,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                             parameter.Span, "Self parameters not implemented"));
                         types.Add(parameter.Type.Fulfill(DataType.Unknown));
                         break;
+                    case FieldParameterSyntax fieldParameter:
+                        throw new NotImplementedException();
                     default:
                         throw NonExhaustiveMatchException.For(parameter);
                 }
@@ -120,16 +132,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         [NotNull]
         private static DataType ResolveReturnType(
             [NotNull] FunctionDeclarationSyntax function,
-            [NotNull] ExpressionTypeResolver expressionResolver)
+            [NotNull] ExpressionTypeResolver expressionResolver,
+            [CanBeNull] TypeDeclarationSyntax declaringType)
         {
             function.ReturnType.BeginFulfilling();
             switch (function)
             {
                 case NamedFunctionDeclarationSyntax namedFunction:
+                {
                     var returnType = namedFunction.ReturnTypeExpression != null
-                        ? expressionResolver.CheckAndEvaluateTypeExpression(namedFunction.ReturnTypeExpression)
+                        ? expressionResolver.CheckAndEvaluateTypeExpression(namedFunction
+                            .ReturnTypeExpression)
                         : ObjectType.Void;
                     return function.ReturnType.Fulfill(returnType);
+                }
+                case OperatorDeclarationSyntax operatorDeclaration:
+                {
+                    var returnType = operatorDeclaration.ReturnTypeExpression != null
+                        ? expressionResolver.CheckAndEvaluateTypeExpression(operatorDeclaration
+                            .ReturnTypeExpression)
+                        : ObjectType.Void;
+                    return function.ReturnType.Fulfill(returnType);
+                }
+                case ConstructorDeclarationSyntax _:
+                case InitializerDeclarationSyntax _:
+                {
+                    var returnType = declaringType.NotNull().Type.Fulfilled();
+                    return function.ReturnType.Fulfill(returnType);
+                }
                 default:
                     throw NonExhaustiveMatchException.For(function);
             }
@@ -199,7 +229,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
             }
-            ResolveSignatureTypesInDeclarations(declaration.Members.Select(m => m.AsDeclarationSyntax));
+            ResolveSignatureTypesInDeclarations(declaration.Members.Select(m => m.AsDeclarationSyntax), declaration);
+        }
+
+        private void ResolveSignatureTypesInField([NotNull] FieldDeclarationSyntax field)
+        {
+            var resolver = new ExpressionTypeResolver(field.File, diagnostics);
+            field.Type.BeginFulfilling();
+            var type = resolver.CheckAndEvaluateTypeExpression(field.TypeExpression);
+            field.Type.Fulfill(type);
         }
 
         private void ResolveBodyTypesInDeclarations([NotNull, ItemNotNull] FixedList<INamespacedDeclarationSyntax> declarations)
@@ -217,6 +255,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     break;
                 case TypeDeclarationSyntax t:
                     ResolveBodyTypesInTypeDeclaration(t);
+                    break;
+                case FieldDeclarationSyntax f:
+                    ResolveBodyTypesInField(f);
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
@@ -237,6 +278,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         {
             foreach (var member in typeDeclaration.Members)
                 ResolveBodyTypesInDeclaration(member.AsDeclarationSyntax);
+        }
+
+
+        private void ResolveBodyTypesInField([NotNull] FieldDeclarationSyntax fieldDeclaration)
+        {
+            if (fieldDeclaration.Initializer == null) return;
+
+            var resolver = new ExpressionTypeResolver(fieldDeclaration.File, diagnostics);
+            resolver.CheckExpressionType(fieldDeclaration.Initializer, fieldDeclaration.Type.Fulfilled());
         }
     }
 }

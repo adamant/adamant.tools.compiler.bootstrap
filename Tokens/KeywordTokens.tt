@@ -32,6 +32,7 @@
         "Init",
         "Delete",
         "Owned",
+        "Forever",
         "Namespace",
         "Using",
         "Foreach",

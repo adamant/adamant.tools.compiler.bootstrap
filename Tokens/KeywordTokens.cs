@@ -36,6 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             typeof(InitKeywordToken),
             typeof(DeleteKeywordToken),
             typeof(OwnedKeywordToken),
+            typeof(ForeverKeywordToken),
             typeof(NamespaceKeywordToken),
             typeof(UsingKeywordToken),
             typeof(ForeachKeywordToken),
@@ -242,6 +243,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         public static IOwnedKeywordToken OwnedKeyword(TextSpan span)
         {
             return new OwnedKeywordToken(span);
+        }
+
+        [NotNull]
+        public static IForeverKeywordToken ForeverKeyword(TextSpan span)
+        {
+            return new ForeverKeywordToken(span);
         }
 
         [NotNull]
@@ -784,6 +791,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     internal partial class OwnedKeywordToken : Token, IOwnedKeywordToken
     {
         public OwnedKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface IForeverKeywordToken : IKeywordToken { }
+    internal partial class ForeverKeywordToken : Token, IForeverKeywordToken
+    {
+        public ForeverKeywordToken(TextSpan span)
             : base(span)
         {
         }

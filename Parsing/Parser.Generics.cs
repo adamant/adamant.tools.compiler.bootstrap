@@ -1,5 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -21,12 +23,40 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         [NotNull]
         public GenericParameterSyntax ParseGenericParameter()
         {
+            Name name;
+            var dollar = Tokens.AcceptToken<IDollarToken>();
+            if (dollar != null)
+            {
+                var lifetime = Tokens.RequiredToken<ILifetimeNameToken>();
+                var span = TextSpan.Covering(dollar.Span, lifetime.Span);
+
+                switch (lifetime)
+                {
+                    case IIdentifierToken lifetimeIdentifier:
+                        name = nameContext.Qualify(lifetimeIdentifier.Value);
+                        break;
+                    case IRefKeywordToken _:
+                        name = nameContext.Qualify(SpecialName.Ref);
+                        break;
+                    case IOwnedKeywordToken _:
+                        Add(ParseError.OwnedNotValidAsGenericLifetimeParameter(File, span));
+                        // We just treat it as if they had written `$\owned`
+                        name = nameContext.Qualify("owned");
+                        break;
+                    default:
+                        throw NonExhaustiveMatchException.For(lifetime);
+                }
+
+                return new GenericParameterSyntax(true, false, name, null);
+            }
+
             var isParams = Tokens.Accept<IParamsKeywordToken>();
-            var name = Tokens.RequiredToken<IIdentifierToken>();
+            var identifier = Tokens.RequiredToken<IIdentifierToken>();
+            name = nameContext.Qualify(identifier.Value);
             ExpressionSyntax typeExpression = null;
             if (Tokens.Accept<IColonToken>())
                 typeExpression = ParseExpression();
-            return new GenericParameterSyntax(isParams, name.Value, typeExpression);
+            return new GenericParameterSyntax(false, isParams, name, typeExpression);
         }
 
         [MustUseReturnValue]

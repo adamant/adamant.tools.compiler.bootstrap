@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
 {
     public class SimpleName : Name, IEquatable<SimpleName>
     {
-        [NotNull] private static readonly Regex NeedsQuoted = new Regex(@"[\ ]", RegexOptions.Compiled);
+        [NotNull] private static readonly Regex NeedsQuoted = new Regex(@"[\\ #ₛ]", RegexOptions.Compiled);
 
         [NotNull] public override SimpleName UnqualifiedName => this;
         [NotNull] public readonly string Text;
@@ -51,12 +51,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
 
         public override string ToString()
         {
-            // TODO do something with IsSpecial
             var escapedName = Text.Escape();
             if (NeedsQuoted.IsMatch(escapedName))
                 escapedName += $@"""{escapedName}""";
             if (Number != null) escapedName += "#" + Number;
-
+            if (IsSpecial) escapedName = "ₛ" + escapedName;
             return escapedName;
         }
 
