@@ -49,6 +49,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         }
 
         DeclarationSyntax IDeclarationSyntax.AsDeclarationSyntax => this;
-
     }
 }

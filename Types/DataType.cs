@@ -10,7 +10,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
     public abstract class DataType
     {
         [NotNull] public static UnknownType Unknown = UnknownType.Instance;
-        [NotNull] public static IntegerConstantType IntegerConstant = IntegerConstantType.Instance;
 
         /// <summary>
         /// A resolved type is one that has no unknown or unresolved parts

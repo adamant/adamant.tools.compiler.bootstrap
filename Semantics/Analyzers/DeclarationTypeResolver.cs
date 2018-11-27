@@ -59,14 +59,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         {
             function.Type.BeginFulfilling();
 
-            var expressionChecker = new ExpressionTypeResolver(function.File, diagnostics);
+            var resolver = new ExpressionTypeResolver(function.File, diagnostics);
 
             if (function.GenericParameters != null)
-                ResolveTypesInGenericParameters(function.GenericParameters, expressionChecker);
+                ResolveTypesInGenericParameters(function.GenericParameters, resolver);
 
-            var parameterTypes = ResolveTypesInParameters(function, expressionChecker);
+            var parameterTypes = ResolveTypesInParameters(function, resolver);
 
-            var returnType = ResolveReturnType(function, expressionChecker);
+            var returnType = ResolveReturnType(function, resolver);
             DataType functionType = new FunctionType(parameterTypes, returnType);
 
             if (function.GenericParameters?.Any() ?? false)

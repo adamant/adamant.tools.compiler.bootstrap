@@ -9,15 +9,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
     // Object types are the types created with class and struct declarations. The
     // primitive types are also object types. An object type may have generic parameters
     // that may be filled with generic arguments. An object type with generic parameters
-    // but no generic arguments is *open* or *unbound*. One with generic arguments supplied
-    // for all parameters is *closed* or *bound*. One with some but not all
-    // arguments supplied is *partially bound*.
+    // but no generic arguments is an *unbound type*. One with generic arguments supplied
+    // for all parameters is *a constructed type*. One with some but not all
+    // arguments supplied is *partially constructed type*.
     public class ObjectType : GenericType
     {
         [NotNull] public static readonly ObjectType Void = new ObjectType(SimpleName.Special("void"), false, false);
         [NotNull] public static readonly ObjectType Never = new ObjectType(SimpleName.Special("never"), false, false);
-        [NotNull] public static readonly ObjectType Size = new ObjectType(SimpleName.Special("size"), false, false);
-        [NotNull] public static readonly ObjectType Offset = new ObjectType(SimpleName.Special("offset"), false, false);
         [NotNull] public static readonly ObjectType Bool = new ObjectType(SimpleName.Special("bool"), false, false);
         [NotNull] public static readonly ObjectType Type = new ObjectType(SimpleName.Special("type"), false, false);
         [NotNull] public static readonly ObjectType Metatype = new ObjectType(SimpleName.Special("metatype"), false, false);

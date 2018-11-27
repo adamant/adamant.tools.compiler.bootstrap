@@ -51,6 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
 
         public override string ToString()
         {
+            // TODO do something with IsSpecial
             var escapedName = Text.Escape();
             if (NeedsQuoted.IsMatch(escapedName))
                 escapedName += $@"""{escapedName}""";

@@ -54,8 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             {
                 var type = CheckAndEvaluateTypeExpression(variableDeclaration.TypeExpression);
                 variableDeclaration.Type.Fulfill(type);
-                if (variableDeclaration.Initializer != null)
-                    ImposeIntegerConstantType(type, variableDeclaration.Initializer);
+                variableDeclaration.Initializer = ImplicitConversion(variableDeclaration.Initializer, type);
                 // TODO check that the initializer type is compatible with the variable type
             }
             else if (variableDeclaration.Initializer != null)
@@ -70,6 +69,61 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     "Inference of local variable types not implemented"));
                 variableDeclaration.Type.Fulfill(DataType.Unknown);
             }
+        }
+
+        /// <summary>
+        /// Create an implicit conversion if allowed and needed
+        /// </summary>
+        [ContractAnnotation("expression:null => null; expression:notnull => notnull")]
+        private ExpressionSyntax ImplicitConversion(
+            [CanBeNull] ExpressionSyntax expression,
+            [NotNull] DataType targetType)
+        {
+            if (expression == null) return null;
+
+            switch (expression.Type.Fulfilled())
+            {
+                case SizedIntegerType expressionType:
+                {
+                    switch (targetType)
+                    {
+                        case SizedIntegerType expectedType:
+                            if (expectedType.Bits > expressionType.Bits
+                                && (!expressionType.IsSigned || expectedType.IsSigned))
+                                return new ImplicitNumericConversionExpression(expression, expectedType);
+                            break;
+                        case FloatingPointType expectedType:
+                            if (expressionType.Bits < expectedType.Bits)
+                                return new ImplicitNumericConversionExpression(expression, expectedType);
+                            break;
+                    }
+                }
+                break;
+                case FloatingPointType expressionType:
+                {
+                    if (targetType is FloatingPointType expectedType
+                        && expressionType.Bits < expectedType.Bits)
+                        return new ImplicitNumericConversionExpression(expression, expectedType);
+                }
+                break;
+                case IntegerConstantType expressionType:
+                    switch (targetType)
+                    {
+                        case SizedIntegerType expectedType:
+                            var bits = expressionType.Value.GetByteCount() * 8;
+                            var requireSigned = expressionType.Value < 0;
+                            if (expectedType.Bits >= bits
+                               && (!requireSigned || expectedType.IsSigned))
+                                return new ImplicitNumericConversionExpression(expression, expectedType);
+                            break;
+                        case FloatingPointType expectedType:
+                            throw new NotImplementedException();
+                    }
+                    break;
+            }
+
+            // No conversion
+            return expression;
         }
 
         // Checks the expression is well typed, and that the type of the expression is `bool`
@@ -106,9 +160,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     if (returnExpression.ReturnValue != null)
                     {
                         InferExpressionType(returnExpression.ReturnValue);
-                        if (returnType != null) // TODO report an error?
+                        if (returnType != null) // TODO report an error
                         {
-                            ImposeIntegerConstantType(returnType, returnExpression.ReturnValue);
+                            returnExpression.ReturnValue = ImplicitConversion(returnExpression.ReturnValue, returnType);
                             if (returnType != returnExpression.ReturnValue.Type.Fulfilled())
                                 diagnostics.Add(TypeError.CannotConvert(file,
                                     returnExpression.ReturnValue, returnType));
@@ -122,8 +176,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case LiteralExpressionSyntax literalExpression:
                     switch (literalExpression.Literal)
                     {
-                        case IIntegerLiteralToken _:
-                            return expression.Type.Fulfill(DataType.IntegerConstant);
+                        case IIntegerLiteralToken integerLiteral:
+                            return expression.Type.Fulfill(new IntegerConstantType(integerLiteral.Value));
                         case IStringLiteralToken _:
                             throw new NotImplementedException();
                         case IBooleanLiteralToken _:
@@ -280,7 +334,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case AssignmentExpressionSyntax assignmentExpression:
                     var left = InferExpressionType(assignmentExpression.LeftOperand);
                     InferExpressionType(assignmentExpression.RightOperand);
-                    var right = ImposeIntegerConstantType(left, assignmentExpression.RightOperand);
+                    assignmentExpression.RightOperand = ImplicitConversion(assignmentExpression.RightOperand, left);
                     throw new NotImplementedException("Check compability of types");
                 default:
                     throw NonExhaustiveMatchException.For(expression);
@@ -483,20 +537,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case PointerType _:
                 {
                     // TODO it may need to be size
-                    ImposeIntegerConstantType(ObjectType.Offset, rightOperand);
-
-                    return rightType != ObjectType.Size &&
-                           rightType != ObjectType.Offset;
+                    //ImposeIntegerConstantType(UnsizedIntegerType.Offset, rightOperand);
+                    throw new NotImplementedException();
+                    return rightType != UnsizedIntegerType.Size &&
+                           rightType != UnsizedIntegerType.Offset;
                 }
                 case IntegerConstantType _:
                     // TODO may need to promote based on size
-                    ImposeIntegerConstantType(rightType, leftOperand);
-
+                    //ImposeIntegerConstantType(rightType, leftOperand);
+                    throw new NotImplementedException();
                     return !IsIntegerType(rightType);
                 case DataType type when IsIntegerType(type):
                     // TODO it may need to be size
-                    ImposeIntegerConstantType(leftType, rightOperand);
-
+                    //ImposeIntegerConstantType(leftType, rightOperand);
+                    throw new NotImplementedException();
                     return !IsIntegerType(rightType);
                 case ObjectType _:
                     // Other object types can't be used in numeric expressions
@@ -506,30 +560,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             }
         }
 
-        [NotNull]
-        private DataType ImposeIntegerConstantType([NotNull] DataType expectedType, [NotNull] ExpressionSyntax expression)
-        {
-            var currentType = expression.Type.Fulfilled();
-
-            if (!IsIntegerType(expectedType) // Don't impose a non-integer type
-                || currentType != DataType.IntegerConstant) // If it isn't an integer constant, nothing to do
-                return currentType;
-
-            switch (expression)
-            {
-                case LiteralExpressionSyntax _:
-                    return expression.Type.Resolve(expectedType);
-                default:
-                    throw NonExhaustiveMatchException.For(expression);
-            }
-        }
-
         private static bool IsIntegerType([NotNull] DataType type)
         {
             Requires.NotNull(nameof(type), type);
-            return type is PrimitiveFixedIntegerType
-                   || type == ObjectType.Size
-                   || type == ObjectType.Offset;
+            return type is IntegerType;
         }
 
         [NotNull]
@@ -704,13 +738,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             switch (primitive.Keyword)
             {
                 case IIntKeywordToken _:
-                    return PrimitiveFixedIntegerType.Int;
+                    return SizedIntegerType.Int;
                 case IUIntKeywordToken _:
-                    return PrimitiveFixedIntegerType.UInt;
+                    return SizedIntegerType.UInt;
                 case IByteKeywordToken _:
-                    return PrimitiveFixedIntegerType.Byte;
+                    return SizedIntegerType.Byte;
                 case ISizeKeywordToken _:
-                    return ObjectType.Size;
+                    return UnsizedIntegerType.Size;
                 case IVoidKeywordToken _:
                     return ObjectType.Void;
                 case IBoolKeywordToken _:

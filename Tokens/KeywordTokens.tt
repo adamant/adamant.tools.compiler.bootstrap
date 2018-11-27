@@ -22,6 +22,7 @@
         "UInt64",
         "Byte",
         "Size",
+        "Offset",
         "Bool",
         "Never",
         "Return",
@@ -83,7 +84,6 @@
         "Trait",
         "Float",
         "Float32",
-        "Offset",
         "Underscore",
     }.AsReadOnly();
 #>

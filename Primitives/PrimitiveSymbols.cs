@@ -18,9 +18,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         {
             return new List<ISymbol>
             {
-                new FixedIntegerSymbol(PrimitiveFixedIntegerType.Byte),
-                new FixedIntegerSymbol(PrimitiveFixedIntegerType.Int),
-                new FixedIntegerSymbol(PrimitiveFixedIntegerType.UInt)
+                new IntegerNumericSymbol(SizedIntegerType.Byte),
+                new IntegerNumericSymbol(SizedIntegerType.Int),
+                new IntegerNumericSymbol(SizedIntegerType.UInt)
             }.ToFixedList();
         }
     }

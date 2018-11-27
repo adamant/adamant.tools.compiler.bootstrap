@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
@@ -21,12 +22,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         public PromiseState State { get; private set; }
         [CanBeNull] private DataType DataType { get; set; }
 
+        [DebuggerStepThrough]
         public void BeginFulfilling()
         {
             Requires.That(nameof(State), State == PromiseState.Pending);
             State = PromiseState.InProgress;
         }
 
+        [DebuggerStepThrough]
         [NotNull]
         public DataType Fulfill([NotNull] DataType type)
         {
@@ -37,6 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
             return type;
         }
 
+        [DebuggerStepThrough]
         [NotNull]
         public DataType Resolve([NotNull] DataType type)
         {
@@ -48,6 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
             return type;
         }
 
+        [DebuggerStepThrough]
         [NotNull]
         public DataType Fulfilled()
         {
@@ -57,6 +62,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
             return DataType.NotNull();
         }
 
+        [DebuggerStepThrough]
         [NotNull]
         public DataType Resolved()
         {
@@ -67,6 +73,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         }
 
         // Useful for debugging
+        [NotNull]
         public override string ToString()
         {
             switch (State)

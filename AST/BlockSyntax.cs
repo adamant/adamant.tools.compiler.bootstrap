@@ -1,3 +1,4 @@
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
@@ -18,7 +19,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public override string ToString()
         {
-            return $"{{{Statements}}}";
+            if (Statements.Any())
+                return $"{{ {Statements.Count} Statements}} : {Type}";
+
+            return $"{{ }} : {Type}";
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
@@ -210,13 +211,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case LiteralExpressionSyntax literalExpression:
                     switch (literalExpression.Literal)
                     {
-                        case IIntegerLiteralToken integerLiteral:
-                            var constant = new IntegerConstant(integerLiteral.Value, literalExpression.Type.Resolved());
-                            statements.Add(new AssignmentStatement(CurrentBlockNumber, statements.Count, place, constant));
-                            break;
+                        case IIntegerLiteralToken _:
+                            throw new InvalidOperationException("Integer literals should have an implicit conversion around them");
                         default:
                             throw NonExhaustiveMatchException.For(literalExpression.Literal);
                     }
+                    break;
+                case ImplicitNumericConversionExpression implicitNumericConversion:
+                    if (implicitNumericConversion.Expression.Type.Resolved() is IntegerConstantType constantType)
+                    {
+                        var constant = new IntegerConstant(constantType.Value, implicitNumericConversion.Type.Resolved());
+                        statements.Add(new AssignmentStatement(CurrentBlockNumber, statements.Count, place, constant));
+                    }
+                    else
+                        throw new NotImplementedException();
                     break;
                 case IfExpressionSyntax ifExpression:
                     ConvertExpressionAnalysisToStatement(ifExpression.Condition, statements);

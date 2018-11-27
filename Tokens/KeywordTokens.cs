@@ -26,6 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             typeof(UInt64KeywordToken),
             typeof(ByteKeywordToken),
             typeof(SizeKeywordToken),
+            typeof(OffsetKeywordToken),
             typeof(BoolKeywordToken),
             typeof(NeverKeywordToken),
             typeof(ReturnKeywordToken),
@@ -87,7 +88,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             typeof(TraitKeywordToken),
             typeof(FloatKeywordToken),
             typeof(Float32KeywordToken),
-            typeof(OffsetKeywordToken),
             typeof(UnderscoreKeywordToken),
         }.AsReadOnly().NotNull();
     }
@@ -182,6 +182,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         public static ISizeKeywordToken SizeKeyword(TextSpan span)
         {
             return new SizeKeywordToken(span);
+        }
+
+        [NotNull]
+        public static IOffsetKeywordToken OffsetKeyword(TextSpan span)
+        {
+            return new OffsetKeywordToken(span);
         }
 
         [NotNull]
@@ -551,12 +557,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
 
         [NotNull]
-        public static IOffsetKeywordToken OffsetKeyword(TextSpan span)
-        {
-            return new OffsetKeywordToken(span);
-        }
-
-        [NotNull]
         public static IUnderscoreKeywordToken UnderscoreKeyword(TextSpan span)
         {
             return new UnderscoreKeywordToken(span);
@@ -694,6 +694,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     internal partial class SizeKeywordToken : Token, ISizeKeywordToken
     {
         public SizeKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface IOffsetKeywordToken : IKeywordToken { }
+    internal partial class OffsetKeywordToken : Token, IOffsetKeywordToken
+    {
+        public OffsetKeywordToken(TextSpan span)
             : base(span)
         {
         }
@@ -1243,15 +1252,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     internal partial class Float32KeywordToken : Token, IFloat32KeywordToken
     {
         public Float32KeywordToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
-    public partial interface IOffsetKeywordToken : IKeywordToken { }
-    internal partial class OffsetKeywordToken : Token, IOffsetKeywordToken
-    {
-        public OffsetKeywordToken(TextSpan span)
             : base(span)
         {
         }

@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class ReturnExpressionSyntax : ExpressionSyntax
     {
-        [CanBeNull] public ExpressionSyntax ReturnValue { get; }
+        [CanBeNull] public ExpressionSyntax ReturnValue { get; set; }
 
         public ReturnExpressionSyntax(
             TextSpan span,

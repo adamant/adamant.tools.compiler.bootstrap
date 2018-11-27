@@ -6,19 +6,19 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 {
-    internal class FixedIntegerSymbol : ISymbol
+    internal class IntegerNumericSymbol : ISymbol
     {
-        [NotNull] private readonly PrimitiveFixedIntegerType type;
+        [NotNull] private readonly SizedIntegerType numericType;
         [NotNull] private readonly PrimitiveMemberSymbol remainderMethod;
-        DataType ISymbol.Type => type;
+        DataType ISymbol.Type => numericType;
 
-        public FixedIntegerSymbol([NotNull] PrimitiveFixedIntegerType type)
+        public IntegerNumericSymbol([NotNull] SizedIntegerType numericType)
         {
-            this.type = type;
-            remainderMethod = new PrimitiveMemberSymbol("remainder", new FunctionType(new[] { type }, type));
+            this.numericType = numericType;
+            remainderMethod = new PrimitiveMemberSymbol("remainder", new FunctionType(new[] { numericType }, numericType));
         }
 
-        public Name FullName => type.Name;
+        public Name FullName => numericType.Name;
 
         public ISymbol ComposeWith(ISymbol symbol)
         {

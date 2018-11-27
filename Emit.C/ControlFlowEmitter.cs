@@ -108,7 +108,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             {
                 case ObjectType objectType:
                     return nameMangler.Mangle(objectType);
-                case PrimitiveFixedIntegerType integerType:
+                case SizedIntegerType integerType:
                     return nameMangler.Mangle(integerType.Name);
                 default:
                     throw NonExhaustiveMatchException.For(type);

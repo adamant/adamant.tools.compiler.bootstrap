@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         [NotNull] public ExpressionSyntax LeftOperand { get; }
         public AssignmentOperation Operation { get; }
-        [NotNull] public ExpressionSyntax RightOperand { get; }
+        [NotNull] public ExpressionSyntax RightOperand { get; set; }
 
         public AssignmentExpressionSyntax(
             [NotNull] ExpressionSyntax leftOperand,

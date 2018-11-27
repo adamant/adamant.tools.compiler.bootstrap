@@ -1,24 +1,21 @@
-using JetBrains.Annotations;
+using System.Numerics;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
     /// <summary>
     /// This is the type of integer constants, it isn't possible to declare a
-    /// variable to have this type. It will never be inferred as the type of a
-    /// variable. It is un unresolved type because all expressions should have
-    /// their types inferred to some specific type.
+    /// variable to have this type.
     /// </summary>
-    public class IntegerConstantType : UnresolvedType
+    public class IntegerConstantType : IntegerType
     {
-        #region Singleton
-        [NotNull] internal static readonly IntegerConstantType Instance = new IntegerConstantType();
+        public readonly BigInteger Value;
+        public override bool IsResolved => true;
 
-        private IntegerConstantType() { }
-        #endregion
-
-        public override string ToString()
+        public IntegerConstantType(BigInteger value)
+            : base(value.ToString().NotNull())
         {
-            return "⧼integer-constant⧽";
+            Value = value;
         }
     }
 }

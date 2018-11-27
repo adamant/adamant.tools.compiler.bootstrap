@@ -4,14 +4,19 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
-    public abstract class PrimitiveType : DataType
+    public abstract class SimpleType : DataType
     {
         [NotNull] public Name Name { get; }
 
-        protected PrimitiveType([NotNull] string name)
+        protected SimpleType([NotNull] string name)
         {
             Requires.NotNull(nameof(name), name);
             Name = SimpleName.Special(name);
+        }
+
+        public override string ToString()
+        {
+            return Name.ToString();
         }
     }
 }

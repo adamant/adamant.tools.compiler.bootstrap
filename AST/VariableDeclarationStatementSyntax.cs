@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [NotNull] public SimpleName Name => FullName.UnqualifiedName;
         public TextSpan NameSpan { get; }
         [CanBeNull] public ExpressionSyntax TypeExpression { get; }
-        [CanBeNull] public ExpressionSyntax Initializer { get; }
+        [CanBeNull] public ExpressionSyntax Initializer { get; set; }
         [NotNull] public TypePromise Type { get; } = new TypePromise();
 
         DataType ISymbol.Type => Type.Resolved();

@@ -10,20 +10,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         public readonly IntegerOperator Operator;
         public readonly bool IsChecked;
         [NotNull] public readonly Operand RightOperand;
-        [NotNull] public readonly PrimitiveFixedIntegerType Type;
+        [NotNull] public readonly SizedIntegerType NumericType;
 
         private IntegerOperation(
             [NotNull] Operand leftOperand,
             IntegerOperator @operator,
             bool isChecked,
             [NotNull] Operand rightOperand,
-            [NotNull] PrimitiveFixedIntegerType type)
+            [NotNull] SizedIntegerType numericType)
         {
             Requires.NotNull(nameof(leftOperand), leftOperand);
             Requires.NotNull(nameof(rightOperand), rightOperand);
             LeftOperand = leftOperand;
             RightOperand = rightOperand;
-            Type = type;
+            NumericType = numericType;
             Operator = @operator;
             IsChecked = isChecked;
         }
@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         public override string ToString()
         {
             var checking = IsChecked ? "Checked" : "Unchecked";
-            var type = (Type.IsSigned ? "i" : "u") + Type.Bits;
+            var type = (NumericType.IsSigned ? "i" : "u") + NumericType.Bits;
             return $"{checking}_{Operator}_{type}({LeftOperand}, {RightOperand}";
         }
     }
