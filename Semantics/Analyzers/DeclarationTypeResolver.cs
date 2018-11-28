@@ -69,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         {
             function.Type.BeginFulfilling();
 
-            var resolver = new ExpressionTypeResolver(function.File, diagnostics, declaringType: (Metatype)declaringType?.Type.Fulfilled());
+            var resolver = new ExpressionTypeResolver(function.File, diagnostics, declaringType: declaringType?.Type.Fulfilled());
 
             if (function.GenericParameters != null)
                 ResolveTypesInGenericParameters(function.GenericParameters, resolver);
@@ -143,7 +143,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     var returnType = namedFunction.ReturnTypeExpression != null
                         ? expressionResolver.CheckAndEvaluateTypeExpression(namedFunction
                             .ReturnTypeExpression)
-                        : ObjectType.Void;
+                        : DataType.Void;
                     return function.ReturnType.Fulfill(returnType);
                 }
                 case OperatorDeclarationSyntax operatorDeclaration:
@@ -151,7 +151,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     var returnType = operatorDeclaration.ReturnTypeExpression != null
                         ? expressionResolver.CheckAndEvaluateTypeExpression(operatorDeclaration
                             .ReturnTypeExpression)
-                        : ObjectType.Void;
+                        : DataType.Void;
                     return function.ReturnType.Fulfill(returnType);
                 }
                 case ConstructorDeclarationSyntax _:
@@ -274,10 +274,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         {
             if (function.Body == null) return;
 
-            var resolver = new ExpressionTypeResolver(function.File, diagnostics, declaringType: (Metatype)declaringType?.Type.Fulfilled(), returnType: function.ReturnType.Fulfilled());
+            var resolver = new ExpressionTypeResolver(function.File, diagnostics, declaringType: declaringType?.Type.Fulfilled(), returnType: function.ReturnType.Fulfilled());
             // The body of a function shouldn't itself evaluate to anything.
             // There should be no `=> value` for the block, so the type is `void`.
-            resolver.CheckExpressionType(function.Body, ObjectType.Void);
+            resolver.CheckExpressionType(function.Body, DataType.Void);
         }
 
         private void ResolveBodyTypesInTypeDeclaration([NotNull] TypeDeclarationSyntax typeDeclaration)

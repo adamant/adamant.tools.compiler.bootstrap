@@ -16,6 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         [NotNull]
         private static FixedList<ISymbol> BuildPrimitives()
         {
+            // TODO make a symbol for `Type`
             return new List<ISymbol>
             {
                 new IntegerNumericSymbol(SizedIntegerType.Byte),

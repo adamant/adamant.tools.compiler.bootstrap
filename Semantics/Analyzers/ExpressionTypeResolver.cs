@@ -754,15 +754,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case ISizeKeywordToken _:
                     return UnsizedIntegerType.Size;
                 case IVoidKeywordToken _:
-                    return ObjectType.Void;
+                    return DataType.Void;
                 case IBoolKeywordToken _:
-                    return ObjectType.Bool;
+                    return DataType.Bool;
                 case INeverKeywordToken _:
-                    return ObjectType.Never;
+                    return DataType.Never;
                 case ITypeKeywordToken _:
                     return ObjectType.Type;
-                case IMetatypeKeywordToken _:
-                    return ObjectType.Metatype;
                 case IAnyKeywordToken _:
                     return ObjectType.Any;
                 default:

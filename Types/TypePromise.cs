@@ -17,10 +17,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
     /// Once a <see cref="TypePromise"/> has been fulfilled it can't be changed
     /// except to resolve an unresolved type.
     /// </summary>
-    public class TypePromise
+    public class TypePromise<Type>
+        where Type : DataType
     {
         public PromiseState State { get; private set; }
-        [CanBeNull] private DataType DataType { get; set; }
+        [CanBeNull] private Type DataType { get; set; }
 
         [DebuggerStepThrough]
         public void BeginFulfilling()
@@ -31,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
 
         [DebuggerStepThrough]
         [NotNull]
-        public DataType Fulfill([NotNull] DataType type)
+        public Type Fulfill([NotNull] Type type)
         {
             Requires.That(nameof(State), State == PromiseState.InProgress);
             Requires.NotNull(nameof(type), type);
@@ -42,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
 
         [DebuggerStepThrough]
         [NotNull]
-        public DataType Resolve([NotNull] DataType type)
+        public Type Resolve([NotNull] Type type)
         {
             Requires.That(nameof(State), State == PromiseState.Fulfilled);
             Requires.NotNull(nameof(type), type);
@@ -54,7 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
 
         [DebuggerStepThrough]
         [NotNull]
-        public DataType Fulfilled()
+        public Type Fulfilled()
         {
             if (State != PromiseState.Fulfilled)
                 throw new InvalidOperationException("Promise not fulfilled");
@@ -64,12 +65,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
 
         [DebuggerStepThrough]
         [NotNull]
-        public DataType Resolved()
+        public Type Resolved()
         {
             if (State != PromiseState.Fulfilled)
                 throw new InvalidOperationException("Promise not fulfilled");
 
-            return DataType.NotNull().AssertResolved();
+            return (Type)DataType.NotNull().AssertResolved();
         }
 
         // Useful for debugging
@@ -88,5 +89,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
                     throw NonExhaustiveMatchException.ForEnum(State);
             }
         }
+    }
+
+    public class TypePromise : TypePromise<DataType>
+    {
     }
 }

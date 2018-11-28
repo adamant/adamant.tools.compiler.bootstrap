@@ -70,7 +70,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     throw new Exception($"Unexpected type for parameter to main: {parameterTypeName}");
             }
             var joinedArguments = string.Join(", ", arguments);
-            if (entryPoint.ReturnType == ObjectType.Void)
+            if (entryPoint.ReturnType == DataType.Void)
             {
                 code.Definitions.AppendLine($"{nameMangler.MangleName(entryPoint)}({joinedArguments});");
                 code.Definitions.AppendLine("return 0;");

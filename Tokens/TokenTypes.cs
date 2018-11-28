@@ -43,6 +43,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
                     case "AnyKeywordToken":
                         keyword = "Any";
                         break;
+                    case "TypeKeywordToken":
+                        keyword = "Type";
+                        break;
                     case "UnderscoreKeywordToken":
                         keyword = "_";
                         break;

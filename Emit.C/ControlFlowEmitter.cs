@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
             // TODO assign parameters to temp variables?
 
-            var voidReturn = cfg.ReturnType == ObjectType.Void;
+            var voidReturn = cfg.ReturnType == DataType.Void;
             foreach (var block in cfg.BasicBlocks)
                 Emit(block, voidReturn, definitions);
         }

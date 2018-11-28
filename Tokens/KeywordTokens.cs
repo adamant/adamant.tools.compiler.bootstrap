@@ -51,7 +51,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             typeof(SelfTypeKeywordToken),
             typeof(BaseKeywordToken),
             typeof(TypeKeywordToken),
-            typeof(MetatypeKeywordToken),
             typeof(MutableKeywordToken),
             typeof(ParamsKeywordToken),
             typeof(MayKeywordToken),
@@ -333,12 +332,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         public static ITypeKeywordToken TypeKeyword(TextSpan span)
         {
             return new TypeKeywordToken(span);
-        }
-
-        [NotNull]
-        public static IMetatypeKeywordToken MetatypeKeyword(TextSpan span)
-        {
-            return new MetatypeKeywordToken(span);
         }
 
         [NotNull]
@@ -926,15 +919,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     internal partial class TypeKeywordToken : Token, ITypeKeywordToken
     {
         public TypeKeywordToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
-    public partial interface IMetatypeKeywordToken : IKeywordToken { }
-    internal partial class MetatypeKeywordToken : Token, IMetatypeKeywordToken
-    {
-        public MetatypeKeywordToken(TextSpan span)
             : base(span)
         {
         }

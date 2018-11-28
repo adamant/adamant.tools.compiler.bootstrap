@@ -10,6 +10,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
     public abstract class DataType
     {
         [NotNull] public static UnknownType Unknown = UnknownType.Instance;
+        [NotNull] public static VoidType Void = VoidType.Instance;
+        [NotNull] public static NeverType Never = NeverType.Instance;
+        [NotNull] public static BoolType Bool = BoolType.Instance;
 
         /// <summary>
         /// A resolved type is one that has no unknown or unresolved parts

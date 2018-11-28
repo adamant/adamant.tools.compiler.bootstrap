@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             switch (type)
             {
                 // TODO perhaps the name mangler should be used on primitives
-                case var t when t == ObjectType.Void:
+                case var t when t == DataType.Void:
                     return "void";
                 case SizedIntegerType integerType:
                     return nameMangler.Mangle(integerType.Name);

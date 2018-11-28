@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [NotNull] public SimpleName Name => FullName.UnqualifiedName;
         [CanBeNull] public FixedList<GenericParameterSyntax> GenericParameters { get; }
         [NotNull] public FixedList<IMemberDeclarationSyntax> Members { get; }
-        [NotNull] public TypePromise Type { get; } = new TypePromise();
+        [NotNull] public TypePromise<Metatype> Type { get; } = new TypePromise<Metatype>();
         DataType ISymbol.Type => Type.Fulfilled();
 
         protected TypeDeclarationSyntax(
@@ -31,16 +31,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         DeclarationSyntax IDeclarationSyntax.AsDeclarationSyntax => this;
 
-        public ISymbol ComposeWith(ISymbol symbol)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public ISymbol Lookup(SimpleName name)
-        {
-            throw new System.NotImplementedException();
-        }
-
         ISymbol ISymbol.ComposeWith(ISymbol symbol)
         {
             throw new System.NotImplementedException();
@@ -50,7 +40,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         {
             throw new System.NotImplementedException();
         }
-
-
     }
 }

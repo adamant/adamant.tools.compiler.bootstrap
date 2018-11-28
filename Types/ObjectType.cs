@@ -14,11 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
     // arguments supplied is *partially constructed type*.
     public class ObjectType : GenericType
     {
-        [NotNull] public static readonly ObjectType Void = new ObjectType(SimpleName.Special("void"), false, false);
-        [NotNull] public static readonly ObjectType Never = new ObjectType(SimpleName.Special("never"), false, false);
-        [NotNull] public static readonly ObjectType Bool = new ObjectType(SimpleName.Special("bool"), false, false);
         [NotNull] public static readonly ObjectType Type = new ObjectType(SimpleName.Special("type"), false, false);
-        [NotNull] public static readonly ObjectType Metatype = new ObjectType(SimpleName.Special("metatype"), false, false);
         [NotNull] public static readonly ObjectType Any = new ObjectType(SimpleName.Special("Any"), true, false);
 
         [NotNull] public Name Name { get; }
