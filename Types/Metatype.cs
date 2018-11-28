@@ -23,8 +23,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         // the single object instance that is of this metatype.
         [NotNull] public DataType Instance { get; }
 
-        public override IReadOnlyList<DataType> GenericParameterTypes { get; }
-        public override IReadOnlyList<DataType> GenericArguments { get; }
+        public override FixedList<DataType> GenericParameterTypes { get; }
+        public override FixedList<DataType> GenericArguments { get; }
         public override bool IsResolved { get; }
 
         public Metatype([NotNull] DataType instanceType)
@@ -32,8 +32,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
             Requires.NotNull(nameof(instanceType), instanceType);
             Instance = instanceType;
             IsResolved = instanceType.IsResolved;
-            GenericParameterTypes = Enumerable.Empty<DataType>().ToReadOnlyList();
-            GenericArguments = Enumerable.Empty<DataType>().ToReadOnlyList();
+            GenericParameterTypes = Enumerable.Empty<DataType>().ToFixedList();
+            GenericArguments = Enumerable.Empty<DataType>().ToFixedList();
         }
 
         [NotNull]

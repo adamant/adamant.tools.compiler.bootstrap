@@ -15,17 +15,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
     public class ExpressionTypeResolver
     {
         [NotNull] private readonly CodeFile file;
+        [CanBeNull] private readonly Metatype declaringType;
         [CanBeNull] private readonly DataType returnType;
         [NotNull] private readonly Diagnostics diagnostics;
 
         public ExpressionTypeResolver(
             [NotNull] CodeFile file,
             [NotNull] Diagnostics diagnostics,
+            [CanBeNull] Metatype declaringType = null,
             [CanBeNull] DataType returnType = null)
         {
             this.file = file;
             this.returnType = returnType;
             this.diagnostics = diagnostics;
+            this.declaringType = declaringType;
         }
 
         public void InferStatementType([NotNull] StatementSyntax statement)
@@ -339,6 +342,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     InferExpressionType(assignmentExpression.RightOperand);
                     assignmentExpression.RightOperand = ImplicitConversion(assignmentExpression.RightOperand, left);
                     throw new NotImplementedException("Check compability of types");
+                case SelfExpressionSyntax _:
+                    return declaringType?.Instance ?? DataType.Unknown;
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }

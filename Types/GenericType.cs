@@ -1,12 +1,12 @@
-using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
     public abstract class GenericType : DataType
     {
-        [CanBeNull, ItemNotNull] public abstract IReadOnlyList<DataType> GenericParameterTypes { get; }
+        [CanBeNull, ItemNotNull] public abstract FixedList<DataType> GenericParameterTypes { get; }
         public int? GenericArity => GenericParameterTypes?.Count;
-        [CanBeNull, ItemCanBeNull] public abstract IReadOnlyList<DataType> GenericArguments { get; }
+        [CanBeNull, ItemCanBeNull] public abstract FixedList<DataType> GenericArguments { get; }
     }
 }

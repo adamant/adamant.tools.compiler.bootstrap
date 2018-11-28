@@ -24,9 +24,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         [NotNull] public Name Name { get; }
         public bool IsReferenceType { get; }
         public bool DeclaredMutable { get; }
-        [CanBeNull, ItemNotNull] public override IReadOnlyList<DataType> GenericParameterTypes { get; }
+        [CanBeNull, ItemNotNull] public override FixedList<DataType> GenericParameterTypes { get; }
         public bool IsGeneric => GenericParameterTypes != null;
-        [CanBeNull, ItemCanBeNull] public override IReadOnlyList<DataType> GenericArguments { get; }
+        [CanBeNull, ItemCanBeNull] public override FixedList<DataType> GenericArguments { get; }
         public bool IsMutable { get; }
         // TODO deal with the generic parameters and arguments
         public override bool IsResolved => true;
@@ -41,9 +41,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
             Requires.NotNull(nameof(name), name);
             Name = name;
             DeclaredMutable = declaredMutable;
-            var genericParameterTypesList = genericParameterTypes?.ToReadOnlyList();
+            var genericParameterTypesList = genericParameterTypes?.ToFixedList();
             GenericParameterTypes = genericParameterTypesList;
-            var genericArgumentsList = (genericArguments ?? genericParameterTypesList?.Select(t => default(DataType)))?.ToReadOnlyList();
+            var genericArgumentsList = (genericArguments ?? genericParameterTypesList?.Select(t => default(DataType)))?.ToFixedList();
             Requires.That(nameof(genericArguments), genericArgumentsList?.Count == genericParameterTypesList?.Count);
             GenericArguments = genericArgumentsList;
             IsReferenceType = isReferenceType;
