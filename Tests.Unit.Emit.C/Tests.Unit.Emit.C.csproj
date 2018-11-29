@@ -32,7 +32,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Emit.C\Emit.C.csproj" />
     <ProjectReference Include="..\Tests.Unit\Tests.Unit.csproj" />
-    <ProjectReference Include="..\Types\Types.csproj" />
   </ItemGroup>
 
 </Project>

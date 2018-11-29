@@ -21,8 +21,6 @@
     <ProjectReference Include="..\IntermediateLanguage\IntermediateLanguage.csproj" />
     <ProjectReference Include="..\Primitives\Primitives.csproj" />
     <ProjectReference Include="..\Scopes\Scopes.csproj" />
-    <ProjectReference Include="..\Symbols\Symbols.csproj" />
-    <ProjectReference Include="..\Types\Types.csproj" />
   </ItemGroup>
 
 </Project>

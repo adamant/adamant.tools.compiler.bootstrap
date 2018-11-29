@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Types</AssemblyName>
-    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Types</RootNamespace>
+    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Metadata</AssemblyName>
+    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Metadata</RootNamespace>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
-    <ProjectReference Include="..\Framework\Framework.csproj" />
     <ProjectReference Include="..\Names\Names.csproj" />
   </ItemGroup>
 

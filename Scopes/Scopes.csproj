@@ -16,7 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Symbols\Symbols.csproj" />
+    <ProjectReference Include="..\Metadata\Metadata.csproj" />
+    <ProjectReference Include="..\Names\Names.csproj" />
   </ItemGroup>
 
 </Project>

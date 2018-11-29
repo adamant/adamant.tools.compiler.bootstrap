@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
+    [Obsolete("Switch to something else")]
     public class OverloadedType : UnresolvedType
     {
         [NotNull, ItemNotNull] public readonly IReadOnlyList<DataType> Types;
