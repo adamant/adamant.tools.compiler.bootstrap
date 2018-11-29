@@ -1,30 +1,32 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
-using Adamant.Tools.Compiler.Bootstrap.AST.Visitors;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Primitives;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
 using JetBrains.Annotations;
-using Void = Adamant.Tools.Compiler.Bootstrap.Framework.Void;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
 {
-    public class NameBinder : ExpressionVisitor<LexicalScope, Void>
+    public class NameBinder
     {
         // TODO do we need a list of all the namespaces for validating using statements?
         // Gather a list of all the namespaces for validating using statements
         // Also need to account for empty directories?
 
+        [NotNull] private readonly Diagnostics diagnostics;
         [NotNull, ItemNotNull] private readonly FixedList<ISymbol> allSymbols;
         [NotNull] private readonly GlobalScope globalScope;
 
         public NameBinder(
+            [NotNull] Diagnostics diagnostics,
             [NotNull] PackageSyntax packageSyntax,
             [NotNull] FixedDictionary<string, Package> references)
         {
+            this.diagnostics = diagnostics;
             allSymbols = GetAllSymbols(packageSyntax, references);
             globalScope = new GlobalScope(GetAllGlobalSymbols());
         }
@@ -65,6 +67,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
             [NotNull] LexicalScope containingScope,
             [NotNull] DeclarationSyntax declaration)
         {
+            var binder = new ExpressionNameBinder(diagnostics, declaration.File);
+            var diagnosticCount = diagnostics.Count;
             switch (declaration)
             {
                 case NamespaceDeclarationSyntax ns:
@@ -79,22 +83,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
                 }
                 break;
                 case NamedFunctionDeclarationSyntax function:
-                    BindNamesInFunctionParameters(containingScope, function);
-                    VisitExpression(function.ReturnTypeExpression, containingScope);
-                    BindNamesInFunctionBody(containingScope, function);
+                    BindNamesInFunctionParameters(containingScope, function, binder);
+                    binder.VisitExpression(function.ReturnTypeExpression, containingScope);
+                    BindNamesInFunctionBody(containingScope, function, binder);
                     break;
                 case OperatorDeclarationSyntax operatorDeclaration:
-                    BindNamesInFunctionParameters(containingScope, operatorDeclaration);
-                    VisitExpression(operatorDeclaration.ReturnTypeExpression, containingScope);
-                    BindNamesInFunctionBody(containingScope, operatorDeclaration);
+                    BindNamesInFunctionParameters(containingScope, operatorDeclaration, binder);
+                    binder.VisitExpression(operatorDeclaration.ReturnTypeExpression, containingScope);
+                    BindNamesInFunctionBody(containingScope, operatorDeclaration, binder);
                     break;
                 case ConstructorDeclarationSyntax constructor:
-                    BindNamesInFunctionParameters(containingScope, constructor);
-                    BindNamesInFunctionBody(containingScope, constructor);
+                    BindNamesInFunctionParameters(containingScope, constructor, binder);
+                    BindNamesInFunctionBody(containingScope, constructor, binder);
                     break;
                 case InitializerDeclarationSyntax initializer:
-                    BindNamesInFunctionParameters(containingScope, initializer);
-                    BindNamesInFunctionBody(containingScope, initializer);
+                    BindNamesInFunctionParameters(containingScope, initializer, binder);
+                    BindNamesInFunctionBody(containingScope, initializer, binder);
                     break;
                 case TypeDeclarationSyntax typeDeclaration:
                     // TODO name scope for type declaration
@@ -102,27 +106,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
                         BindNamesInDeclaration(containingScope, (DeclarationSyntax)nestedDeclaration);
                     break;
                 case FieldDeclarationSyntax fieldDeclaration:
-                    VisitExpression(fieldDeclaration.TypeExpression, containingScope);
-                    VisitExpression(fieldDeclaration.Initializer, containingScope);
+                    binder.VisitExpression(fieldDeclaration.TypeExpression, containingScope);
+                    binder.VisitExpression(fieldDeclaration.Initializer, containingScope);
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
             }
+            if (diagnosticCount != diagnostics.Count)
+                declaration.Poison();
         }
 
         private void BindNamesInFunctionParameters(
             [NotNull] LexicalScope containingScope,
-            [NotNull] FunctionDeclarationSyntax function)
+            [NotNull] FunctionDeclarationSyntax function,
+            [NotNull] ExpressionNameBinder binder)
         {
             if (function.GenericParameters != null)
                 foreach (var parameter in function.GenericParameters)
-                    VisitExpression(parameter.TypeExpression, containingScope);
+                    binder.VisitExpression(parameter.TypeExpression, containingScope);
 
             foreach (var parameter in function.Parameters)
                 switch (parameter)
                 {
                     case NamedParameterSyntax namedParameter:
-                        VisitExpression(namedParameter.TypeExpression, containingScope);
+                        binder.VisitExpression(namedParameter.TypeExpression, containingScope);
                         break;
                     case SelfParameterSyntax _:
                     case FieldParameterSyntax _:
@@ -135,43 +142,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
 
         private void BindNamesInFunctionBody(
             [NotNull] LexicalScope containingScope,
-            [NotNull] FunctionDeclarationSyntax function)
+            [NotNull] FunctionDeclarationSyntax function,
+            [NotNull] ExpressionNameBinder binder)
         {
             var symbols = new List<ISymbol>();
             foreach (var parameter in function.Parameters)
                 symbols.Add(parameter);
 
             containingScope = new NestedScope(containingScope, symbols);
-            BindNamesInBlock(containingScope, function.Body);
-        }
-
-        private void BindNamesInBlock([NotNull] LexicalScope containingScope, [CanBeNull] BlockSyntax block)
-        {
-            if (block == null) return;
-
-            var symbols = new List<ISymbol>();
-
-            foreach (var variableDeclaration in block.Statements
-                .OfType<VariableDeclarationStatementSyntax>())
-                symbols.Add(variableDeclaration);
-
-            containingScope = new NestedScope(containingScope, symbols);
-
-            foreach (var statement in block.Statements)
-                VisitStatement(statement, containingScope);
-        }
-
-        public override Void VisitExpression([CanBeNull] ExpressionSyntax expression, LexicalScope containingScope)
-        {
-            return expression == null ? default : base.VisitExpression(expression, containingScope);
-        }
-
-        public override Void VisitIdentifierName(
-            [NotNull] IdentifierNameSyntax identifierName,
-            [NotNull] LexicalScope containingScope)
-        {
-            identifierName.ReferencedSymbol = containingScope.Lookup(identifierName.Name) ?? UnknownSymbol.Instance;
-            return default;
+            binder.VisitBlock(function.Body, containingScope);
         }
 
         [NotNull]

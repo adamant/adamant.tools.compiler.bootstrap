@@ -27,7 +27,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public override string ToString()
         {
-            throw new System.NotImplementedException();
+            var defaultValue = DefaultValue != null ? " = " + DefaultValue : "";
+            return $"{Name}: {TypeExpression}{defaultValue}";
         }
     }
 }

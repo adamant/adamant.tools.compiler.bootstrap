@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // First pull over all the lexer and parser errors from the compilation units
             var diagnostics = AllDiagnostics(packageSyntax);
 
-            var nameBinder = new NameBinder(packageSyntax, references);
+            var nameBinder = new NameBinder(diagnostics, packageSyntax, references);
             nameBinder.BindNamesInPackage(packageSyntax);
 
             // Make a list of all the non-member declarations

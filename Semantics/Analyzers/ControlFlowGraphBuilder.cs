@@ -24,9 +24,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
         private static bool ShouldBuildGraph([NotNull] FunctionDeclarationSyntax function)
         {
-            // TODO If there were type errors on it, don't build a control flow graph
             return function.Body != null // It is not abstract
-                   && function.GenericParameters == null; // It is not generic, generic functions need monomorphized
+                   && function.GenericParameters == null // It is not generic, generic functions need monomorphized
+                   && !function.Poisoned; // There were errors, we may not be able to make a control flow graph, so don't try
         }
 
         [NotNull, ItemNotNull] private readonly List<LocalVariableDeclaration> variables = new List<LocalVariableDeclaration>();

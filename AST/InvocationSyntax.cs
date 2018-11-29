@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public override string ToString()
         {
-            return $"{Callee}({Arguments})";
+            return $"{Callee}({string.Join(", ", Arguments)})";
         }
     }
 }

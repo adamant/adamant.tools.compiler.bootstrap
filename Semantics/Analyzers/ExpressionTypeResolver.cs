@@ -244,6 +244,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                         // TODO check argument types
                         return expression.Type.Fulfill(functionType.ResultType);
                     }
+                    // If it is unknown, we already reported an error
+                    if (callee == DataType.Unknown)
+                        return expression.Type.Fulfill(DataType.Unknown);
 
                     diagnostics.Add(TypeError.MustBeCallable(file, invocation.Callee));
                     return expression.Type.Fulfill(DataType.Unknown);
