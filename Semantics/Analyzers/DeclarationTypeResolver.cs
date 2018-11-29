@@ -197,34 +197,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             switch (declaration)
             {
                 case ClassDeclarationSyntax classDeclaration:
-                    var classType = new ObjectType(declaration.Name, true,
+                    var classType = new ObjectType(declaration, true,
                         classDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
                         genericParameterTypes);
-                    declaration.Type.Fulfill(new Metatype(classDeclaration, classType));
+                    declaration.Type.Fulfill(new Metatype(classType));
                     break;
                 case StructDeclarationSyntax structDeclaration:
-                    var structType = new ObjectType(declaration.Name, false,
+                    var structType = new ObjectType(declaration, false,
                         structDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
                         genericParameterTypes);
-                    declaration.Type.Fulfill(new Metatype(structDeclaration, structType));
+                    declaration.Type.Fulfill(new Metatype(structType));
                     break;
                 case EnumStructDeclarationSyntax enumStructDeclaration:
-                    var enumStructType = new ObjectType(declaration.Name, false,
+                    var enumStructType = new ObjectType(declaration, false,
                         enumStructDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
                         genericParameterTypes);
-                    declaration.Type.Fulfill(new Metatype(enumStructDeclaration, enumStructType));
+                    declaration.Type.Fulfill(new Metatype(enumStructType));
                     break;
                 case EnumClassDeclarationSyntax enumStructDeclaration:
-                    var enumClassType = new ObjectType(declaration.Name, true,
+                    var enumClassType = new ObjectType(declaration, true,
                         enumStructDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
                         genericParameterTypes);
-                    declaration.Type.Fulfill(new Metatype(enumStructDeclaration, enumClassType));
+                    declaration.Type.Fulfill(new Metatype(enumClassType));
                     break;
                 case TraitDeclarationSyntax declarationSyntax:
-                    var type = new ObjectType(declaration.Name, true,
+                    var type = new ObjectType(declaration, true,
                         declarationSyntax.Modifiers.Any(m => m is IMutableKeywordToken),
                         genericParameterTypes);
-                    declaration.Type.Fulfill(new Metatype(declarationSyntax, type));
+                    declaration.Type.Fulfill(new Metatype(type));
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(declaration);

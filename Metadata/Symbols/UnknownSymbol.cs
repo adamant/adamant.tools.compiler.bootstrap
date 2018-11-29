@@ -1,13 +1,14 @@
-﻿using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
 {
     public class UnknownSymbol : ISymbol
     {
         #region Singleton
-        public static readonly UnknownSymbol Instance = new UnknownSymbol();
+        [NotNull] public static readonly UnknownSymbol Instance = new UnknownSymbol();
 
         private UnknownSymbol() { }
         #endregion

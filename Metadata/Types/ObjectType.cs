@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using JetBrains.Annotations;
 
@@ -14,6 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     // arguments supplied is *partially constructed type*.
     public class ObjectType : ReferenceType
     {
+        [NotNull] public ISymbol Symbol { get; }
         [NotNull] public Name Name { get; }
         public bool IsReferenceType { get; }
         public bool DeclaredMutable { get; }
@@ -28,15 +30,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public override bool IsResolved => true;
 
         private ObjectType(
-            [NotNull] Name name,
+            [NotNull] ISymbol symbol,
             bool isReferenceType,
             bool declaredMutable,
-            [CanBeNull, ItemNotNull] IEnumerable<DataType> genericParameterTypes,
-            [CanBeNull, ItemCanBeNull] IEnumerable<DataType> genericArguments)
+            [CanBeNull] [ItemNotNull] IEnumerable<DataType> genericParameterTypes,
+            [CanBeNull] [ItemCanBeNull] IEnumerable<DataType> genericArguments)
         {
-            Requires.NotNull(nameof(name), name);
-            Name = name;
+            Name = symbol.FullName;
             DeclaredMutable = declaredMutable;
+            Symbol = symbol;
             var genericParameterTypesList = genericParameterTypes?.ToFixedList();
             GenericParameterTypes = genericParameterTypesList;
             var genericArgumentsList = (genericArguments ?? genericParameterTypesList?.Select(t => default(DataType)))?.ToFixedList();
@@ -47,16 +49,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         }
 
         public ObjectType(
-            [NotNull] Name name,
+            [NotNull] ISymbol symbol,
             bool isReferenceType,
             bool declaredMutable,
-            [CanBeNull, ItemNotNull] IEnumerable<DataType> genericParameterTypes)
-            : this(name, isReferenceType, declaredMutable, genericParameterTypes, null)
+            [CanBeNull] [ItemNotNull] IEnumerable<DataType> genericParameterTypes)
+            : this(symbol, isReferenceType, declaredMutable, genericParameterTypes, null)
         {
         }
 
-        public ObjectType([NotNull] Name name, bool isReferenceType, bool declaredMutable)
-            : this(name, isReferenceType, declaredMutable, null, null)
+        public ObjectType([NotNull] ISymbol symbol, bool isReferenceType, bool declaredMutable)
+            : this(symbol, isReferenceType, declaredMutable, null, null)
         {
         }
 
@@ -72,7 +74,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         [NotNull]
         public ObjectType WithGenericArguments(IEnumerable<DataType> genericArguments)
         {
-            return new ObjectType(Name, IsReferenceType, DeclaredMutable, GenericParameterTypes, genericArguments);
+            return new ObjectType(Symbol, IsReferenceType, DeclaredMutable, GenericParameterTypes, genericArguments);
         }
     }
 }

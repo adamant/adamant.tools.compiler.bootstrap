@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             NumericType = numericType;
             var children = ConstructChildSymbols(numericType);
             ChildSymbols = children.ToFixedDictionary(s => s.FullName.UnqualifiedName);
-            Type = new Metatype(this, numericType);
+            Type = new Metatype(numericType);
         }
 
         [NotNull]

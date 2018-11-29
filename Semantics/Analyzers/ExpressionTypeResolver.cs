@@ -356,10 +356,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             {
                 case UnknownType _:
                     return DataType.Unknown;
-                // TODO data types need to be connected to symbols so we can do this lookup
-                //    case ObjectType objectType:
-                //        symbol = memberAccess.Expression.Context.Scope.LookupGlobal(objectType.Name);
-                //        break;
+                case ObjectType objectType:
+                    symbol = objectType.Symbol;
+                    break;
                 //    case PrimitiveFixedIntegerType fixedInteger:
                 //        symbol = memberAccess.Expression.Context.Scope.LookupGlobal(fixedInteger.Name);
                 //        break;
@@ -367,18 +366,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     throw NonExhaustiveMatchException.For(left);
             }
 
-            if (symbol == null) return DataType.Unknown;
-
             DataType type;
             switch (memberAccess.Member)
             {
                 case IIdentifierToken identifier:
-                    type = symbol.Lookup(new SimpleName(identifier.Value))?.Type;
+                    // TODO report error on lookup failure
+                    type = symbol.Lookup(new SimpleName(identifier.Value)).Type;
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(memberAccess.Member);
             }
-            return memberAccess.Type.Fulfill(type ?? DataType.Unknown);
+            return memberAccess.Type.Fulfill(type);
         }
 
         [NotNull]
