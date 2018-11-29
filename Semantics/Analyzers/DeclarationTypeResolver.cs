@@ -75,7 +75,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             if (function.GenericParameters != null)
                 ResolveTypesInGenericParameters(function.GenericParameters, resolver);
 
-            var parameterTypes = ResolveTypesInParameters(function, resolver);
+            var parameterTypes = ResolveTypesInParameters(function, resolver, declaringType);
 
             var returnType = ResolveReturnType(function, resolver, declaringType);
             DataType functionType = new FunctionType(parameterTypes, returnType);
@@ -104,7 +104,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         [NotNull, ItemNotNull]
         private FixedList<DataType> ResolveTypesInParameters(
             [NotNull] FunctionDeclarationSyntax function,
-            [NotNull] ExpressionTypeResolver expressionResolver)
+            [NotNull] ExpressionTypeResolver expressionResolver,
+            [CanBeNull] TypeDeclarationSyntax declaringType)
         {
             var types = new List<DataType>();
             foreach (var parameter in function.Parameters)
@@ -113,14 +114,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 switch (parameter)
                 {
                     case NamedParameterSyntax namedParameter:
-                        var type = expressionResolver.CheckAndEvaluateTypeExpression(namedParameter.TypeExpression);
+                    {
+                        var type = expressionResolver
+                            .CheckAndEvaluateTypeExpression(namedParameter.TypeExpression);
                         types.Add(parameter.Type.Fulfill(type));
-                        break;
-                    case SelfParameterSyntax selfParameter:
-                        diagnostics.Add(TypeError.NotImplemented(function.File,
-                            parameter.Span, "Self parameters not implemented"));
-                        types.Add(parameter.Type.Fulfill(DataType.Unknown));
-                        break;
+                    }
+                    break;
+                    case SelfParameterSyntax _:
+                    {
+                        var type = declaringType?.Type.Fulfilled().Instance ?? DataType.Unknown;
+                        types.Add(parameter.Type.Fulfill(type));
+                    }
+                    break;
                     case FieldParameterSyntax fieldParameter:
                         throw new NotImplementedException();
                     default:

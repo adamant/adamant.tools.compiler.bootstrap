@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Primitives
@@ -19,18 +21,42 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             // TODO make a symbol for `Type`
             return new List<ISymbol>
             {
-                new IntegerNumericSymbol(DataType.Int8),
-                new IntegerNumericSymbol(DataType.Byte),
-                new IntegerNumericSymbol(DataType.Int16),
-                new IntegerNumericSymbol(DataType.UInt16),
-                new IntegerNumericSymbol(DataType.Int),
-                new IntegerNumericSymbol(DataType.UInt),
-                new IntegerNumericSymbol(DataType.Int64),
-                new IntegerNumericSymbol(DataType.UInt64),
+                BuildStringSymbol(),
 
-                new IntegerNumericSymbol(DataType.Size),
-                new IntegerNumericSymbol(DataType.Offset),
+                BuildIntegerNumericSymbol(DataType.Int8),
+                BuildIntegerNumericSymbol(DataType.Byte),
+                BuildIntegerNumericSymbol(DataType.Int16),
+                BuildIntegerNumericSymbol(DataType.UInt16),
+                BuildIntegerNumericSymbol(DataType.Int),
+                BuildIntegerNumericSymbol(DataType.UInt),
+                BuildIntegerNumericSymbol(DataType.Int64),
+                BuildIntegerNumericSymbol(DataType.UInt64),
+
+                BuildIntegerNumericSymbol(DataType.Size),
+                BuildIntegerNumericSymbol(DataType.Offset),
             }.ToFixedList();
+        }
+
+        /// <summary>
+        /// For now, we are putting string in the runtime library
+        /// </summary>
+        private static ISymbol BuildStringSymbol()
+        {
+            var name = new SimpleName("String");
+            var symbol = new PrimitiveSymbol(name, null, Enumerable.Empty<ISymbol>());
+            var objectType = new ObjectType(symbol, true, false);
+            symbol.Type = new Metatype(objectType);
+            return symbol;
+        }
+
+        private static ISymbol BuildIntegerNumericSymbol([NotNull] IntegerType numericType)
+        {
+            var typeName = numericType.Name;
+            var symbols = new List<ISymbol>
+            {
+                new PrimitiveSymbol(typeName.Qualify("remainder"), new FunctionType(new[] {numericType}, numericType))
+            };
+            return new PrimitiveSymbol(typeName, new Metatype(numericType), symbols);
         }
     }
 }
