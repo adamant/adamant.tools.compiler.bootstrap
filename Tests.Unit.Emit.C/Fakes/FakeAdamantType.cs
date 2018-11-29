@@ -1,5 +1,5 @@
 using System;
-using Adamant.Tools.Compiler.Bootstrap.Types;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C.Fakes
 {

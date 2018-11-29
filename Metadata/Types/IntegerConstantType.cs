@@ -1,7 +1,7 @@
 using System.Numerics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     /// <summary>
     /// This is the type of integer constants, it isn't possible to declare a

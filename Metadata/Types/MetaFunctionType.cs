@@ -3,7 +3,7 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     /// <summary>
     /// A meta-function is a function that operates at the meta level. That is,

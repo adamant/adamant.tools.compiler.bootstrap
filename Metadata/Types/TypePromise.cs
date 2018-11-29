@@ -4,7 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     /// <summary>
     /// This represents a DataType that may not be computed yet. There are three

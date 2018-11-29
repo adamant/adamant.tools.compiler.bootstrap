@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using Adamant.Tools.Compiler.Bootstrap.Types;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols
+namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
 {
     // TODO split this out so symbols are always singular somehow
     public class CompositeSymbol : ISymbol

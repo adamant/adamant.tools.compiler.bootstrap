@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Symbols;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {

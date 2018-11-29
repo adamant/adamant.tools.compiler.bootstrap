@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     public abstract class SimpleType : DataType
     {

@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     public abstract class IntegerType : NumericType
     {

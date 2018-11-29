@@ -1,7 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     /// <summary>
     /// As in Swift, the metatype is the type of a type. That is the type of the

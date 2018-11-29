@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     [Obsolete("Switch to something else")]
     public class OverloadedType : UnresolvedType

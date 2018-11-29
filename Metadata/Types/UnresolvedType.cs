@@ -1,6 +1,6 @@
 using System;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     /// <summary>
     /// An unresolved type is a type that either unknown or an overloaded type.

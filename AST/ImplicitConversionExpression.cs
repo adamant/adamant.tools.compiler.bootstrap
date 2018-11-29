@@ -1,5 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Types;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST

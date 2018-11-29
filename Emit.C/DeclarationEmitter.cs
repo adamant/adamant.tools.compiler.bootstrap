@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Model;
-using Adamant.Tools.Compiler.Bootstrap.Types;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C

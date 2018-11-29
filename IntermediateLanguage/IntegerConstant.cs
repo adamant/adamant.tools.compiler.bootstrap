@@ -1,6 +1,6 @@
 using System.Numerics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Types;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage

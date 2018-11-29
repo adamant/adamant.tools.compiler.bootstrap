@@ -3,7 +3,7 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     /// <summary>
     /// A function type is the type of a declared function, method or constructor.
