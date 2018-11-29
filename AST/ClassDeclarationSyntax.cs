@@ -1,4 +1,3 @@
-using System;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -40,7 +39,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public override string ToString()
         {
-            throw new NotImplementedException();
+            var generics = GenericParameters != null
+                ? $"[{string.Join(", ", GenericParameters)}]"
+                : "";
+            return $"class {FullName}{generics} {{ … }}";
         }
     }
 }

@@ -66,11 +66,42 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                     return VisitSelfExpression(selfExpression, args);
                 case BaseExpressionSyntax baseExpression:
                     return VisitBaseExpression(baseExpression, args);
+                case LoopExpressionSyntax loopExpression:
+                    return VisitLoopExpression(loopExpression, args);
+                case IfExpressionSyntax ifExpression:
+                    return VisitIfExpression(ifExpression, args);
+                case ResultExpressionSyntax resultExpression:
+                    return VisitResultExpression(resultExpression, args);
+                case BreakExpressionSyntax breakExpression:
+                    return VisitBreakExpression(breakExpression, args);
                 case null:
                     return VisitNull(args);
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
+        }
+
+        public virtual R VisitBreakExpression(BreakExpressionSyntax breakExpression, A args)
+        {
+            return DefaultResult(args);
+        }
+
+        public virtual R VisitResultExpression([NotNull] ResultExpressionSyntax resultExpression, A args)
+        {
+            return VisitExpression(resultExpression.Expression, args);
+        }
+
+        public virtual R VisitIfExpression([NotNull] IfExpressionSyntax ifExpression, A args)
+        {
+            var r1 = VisitExpression(ifExpression.Condition, args);
+            var r2 = VisitExpression(ifExpression.ThenBlock, args);
+            var r3 = VisitExpression(ifExpression.ElseClause, args);
+            return CombineResults(args, r1, r2, r3);
+        }
+
+        public virtual R VisitLoopExpression([NotNull] LoopExpressionSyntax loopExpression, A args)
+        {
+            return VisitExpression(loopExpression.Block, args);
         }
 
         public virtual R VisitBaseExpression(BaseExpressionSyntax baseExpression, A args)

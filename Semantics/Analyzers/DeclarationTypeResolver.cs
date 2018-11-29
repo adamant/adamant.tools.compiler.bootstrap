@@ -68,6 +68,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             [CanBeNull] TypeDeclarationSyntax declaringType)
         {
             function.Type.BeginFulfilling();
+            var diagnosticCount = diagnostics.Count;
 
             var resolver = new ExpressionTypeResolver(function.File, diagnostics, declaringType: declaringType?.Type.Fulfilled());
 
@@ -83,6 +84,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 functionType = new MetaFunctionType(function.GenericParameters.NotNull().Select(p => p.Type.Fulfilled()), functionType);
 
             function.Type.Fulfill(functionType);
+            if (diagnosticCount != diagnostics.Count) function.Poison();
         }
 
         private static void ResolveTypesInGenericParameters(
@@ -274,10 +276,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         {
             if (function.Body == null) return;
 
+            var diagnosticCount = diagnostics.Count;
             var resolver = new ExpressionTypeResolver(function.File, diagnostics, declaringType: declaringType?.Type.Fulfilled(), returnType: function.ReturnType.Fulfilled());
             // The body of a function shouldn't itself evaluate to anything.
             // There should be no `=> value` for the block, so the type is `void`.
             resolver.CheckExpressionType(function.Body, DataType.Void);
+            if (diagnosticCount != diagnostics.Count) function.Poison();
         }
 
         private void ResolveBodyTypesInTypeDeclaration([NotNull] TypeDeclarationSyntax typeDeclaration)

@@ -108,13 +108,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         {
             switch (statement)
             {
-                //case VariableDeclarationStatementSyntax variableDeclaration:
-                //    var variable = AddVariable(variableDeclaration.MutableBinding,
-                //        variableDeclaration.Type.AssertResolved(),
-                //        variableDeclaration.Name.UnqualifiedName.Text);
-                //    if (variableDeclaration.Initializer != null)
-                //        ConvertToAssignmentStatement(variable.Reference, variableDeclaration.Initializer, currentBlock);
-                //    break;
+                case VariableDeclarationStatementSyntax variableDeclaration:
+                    var variable = AddVariable(variableDeclaration.MutableBinding,
+                        variableDeclaration.Type.Fulfilled(),
+                        variableDeclaration.Name.UnqualifiedName.Text);
+                    if (variableDeclaration.Initializer != null)
+                        ConvertToAssignmentStatement(variable.Reference, variableDeclaration.Initializer, currentBlock);
+                    break;
 
                 case ExpressionSyntax expression:
                     ConvertExpressionAnalysisToStatement(expression, currentBlock);

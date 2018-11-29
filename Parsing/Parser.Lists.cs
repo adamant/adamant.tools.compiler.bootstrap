@@ -63,7 +63,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             while (item != null)
             {
                 items.Add(item);
-                if (Tokens.Accept<TSeparator>())
+                if (!Tokens.Accept<TSeparator>())
                     break;
 
                 item = acceptItem();

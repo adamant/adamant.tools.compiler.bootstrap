@@ -12,6 +12,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
     {
         [NotNull] private readonly List<Diagnostic> items = new List<Diagnostic>();
 
+        public int Count => items.Count;
+
         public void Add([NotNull] Diagnostic diagnostic)
         {
             Requires.NotNull(nameof(diagnostic), diagnostic);

@@ -27,6 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         [NotNull] public static readonly UnsizedIntegerType Offset = UnsizedIntegerType.Offset;
         [NotNull] public static readonly FloatingPointType Float32 = FloatingPointType.Float32;
         [NotNull] public static readonly FloatingPointType Float = FloatingPointType.Float;
+        [NotNull] public static readonly StringConstantType StringConstant = StringConstantType.Instance;
 
         /// <summary>
         /// A resolved type is one that has no unknown or unresolved parts

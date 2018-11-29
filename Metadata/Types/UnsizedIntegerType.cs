@@ -4,8 +4,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     public class UnsizedIntegerType : IntegerType
     {
-        [NotNull] internal static readonly UnsizedIntegerType Size = new UnsizedIntegerType("size", false);
-        [NotNull] internal static readonly UnsizedIntegerType Offset = new UnsizedIntegerType("offset", true);
+        [NotNull] internal static new readonly UnsizedIntegerType Size = new UnsizedIntegerType("size", false);
+        [NotNull] internal static new readonly UnsizedIntegerType Offset = new UnsizedIntegerType("offset", true);
 
         public readonly bool IsSigned;
         public override bool IsResolved => true;

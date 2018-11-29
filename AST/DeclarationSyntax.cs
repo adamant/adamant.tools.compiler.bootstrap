@@ -6,6 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public abstract class DeclarationSyntax : Syntax
     {
         [NotNull] public CodeFile File { get; }
+        public bool Poisoned { get; private set; }
 
         /// <summary>
         /// The span of whatever would count as the "name" of this declaration
@@ -21,6 +22,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         {
             NameSpan = nameSpan;
             File = file;
+        }
+
+        public void Poison()
+        {
+            Poisoned = true;
         }
     }
 }

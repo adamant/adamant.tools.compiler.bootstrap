@@ -63,7 +63,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         private IEnumerable<ISymbol> GetChildSymbols()
         {
             return Parameters
-                .Concat(GenericParameters?.Cast<ISymbol>() ?? Enumerable.Empty<ISymbol>())
+                .Concat(GenericParameters ?? Enumerable.Empty<ISymbol>())
                 .Concat(GetVariableDeclarationsVisitor.Instance.VisitExpression(Body, default).NotNull());
         }
 

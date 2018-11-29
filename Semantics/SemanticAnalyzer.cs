@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             // Build final declaration objects and find the entry point
             var declarationBuilder = new DeclarationBuilder();
-            var declarations = declarationBuilder.Build(namespacedDeclarations);
+            var declarations = declarationBuilder.Build(namespacedDeclarations.Select(d => d.AsDeclarationSyntax));
             var entryPoint = DetermineEntryPoint(declarations, diagnostics);
 
             return new Package(packageSyntax.Name, diagnostics.Build(), references, declarations, entryPoint);
