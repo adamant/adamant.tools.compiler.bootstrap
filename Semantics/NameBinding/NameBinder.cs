@@ -8,6 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Primitives;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
 using JetBrains.Annotations;
+using Void = Adamant.Tools.Compiler.Bootstrap.Framework.Void;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
 {
@@ -77,14 +78,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
                         BindNamesInDeclaration(containingScope, nestedDeclaration);
                 }
                 break;
-                case FunctionDeclarationSyntax function:
+                case NamedFunctionDeclarationSyntax function:
                 {
-                    var symbols = new List<ISymbol>();
-                    foreach (var parameter in function.Parameters)
-                        symbols.Add(parameter);
-
-                    containingScope = new NestedScope(containingScope, symbols);
-                    BindNamesInBlock(containingScope, function.Body);
+                    BindNamesInFunctionParameters(containingScope, function);
+                    VisitExpression(function.ReturnTypeExpression, containingScope);
+                    BindNamesInFunctionBody(containingScope, function);
                 }
                 break;
                 case TypeDeclarationSyntax typeDeclaration:
@@ -99,6 +97,41 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
             }
+        }
+
+        private void BindNamesInFunctionParameters(
+            [NotNull] LexicalScope containingScope,
+            [NotNull] FunctionDeclarationSyntax function)
+        {
+            if (function.GenericParameters != null)
+                foreach (var parameter in function.GenericParameters)
+                    VisitExpression(parameter.TypeExpression, containingScope);
+
+            foreach (var parameter in function.Parameters)
+                switch (parameter)
+                {
+                    case NamedParameterSyntax namedParameter:
+                        VisitExpression(namedParameter.TypeExpression, containingScope);
+                        break;
+                    case SelfParameterSyntax _:
+                    case FieldParameterSyntax _:
+                        // Nothing to bind
+                        break;
+                    default:
+                        throw NonExhaustiveMatchException.For(parameter);
+                }
+        }
+
+        private void BindNamesInFunctionBody(
+            [NotNull] LexicalScope containingScope,
+            [NotNull] FunctionDeclarationSyntax function)
+        {
+            var symbols = new List<ISymbol>();
+            foreach (var parameter in function.Parameters)
+                symbols.Add(parameter);
+
+            containingScope = new NestedScope(containingScope, symbols);
+            BindNamesInBlock(containingScope, function.Body);
         }
 
         private void BindNamesInBlock([NotNull] LexicalScope containingScope, [CanBeNull] BlockSyntax block)
@@ -120,6 +153,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
         public override Void VisitExpression([CanBeNull] ExpressionSyntax expression, LexicalScope containingScope)
         {
             return expression == null ? default : base.VisitExpression(expression, containingScope);
+        }
+
+        public override Void VisitIdentifierName(
+            [NotNull] IdentifierNameSyntax identifierName,
+            [NotNull] LexicalScope containingScope)
+        {
+            // TODO if the name wasn't found, put in some default, unknown symbol
+            identifierName.ReferencedSymbol = containingScope.Lookup(identifierName.Name);
+            return default;
         }
 
         [NotNull]

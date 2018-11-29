@@ -8,14 +8,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 {
     internal class IntegerNumericSymbol : ISymbol
     {
-        [NotNull] private readonly SizedIntegerType numericType;
+        [NotNull] private readonly IntegerType numericType;
         [NotNull] private readonly PrimitiveMemberSymbol remainderMethod;
-        DataType ISymbol.Type => numericType;
+        public DataType Type { get; }
 
-        public IntegerNumericSymbol([NotNull] SizedIntegerType numericType)
+        public IntegerNumericSymbol([NotNull] IntegerType numericType)
         {
             this.numericType = numericType;
             remainderMethod = new PrimitiveMemberSymbol("remainder", new FunctionType(new[] { numericType }, numericType));
+            Type = new Metatype(this, numericType);
         }
 
         public Name FullName => numericType.Name;

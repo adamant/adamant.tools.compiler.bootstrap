@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
@@ -9,16 +10,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
     {
         [NotNull] private readonly IReadOnlyDictionary<TKey, TValue> items;
 
+        [DebuggerStepThrough]
         public FixedDictionary([NotNull] IDictionary<TKey, TValue> items)
         {
             this.items = new ReadOnlyDictionary<TKey, TValue>(new Dictionary<TKey, TValue>(items));
         }
 
+        [DebuggerStepThrough]
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
             return items.GetEnumerator();
         }
 
+        [DebuggerStepThrough]
         IEnumerator IEnumerable.GetEnumerator()
         {
             return ((IEnumerable)items).GetEnumerator();
@@ -26,11 +30,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
 
         public int Count => items.Count;
 
+        [DebuggerStepThrough]
         public bool ContainsKey(TKey key)
         {
             return items.ContainsKey(key);
         }
 
+        [DebuggerStepThrough]
         public bool TryGetValue(TKey key, out TValue value)
         {
             return items.TryGetValue(key, out value);
