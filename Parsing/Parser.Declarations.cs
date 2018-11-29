@@ -372,7 +372,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             // TODO include these in the syntax tree
             var binding = Tokens.Expect<IBindingToken>();
             var getterAccess = AcceptFieldGetter();
-            var name = Tokens.RequiredToken<IIdentifierToken>();
+            var identifier = Tokens.RequiredToken<IIdentifierToken>();
+            var name = nameContext.Qualify(identifier.Value);
             ExpressionSyntax typeExpression = null;
             if (Tokens.Accept<IColonToken>())
             {
@@ -385,7 +386,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 initializer = ParseExpression();
 
             Tokens.Expect<ISemicolonToken>();
-            return new FieldDeclarationSyntax(File, attributes, modifiers, getterAccess, name.Value, name.Span, typeExpression, initializer);
+            return new FieldDeclarationSyntax(File, attributes, modifiers, getterAccess, name, identifier.Span, typeExpression, initializer);
         }
 
         [MustUseReturnValue]
@@ -431,9 +432,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers)
         {
-            var operatorKeywordSpan = Tokens.Expect<IOperatorKeywordToken>();
+            var operatorKeyword = Tokens.Expect<IOperatorKeywordToken>();
             var genericParameters = AcceptGenericParameters();
             // TODO correctly store these in the syntax class
+            OverloadableOperator oper;
+            TextSpan endOperatorSpan;
             switch (Tokens.Current)
             {
                 case IHashToken _:
@@ -442,29 +445,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     {
                         case IOpenParenToken _:
                             Tokens.Next();
-                            Tokens.Expect<ICloseParenToken>();
+                            endOperatorSpan = Tokens.Expect<ICloseParenToken>();
+                            oper = OverloadableOperator.TupleInitializer;
                             break;
                         case IOpenBracketToken _:
                             Tokens.Next();
-                            Tokens.Expect<ICloseBracketToken>();
+                            endOperatorSpan = Tokens.Expect<ICloseBracketToken>();
+                            oper = OverloadableOperator.ListInitializer;
                             break;
                         case IOpenBraceToken _:
                             Tokens.Next();
-                            Tokens.Expect<ICloseBraceToken>();
+                            endOperatorSpan = Tokens.Expect<ICloseBraceToken>();
+                            oper = OverloadableOperator.SetInitializer;
                             break;
                         default:
                             throw NonExhaustiveMatchException.For(Tokens.Current);
                     }
                     break;
                 case IStringLiteralToken _:
-                    Tokens.Expect<IStringLiteralToken>();
+                    endOperatorSpan = Tokens.Expect<IStringLiteralToken>();
                     // TODO need to check it is empty string
+                    oper = OverloadableOperator.StringLiteral;
                     break;
                 // TODO case for user defined literals ''
                 default:
-                    Tokens.Expect<IOperatorToken>();
-                    break;
+                    Tokens.UnexpectedToken();
+                    throw new ParseFailedException();
             }
+
+            var nameSpan = TextSpan.Covering(operatorKeyword, endOperatorSpan);
+            var name = nameContext.Qualify(SimpleName.Special("operator_" + oper));
             var parameters = ParseParameters();
             ExpressionSyntax returnType = null;
             if (Tokens.Accept<IRightArrowToken>())
@@ -474,7 +484,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
             var body = ParseBlock();
-            return new OperatorDeclarationSyntax(File, modifiers, operatorKeywordSpan, genericParameters,
+            return new OperatorDeclarationSyntax(File, modifiers, name, nameSpan, genericParameters,
                  parameters, returnType, genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
 
@@ -719,7 +729,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             try
             {
                 Tokens.Expect<IConstKeywordToken>();
-                var name = Tokens.RequiredToken<IIdentifierToken>();
+                var identifier = Tokens.RequiredToken<IIdentifierToken>();
+                var name = nameContext.Qualify(identifier.Value);
                 ExpressionSyntax type = null;
                 if (Tokens.Accept<IColonToken>())
                 {
@@ -733,7 +744,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     initializer = ParseExpression();
 
                 Tokens.Expect<ISemicolonToken>();
-                return new ConstDeclarationSyntax(File, attributes, modifiers, name.Value, name.Span, type, initializer);
+                return new ConstDeclarationSyntax(File, attributes, modifiers, name, identifier.Span, type, initializer);
             }
             catch (ParseFailedException)
             {

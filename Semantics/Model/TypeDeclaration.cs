@@ -16,16 +16,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Model
         public TypeDeclaration(
             [NotNull] Name name,
             [NotNull] DataType type,
-            [CanBeNull, ItemNotNull] IEnumerable<GenericParameter> genericParameters)
-            : base(name, type)
+            [CanBeNull, ItemNotNull] IEnumerable<GenericParameter> genericParameters,
+            [NotNull] FixedDictionary<SimpleName, ISymbol> childSymbols)
+            : base(name, type, childSymbols)
         {
             GenericParameters = genericParameters?.ToFixedList();
-        }
-
-        [CanBeNull]
-        public override ISymbol Lookup([NotNull] SimpleName name)
-        {
-            throw new System.NotImplementedException();
         }
     }
 }

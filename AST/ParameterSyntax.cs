@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -15,16 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [NotNull] public TypePromise Type { get; } = new TypePromise();
 
         DataType ISymbol.Type => Type.Resolved();
-
-        public ISymbol ComposeWith(ISymbol symbol)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public ISymbol Lookup(SimpleName name)
-        {
-            throw new System.NotImplementedException();
-        }
+        FixedDictionary<SimpleName, ISymbol> ISymbol.ChildSymbols => FixedDictionary<SimpleName, ISymbol>.Empty;
 
         protected ParameterSyntax(TextSpan span, bool mutableBinding, [NotNull] Name fullName)
         {

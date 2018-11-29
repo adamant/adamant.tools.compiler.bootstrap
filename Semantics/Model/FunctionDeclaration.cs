@@ -20,17 +20,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Model
             [NotNull, ItemNotNull] FixedList<Parameter> parameters,
             [NotNull] DataType returnType,
             [CanBeNull] ControlFlowGraph controlFlow)
-            : base(name, type)
+            : base(name, type, FixedDictionary<SimpleName, ISymbol>.Empty)
         {
             Parameters = parameters;
             ReturnType = returnType;
             ControlFlow = controlFlow;
-        }
-
-        [CanBeNull]
-        public override ISymbol Lookup([NotNull] SimpleName name)
-        {
-            throw new System.NotImplementedException();
         }
     }
 }

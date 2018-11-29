@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -13,8 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Scopes
 
         protected LexicalScope([NotNull, ItemNotNull] IEnumerable<ISymbol> symbols)
         {
-            this.symbols = symbols.ToDictionary(s => s.FullName.UnqualifiedName, s => s)
-                .ToFixedDictionary();
+            this.symbols = symbols.ToFixedDictionary(s => s.FullName.UnqualifiedName);
         }
 
         [CanBeNull]

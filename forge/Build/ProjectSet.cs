@@ -68,8 +68,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             var taskFactory = new TaskFactory(taskScheduler);
             var projectBuilds = new Dictionary<Project, Task<Package>>();
 
-            var projectBuildsSource = new TaskCompletionSource<IReadOnlyDictionary<Project, Task<Package>>>();
-            var projectBuildsTask = projectBuildsSource.Task;
+            var projectBuildsSource = new TaskCompletionSource<FixedDictionary<Project, Task<Package>>>();
+            var projectBuildsTask = projectBuildsSource.Task.NotNull();
 
             // Sort projects to detect cycles and so we can assume the tasks already exist
             var sortedProjects = TopologicalSort();
@@ -83,16 +83,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
                 if (!projectBuilds.TryAdd(project, buildTask))
                     throw new Exception("Project added to build set twice");
             }
-            projectBuildsSource.SetResult(projectBuilds.AsReadOnly());
+            projectBuildsSource.SetResult(projectBuilds.ToFixedDictionary());
 
-            await Task.WhenAll(projectBuilds.Values);
+            await Task.WhenAll(projectBuilds.Values).NotNull();
         }
 
         [NotNull]
         private static async Task<Package> Build(
             [NotNull] AdamantCompiler compiler,
             [NotNull] Project project,
-            [NotNull] Task<IReadOnlyDictionary<Project, Task<Package>>> projectBuildsTask,
+            [NotNull] Task<FixedDictionary<Project, Task<Package>>> projectBuildsTask,
             [NotNull] object consoleLock)
         {
             var projectBuilds = await projectBuildsTask;

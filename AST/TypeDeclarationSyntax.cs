@@ -14,7 +14,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [CanBeNull] public FixedList<GenericParameterSyntax> GenericParameters { get; }
         [NotNull] public FixedList<IMemberDeclarationSyntax> Members { get; }
         [NotNull] public TypePromise<Metatype> Type { get; } = new TypePromise<Metatype>();
+
         DataType ISymbol.Type => Type.Fulfilled();
+        public FixedDictionary<SimpleName, ISymbol> ChildSymbols { get; }
 
         protected TypeDeclarationSyntax(
             [NotNull] CodeFile file,
@@ -27,18 +29,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             FullName = fullName;
             Members = members;
             GenericParameters = genericParameters;
+            ChildSymbols = members.ToFixedDictionary(m => m.FullName.UnqualifiedName, m => (ISymbol)m);
         }
 
         DeclarationSyntax IDeclarationSyntax.AsDeclarationSyntax => this;
-
-        ISymbol ISymbol.ComposeWith(ISymbol symbol)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        ISymbol ISymbol.Lookup(SimpleName name)
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }

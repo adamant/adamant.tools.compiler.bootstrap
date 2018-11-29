@@ -8,9 +8,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class DestructorDeclarationSyntax : FunctionDeclarationSyntax
     {
-        [NotNull] public Name FullName { get; }
-        [NotNull] public SimpleName Name => FullName.UnqualifiedName;
-
         public DestructorDeclarationSyntax(
             [NotNull] CodeFile file,
             [NotNull] FixedList<IModiferToken> modifiers,
@@ -22,10 +19,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             [NotNull] FixedList<ExpressionSyntax> requires,
             [NotNull] FixedList<ExpressionSyntax> ensures,
             [NotNull] BlockSyntax body)
-            : base(file, modifiers, nameSpan, null, parameters,
+            : base(file, modifiers, fullName, nameSpan, null, parameters,
                 FixedList<GenericConstraintSyntax>.Empty, mayEffects, noEffects, requires, ensures, body)
         {
-            FullName = fullName;
         }
 
         public override string ToString()

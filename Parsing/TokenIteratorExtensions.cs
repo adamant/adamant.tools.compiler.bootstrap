@@ -114,8 +114,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             // TODO shouldn't we ignore or combine unexpected token errors until we parse something successfully?
             var span = tokens.Current.Span;
-            tokens.Context.Diagnostics.Add(
-                ParseError.UnexpectedToken(tokens.Context.File, span));
+            tokens.Context.Diagnostics.Add(ParseError.UnexpectedToken(tokens.Context.File, span));
             tokens.Next();
             return span;
         }

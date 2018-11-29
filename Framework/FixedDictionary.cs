@@ -8,6 +8,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
     public class FixedDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue>
     {
+        [NotNull] public static readonly FixedDictionary<TKey, TValue> Empty = new FixedDictionary<TKey, TValue>(new Dictionary<TKey, TValue>());
+
         [NotNull] private readonly IReadOnlyDictionary<TKey, TValue> items;
 
         [DebuggerStepThrough]

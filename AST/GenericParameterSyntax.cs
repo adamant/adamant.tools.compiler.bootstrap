@@ -1,10 +1,12 @@
+using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class GenericParameterSyntax : Syntax
+    public class GenericParameterSyntax : Syntax, ISymbol
     {
         public bool IsLifetime { get; }
         public bool IsParams { get; }
@@ -12,6 +14,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [NotNull] public SimpleName Name => FullName.UnqualifiedName;
         [CanBeNull] public ExpressionSyntax TypeExpression { get; }
         [NotNull] public TypePromise Type { get; } = new TypePromise();
+        [NotNull] DataType ISymbol.Type => Type.Fulfilled();
+        [NotNull] FixedDictionary<SimpleName, ISymbol> ISymbol.ChildSymbols => FixedDictionary<SimpleName, ISymbol>.Empty;
 
         public GenericParameterSyntax(
             bool isLifetime,

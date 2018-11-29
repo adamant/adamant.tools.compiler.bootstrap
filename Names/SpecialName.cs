@@ -4,6 +4,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
 {
     public static class SpecialName
     {
+        // The name of the `UnknownSymbol`
+        [NotNull] public static readonly SimpleName Unknown = SimpleName.Special("unknown");
+
         [NotNull] public static readonly SimpleName Self = SimpleName.Special("self");
         [NotNull] public static readonly SimpleName Base = SimpleName.Special("base");
         [NotNull] public static readonly SimpleName Ref = SimpleName.Special("ref");

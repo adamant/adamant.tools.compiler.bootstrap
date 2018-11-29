@@ -1,4 +1,4 @@
-using System;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -10,22 +10,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
     {
         public Name FullName { get; }
         [NotNull] private readonly FunctionType type;
-        DataType ISymbol.Type => type;
+        [NotNull] DataType ISymbol.Type => type;
+        [NotNull] public FixedDictionary<SimpleName, ISymbol> ChildSymbols => FixedDictionary<SimpleName, ISymbol>.Empty;
 
         public PrimitiveMemberSymbol([NotNull] string name, [NotNull] FunctionType type)
         {
             FullName = new SimpleName(name);
             this.type = type;
-        }
-
-        public ISymbol ComposeWith(ISymbol symbol)
-        {
-            throw new NotSupportedException();
-        }
-
-        public ISymbol Lookup(SimpleName name)
-        {
-            return null;
         }
     }
 }

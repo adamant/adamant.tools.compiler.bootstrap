@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -14,6 +13,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
         [NotNull] public Name FullName { get; }
         [NotNull] [ItemNotNull] public FixedList<ISymbol> Symbols { get; }
         DataType ISymbol.Type => throw new NotImplementedException();
+
+        public FixedDictionary<SimpleName, ISymbol> ChildSymbols => throw new NotImplementedException();
 
         public CompositeSymbol([NotNull] ISymbol symbol1, [NotNull] ISymbol symbol2)
         {
@@ -34,17 +35,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
             Symbols = symbols.ToFixedList();
         }
 
-        [NotNull]
-        public ISymbol ComposeWith([NotNull] ISymbol symbol)
-        {
-            Requires.That(nameof(symbol), FullName.Equals(symbol.FullName));
-            return new CompositeSymbol(FullName, Symbols.Append(symbol).NotNull());
-        }
-
-        [CanBeNull]
-        public ISymbol Lookup([NotNull] SimpleName name)
-        {
-            throw new System.NotImplementedException();
-        }
+       
     }
 }

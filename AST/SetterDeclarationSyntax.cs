@@ -10,8 +10,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         [NotNull] public FixedList<AttributeSyntax> Attributes { get; }
         [NotNull] public Name PropertyName { get; }
-        [NotNull] public Name FullName { get; }
-        [NotNull] public SimpleName Name => FullName.UnqualifiedName;
 
         public SetterDeclarationSyntax(
             [NotNull] CodeFile file,
@@ -26,12 +24,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             [NotNull] FixedList<ExpressionSyntax> requires,
             [NotNull] FixedList<ExpressionSyntax> ensures,
             [CanBeNull] BlockSyntax body)
-            : base(file, modifiers, nameSpan, null, parameters,
+            : base(file, modifiers, fullName, nameSpan, null, parameters,
                 FixedList<GenericConstraintSyntax>.Empty, mayEffects, noEffects, requires, ensures, body)
         {
             Attributes = attributes;
             PropertyName = propertyName;
-            FullName = fullName;
         }
 
         public override string ToString()

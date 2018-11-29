@@ -79,12 +79,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
                 }
                 break;
                 case NamedFunctionDeclarationSyntax function:
-                {
                     BindNamesInFunctionParameters(containingScope, function);
                     VisitExpression(function.ReturnTypeExpression, containingScope);
                     BindNamesInFunctionBody(containingScope, function);
-                }
-                break;
+                    break;
+                case OperatorDeclarationSyntax operatorDeclaration:
+                    BindNamesInFunctionParameters(containingScope, operatorDeclaration);
+                    VisitExpression(operatorDeclaration.ReturnTypeExpression, containingScope);
+                    BindNamesInFunctionBody(containingScope, operatorDeclaration);
+                    break;
+                case ConstructorDeclarationSyntax constructor:
+                    BindNamesInFunctionParameters(containingScope, constructor);
+                    BindNamesInFunctionBody(containingScope, constructor);
+                    break;
+                case InitializerDeclarationSyntax initializer:
+                    BindNamesInFunctionParameters(containingScope, initializer);
+                    BindNamesInFunctionBody(containingScope, initializer);
+                    break;
                 case TypeDeclarationSyntax typeDeclaration:
                     // TODO name scope for type declaration
                     foreach (var nestedDeclaration in typeDeclaration.Members)

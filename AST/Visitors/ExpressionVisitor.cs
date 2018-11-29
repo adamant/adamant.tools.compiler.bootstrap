@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
     {
         public virtual R DefaultResult(A args) => default;
 
-        public virtual R CombineResults(A result, params R[] results) => default;
+        public virtual R CombineResults(A args, params R[] results) => default;
 
         public virtual R VisitStatement([CanBeNull] StatementSyntax statement, A args)
         {

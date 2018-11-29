@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     public static partial class TokenTypes
     {
         [NotNull]
-        public static readonly IReadOnlyDictionary<string, Func<TextSpan, IKeywordToken>> KeywordFactories;
+        public static readonly FixedDictionary<string, Func<TextSpan, IKeywordToken>> KeywordFactories;
 
         private static readonly int KeywordTokenLength = "KeywordToken".Length;
 
@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
 
         [NotNull]
-        private static IReadOnlyDictionary<string, Func<TextSpan, IKeywordToken>> BuildKeywordFactories()
+        private static FixedDictionary<string, Func<TextSpan, IKeywordToken>> BuildKeywordFactories()
         {
             var factories = new Dictionary<string, Func<TextSpan, IKeywordToken>>();
 
@@ -59,7 +59,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
                 var factory = CompileFactory<IKeywordToken>(tokenType);
                 factories.Add(keyword, factory);
             }
-            return factories.AsReadOnly();
+            return factories.ToFixedDictionary();
         }
 
         private static Func<TextSpan, T> CompileFactory<T>([NotNull] Type tokenType)

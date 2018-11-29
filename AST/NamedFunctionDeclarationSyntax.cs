@@ -10,19 +10,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class NamedFunctionDeclarationSyntax : FunctionDeclarationSyntax, INamespacedDeclarationSyntax
     {
-        [NotNull] public Name FullName { get; }
-        [NotNull] public SimpleName Name => FullName.UnqualifiedName;
-
-        ISymbol ISymbol.ComposeWith(ISymbol symbol)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        ISymbol ISymbol.Lookup(SimpleName name)
-        {
-            throw new System.NotImplementedException();
-        }
-
         [CanBeNull] public ExpressionSyntax ReturnTypeExpression { get; }
         DataType ISymbol.Type => Type.Fulfilled();
 
@@ -40,10 +27,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             [NotNull] FixedList<ExpressionSyntax> requires,
             [NotNull] FixedList<ExpressionSyntax> ensures,
             [CanBeNull] BlockSyntax body)
-            : base(file, modifiers, nameSpan, genericParameters, parameters,
+            : base(file, modifiers, fullName, nameSpan, genericParameters, parameters,
                 genericConstraints, mayEffects, noEffects, requires, ensures, body)
         {
-            FullName = fullName;
             ReturnTypeExpression = returnTypeExpression;
         }
 
