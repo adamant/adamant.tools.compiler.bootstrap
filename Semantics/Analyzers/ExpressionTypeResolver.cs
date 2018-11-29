@@ -190,15 +190,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     return InferBinaryExpressionType(binaryOperatorExpression);
                 case IdentifierNameSyntax identifierName:
                 {
-                    var type = identifierName.ReferencedSymbol != null ? identifierName.ReferencedSymbol.Type : DataType.Unknown;
+                    var type = identifierName.ReferencedSymbol.NotNull().Type;
                     return identifierName.Type.Fulfill(type);
                 }
                 case UnaryExpressionSyntax unaryOperatorExpression:
                     return InferUnaryExpressionType(unaryOperatorExpression);
                 case LifetimeTypeSyntax lifetimeType:
-                    InferExpressionType(lifetimeType.TypeExpression);
-                    if (lifetimeType.TypeExpression.Type.Fulfilled() != DataType.Type)
-                        diagnostics.Add(TypeError.MustBeATypeExpression(file, lifetimeType.TypeExpression.Span));
+                    InferExpressionType(lifetimeType.ReferentTypeExpression);
+                    if (lifetimeType.ReferentTypeExpression.Type.Fulfilled() != DataType.Type)
+                        diagnostics.Add(TypeError.MustBeATypeExpression(file, lifetimeType.ReferentTypeExpression.Span));
                     return expression.Type.Fulfill(DataType.Type);
                 case BlockSyntax blockExpression:
                     foreach (var statement in blockExpression.Statements)
@@ -339,7 +339,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     var left = InferExpressionType(assignmentExpression.LeftOperand);
                     InferExpressionType(assignmentExpression.RightOperand);
                     assignmentExpression.RightOperand = ImplicitConversion(assignmentExpression.RightOperand, left);
-                    throw new NotImplementedException("Check compability of types");
+                    // TODO Check compability of types
+                    //throw new NotImplementedException("Check compability of types");
+                    return DataType.Void;
                 case SelfExpressionSyntax _:
                     return declaringType?.Instance ?? DataType.Unknown;
                 default:
@@ -673,7 +675,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 }
                 case LifetimeTypeSyntax lifetimeType:
                 {
-                    var type = EvaluateExpression(lifetimeType.TypeExpression);
+                    var type = EvaluateExpression(lifetimeType.ReferentTypeExpression);
                     if (type == DataType.Unknown) return DataType.Unknown;
                     var lifetimeToken = lifetimeType.Lifetime;
                     Lifetime lifetime;

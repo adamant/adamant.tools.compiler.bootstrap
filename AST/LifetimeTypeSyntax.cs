@@ -6,24 +6,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class LifetimeTypeSyntax : TypeSyntax
     {
-        [NotNull] public ExpressionSyntax TypeExpression { get; }
+        [NotNull] public ExpressionSyntax ReferentTypeExpression { get; }
         [NotNull] public LifetimeOperator Operator { get; }
         [NotNull] public ILifetimeNameToken Lifetime { get; }
 
         public LifetimeTypeSyntax(
-            [NotNull] ExpressionSyntax typeExpression,
+            [NotNull] ExpressionSyntax referentTypeExpression,
             LifetimeOperator lifetimeOperator,
             [NotNull] ILifetimeNameToken lifetime)
-            : base(TextSpan.Covering(typeExpression.Span, lifetime.Span))
+            : base(TextSpan.Covering(referentTypeExpression.Span, lifetime.Span))
         {
-            TypeExpression = typeExpression;
+            ReferentTypeExpression = referentTypeExpression;
             Operator = lifetimeOperator;
             Lifetime = lifetime;
         }
 
         public override string ToString()
         {
-            return $"{TypeExpression}{Operator}{Lifetime}";
+            return $"{ReferentTypeExpression}{Operator}{Lifetime}";
         }
     }
 }

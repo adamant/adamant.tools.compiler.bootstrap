@@ -170,8 +170,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
             [NotNull] IdentifierNameSyntax identifierName,
             [NotNull] LexicalScope containingScope)
         {
-            // TODO if the name wasn't found, put in some default, unknown symbol
-            identifierName.ReferencedSymbol = containingScope.Lookup(identifierName.Name);
+            identifierName.ReferencedSymbol = containingScope.Lookup(identifierName.Name) ?? UnknownSymbol.Instance;
             return default;
         }
 

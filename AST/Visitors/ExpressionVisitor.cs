@@ -114,7 +114,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 
         public virtual R VisitLifetimeType([NotNull] LifetimeTypeSyntax lifetimeType, A args)
         {
-            return VisitExpression(lifetimeType.TypeExpression, args);
+            return VisitExpression(lifetimeType.ReferentTypeExpression, args);
         }
 
         public virtual R VisitBlock([NotNull] BlockSyntax block, A args)
