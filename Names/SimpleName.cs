@@ -49,6 +49,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
             return false;
         }
 
+        public SimpleName WithoutNumber()
+        {
+            if (Number == null) return this;
+            return new SimpleName(Text, IsSpecial, null);
+        }
+
         public override string ToString()
         {
             var escapedName = Text.Escape();

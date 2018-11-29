@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Scopes
 
         protected LexicalScope([NotNull, ItemNotNull] IEnumerable<ISymbol> symbols)
         {
-            this.symbols = symbols.ToFixedDictionary(s => s.FullName.UnqualifiedName);
+            this.symbols = symbols.ToFixedDictionary(s => s.FullName.UnqualifiedName.WithoutNumber());
         }
 
         [CanBeNull]

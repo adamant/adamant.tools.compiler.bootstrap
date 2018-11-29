@@ -18,7 +18,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public override string ToString()
         {
-            throw new System.NotImplementedException();
+            var value = "self";
+            if (MutableSelf) value = "mut " + value;
+            if (RefSelf) value = "ref " + value;
+            return value;
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [NotNull] public SimpleName Name => FullName.UnqualifiedName;
         [NotNull] public TypePromise Type { get; } = new TypePromise();
 
-        DataType ISymbol.Type => Type.Resolved();
+        DataType ISymbol.Type => Type.Fulfilled();
         FixedDictionary<SimpleName, ISymbol> ISymbol.ChildSymbols => FixedDictionary<SimpleName, ISymbol>.Empty;
 
         protected ParameterSyntax(TextSpan span, bool mutableBinding, [NotNull] Name fullName)

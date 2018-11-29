@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [CanBeNull] public ExpressionSyntax Initializer { get; set; }
         [NotNull] public TypePromise Type { get; } = new TypePromise();
 
-        DataType ISymbol.Type => Type.Resolved();
+        DataType ISymbol.Type => Type.Fulfilled();
         FixedDictionary<SimpleName, ISymbol> ISymbol.ChildSymbols => FixedDictionary<SimpleName, ISymbol>.Empty;
 
         public VariableDeclarationStatementSyntax(

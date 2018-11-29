@@ -6,6 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Primitives;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
@@ -364,9 +365,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case ObjectType objectType:
                     symbol = objectType.Symbol;
                     break;
-                //    case PrimitiveFixedIntegerType fixedInteger:
-                //        symbol = memberAccess.Expression.Context.Scope.LookupGlobal(fixedInteger.Name);
-                //        break;
+                case SizedIntegerType integerType:
+                    // TODO this seems a very strange way to handle this. Shouldn't the symbol be on the type?
+                    symbol = PrimitiveSymbols.Instance.Single(p => p.FullName == integerType.Name).NotNull();
+                    break;
                 default:
                     throw NonExhaustiveMatchException.For(left);
             }
