@@ -19,9 +19,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             // TODO make a symbol for `Type`
             return new List<ISymbol>
             {
-                new IntegerNumericSymbol(SizedIntegerType.Byte),
-                new IntegerNumericSymbol(SizedIntegerType.Int),
-                new IntegerNumericSymbol(SizedIntegerType.UInt)
+                new IntegerNumericSymbol(DataType.Byte),
+                new IntegerNumericSymbol(DataType.Int),
+                new IntegerNumericSymbol(DataType.UInt)
             }.ToFixedList();
         }
     }

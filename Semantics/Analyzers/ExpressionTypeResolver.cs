@@ -133,7 +133,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         private void CheckExpressionTypeIsBool([NotNull] ExpressionSyntax expression)
         {
             InferExpressionType(expression);
-            if (expression.Type.Fulfilled() != ObjectType.Bool)
+            if (expression.Type.Fulfilled() != DataType.Bool)
                 diagnostics.Add(TypeError.MustBeABoolExpression(file, expression.Span));
         }
 
@@ -175,7 +175,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     {
                         // TODO a void or never function shouldn't have this
                     }
-                    return expression.Type.Fulfill(ObjectType.Never);
+                    return expression.Type.Fulfill(DataType.Never);
                 case LiteralExpressionSyntax literalExpression:
                     switch (literalExpression.Literal)
                     {
@@ -184,7 +184,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                         case IStringLiteralToken _:
                             throw new NotImplementedException();
                         case IBooleanLiteralToken _:
-                            return expression.Type.Fulfill(ObjectType.Bool);
+                            return expression.Type.Fulfill(DataType.Bool);
                         default:
                             throw NonExhaustiveMatchException.For(literalExpression.Literal);
                     }
@@ -199,14 +199,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     return InferUnaryExpressionType(unaryOperatorExpression);
                 case LifetimeTypeSyntax lifetimeType:
                     InferExpressionType(lifetimeType.TypeExpression);
-                    if (lifetimeType.TypeExpression.Type.Fulfilled() != ObjectType.Type)
+                    if (lifetimeType.TypeExpression.Type.Fulfilled() != DataType.Type)
                         diagnostics.Add(TypeError.MustBeATypeExpression(file, lifetimeType.TypeExpression.Span));
-                    return expression.Type.Fulfill(ObjectType.Type);
+                    return expression.Type.Fulfill(DataType.Type);
                 case BlockSyntax blockExpression:
                     foreach (var statement in blockExpression.Statements)
                         InferStatementType(statement);
 
-                    return expression.Type.Fulfill(ObjectType.Void);// TODO assign the correct type to the block
+                    return expression.Type.Fulfill(DataType.Void);// TODO assign the correct type to the block
                 case NewObjectExpressionSyntax newObjectExpression:
                     foreach (var argument in newObjectExpression.Arguments)
                         CheckArgument(argument);
@@ -314,7 +314,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 }
                 case RefTypeSyntax refType:
                     CheckAndEvaluateTypeExpression(refType.ReferencedType);
-                    return refType.Type.Fulfill(ObjectType.Type);
+                    return refType.Type.Fulfill(DataType.Type);
                 case UnsafeExpressionSyntax unsafeExpression:
                     InferExpressionType(unsafeExpression.Expression);
                     return unsafeExpression.Type.Fulfill(unsafeExpression.Expression.Type.Fulfilled());
@@ -328,7 +328,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     return ifExpression.Type.Fulfill(DataType.Unknown);
                 case ResultExpressionSyntax resultExpression:
                     InferExpressionType(resultExpression.Expression);
-                    return resultExpression.Type.Fulfill(ObjectType.Never);
+                    return resultExpression.Type.Fulfill(DataType.Never);
                 //                case UninitializedExpressionSyntax uninitializedExpression:
                 //                    // TODO assign a type to the expression
                 //                    return uninitializedExpression.Type.Computed(DataType.Unknown);
@@ -336,7 +336,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     return InferMemberAccessType(memberAccess);
                 case BreakExpressionSyntax breakExpression:
                     InferExpressionType(breakExpression.Value);
-                    return breakExpression.Type.Fulfill(ObjectType.Never);
+                    return breakExpression.Type.Fulfill(DataType.Never);
                 case AssignmentExpressionSyntax assignmentExpression:
                     var left = InferExpressionType(assignmentExpression.LeftOperand);
                     InferExpressionType(assignmentExpression.RightOperand);
@@ -458,7 +458,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     case BinaryOperator.GreaterThanOrEqual:
                     case BinaryOperator.And:
                     case BinaryOperator.Or:
-                        return binaryExpression.Type.Fulfill(ObjectType.Bool);
+                        return binaryExpression.Type.Fulfill(DataType.Bool);
                     default:
                         return binaryExpression.Type.Fulfill(DataType.Unknown);
                 }
@@ -495,7 +495,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case BinaryOperator.GreaterThan:
                 case BinaryOperator.GreaterThanOrEqual:
                     typeError = leftOperandCore != rightOperandCore;
-                    binaryExpression.Type.Fulfill(ObjectType.Bool);
+                    binaryExpression.Type.Fulfill(DataType.Bool);
                     break;
                 //case IEqualsToken _:
                 //    typeError = leftOperandCore != rightOperandCore;
@@ -504,9 +504,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 //    break;
                 case BinaryOperator.And:
                 case BinaryOperator.Or:
-                    typeError = leftOperand != ObjectType.Bool || rightOperand != ObjectType.Bool;
+                    typeError = leftOperand != DataType.Bool || rightOperand != DataType.Bool;
 
-                    binaryExpression.Type.Fulfill(ObjectType.Bool);
+                    binaryExpression.Type.Fulfill(DataType.Bool);
                     break;
                 //case IDollarToken _:
                 //case IDollarLessThanToken _:
@@ -547,8 +547,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     // TODO it may need to be size
                     //ImposeIntegerConstantType(UnsizedIntegerType.Offset, rightOperand);
                     throw new NotImplementedException();
-                    return rightType != UnsizedIntegerType.Size &&
-                           rightType != UnsizedIntegerType.Offset;
+                    return rightType != DataType.Size &&
+                           rightType != DataType.Offset;
                 }
                 case IntegerConstantType _:
                     // TODO may need to promote based on size
@@ -592,13 +592,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             switch (@operator)
             {
                 case UnaryOperator.Not:
-                    typeError = operand != ObjectType.Bool;
-                    unaryExpression.Type.Fulfill(ObjectType.Bool);
+                    typeError = operand != DataType.Bool;
+                    unaryExpression.Type.Fulfill(DataType.Bool);
                     break;
                 case UnaryOperator.At:
                     typeError = false; // TODO check that the expression can have a pointer taken
                     if (operand is Metatype)
-                        unaryExpression.Type.Fulfill(ObjectType.Type); // constructing a type
+                        unaryExpression.Type.Fulfill(DataType.Type); // constructing a type
                     else
                         unaryExpression.Type.Fulfill(new PointerType(operand)); // taking the address of something
                     break;
@@ -643,7 +643,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
             var type = InferExpressionType(typeExpression);
             if (!(type is Metatype)
-                && type != ObjectType.Type)
+                && type != DataType.Type)
             {
                 diagnostics.Add(TypeError.MustBeATypeExpression(file, typeExpression.Span));
                 return DataType.Unknown;
@@ -665,10 +665,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     {
                         case Metatype metatype:
                             return metatype.Instance;
-                        case ObjectType t
-                            when t == ObjectType.Type: // It is a variable holding a type?
-                                                       // for now, return a placeholder type
-                            return ObjectType.Any;
+                        case TypeType _:
+                            // It is a variable holding a type?
+                            // for now, return a placeholder type
+                            return DataType.Any;
                         case UnknownType _:
                             return DataType.Unknown;
                         default:
@@ -746,13 +746,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             switch (primitive.Keyword)
             {
                 case IIntKeywordToken _:
-                    return SizedIntegerType.Int;
+                    return DataType.Int;
                 case IUIntKeywordToken _:
-                    return SizedIntegerType.UInt;
+                    return DataType.UInt;
                 case IByteKeywordToken _:
-                    return SizedIntegerType.Byte;
+                    return DataType.Byte;
                 case ISizeKeywordToken _:
-                    return UnsizedIntegerType.Size;
+                    return DataType.Size;
                 case IVoidKeywordToken _:
                     return DataType.Void;
                 case IBoolKeywordToken _:
@@ -760,9 +760,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case INeverKeywordToken _:
                     return DataType.Never;
                 case ITypeKeywordToken _:
-                    return ObjectType.Type;
+                    return DataType.Type;
                 case IAnyKeywordToken _:
-                    return ObjectType.Any;
+                    return DataType.Any;
                 default:
                     throw NonExhaustiveMatchException.For(primitive.Keyword);
             }

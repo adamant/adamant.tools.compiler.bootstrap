@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
     /// However, generic functions also have meta-function types. For example,
     /// the `size_of` function which has the type `[type] -> size`.
     /// </summary>
-    public class MetaFunctionType : DataType
+    public class MetaFunctionType : ReferenceType
     {
         [NotNull, ItemNotNull] public IReadOnlyList<DataType> ParameterTypes { get; }
         public int Arity => ParameterTypes.Count;

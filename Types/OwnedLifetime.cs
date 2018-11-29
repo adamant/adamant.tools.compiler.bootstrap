@@ -4,6 +4,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
     public class OwnedLifetime : Lifetime
     {
+        // TODO expose this as a property on lifetime instead `Lifetime.Owned`
         #region Singleton
         [NotNull]
         public static readonly OwnedLifetime Instance = new OwnedLifetime();

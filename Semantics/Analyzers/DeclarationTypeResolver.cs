@@ -93,7 +93,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             {
                 parameter.Type.BeginFulfilling();
                 var type = parameter.TypeExpression == null ?
-                    ObjectType.Type
+                    DataType.Type
                     : expressionResolver.CheckAndEvaluateTypeExpression(parameter.TypeExpression);
                 parameter.Type.Fulfill(type);
             }

@@ -7,11 +7,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
     /// As in Swift, the metatype is the type of a type. That is the type of the
     /// metaobject which has the class or associated functions on it. The metatype
     /// of a class can be accessed using `Class_Name.Type`. Metatypes are subtypes
-    /// of `Metatype` which is a subtype of `Type`.
+    /// of `Type`.
     ///
     /// This can be very confusing. Think of types as values. Then `Class_Name`
     /// refers to an object whose type is `Class_Name.type`. Note that for any
-    /// any type `T`, `T.Type.Type == Metatype`.
+    /// any type `T`, `T.Type.Type == Type`.
     ///
     /// see https://docs.swift.org/swift-book/ReferenceManual/Types.html#grammar_metatype-type
     /// </summary>
@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         [NotNull]
         public override string ToString()
         {
-            throw new System.NotImplementedException();
+            return $"({Instance}).Type";
         }
     }
 }

@@ -5,14 +5,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
     public class SizedIntegerType : IntegerType
     {
-        [NotNull] public static readonly SizedIntegerType Int8 = new SizedIntegerType("int8", -8);
-        [NotNull] public static readonly SizedIntegerType Byte = new SizedIntegerType("byte", 8);
-        [NotNull] public static readonly SizedIntegerType Int16 = new SizedIntegerType("int16", -16);
-        [NotNull] public static readonly SizedIntegerType UInt16 = new SizedIntegerType("uint16", 16);
-        [NotNull] public static readonly SizedIntegerType Int = new SizedIntegerType("int", -32);
-        [NotNull] public static readonly SizedIntegerType UInt = new SizedIntegerType("uint", 32);
-        [NotNull] public static readonly SizedIntegerType Int64 = new SizedIntegerType("int64", -64);
-        [NotNull] public static readonly SizedIntegerType UInt64 = new SizedIntegerType("uint64", 64);
+        [NotNull] internal static readonly SizedIntegerType Int8 = new SizedIntegerType("int8", -8);
+        [NotNull] internal static readonly SizedIntegerType Byte = new SizedIntegerType("byte", 8);
+        [NotNull] internal static readonly SizedIntegerType Int16 = new SizedIntegerType("int16", -16);
+        [NotNull] internal static readonly SizedIntegerType UInt16 = new SizedIntegerType("uint16", 16);
+        [NotNull] internal static readonly SizedIntegerType Int = new SizedIntegerType("int", -32);
+        [NotNull] internal static readonly SizedIntegerType UInt = new SizedIntegerType("uint", 32);
+        [NotNull] internal static readonly SizedIntegerType Int64 = new SizedIntegerType("int64", -64);
+        [NotNull] internal static readonly SizedIntegerType UInt64 = new SizedIntegerType("uint64", 64);
 
         public readonly bool IsSigned;
         public readonly int Bits;

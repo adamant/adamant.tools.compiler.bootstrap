@@ -12,17 +12,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
     // but no generic arguments is an *unbound type*. One with generic arguments supplied
     // for all parameters is *a constructed type*. One with some but not all
     // arguments supplied is *partially constructed type*.
-    public class ObjectType : GenericType
+    public class ObjectType : ReferenceType
     {
-        [NotNull] public static readonly ObjectType Type = new ObjectType(SimpleName.Special("type"), false, false);
-        [NotNull] public static readonly ObjectType Any = new ObjectType(SimpleName.Special("Any"), true, false);
-
         [NotNull] public Name Name { get; }
         public bool IsReferenceType { get; }
         public bool DeclaredMutable { get; }
-        [CanBeNull, ItemNotNull] public override FixedList<DataType> GenericParameterTypes { get; }
+
+        [CanBeNull, ItemNotNull] public FixedList<DataType> GenericParameterTypes { get; }
         public bool IsGeneric => GenericParameterTypes != null;
-        [CanBeNull, ItemCanBeNull] public override FixedList<DataType> GenericArguments { get; }
+        public int? GenericArity => GenericParameterTypes?.Count;
+        [CanBeNull, ItemCanBeNull] public FixedList<DataType> GenericArguments { get; }
+
         public bool IsMutable { get; }
         // TODO deal with the generic parameters and arguments
         public override bool IsResolved => true;

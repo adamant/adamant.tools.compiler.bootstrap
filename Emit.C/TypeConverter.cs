@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     return Convert(lifetimeType.Referent);
                 case PointerType ptr:
                     var referenced = ptr.Referent.AssertResolved();
-                    if (referenced == ObjectType.Any)
+                    if (referenced == DataType.Any)
                         return "void*";
 
                     return Convert(referenced) + "*";
