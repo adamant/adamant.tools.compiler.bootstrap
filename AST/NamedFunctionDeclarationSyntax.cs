@@ -49,7 +49,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public override string ToString()
         {
-            throw new System.NotImplementedException();
+            var generics = GenericParameters != null
+                ? $"[{string.Join(", ", GenericParameters)}]"
+                : "";
+            return $"fn {FullName}{generics}({string.Join(", ", Parameters)}) -> {ReturnTypeExpression} {{ … }}";
         }
     }
 }

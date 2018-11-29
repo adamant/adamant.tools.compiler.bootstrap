@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public override string ToString()
         {
             if (Statements.Any())
-                return $"{{ {Statements.Count} Statements}} : {Type}";
+                return $"{{ {Statements.Count} Statements }} : {Type}";
 
             return $"{{ }} : {Type}";
         }

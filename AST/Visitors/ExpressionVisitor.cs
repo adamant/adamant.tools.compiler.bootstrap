@@ -46,8 +46,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                     return VisitIdentifierName(identifierName, args);
                 case UnaryExpressionSyntax unaryExpression:
                     return VisitUnaryExpression(unaryExpression, args);
-                case PrimitiveTypeSyntax primitiveType:
-                    return VisitPrimitiveType(primitiveType, args);
                 case AssignmentExpressionSyntax assignmentExpression:
                     return VisitAssignmentExpression(assignmentExpression, args);
                 case BlockSyntax block:
@@ -129,11 +127,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             var r1 = VisitExpression(assignmentExpression.LeftOperand, args);
             var r2 = VisitExpression(assignmentExpression.RightOperand, args);
             return CombineResults(args, r1, r2);
-        }
-
-        public virtual R VisitPrimitiveType(PrimitiveTypeSyntax primitiveType, A args)
-        {
-            return DefaultResult(args);
         }
 
         public virtual R VisitUnaryExpression([NotNull] UnaryExpressionSyntax unaryExpression, A args)

@@ -396,25 +396,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var literal = Tokens.RequiredToken<ILiteralToken>();
                     return new LiteralExpressionSyntax(literal);
                 }
-                case IVoidKeywordToken _:
-                case IIntKeywordToken _:
-                case IUIntKeywordToken _:
-                case IBoolKeywordToken _:
-                case IByteKeywordToken _:
-                case INeverKeywordToken _:
-                case ISizeKeywordToken _:
-                case ITypeKeywordToken _:
-                case IAnyKeywordToken _:
+                case IPrimitiveTypeToken _:
                 {
-                    var keyword = Tokens.RequiredToken<IPrimitiveTypeToken>();
-                    return new PrimitiveTypeSyntax(keyword);
+                    return ParsePrimitiveType();
                 }
                 case IIdentifierToken _:
                 {
                     var identifier = Tokens.RequiredToken<IIdentifierToken>();
-                    var name = new IdentifierNameSyntax(identifier.Span, identifier.Value);
-                    if (!Tokens.Accept<IDollarToken>()) return name;
-                    return ParseRestOfLifetimeType(name, LifetimeOperator.Equal) ?? name;
+                    var name = new SimpleName(identifier.Value);
+                    var syntax = new IdentifierNameSyntax(identifier.Span, name);
+                    if (!Tokens.Accept<IDollarToken>()) return syntax;
+                    return ParseRestOfLifetimeType(syntax, LifetimeOperator.Equal) ?? syntax;
                 }
                 case IForeachKeywordToken _:
                     return ParseForeach();
@@ -498,11 +490,75 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 {
                     // If it is one of these, we assume there is a missing identifier
                     var identifierSpan = Tokens.Expect<IIdentifierToken>();
-                    return new IdentifierNameSyntax(identifierSpan, "_");
+                    return new IdentifierNameSyntax(identifierSpan, SpecialName.Underscore);
                 }
                 default:
                     throw NonExhaustiveMatchException.For(Tokens.Current);
             }
+        }
+
+        [NotNull]
+        private ExpressionSyntax ParsePrimitiveType()
+        {
+            var keyword = Tokens.RequiredToken<IPrimitiveTypeToken>();
+            SimpleName name;
+            switch (keyword)
+            {
+                case IVoidKeywordToken _:
+                    name = SpecialName.Void;
+                    break;
+                case INeverKeywordToken _:
+                    name = SpecialName.Never;
+                    break;
+                case IBoolKeywordToken _:
+                    name = SpecialName.Bool;
+                    break;
+                case IAnyKeywordToken _:
+                    name = SpecialName.Any;
+                    break;
+                case ITypeKeywordToken _:
+                    name = SpecialName.Type;
+                    break;
+                case IInt8KeywordToken _:
+                    name = SpecialName.Int8;
+                    break;
+                case IByteKeywordToken _:
+                    name = SpecialName.Byte;
+                    break;
+                case IInt16KeywordToken _:
+                    name = SpecialName.Int16;
+                    break;
+                case IUInt16KeywordToken _:
+                    name = SpecialName.UInt16;
+                    break;
+                case IIntKeywordToken _:
+                    name = SpecialName.Int;
+                    break;
+                case IUIntKeywordToken _:
+                    name = SpecialName.UInt;
+                    break;
+                case IInt64KeywordToken _:
+                    name = SpecialName.Int64;
+                    break;
+                case IUInt64KeywordToken _:
+                    name = SpecialName.UInt64;
+                    break;
+                case ISizeKeywordToken _:
+                    name = SpecialName.Size;
+                    break;
+                case IOffsetKeywordToken _:
+                    name = SpecialName.Offset;
+                    break;
+                case IFloat32KeywordToken _:
+                    name = SpecialName.Float32;
+                    break;
+                case IFloatKeywordToken _:
+                    name = SpecialName.Float;
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.For(keyword);
+            }
+            return new IdentifierNameSyntax(keyword.Span, name);
         }
 
         [NotNull]

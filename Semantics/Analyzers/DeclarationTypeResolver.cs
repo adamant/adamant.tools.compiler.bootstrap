@@ -200,31 +200,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     var classType = new ObjectType(declaration.Name, true,
                         classDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
                         genericParameterTypes);
-                    declaration.Type.Fulfill(new Metatype(classType));
+                    declaration.Type.Fulfill(new Metatype(classDeclaration, classType));
                     break;
                 case StructDeclarationSyntax structDeclaration:
                     var structType = new ObjectType(declaration.Name, false,
                         structDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
                         genericParameterTypes);
-                    declaration.Type.Fulfill(new Metatype(structType));
+                    declaration.Type.Fulfill(new Metatype(structDeclaration, structType));
                     break;
                 case EnumStructDeclarationSyntax enumStructDeclaration:
                     var enumStructType = new ObjectType(declaration.Name, false,
                         enumStructDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
                         genericParameterTypes);
-                    declaration.Type.Fulfill(new Metatype(enumStructType));
+                    declaration.Type.Fulfill(new Metatype(enumStructDeclaration, enumStructType));
                     break;
                 case EnumClassDeclarationSyntax enumStructDeclaration:
                     var enumClassType = new ObjectType(declaration.Name, true,
                         enumStructDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
                         genericParameterTypes);
-                    declaration.Type.Fulfill(new Metatype(enumClassType));
+                    declaration.Type.Fulfill(new Metatype(enumStructDeclaration, enumClassType));
                     break;
                 case TraitDeclarationSyntax declarationSyntax:
                     var type = new ObjectType(declaration.Name, true,
                         declarationSyntax.Modifiers.Any(m => m is IMutableKeywordToken),
                         genericParameterTypes);
-                    declaration.Type.Fulfill(new Metatype(type));
+                    declaration.Type.Fulfill(new Metatype(declarationSyntax, type));
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(declaration);

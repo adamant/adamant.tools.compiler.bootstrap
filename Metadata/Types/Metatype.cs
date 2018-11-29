@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
@@ -17,15 +18,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// </summary>
     public class Metatype : ReferenceType
     {
+        [NotNull] public ISymbol Symbol { get; }
         // The type this is a metatype for. Named instance because it represents
         // the single object instance that is of this metatype.
         [NotNull] public DataType Instance { get; }
         public override bool IsResolved => Instance.IsResolved;
 
-        public Metatype([NotNull] DataType instanceType)
+        public Metatype([NotNull] ISymbol symbol, [NotNull] DataType instanceType)
         {
-            Requires.NotNull(nameof(instanceType), instanceType);
-            Instance = instanceType;
+            Instance = instanceType.NotNull();
+            Symbol = symbol.NotNull();
         }
 
         [NotNull]

@@ -157,8 +157,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             expression.Type.BeginFulfilling();
             switch (expression)
             {
-                case PrimitiveTypeSyntax primitive:
-                    return expression.Type.Fulfill(new Metatype(GetPrimitiveType(primitive)));
                 case ReturnExpressionSyntax returnExpression:
                     if (returnExpression.ReturnValue != null)
                     {
@@ -675,8 +673,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                             throw NonExhaustiveMatchException.For(identifierType);
                     }
                 }
-                case PrimitiveTypeSyntax primitive:
-                    return GetPrimitiveType(primitive);
                 case LifetimeTypeSyntax lifetimeType:
                 {
                     var type = EvaluateExpression(lifetimeType.TypeExpression);
@@ -737,34 +733,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     return EvaluateExpression(mutableType.ReferencedTypeExpression); // TODO make the type mutable
                 default:
                     throw NonExhaustiveMatchException.For(typeExpression);
-            }
-        }
-
-        [NotNull]
-        private static DataType GetPrimitiveType([NotNull] PrimitiveTypeSyntax primitive)
-        {
-            switch (primitive.Keyword)
-            {
-                case IIntKeywordToken _:
-                    return DataType.Int;
-                case IUIntKeywordToken _:
-                    return DataType.UInt;
-                case IByteKeywordToken _:
-                    return DataType.Byte;
-                case ISizeKeywordToken _:
-                    return DataType.Size;
-                case IVoidKeywordToken _:
-                    return DataType.Void;
-                case IBoolKeywordToken _:
-                    return DataType.Bool;
-                case INeverKeywordToken _:
-                    return DataType.Never;
-                case ITypeKeywordToken _:
-                    return DataType.Type;
-                case IAnyKeywordToken _:
-                    return DataType.Any;
-                default:
-                    throw NonExhaustiveMatchException.For(primitive.Keyword);
             }
         }
     }

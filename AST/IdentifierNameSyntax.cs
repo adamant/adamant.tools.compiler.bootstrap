@@ -6,8 +6,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class IdentifierNameSyntax : SimpleNameSyntax
     {
-        public IdentifierNameSyntax(TextSpan span, [NotNull] string name)
-            : base(new SimpleName(name), span)
+        public IdentifierNameSyntax(TextSpan span, [NotNull] SimpleName name)
+            : base(name, span)
         {
         }
 
