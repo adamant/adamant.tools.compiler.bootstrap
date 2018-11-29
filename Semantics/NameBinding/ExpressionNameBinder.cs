@@ -51,10 +51,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
             [NotNull] IdentifierNameSyntax identifierName,
             [NotNull] LexicalScope containingScope)
         {
-            var symbol = containingScope.Lookup(identifierName.Name);
-            if (symbol == null)
+            var symbols = containingScope.Lookup(identifierName.Name);
+            if (!symbols.Any())
                 diagnostics.Add(NameBindingError.CouldNotBindName(file, identifierName.Span));
-            identifierName.ReferencedSymbol = symbol ?? UnknownSymbol.Instance;
+            identifierName.ReferencedSymbols = symbols;
             return default;
         }
     }

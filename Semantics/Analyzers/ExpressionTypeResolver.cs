@@ -191,7 +191,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     return InferBinaryExpressionType(binaryOperatorExpression);
                 case IdentifierNameSyntax identifierName:
                 {
-                    var type = identifierName.ReferencedSymbol.NotNull().Type;
+                    DataType type;
+                    switch (identifierName.ReferencedSymbols.NotNull().Count)
+                    {
+                        case 0:
+                            // Name binding error should already have been reported
+                            type = DataType.Unknown;
+                            break;
+                        case 1:
+                            type = identifierName.ReferencedSymbols.NotNull().Single().NotNull().Type;
+                            break;
+                        default:
+                            diagnostics.Add(NameBindingError.AmbiguousName(file, identifierName.Span));
+                            type = DataType.Unknown;
+                            break;
+                    }
+
                     return identifierName.Type.Fulfill(type);
                 }
                 case UnaryExpressionSyntax unaryOperatorExpression:

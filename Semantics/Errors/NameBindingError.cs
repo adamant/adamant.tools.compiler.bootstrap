@@ -19,5 +19,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5001,
                 $"The name `{file.Code[span]}` is not defined in this scope.");
         }
+
+        [NotNull]
+        public static Diagnostic AmbiguousName([NotNull] CodeFile file, TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5002,
+                $"The name `{file.Code[span]}` is ambiguous.");
+        }
     }
 }

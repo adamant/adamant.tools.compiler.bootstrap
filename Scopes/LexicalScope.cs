@@ -8,20 +8,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Scopes
 {
     public abstract class LexicalScope
     {
-        [NotNull] private readonly FixedDictionary<SimpleName, ISymbol> symbols;
+        [NotNull] private readonly SymbolSet symbols;
 
         protected LexicalScope([NotNull, ItemNotNull] IEnumerable<ISymbol> symbols)
         {
-            this.symbols = symbols.ToFixedDictionary(s => s.FullName.UnqualifiedName.WithoutNumber());
+            this.symbols = new SymbolSet(symbols);
         }
 
-        [CanBeNull]
-        public virtual ISymbol Lookup([NotNull] SimpleName name)
+        [NotNull]
+        public virtual FixedList<ISymbol> Lookup([NotNull] SimpleName name)
         {
-            return symbols.TryGetValue(name, out var declaration) ? declaration : null;
+            return symbols.TryGetValue(name, out var declaration) ? declaration : FixedList<ISymbol>.Empty;
         }
 
-        [CanBeNull]
-        public abstract ISymbol LookupGlobal([NotNull] SimpleName name);
+        [NotNull]
+        public abstract FixedList<ISymbol> LookupGlobal([NotNull] SimpleName name);
     }
 }
