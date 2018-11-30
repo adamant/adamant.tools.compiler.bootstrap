@@ -30,7 +30,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         [NotNull]
         public override string ToString()
         {
-            return $"({Instance}).Type";
+            switch (Instance)
+            {
+                case ObjectType _:
+                case SimpleType _:
+                case AnyType _:
+                case TypeType _:
+                case Metatype _:
+                    // For these types we don't need parens, for others we might
+                    return $"{Instance}.Type";
+                default:
+                    return $"({Instance}).Type";
+            }
         }
     }
 }

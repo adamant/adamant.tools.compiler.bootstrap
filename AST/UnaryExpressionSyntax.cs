@@ -27,9 +27,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             switch (Fixty)
             {
                 case UnaryOperatorFixity.Prefix:
-                    return $"{Operator}{Operand}";
+                    return $"{Operator.ToSymbolString()}{Operand}";
                 case UnaryOperatorFixity.Postfix:
-                    return $"{Operand}{Operator}";
+                    return $"{Operand}{Operator.ToSymbolString()}";
                 default:
                     throw NonExhaustiveMatchException.ForEnum(Fixty);
             }

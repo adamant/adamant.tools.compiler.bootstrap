@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         public override string ToString()
         {
-            return $"({string.Join(',', ParameterTypes)}) -> {ResultType}";
+            return $"({string.Join(", ", ParameterTypes)}) -> {ResultType}";
         }
     }
 }

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
@@ -11,13 +12,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         public bool MutableBinding { get; }
         [NotNull] public Name FullName { get; }
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [NotNull] public SimpleName Name => FullName.UnqualifiedName;
         public TextSpan NameSpan { get; }
         [CanBeNull] public ExpressionSyntax TypeExpression { get; }
         [CanBeNull] public ExpressionSyntax Initializer { get; set; }
         [NotNull] public TypePromise Type { get; } = new TypePromise();
 
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         DataType ISymbol.Type => Type.Fulfilled();
+
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         FixedDictionary<SimpleName, ISymbol> ISymbol.ChildSymbols => FixedDictionary<SimpleName, ISymbol>.Empty;
 
         public VariableDeclarationStatementSyntax(
@@ -36,7 +44,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public override string ToString()
         {
-            throw new System.NotImplementedException();
+            var binding = MutableBinding ? "var" : "let";
+            var type = TypeExpression != null ? ": " + TypeExpression : "";
+            var initializer = Initializer != null ? " = " + Initializer : "";
+            return $"{binding} {Name}{type}{initializer};";
         }
     }
 }

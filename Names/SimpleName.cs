@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
@@ -10,6 +11,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
     {
         [NotNull] private static readonly Regex NeedsQuoted = new Regex(@"[\\ #ₛ]", RegexOptions.Compiled);
 
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [NotNull] public override SimpleName UnqualifiedName => this;
         [NotNull] public readonly string Text;
         public readonly int? Number;
@@ -40,6 +43,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
             Number = number;
         }
 
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [NotNull] public override IEnumerable<SimpleName> Segments => this.Yield();
 
         public override bool HasQualifier([NotNull] Name name)

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
@@ -25,6 +26,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
             UnqualifiedName = simpleName;
         }
 
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public override IEnumerable<SimpleName> Segments => Qualifier.Segments.Append(UnqualifiedName).NotNull();
 
         public override bool HasQualifier([NotNull] Name name)

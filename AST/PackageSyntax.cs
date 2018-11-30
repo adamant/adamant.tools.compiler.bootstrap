@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
@@ -6,6 +7,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public class PackageSyntax : Syntax
     {
         [NotNull] public string Name { get; }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         [NotNull, ItemNotNull] public FixedList<CompilationUnitSyntax> CompilationUnits { get; }
 
         public PackageSyntax(

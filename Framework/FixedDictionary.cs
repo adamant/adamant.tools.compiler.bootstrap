@@ -6,6 +6,8 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
+    [DebuggerDisplay("Count = {" + nameof(Count) + "}")]
+    [DebuggerTypeProxy(typeof(DictionaryDebugView<,>))]
     public class FixedDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue>
     {
         [NotNull] public static readonly FixedDictionary<TKey, TValue> Empty = new FixedDictionary<TKey, TValue>(new Dictionary<TKey, TValue>());

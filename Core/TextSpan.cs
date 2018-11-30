@@ -1,10 +1,12 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
+    [DebuggerDisplay("positions {Start} to {End}")]
     public readonly struct TextSpan : IEquatable<TextSpan>, IComparable<TextSpan>
     {
         public readonly int Start;

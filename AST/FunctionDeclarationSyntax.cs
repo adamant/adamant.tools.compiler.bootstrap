@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST.Visitors;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -16,6 +17,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         [NotNull] public FixedList<IModiferToken> Modifiers { get; }
         [NotNull] public Name FullName { get; }
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [NotNull] public SimpleName Name => FullName.UnqualifiedName;
         [CanBeNull] public FixedList<GenericParameterSyntax> GenericParameters { get; }
         [NotNull] public FixedList<ParameterSyntax> Parameters { get; } // For now we will not support pure meta functions
@@ -26,6 +29,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [NotNull] public FixedList<ExpressionSyntax> Ensures { get; }
         [CanBeNull] public BlockSyntax Body { get; }
         [NotNull] public TypePromise Type { get; } = new TypePromise();
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [NotNull] DataType ISymbol.Type => Type.Fulfilled();
         [NotNull] public TypePromise ReturnType { get; } = new TypePromise();
         public FixedDictionary<SimpleName, ISymbol> ChildSymbols { get; }
@@ -67,6 +72,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
                 .Concat(GetVariableDeclarationsVisitor.Instance.VisitExpression(Body, default).NotNull());
         }
 
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         DeclarationSyntax IDeclarationSyntax.AsDeclarationSyntax => this;
     }
 }

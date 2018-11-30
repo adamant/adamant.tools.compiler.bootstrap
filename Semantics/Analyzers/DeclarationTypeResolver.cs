@@ -164,7 +164,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case ConstructorDeclarationSyntax _:
                 case InitializerDeclarationSyntax _:
                 {
-                    var returnType = declaringType.NotNull().Type.Fulfilled();
+                    var returnType = declaringType.NotNull().Type.Fulfilled().Instance;
                     return function.ReturnType.Fulfill(returnType);
                 }
                 default:

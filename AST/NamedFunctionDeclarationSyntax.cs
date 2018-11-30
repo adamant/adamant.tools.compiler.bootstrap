@@ -39,7 +39,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             var generics = GenericParameters != null
                 ? $"[{string.Join(", ", GenericParameters)}]"
                 : "";
-            return $"fn {FullName}{generics}({string.Join(", ", Parameters)}) -> {ReturnTypeExpression} {{ … }}";
+            var returnType = ReturnTypeExpression != null ? " -> " + ReturnTypeExpression : "";
+            var body = Body != null ? " {{ … }}" : ";";
+            return $"fn {FullName}{generics}({string.Join(", ", Parameters)}){returnType}{body}";
         }
     }
 }

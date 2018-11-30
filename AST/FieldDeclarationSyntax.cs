@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
@@ -18,6 +19,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [CanBeNull] public ExpressionSyntax TypeExpression { get; }
         [CanBeNull] public ExpressionSyntax Initializer { get; }
         [NotNull] public TypePromise Type { get; } = new TypePromise();
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [NotNull] DataType ISymbol.Type => Type.Fulfilled();
         FixedDictionary<SimpleName, ISymbol> ISymbol.ChildSymbols => FixedDictionary<SimpleName, ISymbol>.Empty;
 
@@ -40,6 +43,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             Initializer = initializer;
         }
 
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         DeclarationSyntax IDeclarationSyntax.AsDeclarationSyntax => this;
 
         public override string ToString()

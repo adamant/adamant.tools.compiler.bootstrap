@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Names
@@ -7,6 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
     /// A root name is a name one can use to qualify a simple name. It may be
     /// the global namespace.
     /// </summary>
+    [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
     public abstract class RootName
     {
         [NotNull, ItemNotNull] public abstract IEnumerable<SimpleName> Segments { get; }

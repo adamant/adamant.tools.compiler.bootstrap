@@ -17,6 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// Once a <see cref="TypePromise"/> has been fulfilled it can't be changed
     /// except to resolve an unresolved type.
     /// </summary>
+    [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
     public class TypePromise<Type>
         where Type : DataType
     {

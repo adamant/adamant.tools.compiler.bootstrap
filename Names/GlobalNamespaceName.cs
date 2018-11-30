@@ -22,5 +22,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         {
             return name;
         }
+
+        public override string ToString()
+        {
+            return "::";
+        }
     }
 }
