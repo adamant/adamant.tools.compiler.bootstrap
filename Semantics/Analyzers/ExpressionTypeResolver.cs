@@ -181,7 +181,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                         case IIntegerLiteralToken integerLiteral:
                             return expression.Type.Fulfill(new IntegerConstantType(integerLiteral.Value));
                         case IStringLiteralToken _:
-                            return DataType.StringConstant;
+                            return expression.Type.Fulfill(DataType.StringConstant);
                         case IBooleanLiteralToken _:
                             return expression.Type.Fulfill(DataType.Bool);
                         default:

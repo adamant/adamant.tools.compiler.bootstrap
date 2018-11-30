@@ -85,6 +85,7 @@
         "Float",
         "Float32",
         "Underscore",
+        "External",
     }.AsReadOnly();
 #>
 using System;

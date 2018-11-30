@@ -67,6 +67,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             {
                 case NamedParameterSyntax namedParameter:
                     return new Parameter(namedParameter.MutableBinding, namedParameter.Name, namedParameter.Type.Resolved());
+                case SelfParameterSyntax selfParameter:
+                    return new Parameter(selfParameter.MutableBinding, selfParameter.Name, selfParameter.Type.Resolved());
                 default:
                     throw NonExhaustiveMatchException.For(parameter);
             }

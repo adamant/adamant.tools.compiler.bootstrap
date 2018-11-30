@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -12,6 +13,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     {
         [MustUseReturnValue]
         [NotNull, ItemNotNull]
+        public FixedList<DeclarationSyntax> ParseTopLevelDeclarations()
+        {
+            var declarations = new List<DeclarationSyntax>();
+            // Keep going to the end of the file
+            while (!Tokens.AtEnd<IEndOfFileToken>())
+                try
+                {
+                    declarations.AddRange(ParseDeclaration());
+                }
+                catch (ParseFailedException)
+                {
+                    // Ignore: we would have consumed something before failing, try to get the next declaration
+                }
+
+            return declarations.ToFixedList();
+        }
+
+        [MustUseReturnValue]
+        [NotNull, ItemNotNull]
         public FixedList<DeclarationSyntax> ParseDeclarations()
         {
             var declarations = new List<DeclarationSyntax>();
@@ -19,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             while (!Tokens.AtEnd<ICloseBraceToken>())
                 try
                 {
-                    declarations.Add(ParseDeclaration());
+                    declarations.AddRange(ParseDeclaration());
                 }
                 catch (ParseFailedException)
                 {
@@ -31,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        public DeclarationSyntax ParseDeclaration()
+        public IEnumerable<DeclarationSyntax> ParseDeclaration()
         {
             var attributes = ParseAttributes();
             var modifiers = AcceptMany(Tokens.AcceptToken<IModiferToken>);
@@ -39,19 +59,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             switch (Tokens.Current)
             {
                 case INamespaceKeywordToken _:
-                    return ParseNamespaceDeclaration(attributes, modifiers);
+                    return ParseNamespaceDeclaration(attributes, modifiers).Yield();
                 case IClassKeywordToken _:
-                    return ParseClass(attributes, modifiers);
+                    return ParseClass(attributes, modifiers).Yield();
                 case ITraitKeywordToken _:
-                    return ParseTrait(attributes, modifiers);
+                    return ParseTrait(attributes, modifiers).Yield();
                 case IStructKeywordToken _:
-                    return ParseStruct(attributes, modifiers);
+                    return ParseStruct(attributes, modifiers).Yield();
                 case IEnumKeywordToken _:
-                    return ParseEnum(attributes, modifiers);
+                    return ParseEnum(attributes, modifiers).Yield();
                 case IFunctionKeywordToken _:
-                    return ParseNamedFunction(attributes, modifiers);
+                    return ParseNamedFunction(attributes, modifiers).Yield();
                 case IConstKeywordToken _:
-                    return ParseConst(attributes, modifiers);
+                    return ParseConst(attributes, modifiers).Yield();
+                case IExternalKeywordToken _:
+                    return ParseExternalBlock(attributes, modifiers);
                 default:
                     Tokens.UnexpectedToken();
                     throw new ParseFailedException();
@@ -65,9 +87,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private void SkipToEndOfStatement()
         {
             while (!Tokens.AtEnd<ISemicolonToken>())
-            {
                 Tokens.Next();
-            }
+
             // Consume the semicolon is we aren't at the end of the file.
             var _ = Tokens.Accept<ISemicolonToken>();
         }
@@ -131,8 +152,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var usingDirectives = bodyParser.ParseUsingDirectives();
             var declarations = bodyParser.ParseDeclarations();
             Tokens.Expect<ICloseBraceToken>();
-            return new NamespaceDeclarationSyntax(File, globalQualifier != null, name,
-                span, nameContext, usingDirectives, declarations);
+            return new NamespaceDeclarationSyntax(File, globalQualifier != null, name, span,
+                nameContext, usingDirectives, declarations);
         }
 
         [MustUseReturnValue]
@@ -161,8 +182,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             var attributes = new List<AttributeSyntax>();
             // Take modifiers until null
-            while (AcceptAttribute() is AttributeSyntax attribute)
-                attributes.Add(attribute);
+            while (AcceptAttribute() is AttributeSyntax attribute) attributes.Add(attribute);
             return attributes.ToFixedList();
         }
 
@@ -244,9 +264,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var genericConstraints = ParseGenericConstraints();
             var invariants = ParseInvariants();
             var members = ParseTypeBody();
-            return new ClassDeclarationSyntax(File, attributes, modifiers, name, identifier.Span, genericParameters,
-                baseClass, baseTypes, genericConstraints, invariants,
-                members);
+            return new ClassDeclarationSyntax(File, attributes, modifiers, name, identifier.Span,
+                genericParameters, baseClass, baseTypes, genericConstraints, invariants, members);
         }
 
         [MustUseReturnValue]
@@ -264,8 +283,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var invariants = ParseInvariants();
             var members = ParseTypeBody();
             return new TraitDeclarationSyntax(File, attributes, modifiers, name, identifier.Span,
-                genericParameters, baseTypes, genericConstraints, invariants,
-                members);
+                genericParameters, baseTypes, genericConstraints, invariants, members);
         }
 
         [MustUseReturnValue]
@@ -282,9 +300,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var genericConstraints = ParseGenericConstraints();
             var invariants = ParseInvariants();
             var members = ParseTypeBody();
-            return new StructDeclarationSyntax(File, attributes, modifiers, name, identifier.Span, genericParameters,
-                baseTypes, genericConstraints, invariants,
-                members);
+            return new StructDeclarationSyntax(File, attributes, modifiers, name, identifier.Span,
+                genericParameters, baseTypes, genericConstraints, invariants, members);
         }
 
         [MustUseReturnValue]
@@ -309,8 +326,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var variants = ParseEnumVariants();
                     var members = ParseMemberDeclarations();
                     Tokens.Expect<ICloseBraceToken>();
-                    return new EnumStructDeclarationSyntax(File, attributes, modifiers,
-                        name, identifier.Span, genericParameters, baseTypes, genericConstraints,
+                    return new EnumStructDeclarationSyntax(File, attributes, modifiers, name,
+                        identifier.Span, genericParameters, baseTypes, genericConstraints,
                         invariants, variants, members);
                 }
                 case IClassKeywordToken _:
@@ -327,9 +344,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var variants = ParseEnumVariants();
                     var members = ParseMemberDeclarations();
                     Tokens.Expect<ICloseBraceToken>();
-                    return new EnumClassDeclarationSyntax(File, attributes, modifiers,
-                        name, identifier.Span, genericParameters, baseClass, baseTypes, genericConstraints,
-                        invariants, variants, members);
+                    return new EnumClassDeclarationSyntax(File, attributes, modifiers, name,
+                        identifier.Span, genericParameters, baseClass, baseTypes,
+                        genericConstraints, invariants, variants, members);
                 }
                 default:
                     throw new ParseFailedException();
@@ -386,7 +403,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 initializer = ParseExpression();
 
             Tokens.Expect<ISemicolonToken>();
-            return new FieldDeclarationSyntax(File, attributes, modifiers, getterAccess, name, identifier.Span, typeExpression, initializer);
+            return new FieldDeclarationSyntax(File, attributes, modifiers, getterAccess, name,
+                identifier.Span, typeExpression, initializer);
         }
 
         [MustUseReturnValue]
@@ -422,8 +440,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
             var body = bodyParser.ParseFunctionBody();
-            return new NamedFunctionDeclarationSyntax(File, modifiers, name, identifier.Span, genericParameters, parameters, returnType,
-                genericConstraints, mayEffects, noEffects, requires, ensures, body);
+            return new NamedFunctionDeclarationSyntax(File, modifiers, name, identifier.Span,
+                genericParameters, parameters, returnType, genericConstraints, mayEffects,
+                noEffects, requires, ensures, body);
         }
 
         [MustUseReturnValue]
@@ -485,7 +504,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var (requires, ensures) = ParseFunctionContracts();
             var body = ParseBlock();
             return new OperatorDeclarationSyntax(File, modifiers, name, nameSpan, genericParameters,
-                 parameters, returnType, genericConstraints, mayEffects, noEffects, requires, ensures, body);
+                parameters, returnType, genericConstraints, mayEffects, noEffects, requires,
+                ensures, body);
         }
 
         [MustUseReturnValue]
@@ -505,8 +525,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
             var body = bodyParser.ParseBlock();
-            return new ConstructorDeclarationSyntax(File, modifiers, name, TextSpan.Covering(newKeywordSpan, identifier?.Span),
-                genericParameters, parameters, genericConstraints, mayEffects, noEffects, requires, ensures, body);
+            return new ConstructorDeclarationSyntax(File, modifiers, name,
+                TextSpan.Covering(newKeywordSpan, identifier?.Span), genericParameters, parameters,
+                genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
 
         [MustUseReturnValue]
@@ -526,8 +547,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
             var body = bodyParser.ParseBlock();
-            return new InitializerDeclarationSyntax(File, modifiers, name, TextSpan.Covering(initKeywordSpan, identifier?.Span),
-                genericParameters, parameters, genericConstraints, mayEffects, noEffects, requires, ensures, body);
+            return new InitializerDeclarationSyntax(File, modifiers, name,
+                TextSpan.Covering(initKeywordSpan, identifier?.Span), genericParameters, parameters,
+                genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
 
 
@@ -546,7 +568,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var (requires, ensures) = ParseFunctionContracts();
             var body = bodyParser.ParseBlock();
             return new DestructorDeclarationSyntax(File, modifiers, name, deleteKeywordSpan,
-                 parameters, mayEffects, noEffects, requires, ensures, body);
+                parameters, mayEffects, noEffects, requires, ensures, body);
         }
 
         [MustUseReturnValue]
@@ -567,8 +589,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
             var body = bodyParser.ParseBlock();
-            return new GetterDeclarationSyntax(File, attributes, modifiers, propertyName, name, identifier.Span,
-                parameters, returnType, mayEffects, noEffects, requires, ensures, body);
+            return new GetterDeclarationSyntax(File, attributes, modifiers, propertyName, name,
+                identifier.Span, parameters, returnType, mayEffects, noEffects, requires, ensures,
+                body);
         }
 
         [MustUseReturnValue]
@@ -587,8 +610,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
             var body = bodyParser.ParseBlock();
-            return new SetterDeclarationSyntax(File, attributes, modifiers, propertyName, name, identifier.Span,
-                 parameters, mayEffects, noEffects, requires, ensures, body);
+            return new SetterDeclarationSyntax(File, attributes, modifiers, propertyName, name,
+                identifier.Span, parameters, mayEffects, noEffects, requires, ensures, body);
         }
 
         [MustUseReturnValue]
@@ -677,7 +700,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        private (FixedList<ExpressionSyntax> Requires, FixedList<ExpressionSyntax> Ensures) ParseFunctionContracts()
+        private (FixedList<ExpressionSyntax> Requires, FixedList<ExpressionSyntax> Ensures)
+            ParseFunctionContracts()
         {
             var requires = new List<ExpressionSyntax>();
             var ensures = new List<ExpressionSyntax>();
@@ -744,13 +768,33 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     initializer = ParseExpression();
 
                 Tokens.Expect<ISemicolonToken>();
-                return new ConstDeclarationSyntax(File, attributes, modifiers, name, identifier.Span, type, initializer);
+                return new ConstDeclarationSyntax(File, attributes, modifiers, name,
+                    identifier.Span, type, initializer);
             }
             catch (ParseFailedException)
             {
                 SkipToEndOfStatement();
                 throw;
             }
+        }
+
+        [MustUseReturnValue]
+        [NotNull]
+        private FixedList<NamedFunctionDeclarationSyntax> ParseExternalBlock(
+            [NotNull] FixedList<AttributeSyntax> attributes,
+            [NotNull] FixedList<IModiferToken> modifiers)
+        {
+            Tokens.Expect<IExternalKeywordToken>();
+            return ParseTypeBody().Select(d =>
+            {
+                if (d is NamedFunctionDeclarationSyntax function)
+                {
+                    function.IsExternalFunction = true;
+                    return function;
+                }
+                Add(ParseError.DeclarationNotAllowedInExternal(File, d.AsDeclarationSyntax.NameSpan));
+                return null;
+            }).Where(d => d != null).ToFixedList();
         }
     }
 }

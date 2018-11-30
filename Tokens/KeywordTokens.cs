@@ -89,6 +89,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             typeof(FloatKeywordToken),
             typeof(Float32KeywordToken),
             typeof(UnderscoreKeywordToken),
+            typeof(ExternalKeywordToken),
         }.AsReadOnly().NotNull();
     }
 
@@ -560,6 +561,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         public static IUnderscoreKeywordToken UnderscoreKeyword(TextSpan span)
         {
             return new UnderscoreKeywordToken(span);
+        }
+
+        [NotNull]
+        public static IExternalKeywordToken ExternalKeyword(TextSpan span)
+        {
+            return new ExternalKeywordToken(span);
         }
 
     }
@@ -1261,6 +1268,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     internal partial class UnderscoreKeywordToken : Token, IUnderscoreKeywordToken
     {
         public UnderscoreKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface IExternalKeywordToken : IKeywordToken { }
+    internal partial class ExternalKeywordToken : Token, IExternalKeywordToken
+    {
+        public ExternalKeywordToken(TextSpan span)
             : base(span)
         {
         }

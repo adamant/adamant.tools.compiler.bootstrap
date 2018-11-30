@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public override string ToString()
         {
-            throw new System.NotImplementedException();
+            return $"package {Name} {CompilationUnits.Count} Compilation Units";
         }
     }
 }

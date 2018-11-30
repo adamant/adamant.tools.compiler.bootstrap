@@ -12,6 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         [CanBeNull] public ExpressionSyntax ReturnTypeExpression { get; }
         DataType ISymbol.Type => Type.Fulfilled();
+        public bool IsExternalFunction { get; set; }
 
         public NamedFunctionDeclarationSyntax(
             [NotNull] CodeFile file,
