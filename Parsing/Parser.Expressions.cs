@@ -387,14 +387,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     return ParsePrefixUnaryOperator(UnaryOperator.Caret);
                 case INotKeywordToken _:
                     return ParsePrefixUnaryOperator(UnaryOperator.Not);
-                case IIntegerLiteralToken _:
-                case IStringLiteralToken _:
                 case IBooleanLiteralToken _:
+                {
+                    var literal = Tokens.RequiredToken<IBooleanLiteralToken>();
+                    return new BoolLiteralExpressionSyntax(literal.Span, literal.Value);
+                }
+                case IIntegerLiteralToken _:
+                {
+                    var literal = Tokens.RequiredToken<IIntegerLiteralToken>();
+                    return new IntegerLiteralExpressionSyntax(literal.Span, literal.Value);
+                }
                 case IUninitializedKeywordToken _:
+                {
+                    var literal = Tokens.Required<IUninitializedKeywordToken>();
+                    return new UninitializedLiteralExpressionSyntax(literal);
+                }
+                case IStringLiteralToken _:
+                {
+                    var literal = Tokens.RequiredToken<IStringLiteralToken>();
+                    return new StringLiteralExpressionSyntax(literal.Span, literal.Value);
+                }
                 case INoneKeywordToken _:
                 {
-                    var literal = Tokens.RequiredToken<ILiteralToken>();
-                    return new LiteralExpressionSyntax(literal);
+                    var literal = Tokens.Required<IUninitializedKeywordToken>();
+                    return new NoneLiteralExpressionSyntax(literal);
                 }
                 case IPrimitiveTypeToken _:
                 {

@@ -93,8 +93,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case BreakExpressionSyntax breakExpression:
                     VisitBreakExpression(breakExpression, args);
                     break;
-                case ImplicitNumericConversionExpression implicitNumericConversion:
-                    VisitImplicitNumericConversion(implicitNumericConversion, args);
+                case ImplicitConversionExpression implicitConversion:
+                    VisitImplicitConversionExpression(implicitConversion, args);
                     break;
                 case null:
                     // Ignore
@@ -104,9 +104,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             }
         }
 
-        public virtual void VisitImplicitNumericConversion([NotNull] ImplicitNumericConversionExpression implicitNumericConversion, A args)
+        public virtual void VisitImplicitConversionExpression([CanBeNull] ImplicitConversionExpression implicitConversionExpression, A args)
         {
-            VisitExpression(implicitNumericConversion.Expression, args);
+            switch (implicitConversionExpression)
+            {
+                case ImplicitNumericConversionExpression implicitNumericConversionExpression:
+                    VisitImplicitNumericConversionExpression(implicitNumericConversionExpression, args);
+                    break;
+                case ImplicitLiteralConversionExpression implicitLiteralConversionExpression:
+                    VisitImplicitLiteralConversionExpression(implicitLiteralConversionExpression, args);
+                    break;
+                case null:
+                    // Ignore
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.For(implicitConversionExpression);
+            }
+        }
+
+        public virtual void VisitImplicitLiteralConversionExpression([NotNull] ImplicitLiteralConversionExpression implicitLiteralConversionExpression, A args)
+        {
+            VisitExpression(implicitLiteralConversionExpression.Expression, args);
+        }
+
+        public virtual void VisitImplicitNumericConversionExpression([NotNull] ImplicitNumericConversionExpression implicitNumericConversionExpression, A args)
+        {
+            VisitExpression(implicitNumericConversionExpression.Expression, args);
         }
 
         public virtual void VisitBreakExpression(BreakExpressionSyntax breakExpression, A args)

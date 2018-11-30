@@ -7,7 +7,6 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
@@ -211,17 +210,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case BinaryExpressionSyntax binaryOperator:
                     ConvertOperator(place, binaryOperator, statements);
                     break;
-                case LiteralExpressionSyntax literalExpression:
-                    switch (literalExpression.Literal)
-                    {
-                        case IIntegerLiteralToken _:
-                            throw new InvalidOperationException("Integer literals should have an implicit conversion around them");
-                        case IStringLiteralToken _:
-                            throw new InvalidOperationException("String literals should have an implicit conversion around them");
-                        default:
-                            throw NonExhaustiveMatchException.For(literalExpression.Literal);
-                    }
-                    break;
+                case IntegerLiteralExpressionSyntax _:
+                    throw new InvalidOperationException("Integer literals should have an implicit conversion around them");
+                case StringLiteralExpressionSyntax _:
+                    throw new InvalidOperationException("String literals should have an implicit conversion around them");
                 case ImplicitNumericConversionExpression implicitNumericConversion:
                     if (implicitNumericConversion.Expression.Type.Resolved() is IntegerConstantType constantType)
                     {
@@ -238,6 +230,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case UnsafeExpressionSyntax unsafeExpression:
                     ConvertExpressionAnalysisToStatement(unsafeExpression.Expression, statements);
                     break;
+                case ImplicitLiteralConversionExpression implicitLiteralConversion:
+                {
+                    var conversionFunction = implicitLiteralConversion.ConversionFunction.FullName;
+                    var literal = (StringLiteralExpressionSyntax)implicitLiteralConversion.Expression;
+                    var constantLength = Utf8BytesConstant.Encoding.GetByteCount(literal.Value);
+                    var sizeArgument = new IntegerConstant(constantLength, DataType.Size);
+                    var bytesArgument = new Utf8BytesConstant(literal.Value);
+                    statements.Add(new CallStatement(CurrentBlockNumber, statements.Count, place, conversionFunction, new IValue[] { sizeArgument, bytesArgument }));
+                }
+                break;
                 default:
                     throw NonExhaustiveMatchException.For(value);
             }

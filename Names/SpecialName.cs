@@ -32,5 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         [NotNull] public static readonly SimpleName Offset = SimpleName.Special("offset");
         [NotNull] public static readonly SimpleName Float32 = SimpleName.Special("float32");
         [NotNull] public static readonly SimpleName Float = SimpleName.Special("float");
+
+        [NotNull] public static readonly SimpleName OperatorStringLiteral = SimpleName.Special("operator_string_literal");
     }
 }

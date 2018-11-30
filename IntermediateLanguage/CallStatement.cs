@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
@@ -7,14 +8,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
     public class CallStatement : ExpressionStatement
     {
         [NotNull] public readonly Place Place;
-        [NotNull] public readonly string FunctionName;
+        [NotNull] public readonly Name FunctionName;
         [NotNull, ItemNotNull] public FixedList<IValue> Arguments { get; }
 
         public CallStatement(
             int blockNumber,
             int number,
             [NotNull] Place lvalue,
-            [NotNull] string functionName,
+            [NotNull] Name functionName,
             [NotNull] [ItemNotNull] IEnumerable<IValue> arguments)
             : base(blockNumber, number)
         {

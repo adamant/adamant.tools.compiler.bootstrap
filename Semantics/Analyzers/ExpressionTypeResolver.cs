@@ -124,6 +124,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                             throw new NotImplementedException();
                     }
                     break;
+                case StringConstantType expressionType:
+                {
+                    if (targetType is ObjectType objectType)
+                    {
+                        var conversionOperators = objectType.Symbol.Lookup(SpecialName.OperatorStringLiteral);
+                        if (conversionOperators.Count == 1) // TODO actually check we can call it
+                        {
+                            return new ImplicitLiteralConversionExpression(expression, objectType, conversionOperators.Single().NotNull());
+                        }
+                        // TODO if there is more than one
+                    }
+                }
+                break;
             }
 
             // No conversion
@@ -167,18 +180,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                         // TODO a void or never function shouldn't have this
                     }
                     return expression.Type.Fulfill(DataType.Never);
-                case LiteralExpressionSyntax literalExpression:
-                    switch (literalExpression.Literal)
-                    {
-                        case IIntegerLiteralToken integerLiteral:
-                            return expression.Type.Fulfill(new IntegerConstantType(integerLiteral.Value));
-                        case IStringLiteralToken _:
-                            return expression.Type.Fulfill(DataType.StringConstant);
-                        case IBooleanLiteralToken _:
-                            return expression.Type.Fulfill(DataType.Bool);
-                        default:
-                            throw NonExhaustiveMatchException.For(literalExpression.Literal);
-                    }
+                case IntegerLiteralExpressionSyntax integerLiteral:
+                    return expression.Type.Fulfill(new IntegerConstantType(integerLiteral.Value));
+                case StringLiteralExpressionSyntax _:
+                    return expression.Type.Fulfill(DataType.StringConstant);
+                case BoolLiteralExpressionSyntax _:
+                    return expression.Type.Fulfill(DataType.Bool);
                 case BinaryExpressionSyntax binaryOperatorExpression:
                     return InferBinaryExpressionType(binaryOperatorExpression);
                 case IdentifierNameSyntax identifierName:

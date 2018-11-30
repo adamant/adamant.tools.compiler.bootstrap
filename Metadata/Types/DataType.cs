@@ -30,6 +30,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         [NotNull] public static readonly FloatingPointType Float = FloatingPointType.Float;
         [NotNull] public static readonly StringConstantType StringConstant = StringConstantType.Instance;
 
+        [NotNull] public static readonly PointerType BytePointer = new PointerType(Byte);
+
         /// <summary>
         /// A resolved type is one that has no unknown or unresolved parts
         /// </summary>

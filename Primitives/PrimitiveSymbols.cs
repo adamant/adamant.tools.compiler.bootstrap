@@ -42,13 +42,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         private static ISymbol BuildStringSymbol()
         {
             var typeName = new SimpleName("String");
+            var stringLiteralOperator = PrimitiveSymbol.NewMember(typeName.Qualify(SpecialName.OperatorStringLiteral));
             var symbols = new List<ISymbol>()
             {
-                 PrimitiveSymbol.Getter(typeName.Qualify("bytes"), new PointerType(DataType.Byte)),
-                 PrimitiveSymbol.Getter(typeName.Qualify("bytes_count"), DataType.Size),
+                PrimitiveSymbol.NewGetter(typeName.Qualify("bytes"), DataType.BytePointer),
+                PrimitiveSymbol.NewGetter(typeName.Qualify("bytes_count"), DataType.Size),
+                stringLiteralOperator
             };
 
-            return PrimitiveSymbol.ReferenceType(typeName, declaredMutable: false, symbols);
+            var stringSymbol = PrimitiveSymbol.NewType(typeName, symbols);
+            var stringType = new ObjectType(stringSymbol, true, false);
+            stringSymbol.Type = new Metatype(stringType);
+            stringLiteralOperator.Type = new FunctionType(new DataType[] { DataType.Size, DataType.BytePointer }, stringType);
+            return stringSymbol;
         }
 
         private static ISymbol BuildIntegerNumericSymbol([NotNull] IntegerType numericType)
@@ -56,9 +62,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             var typeName = numericType.Name;
             var symbols = new List<ISymbol>
             {
-                PrimitiveSymbol.Member(typeName.Qualify("remainder"), new FunctionType(new[] {numericType}, numericType))
+                PrimitiveSymbol.NewMember(typeName.Qualify("remainder"), new FunctionType(new[] {numericType}, numericType))
             };
-            return PrimitiveSymbol.SimpleType(numericType, symbols);
+            return PrimitiveSymbol.NewSimpleType(numericType, symbols);
         }
     }
 }
