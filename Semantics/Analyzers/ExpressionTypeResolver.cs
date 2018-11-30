@@ -130,14 +130,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             return expression;
         }
 
-        // Checks the expression is well typed, and that the type of the expression is `bool`
-        private void CheckExpressionTypeIsBool([NotNull] ExpressionSyntax expression)
-        {
-            InferExpressionType(expression);
-            if (expression.Type.Fulfilled() != DataType.Bool)
-                diagnostics.Add(TypeError.MustBeABoolExpression(file, expression.Span));
-        }
-
         [NotNull]
         public DataType CheckExpressionType(
             [NotNull] ExpressionSyntax expression,
@@ -243,7 +235,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     // TODO assign correct type to the expression
                     return expression.Type.Fulfill(DataType.Unknown);
                 case WhileExpressionSyntax whileExpression:
-                    CheckExpressionTypeIsBool(whileExpression.Condition);
+                    CheckExpressionType(whileExpression.Condition, DataType.Bool);
                     InferExpressionType(whileExpression.Block);
                     // TODO assign correct type to the expression
                     return expression.Type.Fulfill(DataType.Unknown);
@@ -338,7 +330,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case MutableTypeSyntax mutableType:
                     return mutableType.Type.Fulfill(CheckAndEvaluateTypeExpression(mutableType.ReferencedTypeExpression));// TODO make that type mutable
                 case IfExpressionSyntax ifExpression:
-                    CheckExpressionTypeIsBool(ifExpression.Condition);
+                    CheckExpressionType(ifExpression.Condition, DataType.Bool);
                     InferExpressionType(ifExpression.ThenBlock);
                     InferExpressionType(ifExpression.ElseClause);
                     // TODO assign a type to the expression
@@ -392,8 +384,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             switch (memberAccess.Member)
             {
                 case IIdentifierToken identifier:
-                    // TODO report error on lookup failure
-                    type = symbol.Lookup(new SimpleName(identifier.Value)).Type;
+                    var memberSymbol = symbol.Lookup(new SimpleName(identifier.Value));
+                    if (memberSymbol == UnknownSymbol.Instance)
+                        diagnostics.Add(NameBindingError.CouldNotBindMember(file, identifier.Span));
+                    type = memberSymbol.Type;
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(memberAccess.Member);

@@ -26,5 +26,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5002,
                 $"The name `{file.Code[span]}` is ambiguous.");
         }
+
+        [NotNull]
+        public static Diagnostic CouldNotBindMember([NotNull] CodeFile file, in TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5003,
+                $"Could not find member `{file.Code[span]}` on object.");
+        }
     }
 }
