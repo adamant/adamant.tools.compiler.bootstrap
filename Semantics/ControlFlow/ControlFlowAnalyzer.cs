@@ -12,7 +12,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 {
-    public class ControlFlowGraphBuilder
+    public class ControlFlowAnalyzer
     {
         public static void BuildGraphs([NotNull, ItemNotNull] IEnumerable<DeclarationSyntax> declarations)
         {
@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             visitor.VisitDeclarations(declarations);
             foreach (var function in visitor.FunctionDeclarations.Where(ShouldBuildGraph))
             {
-                var builder = new ControlFlowGraphBuilder();
+                var builder = new ControlFlowAnalyzer();
                 builder.BuildGraph(function);
             }
         }

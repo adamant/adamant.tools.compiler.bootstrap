@@ -38,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             TypeResolutionValidator.Validate(memberDeclarations);
 #endif
 
-            ControlFlowGraphBuilder.BuildGraphs(memberDeclarations);
+            ControlFlowAnalyzer.BuildGraphs(memberDeclarations);
 
             //var borrowChecker = new BorrowChecker();
             //borrowChecker.Check(declarationAnalyses);
