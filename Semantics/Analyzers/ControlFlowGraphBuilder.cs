@@ -90,7 +90,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
             var entryBlockStatements = new List<ExpressionStatement>();
             foreach (var statement in function.Body.NotNull().Statements)
-                ConvertStatementAnalysisToStatement(entryBlockStatements, statement);
+                ConvertStatementSyntaxToStatement(entryBlockStatements, statement);
 
             // Generate the implicit return statement
             if (!blocks.Any())
@@ -105,7 +105,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             return variables.Single(v => v.Name == name).NotNull().Reference;
         }
 
-        private void ConvertStatementAnalysisToStatement(
+        private void ConvertStatementSyntaxToStatement(
             [NotNull, ItemNotNull] List<ExpressionStatement> currentBlock,
             [NotNull] StatementSyntax statement)
         {
@@ -167,7 +167,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     break;
                 case BlockSyntax block:
                     foreach (var statementInBlock in block.Statements)
-                        ConvertStatementAnalysisToStatement(statements, statementInBlock);
+                        ConvertStatementSyntaxToStatement(statements, statementInBlock);
 
                     // Now we need to delete any owned variables
                     foreach (var variableDeclaration in block.Statements.OfType<VariableDeclarationStatementSyntax>().Where(IsOwned))
