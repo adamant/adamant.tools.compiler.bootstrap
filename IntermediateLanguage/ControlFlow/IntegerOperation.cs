@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
+namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class IntegerOperation : IValue
     {

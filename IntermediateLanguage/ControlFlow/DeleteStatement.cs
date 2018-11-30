@@ -1,6 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 
-namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
+namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class DeleteStatement : ExpressionStatement
     {

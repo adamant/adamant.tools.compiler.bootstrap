@@ -1,4 +1,4 @@
-namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
+namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     /// <summary>
     /// A statement that exists to evaluate an expression of some kind. Unlike

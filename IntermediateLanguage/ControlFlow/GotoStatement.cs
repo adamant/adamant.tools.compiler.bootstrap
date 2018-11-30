@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
+namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class GotoStatement : BlockTerminatorStatement
     {

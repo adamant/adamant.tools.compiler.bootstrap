@@ -1,7 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
+namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class AssignmentStatement : ExpressionStatement
     {
@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
             int number,
             [NotNull] Place place,
             [NotNull] IValue value)
-            : base(blockNumber,number)
+            : base(blockNumber, number)
         {
             Requires.NotNull(nameof(place), place);
             Requires.NotNull(nameof(value), value);

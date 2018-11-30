@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
+namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
     public abstract class Operand
