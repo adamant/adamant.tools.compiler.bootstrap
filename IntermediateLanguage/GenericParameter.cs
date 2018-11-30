@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Model
+namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
     public class GenericParameter
     {
