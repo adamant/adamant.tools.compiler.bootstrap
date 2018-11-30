@@ -7,7 +7,6 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using Adamant.Tools.Compiler.Bootstrap.Names;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
@@ -32,95 +31,39 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                    && !function.Poisoned; // There were errors, we may not be able to make a control flow graph, so don't try
         }
 
-        [NotNull, ItemNotNull] private readonly List<LocalVariableDeclaration> variables = new List<LocalVariableDeclaration>();
-        [NotNull] private LocalVariableDeclaration ReturnVariable => variables.First().NotNull();
-        [NotNull, ItemNotNull] private readonly List<BasicBlock> blocks = new List<BasicBlock>();
-        private int CurrentBlockNumber => blocks.Count;
-
-        [NotNull]
-        public LocalVariableDeclaration AddParameter(bool mutableBinding, [NotNull] DataType type, [CanBeNull] SimpleName name)
-        {
-            var variable = new LocalVariableDeclaration(true, mutableBinding, type, variables.Count)
-            {
-                Name = name
-            };
-            variables.Add(variable);
-            return variable;
-        }
-
-        [NotNull]
-        public LocalVariableDeclaration AddVariable(bool mutableBinding, [NotNull] DataType type, [CanBeNull] SimpleName name = null)
-        {
-            var variable = new LocalVariableDeclaration(false, mutableBinding, type, variables.Count)
-            {
-                Name = name
-            };
-            variables.Add(variable);
-            return variable;
-        }
-
-        [NotNull]
-        public LocalVariableDeclaration Let([NotNull] DataType type)
-        {
-            return AddVariable(false, type);
-        }
-
-        [NotNull]
-        public LocalVariableDeclaration Var([NotNull] DataType type)
-        {
-            return AddVariable(true, type);
-        }
-
-        [NotNull]
-        public BasicBlock AddBlock(
-            [NotNull] IEnumerable<ExpressionStatement> statements,
-            [NotNull] BlockTerminatorStatement terminator)
-        {
-            var block = new BasicBlock(CurrentBlockNumber, statements, terminator);
-            blocks.Add(block);
-            return block;
-        }
+        [NotNull] private readonly ControlFlowGraphBuilder graph = new ControlFlowGraphBuilder();
 
         private void BuildGraph([NotNull] FunctionDeclarationSyntax function)
         {
             // Temp Variable for return
-            Let(function.ReturnType.Resolved());
+            graph.Let(function.ReturnType.Resolved());
             foreach (var parameter in function.Parameters)
-                AddParameter(parameter.MutableBinding, parameter.Type.Resolved(), parameter.Name.UnqualifiedName);
+                graph.AddParameter(parameter.MutableBinding, parameter.Type.Resolved(), parameter.Name.UnqualifiedName);
 
-            var entryBlockStatements = new List<ExpressionStatement>();
             foreach (var statement in function.Body.NotNull().Statements)
-                ConvertStatementSyntaxToStatement(entryBlockStatements, statement);
+                ConvertStatementSyntaxToStatement(statement);
 
             // Generate the implicit return statement
-            if (!blocks.Any())
-                AddBlock(entryBlockStatements, new ReturnStatement(CurrentBlockNumber, entryBlockStatements.Count));
+            if (graph.CurrentBlockNumber == 0)
+                graph.AddBlockReturn();
 
-            function.ControlFlow = new ControlFlowGraph(variables, blocks);
+            function.ControlFlow = graph.Build();
         }
 
-        [NotNull]
-        private VariableReference LookupVariable([NotNull] SimpleName name)
-        {
-            return variables.Single(v => v.Name == name).NotNull().Reference;
-        }
-
-        private void ConvertStatementSyntaxToStatement(
-            [NotNull, ItemNotNull] List<ExpressionStatement> currentBlock,
-            [NotNull] StatementSyntax statement)
+        private void ConvertStatementSyntaxToStatement([NotNull] StatementSyntax statement)
         {
             switch (statement)
             {
                 case VariableDeclarationStatementSyntax variableDeclaration:
-                    var variable = AddVariable(variableDeclaration.MutableBinding,
+                    var variable = graph.AddVariable(variableDeclaration.MutableBinding,
                         variableDeclaration.Type.Fulfilled(),
                         variableDeclaration.Name.UnqualifiedName);
                     if (variableDeclaration.Initializer != null)
-                        ConvertToAssignmentStatement(variable.Reference, variableDeclaration.Initializer, currentBlock);
+                        ConvertToAssignmentStatement(variable.Reference, variableDeclaration.Initializer);
                     break;
 
                 case ExpressionSyntax expression:
-                    ConvertExpressionAnalysisToStatement(expression, currentBlock);
+                    ConvertExpressionSyntaxToStatement(expression);
                     break;
 
                 default:
@@ -130,16 +73,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
         private static bool IsOwned([NotNull] VariableDeclarationStatementSyntax declaration)
         {
-            Requires.NotNull(nameof(declaration), declaration);
             if (declaration.Type.Resolved() is LifetimeType type)
                 return type.IsOwned;
 
             return false;
         }
 
-        private void ConvertExpressionAnalysisToStatement(
-            [NotNull] ExpressionSyntax expression,
-            [NotNull] [ItemNotNull] List<ExpressionStatement> statements)
+        private void ConvertExpressionSyntaxToStatement([NotNull] ExpressionSyntax expression)
         {
             switch (expression)
             {
@@ -155,24 +95,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         //    break;
                         default:
                             // Could be side effects possibly.
-                            var temp = Let(binaryOperatorExpression.Type.Resolved());
-                            ConvertToAssignmentStatement(temp.Reference, expression, statements);
+                            var temp = graph.Let(binaryOperatorExpression.Type.Resolved());
+                            ConvertToAssignmentStatement(temp.Reference, expression);
                             break;
                     }
                     break;
                 case ReturnExpressionSyntax returnExpression:
                     if (returnExpression.ReturnValue != null)
-                        ConvertToAssignmentStatement(ReturnVariable.Reference, returnExpression.ReturnValue, statements);
-                    AddBlock(statements, new ReturnStatement(CurrentBlockNumber, statements.Count));
+                        ConvertToAssignmentStatement(graph.ReturnVariable.Reference, returnExpression.ReturnValue);
+                    graph.AddBlockReturn();
                     break;
                 case BlockSyntax block:
                     foreach (var statementInBlock in block.Statements)
-                        ConvertStatementSyntaxToStatement(statements, statementInBlock);
+                        ConvertStatementSyntaxToStatement(statementInBlock);
 
                     // Now we need to delete any owned variables
                     foreach (var variableDeclaration in block.Statements.OfType<VariableDeclarationStatementSyntax>().Where(IsOwned))
-                        statements.Add(new DeleteStatement(CurrentBlockNumber, statements.Count, LookupVariable(variableDeclaration.Name.UnqualifiedName).VariableNumber, new TextSpan(block.Span.End, 0)));
-
+                        graph.AddDelete(graph.VariableFor(variableDeclaration.Name.UnqualifiedName), new TextSpan(block.Span.End, 0));
                     break;
                 case ForeachExpressionSyntax @foreach:
                     // TODO actually convert the expression
@@ -184,7 +123,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     // TODO actually convert the expression
                     break;
                 case UnsafeExpressionSyntax unsafeExpression:
-                    ConvertExpressionAnalysisToStatement(unsafeExpression.Expression, statements);
+                    ConvertExpressionSyntaxToStatement(unsafeExpression.Expression);
                     break;
                 case InvocationSyntax invocation:
                     // TODO actually convert the expression
@@ -196,8 +135,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
         private void ConvertToAssignmentStatement(
             [NotNull] Place place,
-            [NotNull] ExpressionSyntax value,
-            [NotNull, ItemNotNull] List<ExpressionStatement> statements)
+            [NotNull] ExpressionSyntax value)
         {
             switch (value)
             {
@@ -206,10 +144,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 //    statements.Add(new NewObjectStatement(place, newObjectExpression.Type.AssertResolved(), args));
                 //    break;
                 case IdentifierNameSyntax identifier:
-                    statements.Add(new AssignmentStatement(CurrentBlockNumber, statements.Count, place, new CopyPlace(LookupVariable(identifier.Name))));
+                    graph.AddAssignment(place, new CopyPlace(graph.VariableFor(identifier.Name)));
                     break;
                 case BinaryExpressionSyntax binaryOperator:
-                    ConvertOperator(place, binaryOperator, statements);
+                    ConvertOperator(place, binaryOperator);
                     break;
                 case IntegerLiteralExpressionSyntax _:
                     throw new InvalidOperationException("Integer literals should have an implicit conversion around them");
@@ -219,17 +157,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     if (implicitNumericConversion.Expression.Type.Resolved() is IntegerConstantType constantType)
                     {
                         var constant = new IntegerConstant(constantType.Value, implicitNumericConversion.Type.Resolved());
-                        statements.Add(new AssignmentStatement(CurrentBlockNumber, statements.Count, place, constant));
+                        graph.AddAssignment(place, constant);
                     }
                     else
                         throw new NotImplementedException();
                     break;
                 case IfExpressionSyntax ifExpression:
-                    ConvertExpressionAnalysisToStatement(ifExpression.Condition, statements);
+                    ConvertExpressionSyntaxToStatement(ifExpression.Condition);
                     // TODO assign the result into the temp, branch and execute then or else, assign result
                     break;
                 case UnsafeExpressionSyntax unsafeExpression:
-                    ConvertExpressionAnalysisToStatement(unsafeExpression.Expression, statements);
+                    ConvertExpressionSyntaxToStatement(unsafeExpression.Expression);
                     break;
                 case ImplicitLiteralConversionExpression implicitLiteralConversion:
                 {
@@ -238,7 +176,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     var constantLength = Utf8BytesConstant.Encoding.GetByteCount(literal.Value);
                     var sizeArgument = new IntegerConstant(constantLength, DataType.Size);
                     var bytesArgument = new Utf8BytesConstant(literal.Value);
-                    statements.Add(new CallStatement(CurrentBlockNumber, statements.Count, place, conversionFunction, new IValue[] { sizeArgument, bytesArgument }));
+                    graph.AddCall(place, conversionFunction, sizeArgument, bytesArgument);
                 }
                 break;
                 default:
@@ -248,8 +186,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
         private void ConvertOperator(
             [NotNull] Place lvalue,
-            [NotNull] BinaryExpressionSyntax binary,
-            [NotNull] List<ExpressionStatement> statements)
+            [NotNull] BinaryExpressionSyntax binary)
         {
             switch (binary.Operator)
             {
@@ -279,7 +216,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             switch (value)
             {
                 case IdentifierNameSyntax identifier:
-                    return LookupVariable(identifier.Name);
+                    return graph.VariableFor(identifier.Name);
                 //case VariableExpression variableExpression:
                 //    return LookupVariable(variableExpression.Name);
                 default:
