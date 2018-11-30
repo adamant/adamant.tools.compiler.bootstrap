@@ -1,4 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using JetBrains.Annotations;
@@ -14,7 +13,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
         #endregion
 
         public Name FullName => SpecialName.Unknown;
+        public SimpleName LookupByName => SpecialName.Unknown;
         public DataType Type => DataType.Unknown;
-        public FixedDictionary<SimpleName, ISymbol> ChildSymbols => FixedDictionary<SimpleName, ISymbol>.Empty;
+        public SymbolSet ChildSymbols => SymbolSet.Empty;
     }
 }

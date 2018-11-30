@@ -20,6 +20,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [NotNull] public SimpleName Name => FullName.UnqualifiedName;
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [NotNull] public virtual SimpleName LookupByName => FullName.UnqualifiedName;
         [CanBeNull] public FixedList<GenericParameterSyntax> GenericParameters { get; }
         [NotNull] public FixedList<ParameterSyntax> Parameters { get; } // For now we will not support pure meta functions
         [NotNull] public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
@@ -33,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [NotNull] DataType ISymbol.Type => Type.Fulfilled();
         [NotNull] public TypePromise ReturnType { get; } = new TypePromise();
-        public FixedDictionary<SimpleName, ISymbol> ChildSymbols { get; }
+        public SymbolSet ChildSymbols { get; }
         [CanBeNull] public ControlFlowGraph ControlFlow { get; set; }
 
         protected FunctionDeclarationSyntax(
@@ -61,7 +64,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             FullName = fullName;
             GenericParameters = genericParameters;
             GenericConstraints = genericConstraints;
-            ChildSymbols = GetChildSymbols().ToFixedDictionary(s => s.FullName.UnqualifiedName);
+            ChildSymbols = new SymbolSet(GetChildSymbols());
         }
 
         [NotNull]

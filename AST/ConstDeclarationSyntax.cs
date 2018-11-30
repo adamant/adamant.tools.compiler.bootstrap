@@ -14,14 +14,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [NotNull] public FixedList<AttributeSyntax> Attributes { get; }
         [NotNull] [ItemNotNull] public FixedList<IModiferToken> Modifiers { get; }
         [NotNull] public Name FullName { get; }
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [NotNull] public SimpleName Name => FullName.UnqualifiedName;
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [NotNull] public SimpleName LookupByName => FullName.UnqualifiedName;
         [CanBeNull] public ExpressionSyntax TypeExpression { get; }
         [CanBeNull] public ExpressionSyntax Initializer { get; }
         [NotNull] public TypePromise Type { get; } = new TypePromise();
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [NotNull] DataType ISymbol.Type => Type.Fulfilled();
-        FixedDictionary<SimpleName, ISymbol> ISymbol.ChildSymbols => FixedDictionary<SimpleName, ISymbol>.Empty;
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        SymbolSet ISymbol.ChildSymbols => SymbolSet.Empty;
 
         public ConstDeclarationSyntax(
             [NotNull] CodeFile file,

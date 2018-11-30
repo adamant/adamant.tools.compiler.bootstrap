@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
+using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -11,11 +11,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public bool IsLifetime { get; }
         public bool IsParams { get; }
         [NotNull] public Name FullName { get; }
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [NotNull] public SimpleName Name => FullName.UnqualifiedName;
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [NotNull] public SimpleName LookupByName => FullName.UnqualifiedName;
         [CanBeNull] public ExpressionSyntax TypeExpression { get; }
         [NotNull] public TypePromise Type { get; } = new TypePromise();
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [NotNull] DataType ISymbol.Type => Type.Fulfilled();
-        [NotNull] FixedDictionary<SimpleName, ISymbol> ISymbol.ChildSymbols => FixedDictionary<SimpleName, ISymbol>.Empty;
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [NotNull] SymbolSet ISymbol.ChildSymbols => SymbolSet.Empty;
 
         public GenericParameterSyntax(
             bool isLifetime,

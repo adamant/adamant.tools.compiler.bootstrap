@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Model
             [NotNull, ItemNotNull] FixedList<Parameter> parameters,
             [NotNull] DataType returnType,
             [CanBeNull] ControlFlowGraph controlFlow)
-            : base(name, type, FixedDictionary<SimpleName, ISymbol>.Empty)
+            : base(name, type, SymbolSet.Empty)
         {
             Parameters = parameters;
             ReturnType = returnType;

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
@@ -42,11 +41,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         /// </summary>
         private static ISymbol BuildStringSymbol()
         {
-            var name = new SimpleName("String");
-            var symbol = new PrimitiveSymbol(name, null, Enumerable.Empty<ISymbol>());
-            var objectType = new ObjectType(symbol, true, false);
-            symbol.Type = new Metatype(objectType);
-            return symbol;
+            var typeName = new SimpleName("String");
+            var symbols = new List<ISymbol>()
+            {
+                 PrimitiveSymbol.Getter(typeName.Qualify("bytes"), new PointerType(DataType.Byte)),
+                 PrimitiveSymbol.Getter(typeName.Qualify("bytes_count"), DataType.Size),
+            };
+
+            return PrimitiveSymbol.ReferenceType(typeName, declaredMutable: false, symbols);
         }
 
         private static ISymbol BuildIntegerNumericSymbol([NotNull] IntegerType numericType)
@@ -54,9 +56,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             var typeName = numericType.Name;
             var symbols = new List<ISymbol>
             {
-                new PrimitiveSymbol(typeName.Qualify("remainder"), new FunctionType(new[] {numericType}, numericType))
+                PrimitiveSymbol.Member(typeName.Qualify("remainder"), new FunctionType(new[] {numericType}, numericType))
             };
-            return new PrimitiveSymbol(typeName, new Metatype(numericType), symbols);
+            return PrimitiveSymbol.SimpleType(numericType, symbols);
         }
     }
 }

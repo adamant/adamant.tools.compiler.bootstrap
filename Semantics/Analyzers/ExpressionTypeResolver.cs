@@ -384,10 +384,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             switch (memberAccess.Member)
             {
                 case IIdentifierToken identifier:
-                    var memberSymbol = symbol.Lookup(new SimpleName(identifier.Value));
-                    if (memberSymbol == UnknownSymbol.Instance)
-                        diagnostics.Add(NameBindingError.CouldNotBindMember(file, identifier.Span));
-                    type = memberSymbol.Type;
+                    var memberSymbols = symbol.Lookup(new SimpleName(identifier.Value));
+                    memberAccess.ReferencedSymbols = memberSymbols;
+                    switch (memberSymbols.Count)
+                    {
+                        case 0:
+                            diagnostics.Add(NameBindingError.CouldNotBindMember(file, identifier.Span));
+                            type = DataType.Unknown;
+                            break;
+                        case 1:
+                            var memberSymbol = memberSymbols.Single().NotNull();
+                            type = memberSymbol.Type;
+                            break;
+                        default:
+                            diagnostics.Add(NameBindingError.AmbiguousName(file, identifier.Span));
+                            type = DataType.Unknown;
+                            break;
+                    }
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(memberAccess.Member);

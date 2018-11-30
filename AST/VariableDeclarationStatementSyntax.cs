@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -15,6 +14,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [NotNull] public SimpleName Name => FullName.UnqualifiedName;
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [NotNull] public SimpleName LookupByName => FullName.UnqualifiedName.WithoutNumber();
         public TextSpan NameSpan { get; }
         [CanBeNull] public ExpressionSyntax TypeExpression { get; }
         [CanBeNull] public ExpressionSyntax Initializer { get; set; }
@@ -26,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        FixedDictionary<SimpleName, ISymbol> ISymbol.ChildSymbols => FixedDictionary<SimpleName, ISymbol>.Empty;
+        SymbolSet ISymbol.ChildSymbols => SymbolSet.Empty;
 
         public VariableDeclarationStatementSyntax(
             bool mutableBinding,

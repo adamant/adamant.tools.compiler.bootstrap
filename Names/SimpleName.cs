@@ -54,6 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
             return false;
         }
 
+        [NotNull]
         public SimpleName WithoutNumber()
         {
             if (Number == null) return this;

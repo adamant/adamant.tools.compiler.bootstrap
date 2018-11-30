@@ -14,6 +14,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [NotNull] public SimpleName Name => FullName.UnqualifiedName;
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [NotNull] public SimpleName LookupByName => FullName.UnqualifiedName;
         [CanBeNull] public FixedList<GenericParameterSyntax> GenericParameters { get; }
         [NotNull] public FixedList<IMemberDeclarationSyntax> Members { get; }
         [NotNull] public TypePromise<Metatype> Type { get; } = new TypePromise<Metatype>();
@@ -21,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         DataType ISymbol.Type => Type.Fulfilled();
-        public FixedDictionary<SimpleName, ISymbol> ChildSymbols { get; }
+        public SymbolSet ChildSymbols { get; }
 
         protected TypeDeclarationSyntax(
             [NotNull] CodeFile file,
@@ -34,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             FullName = fullName;
             Members = members;
             GenericParameters = genericParameters;
-            ChildSymbols = members.ToFixedDictionary(m => m.FullName.UnqualifiedName, m => (ISymbol)m);
+            ChildSymbols = new SymbolSet(members);
         }
 
         [DebuggerHidden]

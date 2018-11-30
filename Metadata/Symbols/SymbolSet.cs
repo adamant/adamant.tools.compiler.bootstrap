@@ -9,6 +9,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
     // A set of symbols that are indexed by name
     public class SymbolSet : FixedDictionary<SimpleName, FixedList<ISymbol>>
     {
+        [NotNull] public static new readonly SymbolSet Empty = new SymbolSet(Enumerable.Empty<ISymbol>());
+
         public SymbolSet([NotNull, ItemNotNull] IEnumerable<ISymbol> symbols)
         : base(GroupSymbols(symbols))
         {
@@ -18,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
         private static Dictionary<SimpleName, FixedList<ISymbol>> GroupSymbols(
             [NotNull, ItemNotNull] IEnumerable<ISymbol> symbols)
         {
-            return symbols.Distinct().GroupBy(s => s.FullName.UnqualifiedName.WithoutNumber())
+            return symbols.Distinct().GroupBy(s => s.LookupByName)
                 .ToDictionary(g => g.Key, g => g.ToFixedList());
         }
     }

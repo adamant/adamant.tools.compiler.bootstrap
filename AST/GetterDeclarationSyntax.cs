@@ -10,6 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         [NotNull] public FixedList<AttributeSyntax> Attributes { get; }
         [NotNull] public Name PropertyName { get; }
+        [NotNull] public override SimpleName LookupByName => PropertyName.UnqualifiedName;
         [NotNull] public ExpressionSyntax ReturnTypeExpression { get; }
 
         public GetterDeclarationSyntax(

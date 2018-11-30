@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
+using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -9,13 +9,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Model
     public abstract class Declaration : ISymbol
     {
         [NotNull] public Name FullName { get; }
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [NotNull] public SimpleName Name => FullName.UnqualifiedName;
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        [NotNull] public SimpleName LookupByName => FullName.UnqualifiedName;
+
         [NotNull] public DataType Type { get; }
-        [NotNull] public FixedDictionary<SimpleName, ISymbol> ChildSymbols { get; }
+        [NotNull] public SymbolSet ChildSymbols { get; }
 
         protected Declaration(
             [NotNull] Name fullName,
             [NotNull] DataType type,
-            [NotNull] FixedDictionary<SimpleName, ISymbol> childSymbols)
+            [NotNull] SymbolSet childSymbols)
         {
             FullName = fullName;
             Type = type;

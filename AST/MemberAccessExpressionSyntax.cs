@@ -1,4 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
@@ -12,6 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [CanBeNull] public ExpressionSyntax Expression { get; }
         public AccessOperator AccessOperator { get; }
         [NotNull] public IMemberNameToken Member { get; }
+        [CanBeNull] public FixedList<ISymbol> ReferencedSymbols { get; set; }
 
         public MemberAccessExpressionSyntax(
             TextSpan span,

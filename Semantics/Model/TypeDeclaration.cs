@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Model
             [NotNull] DataType type,
             [CanBeNull, ItemNotNull] IEnumerable<GenericParameter> genericParameters,
             [NotNull] FixedList<Declaration> members)
-            : base(name, type, members.ToFixedDictionary(m => m.FullName.UnqualifiedName, m => (ISymbol)m))
+            : base(name, type, new SymbolSet(members))
         {
             GenericParameters = genericParameters?.ToFixedList();
         }
