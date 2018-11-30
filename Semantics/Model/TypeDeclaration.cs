@@ -12,6 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Model
         [CanBeNull, ItemNotNull] public FixedList<GenericParameter> GenericParameters { get; }
         public bool IsGeneric => GenericParameters != null;
         public int? GenericArity => GenericParameters?.Count;
+        [NotNull] public FixedList<Declaration> Members { get; }
 
         public TypeDeclaration(
             [NotNull] Name name,
@@ -20,6 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Model
             [NotNull] FixedList<Declaration> members)
             : base(name, type, new SymbolSet(members))
         {
+            Members = members;
             GenericParameters = genericParameters?.ToFixedList();
         }
     }

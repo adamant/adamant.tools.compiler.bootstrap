@@ -28,5 +28,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Model
             Type = type;
             ChildSymbols = childSymbols;
         }
+
+        public override string ToString()
+        {
+            return FullName.ToString();
+        }
     }
 }

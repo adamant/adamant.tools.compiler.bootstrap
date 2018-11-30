@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
@@ -5,6 +6,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 {
     public class DeclarationVisitor<A> : ExpressionVisitor<A>
     {
+        public virtual void VisitDeclarations(
+            [NotNull] IEnumerable<DeclarationSyntax> declarations,
+            A args)
+        {
+            foreach (var declaration in declarations) VisitDeclaration(declaration, args);
+        }
+
         public virtual void VisitDeclaration([CanBeNull] DeclarationSyntax declaration, A args)
         {
             switch (declaration)
@@ -44,9 +52,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 VisitDeclaration(member.AsDeclarationSyntax, args);
         }
 
-        public virtual void VisitFunctionDeclaration([CanBeNull] FunctionDeclarationSyntax function, A args)
+        public virtual void VisitFunctionDeclaration([CanBeNull] FunctionDeclarationSyntax functionDeclaration, A args)
         {
-            switch (function)
+            switch (functionDeclaration)
             {
                 case NamedFunctionDeclarationSyntax namedFunction:
                     VisitNamedFunctionDeclaration(namedFunction, args);
@@ -58,7 +66,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                     // Ignore
                     break;
                 default:
-                    throw NonExhaustiveMatchException.For(function);
+                    throw NonExhaustiveMatchException.For(functionDeclaration);
             }
         }
 

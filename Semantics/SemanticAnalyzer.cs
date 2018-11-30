@@ -37,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             TypeResolutionValidator.Validate(namespacedDeclarations);
 #endif
 
-            ControlFlowGraphBuilder.BuildGraphs(namespacedDeclarations.OfType<FunctionDeclarationSyntax>());
+            ControlFlowGraphBuilder.BuildGraphs(namespacedDeclarations.Select(d => d.AsDeclarationSyntax));
 
             //var borrowChecker = new BorrowChecker();
             //borrowChecker.Check(declarationAnalyses);

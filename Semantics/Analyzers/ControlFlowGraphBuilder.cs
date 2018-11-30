@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
+using Adamant.Tools.Compiler.Bootstrap.AST.Visitors;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
@@ -13,9 +14,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 {
     public class ControlFlowGraphBuilder
     {
-        public static void BuildGraphs([NotNull, ItemNotNull] IEnumerable<FunctionDeclarationSyntax> functions)
+        public static void BuildGraphs([NotNull, ItemNotNull] IEnumerable<DeclarationSyntax> declarations)
         {
-            foreach (var function in functions.Where(ShouldBuildGraph))
+            var visitor = new GetFunctionDeclarationsVisitor();
+            visitor.VisitDeclarations(declarations);
+            foreach (var function in visitor.FunctionDeclarations.Where(ShouldBuildGraph))
             {
                 var builder = new ControlFlowGraphBuilder();
                 builder.BuildGraph(function);
@@ -213,6 +216,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     {
                         case IIntegerLiteralToken _:
                             throw new InvalidOperationException("Integer literals should have an implicit conversion around them");
+                        case IStringLiteralToken _:
+                            throw new InvalidOperationException("String literals should have an implicit conversion around them");
                         default:
                             throw NonExhaustiveMatchException.For(literalExpression.Literal);
                     }

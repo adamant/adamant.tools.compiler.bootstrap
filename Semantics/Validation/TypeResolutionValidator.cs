@@ -28,10 +28,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
             typeDeclaration?.Type.Resolved();
         }
 
-        public override void VisitFunctionDeclaration([CanBeNull] FunctionDeclarationSyntax function, Void args)
+        public override void VisitFunctionDeclaration([CanBeNull] FunctionDeclarationSyntax functionDeclaration, Void args)
         {
-            base.VisitFunctionDeclaration(function, args);
-            function?.ReturnType.Resolved();
+            base.VisitFunctionDeclaration(functionDeclaration, args);
+            functionDeclaration?.ReturnType.Resolved();
         }
 
         public override void VisitExpression(ExpressionSyntax expression, Void args)
