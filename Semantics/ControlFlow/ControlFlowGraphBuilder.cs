@@ -10,7 +10,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 {
     public class ControlFlowGraphBuilder
     {
