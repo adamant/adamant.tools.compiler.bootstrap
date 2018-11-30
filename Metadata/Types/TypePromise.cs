@@ -24,14 +24,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public PromiseState State { get; private set; }
         [CanBeNull] private Type DataType { get; set; }
 
-        [DebuggerStepThrough]
+        [DebuggerHidden]
         public void BeginFulfilling()
         {
             Requires.That(nameof(State), State == PromiseState.Pending);
             State = PromiseState.InProgress;
         }
 
-        [DebuggerStepThrough]
+        [DebuggerHidden]
         [NotNull]
         public Type Fulfill([NotNull] Type type)
         {
@@ -42,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             return type;
         }
 
-        [DebuggerStepThrough]
+        [DebuggerHidden]
         [NotNull]
         public Type Resolve([NotNull] Type type)
         {
@@ -54,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             return type;
         }
 
-        [DebuggerStepThrough]
+        [DebuggerHidden]
         [NotNull]
         public Type Fulfilled()
         {
@@ -64,7 +64,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             return DataType.NotNull();
         }
 
-        [DebuggerStepThrough]
+        [DebuggerHidden]
         [NotNull]
         public Type Resolved()
         {

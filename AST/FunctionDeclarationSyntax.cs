@@ -67,9 +67,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [NotNull]
         private IEnumerable<ISymbol> GetChildSymbols()
         {
+            var visitor = new GetVariableDeclarationsVisitor();
+            visitor.VisitExpression(Body, default);
             return Parameters
                 .Concat(GenericParameters ?? Enumerable.Empty<ISymbol>())
-                .Concat(GetVariableDeclarationsVisitor.Instance.VisitExpression(Body, default).NotNull());
+                .Concat(visitor.VariableDeclarations);
         }
 
         [DebuggerHidden]

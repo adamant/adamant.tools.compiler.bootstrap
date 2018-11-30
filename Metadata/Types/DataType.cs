@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
@@ -35,6 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public abstract bool IsResolved { get; }
 
         [NotNull]
+        [DebuggerHidden]
         public DataType AssertResolved()
         {
             if (!IsResolved)

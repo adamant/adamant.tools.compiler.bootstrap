@@ -5,6 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Model;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Validation;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
@@ -31,6 +32,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // Do type checking
             var typeChecker = new DeclarationTypeResolver(diagnostics);
             typeChecker.ResolveTypesInDeclarations(namespacedDeclarations);
+
+#if DEBUG
+            TypeResolutionValidator.Validate(namespacedDeclarations);
+#endif
 
             ControlFlowGraphBuilder.BuildGraphs(namespacedDeclarations.OfType<FunctionDeclarationSyntax>());
 

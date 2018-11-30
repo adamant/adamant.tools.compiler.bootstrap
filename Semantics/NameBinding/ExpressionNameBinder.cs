@@ -3,7 +3,6 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.AST.Visitors;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
@@ -11,7 +10,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
 {
-    public class ExpressionNameBinder : ExpressionVisitor<LexicalScope, Void>
+    public class ExpressionNameBinder : ExpressionVisitor<LexicalScope>
     {
         [NotNull] private readonly Diagnostics diagnostics;
         [NotNull] private readonly CodeFile file;
@@ -24,14 +23,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
             this.file = file;
         }
 
-        public override Void VisitExpression([CanBeNull] ExpressionSyntax expression, [NotNull] LexicalScope containingScope)
+        public override void VisitBlock([CanBeNull] BlockSyntax block, [NotNull] LexicalScope containingScope)
         {
-            return expression == null ? default : base.VisitExpression(expression, containingScope);
-        }
-
-        public override Void VisitBlock([CanBeNull] BlockSyntax block, [NotNull] LexicalScope containingScope)
-        {
-            if (block == null) return default;
+            if (block == null) return;
 
             var symbols = new List<ISymbol>();
 
@@ -43,11 +37,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
 
             foreach (var statement in block.Statements)
                 VisitStatement(statement, containingScope);
-
-            return default;
         }
 
-        public override Void VisitIdentifierName(
+        public override void VisitIdentifierName(
             [NotNull] IdentifierNameSyntax identifierName,
             [NotNull] LexicalScope containingScope)
         {
@@ -55,7 +47,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
             if (!symbols.Any())
                 diagnostics.Add(NameBindingError.CouldNotBindName(file, identifierName.Span));
             identifierName.ReferencedSymbols = symbols;
-            return default;
         }
     }
 }

@@ -1,202 +1,218 @@
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 {
-    public class ExpressionVisitor<A, R>
+    public class ExpressionVisitor<A>
     {
-        public virtual R DefaultResult(A args) => default;
-
-        public virtual R CombineResults(A args, params R[] results) => default;
-
-        public virtual R VisitStatement([CanBeNull] StatementSyntax statement, A args)
+        public virtual void VisitStatement([CanBeNull] StatementSyntax statement, A args)
         {
             switch (statement)
             {
                 case VariableDeclarationStatementSyntax variableDeclaration:
-                    return VisitVariableDeclarationStatement(variableDeclaration, args);
+                    VisitVariableDeclarationStatement(variableDeclaration, args);
+                    break;
                 case ExpressionSyntax expression:
-                    return VisitExpression(expression, args);
+                    VisitExpression(expression, args);
+                    break;
+                case null:
+                    // Ignore
+                    break;
                 default:
                     throw NonExhaustiveMatchException.For(statement);
             }
         }
 
-        public virtual R VisitVariableDeclarationStatement([NotNull] VariableDeclarationStatementSyntax variableDeclaration, A args)
+        public virtual void VisitVariableDeclarationStatement([NotNull] VariableDeclarationStatementSyntax variableDeclaration, A args)
         {
-            var r1 = VisitExpression(variableDeclaration.TypeExpression, args);
-            var r2 = VisitExpression(variableDeclaration.Initializer, args);
-            return CombineResults(args, r1, r2);
+            VisitExpression(variableDeclaration.TypeExpression, args);
+            VisitExpression(variableDeclaration.Initializer, args);
         }
 
-        public virtual R VisitExpression([CanBeNull] ExpressionSyntax expression, A args)
+        public virtual void VisitExpression([CanBeNull] ExpressionSyntax expression, A args)
         {
             switch (expression)
             {
                 case BinaryExpressionSyntax binaryExpression:
-                    return VisitBinaryExpression(binaryExpression, args);
+                    VisitBinaryExpression(binaryExpression, args);
+                    break;
                 case ReturnExpressionSyntax returnExpression:
-                    return VisitReturnExpression(returnExpression, args);
+                    VisitReturnExpression(returnExpression, args);
+                    break;
                 case InvocationSyntax invocation:
-                    return VisitInvocation(invocation, args);
+                    VisitInvocation(invocation, args);
+                    break;
                 case LiteralExpressionSyntax literalExpression:
-                    return VisitLiteralExpression(literalExpression, args);
+                    VisitLiteralExpression(literalExpression, args);
+                    break;
                 case IdentifierNameSyntax identifierName:
-                    return VisitIdentifierName(identifierName, args);
+                    VisitIdentifierName(identifierName, args);
+                    break;
                 case UnaryExpressionSyntax unaryExpression:
-                    return VisitUnaryExpression(unaryExpression, args);
+                    VisitUnaryExpression(unaryExpression, args);
+                    break;
                 case AssignmentExpressionSyntax assignmentExpression:
-                    return VisitAssignmentExpression(assignmentExpression, args);
+                    VisitAssignmentExpression(assignmentExpression, args);
+                    break;
                 case BlockSyntax block:
-                    return VisitBlock(block, args);
+                    VisitBlock(block, args);
+                    break;
                 case LifetimeTypeSyntax lifetimeType:
-                    return VisitLifetimeType(lifetimeType, args);
+                    VisitLifetimeType(lifetimeType, args);
+                    break;
                 case NewObjectExpressionSyntax newObjectExpression:
-                    return VisitNewObjectExpression(newObjectExpression, args);
+                    VisitNewObjectExpression(newObjectExpression, args);
+                    break;
                 case MemberAccessExpressionSyntax memberAccessExpression:
-                    return VisitMemberAccessExpression(memberAccessExpression, args);
+                    VisitMemberAccessExpression(memberAccessExpression, args);
+                    break;
                 case UnsafeExpressionSyntax unsafeExpression:
-                    return VisitUnsafeExpression(unsafeExpression, args);
+                    VisitUnsafeExpression(unsafeExpression, args);
+                    break;
                 case GenericsInvocationSyntax genericsInvocation:
-                    return VisitGenericInvocation(genericsInvocation, args);
+                    VisitGenericInvocation(genericsInvocation, args);
+                    break;
                 case LifetimeNameSyntax lifetimeName:
-                    return VisitLifetimeName(lifetimeName, args);
+                    VisitLifetimeName(lifetimeName, args);
+                    break;
                 case SelfExpressionSyntax selfExpression:
-                    return VisitSelfExpression(selfExpression, args);
+                    VisitSelfExpression(selfExpression, args);
+                    break;
                 case BaseExpressionSyntax baseExpression:
-                    return VisitBaseExpression(baseExpression, args);
+                    VisitBaseExpression(baseExpression, args);
+                    break;
                 case LoopExpressionSyntax loopExpression:
-                    return VisitLoopExpression(loopExpression, args);
+                    VisitLoopExpression(loopExpression, args);
+                    break;
                 case IfExpressionSyntax ifExpression:
-                    return VisitIfExpression(ifExpression, args);
+                    VisitIfExpression(ifExpression, args);
+                    break;
                 case ResultExpressionSyntax resultExpression:
-                    return VisitResultExpression(resultExpression, args);
+                    VisitResultExpression(resultExpression, args);
+                    break;
                 case BreakExpressionSyntax breakExpression:
-                    return VisitBreakExpression(breakExpression, args);
+                    VisitBreakExpression(breakExpression, args);
+                    break;
+                case ImplicitNumericConversionExpression implicitNumericConversion:
+                    VisitImplicitNumericConversion(implicitNumericConversion, args);
+                    break;
                 case null:
-                    return VisitNull(args);
+                    // Ignore
+                    break;
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
         }
 
-        public virtual R VisitBreakExpression(BreakExpressionSyntax breakExpression, A args)
+        public virtual void VisitImplicitNumericConversion([NotNull] ImplicitNumericConversionExpression implicitNumericConversion, A args)
         {
-            return DefaultResult(args);
+            VisitExpression(implicitNumericConversion.Expression, args);
         }
 
-        public virtual R VisitResultExpression([NotNull] ResultExpressionSyntax resultExpression, A args)
+        public virtual void VisitBreakExpression(BreakExpressionSyntax breakExpression, A args)
         {
-            return VisitExpression(resultExpression.Expression, args);
         }
 
-        public virtual R VisitIfExpression([NotNull] IfExpressionSyntax ifExpression, A args)
+        public virtual void VisitResultExpression([NotNull] ResultExpressionSyntax resultExpression, A args)
         {
-            var r1 = VisitExpression(ifExpression.Condition, args);
-            var r2 = VisitExpression(ifExpression.ThenBlock, args);
-            var r3 = VisitExpression(ifExpression.ElseClause, args);
-            return CombineResults(args, r1, r2, r3);
+            VisitExpression(resultExpression.Expression, args);
         }
 
-        public virtual R VisitLoopExpression([NotNull] LoopExpressionSyntax loopExpression, A args)
+        public virtual void VisitIfExpression([NotNull] IfExpressionSyntax ifExpression, A args)
         {
-            return VisitExpression(loopExpression.Block, args);
+            VisitExpression(ifExpression.Condition, args);
+            VisitExpression(ifExpression.ThenBlock, args);
+            VisitExpression(ifExpression.ElseClause, args);
         }
 
-        public virtual R VisitBaseExpression(BaseExpressionSyntax baseExpression, A args)
+        public virtual void VisitLoopExpression([NotNull] LoopExpressionSyntax loopExpression, A args)
         {
-            return DefaultResult(args);
+            VisitExpression(loopExpression.Block, args);
         }
 
-        public virtual R VisitSelfExpression(SelfExpressionSyntax selfExpression, A args)
+        public virtual void VisitBaseExpression(BaseExpressionSyntax baseExpression, A args)
         {
-            return DefaultResult(args);
         }
 
-        public virtual R VisitLifetimeName(LifetimeNameSyntax lifetimeName, A args)
+        public virtual void VisitSelfExpression(SelfExpressionSyntax selfExpression, A args)
         {
-            return DefaultResult(args);
         }
 
-        public virtual R VisitGenericInvocation([NotNull] GenericsInvocationSyntax genericsInvocation, A args)
+        public virtual void VisitLifetimeName(LifetimeNameSyntax lifetimeName, A args)
         {
-            var r = VisitExpression(genericsInvocation.Callee, args);
-            var argumentResults = genericsInvocation.Arguments.Select(a => VisitExpression(a.Value, args));
-            return CombineResults(args, r.Yield().Concat(argumentResults).ToArray());
         }
 
-        public virtual R VisitUnsafeExpression([NotNull] UnsafeExpressionSyntax unsafeExpression, A args)
+        public virtual void VisitGenericInvocation([NotNull] GenericsInvocationSyntax genericsInvocation, A args)
         {
-            return VisitExpression(unsafeExpression.Expression, args);
+            VisitExpression(genericsInvocation.Callee, args);
+            foreach (var argument in genericsInvocation.Arguments) VisitArgument(argument, args);
         }
 
-        public virtual R VisitMemberAccessExpression([NotNull] MemberAccessExpressionSyntax memberAccessExpression, A args)
+        public virtual void VisitUnsafeExpression([NotNull] UnsafeExpressionSyntax unsafeExpression, A args)
         {
-            return VisitExpression(memberAccessExpression.Expression, args);
+            VisitExpression(unsafeExpression.Expression, args);
         }
 
-        public virtual R VisitNewObjectExpression([NotNull] NewObjectExpressionSyntax newObjectExpression, A args)
+        public virtual void VisitMemberAccessExpression([NotNull] MemberAccessExpressionSyntax memberAccessExpression, A args)
         {
-            var r = VisitExpression(newObjectExpression.Constructor, args);
-            var argumentResults = newObjectExpression.Arguments.Select(a => VisitExpression(a.Value, args));
-            return CombineResults(args, r.Yield().Concat(argumentResults).ToArray());
+            VisitExpression(memberAccessExpression.Expression, args);
         }
 
-        public virtual R VisitLifetimeType([NotNull] LifetimeTypeSyntax lifetimeType, A args)
+        public virtual void VisitNewObjectExpression([NotNull] NewObjectExpressionSyntax newObjectExpression, A args)
         {
-            return VisitExpression(lifetimeType.ReferentTypeExpression, args);
+            VisitExpression(newObjectExpression.Constructor, args);
+            foreach (var argument in newObjectExpression.Arguments) VisitArgument(argument, args);
         }
 
-        public virtual R VisitBlock([NotNull] BlockSyntax block, A args)
+        public virtual void VisitArgument([NotNull] ArgumentSyntax argument, A args)
         {
-            return CombineResults(args, block.Statements.Select(s => VisitStatement(s, args)).ToArray());
+            VisitExpression(argument.Value, args);
         }
 
-        public virtual R VisitAssignmentExpression([NotNull] AssignmentExpressionSyntax assignmentExpression, A args)
+        public virtual void VisitLifetimeType([NotNull] LifetimeTypeSyntax lifetimeType, A args)
         {
-            var r1 = VisitExpression(assignmentExpression.LeftOperand, args);
-            var r2 = VisitExpression(assignmentExpression.RightOperand, args);
-            return CombineResults(args, r1, r2);
+            VisitExpression(lifetimeType.ReferentTypeExpression, args);
         }
 
-        public virtual R VisitUnaryExpression([NotNull] UnaryExpressionSyntax unaryExpression, A args)
+        public virtual void VisitBlock([NotNull] BlockSyntax block, A args)
         {
-            return VisitExpression(unaryExpression.Operand, args);
+            foreach (var statement in block.Statements) VisitStatement(statement, args);
         }
 
-        public virtual R VisitIdentifierName([NotNull] IdentifierNameSyntax identifierName, A args)
+        public virtual void VisitAssignmentExpression([NotNull] AssignmentExpressionSyntax assignmentExpression, A args)
         {
-            return DefaultResult(args);
+            VisitExpression(assignmentExpression.LeftOperand, args);
+            VisitExpression(assignmentExpression.RightOperand, args);
         }
 
-        public virtual R VisitNull(A args)
+        public virtual void VisitUnaryExpression([NotNull] UnaryExpressionSyntax unaryExpression, A args)
         {
-            return DefaultResult(args);
+            VisitExpression(unaryExpression.Operand, args);
         }
 
-        public virtual R VisitLiteralExpression([NotNull] LiteralExpressionSyntax literalExpression, A args)
+        public virtual void VisitIdentifierName([NotNull] IdentifierNameSyntax identifierName, A args)
         {
-            return DefaultResult(args);
         }
 
-        public virtual R VisitInvocation([NotNull] InvocationSyntax invocation, A args)
+        public virtual void VisitLiteralExpression([NotNull] LiteralExpressionSyntax literalExpression, A args)
         {
-            var r = VisitExpression(invocation.Callee, args);
-            var argumentResults = invocation.Arguments.Select(a => VisitExpression(a.Value, args));
-            return CombineResults(args, r.Yield().Concat(argumentResults).ToArray());
         }
 
-        public virtual R VisitReturnExpression([NotNull] ReturnExpressionSyntax returnExpression, A args)
+        public virtual void VisitInvocation([NotNull] InvocationSyntax invocation, A args)
         {
-            return VisitExpression(returnExpression.ReturnValue, args);
+            VisitExpression(invocation.Callee, args);
+            foreach (var argument in invocation.Arguments) VisitArgument(argument, args);
         }
 
-        public virtual R VisitBinaryExpression([NotNull] BinaryExpressionSyntax binaryExpression, A args)
+        public virtual void VisitReturnExpression([NotNull] ReturnExpressionSyntax returnExpression, A args)
         {
-            var r1 = VisitExpression(binaryExpression.LeftOperand, args);
-            var r2 = VisitExpression(binaryExpression.RightOperand, args);
-            return CombineResults(args, r1, r2);
+            VisitExpression(returnExpression.ReturnValue, args);
+        }
+
+        public virtual void VisitBinaryExpression([NotNull] BinaryExpressionSyntax binaryExpression, A args)
+        {
+            VisitExpression(binaryExpression.LeftOperand, args);
+            VisitExpression(binaryExpression.RightOperand, args);
         }
     }
 }
