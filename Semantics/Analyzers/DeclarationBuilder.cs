@@ -30,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                             classDeclaration.FullName,
                             classDeclaration.Type.Resolved(),
                             BuildGenericParameters(classDeclaration.GenericParameters),
-                            Build(classDeclaration.Members.Select(m => m.AsDeclarationSyntax))));
+                            Build(classDeclaration.Members)));
                         break;
                     case ConstructorDeclarationSyntax constructorDeclaration:
                         declarations.Add(new ConstructorDeclaration(

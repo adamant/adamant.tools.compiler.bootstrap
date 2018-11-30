@@ -69,6 +69,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     case AssignmentStatement assignment:
                         code.AppendLine($"{Convert(assignment.Place)} = {Convert(assignment.Value)};");
                         break;
+                    case CallStatement callStatement:
+                        var mangledName = nameMangler.Mangle(callStatement.FunctionName);
+                        var arguments = callStatement.Arguments.Select(Convert);
+                        code.AppendLine($"{Convert(callStatement.Place)} = {mangledName}({string.Join(", ", arguments)});");
+                        break;
                     case NewObjectStatement newObjectStatement:
                         // TODO implement this
                         break;
@@ -95,6 +100,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             {
                 case IntegerConstant integer:
                     return $"({Convert(integer.Type)}){{{integer.Value}}}";
+                case Utf8BytesConstant utf8BytesConstant:
+                    return $"((ₐbyte const *)u8\"{utf8BytesConstant.Value.Escape()}\")";
                 //case VariableReference variable:
                 //    return "ₜ" + NameOf(variable);
                 default:
@@ -108,8 +115,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             {
                 case ObjectType objectType:
                     return nameMangler.Mangle(objectType);
-                case SizedIntegerType integerType:
-                    return nameMangler.Mangle(integerType.Name);
+                case SimpleType simpleType:
+                    return nameMangler.Mangle(simpleType.Name);
                 default:
                     throw NonExhaustiveMatchException.For(type);
             }

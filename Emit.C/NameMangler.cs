@@ -66,6 +66,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         }
 
         [NotNull]
+        public string MangleName([NotNull] ConstructorDeclaration constructor)
+        {
+            // builder with room for the characters we are likely to add
+            var builder = new StringBuilder(EstimateSize(constructor.FullName) + 5);
+            Mangle(constructor.FullName, builder);
+            builder.Append('´');
+            builder.Append(constructor.Arity);
+            return builder.ToString().NotNull();
+        }
+
+        [NotNull]
         public string MangleName([NotNull] TypeDeclaration type)
         {
             // builder with room for the characters we are likely to add

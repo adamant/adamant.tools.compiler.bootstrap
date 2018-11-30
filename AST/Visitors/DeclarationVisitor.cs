@@ -17,8 +17,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         {
             switch (declaration)
             {
-                case FunctionDeclarationSyntax function:
-                    VisitFunctionDeclaration(function, args);
+                case MemberDeclarationSyntax memberDeclaration:
+                    VisitMemberDeclaration(memberDeclaration, args);
+                    break;
+                case null:
+                    // Ignore
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.For(declaration);
+            }
+        }
+
+        public virtual void VisitMemberDeclaration([CanBeNull] MemberDeclarationSyntax memberDeclaration, A args)
+        {
+            switch (memberDeclaration)
+            {
+                case FunctionDeclarationSyntax functionDeclaration:
+                    VisitFunctionDeclaration(functionDeclaration, args);
                     break;
                 case TypeDeclarationSyntax typeDeclaration:
                     VisitTypeDeclaration(typeDeclaration, args);
@@ -27,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                     // Ignore
                     break;
                 default:
-                    throw NonExhaustiveMatchException.For(declaration);
+                    throw NonExhaustiveMatchException.For(memberDeclaration);
             }
         }
 
@@ -49,7 +64,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         public virtual void VisitClassDeclaration([NotNull] ClassDeclarationSyntax classDeclaration, A args)
         {
             foreach (var member in classDeclaration.Members)
-                VisitDeclaration(member.AsDeclarationSyntax, args);
+                VisitDeclaration(member, args);
         }
 
         public virtual void VisitFunctionDeclaration([CanBeNull] FunctionDeclarationSyntax functionDeclaration, A args)

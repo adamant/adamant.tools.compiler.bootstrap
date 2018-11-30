@@ -36,17 +36,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             switch (declaration)
             {
                 case FunctionDeclaration function:
-                    Emit(function, code);
+                    EmitFunction(function, code);
+                    break;
+                case ConstructorDeclaration constructor:
+                    EmitConstructor(constructor, code);
                     break;
                 case TypeDeclaration type:
-                    Emit(type, code);
+                    EmitType(type, code);
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
             }
         }
 
-        private void Emit([NotNull] FunctionDeclaration function, [NotNull] Code code)
+        private void EmitFunction([NotNull] FunctionDeclaration function, [NotNull] Code code)
         {
             // Don't emit functions without control flow, they are generic
             // TODO need to handle better
@@ -66,12 +69,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.Definitions.EndBlock();
         }
 
+        private void EmitConstructor([NotNull] ConstructorDeclaration constructor, [NotNull] Code code)
+        {
+            // Don't emit constructors without control flow, they are generic
+            // TODO need to handle better
+            if (constructor.ControlFlow == null) return;
+
+            var name = nameMangler.MangleName(constructor);
+            var parameters = Convert(constructor.Parameters);
+            var returnType = typeConverter.Convert(constructor.ReturnType.AssertResolved());
+
+            // Write out the function declaration for C so we can call functions defined after others
+            code.FunctionDeclarations.AppendLine($"{returnType} {name}({parameters});");
+
+            code.Definitions.DeclarationSeparatorLine();
+            code.Definitions.AppendLine($"{returnType} {name}({parameters})");
+            code.Definitions.BeginBlock();
+            controlFlowEmitter.Emit(constructor.ControlFlow, code);
+            code.Definitions.EndBlock();
+        }
+
         private string Convert([NotNull][ItemNotNull] IEnumerable<Parameter> parameters)
         {
             return string.Join(", ", parameters.Select(parameterConverter.Convert));
         }
 
-        private void Emit([NotNull] TypeDeclaration type, [NotNull] Code code)
+        private void EmitType([NotNull] TypeDeclaration type, [NotNull] Code code)
         {
             var typeName = nameMangler.MangleName(type);
 

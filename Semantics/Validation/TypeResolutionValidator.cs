@@ -7,11 +7,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
 {
     public class TypeResolutionValidator : DeclarationVisitor<Void>
     {
-        public static void Validate([NotNull, ItemNotNull] FixedList<INamespacedDeclarationSyntax> namespacedDeclarations)
+        public static void Validate([NotNull, ItemNotNull] FixedList<MemberDeclarationSyntax> namespacedDeclarations)
         {
             var validator = new TypeResolutionValidator();
             foreach (var declaration in namespacedDeclarations)
-                validator.VisitDeclaration(declaration.AsDeclarationSyntax);
+                validator.VisitDeclaration(declaration);
         }
 
         public override void VisitDeclaration([CanBeNull] DeclarationSyntax declaration, Void args)

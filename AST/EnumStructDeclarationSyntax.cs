@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             [NotNull] FixedList<GenericConstraintSyntax> genericConstraints,
             [NotNull] FixedList<ExpressionSyntax> invariants,
             [NotNull] FixedList<EnumVariantSyntax> variants,
-            [NotNull] FixedList<IMemberDeclarationSyntax> members)
+            [NotNull] FixedList<MemberDeclarationSyntax> members)
             : base(file, nameSpan, fullName, genericParameters, members)
         {
             Attributes = attributes;

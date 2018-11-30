@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
@@ -13,6 +14,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [CanBeNull] public ExpressionSyntax ReturnTypeExpression { get; }
         DataType ISymbol.Type => Type.Fulfilled();
         public bool IsExternalFunction { get; set; }
+
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        DeclarationSyntax IDeclarationSyntax.AsDeclarationSyntax => this;
 
         public NamedFunctionDeclarationSyntax(
             [NotNull] CodeFile file,

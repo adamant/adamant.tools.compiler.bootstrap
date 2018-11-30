@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.AST.Visitors;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -14,6 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [NotNull, ItemNotNull] public FixedList<UsingDirectiveSyntax> UsingDirectives { get; }
         [NotNull, ItemNotNull] public FixedList<DeclarationSyntax> Declarations { get; }
         [NotNull, ItemNotNull] public FixedList<INamespacedDeclarationSyntax> AllNamespacedDeclarations { get; }
+        [NotNull, ItemNotNull] public FixedList<MemberDeclarationSyntax> AllMemberDeclarations { get; }
         [NotNull, ItemNotNull] public FixedList<Diagnostic> Diagnostics { get; }
 
         public CompilationUnitSyntax(
@@ -28,6 +30,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             UsingDirectives = usingDirectives;
             Declarations = declarations;
             AllNamespacedDeclarations = GetAllNamespacedDeclarations(declarations);
+            var visitor = new GetMemberDeclarationsVisitor();
+            visitor.VisitDeclarations(declarations);
+            AllMemberDeclarations = visitor.MemberDeclarations.ToFixedList();
             Diagnostics = diagnostics;
         }
 

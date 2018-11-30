@@ -95,7 +95,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        public IMemberDeclarationSyntax ParseMemberDeclaration()
+        public MemberDeclarationSyntax ParseMemberDeclaration()
         {
             var attributes = ParseAttributes();
             var modifiers = AcceptMany(Tokens.AcceptToken<IModiferToken>);
@@ -233,13 +233,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         }
 
         [NotNull]
-        private FixedList<IMemberDeclarationSyntax> ParseMemberDeclarations()
+        private FixedList<MemberDeclarationSyntax> ParseMemberDeclarations()
         {
-            return ParseMany<IMemberDeclarationSyntax, ICloseBraceToken>(ParseMemberDeclaration);
+            return ParseMany<MemberDeclarationSyntax, ICloseBraceToken>(ParseMemberDeclaration);
         }
 
         [NotNull]
-        private FixedList<IMemberDeclarationSyntax> ParseTypeBody()
+        private FixedList<MemberDeclarationSyntax> ParseTypeBody()
         {
             Tokens.Expect<IOpenBraceToken>();
             var members = ParseMemberDeclarations();
@@ -784,6 +784,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers)
         {
+            // TODO error on attributes and modifiers
             Tokens.Expect<IExternalKeywordToken>();
             return ParseTypeBody().Select(d =>
             {
@@ -792,7 +793,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     function.IsExternalFunction = true;
                     return function;
                 }
-                Add(ParseError.DeclarationNotAllowedInExternal(File, d.AsDeclarationSyntax.NameSpan));
+                Add(ParseError.DeclarationNotAllowedInExternal(File, d.NameSpan));
                 return null;
             }).Where(d => d != null).ToFixedList();
         }

@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
@@ -8,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         public readonly int Number; // The declaration number is used as its name in the IR
 
         // If this declaration corresponds to an argument or local variable, what it was named. Not guaranteed unique
-        [CanBeNull] public string Name = null;
+        [CanBeNull] public SimpleName Name = null;
         public readonly bool IsParameter;
         public readonly bool MutableBinding;
         [NotNull] public readonly DataType Type;

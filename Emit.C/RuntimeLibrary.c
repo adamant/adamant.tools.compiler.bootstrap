@@ -20,3 +20,6 @@ void test()
     //void* ptr = aligned_alloc(8, 32);
     //free(ptr);
 }
+
+// Inline functions from RuntimeLibrary.h
+extern ᵢString ᵢString·ₐoperator_string_literal(ₐsize count, ₐbyte const* bytes);

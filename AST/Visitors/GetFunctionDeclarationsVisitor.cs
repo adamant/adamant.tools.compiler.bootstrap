@@ -9,7 +9,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         [NotNull] public IReadOnlyList<FunctionDeclarationSyntax> FunctionDeclarations => functionDeclarations;
         [NotNull] private readonly List<FunctionDeclarationSyntax> functionDeclarations = new List<FunctionDeclarationSyntax>();
 
-
         public override void VisitFunctionDeclaration(FunctionDeclarationSyntax functionDeclaration, Void args)
         {
             // No need to visit the children, no functions there

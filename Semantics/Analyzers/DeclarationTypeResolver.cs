@@ -27,30 +27,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             this.diagnostics = diagnostics;
         }
 
-        public void ResolveTypesInDeclarations([NotNull, ItemNotNull] FixedList<INamespacedDeclarationSyntax> declarations)
+        public void ResolveTypesInDeclarations([NotNull, ItemNotNull] FixedList<MemberDeclarationSyntax> declarations)
         {
-            ResolveSignatureTypesInDeclarations(declarations.Select(AsDeclarationSyntax));
+            ResolveSignatureTypesInDeclarations(declarations);
             // Function bodies are checked after signatures to ensure that all function invocation
             // expressions can get a type for the invoked function.
-            ResolveBodyTypesInDeclarations(declarations.Select(AsDeclarationSyntax));
+            ResolveBodyTypesInDeclarations(declarations);
         }
 
         private void ResolveSignatureTypesInDeclarations(
-            [NotNull] [ItemNotNull] IEnumerable<DeclarationSyntax> declarations,
-            [CanBeNull] TypeDeclarationSyntax declaringType = null)
+            [NotNull] [ItemNotNull] IEnumerable<DeclarationSyntax> declarations)
         {
             foreach (var declaration in declarations)
-                ResolveSignatureTypesInDeclaration(declaration, declaringType);
+                ResolveSignatureTypesInDeclaration(declaration);
         }
 
-        private void ResolveSignatureTypesInDeclaration(
-            [NotNull] DeclarationSyntax declaration,
-            [CanBeNull] TypeDeclarationSyntax declaringType)
+        private void ResolveSignatureTypesInDeclaration([NotNull] DeclarationSyntax declaration)
         {
             switch (declaration)
             {
                 case FunctionDeclarationSyntax f:
-                    ResolveSignatureTypesInFunction(f, declaringType);
+                    ResolveSignatureTypesInFunction(f);
                     break;
                 case TypeDeclarationSyntax t:
                     ResolveSignatureTypesInTypeDeclaration(t);
@@ -63,21 +60,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             }
         }
 
-        private void ResolveSignatureTypesInFunction(
-            [NotNull] FunctionDeclarationSyntax function,
-            [CanBeNull] TypeDeclarationSyntax declaringType)
+        private void ResolveSignatureTypesInFunction([NotNull] FunctionDeclarationSyntax function)
         {
             function.Type.BeginFulfilling();
             var diagnosticCount = diagnostics.Count;
 
-            var resolver = new ExpressionTypeResolver(function.File, diagnostics, declaringType: declaringType?.Type.Fulfilled());
+            // Resolve the declaring type because we need its type for things like `self`
+            if (function.DeclaringType != null)
+                ResolveSignatureTypesInTypeDeclaration(function.DeclaringType);
+
+            var resolver = new ExpressionTypeResolver(function.File, diagnostics, function.DeclaringType?.Type.Fulfilled());
 
             if (function.GenericParameters != null)
                 ResolveTypesInGenericParameters(function.GenericParameters, resolver);
 
-            var parameterTypes = ResolveTypesInParameters(function, resolver, declaringType);
+            var parameterTypes = ResolveTypesInParameters(function, resolver);
 
-            var returnType = ResolveReturnType(function, resolver, declaringType);
+            var returnType = ResolveReturnType(function, resolver);
             DataType functionType = new FunctionType(parameterTypes, returnType);
 
             if (function.GenericParameters?.Any() ?? false)
@@ -104,8 +103,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         [NotNull, ItemNotNull]
         private FixedList<DataType> ResolveTypesInParameters(
             [NotNull] FunctionDeclarationSyntax function,
-            [NotNull] ExpressionTypeResolver expressionResolver,
-            [CanBeNull] TypeDeclarationSyntax declaringType)
+            [NotNull] ExpressionTypeResolver expressionResolver)
         {
             var types = new List<DataType>();
             foreach (var parameter in function.Parameters)
@@ -122,7 +120,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     break;
                     case SelfParameterSyntax _:
                     {
-                        var type = declaringType?.Type.Fulfilled().Instance ?? DataType.Unknown;
+                        var type = function.DeclaringType?.Type.Fulfilled().Instance ?? DataType.Unknown;
                         types.Add(parameter.Type.Fulfill(type));
                     }
                     break;
@@ -139,8 +137,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         [NotNull]
         private static DataType ResolveReturnType(
             [NotNull] FunctionDeclarationSyntax function,
-            [NotNull] ExpressionTypeResolver expressionResolver,
-            [CanBeNull] TypeDeclarationSyntax declaringType)
+            [NotNull] ExpressionTypeResolver expressionResolver)
         {
             function.ReturnType.BeginFulfilling();
             switch (function)
@@ -164,7 +161,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case ConstructorDeclarationSyntax _:
                 case InitializerDeclarationSyntax _:
                 {
-                    var returnType = declaringType.NotNull().Type.Fulfilled().Instance;
+                    var returnType = function.DeclaringType.NotNull().Type.Fulfilled().Instance;
                     return function.ReturnType.Fulfill(returnType);
                 }
                 default:
@@ -236,7 +233,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
             }
-            ResolveSignatureTypesInDeclarations(declaration.Members.Select(m => m.AsDeclarationSyntax), declaration);
         }
 
         private void ResolveSignatureTypesInField([NotNull] FieldDeclarationSyntax field)
@@ -248,21 +244,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         }
 
         private void ResolveBodyTypesInDeclarations(
-            [NotNull, ItemNotNull] IEnumerable<DeclarationSyntax> declarations,
-            [CanBeNull] TypeDeclarationSyntax declaringType = null)
+            [NotNull] [ItemNotNull] IEnumerable<DeclarationSyntax> declarations)
         {
             foreach (var declaration in declarations)
-                ResolveBodyTypesInDeclaration(declaration, declaringType);
+                ResolveBodyTypesInDeclaration(declaration);
         }
 
-        private void ResolveBodyTypesInDeclaration(
-            DeclarationSyntax declaration,
-            [CanBeNull] TypeDeclarationSyntax declaringType)
+        private void ResolveBodyTypesInDeclaration(DeclarationSyntax declaration)
         {
             switch (declaration)
             {
                 case FunctionDeclarationSyntax f:
-                    ResolveBodyTypesInFunction(f, declaringType);
+                    ResolveBodyTypesInFunction(f);
                     break;
                 case TypeDeclarationSyntax t:
                     ResolveBodyTypesInTypeDeclaration(t);
@@ -275,14 +268,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             }
         }
 
-        private void ResolveBodyTypesInFunction(
-            [NotNull] FunctionDeclarationSyntax function,
-            [CanBeNull] TypeDeclarationSyntax declaringType)
+        private void ResolveBodyTypesInFunction([NotNull] FunctionDeclarationSyntax function)
         {
             if (function.Body == null) return;
 
             var diagnosticCount = diagnostics.Count;
-            var resolver = new ExpressionTypeResolver(function.File, diagnostics, declaringType: declaringType?.Type.Fulfilled(), returnType: function.ReturnType.Fulfilled());
+            // TODO the return types of constructors and init functions should probably be void for purposes of expressions
+            var resolver = new ExpressionTypeResolver(function.File, diagnostics, function.DeclaringType?.Type.Fulfilled(), function.ReturnType.Fulfilled());
             // The body of a function shouldn't itself evaluate to anything.
             // There should be no `=> value` for the block, so the type is `void`.
             resolver.CheckExpressionType(function.Body, DataType.Void);
@@ -291,7 +283,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
         private void ResolveBodyTypesInTypeDeclaration([NotNull] TypeDeclarationSyntax typeDeclaration)
         {
-            ResolveBodyTypesInDeclarations(typeDeclaration.Members.Select(AsDeclarationSyntax), typeDeclaration);
+            // No body types, members are already processed
         }
 
         private void ResolveBodyTypesInField([NotNull] FieldDeclarationSyntax fieldDeclaration)
@@ -300,11 +292,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
             var resolver = new ExpressionTypeResolver(fieldDeclaration.File, diagnostics);
             resolver.CheckExpressionType(fieldDeclaration.Initializer, fieldDeclaration.Type.Fulfilled());
-        }
-
-        private static DeclarationSyntax AsDeclarationSyntax([NotNull] IDeclarationSyntax m)
-        {
-            return m.AsDeclarationSyntax;
         }
     }
 }

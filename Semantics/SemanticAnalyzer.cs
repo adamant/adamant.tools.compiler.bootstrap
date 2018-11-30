@@ -23,28 +23,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             var nameBinder = new NameBinder(diagnostics, packageSyntax, references);
             nameBinder.BindNamesInPackage(packageSyntax);
 
-            // Make a list of all the non-member declarations
-            var namespacedDeclarations = packageSyntax.CompilationUnits
-                .SelectMany(cu => cu.AllNamespacedDeclarations).ToFixedList();
+            // Make a list of all the member declarations (i.e. not namespaces)
+            var memberDeclarations = packageSyntax.CompilationUnits
+                .SelectMany(cu => cu.AllMemberDeclarations).ToFixedList();
 
             // TODO we can't do full type checking without some IL gen and code execution, how to handle that?
 
             // Do type checking
             var typeChecker = new DeclarationTypeResolver(diagnostics);
-            typeChecker.ResolveTypesInDeclarations(namespacedDeclarations);
+            typeChecker.ResolveTypesInDeclarations(memberDeclarations);
 
 #if DEBUG
-            TypeResolutionValidator.Validate(namespacedDeclarations);
+            TypeResolutionValidator.Validate(memberDeclarations);
 #endif
 
-            ControlFlowGraphBuilder.BuildGraphs(namespacedDeclarations.Select(d => d.AsDeclarationSyntax));
+            ControlFlowGraphBuilder.BuildGraphs(memberDeclarations);
 
             //var borrowChecker = new BorrowChecker();
             //borrowChecker.Check(declarationAnalyses);
 
             // Build final declaration objects and find the entry point
             var declarationBuilder = new DeclarationBuilder();
-            var declarations = declarationBuilder.Build(namespacedDeclarations.Select(d => d.AsDeclarationSyntax));
+            var declarations = declarationBuilder.Build(memberDeclarations);
             var entryPoint = DetermineEntryPoint(declarations, diagnostics);
 
             return new Package(packageSyntax.Name, diagnostics.Build(), references, declarations, entryPoint);

@@ -60,12 +60,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
             var containingScope = BuildNamespaceScopes(globalScope, compilationUnit.ImplicitNamespaceName);
             containingScope = BuildUsingDirectivesScope(containingScope, compilationUnit.UsingDirectives);
             foreach (var declaration in compilationUnit.Declarations)
-                BindNamesInDeclaration(containingScope, declaration);
+                BindNamesInDeclaration(containingScope, declaration, declaringType: null);
         }
 
         private void BindNamesInDeclaration(
             [NotNull] LexicalScope containingScope,
-            [NotNull] DeclarationSyntax declaration)
+            [NotNull] DeclarationSyntax declaration,
+            [CanBeNull] TypeDeclarationSyntax declaringType)
         {
             var binder = new ExpressionNameBinder(diagnostics, declaration.File);
             var diagnosticCount = diagnostics.Count;
@@ -79,33 +80,39 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
                     containingScope = BuildNamespaceScopes(containingScope, ns.Name);
                     containingScope = BuildUsingDirectivesScope(containingScope, ns.UsingDirectives);
                     foreach (var nestedDeclaration in ns.Declarations)
-                        BindNamesInDeclaration(containingScope, nestedDeclaration);
+                        BindNamesInDeclaration(containingScope, nestedDeclaration, declaringType: null);
                 }
                 break;
                 case NamedFunctionDeclarationSyntax function:
+                    function.DeclaringType = declaringType;
                     BindNamesInFunctionParameters(containingScope, function, binder);
                     binder.VisitExpression(function.ReturnTypeExpression, containingScope);
                     BindNamesInFunctionBody(containingScope, function, binder);
                     break;
                 case OperatorDeclarationSyntax operatorDeclaration:
+                    operatorDeclaration.DeclaringType = declaringType;
                     BindNamesInFunctionParameters(containingScope, operatorDeclaration, binder);
                     binder.VisitExpression(operatorDeclaration.ReturnTypeExpression, containingScope);
                     BindNamesInFunctionBody(containingScope, operatorDeclaration, binder);
                     break;
                 case ConstructorDeclarationSyntax constructor:
+                    constructor.DeclaringType = declaringType;
                     BindNamesInFunctionParameters(containingScope, constructor, binder);
                     BindNamesInFunctionBody(containingScope, constructor, binder);
                     break;
                 case InitializerDeclarationSyntax initializer:
+                    initializer.DeclaringType = declaringType;
                     BindNamesInFunctionParameters(containingScope, initializer, binder);
                     BindNamesInFunctionBody(containingScope, initializer, binder);
                     break;
                 case TypeDeclarationSyntax typeDeclaration:
+                    typeDeclaration.DeclaringType = declaringType;
                     // TODO name scope for type declaration
                     foreach (var nestedDeclaration in typeDeclaration.Members)
-                        BindNamesInDeclaration(containingScope, (DeclarationSyntax)nestedDeclaration);
+                        BindNamesInDeclaration(containingScope, nestedDeclaration, typeDeclaration);
                     break;
                 case FieldDeclarationSyntax fieldDeclaration:
+                    fieldDeclaration.DeclaringType = declaringType;
                     binder.VisitExpression(fieldDeclaration.TypeExpression, containingScope);
                     binder.VisitExpression(fieldDeclaration.Initializer, containingScope);
                     break;

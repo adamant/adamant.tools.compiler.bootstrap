@@ -7,6 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
@@ -37,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         private int CurrentBlockNumber => blocks.Count;
 
         [NotNull]
-        public LocalVariableDeclaration AddParameter(bool mutableBinding, [NotNull] DataType type, [CanBeNull] string name)
+        public LocalVariableDeclaration AddParameter(bool mutableBinding, [NotNull] DataType type, [CanBeNull] SimpleName name)
         {
             var variable = new LocalVariableDeclaration(true, mutableBinding, type, variables.Count)
             {
@@ -48,7 +49,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         }
 
         [NotNull]
-        public LocalVariableDeclaration AddVariable(bool mutableBinding, [NotNull] DataType type, [CanBeNull] string name = null)
+        public LocalVariableDeclaration AddVariable(bool mutableBinding, [NotNull] DataType type, [CanBeNull] SimpleName name = null)
         {
             var variable = new LocalVariableDeclaration(false, mutableBinding, type, variables.Count)
             {
@@ -85,7 +86,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             // Temp Variable for return
             Let(function.ReturnType.Resolved());
             foreach (var parameter in function.Parameters)
-                AddParameter(parameter.MutableBinding, parameter.Type.Resolved(), parameter.Name.UnqualifiedName.Text);
+                AddParameter(parameter.MutableBinding, parameter.Type.Resolved(), parameter.Name.UnqualifiedName);
 
             var entryBlockStatements = new List<ExpressionStatement>();
             foreach (var statement in function.Body.NotNull().Statements)
@@ -99,7 +100,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         }
 
         [NotNull]
-        private VariableReference LookupVariable([NotNull] string name)
+        private VariableReference LookupVariable([NotNull] SimpleName name)
         {
             return variables.Single(v => v.Name == name).NotNull().Reference;
         }
@@ -113,7 +114,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 case VariableDeclarationStatementSyntax variableDeclaration:
                     var variable = AddVariable(variableDeclaration.MutableBinding,
                         variableDeclaration.Type.Fulfilled(),
-                        variableDeclaration.Name.UnqualifiedName.Text);
+                        variableDeclaration.Name.UnqualifiedName);
                     if (variableDeclaration.Initializer != null)
                         ConvertToAssignmentStatement(variable.Reference, variableDeclaration.Initializer, currentBlock);
                     break;
@@ -170,7 +171,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
                     // Now we need to delete any owned variables
                     foreach (var variableDeclaration in block.Statements.OfType<VariableDeclarationStatementSyntax>().Where(IsOwned))
-                        statements.Add(new DeleteStatement(CurrentBlockNumber, statements.Count, LookupVariable(variableDeclaration.Name.UnqualifiedName.Text).VariableNumber, new TextSpan(block.Span.End, 0)));
+                        statements.Add(new DeleteStatement(CurrentBlockNumber, statements.Count, LookupVariable(variableDeclaration.Name.UnqualifiedName).VariableNumber, new TextSpan(block.Span.End, 0)));
 
                     break;
                 case ForeachExpressionSyntax @foreach:
@@ -205,7 +206,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 //    statements.Add(new NewObjectStatement(place, newObjectExpression.Type.AssertResolved(), args));
                 //    break;
                 case IdentifierNameSyntax identifier:
-                    statements.Add(new AssignmentStatement(CurrentBlockNumber, statements.Count, place, new CopyPlace(LookupVariable(identifier.Name.Text))));
+                    statements.Add(new AssignmentStatement(CurrentBlockNumber, statements.Count, place, new CopyPlace(LookupVariable(identifier.Name))));
                     break;
                 case BinaryExpressionSyntax binaryOperator:
                     ConvertOperator(place, binaryOperator, statements);
@@ -278,7 +279,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             switch (value)
             {
                 case IdentifierNameSyntax identifier:
-                    return LookupVariable(identifier.Name.Text);
+                    return LookupVariable(identifier.Name);
                 //case VariableExpression variableExpression:
                 //    return LookupVariable(variableExpression.Name);
                 default:
