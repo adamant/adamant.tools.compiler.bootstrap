@@ -21,6 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             return new List<ISymbol>
             {
                 BuildStringSymbol(),
+                BuildBoolSymbol(),
 
                 BuildIntegerNumericSymbol(DataType.Int8),
                 BuildIntegerNumericSymbol(DataType.Byte),
@@ -34,6 +35,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
                 BuildIntegerNumericSymbol(DataType.Size),
                 BuildIntegerNumericSymbol(DataType.Offset),
             }.ToFixedList();
+        }
+
+        private static ISymbol BuildBoolSymbol()
+        {
+            var typeName = DataType.Bool.Name;
+            var symbols = new List<ISymbol> { };
+            return PrimitiveSymbol.NewSimpleType(DataType.Bool, symbols);
         }
 
         /// <summary>
