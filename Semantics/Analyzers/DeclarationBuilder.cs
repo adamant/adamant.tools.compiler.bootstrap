@@ -4,6 +4,8 @@ using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
@@ -33,13 +35,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                             Build(classDeclaration.Members)));
                         break;
                     case ConstructorDeclarationSyntax constructorDeclaration:
-                        declarations.Add(new ConstructorDeclaration(
-                            constructorDeclaration.FullName,
-                            constructorDeclaration.Type.Resolved(),
-                            BuildParameters(constructorDeclaration.Parameters),
+                    {
+                        var constructorType = (FunctionType)constructorDeclaration.Type.Resolved();
+                        var selfType = SelfType(constructorDeclaration);
+                        constructorType = new FunctionType(selfType.Yield().Concat(constructorType.ParameterTypes), constructorType.ResultType);
+                        declarations.Add(new ConstructorDeclaration(constructorDeclaration.FullName,
+                            constructorType,
+                            BuildConstructorParameters(constructorDeclaration),
                             constructorDeclaration.ReturnType.Resolved(),
                             constructorDeclaration.ControlFlow));
-                        break;
+                    }
+                    break;
                     default:
                         throw NonExhaustiveMatchException.For(namespacedDeclaration);
                 }
@@ -58,6 +64,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         private static FixedList<Parameter> BuildParameters([NotNull, ItemNotNull] FixedList<ParameterSyntax> parameters)
         {
             return parameters.Select(BuildParameter).ToFixedList();
+        }
+
+        [NotNull, ItemNotNull]
+        private static FixedList<Parameter> BuildConstructorParameters([NotNull] ConstructorDeclarationSyntax constructorDeclaration)
+        {
+            var selfType = SelfType(constructorDeclaration);
+            var selfName = ((QualifiedName)constructorDeclaration.FullName).Qualifier.Qualify(SpecialName.Self);
+            var selfParameter = new Parameter(true, selfName, selfType);
+            return selfParameter.Yield().Concat(constructorDeclaration.Parameters.Select(BuildParameter))
+                .ToFixedList();
+        }
+
+        [NotNull]
+        private static DataType SelfType([NotNull] ConstructorDeclarationSyntax constructorDeclaration)
+        {
+            var declaringType = constructorDeclaration.DeclaringType.NotNull().Type.Resolved();
+            return declaringType.Instance;
         }
 
         [NotNull]

@@ -7,6 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
@@ -36,7 +37,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private void BuildGraph([NotNull] FunctionDeclarationSyntax function)
         {
             // Temp Variable for return
-            graph.Let(function.ReturnType.Resolved());
+            if (function is ConstructorDeclarationSyntax constructor)
+                graph.AddParameter(true, constructor.ReturnType.Resolved(), SpecialName.Self);
+            else
+                graph.Let(function.ReturnType.Resolved());
             foreach (var parameter in function.Parameters.Where(p => !p.Unused))
                 graph.AddParameter(parameter.MutableBinding, parameter.Type.Resolved(), parameter.Name.UnqualifiedName);
 
