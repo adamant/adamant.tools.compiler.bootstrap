@@ -257,7 +257,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     if (callee is FunctionType functionType)
                     {
                         // TODO check argument types
-                        return expression.Type.Fulfill(functionType.ResultType);
+                        return expression.Type.Fulfill(functionType.ReturnType);
                     }
                     // If it is unknown, we already reported an error
                     if (callee == DataType.Unknown)

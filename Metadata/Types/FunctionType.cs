@@ -13,23 +13,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     public class FunctionType : ReferenceType
     {
         [NotNull, ItemNotNull] public readonly FixedList<DataType> ParameterTypes;
-        [NotNull] public readonly DataType ResultType;
+        [NotNull] public readonly DataType ReturnType;
         public override bool IsResolved { get; }
 
         public FunctionType(
             [NotNull, ItemNotNull] IEnumerable<DataType> parameterTypes,
-            [NotNull] DataType resultType)
+            [NotNull] DataType returnType)
         {
             Requires.NotNull(nameof(parameterTypes), parameterTypes);
-            Requires.NotNull(nameof(resultType), resultType);
+            Requires.NotNull(nameof(returnType), returnType);
             ParameterTypes = parameterTypes.ItemsNotNull().ToFixedList();
-            ResultType = resultType;
-            IsResolved = ParameterTypes.All(pt => pt.NotNull().IsResolved) && ResultType.IsResolved;
+            ReturnType = returnType;
+            IsResolved = ParameterTypes.All(pt => pt.NotNull().IsResolved) && ReturnType.IsResolved;
         }
 
         public override string ToString()
         {
-            return $"({string.Join(", ", ParameterTypes)}) -> {ResultType}";
+            return $"({string.Join(", ", ParameterTypes)}) -> {ReturnType}";
         }
     }
 }

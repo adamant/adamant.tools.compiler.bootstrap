@@ -26,6 +26,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     Tokens.Expect<IBindingToken>();
                     return ParseRestOfVariableDeclaration(true);
                 }
+                case IForeachKeywordToken _:
+                    return ParseForeach();
+                case IWhileKeywordToken _:
+                    return ParseWhile();
+                case ILoopKeywordToken _:
+                    return ParseLoop();
+                case IIfKeywordToken _:
+                    return ParseIf();
+                case IMatchKeywordToken _:
+                    return ParseMatch();
+                case IUnsafeKeywordToken _:
+                    return ParseUnsafeExpression(ParseAs.Statement);
                 default:
                 {
                     var expression = ParseExpression();
@@ -79,8 +91,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             var statements = ParseMany<StatementSyntax, ICloseBraceToken>(ParseStatement);
             var closeBrace = Tokens.Expect<ICloseBraceToken>();
-            openBrace = TextSpan.Covering(openBrace, closeBrace);
-            return new BlockSyntax(openBrace, statements);
+            var span = TextSpan.Covering(openBrace, closeBrace);
+            return new BlockSyntax(span, statements);
         }
 
         [MustUseReturnValue]

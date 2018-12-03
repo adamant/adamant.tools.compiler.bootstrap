@@ -38,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     {
                         var constructorType = (FunctionType)constructorDeclaration.Type.Resolved();
                         var selfType = SelfType(constructorDeclaration);
-                        constructorType = new FunctionType(selfType.Yield().Concat(constructorType.ParameterTypes), constructorType.ResultType);
+                        constructorType = new FunctionType(selfType.Yield().Concat(constructorType.ParameterTypes), constructorType.ReturnType);
                         declarations.Add(new ConstructorDeclaration(constructorDeclaration.FullName,
                             constructorType,
                             BuildConstructorParameters(constructorDeclaration),

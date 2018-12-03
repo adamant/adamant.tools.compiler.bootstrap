@@ -439,14 +439,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     return new BreakExpressionSyntax(span, expression);
                 }
                 case IUnsafeKeywordToken _:
-                {
-                    var unsafeKeyword = Tokens.Expect<IUnsafeKeywordToken>();
-                    var expression = Tokens.Current is IOpenBraceToken ?
-                        ParseBlock()
-                        : ParseParenthesizedExpression();
-                    var span = TextSpan.Covering(unsafeKeyword, expression.Span);
-                    return new UnsafeExpressionSyntax(span, expression);
-                }
+                    return ParseUnsafeExpression();
                 case IRefKeywordToken _:
                 {
                     var refKeyword = Tokens.Expect<IRefKeywordToken>();
@@ -511,6 +504,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 default:
                     throw NonExhaustiveMatchException.For(Tokens.Current);
             }
+        }
+
+        [NotNull]
+        private ExpressionSyntax ParseUnsafeExpression(ParseAs parseAs = ParseAs.Expression)
+        {
+            var unsafeKeyword = Tokens.Expect<IUnsafeKeywordToken>();
+            var isBlock = Tokens.Current is IOpenBraceToken;
+            var expression = isBlock
+                ? ParseBlock()
+                : ParseParenthesizedExpression();
+            var span = TextSpan.Covering(unsafeKeyword, expression.Span);
+            if (parseAs == ParseAs.Statement && !isBlock)
+            {
+                var semicolon = Tokens.Expect<ISemicolonToken>();
+                span = TextSpan.Covering(span, semicolon);
+            }
+            return new UnsafeExpressionSyntax(span, expression);
         }
 
         [NotNull]

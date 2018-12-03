@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             var definitions = code.Definitions;
 
             foreach (var variable in cfg.VariableDeclarations.Where(v => v.Exists))
-                Emit(variable, definitions);
+                EmitVariable(variable, definitions);
 
             if (cfg.VariableDeclarations.Any(v => v.Exists))
                 definitions.BlankLine();
@@ -37,10 +37,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 EmitBlock(block, voidReturn, definitions);
         }
 
-        private void Emit([NotNull] LocalVariableDeclaration variable, [NotNull] CCodeBuilder code)
+        private void EmitVariable([NotNull] LocalVariableDeclaration variable, [NotNull] CCodeBuilder code)
         {
             Requires.That(nameof(variable), variable.Exists);
             var initializer = variable.IsParameter ? $" = {nameMangler.Mangle(variable.Name.NotNull())}" : "";
+            var name = variable.Name != null ? " // " + variable.Name : "";
             code.AppendLine($"{typeConverter.Convert(variable.Type)} ₜ{NameOf(variable.Reference)}{initializer};");
         }
 
@@ -96,10 +97,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 case FunctionCall callStatement:
                     var mangledName = nameMangler.Mangle(callStatement.FunctionName);
                     var arguments = callStatement.Arguments.Select(ConvertValue);
-                    return $"{mangledName}({string.Join(", ", arguments)});";
-                case ConstructorCall newObjectStatement:
+                    return $"{mangledName}({string.Join(", ", arguments)})";
+                case ConstructorCall _:
                     // TODO implement this
                     throw new NotImplementedException();
+                case DeclaredValue declaredValue:
+                    return nameMangler.Mangle(declaredValue.Name);
+                case MemberAccessValue memberAccess:
+                    return $"{ConvertValue(memberAccess.Expression)}.{nameMangler.Mangle(memberAccess.Member)}";
+                case CopyPlace copyPlace:
+                    return ConvertPlace(copyPlace.Place);
                 default:
                     throw NonExhaustiveMatchException.For(value);
             }

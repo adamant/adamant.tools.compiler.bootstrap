@@ -59,11 +59,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             switch (statement)
             {
                 case VariableDeclarationStatementSyntax variableDeclaration:
+                    Value value = null;
+                    if (variableDeclaration.Initializer != null)
+                        value = ConvertToValue(variableDeclaration.Initializer);
+
                     var variable = graph.AddVariable(variableDeclaration.MutableBinding,
                         variableDeclaration.Type.Fulfilled(),
                         variableDeclaration.Name.UnqualifiedName);
-                    if (variableDeclaration.Initializer != null)
-                        ConvertToAssignmentStatement(variable.Reference, variableDeclaration.Initializer);
+                    if (value != null) graph.AddAssignment(variable.Reference, value);
                     break;
 
                 case ExpressionSyntax expression:
@@ -99,14 +102,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         //    break;
                         default:
                             // Could be side effects possibly.
-                            var temp = graph.Let(binaryOperatorExpression.Type.Resolved());
-                            ConvertToAssignmentStatement(temp.Reference, expression);
+                            ConvertToAssignmentStatement(expression);
                             break;
                     }
                     break;
                 case ReturnExpressionSyntax returnExpression:
                     if (returnExpression.ReturnValue != null)
-                        ConvertToAssignmentStatement(graph.ReturnVariable.Reference, returnExpression.ReturnValue);
+                        graph.AddAssignment(graph.ReturnVariable.Reference, ConvertToValue(returnExpression.ReturnValue));
+
                     graph.AddBlockReturn();
                     break;
                 case BlockSyntax block:
@@ -130,19 +133,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     ConvertToStatement(unsafeExpression.Expression);
                     break;
                 case InvocationSyntax invocation:
-                    // TODO actually convert the expression
+                    ConvertToAssignmentStatement(invocation);
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
         }
 
-        private void ConvertToAssignmentStatement(
-            [NotNull] Place place,
-            [NotNull] ExpressionSyntax expression)
+        [NotNull]
+        private Place ConvertToAssignmentStatement([NotNull] ExpressionSyntax expression)
         {
             var value = ConvertToValue(expression);
-            graph.AddAssignment(place, value);
+            var place = graph.Let(expression.Type.Resolved());
+            graph.AddAssignment(place.Reference, value);
+            return place.Reference;
         }
 
         [NotNull]
@@ -155,7 +159,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 //    statements.Add(new NewObjectStatement(place, newObjectExpression.Type.AssertResolved(), args));
                 //    break;
                 case IdentifierNameSyntax identifier:
-                    return new CopyPlace(graph.VariableFor(identifier.Name));
+                    var symbol = identifier.ReferencedSymbols.NotNull().Single().NotNull();
+                    switch (symbol)
+                    {
+                        case VariableDeclarationStatementSyntax _:
+                        case ParameterSyntax _:
+                            return new CopyPlace(graph.VariableFor(symbol.FullName.UnqualifiedName));
+                        default:
+                            return new DeclaredValue(symbol.FullName);
+                    }
                 case BinaryExpressionSyntax binaryExpression:
                     return ConvertBinaryExpressionToValue(binaryExpression);
                 case IntegerLiteralExpressionSyntax _:
@@ -182,9 +194,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     var bytesArgument = new Utf8BytesConstant(literal.Value);
                     return new FunctionCall(conversionFunction, sizeArgument, bytesArgument);
                 }
+                case InvocationSyntax invocation:
+                {
+                    var temp = ConvertToOperand(invocation.Callee);
+                    var arguments = invocation.Arguments.Select(a => ConvertToOperand(a.Value.NotNull())).ToList();
+                    return new FunctionCall(SpecialName.Any, arguments);
+                }
+                case MemberAccessExpressionSyntax memberAccess:
+                {
+                    var value = ConvertToOperand(memberAccess.Expression.NotNull());
+                    return new MemberAccessValue(value,
+                        memberAccess.ReferencedSymbols.NotNull().Single().NotNull().FullName);
+                }
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
+        }
+
+        [NotNull]
+        private Operand ConvertToOperand([NotNull] ExpressionSyntax expression)
+        {
+            var value = ConvertToValue(expression);
+            if (value is Operand operand) return operand;
+            var temp = graph.Let(expression.Type.Resolved());
+            graph.AddAssignment(temp.Reference, value);
+            return new CopyPlace(temp.Reference);
         }
 
         [NotNull]

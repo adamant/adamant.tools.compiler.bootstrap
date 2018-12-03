@@ -1,3 +1,4 @@
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using JetBrains.Annotations;
@@ -21,8 +22,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 // TODO perhaps the name mangler should be used on primitives
                 case var t when t == DataType.Void:
                     return "void";
-                case SizedIntegerType integerType:
-                    return nameMangler.Mangle(integerType.Name);
+                case SimpleType simpleType:
+                    return nameMangler.Mangle(simpleType.Name);
                 case ObjectType t:
                     return nameMangler.Mangle(t);
                 case LifetimeType lifetimeType:
@@ -33,6 +34,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                         return "void*";
 
                     return Convert(referenced) + "*";
+                case FunctionType functionType:
+                    return $"{Convert(functionType.ReturnType)}(*)({string.Join(", ", functionType.ParameterTypes.Select(Convert))})";
                 default:
                     throw NonExhaustiveMatchException.For(type);
             }
