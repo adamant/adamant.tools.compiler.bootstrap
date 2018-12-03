@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public readonly TextSpan Span;
 
         public DeleteStatement(int blockNumber, int number, int variableNumber, TextSpan span)
-            : base(blockNumber,number)
+            : base(blockNumber, number)
         {
             VariableNumber = variableNumber;
             Span = span;
@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         // Useful for debugging
         public override string ToString()
         {
-            return $"delete {VariableNumber};";
+            return $"delete {VariableNumber} // at {Span}";
         }
     }
 }

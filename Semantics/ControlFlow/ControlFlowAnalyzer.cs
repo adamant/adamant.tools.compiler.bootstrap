@@ -37,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         {
             // Temp Variable for return
             graph.Let(function.ReturnType.Resolved());
-            foreach (var parameter in function.Parameters)
+            foreach (var parameter in function.Parameters.Where(p => !p.Unused))
                 graph.AddParameter(parameter.MutableBinding, parameter.Type.Resolved(), parameter.Name.UnqualifiedName);
 
             foreach (var statement in function.Body.NotNull().Statements)

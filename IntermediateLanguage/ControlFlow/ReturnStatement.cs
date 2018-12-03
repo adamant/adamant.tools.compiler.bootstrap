@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 
         public override string ToString()
         {
-            return "return;";
+            return "return";
         }
     }
 }

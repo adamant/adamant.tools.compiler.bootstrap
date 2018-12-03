@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         {
             var checking = IsChecked ? "Checked" : "Unchecked";
             var type = (NumericType.IsSigned ? "i" : "u") + NumericType.Bits;
-            return $"{checking}_{Operator}_{type}({LeftOperand}, {RightOperand}";
+            return $"{checking}_{Operator}_{type}({LeftOperand}, {RightOperand})";
         }
     }
 }

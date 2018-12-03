@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
@@ -18,6 +19,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         }
 
         // Useful for debugging
-        public abstract override string ToString();
+        [NotNull] public abstract override string ToString();
     }
 }

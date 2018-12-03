@@ -11,7 +11,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 
         public override string ToString()
         {
-            return $"%{VariableNumber}";
+            var variableName = VariableNumber == 0 ? "result" : VariableNumber.ToString();
+            return $"%{variableName}";
         }
 
         public override int CoreVariable()

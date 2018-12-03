@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         // Useful for debugging
         public override string ToString()
         {
-            return $"{Place} = {Value};";
+            return $"{Place} = {Value}";
         }
     }
 }

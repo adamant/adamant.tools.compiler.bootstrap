@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 
         public override string ToString()
         {
-            return $"goto bb{GotoBlockNumber};";
+            return $"goto bb{GotoBlockNumber}";
         }
     }
 }

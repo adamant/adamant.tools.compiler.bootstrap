@@ -15,6 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [NotNull] public SimpleName Name => FullName.UnqualifiedName;
+        public bool Unused { get; }
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [NotNull] public SimpleName LookupByName => FullName.UnqualifiedName.WithoutNumber();
@@ -32,6 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             Span = span;
             MutableBinding = mutableBinding;
             FullName = fullName;
+            Unused = fullName.UnqualifiedName.Text.StartsWith("_");
         }
     }
 }

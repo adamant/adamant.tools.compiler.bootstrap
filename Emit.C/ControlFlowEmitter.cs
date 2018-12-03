@@ -54,17 +54,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.AppendLine($"bb{block.Number}:");
             code.BeginBlock();
             foreach (var statement in block.Statements)
+            {
+                code.AppendLine("// " + statement);
                 switch (statement)
                 {
                     case ReturnStatement _:
                         code.AppendLine(voidReturn ? "return;" : "return ₜresult;");
                         break;
                     case AssignmentStatement assignment:
-                        code.AppendLine($"{ConvertPlace(assignment.Place)} = {ConvertValue(assignment.Value)};");
+                        code.AppendLine(
+                            $"{ConvertPlace(assignment.Place)} = {ConvertValue(assignment.Value)};");
                         break;
                     default:
                         throw NonExhaustiveMatchException.For(statement);
                 }
+            }
             code.EndBlock();
         }
 

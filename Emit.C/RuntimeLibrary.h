@@ -1,5 +1,7 @@
 ﻿#include <stdint.h>
 
+#define UNUSED(x) (void)(x)
+
 typedef struct { int32_t ₐvalue; } ₐint;
 typedef struct { uint32_t ₐvalue; } ₐuint;
 typedef struct { uint8_t ₐvalue; } ₐbyte;
