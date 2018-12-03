@@ -58,14 +58,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             return variables.Single(v => v.Name == name).NotNull().Reference;
         }
 
-        public void AddAssignment([NotNull] Place place, [NotNull] IValue value)
+        public void AddAssignment([NotNull] Place place, [NotNull] Value value)
         {
             statements.Add(new AssignmentStatement(CurrentBlockNumber, NextStatementNumber, place, value));
-        }
-
-        public void AddCall([NotNull] Place place, [NotNull] Name function, [NotNull] params IValue[] arguments)
-        {
-            statements.Add(new CallStatement(CurrentBlockNumber, NextStatementNumber, place, function, arguments));
         }
 
         public void AddDelete([NotNull] VariableReference variable, TextSpan span)

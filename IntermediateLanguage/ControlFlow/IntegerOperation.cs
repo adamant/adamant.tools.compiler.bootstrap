@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
-    public class IntegerOperation : IValue
+    public class IntegerOperation : Value
     {
         [NotNull] public readonly Operand LeftOperand;
         public readonly IntegerOperator Operator;

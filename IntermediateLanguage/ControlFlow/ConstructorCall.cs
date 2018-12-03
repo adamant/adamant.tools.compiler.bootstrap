@@ -5,21 +5,15 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
-    public class NewObjectStatement : ExpressionStatement
+    public class ConstructorCall : Value
     {
-        [NotNull] public readonly Place ResultInto;
         [NotNull] public readonly ObjectType Type;
-        [NotNull] public FixedList<IValue> Arguments { get; }
+        [NotNull] public FixedList<Value> Arguments { get; }
 
-        public NewObjectStatement(
-            int blockNumber,
-            int number,
-            [NotNull] Place resultInto,
+        public ConstructorCall(
             [NotNull] ObjectType type,
-            [NotNull] [ItemNotNull] IEnumerable<IValue> arguments)
-            : base(blockNumber, number)
+            [NotNull] [ItemNotNull] IEnumerable<Value> arguments)
         {
-            ResultInto = resultInto;
             Type = type;
             Arguments = arguments.ToFixedList();
         }
@@ -27,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         // Useful for debugging
         public override string ToString()
         {
-            return $"{ResultInto} = new {Type}({string.Join(", ", Arguments)});";
+            return $"new {Type}({string.Join(", ", Arguments)});";
         }
     }
 }

@@ -6,13 +6,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     public class AssignmentStatement : ExpressionStatement
     {
         [NotNull] public Place Place { get; }
-        [NotNull] public IValue Value { get; }
+        [NotNull] public Value Value { get; }
 
         public AssignmentStatement(
             int blockNumber,
             int number,
             [NotNull] Place place,
-            [NotNull] IValue value)
+            [NotNull] Value value)
             : base(blockNumber, number)
         {
             Requires.NotNull(nameof(place), place);

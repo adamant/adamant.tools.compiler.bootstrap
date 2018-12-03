@@ -5,29 +5,30 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
-    public class CallStatement : ExpressionStatement
+    public class FunctionCall : Value
     {
-        [NotNull] public readonly Place Place;
         [NotNull] public readonly Name FunctionName;
-        [NotNull, ItemNotNull] public FixedList<IValue> Arguments { get; }
+        [NotNull, ItemNotNull] public FixedList<Value> Arguments { get; }
 
-        public CallStatement(
-            int blockNumber,
-            int number,
-            [NotNull] Place lvalue,
+        public FunctionCall(
             [NotNull] Name functionName,
-            [NotNull] [ItemNotNull] IEnumerable<IValue> arguments)
-            : base(blockNumber, number)
+            [NotNull] [ItemNotNull] IEnumerable<Value> arguments)
         {
-            Place = lvalue;
             FunctionName = functionName;
             Arguments = arguments.ToFixedList();
+        }
+
+        public FunctionCall(
+            [NotNull] Name functionName,
+            [NotNull, ItemNotNull] params Value[] arguments)
+            : this(functionName, arguments as IEnumerable<Value>)
+        {
         }
 
         // Useful for debugging
         public override string ToString()
         {
-            return $"{Place} = {FunctionName}({string.Join(",", Arguments)});";
+            return $"{FunctionName}({string.Join(",", Arguments)});";
         }
     }
 }

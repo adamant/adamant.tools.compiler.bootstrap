@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 graph.AddParameter(parameter.MutableBinding, parameter.Type.Resolved(), parameter.Name.UnqualifiedName);
 
             foreach (var statement in function.Body.NotNull().Statements)
-                ConvertStatementSyntaxToStatement(statement);
+                ConvertToStatement(statement);
 
             // Generate the implicit return statement
             if (graph.CurrentBlockNumber == 0)
@@ -50,7 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             function.ControlFlow = graph.Build();
         }
 
-        private void ConvertStatementSyntaxToStatement([NotNull] StatementSyntax statement)
+        private void ConvertToStatement([NotNull] StatementSyntax statement)
         {
             switch (statement)
             {
@@ -63,7 +63,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     break;
 
                 case ExpressionSyntax expression:
-                    ConvertExpressionSyntaxToStatement(expression);
+                    ConvertToStatement(expression);
                     break;
 
                 default:
@@ -79,7 +79,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             return false;
         }
 
-        private void ConvertExpressionSyntaxToStatement([NotNull] ExpressionSyntax expression)
+        private void ConvertToStatement([NotNull] ExpressionSyntax expression)
         {
             switch (expression)
             {
@@ -107,7 +107,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     break;
                 case BlockSyntax block:
                     foreach (var statementInBlock in block.Statements)
-                        ConvertStatementSyntaxToStatement(statementInBlock);
+                        ConvertToStatement(statementInBlock);
 
                     // Now we need to delete any owned variables
                     foreach (var variableDeclaration in block.Statements.OfType<VariableDeclarationStatementSyntax>().Where(IsOwned))
@@ -123,7 +123,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     // TODO actually convert the expression
                     break;
                 case UnsafeExpressionSyntax unsafeExpression:
-                    ConvertExpressionSyntaxToStatement(unsafeExpression.Expression);
+                    ConvertToStatement(unsafeExpression.Expression);
                     break;
                 case InvocationSyntax invocation:
                     // TODO actually convert the expression
@@ -135,40 +135,40 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
         private void ConvertToAssignmentStatement(
             [NotNull] Place place,
-            [NotNull] ExpressionSyntax value)
+            [NotNull] ExpressionSyntax expression)
         {
-            switch (value)
+            var value = ConvertToValue(expression);
+            graph.AddAssignment(place, value);
+        }
+
+        [NotNull]
+        private Value ConvertToValue([NotNull] ExpressionSyntax expression)
+        {
+            switch (expression)
             {
                 //case NewObjectExpressionAnalysis newObjectExpression:
                 //    var args = newObjectExpression.Arguments.Select(a => ConvertToLValue(a.Value));
                 //    statements.Add(new NewObjectStatement(place, newObjectExpression.Type.AssertResolved(), args));
                 //    break;
                 case IdentifierNameSyntax identifier:
-                    graph.AddAssignment(place, new CopyPlace(graph.VariableFor(identifier.Name)));
-                    break;
-                case BinaryExpressionSyntax binaryOperator:
-                    ConvertOperator(place, binaryOperator);
-                    break;
+                    return new CopyPlace(graph.VariableFor(identifier.Name));
+                case BinaryExpressionSyntax binaryExpression:
+                    return ConvertBinaryExpressionToValue(binaryExpression);
                 case IntegerLiteralExpressionSyntax _:
                     throw new InvalidOperationException("Integer literals should have an implicit conversion around them");
                 case StringLiteralExpressionSyntax _:
                     throw new InvalidOperationException("String literals should have an implicit conversion around them");
                 case ImplicitNumericConversionExpression implicitNumericConversion:
                     if (implicitNumericConversion.Expression.Type.Resolved() is IntegerConstantType constantType)
-                    {
-                        var constant = new IntegerConstant(constantType.Value, implicitNumericConversion.Type.Resolved());
-                        graph.AddAssignment(place, constant);
-                    }
+                        return new IntegerConstant(constantType.Value, implicitNumericConversion.Type.Resolved());
                     else
                         throw new NotImplementedException();
-                    break;
                 case IfExpressionSyntax ifExpression:
-                    ConvertExpressionSyntaxToStatement(ifExpression.Condition);
+                    //ConvertToStatement(ifExpression.Condition);
                     // TODO assign the result into the temp, branch and execute then or else, assign result
-                    break;
+                    throw new NotImplementedException();
                 case UnsafeExpressionSyntax unsafeExpression:
-                    ConvertExpressionSyntaxToStatement(unsafeExpression.Expression);
-                    break;
+                    return ConvertToValue(unsafeExpression.Expression);
                 case ImplicitLiteralConversionExpression implicitLiteralConversion:
                 {
                     var conversionFunction = implicitLiteralConversion.ConversionFunction.FullName;
@@ -176,17 +176,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     var constantLength = Utf8BytesConstant.Encoding.GetByteCount(literal.Value);
                     var sizeArgument = new IntegerConstant(constantLength, DataType.Size);
                     var bytesArgument = new Utf8BytesConstant(literal.Value);
-                    graph.AddCall(place, conversionFunction, sizeArgument, bytesArgument);
+                    return new FunctionCall(conversionFunction, sizeArgument, bytesArgument);
                 }
-                break;
                 default:
-                    throw NonExhaustiveMatchException.For(value);
+                    throw NonExhaustiveMatchException.For(expression);
             }
         }
 
-        private void ConvertOperator(
-            [NotNull] Place lvalue,
-            [NotNull] BinaryExpressionSyntax binary)
+        [NotNull]
+        private Value ConvertBinaryExpressionToValue([NotNull] BinaryExpressionSyntax binary)
         {
             switch (binary.Operator)
             {
@@ -199,8 +197,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case BinaryOperator.LessThanOrEqual:
                 case BinaryOperator.GreaterThan:
                 case BinaryOperator.GreaterThanOrEqual:
-                    // TODO generate the correct statement
-                    break;
+                    // TODO generate the correct value
+                    throw new NotImplementedException();
                 //case IAsKeywordToken _:
                 //    ConvertExpressionAnalysisToStatement(binaryOperator.LeftOperand, statements);
                 //    break;

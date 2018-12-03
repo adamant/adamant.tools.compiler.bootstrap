@@ -1,11 +1,10 @@
-using System.Diagnostics;
-
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
-    [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
-    public abstract class Operand
+    /// <summary>
+    /// An operand is something that can be used as the operand of an operator
+    /// or and argument to a call.
+    /// </summary>
+    public abstract class Operand : Value
     {
-        // Useful for debugging
-        public abstract override string ToString();
     }
 }

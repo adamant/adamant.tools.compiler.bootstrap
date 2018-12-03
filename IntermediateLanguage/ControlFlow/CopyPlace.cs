@@ -2,7 +2,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
-    public class CopyPlace : IValue
+    public class CopyPlace : Operand
     {
         [NotNull] public readonly Place Place;
 
