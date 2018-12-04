@@ -3,28 +3,30 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
     public class FunctionDeclaration : Declaration
     {
-        [NotNull, ItemNotNull] public FixedList<Parameter> Parameters { get; }
+        public bool IsExternal { get; }
+        public FixedList<Parameter> Parameters { get; }
         public int Arity => Parameters.Count;
-        [NotNull] public DataType ReturnType { get; }
-        [CanBeNull] public ControlFlowGraph ControlFlow { get; }
+        public DataType ReturnType { get; }
+        public ControlFlowGraph ControlFlow { get; }
 
         public FunctionDeclaration(
-            [NotNull] Name name,
-            [NotNull] DataType type,
-            [NotNull, ItemNotNull] FixedList<Parameter> parameters,
-            [NotNull] DataType returnType,
-            [CanBeNull] ControlFlowGraph controlFlow)
+            bool isExternal,
+            Name name,
+            DataType type,
+            FixedList<Parameter> parameters,
+            DataType returnType,
+            ControlFlowGraph controlFlow)
             : base(name, type, SymbolSet.Empty)
         {
             Parameters = parameters;
             ReturnType = returnType;
             ControlFlow = controlFlow;
+            IsExternal = isExternal;
         }
     }
 }

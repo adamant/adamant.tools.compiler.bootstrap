@@ -1,4 +1,5 @@
 ﻿#include "RuntimeLibrary.h"
+#include <stdio.h>
 //#include <windows.h>
 
 typedef void* LPVOID;
@@ -23,3 +24,9 @@ void test()
 
 // Inline functions from RuntimeLibrary.h
 extern ᵢString ᵢString·ₐoperator_string_literal(ₐsize count, ₐbyte* bytes);
+
+
+void ᵢprint_string(ᵢString text)
+{
+    printf("%.*s\n", (int)text.ᵢbyte_count.ₐvalue, (char*)text.ᵢbytes);
+}

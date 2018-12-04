@@ -8,7 +8,6 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Primitives;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
 {
@@ -77,7 +76,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
         /// <summary>
         /// Create an implicit conversion if allowed and needed
         /// </summary>
-        [ContractAnnotation("expression:null => null; expression:notnull => notnull")]
         private ExpressionSyntax ImplicitConversion(
             ExpressionSyntax expression,
             DataType targetType)
@@ -153,7 +151,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             return actualType;
         }
 
-        public DataType InferExpressionType([CanBeNull] ExpressionSyntax expression)
+        public DataType InferExpressionType(ExpressionSyntax expression)
         {
             if (expression == null) return DataType.Unknown;
 
@@ -585,8 +583,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             return type is IntegerType;
         }
 
-        private DataType InferUnaryExpressionType(
-            UnaryExpressionSyntax unaryExpression)
+        private DataType InferUnaryExpressionType(UnaryExpressionSyntax unaryExpression)
         {
             InferExpressionType(unaryExpression.Operand);
             var operand = unaryExpression.Operand.Type;
@@ -642,8 +639,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
         /// <summary>
         /// Evaluates a type expression to the type it identifies
         /// </summary>
-
-        public DataType CheckAndEvaluateTypeExpression([CanBeNull] ExpressionSyntax typeExpression)
+        public DataType CheckAndEvaluateTypeExpression(ExpressionSyntax typeExpression)
         {
             if (typeExpression == null)
             {

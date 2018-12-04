@@ -9,7 +9,7 @@ typedef struct { uintptr_t ₐvalue; } ₐsize;
 typedef struct { intptr_t ₐvalue; } ₐoffset;
 
 /*
-For now, we have moved strings into the runtime library
+For now, we have moved strings and console IO into the runtime library
 */
 typedef struct {
     ₐsize ᵢbyte_count;
@@ -20,3 +20,5 @@ inline ᵢString ᵢString·ₐoperator_string_literal(ₐsize byte_count, ₐby
 {
     return (ᵢString){ byte_count, bytes };
 }
+
+void ᵢprint_string(ᵢString text);

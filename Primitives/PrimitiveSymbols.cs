@@ -18,9 +18,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         private static FixedList<ISymbol> BuildPrimitives()
         {
             // TODO make a symbol for `Type`
+            var stringSymbol = BuildStringSymbol();
             return new List<ISymbol>
             {
-                BuildStringSymbol(),
+                stringSymbol,
+                BuildPrintStringSymbol(stringSymbol),
+
                 BuildBoolSymbol(),
 
                 BuildIntegerNumericSymbol(DataType.Int8),
@@ -36,26 +39,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
                 BuildIntegerNumericSymbol(DataType.Offset),
             }.ToFixedList();
         }
-
-        private static ISymbol BuildBoolSymbol()
-        {
-            var typeName = DataType.Bool.Name;
-            var symbols = new List<ISymbol> { };
-            return Symbol.NewSimpleType(DataType.Bool, symbols);
-        }
-
+        
         /// <summary>
         /// For now, we are putting string in the runtime library
         /// </summary>
         private static ISymbol BuildStringSymbol()
         {
             var typeName = new SimpleName("String");
-            var stringLiteralOperator = Symbol.NewMember(typeName.Qualify(SpecialName.OperatorStringLiteral));
+            var stringLiteralOperator = Symbol.New(typeName.Qualify(SpecialName.OperatorStringLiteral));
             var symbols = new List<ISymbol>()
             {
                 // Making these fields for now
-                Symbol.NewMember(typeName.Qualify("bytes"), DataType.BytePointer),
-                Symbol.NewMember(typeName.Qualify("byte_count"), DataType.Size),
+                Symbol.New(typeName.Qualify("bytes"), DataType.BytePointer),
+                Symbol.New(typeName.Qualify("byte_count"), DataType.Size),
                 stringLiteralOperator
             };
 
@@ -66,12 +62,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             return stringSymbol;
         }
 
+        private static ISymbol BuildPrintStringSymbol(ISymbol stringSymbol)
+        {
+            var name = new SimpleName("print_string");
+            var type = new FunctionType(new[] { stringSymbol.Type }, DataType.Void);
+            return Symbol.New(name, type);
+        }
+
+        private static ISymbol BuildBoolSymbol()
+        {
+            var typeName = DataType.Bool.Name;
+            var symbols = new List<ISymbol> { };
+            return Symbol.NewSimpleType(DataType.Bool, symbols);
+        }
+
         private static ISymbol BuildIntegerNumericSymbol([NotNull] IntegerType numericType)
         {
             var typeName = numericType.Name;
             var symbols = new List<ISymbol>
             {
-                Symbol.NewMember(typeName.Qualify("remainder"), new FunctionType(new[] {numericType}, numericType))
+                Symbol.New(typeName.Qualify("remainder"), new FunctionType(new[] {numericType}, numericType))
             };
             return Symbol.NewSimpleType(numericType, symbols);
         }

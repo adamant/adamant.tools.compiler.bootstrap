@@ -34,7 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             return new Symbol(fullName, null, childSymbols);
         }
 
-        public static Symbol NewMember(Name fullName, DataType type = null)
+        public static Symbol New(Name fullName, DataType type = null)
         {
             return new Symbol(fullName, type);
         }

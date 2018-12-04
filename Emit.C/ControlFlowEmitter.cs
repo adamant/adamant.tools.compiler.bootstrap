@@ -29,8 +29,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             if (cfg.VariableDeclarations.Any(v => v.Exists))
                 definitions.BlankLine();
 
-            // TODO assign parameters to temp variables?
-
             var voidReturn = cfg.ReturnType == DataType.Void;
             foreach (var block in cfg.BasicBlocks)
                 EmitBlock(block, voidReturn, definitions);
@@ -41,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             Requires.That(nameof(variable), variable.Exists, "tried to look up variable that does not exist");
             var initializer = variable.IsParameter ? $" = {nameMangler.Mangle(variable.Name)}" : "";
             var name = variable.Name != null ? " // " + variable.Name : "";
-            code.AppendLine($"{typeConverter.Convert(variable.Type)} ₜ{NameOf(variable.Reference)}{initializer};");
+            code.AppendLine($"{typeConverter.Convert(variable.Type)} ₜ{NameOf(variable.Reference)}{initializer};{name}");
         }
 
         private static string NameOf(VariableReference variable)
@@ -96,8 +94,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     return $"({ConvertType(integer.Type)}){{{integer.Value}}}";
                 case Utf8BytesConstant utf8BytesConstant:
                     return $"((ₐbyte*)u8\"{utf8BytesConstant.Value.Escape()}\")";
-                //case VariableReference variable:
-                //    return "ₜ" + NameOf(variable);
                 case FunctionCall functionCall:
                 {
                     var mangledName = nameMangler.Mangle(functionCall.FunctionName);

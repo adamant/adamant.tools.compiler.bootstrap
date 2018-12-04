@@ -32,7 +32,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             switch (declaration)
             {
                 case FunctionDeclaration function:
-                    EmitFunction(function, code);
+                    if (function.IsExternal)
+                        EmitExternalFunctionSignature(function, code);
+                    else
+                        EmitFunction(function, code);
                     break;
                 case ConstructorDeclaration constructor:
                     EmitConstructor(constructor, code);
@@ -43,6 +46,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
             }
+        }
+
+        private void EmitExternalFunctionSignature(FunctionDeclaration function, Code code)
+        {
+            var name = function.Name.Text;
+            var parameters = Convert(function.Parameters);
+            var returnType = typeConverter.Convert(function.ReturnType.AssertResolved());
+            code.FunctionDeclarations.AppendLine($"{returnType} {name}({parameters});");
         }
 
         private void EmitFunction(FunctionDeclaration function, Code code)

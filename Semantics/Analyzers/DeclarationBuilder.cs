@@ -21,6 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 {
                     case NamedFunctionDeclarationSyntax namedFunction:
                         declarations.Add(new FunctionDeclaration(
+                            namedFunction.IsExternalFunction,
                             namedFunction.FullName,
                             namedFunction.Type.Resolved(),
                             BuildParameters(namedFunction.Parameters),

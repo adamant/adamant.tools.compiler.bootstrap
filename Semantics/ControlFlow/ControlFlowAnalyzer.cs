@@ -37,6 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private void BuildGraph(FunctionDeclarationSyntax function)
         {
             // Temp Variable for return
+            // TODO don't emit temp variables for unused parameters
             if (function is ConstructorDeclarationSyntax constructor)
                 graph.AddParameter(true, constructor.SelfParameterType.Resolved(), SpecialName.Self);
             else
