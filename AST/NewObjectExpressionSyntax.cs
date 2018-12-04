@@ -6,12 +6,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class NewObjectExpressionSyntax : ExpressionSyntax
     {
-        [NotNull] public NameSyntax Constructor { get; }
+        [NotNull] public ExpressionSyntax Constructor { get; }
         [NotNull] public FixedList<ArgumentSyntax> Arguments { get; }
 
         public NewObjectExpressionSyntax(
             TextSpan span,
-            [NotNull] NameSyntax constructor,
+            [NotNull] ExpressionSyntax constructor,
             [NotNull] FixedList<ArgumentSyntax> arguments)
             : base(span)
         {

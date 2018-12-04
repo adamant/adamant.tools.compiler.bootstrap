@@ -10,24 +10,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     {
         [MustUseReturnValue]
         [NotNull]
-        public NameSyntax ParseName()
+        public ExpressionSyntax ParseName()
         {
-            NameSyntax name = ParseSimpleName();
+            ExpressionSyntax name = ParseSimpleName();
             while (Tokens.Accept<IDotToken>())
             {
                 var simpleName = ParseSimpleName();
-                name = new QualifiedNameSyntax(name, simpleName);
+                var span = TextSpan.Covering(name.Span, simpleName.Span);
+                name = new MemberAccessExpressionSyntax(span, name, AccessOperator.Standard, simpleName);
             }
             return name;
         }
 
         [MustUseReturnValue]
         [NotNull]
-        private SimpleNameSyntax ParseSimpleName()
+        private NameSyntax ParseSimpleName()
         {
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = new SimpleName(identifier.Value);
-            SimpleNameSyntax syntax;
+            NameSyntax syntax;
             if (Tokens.Accept<IOpenBracketToken>())
             {
                 var arguments = ParseArguments();

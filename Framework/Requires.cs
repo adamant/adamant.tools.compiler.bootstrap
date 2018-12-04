@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         public static void That([NotNull] string parameter, bool condition, string message)
         {
             if (!condition)
-                throw new ArgumentException("Does not satisfy condition", parameter);
+                throw new ArgumentException(message, parameter);
         }
     }
 }

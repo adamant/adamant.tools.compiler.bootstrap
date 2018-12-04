@@ -187,7 +187,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         }
 
         [MustUseReturnValue]
-        [CanBeNull]
         private AttributeSyntax AcceptAttribute()
         {
             if (!Tokens.Accept<IHashHashToken>()) return null;
@@ -202,7 +201,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         }
 
         [MustUseReturnValue]
-        [CanBeNull]
         private ExpressionSyntax AcceptBaseClass()
         {
             if (!Tokens.Accept<IColonToken>()) return null;
@@ -210,7 +208,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         }
 
         [MustUseReturnValue]
-        [CanBeNull]
         private FixedList<ExpressionSyntax> AcceptBaseTypes()
         {
             if (!Tokens.Accept<ILessThanColonToken>()) return null;
@@ -218,27 +215,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         }
 
         [MustUseReturnValue]
-        [NotNull]
         private FixedList<ExpressionSyntax> ParseInvariants()
         {
             return AcceptMany(AcceptInvariant);
         }
 
         [MustUseReturnValue]
-        [CanBeNull]
         private ExpressionSyntax AcceptInvariant()
         {
             if (!Tokens.Accept<IInvariantKeywordToken>()) return null;
             return ParseExpression();
         }
 
-        [NotNull]
         private FixedList<MemberDeclarationSyntax> ParseMemberDeclarations()
         {
             return ParseMany<MemberDeclarationSyntax, ICloseBraceToken>(ParseMemberDeclaration);
         }
 
-        [NotNull]
         private FixedList<MemberDeclarationSyntax> ParseTypeBody()
         {
             Tokens.Expect<IOpenBraceToken>();
@@ -249,8 +242,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         #endregion
 
         #region Parse Type Declarations
-        [MustUseReturnValue]
-        [NotNull]
         private ClassDeclarationSyntax ParseClass(
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers)
@@ -268,8 +259,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 genericParameters, baseClass, baseTypes, genericConstraints, invariants, members);
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         private TraitDeclarationSyntax ParseTrait(
             [NotNull] FixedList<AttributeSyntax> attributes,
             [NotNull] FixedList<IModiferToken> modifiers)
@@ -286,11 +275,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 genericParameters, baseTypes, genericConstraints, invariants, members);
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         private StructDeclarationSyntax ParseStruct(
-            [NotNull] FixedList<AttributeSyntax> attributes,
-            [NotNull] FixedList<IModiferToken> modifiers)
+            FixedList<AttributeSyntax> attributes,
+            FixedList<IModiferToken> modifiers)
         {
             Tokens.Expect<IStructKeywordToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
@@ -304,11 +291,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 genericParameters, baseTypes, genericConstraints, invariants, members);
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         private TypeDeclarationSyntax ParseEnum(
-            [NotNull] FixedList<AttributeSyntax> attributes,
-            [NotNull] FixedList<IModiferToken> modifiers)
+            FixedList<AttributeSyntax> attributes,
+            FixedList<IModiferToken> modifiers)
         {
             Tokens.Expect<IEnumKeywordToken>();
             switch (Tokens.Current)
@@ -353,8 +338,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         private FixedList<EnumVariantSyntax> ParseEnumVariants()
         {
             var variants = new List<EnumVariantSyntax>();
@@ -368,8 +351,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return variants.ToFixedList();
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         private EnumVariantSyntax ParseEnumVariant()
         {
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
@@ -380,11 +361,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         #endregion
 
         #region Parse Type Member Declarations
-        [MustUseReturnValue]
-        [NotNull]
         private FieldDeclarationSyntax ParseField(
-            [NotNull] FixedList<AttributeSyntax> attributes,
-            [NotNull] FixedList<IModiferToken> modifiers)
+            FixedList<AttributeSyntax> attributes,
+            FixedList<IModiferToken> modifiers)
         {
             // TODO include these in the syntax tree
             var binding = Tokens.Expect<IBindingToken>();
@@ -407,8 +386,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 identifier.Span, typeExpression, initializer);
         }
 
-        [MustUseReturnValue]
-        [CanBeNull]
         private AccessModifier? AcceptFieldGetter()
         {
             // TODO allow other access modifiers
@@ -420,11 +397,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         #endregion
 
         #region Parse Functions
-        [MustUseReturnValue]
-        [NotNull]
         public NamedFunctionDeclarationSyntax ParseNamedFunction(
-            [NotNull] FixedList<AttributeSyntax> attributes,
-            [NotNull] FixedList<IModiferToken> modifiers)
+            FixedList<AttributeSyntax> attributes,
+            FixedList<IModiferToken> modifiers)
         {
             Tokens.Expect<IFunctionKeywordToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
@@ -445,11 +420,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 noEffects, requires, ensures, body);
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         public OperatorDeclarationSyntax ParseOperator(
-            [NotNull] FixedList<AttributeSyntax> attributes,
-            [NotNull] FixedList<IModiferToken> modifiers)
+            FixedList<AttributeSyntax> attributes,
+            FixedList<IModiferToken> modifiers)
         {
             var operatorKeyword = Tokens.Expect<IOperatorKeywordToken>();
             var genericParameters = AcceptGenericParameters();
@@ -508,11 +481,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 ensures, body);
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         public ConstructorDeclarationSyntax ParseConstructor(
-            [NotNull] FixedList<AttributeSyntax> attributes,
-            [NotNull] FixedList<IModiferToken> modifiers)
+            FixedList<AttributeSyntax> attributes,
+            FixedList<IModiferToken> modifiers)
         {
             var newKeywordSpan = Tokens.Expect<INewKeywordToken>();
             var identifier = Tokens.AcceptToken<IIdentifierToken>();
@@ -530,11 +501,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         public InitializerDeclarationSyntax ParseInitializer(
-            [NotNull] FixedList<AttributeSyntax> attributes,
-            [NotNull] FixedList<IModiferToken> modifiers)
+            FixedList<AttributeSyntax> attributes,
+            FixedList<IModiferToken> modifiers)
         {
             var initKeywordSpan = Tokens.Expect<IInitKeywordToken>();
             var identifier = Tokens.AcceptToken<IIdentifierToken>();
@@ -552,12 +521,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 genericConstraints, mayEffects, noEffects, requires, ensures, body);
         }
 
-
-        [MustUseReturnValue]
-        [NotNull]
         public DestructorDeclarationSyntax ParseDestructor(
-            [NotNull] FixedList<AttributeSyntax> attributes,
-            [NotNull] FixedList<IModiferToken> modifiers)
+            FixedList<AttributeSyntax> attributes,
+            FixedList<IModiferToken> modifiers)
         {
             var deleteKeywordSpan = Tokens.Expect<IDeleteKeywordToken>();
             var name = nameContext.Qualify(SpecialName.Delete);
@@ -571,11 +537,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 parameters, mayEffects, noEffects, requires, ensures, body);
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         private GetterDeclarationSyntax ParseGetter(
-            [NotNull] FixedList<AttributeSyntax> attributes,
-            [NotNull] FixedList<IModiferToken> modifiers)
+            FixedList<AttributeSyntax> attributes,
+            FixedList<IModiferToken> modifiers)
         {
             Tokens.Expect<IGetKeywordToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
@@ -594,11 +558,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 body);
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         private SetterDeclarationSyntax ParseSetter(
-            [NotNull] FixedList<AttributeSyntax> attributes,
-            [NotNull] FixedList<IModiferToken> modifiers)
+            FixedList<AttributeSyntax> attributes,
+            FixedList<IModiferToken> modifiers)
         {
             Tokens.Expect<ISetKeywordToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
@@ -614,17 +576,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 identifier.Span, parameters, mayEffects, noEffects, requires, ensures, body);
         }
 
-        [MustUseReturnValue]
-        [CanBeNull]
-        private FixedList<ParameterSyntax> AcceptParameters()
-        {
-            if (!Tokens.Accept<IOpenParenToken>())
-                return null;
-            return ParseRestOfParameters();
-        }
-
-        [MustUseReturnValue]
-        [NotNull]
         private FixedList<ParameterSyntax> ParseParameters()
         {
             Tokens.Expect<IOpenParenToken>();
@@ -635,8 +586,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         /// Requires that the open paren has already been consumed
         /// </summary>
         /// <returns></returns>
-        [NotNull]
-        [MustUseReturnValue]
         private FixedList<ParameterSyntax> ParseRestOfParameters()
         {
             var parameters = new List<ParameterSyntax>();
@@ -651,8 +600,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return parameters.ToFixedList();
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         private FixedList<EffectSyntax> ParseMayEffects()
         {
             if (!Tokens.Accept<IMayKeywordToken>())
@@ -661,8 +608,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return AcceptOneOrMore<EffectSyntax, ICommaToken>(ParseEffect);
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         private FixedList<EffectSyntax> ParseNoEffects()
         {
             if (!Tokens.Accept<INoKeywordToken>())
@@ -671,8 +616,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return AcceptOneOrMore<EffectSyntax, ICommaToken>(ParseEffect);
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         public EffectSyntax ParseEffect()
         {
             switch (Tokens.Current)
@@ -689,8 +632,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         private ThrowEffectEntrySyntax ParseThrowEffectEntry()
         {
             var isParams = Tokens.Accept<IParamsKeywordToken>();
@@ -698,8 +639,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new ThrowEffectEntrySyntax(isParams, exceptionType);
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         private (FixedList<ExpressionSyntax> Requires, FixedList<ExpressionSyntax> Ensures)
             ParseFunctionContracts()
         {
@@ -719,16 +658,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 }
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         private ExpressionSyntax ParseRequires()
         {
             Tokens.Expect<IRequiresKeywordToken>();
             return ParseExpression();
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         private ExpressionSyntax ParseEnsures()
         {
             Tokens.Expect<IEnsuresKeywordToken>();
@@ -744,11 +679,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         }
         #endregion
 
-        [MustUseReturnValue]
-        [NotNull]
         private ConstDeclarationSyntax ParseConst(
-            [NotNull] FixedList<AttributeSyntax> attributes,
-            [NotNull] FixedList<IModiferToken> modifiers)
+            FixedList<AttributeSyntax> attributes,
+            FixedList<IModiferToken> modifiers)
         {
             try
             {
@@ -778,11 +711,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         private FixedList<NamedFunctionDeclarationSyntax> ParseExternalBlock(
-            [NotNull] FixedList<AttributeSyntax> attributes,
-            [NotNull] FixedList<IModiferToken> modifiers)
+            FixedList<AttributeSyntax> attributes,
+            FixedList<IModiferToken> modifiers)
         {
             // TODO error on attributes and modifiers
             Tokens.Expect<IExternalKeywordToken>();

@@ -85,35 +85,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
                 }
                 break;
                 case NamedFunctionDeclarationSyntax function:
-                    function.DeclaringType = declaringType;
                     BindNamesInFunctionParameters(containingScope, function, binder);
                     binder.VisitExpression(function.ReturnTypeExpression, containingScope);
                     BindNamesInFunctionBody(containingScope, function, binder);
                     break;
                 case OperatorDeclarationSyntax operatorDeclaration:
-                    operatorDeclaration.DeclaringType = declaringType;
                     BindNamesInFunctionParameters(containingScope, operatorDeclaration, binder);
                     binder.VisitExpression(operatorDeclaration.ReturnTypeExpression, containingScope);
                     BindNamesInFunctionBody(containingScope, operatorDeclaration, binder);
                     break;
                 case ConstructorDeclarationSyntax constructor:
-                    constructor.DeclaringType = declaringType;
                     BindNamesInFunctionParameters(containingScope, constructor, binder);
                     BindNamesInFunctionBody(containingScope, constructor, binder);
                     break;
                 case InitializerDeclarationSyntax initializer:
-                    initializer.DeclaringType = declaringType;
                     BindNamesInFunctionParameters(containingScope, initializer, binder);
                     BindNamesInFunctionBody(containingScope, initializer, binder);
                     break;
                 case TypeDeclarationSyntax typeDeclaration:
-                    typeDeclaration.DeclaringType = declaringType;
                     // TODO name scope for type declaration
                     foreach (var nestedDeclaration in typeDeclaration.Members)
                         BindNamesInDeclaration(containingScope, nestedDeclaration, typeDeclaration);
                     break;
                 case FieldDeclarationSyntax fieldDeclaration:
-                    fieldDeclaration.DeclaringType = declaringType;
                     binder.VisitExpression(fieldDeclaration.TypeExpression, containingScope);
                     binder.VisitExpression(fieldDeclaration.Initializer, containingScope);
                     break;

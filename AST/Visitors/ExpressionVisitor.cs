@@ -69,9 +69,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case UnsafeExpressionSyntax unsafeExpression:
                     VisitUnsafeExpression(unsafeExpression, args);
                     break;
-                case GenericsInvocationSyntax genericsInvocation:
-                    VisitGenericInvocation(genericsInvocation, args);
-                    break;
                 case LifetimeNameSyntax lifetimeName:
                     VisitLifetimeName(lifetimeName, args);
                     break;
@@ -163,12 +160,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 
         public virtual void VisitLifetimeName(LifetimeNameSyntax lifetimeName, A args)
         {
-        }
-
-        public virtual void VisitGenericInvocation([NotNull] GenericsInvocationSyntax genericsInvocation, A args)
-        {
-            VisitExpression(genericsInvocation.Callee, args);
-            foreach (var argument in genericsInvocation.Arguments) VisitArgument(argument, args);
         }
 
         public virtual void VisitUnsafeExpression([NotNull] UnsafeExpressionSyntax unsafeExpression, A args)

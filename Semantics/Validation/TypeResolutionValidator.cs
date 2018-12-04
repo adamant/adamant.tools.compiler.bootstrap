@@ -37,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
         public override void VisitExpression(ExpressionSyntax expression, Void args)
         {
             base.VisitExpression(expression, args);
-            expression?.Type.Resolved();
+            expression?.Type.AssertResolved();
         }
     }
 }

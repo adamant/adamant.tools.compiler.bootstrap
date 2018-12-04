@@ -1,8 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
-using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
@@ -11,16 +8,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         /// <summary>
         /// This expression is null for implicit member access i.e. self and enums
         /// </summary>
-        [CanBeNull] public ExpressionSyntax Expression { get; }
+        public ExpressionSyntax Expression { get; }
         public AccessOperator AccessOperator { get; }
-        [NotNull] public IMemberNameToken Member { get; }
-        [CanBeNull] public FixedList<ISymbol> ReferencedSymbols { get; set; }
+        public NameSyntax Member { get; }
+
+        public ISymbol ReferencedSymbol
+        {
+            get => Member.ReferencedSymbol;
+            set => Member.ReferencedSymbol = value;
+        }
 
         public MemberAccessExpressionSyntax(
             TextSpan span,
-            [CanBeNull] ExpressionSyntax expression,
+            ExpressionSyntax expression,
             AccessOperator accessOperator,
-            [NotNull] IMemberNameToken member)
+            NameSyntax member)
             : base(span)
         {
             Expression = expression;

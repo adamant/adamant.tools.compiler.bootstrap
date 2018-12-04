@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class GenericNameSyntax : SimpleNameSyntax
+    public class GenericNameSyntax : NameSyntax
     {
         [NotNull] public FixedList<ArgumentSyntax> Arguments { get; }
         public int Arity => Arguments.Count;

@@ -207,18 +207,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                             continue;
                         }
                         break;
-                    case IOpenBracketToken _:
-                        if (minPrecedence <= OperatorPrecedence.Primary)
-                        {
-                            var callee = expression;
-                            Tokens.Expect<IOpenBracketToken>();
-                            var arguments = ParseArguments();
-                            var closeBracket = Tokens.Expect<ICloseBracketToken>();
-                            var span = TextSpan.Covering(callee.Span, closeBracket);
-                            expression = new GenericsInvocationSyntax(span, callee, arguments);
-                            continue;
-                        }
-                        break;
                     case IDotToken _:
                     case ICaretDotToken _:
                     case IQuestionDotToken _:
@@ -226,7 +214,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         {
                             // Member Access
                             var accessOperator = BuildAccessOperator(Tokens.RequiredToken<IAccessOperatorToken>());
-                            var member = Tokens.RequiredToken<IMemberNameToken>();
+                            var member = ParseSimpleName();
                             var span = TextSpan.Covering(expression.Span, member.Span);
                             expression = new MemberAccessExpressionSyntax(span, expression, accessOperator, member);
                             continue;
@@ -418,6 +406,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 }
                 case IIdentifierToken _:
                 {
+                    // TODO ParseSimpleName()
                     var identifier = Tokens.RequiredToken<IIdentifierToken>();
                     var name = new SimpleName(identifier.Value);
                     var syntax = new IdentifierNameSyntax(identifier.Span, name);
@@ -462,7 +451,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 {
                     // implicit self etc.
                     var dot = Tokens.Required<IDotToken>();
-                    var member = Tokens.RequiredToken<IMemberNameToken>();
+                    var member = ParseSimpleName();
                     var span = TextSpan.Covering(dot, member.Span);
                     return new MemberAccessExpressionSyntax(span, null, AccessOperator.Standard, member);
                 }

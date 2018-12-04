@@ -1,20 +1,18 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
 {
     public static class SymbolExtensions
     {
-        [NotNull] private static readonly FixedList<ISymbol> UnknownSymbolList = new FixedList<ISymbol>(UnknownSymbol.Instance.Yield());
+        private static readonly FixedList<ISymbol> UnknownSymbolList = new FixedList<ISymbol>(UnknownSymbol.Instance.Yield());
 
-        public static bool IsGlobal([NotNull] this ISymbol symbol)
+        public static bool IsGlobal(this ISymbol symbol)
         {
             return symbol.FullName is SimpleName;
         }
 
-        [NotNull]
-        public static FixedList<ISymbol> Lookup([NotNull] this ISymbol symbol, [NotNull] SimpleName name)
+        public static FixedList<ISymbol> Lookup(this ISymbol symbol, SimpleName name)
         {
             if (symbol == UnknownSymbol.Instance) return UnknownSymbolList;
 

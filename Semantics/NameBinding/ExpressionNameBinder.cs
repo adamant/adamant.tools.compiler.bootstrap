@@ -5,7 +5,6 @@ using Adamant.Tools.Compiler.Bootstrap.AST.Visitors;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
@@ -43,10 +42,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
             [NotNull] IdentifierNameSyntax identifierName,
             [NotNull] LexicalScope containingScope)
         {
-            var symbols = containingScope.Lookup(identifierName.Name);
-            if (!symbols.Any())
-                diagnostics.Add(NameBindingError.CouldNotBindName(file, identifierName.Span));
-            identifierName.ReferencedSymbols = symbols;
+            identifierName.ContainingScope = containingScope;
+            //var symbols = containingScope.Lookup(identifierName.Name);
+            //if (!symbols.Any())
+            //    diagnostics.Add(NameBindingError.CouldNotBindName(file, identifierName.Span));
+            //identifierName.ReferencedSymbols = symbols;
         }
     }
 }

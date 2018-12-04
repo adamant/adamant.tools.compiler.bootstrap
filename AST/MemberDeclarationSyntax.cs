@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public abstract class MemberDeclarationSyntax : DeclarationSyntax, ISymbol
     {
-        public TypeDeclarationSyntax DeclaringType { get; set; }
+        public TypeDeclarationSyntax DeclaringType { get; internal set; }
 
         public Name FullName { get; }
 

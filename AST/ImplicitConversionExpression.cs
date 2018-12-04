@@ -14,8 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         protected ImplicitConversionExpression(TextSpan span, [NotNull] DataType convertToType)
             : base(span)
         {
-            Type.BeginFulfilling();
-            Type.Fulfill(convertToType);
+            Type = convertToType;
         }
     }
 }

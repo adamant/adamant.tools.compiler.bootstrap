@@ -22,6 +22,7 @@
     <ProjectReference Include="..\IntermediateLanguage\IntermediateLanguage.csproj" />
     <ProjectReference Include="..\Metadata\Metadata.csproj" />
     <ProjectReference Include="..\Names\Names.csproj" />
+    <ProjectReference Include="..\Scopes\Scopes.csproj" />
     <ProjectReference Include="..\Tokens\Tokens.csproj" />
   </ItemGroup>
 

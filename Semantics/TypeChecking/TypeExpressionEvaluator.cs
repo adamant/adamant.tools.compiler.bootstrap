@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             {
                 case IdentifierNameSyntax identifier:
                 {
-                    var identifierType = identifier.Type.Fulfilled();
+                    var identifierType = identifier.Type;
                     switch (identifierType)
                     {
                         case Metatype metatype:
@@ -66,7 +66,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     switch (unaryOperatorExpression.Operator)
                     {
                         case UnaryOperator.At:
-                            if (unaryOperatorExpression.Operand.Type.Fulfilled() is Metatype metatype)
+                            if (unaryOperatorExpression.Operand.Type is Metatype metatype)
                                 return new PointerType(metatype.Instance);
                             // TODO evaluate to type
                             return DataType.Unknown;
@@ -74,10 +74,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                             // TODO evaluate to type
                             return DataType.Unknown;
                     }
-                case GenericsInvocationSyntax _:
                 case GenericNameSyntax _:
                 {
-                    var type = typeExpression.Type.Fulfilled();
+                    var type = typeExpression.Type;
                     if (type is Metatype metatype)
                         return metatype.Instance;
 

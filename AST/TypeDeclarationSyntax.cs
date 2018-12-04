@@ -21,6 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         {
             Members = members;
             GenericParameters = genericParameters;
+            foreach (var member in Members) member.DeclaringType = this;
         }
 
         [DebuggerHidden]

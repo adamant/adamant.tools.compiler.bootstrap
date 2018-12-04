@@ -6,7 +6,6 @@ using Adamant.Tools.Compiler.Bootstrap.AST.Visitors;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using JetBrains.Annotations;
@@ -145,7 +144,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private Place ConvertToAssignmentStatement([NotNull] ExpressionSyntax expression)
         {
             var value = ConvertToValue(expression);
-            var place = graph.Let(expression.Type.Resolved());
+            var place = graph.Let(expression.Type.AssertResolved());
             graph.AddAssignment(place.Reference, value);
             return place.Reference;
         }
@@ -160,7 +159,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 //    statements.Add(new NewObjectStatement(place, newObjectExpression.Type.AssertResolved(), args));
                 //    break;
                 case IdentifierNameSyntax identifier:
-                    var symbol = identifier.ReferencedSymbols.Single();
+                    var symbol = identifier.ReferencedSymbol;
                     switch (symbol)
                     {
                         case VariableDeclarationStatementSyntax _:
@@ -176,8 +175,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case StringLiteralExpressionSyntax _:
                     throw new InvalidOperationException("String literals should have an implicit conversion around them");
                 case ImplicitNumericConversionExpression implicitNumericConversion:
-                    if (implicitNumericConversion.Expression.Type.Resolved() is IntegerConstantType constantType)
-                        return new IntegerConstant(constantType.Value, implicitNumericConversion.Type.Resolved());
+                    if (implicitNumericConversion.Expression.Type.AssertResolved() is IntegerConstantType constantType)
+                        return new IntegerConstant(constantType.Value, implicitNumericConversion.Type.AssertResolved());
                     else
                         throw new NotImplementedException();
                 case IfExpressionSyntax ifExpression:
@@ -201,7 +200,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 {
                     var value = ConvertToOperand(memberAccess.Expression);
                     return new MemberAccessValue(value,
-                        memberAccess.ReferencedSymbols.Single().FullName);
+                        memberAccess.ReferencedSymbol.FullName);
                 }
                 default:
                     throw NonExhaustiveMatchException.For(expression);
@@ -215,14 +214,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             {
                 case IdentifierNameSyntax identifier:
                 {
-                    var symbol = identifier.ReferencedSymbols.Single();
+                    var symbols = identifier.LookupInContainingScope();
+                    var symbol = symbols.Single();
                     var arguments = invocation.Arguments
                         .Select(a => ConvertToOperand(a.Value)).ToList();
                     return new FunctionCall(symbol.FullName, arguments);
                 }
                 case MemberAccessExpressionSyntax memberAccess:
                 {
-                    var symbol = memberAccess.ReferencedSymbols.Single();
+                    var symbol = memberAccess.ReferencedSymbol;
                     switch (symbol)
                     {
                         case FunctionDeclarationSyntax function:
@@ -241,7 +241,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         {
             var value = ConvertToValue(expression);
             if (value is Operand operand) return operand;
-            var temp = graph.Let(expression.Type.Resolved());
+            var temp = graph.Let(expression.Type.AssertResolved());
             graph.AddAssignment(temp.Reference, value);
             return new CopyPlace(temp.Reference);
         }
