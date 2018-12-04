@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class InitializerDeclarationSyntax : FunctionDeclarationSyntax
+    public class InitializerDeclarationSyntax : InitializerDeclarationSyntaxBase
     {
         public InitializerDeclarationSyntax(
             [NotNull] CodeFile file,
@@ -26,9 +26,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         {
         }
 
-        public override string ToString()
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }

@@ -30,13 +30,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 
         private PrimitiveSymbol(
             [NotNull] Name fullName,
-            bool isReferenceType,
             bool declaredMutable,
             [NotNull] SimpleName lookupByName,
-            [CanBeNull, ItemNotNull] IEnumerable<ISymbol> childSymbols = null)
+            [CanBeNull] [ItemNotNull] IEnumerable<ISymbol> childSymbols = null)
         {
             FullName = fullName;
-            Type = new Metatype(new ObjectType(this, isReferenceType, declaredMutable));
+            Type = new Metatype(new ObjectType(this, declaredMutable));
             LookupByName = lookupByName;
             ChildSymbols = new SymbolSet(childSymbols ?? Enumerable.Empty<ISymbol>());
         }
@@ -48,7 +47,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         {
             return new PrimitiveSymbol(type.Name, new Metatype(type), type.Name.UnqualifiedName, childSymbols);
         }
-
 
         [NotNull]
         public static PrimitiveSymbol NewType([NotNull] Name fullName, [ItemNotNull] [NotNull] IEnumerable<ISymbol> childSymbols)

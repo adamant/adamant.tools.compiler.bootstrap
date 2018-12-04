@@ -37,11 +37,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     case ConstructorDeclarationSyntax constructorDeclaration:
                     {
                         var constructorType = (FunctionType)constructorDeclaration.Type.Resolved();
-                        var selfType = SelfType(constructorDeclaration);
-                        constructorType = new FunctionType(selfType.Yield().Concat(constructorType.ParameterTypes), constructorType.ReturnType);
+                        var parameters = BuildConstructorParameters(constructorDeclaration);
+                        constructorType = new FunctionType(parameters.Select(p => p.Type), constructorType.ReturnType);
                         declarations.Add(new ConstructorDeclaration(constructorDeclaration.FullName,
                             constructorType,
-                            BuildConstructorParameters(constructorDeclaration),
+                            parameters,
                             constructorDeclaration.ReturnType.Resolved(),
                             constructorDeclaration.ControlFlow));
                     }
@@ -69,18 +69,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         [NotNull, ItemNotNull]
         private static FixedList<Parameter> BuildConstructorParameters([NotNull] ConstructorDeclarationSyntax constructorDeclaration)
         {
-            var selfType = SelfType(constructorDeclaration);
+            var selfType = constructorDeclaration.SelfParameterType.Resolved();
             var selfName = ((QualifiedName)constructorDeclaration.FullName).Qualifier.Qualify(SpecialName.Self);
             var selfParameter = new Parameter(true, selfName, selfType);
             return selfParameter.Yield().Concat(constructorDeclaration.Parameters.Select(BuildParameter))
                 .ToFixedList();
-        }
-
-        [NotNull]
-        private static DataType SelfType([NotNull] ConstructorDeclarationSyntax constructorDeclaration)
-        {
-            var declaringType = constructorDeclaration.DeclaringType.NotNull().Type.Resolved();
-            return declaringType.Instance;
         }
 
         [NotNull]

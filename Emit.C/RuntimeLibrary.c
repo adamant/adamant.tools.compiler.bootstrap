@@ -15,8 +15,8 @@ DWORD GetLastError();
 
 void test()
 {
-	void* ptr = HeapAlloc(GetProcessHeap(), 0, 10);
-	HeapFree(GetProcessHeap(), 0, ptr);
+    void* ptr = HeapAlloc(GetProcessHeap(), 0, 10);
+    HeapFree(GetProcessHeap(), 0, ptr);
     //void* ptr = aligned_alloc(8, 32);
     //free(ptr);
 }

@@ -158,10 +158,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                         : DataType.Void;
                     return function.ReturnType.Fulfill(returnType);
                 }
-                case ConstructorDeclarationSyntax _:
-                case InitializerDeclarationSyntax _:
+                case InitializerDeclarationSyntaxBase initializer:
                 {
                     var returnType = function.DeclaringType.NotNull().Type.Fulfilled().Instance;
+                    initializer.SelfParameterType.BeginFulfilling();
+                    switch (returnType)
+                    {
+                        case ObjectType objectType:
+                            initializer.SelfParameterType.Fulfill(objectType.ForConstruction());
+                            break;
+                        default:
+                            throw NonExhaustiveMatchException.For(returnType);
+                    }
                     return function.ReturnType.Fulfill(returnType);
                 }
                 default:
@@ -170,8 +178,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         }
 
         /// <summary>
-        /// If the type has not been checked, this checks it and returns it.
-        /// Also watches for type cycles
+        /// If the type has not been resolved, this resolves it. This function
+        /// also watches for type cycles and reports an error.
         /// </summary>
         private void ResolveSignatureTypesInTypeDeclaration([NotNull] TypeDeclarationSyntax declaration)
         {
@@ -201,31 +209,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             switch (declaration)
             {
                 case ClassDeclarationSyntax classDeclaration:
-                    var classType = new ObjectType(declaration, true,
+                    var classType = new ObjectType(declaration,
                         classDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
                         genericParameterTypes);
                     declaration.Type.Fulfill(new Metatype(classType));
                     break;
                 case StructDeclarationSyntax structDeclaration:
-                    var structType = new ObjectType(declaration, false,
+                    var structType = new ObjectType(declaration,
                         structDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
                         genericParameterTypes);
                     declaration.Type.Fulfill(new Metatype(structType));
                     break;
                 case EnumStructDeclarationSyntax enumStructDeclaration:
-                    var enumStructType = new ObjectType(declaration, false,
+                    var enumStructType = new ObjectType(declaration,
                         enumStructDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
                         genericParameterTypes);
                     declaration.Type.Fulfill(new Metatype(enumStructType));
                     break;
                 case EnumClassDeclarationSyntax enumStructDeclaration:
-                    var enumClassType = new ObjectType(declaration, true,
+                    var enumClassType = new ObjectType(declaration,
                         enumStructDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
                         genericParameterTypes);
                     declaration.Type.Fulfill(new Metatype(enumClassType));
                     break;
                 case TraitDeclarationSyntax declarationSyntax:
-                    var type = new ObjectType(declaration, true,
+                    var type = new ObjectType(declaration,
                         declarationSyntax.Modifiers.Any(m => m is IMutableKeywordToken),
                         genericParameterTypes);
                     declaration.Type.Fulfill(new Metatype(type));

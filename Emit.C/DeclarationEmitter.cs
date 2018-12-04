@@ -103,8 +103,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             var vtableType = $"{typeName}·ₐV_Table";
             code.TypeDeclarations.AppendLine($"typedef struct {selfType} {selfType};");
             code.TypeDeclarations.AppendLine($"typedef struct {vtableType} {vtableType};");
-            code.TypeDeclarations.AppendLine($"typedef struct {{ {vtableType} const*_Nonnull restrict ₐvtable; {selfType} const*_Nonnull restrict ₐself; }} {typeName};");
-            code.TypeDeclarations.AppendLine($"typedef struct {{ {vtableType} const*_Nonnull restrict ₐvtable; {selfType} *_Nonnull restrict ₐself; }} mut˽{typeName};");
+            code.TypeDeclarations.AppendLine($"typedef struct {{ {vtableType} const* restrict ₐvtable; {selfType}* restrict ₐself; }} {typeName};");
 
             code.StructDeclarations.AppendLine($"struct {selfType}");
             code.StructDeclarations.BeginBlock();

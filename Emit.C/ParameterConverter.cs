@@ -1,4 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using JetBrains.Annotations;
@@ -22,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             var type = typeConverter.Convert(parameter.Type);
             var name = nameMangler.Mangle(parameter.Name.UnqualifiedName);
-            return parameter.MutableBinding ? $"{type} {name}" : $"const {type} {name}";
+            return $"{type} {name}";
         }
     }
 }

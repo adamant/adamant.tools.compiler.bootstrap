@@ -12,11 +12,11 @@ typedef struct { intptr_t ₐvalue; } ₐoffset;
 For now, we have moved strings into the runtime library
 */
 typedef struct {
-	ₐsize byte_count;
-	ₐbyte const* bytes;
+    ₐsize byte_count;
+    ₐbyte const* bytes;
 } ᵢString;
 
 inline ᵢString ᵢString·ₐoperator_string_literal(ₐsize byte_count, ₐbyte const* bytes)
 {
-	return ((ᵢString){ byte_count, bytes });
+    return (ᵢString){ byte_count, bytes };
 }

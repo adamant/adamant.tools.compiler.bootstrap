@@ -59,7 +59,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             };
 
             var stringSymbol = PrimitiveSymbol.NewType(typeName, symbols);
-            var stringType = new ObjectType(stringSymbol, true, false);
+            var stringType = new ObjectType(stringSymbol, false);
             stringSymbol.Type = new Metatype(stringType);
             stringLiteralOperator.Type = new FunctionType(new DataType[] { DataType.Size, DataType.BytePointer }, stringType);
             return stringSymbol;

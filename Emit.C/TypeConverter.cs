@@ -19,8 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             Requires.NotNull(nameof(type), type);
             switch (type)
             {
-                // TODO perhaps the name mangler should be used on primitives
-                case var t when t == DataType.Void:
+                case VoidType _:
                     return "void";
                 case SimpleType simpleType:
                     return nameMangler.Mangle(simpleType.Name);
@@ -32,7 +31,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     var referenced = ptr.Referent.AssertResolved();
                     if (referenced == DataType.Any)
                         return "void*";
-
                     return Convert(referenced) + "*";
                 case FunctionType functionType:
                     return $"{Convert(functionType.ReturnType)}(*)({string.Join(", ", functionType.ParameterTypes.Select(Convert))})";
