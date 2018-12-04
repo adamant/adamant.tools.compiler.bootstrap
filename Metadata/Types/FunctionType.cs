@@ -13,6 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     public class FunctionType : ReferenceType
     {
         [NotNull, ItemNotNull] public readonly FixedList<DataType> ParameterTypes;
+        public int Arity => ParameterTypes.Count;
         [NotNull] public readonly DataType ReturnType;
         public override bool IsResolved { get; }
 

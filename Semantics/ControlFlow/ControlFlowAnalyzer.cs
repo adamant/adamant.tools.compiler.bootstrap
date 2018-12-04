@@ -195,11 +195,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     return new FunctionCall(conversionFunction, sizeArgument, bytesArgument);
                 }
                 case InvocationSyntax invocation:
-                {
-                    var temp = ConvertToOperand(invocation.Callee);
-                    var arguments = invocation.Arguments.Select(a => ConvertToOperand(a.Value.NotNull())).ToList();
-                    return new FunctionCall(SpecialName.Any, arguments);
-                }
+                    return ConvertInvocationToValue(invocation);
                 case MemberAccessExpressionSyntax memberAccess:
                 {
                     var value = ConvertToOperand(memberAccess.Expression.NotNull());
@@ -208,6 +204,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 }
                 default:
                     throw NonExhaustiveMatchException.For(expression);
+            }
+        }
+
+        [NotNull]
+        private Value ConvertInvocationToValue([NotNull] InvocationSyntax invocation)
+        {
+            switch (invocation.Callee)
+            {
+                case IdentifierNameSyntax identifier:
+                {
+                    var symbol = identifier.ReferencedSymbols.NotNull().Single().NotNull();
+                    var arguments = invocation.Arguments
+                        .Select(a => ConvertToOperand(a.Value.NotNull())).ToList();
+                    return new FunctionCall(symbol.FullName, arguments);
+                }
+                case MemberAccessExpressionSyntax memberAccess:
+                {
+                    var symbol = memberAccess.ReferencedSymbols.NotNull().Single();
+                    switch (symbol)
+                    {
+                        case FunctionDeclarationSyntax function:
+
+                        default:
+                            throw NonExhaustiveMatchException.For(symbol);
+                    }
+                }
+                default:
+                    throw NonExhaustiveMatchException.For(invocation.Callee);
             }
         }
 

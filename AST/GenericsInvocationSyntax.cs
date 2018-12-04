@@ -1,9 +1,11 @@
+using System;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
+    [Obsolete("This only makes sense if there are meta functions. Everything should be a GenericName")]
     public class GenericsInvocationSyntax : ExpressionSyntax
     {
         [NotNull] public ExpressionSyntax Callee { get; set; }

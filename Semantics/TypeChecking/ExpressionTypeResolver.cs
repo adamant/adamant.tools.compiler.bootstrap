@@ -16,9 +16,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
     public class ExpressionTypeResolver
     {
         [NotNull] private readonly CodeFile file;
+        [NotNull] private readonly Diagnostics diagnostics;
         [CanBeNull] private readonly Metatype declaringType;
         [CanBeNull] private readonly DataType returnType;
-        [NotNull] private readonly Diagnostics diagnostics;
 
         public ExpressionTypeResolver(
             [NotNull] CodeFile file,
@@ -27,8 +27,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             [CanBeNull] DataType returnType = null)
         {
             this.file = file;
-            this.returnType = returnType;
             this.diagnostics = diagnostics;
+            this.returnType = returnType;
             this.declaringType = declaringType;
         }
 
@@ -257,9 +257,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     // * Invoke a static function
                     // * Invoke a method
                     // * Invoke a function pointer
+                    var argumentTypes = invocation.Arguments.Select(a => InferExpressionType(a.Value)).ToFixedList();
+                    InferFunctionType(invocation.Callee, argumentTypes);
+                    var callee = invocation.Callee.Type.Fulfilled();
 
-                    var callee = InferExpressionType(invocation.Callee);
-                    foreach (var argument in invocation.Arguments) InferExpressionType(argument.Value);
                     if (callee is FunctionType functionType)
                     {
                         // TODO check argument types
@@ -687,93 +688,61 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 return DataType.Unknown;
             }
 
-            return EvaluateExpression(typeExpression);
+            return TypeExpressionEvaluator.EvaluateExpression(typeExpression);
+        }
+
+        public void InferFunctionType([NotNull] ExpressionSyntax callee, [NotNull] FixedList<DataType> argumentTypes)
+        {
+            callee.Type.BeginFulfilling();
+            switch (callee)
+            {
+                case IdentifierNameSyntax identifierName:
+                {
+                    var referencedSymbols = identifierName.ReferencedSymbols.NotNull();
+                    if (referencedSymbols.Count > 1)
+                    {
+                        referencedSymbols = ResolveOverload(referencedSymbols, argumentTypes);
+                        identifierName.ReferencedSymbols = referencedSymbols;
+                    }
+
+                    identifierName.Type.Fulfill(referencedSymbols.Single().NotNull().Type);
+                }
+                break;
+                case MemberAccessExpressionSyntax memberAccess:
+                {
+                    InferMemberAccessType(memberAccess);
+                    var referencedSymbols = memberAccess.ReferencedSymbols.NotNull();
+                    if (referencedSymbols.Count > 1)
+                    {
+                        referencedSymbols = ResolveOverload(referencedSymbols, argumentTypes);
+                        memberAccess.ReferencedSymbols = referencedSymbols;
+                        //memberAccess.Type.Resolve(referencedSymbols.Single().NotNull().Type);
+                        throw new NotImplementedException();
+                    }
+                }
+                break;
+                default:
+                    throw NonExhaustiveMatchException.For(callee);
+            }
         }
 
         [NotNull]
-        private DataType EvaluateExpression(
-            [NotNull] ExpressionSyntax typeExpression)
+        private FixedList<ISymbol> ResolveOverload([NotNull] FixedList<ISymbol> symbols, [NotNull] FixedList<DataType> argumentTypes)
         {
-            switch (typeExpression)
+            // Filter down to symbols that could possible match
+            symbols = symbols.Where(s =>
             {
-                case IdentifierNameSyntax identifier:
+                if (s.Type is FunctionType functionType)
                 {
-                    var identifierType = identifier.Type.Fulfilled();
-                    switch (identifierType)
-                    {
-                        case Metatype metatype:
-                            return metatype.Instance;
-                        case TypeType _:
-                            // It is a variable holding a type?
-                            // for now, return a placeholder type
-                            return DataType.Any;
-                        case UnknownType _:
-                            return DataType.Unknown;
-                        default:
-                            throw NonExhaustiveMatchException.For(identifierType);
-                    }
+                    if (functionType.Arity != argumentTypes.Count) return false;
+                    // TODO check compability over argument types
                 }
-                case LifetimeTypeSyntax lifetimeType:
-                {
-                    var type = EvaluateExpression(lifetimeType.ReferentTypeExpression);
-                    if (type == DataType.Unknown) return DataType.Unknown;
-                    var lifetimeToken = lifetimeType.Lifetime;
-                    Lifetime lifetime;
-                    switch (lifetimeToken)
-                    {
-                        case IOwnedKeywordToken _:
-                            lifetime = OwnedLifetime.Instance;
-                            break;
-                        case IRefKeywordToken _:
-                            lifetime = RefLifetime.Instance;
-                            break;
-                        case IIdentifierToken identifier:
-                            lifetime = new NamedLifetime(identifier.Value);
-                            break;
-                        default:
-                            throw NonExhaustiveMatchException.For(lifetimeToken);
-                    }
-                    if (type is ObjectType objectType)
-                        return new LifetimeType(objectType, lifetime);
-                    return DataType.Unknown;
-                }
-                case RefTypeSyntax refType:
-                {
-                    var referent = EvaluateExpression(refType.ReferencedType);
-                    if (referent is ObjectType objectType)
-                        return new RefType(objectType);
-                    return DataType.Unknown;
-                }
-                case UnaryExpressionSyntax unaryOperatorExpression:
-                    switch (unaryOperatorExpression.Operator)
-                    {
-                        case UnaryOperator.At:
-                            if (unaryOperatorExpression.Operand.Type.Fulfilled() is Metatype metatype)
-                                return new PointerType(metatype.Instance);
-                            // TODO evaluate to type
-                            return DataType.Unknown;
-                        default:
-                            // TODO evaluate to type
-                            return DataType.Unknown;
-                    }
-                case GenericsInvocationSyntax _:
-                case GenericNameSyntax _:
-                {
-                    var type = typeExpression.Type.Fulfilled();
-                    if (type is Metatype metatype)
-                        return metatype.Instance;
 
-                    // TODO evaluate to type
-                    return DataType.Unknown;
-                }
-                case BinaryExpressionSyntax _:
-                    // TODO evaluate to type
-                    return DataType.Unknown;
-                case MutableTypeSyntax mutableType:
-                    return EvaluateExpression(mutableType.ReferencedTypeExpression); // TODO make the type mutable
-                default:
-                    throw NonExhaustiveMatchException.For(typeExpression);
-            }
+                return true;
+            }).ToFixedList();
+            // TODO Select most specific match
+            return symbols;
         }
+
     }
 }

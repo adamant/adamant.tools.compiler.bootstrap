@@ -18,11 +18,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// except to resolve an unresolved type.
     /// </summary>
     [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
-    public class TypePromise<Type>
-        where Type : DataType
+    public class TypePromise<TType>
+        where TType : DataType
     {
         public PromiseState State { get; private set; }
-        [CanBeNull] private Type DataType { get; set; }
+        [CanBeNull] private TType DataType { get; set; }
 
         [DebuggerHidden]
         public void BeginFulfilling()
@@ -33,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         [DebuggerHidden]
         [NotNull]
-        public Type Fulfill([NotNull] Type type)
+        public TType Fulfill([NotNull] TType type)
         {
             Requires.That(nameof(State), State == PromiseState.InProgress);
             Requires.NotNull(nameof(type), type);
@@ -44,19 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         [DebuggerHidden]
         [NotNull]
-        public Type Resolve([NotNull] Type type)
-        {
-            Requires.That(nameof(State), State == PromiseState.Fulfilled);
-            Requires.NotNull(nameof(type), type);
-            Requires.That(nameof(type), !DataType.NotNull().IsResolved);
-            Requires.That(nameof(type), type.IsResolved);
-            DataType = type;
-            return type;
-        }
-
-        [DebuggerHidden]
-        [NotNull]
-        public Type Fulfilled()
+        public TType Fulfilled()
         {
             if (State != PromiseState.Fulfilled)
                 throw new InvalidOperationException("Promise not fulfilled");
@@ -66,12 +54,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         [DebuggerHidden]
         [NotNull]
-        public Type Resolved()
+        public TType Resolved()
         {
             if (State != PromiseState.Fulfilled)
                 throw new InvalidOperationException("Promise not fulfilled");
 
-            return (Type)DataType.NotNull().AssertResolved();
+            return (TType)DataType.NotNull().AssertResolved();
         }
 
         // Useful for debugging
