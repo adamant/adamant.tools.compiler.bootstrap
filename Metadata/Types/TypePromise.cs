@@ -17,11 +17,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// except to resolve an unresolved type.
     /// </summary>
     [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
-    public class TypePromise<TType>
-        where TType : DataType
+    public class TypePromise
     {
         public PromiseState State { get; private set; }
-        private TType DataType { get; set; }
+        private DataType DataType { get; set; }
 
         [DebuggerHidden]
         public void BeginFulfilling()
@@ -31,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         }
 
         [DebuggerHidden]
-        public TType Fulfill(TType type)
+        public DataType Fulfill(DataType type)
         {
             Requires.That(nameof(State), State == PromiseState.InProgress, "must be in progress is " + State);
             State = PromiseState.Fulfilled;
@@ -40,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         }
 
         [DebuggerHidden]
-        public TType Fulfilled()
+        public DataType Fulfilled()
         {
             if (State != PromiseState.Fulfilled)
                 throw new InvalidOperationException("Promise not fulfilled");
@@ -49,12 +48,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         }
 
         [DebuggerHidden]
-        public TType Resolved()
+        public DataType Resolved()
         {
             if (State != PromiseState.Fulfilled)
                 throw new InvalidOperationException("Promise not fulfilled");
 
-            return (TType)DataType.AssertResolved();
+            return DataType.AssertResolved();
         }
 
         // Useful for debugging
@@ -72,9 +71,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                     throw NonExhaustiveMatchException.ForEnum(State);
             }
         }
-    }
-
-    public class TypePromise : TypePromise<DataType>
-    {
     }
 }

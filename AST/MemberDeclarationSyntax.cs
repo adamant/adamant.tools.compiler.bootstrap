@@ -9,24 +9,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public abstract class MemberDeclarationSyntax : DeclarationSyntax, ISymbol
     {
-        [CanBeNull] public TypeDeclarationSyntax DeclaringType { get; set; }
+        public TypeDeclarationSyntax DeclaringType { get; set; }
 
-        [NotNull] public Name FullName { get; }
+        public Name FullName { get; }
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [NotNull]
         public SimpleName Name => FullName.UnqualifiedName;
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [NotNull]
         public virtual SimpleName LookupByName => FullName.UnqualifiedName;
+
+        public TypePromise Type { get; } = new TypePromise();
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [NotNull]
-        DataType ISymbol.Type => GetDataType();
+        DataType ISymbol.Type => Type.Fulfilled();
 
         public SymbolSet ChildSymbols { get; }
 
@@ -40,7 +39,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             FullName = fullName;
             ChildSymbols = childSymbols ?? SymbolSet.Empty;
         }
-
-        [NotNull] protected abstract DataType GetDataType();
     }
 }
