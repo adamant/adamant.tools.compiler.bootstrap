@@ -11,7 +11,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
 {
     public class ExpressionTypeResolver
     {
@@ -252,6 +252,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     return expression.Type.Fulfill(DataType.Unknown);
                 case InvocationSyntax invocation:
                 {
+                    // This could:
+                    // * Invoke a stand alone function
+                    // * Invoke a static function
+                    // * Invoke a method
+                    // * Invoke a function pointer
+
                     var callee = InferExpressionType(invocation.Callee);
                     foreach (var argument in invocation.Arguments) InferExpressionType(argument.Value);
                     if (callee is FunctionType functionType)

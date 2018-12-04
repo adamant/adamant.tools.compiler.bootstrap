@@ -21,6 +21,7 @@ The following features will not be implemented by this compiler even though they
 * Meta Functions: Functions which have generic parameters but not regular parameters and are evaluated only at compilet time.
 * [Loop Labels](https://github.com/adamant/adamant.language.reference/blob/master/src/loop-expressions.md#loop-labels)
 * [Document Comment Validation](https://github.com/adamant/adamant.language.reference/blob/master/src/documentation-comments.md#supported-markdown)
+* Full Type Inference: Variable types can be inferred from the type of their initalizer only.
 
 ### Features Planned for After v1.0
 

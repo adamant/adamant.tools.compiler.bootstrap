@@ -9,7 +9,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
 {
     /// <summary>
     /// Terminology:

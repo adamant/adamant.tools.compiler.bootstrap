@@ -11,7 +11,7 @@ using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
 {
-    public class NameBinder
+    public class DeclarationNameBinder
     {
         // TODO do we need a list of all the namespaces for validating using statements?
         // Gather a list of all the namespaces for validating using statements
@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
         [NotNull, ItemNotNull] private readonly FixedList<ISymbol> allSymbols;
         [NotNull] private readonly GlobalScope globalScope;
 
-        public NameBinder(
+        public DeclarationNameBinder(
             [NotNull] Diagnostics diagnostics,
             [NotNull] PackageSyntax packageSyntax,
             [NotNull] FixedDictionary<string, Package> references)

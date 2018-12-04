@@ -6,6 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Validation;
 using JetBrains.Annotations;
 
@@ -21,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // First pull over all the lexer and parser errors from the compilation units
             var diagnostics = AllDiagnostics(packageSyntax);
 
-            var nameBinder = new NameBinder(diagnostics, packageSyntax, references);
+            var nameBinder = new DeclarationNameBinder(diagnostics, packageSyntax, references);
             nameBinder.BindNamesInPackage(packageSyntax);
 
             // Make a list of all the member declarations (i.e. not namespaces)
@@ -36,6 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
 #if DEBUG
             TypeResolutionValidator.Validate(memberDeclarations);
+            // TODO validate that all ReferencedSymbols lists have a single value non-errored code
 #endif
 
             ControlFlowAnalyzer.BuildGraphs(memberDeclarations);

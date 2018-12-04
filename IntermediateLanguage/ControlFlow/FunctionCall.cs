@@ -28,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         // Useful for debugging
         public override string ToString()
         {
-            return $"{FunctionName}({string.Join(",", Arguments)});";
+            return $"call {FunctionName}({string.Join(",", Arguments)});";
         }
     }
 }
