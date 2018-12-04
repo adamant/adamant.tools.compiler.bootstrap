@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// </summary>
     public class MetaFunctionType : ReferenceType
     {
-        [NotNull, ItemNotNull] public IReadOnlyList<DataType> ParameterTypes { get; }
+        [NotNull, ItemNotNull] public FixedList<DataType> ParameterTypes { get; }
         public int Arity => ParameterTypes.Count;
         [NotNull] public DataType ResultType { get; }
         public override bool IsResolved { get; }
@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         {
             Requires.NotNull(nameof(parameterTypes), parameterTypes);
             Requires.NotNull(nameof(resultType), resultType);
-            ParameterTypes = parameterTypes.ItemsNotNull().ToReadOnlyList();
+            ParameterTypes = parameterTypes.ItemsNotNull().ToFixedList();
             ResultType = resultType;
             IsResolved = ParameterTypes.All(pt => pt.IsResolved) && ResultType.IsResolved;
         }

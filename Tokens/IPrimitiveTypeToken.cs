@@ -1,8 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
-    public interface IPrimitiveTypeToken : IToken, IIdentifierOrPrimitiveToken
-    {
-    }
+    public interface IPrimitiveTypeToken : IToken { }
 
     public partial interface IVoidKeywordToken : IPrimitiveTypeToken { }
     public partial interface INeverKeywordToken : IPrimitiveTypeToken { }

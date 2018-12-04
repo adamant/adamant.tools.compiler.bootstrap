@@ -273,13 +273,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
                     InferExpressionType(genericInvocation.Callee);
                     var calleeType = genericInvocation.Callee.Type.Fulfilled();
-                    if (calleeType is OverloadedType overloadedType)
-                    {
-                        genericInvocation.Callee.Type.Resolve(calleeType = overloadedType.Types
-                            .OfType<GenericType>()
-                            .Single(t => t.GenericArity == genericInvocation.Arity)
-                            .NotNull());
-                    }
+                    //if (calleeType is OverloadedType overloadedType)
+                    //{
+                    //    genericInvocation.Callee.Type.Resolve(calleeType = overloadedType.Types
+                    //        .OfType<GenericType>()
+                    //        .Single(t => t.GenericArity == genericInvocation.Arity)
+                    //        .NotNull());
+                    //}
 
                     // TODO check that argument types match function type
                     switch (calleeType)
@@ -305,11 +305,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 
                     genericName.NameType.BeginFulfilling();
                     var nameType = InferNameType(genericName.Name, genericName.Span);
-                    if (nameType is OverloadedType overloadedType)
-                    {
-                        nameType = overloadedType.Types.OfType<GenericType>()
-                            .Single(t => t.GenericArity == genericName.Arity).NotNull();
-                    }
+                    //if (nameType is OverloadedType overloadedType)
+                    //{
+                    //    nameType = overloadedType.Types.OfType<GenericType>()
+                    //        .Single(t => t.GenericArity == genericName.Arity).NotNull();
+                    //}
 
                     // TODO check that argument types match function type
                     genericName.NameType.Fulfill(nameType);
@@ -579,19 +579,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                     // TODO it may need to be size
                     //ImposeIntegerConstantType(UnsizedIntegerType.Offset, rightOperand);
                     throw new NotImplementedException();
-                    return rightType != DataType.Size &&
-                           rightType != DataType.Offset;
+                    //return rightType != DataType.Size &&
+                    //       rightType != DataType.Offset;
                 }
                 case IntegerConstantType _:
                     // TODO may need to promote based on size
                     //ImposeIntegerConstantType(rightType, leftOperand);
                     throw new NotImplementedException();
-                    return !IsIntegerType(rightType);
+                //return !IsIntegerType(rightType);
                 case DataType type when IsIntegerType(type):
                     // TODO it may need to be size
                     //ImposeIntegerConstantType(leftType, rightOperand);
                     throw new NotImplementedException();
-                    return !IsIntegerType(rightType);
+                //return !IsIntegerType(rightType);
                 case ObjectType _:
                     // Other object types can't be used in numeric expressions
                     return false;

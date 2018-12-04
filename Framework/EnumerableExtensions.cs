@@ -34,13 +34,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
                 yield return value.Value;
         }
 
-        [Obsolete("Used ToFixedList() instead")]
-        [NotNull]
-        public static IReadOnlyList<T> ToReadOnlyList<T>([NotNull] this IEnumerable<T> values)
-        {
-            return values.ToList().AsReadOnly().NotNull();
-        }
-
         [NotNull]
         [DebuggerStepThrough]
         public static FixedList<T> ToFixedList<T>([NotNull] this IEnumerable<T> values)

@@ -10,8 +10,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         [NotNull] public FixedList<AttributeSyntax> Attributes { get; }
         [NotNull] public FixedList<IModiferToken> Modifiers { get; }
-        [NotNull] public Name FullName { get; }
-        [NotNull] public SimpleName Name => FullName.UnqualifiedName;
         [CanBeNull] public FixedList<ExpressionSyntax> BaseTypes { get; }
         [NotNull] public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
         [NotNull] public FixedList<ExpressionSyntax> Invariants { get; }
@@ -31,7 +29,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         {
             Attributes = attributes;
             Modifiers = modifiers;
-            FullName = fullName;
             BaseTypes = baseTypes;
             GenericConstraints = genericConstraints;
             Invariants = invariants;

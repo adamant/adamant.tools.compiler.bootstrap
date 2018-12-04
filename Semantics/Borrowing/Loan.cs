@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using JetBrains.Annotations;
 
@@ -12,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
     /// </summary>
     public class Loan : Claim
     {
-        [NotNull] public IReadOnlyList<Restriction> Restrictions { get; }
+        [NotNull] public FixedList<Restriction> Restrictions { get; }
 
         /// <param name="variable">Variable the reference is loaned to</param>
         /// <param name="rvalue">The value loaned from</param>
@@ -23,13 +22,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             Requires.NotNull(nameof(rvalue), rvalue);
             var restrictions = new List<Restriction>();
             GatherRestrictions(rvalue, restrictions);
-            Restrictions = restrictions.AsReadOnly().NotNull();
+            Restrictions = restrictions.ToFixedList();
         }
 
         public Loan(int variable, int @object)
             : base(variable, @object)
         {
-            Restrictions = Enumerable.Empty<Restriction>().ToReadOnlyList();
+            Restrictions = Enumerable.Empty<Restriction>().ToFixedList();
         }
 
         private static void GatherRestrictions([NotNull] Value rvalue, [NotNull] List<Restriction> restrictions)
