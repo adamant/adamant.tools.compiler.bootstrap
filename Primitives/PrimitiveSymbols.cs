@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         {
             var typeName = DataType.Bool.Name;
             var symbols = new List<ISymbol> { };
-            return PrimitiveSymbol.NewSimpleType(DataType.Bool, symbols);
+            return Symbol.NewSimpleType(DataType.Bool, symbols);
         }
 
         /// <summary>
@@ -50,15 +50,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         private static ISymbol BuildStringSymbol()
         {
             var typeName = new SimpleName("String");
-            var stringLiteralOperator = PrimitiveSymbol.NewMember(typeName.Qualify(SpecialName.OperatorStringLiteral));
+            var stringLiteralOperator = Symbol.NewMember(typeName.Qualify(SpecialName.OperatorStringLiteral));
             var symbols = new List<ISymbol>()
             {
-                PrimitiveSymbol.NewGetter(typeName.Qualify("bytes"), DataType.BytePointer),
-                PrimitiveSymbol.NewGetter(typeName.Qualify("bytes_count"), DataType.Size),
+                // Making these fields for now
+                Symbol.NewMember(typeName.Qualify("bytes"), DataType.BytePointer),
+                Symbol.NewMember(typeName.Qualify("byte_count"), DataType.Size),
                 stringLiteralOperator
             };
 
-            var stringSymbol = PrimitiveSymbol.NewType(typeName, symbols);
+            var stringSymbol = Symbol.NewType(typeName, symbols);
             var stringType = new ObjectType(stringSymbol, false);
             stringSymbol.Type = new Metatype(stringType);
             stringLiteralOperator.Type = new FunctionType(new DataType[] { DataType.Size, DataType.BytePointer }, stringType);
@@ -70,9 +71,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             var typeName = numericType.Name;
             var symbols = new List<ISymbol>
             {
-                PrimitiveSymbol.NewMember(typeName.Qualify("remainder"), new FunctionType(new[] {numericType}, numericType))
+                Symbol.NewMember(typeName.Qualify("remainder"), new FunctionType(new[] {numericType}, numericType))
             };
-            return PrimitiveSymbol.NewSimpleType(numericType, symbols);
+            return Symbol.NewSimpleType(numericType, symbols);
         }
     }
 }

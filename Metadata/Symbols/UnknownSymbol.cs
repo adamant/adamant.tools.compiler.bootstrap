@@ -12,7 +12,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
         #endregion
 
         public Name FullName => SpecialName.Unknown;
-        public SimpleName LookupByName => SpecialName.Unknown;
         public DataType Type => DataType.Unknown;
         public SymbolSet ChildSymbols => SymbolSet.Empty;
     }

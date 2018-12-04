@@ -18,8 +18,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
         private static Dictionary<SimpleName, FixedList<ISymbol>> GroupSymbols(
             IEnumerable<ISymbol> symbols)
         {
-            return symbols.Distinct().GroupBy(s => s.LookupByName)
+            return symbols.Distinct().GroupBy(LookupByName)
                 .ToDictionary(g => g.Key, g => g.ToFixedList());
+        }
+
+        private static SimpleName LookupByName(ISymbol symbol)
+        {
+            if (symbol is IAccessorSymbol accessor) return accessor.PropertyName.UnqualifiedName.WithoutNumber();
+            return symbol.FullName.UnqualifiedName.WithoutNumber();
         }
     }
 }

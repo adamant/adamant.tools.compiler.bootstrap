@@ -22,4 +22,4 @@ void test()
 }
 
 // Inline functions from RuntimeLibrary.h
-extern ᵢString ᵢString·ₐoperator_string_literal(ₐsize count, ₐbyte const* bytes);
+extern ᵢString ᵢString·ₐoperator_string_literal(ₐsize count, ₐbyte* bytes);

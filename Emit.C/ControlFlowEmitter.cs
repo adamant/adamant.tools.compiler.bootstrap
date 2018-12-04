@@ -3,24 +3,23 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
     public class ControlFlowEmitter : IEmitter<ControlFlowGraph>
     {
-        [NotNull] private readonly NameMangler nameMangler;
-        [NotNull] private readonly IConverter<DataType> typeConverter;
+        private readonly NameMangler nameMangler;
+        private readonly IConverter<DataType> typeConverter;
 
         public ControlFlowEmitter(
-            [NotNull] NameMangler nameMangler,
-            [NotNull] IConverter<DataType> typeConverter)
+            NameMangler nameMangler,
+            IConverter<DataType> typeConverter)
         {
             this.typeConverter = typeConverter;
             this.nameMangler = nameMangler;
         }
 
-        public void Emit([NotNull] ControlFlowGraph cfg, [NotNull] Code code)
+        public void Emit(ControlFlowGraph cfg, Code code)
         {
             var definitions = code.Definitions;
 
@@ -37,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 EmitBlock(block, voidReturn, definitions);
         }
 
-        private void EmitVariable([NotNull] LocalVariableDeclaration variable, [NotNull] CCodeBuilder code)
+        private void EmitVariable(LocalVariableDeclaration variable, CCodeBuilder code)
         {
             Requires.That(nameof(variable), variable.Exists, "tried to look up variable that does not exist");
             var initializer = variable.IsParameter ? $" = {nameMangler.Mangle(variable.Name)}" : "";
@@ -45,32 +44,37 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.AppendLine($"{typeConverter.Convert(variable.Type)} ₜ{NameOf(variable.Reference)}{initializer};");
         }
 
-        private static string NameOf([NotNull] VariableReference variable)
+        private static string NameOf(VariableReference variable)
         {
             return variable.VariableNumber == 0 ? "result" : variable.VariableNumber.ToString();
         }
 
-        private void EmitBlock([NotNull] BasicBlock block, bool voidReturn, [NotNull] CCodeBuilder code)
+        private void EmitBlock(BasicBlock block, bool voidReturn, CCodeBuilder code)
         {
             code.AppendLine($"bb{block.Number}:");
             code.BeginBlock();
-            foreach (var statement in block.Statements)
-            {
-                code.AppendLine("// " + statement);
-                switch (statement)
-                {
-                    case ReturnStatement _:
-                        code.AppendLine(voidReturn ? "return;" : "return ₜresult;");
-                        break;
-                    case AssignmentStatement assignment:
-                        code.AppendLine(
-                            $"{ConvertPlace(assignment.Place)} = {ConvertValue(assignment.Value)};");
-                        break;
-                    default:
-                        throw NonExhaustiveMatchException.For(statement);
-                }
-            }
+            foreach (var statement in block.Statements) EmitStatement(statement, voidReturn, code);
             code.EndBlock();
+        }
+
+        private void EmitStatement(Statement statement, bool voidReturn, CCodeBuilder code)
+        {
+            code.AppendLine("// " + statement);
+            switch (statement)
+            {
+                case ReturnStatement _:
+                    code.AppendLine(voidReturn ? "return;" : "return ₜresult;");
+                    break;
+                case AssignmentStatement assignment:
+                    code.AppendLine(
+                        $"{ConvertPlace(assignment.Place)} = {ConvertValue(assignment.Value)};");
+                    break;
+                case ActionStatement action:
+                    code.AppendLine(ConvertValue(action.Value) + ";");
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.For(statement);
+            }
         }
 
         private string ConvertPlace(Place place)
@@ -91,22 +95,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 case IntegerConstant integer:
                     return $"({ConvertType(integer.Type)}){{{integer.Value}}}";
                 case Utf8BytesConstant utf8BytesConstant:
-                    return $"((ₐbyte const *)u8\"{utf8BytesConstant.Value.Escape()}\")";
+                    return $"((ₐbyte*)u8\"{utf8BytesConstant.Value.Escape()}\")";
                 //case VariableReference variable:
                 //    return "ₜ" + NameOf(variable);
-                case FunctionCall callStatement:
-                    var mangledName = nameMangler.Mangle(callStatement.FunctionName);
-                    var arguments = callStatement.Arguments.Select(ConvertValue);
+                case FunctionCall functionCall:
+                {
+                    var mangledName = nameMangler.Mangle(functionCall.FunctionName);
+                    var arguments = functionCall.Arguments.Select(ConvertValue);
                     return $"{mangledName}({string.Join(", ", arguments)})";
+                }
                 case ConstructorCall _:
                     // TODO implement this
                     throw new NotImplementedException();
                 case DeclaredValue declaredValue:
                     return nameMangler.Mangle(declaredValue.Name);
-                case MemberAccessValue memberAccess:
-                    return $"{ConvertValue(memberAccess.Expression)}.{nameMangler.Mangle(memberAccess.Member)}";
+                case FieldAccessValue fieldAccess:
+                    return $"{ConvertValue(fieldAccess.Expression)}.{nameMangler.Mangle(fieldAccess.Field.UnqualifiedName)}";
                 case CopyPlace copyPlace:
                     return ConvertPlace(copyPlace.Place);
+                case VirtualFunctionCall virtualCall:
+                {
+                    var self = ConvertValue(virtualCall.Self);
+                    var mangledName = nameMangler.Mangle(virtualCall.FunctionName);
+                    var arguments = virtualCall.Arguments.Select(ConvertValue).Prepend(self);
+                    return $"{self}.ₐvtable.{mangledName}({string.Join(", ", arguments)})";
+                }
                 default:
                     throw NonExhaustiveMatchException.For(value);
             }

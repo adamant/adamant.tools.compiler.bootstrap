@@ -6,15 +6,15 @@ using Adamant.Tools.Compiler.Bootstrap.AST.Visitors;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 {
     public class ControlFlowAnalyzer
     {
-        public static void BuildGraphs([NotNull, ItemNotNull] IEnumerable<DeclarationSyntax> declarations)
+        public static void BuildGraphs(IEnumerable<DeclarationSyntax> declarations)
         {
             var visitor = new GetFunctionDeclarationsVisitor();
             visitor.VisitDeclarations(declarations);
@@ -25,16 +25,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
         }
 
-        private static bool ShouldBuildGraph([NotNull] FunctionDeclarationSyntax function)
+        private static bool ShouldBuildGraph(FunctionDeclarationSyntax function)
         {
             return function.Body != null // It is not abstract
                    && function.GenericParameters == null // It is not generic, generic functions need monomorphized
                    && !function.Poisoned; // There were errors, we may not be able to make a control flow graph, so don't try
         }
 
-        [NotNull] private readonly ControlFlowGraphBuilder graph = new ControlFlowGraphBuilder();
+        private readonly ControlFlowGraphBuilder graph = new ControlFlowGraphBuilder();
 
-        private void BuildGraph([NotNull] FunctionDeclarationSyntax function)
+        private void BuildGraph(FunctionDeclarationSyntax function)
         {
             // Temp Variable for return
             if (function is ConstructorDeclarationSyntax constructor)
@@ -54,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             function.ControlFlow = graph.Build();
         }
 
-        private void ConvertToStatement([NotNull] StatementSyntax statement)
+        private void ConvertToStatement(StatementSyntax statement)
         {
             switch (statement)
             {
@@ -78,7 +78,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
         }
 
-        private static bool IsOwned([NotNull] VariableDeclarationStatementSyntax declaration)
+        private static bool IsOwned(VariableDeclarationStatementSyntax declaration)
         {
             if (declaration.Type.Resolved() is LifetimeType type)
                 return type.IsOwned;
@@ -86,7 +86,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             return false;
         }
 
-        private void ConvertToStatement([NotNull] ExpressionSyntax expression)
+        private void ConvertToStatement(ExpressionSyntax expression)
         {
             switch (expression)
             {
@@ -140,17 +140,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
         }
 
-        [NotNull]
-        private Place ConvertToAssignmentStatement([NotNull] ExpressionSyntax expression)
+        private void ConvertToAssignmentStatement(ExpressionSyntax expression)
         {
             var value = ConvertToValue(expression);
-            var place = graph.Let(expression.Type.AssertResolved());
-            graph.AddAssignment(place.Reference, value);
-            return place.Reference;
+            if (expression.Type is VoidType) graph.AddAction(value);
+            else
+            {
+                var place = graph.Let(expression.Type.AssertResolved());
+                graph.AddAssignment(place.Reference, value);
+            }
         }
 
-        [NotNull]
-        private Value ConvertToValue([NotNull] ExpressionSyntax expression)
+        private Value ConvertToValue(ExpressionSyntax expression)
         {
             switch (expression)
             {
@@ -159,15 +160,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 //    statements.Add(new NewObjectStatement(place, newObjectExpression.Type.AssertResolved(), args));
                 //    break;
                 case IdentifierNameSyntax identifier:
+                {
                     var symbol = identifier.ReferencedSymbol;
                     switch (symbol)
                     {
                         case VariableDeclarationStatementSyntax _:
                         case ParameterSyntax _:
-                            return new CopyPlace(graph.VariableFor(symbol.FullName.UnqualifiedName));
+                            return new CopyPlace(
+                                graph.VariableFor(symbol.FullName.UnqualifiedName));
                         default:
                             return new DeclaredValue(symbol.FullName);
                     }
+                }
                 case BinaryExpressionSyntax binaryExpression:
                     return ConvertBinaryExpressionToValue(binaryExpression);
                 case IntegerLiteralExpressionSyntax _:
@@ -199,7 +203,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case MemberAccessExpressionSyntax memberAccess:
                 {
                     var value = ConvertToOperand(memberAccess.Expression);
-                    return new MemberAccessValue(value,
+                    var symbol = memberAccess.ReferencedSymbol;
+                    if (symbol is IAccessorSymbol accessor)
+                        return new VirtualFunctionCall(accessor.PropertyName.UnqualifiedName, value);
+
+                    return new FieldAccessValue(value,
                         memberAccess.ReferencedSymbol.FullName);
                 }
                 default:
@@ -207,15 +215,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
         }
 
-        [NotNull]
-        private Value ConvertInvocationToValue([NotNull] InvocationSyntax invocation)
+        private Value ConvertInvocationToValue(InvocationSyntax invocation)
         {
             switch (invocation.Callee)
             {
                 case IdentifierNameSyntax identifier:
                 {
-                    var symbols = identifier.LookupInContainingScope();
-                    var symbol = symbols.Single();
+                    var symbol = identifier.ReferencedSymbol;
                     var arguments = invocation.Arguments
                         .Select(a => ConvertToOperand(a.Value)).ToList();
                     return new FunctionCall(symbol.FullName, arguments);
@@ -225,8 +231,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     var symbol = memberAccess.ReferencedSymbol;
                     switch (symbol)
                     {
-                        case FunctionDeclarationSyntax function:
-
                         default:
                             throw NonExhaustiveMatchException.For(symbol);
                     }
@@ -236,8 +240,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
         }
 
-        [NotNull]
-        private Operand ConvertToOperand([NotNull] ExpressionSyntax expression)
+        private Operand ConvertToOperand(ExpressionSyntax expression)
         {
             var value = ConvertToValue(expression);
             if (value is Operand operand) return operand;
@@ -246,8 +249,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             return new CopyPlace(temp.Reference);
         }
 
-        [NotNull]
-        private Value ConvertBinaryExpressionToValue([NotNull] BinaryExpressionSyntax binary)
+        private Value ConvertBinaryExpressionToValue(BinaryExpressionSyntax binary)
         {
             switch (binary.Operator)
             {
@@ -270,8 +272,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
         }
 
-        [NotNull]
-        private Place ConvertToLValue([NotNull] ExpressionSyntax value)
+        private Place ConvertToLValue(ExpressionSyntax value)
         {
             switch (value)
             {

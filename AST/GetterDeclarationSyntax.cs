@@ -1,16 +1,16 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class GetterDeclarationSyntax : FunctionDeclarationSyntax
+    public class GetterDeclarationSyntax : FunctionDeclarationSyntax, IAccessorSymbol
     {
         [NotNull] public FixedList<AttributeSyntax> Attributes { get; }
         [NotNull] public Name PropertyName { get; }
-        [NotNull] public override SimpleName LookupByName => PropertyName.UnqualifiedName;
         [NotNull] public ExpressionSyntax ReturnTypeExpression { get; }
 
         public GetterDeclarationSyntax(

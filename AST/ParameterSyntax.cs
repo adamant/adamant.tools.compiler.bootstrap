@@ -3,7 +3,6 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
@@ -11,15 +10,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         public TextSpan Span { get; }
         public bool MutableBinding { get; }
-        [NotNull] public Name FullName { get; }
+        public Name FullName { get; }
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [NotNull] public SimpleName Name => FullName.UnqualifiedName;
+        public SimpleName Name => FullName.UnqualifiedName;
         public bool Unused { get; }
-        [DebuggerHidden]
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [NotNull] public SimpleName LookupByName => FullName.UnqualifiedName.WithoutNumber();
-        [NotNull] public TypePromise Type { get; } = new TypePromise();
+        public TypePromise Type { get; } = new TypePromise();
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -28,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         SymbolSet ISymbol.ChildSymbols => SymbolSet.Empty;
 
-        protected ParameterSyntax(TextSpan span, bool mutableBinding, [NotNull] Name fullName)
+        protected ParameterSyntax(TextSpan span, bool mutableBinding, Name fullName)
         {
             Span = span;
             MutableBinding = mutableBinding;

@@ -14,9 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [NotNull] public SimpleName Name => FullName.UnqualifiedName;
-        [DebuggerHidden]
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [NotNull] public SimpleName LookupByName => FullName.UnqualifiedName;
+
         [CanBeNull] public ExpressionSyntax TypeExpression { get; }
         [NotNull] public TypePromise Type { get; } = new TypePromise();
         [DebuggerHidden]

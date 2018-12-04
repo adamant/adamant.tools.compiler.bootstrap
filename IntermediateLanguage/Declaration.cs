@@ -12,9 +12,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [NotNull] public SimpleName Name => FullName.UnqualifiedName;
-        [DebuggerHidden]
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [NotNull] public SimpleName LookupByName => FullName.UnqualifiedName;
 
         [NotNull] public DataType Type { get; }
         [NotNull] public SymbolSet ChildSymbols { get; }
