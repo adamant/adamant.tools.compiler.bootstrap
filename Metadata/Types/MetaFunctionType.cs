@@ -23,9 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             [NotNull, ItemNotNull] IEnumerable<DataType> parameterTypes,
             [NotNull] DataType resultType)
         {
-            Requires.NotNull(nameof(parameterTypes), parameterTypes);
-            Requires.NotNull(nameof(resultType), resultType);
-            ParameterTypes = parameterTypes.ItemsNotNull().ToFixedList();
+            ParameterTypes = parameterTypes.ToFixedList();
             ResultType = resultType;
             IsResolved = ParameterTypes.All(pt => pt.IsResolved) && ResultType.IsResolved;
         }

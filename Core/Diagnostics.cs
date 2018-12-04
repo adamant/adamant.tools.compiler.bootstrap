@@ -16,14 +16,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
 
         public void Add([NotNull] Diagnostic diagnostic)
         {
-            Requires.NotNull(nameof(diagnostic), diagnostic);
             items.Add(diagnostic);
         }
 
         public void Add([NotNull, ItemNotNull] IEnumerable<Diagnostic> diagnostics)
         {
-            Requires.NotNull(nameof(diagnostics), diagnostics);
-            items.AddRange(diagnostics.ItemsNotNull());
+            items.AddRange(diagnostics);
         }
 
         [NotNull]

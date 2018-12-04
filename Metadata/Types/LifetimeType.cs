@@ -12,8 +12,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         public LifetimeType([NotNull] ObjectType referent, [NotNull] Lifetime lifetime)
         {
-            Requires.NotNull(nameof(referent), referent);
-            Requires.NotNull(nameof(lifetime), lifetime);
             Referent = referent;
             Lifetime = lifetime;
             IsResolved = Referent.IsResolved;

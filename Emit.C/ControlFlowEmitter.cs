@@ -39,8 +39,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
         private void EmitVariable([NotNull] LocalVariableDeclaration variable, [NotNull] CCodeBuilder code)
         {
-            Requires.That(nameof(variable), variable.Exists);
-            var initializer = variable.IsParameter ? $" = {nameMangler.Mangle(variable.Name.NotNull())}" : "";
+            Requires.That(nameof(variable), variable.Exists, "tried to look up variable that does not exist");
+            var initializer = variable.IsParameter ? $" = {nameMangler.Mangle(variable.Name)}" : "";
             var name = variable.Name != null ? " // " + variable.Name : "";
             code.AppendLine($"{typeConverter.Convert(variable.Type)} ₜ{NameOf(variable.Reference)}{initializer};");
         }

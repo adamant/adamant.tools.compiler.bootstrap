@@ -9,7 +9,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 
         public Dereference([NotNull] Place dereferencedValue)
         {
-            Requires.NotNull(nameof(dereferencedValue), dereferencedValue);
             DereferencedValue = dereferencedValue;
         }
 

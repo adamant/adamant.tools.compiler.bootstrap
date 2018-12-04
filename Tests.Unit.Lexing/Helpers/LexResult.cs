@@ -34,8 +34,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
         {
             Assert.True(2 == Tokens.Count, $"Expected token count {1}, was {Tokens.Count - 1} (excluding EOF)");
             var eof = Tokens.Last().AssertOfType<IEndOfFileToken>();
-            Assert.Equal(new TextSpan(Tokens[Tokens.Count - 2].NotNull().Span.End, 0), eof.Span);
-            return Tokens[0].NotNull();
+            Assert.Equal(new TextSpan(Tokens[Tokens.Count - 2].Span.End, 0), eof.Span);
+            return Tokens[0];
         }
 
         public void AssertTokens(int expectedCount)
@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
         [NotNull]
         public Diagnostic AssertSingleDiagnostic()
         {
-            return Assert.Single(Diagnostics).NotNull();
+            return Assert.Single(Diagnostics);
         }
 
         public void AssertDiagnostics(int expectedCount)
@@ -62,13 +62,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
         [NotNull]
         public string TokensToString()
         {
-            return string.Concat(Tokens.Select(t => t.Text(File.Code))).NotNull();
+            return string.Concat(Tokens.Select(t => t.Text(File.Code)));
         }
 
         [NotNull]
         public FixedList<PsuedoToken> ToPsuedoTokens()
         {
-            return Tokens.Select(t => PsuedoToken.For(t.NotNull(), File.Code)).ToFixedList();
+            return Tokens.Select(t => PsuedoToken.For(t, File.Code)).ToFixedList();
         }
     }
 }

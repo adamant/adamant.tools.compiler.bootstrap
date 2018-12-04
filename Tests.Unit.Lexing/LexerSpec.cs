@@ -194,9 +194,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
         {
             return Prop.ForAll(Arbitrary.PsuedoToken(), token =>
             {
-                var result = Lex(token.NotNull().Text);
+                var result = Lex(token.Text);
                 var outputAsPsuedoTokens = result.ToPsuedoTokens();
-                var expectedPsuedoTokens = token.Yield().Append(PsuedoToken.EndOfFile()).NotNull().ToList();
+                var expectedPsuedoTokens = token.Yield().Append(PsuedoToken.EndOfFile()).ToList();
                 return expectedPsuedoTokens.SequenceEqual(outputAsPsuedoTokens)
                     .Label($"Actual:   {outputAsPsuedoTokens.DebugFormat()}")
                     .Label($"Expected: {expectedPsuedoTokens.DebugFormat()}")
@@ -209,10 +209,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
         {
             return Prop.ForAll(Arbitrary.PsuedoTokenList(), tokens =>
             {
-                var input = string.Concat(tokens.NotNull().Select(t => t.Text)).NotNull();
+                var input = string.Concat(tokens.Select(t => t.Text));
                 var result = Lex(input);
                 var outputAsPsuedoTokens = result.ToPsuedoTokens();
-                var expectedPsuedoTokens = tokens.Append(PsuedoToken.EndOfFile()).NotNull().ToFixedList();
+                var expectedPsuedoTokens = tokens.Append(PsuedoToken.EndOfFile()).ToFixedList();
                 return expectedPsuedoTokens.SequenceEqual(outputAsPsuedoTokens)
                     .Label($"Text: „{input.Escape()}„")
                     .Label($"Actual:   {outputAsPsuedoTokens.DebugFormat()}")

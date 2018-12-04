@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
@@ -22,48 +21,43 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         where TType : DataType
     {
         public PromiseState State { get; private set; }
-        [CanBeNull] private TType DataType { get; set; }
+        private TType DataType { get; set; }
 
         [DebuggerHidden]
         public void BeginFulfilling()
         {
-            Requires.That(nameof(State), State == PromiseState.Pending);
+            Requires.That(nameof(State), State == PromiseState.Pending, "must be pending is " + State);
             State = PromiseState.InProgress;
         }
 
         [DebuggerHidden]
-        [NotNull]
-        public TType Fulfill([NotNull] TType type)
+        public TType Fulfill(TType type)
         {
-            Requires.That(nameof(State), State == PromiseState.InProgress);
-            Requires.NotNull(nameof(type), type);
+            Requires.That(nameof(State), State == PromiseState.InProgress, "must be in progress is " + State);
             State = PromiseState.Fulfilled;
-            DataType = type;
+            DataType = type ?? throw new ArgumentNullException(nameof(type));
             return type;
         }
 
         [DebuggerHidden]
-        [NotNull]
         public TType Fulfilled()
         {
             if (State != PromiseState.Fulfilled)
                 throw new InvalidOperationException("Promise not fulfilled");
 
-            return DataType.NotNull();
+            return DataType;
         }
 
         [DebuggerHidden]
-        [NotNull]
         public TType Resolved()
         {
             if (State != PromiseState.Fulfilled)
                 throw new InvalidOperationException("Promise not fulfilled");
 
-            return (TType)DataType.NotNull().AssertResolved();
+            return (TType)DataType.AssertResolved();
         }
 
         // Useful for debugging
-        [NotNull]
         public override string ToString()
         {
             switch (State)
@@ -73,7 +67,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                 case PromiseState.InProgress:
                     return "⧼in progress⧽";
                 case PromiseState.Fulfilled:
-                    return DataType.NotNull().ToString();
+                    return DataType.ToString();
                 default:
                     throw NonExhaustiveMatchException.ForEnum(State);
             }

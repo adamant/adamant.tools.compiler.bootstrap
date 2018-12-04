@@ -6,6 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.AST.Visitors;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using JetBrains.Annotations;
@@ -44,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             foreach (var parameter in function.Parameters.Where(p => !p.Unused))
                 graph.AddParameter(parameter.MutableBinding, parameter.Type.Resolved(), parameter.Name.UnqualifiedName);
 
-            foreach (var statement in function.Body.NotNull().Statements)
+            foreach (var statement in function.Body.Statements)
                 ConvertToStatement(statement);
 
             // Generate the implicit return statement
@@ -159,7 +160,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 //    statements.Add(new NewObjectStatement(place, newObjectExpression.Type.AssertResolved(), args));
                 //    break;
                 case IdentifierNameSyntax identifier:
-                    var symbol = identifier.ReferencedSymbols.NotNull().Single().NotNull();
+                    var symbol = identifier.ReferencedSymbols.Single();
                     switch (symbol)
                     {
                         case VariableDeclarationStatementSyntax _:
@@ -198,9 +199,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     return ConvertInvocationToValue(invocation);
                 case MemberAccessExpressionSyntax memberAccess:
                 {
-                    var value = ConvertToOperand(memberAccess.Expression.NotNull());
+                    var value = ConvertToOperand(memberAccess.Expression);
                     return new MemberAccessValue(value,
-                        memberAccess.ReferencedSymbols.NotNull().Single().NotNull().FullName);
+                        memberAccess.ReferencedSymbols.Single().FullName);
                 }
                 default:
                     throw NonExhaustiveMatchException.For(expression);
@@ -214,14 +215,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             {
                 case IdentifierNameSyntax identifier:
                 {
-                    var symbol = identifier.ReferencedSymbols.NotNull().Single().NotNull();
+                    var symbol = identifier.ReferencedSymbols.Single();
                     var arguments = invocation.Arguments
-                        .Select(a => ConvertToOperand(a.Value.NotNull())).ToList();
+                        .Select(a => ConvertToOperand(a.Value)).ToList();
                     return new FunctionCall(symbol.FullName, arguments);
                 }
                 case MemberAccessExpressionSyntax memberAccess:
                 {
-                    var symbol = memberAccess.ReferencedSymbols.NotNull().Single();
+                    var symbol = memberAccess.ReferencedSymbols.Single();
                     switch (symbol)
                     {
                         case FunctionDeclarationSyntax function:
@@ -272,7 +273,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         [NotNull]
         private Place ConvertToLValue([NotNull] ExpressionSyntax value)
         {
-            Requires.NotNull(nameof(value), value);
             switch (value)
             {
                 case IdentifierNameSyntax identifier:

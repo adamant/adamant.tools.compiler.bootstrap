@@ -55,7 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public override string ToString()
         {
-            return CodeFile.Reference.ToString().NotNull();
+            return CodeFile.Reference.ToString();
         }
     }
 }

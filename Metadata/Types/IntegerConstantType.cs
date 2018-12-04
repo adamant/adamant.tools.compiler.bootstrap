@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public override bool IsResolved => true;
 
         public IntegerConstantType(BigInteger value)
-            : base(value.ToString().NotNull())
+            : base(value.ToString())
         {
             Value = value;
         }

@@ -10,8 +10,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
 
         public ParseContext([NotNull] CodeFile file, [NotNull] Diagnostics diagnostics)
         {
-            File = file.NotNull();
-            Diagnostics = diagnostics.NotNull();
+            File = file;
+            Diagnostics = diagnostics;
         }
     }
 }

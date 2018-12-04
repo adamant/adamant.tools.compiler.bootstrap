@@ -9,7 +9,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         public NamedLifetime([NotNull] string name)
         {
-            Requires.NotNull(nameof(name), name);
             Name = name;
         }
 

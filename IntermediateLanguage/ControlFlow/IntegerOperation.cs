@@ -19,8 +19,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             [NotNull] Operand rightOperand,
             [NotNull] SizedIntegerType numericType)
         {
-            Requires.NotNull(nameof(leftOperand), leftOperand);
-            Requires.NotNull(nameof(rightOperand), rightOperand);
             LeftOperand = leftOperand;
             RightOperand = rightOperand;
             NumericType = numericType;

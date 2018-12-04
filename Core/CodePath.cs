@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
         public CodePath([NotNull] string path, [NotNull] FixedList<string> @namespace)
             : base(@namespace)
         {
-            Requires.That(nameof(path), System.IO.Path.IsPathFullyQualified(path));
+            Requires.That(nameof(path), System.IO.Path.IsPathFullyQualified(path), "must be fully qualified");
             Path = path;
         }
 
@@ -31,13 +31,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
         [NotNull]
         public CodeFile Load()
         {
-            var text = File.ReadAllText(Path, CodeFile.Encoding).NotNull();
+            var text = File.ReadAllText(Path, CodeFile.Encoding);
             return new CodeFile(this, new CodeText(text));
         }
 
         public async Task<CodeFile> LoadAsync()
         {
-            var text = await File.ReadAllTextAsync(Path, CodeFile.Encoding).NotNull();
+            var text = await File.ReadAllTextAsync(Path, CodeFile.Encoding);
             return new CodeFile(this, new CodeText(text));
         }
     }

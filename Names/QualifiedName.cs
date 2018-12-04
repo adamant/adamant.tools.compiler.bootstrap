@@ -20,19 +20,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
             [NotNull] Name qualifier,
             [NotNull] SimpleName simpleName)
         {
-            Requires.NotNull(nameof(qualifier), qualifier);
-            Requires.NotNull(nameof(simpleName), simpleName);
             Qualifier = qualifier;
             UnqualifiedName = simpleName;
         }
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public override IEnumerable<SimpleName> Segments => Qualifier.Segments.Append(UnqualifiedName).NotNull();
+        public override IEnumerable<SimpleName> Segments => Qualifier.Segments.Append(UnqualifiedName);
 
         public override bool HasQualifier([NotNull] Name name)
         {
-            Requires.NotNull(nameof(name), name);
             return Qualifier.Equals(name);
         }
 

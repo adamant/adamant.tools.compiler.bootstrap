@@ -34,8 +34,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
         [NotNull]
         public static CodeFile Load([NotNull] string path, [NotNull] FixedList<string> @namespace)
         {
-            var fullPath = Path.GetFullPath(path).NotNull();
-            return new CodeFile(new CodePath(fullPath, @namespace), new CodeText(File.ReadAllText(fullPath, Encoding).NotNull()));
+            var fullPath = Path.GetFullPath(path);
+            return new CodeFile(new CodePath(fullPath, @namespace), new CodeText(File.ReadAllText(fullPath, Encoding)));
         }
     }
 }

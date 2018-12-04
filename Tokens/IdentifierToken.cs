@@ -11,7 +11,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         protected IdentifierToken(TextSpan span, [NotNull] string value)
             : base(span)
         {
-            Requires.NotNull(nameof(value), value);
             Value = value;
         }
 

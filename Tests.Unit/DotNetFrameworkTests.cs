@@ -17,7 +17,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
 
         public DotNetFrameworkTests([NotNull] ITestOutputHelper output)
         {
-            Requires.NotNull(nameof(output), output);
             this.output = output;
         }
 
@@ -36,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
         [NotNull]
         private static MethodInfo GetMethodInfo([NotNull] Func<int, int> f)
         {
-            return f.Method.NotNull();
+            return f.Method;
         }
 
         [Fact]

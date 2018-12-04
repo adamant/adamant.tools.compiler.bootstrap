@@ -125,8 +125,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
                 GenBareIdentifier().WithWeight(10),
                 GenEscapedIdentifier().WithWeight(5),
                 GenIntegerLiteral().WithWeight(5),
-                GenStringLiteral().WithWeight(5))
-                .NotNull();
+                GenStringLiteral().WithWeight(5));
         }
 
         [NotNull]
@@ -206,7 +205,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
                         .Replace(@"\b", "\\");
 
                     return new PsuedoToken(typeof(IStringLiteralToken), s, value);
-                }).NotNull();
+                });
         }
 
         [NotNull]

@@ -10,7 +10,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         protected SimpleType([NotNull] string name)
         {
-            Requires.NotNull(nameof(name), name);
             Name = SimpleName.Special(name);
         }
 

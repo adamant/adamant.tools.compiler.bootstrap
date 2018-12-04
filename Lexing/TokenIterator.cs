@@ -28,6 +28,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
         }
 
         [NotNull]
-        public IToken Current => (tokens ?? throw new InvalidOperationException("Can't access `TokenIterator.Current` after `Next()` has returned false")).Current.NotNull();
+        public IToken Current => (tokens ?? throw new InvalidOperationException("Can't access `TokenIterator.Current` after `Next()` has returned false")).Current;
     }
 }

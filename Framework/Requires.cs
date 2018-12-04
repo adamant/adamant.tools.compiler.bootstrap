@@ -28,20 +28,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         }
 
         [DebuggerHidden]
-        public static void NotNull([NotNull] string parameter, [NotNull] object value)
-        {
-            if (value == null)
-                throw new ArgumentNullException(parameter);
-        }
-
-        [DebuggerHidden]
-        public static void Null([NotNull] string parameter, [CanBeNull] object value)
-        {
-            if (value != null)
-                throw new ArgumentException("Must be null", parameter);
-        }
-
-        [DebuggerHidden]
         public static void ValidEnum<E>([NotNull] string parameter, E value)
             where E : Enum
         {
@@ -50,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         }
 
         [DebuggerHidden]
-        public static void That([NotNull] string parameter, bool condition)
+        public static void That([NotNull] string parameter, bool condition, string message)
         {
             if (!condition)
                 throw new ArgumentException("Does not satisfy condition", parameter);

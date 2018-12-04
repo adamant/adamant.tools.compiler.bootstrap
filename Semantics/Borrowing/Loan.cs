@@ -19,7 +19,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         public Loan(int variable, [NotNull] Value rvalue, int @object)
             : base(variable, @object)
         {
-            Requires.NotNull(nameof(rvalue), rvalue);
             var restrictions = new List<Restriction>();
             GatherRestrictions(rvalue, restrictions);
             Restrictions = restrictions.ToFixedList();

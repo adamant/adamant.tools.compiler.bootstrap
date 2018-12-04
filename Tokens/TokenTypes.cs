@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
@@ -27,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             foreach (var tokenType in Keyword)
             {
                 string keyword;
-                var tokenTypeName = tokenType.Name.NotNull();
+                var tokenTypeName = tokenType.Name;
                 switch (tokenTypeName)
                 {
                     // Some exceptions to the normal rule
@@ -52,7 +53,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
                     default:
                         keyword = tokenTypeName
                             .Substring(0, tokenTypeName.Length - KeywordTokenLength)
-                            .NotNull()
                             .ToLower();
                         break;
                 }
@@ -66,7 +66,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             where T : IToken
         {
             var spanParam = Expression.Parameter(typeof(TextSpan), "span");
-            var newExpression = Expression.New(tokenType.GetConstructor(new[] { typeof(TextSpan) }).NotNull(), spanParam);
+            var newExpression = Expression.New(tokenType.GetConstructor(new[] { typeof(TextSpan) }), spanParam);
             var factory =
                 Expression.Lambda<Func<TextSpan, T>>(
                     newExpression, spanParam);

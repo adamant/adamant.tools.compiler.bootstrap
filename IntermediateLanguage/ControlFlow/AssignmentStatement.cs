@@ -15,8 +15,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             [NotNull] Value value)
             : base(blockNumber, number)
         {
-            Requires.NotNull(nameof(place), place);
-            Requires.NotNull(nameof(value), value);
             Place = place;
             Value = value;
         }

@@ -12,8 +12,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         [NotNull] public LocalVariableDeclaration ReturnVariable => VariableDeclarations[0];
         [NotNull] public DataType ReturnType => ReturnVariable.Type;
         [NotNull] [ItemNotNull] public FixedList<BasicBlock> BasicBlocks { get; }
-        [NotNull] public BasicBlock EntryBlock => BasicBlocks.First().NotNull();
-        [NotNull] public BasicBlock ExitBlock => BasicBlocks.Last().NotNull();
+        [NotNull] public BasicBlock EntryBlock => BasicBlocks.First();
+        [NotNull] public BasicBlock ExitBlock => BasicBlocks.Last();
         [NotNull] public Edges Edges { get; }
 
         public ControlFlowGraph(

@@ -28,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             Number = number;
             ExpressionStatements = expressionStatements.ToFixedList();
             Terminator = terminator;
-            Statements = ExpressionStatements.Append<Statement>(terminator).NotNull().ToFixedList();
+            Statements = ExpressionStatements.Append<Statement>(terminator).ToFixedList();
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

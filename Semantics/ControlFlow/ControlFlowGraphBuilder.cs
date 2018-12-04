@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
     public class ControlFlowGraphBuilder
     {
         [NotNull, ItemNotNull] private readonly List<LocalVariableDeclaration> variables = new List<LocalVariableDeclaration>();
-        [NotNull] public LocalVariableDeclaration ReturnVariable => variables.First().NotNull();
+        [NotNull] public LocalVariableDeclaration ReturnVariable => variables.First();
         [NotNull, ItemNotNull] private readonly List<BasicBlock> blocks = new List<BasicBlock>();
         [NotNull, ItemNotNull] private List<ExpressionStatement> statements = new List<ExpressionStatement>();
         public int CurrentBlockNumber => blocks.Count;
@@ -49,7 +49,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         [NotNull]
         public VariableReference VariableFor([NotNull] SimpleName name)
         {
-            return variables.Single(v => v.Name == name).NotNull().Reference;
+            return variables.Single(v => v.Name == name).Reference;
         }
 
         public void AddAssignment([NotNull] Place place, [NotNull] Value value)

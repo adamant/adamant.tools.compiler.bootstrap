@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
         [NotNull]
         public static ITokenIterator WhereNotTrivia([NotNull] this ITokenIterator tokens)
         {
-            return new WhereNotTriviaIterator(tokens.NotNull());
+            return new WhereNotTriviaIterator(tokens);
         }
 
         private class WhereNotTriviaIterator : ITokenIterator
@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
 
             public WhereNotTriviaIterator([NotNull] ITokenIterator tokens)
             {
-                this.tokens = tokens.NotNull();
+                this.tokens = tokens;
                 if (Current is ITriviaToken)
                     Next();
             }

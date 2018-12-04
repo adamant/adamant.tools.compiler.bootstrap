@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
@@ -13,10 +14,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
 
         public TextLines([NotNull] string text)
         {
-            Requires.NotNull(nameof(text), text);
             Text = text;
             startOfLine = LineStarts(text);
-            StartOfLine = startOfLine.AsReadOnly().NotNull();
+            StartOfLine = startOfLine.AsReadOnly();
         }
 
         [NotNull]

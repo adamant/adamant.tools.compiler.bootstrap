@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
@@ -90,7 +91,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             typeof(Float32KeywordToken),
             typeof(UnderscoreKeywordToken),
             typeof(ExternalKeywordToken),
-        }.AsReadOnly().NotNull();
+        }.AsReadOnly();
     }
 
     public static partial class TokenFactory

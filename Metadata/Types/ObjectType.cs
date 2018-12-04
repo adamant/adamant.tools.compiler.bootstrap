@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             var genericParameterTypesList = genericParameterTypes?.ToFixedList();
             GenericParameterTypes = genericParameterTypesList;
             var genericArgumentsList = (genericArguments ?? genericParameterTypesList?.Select(t => default(DataType)))?.ToFixedList();
-            Requires.That(nameof(genericArguments), genericArgumentsList?.Count == genericParameterTypesList?.Count);
+            Requires.That(nameof(genericArguments), genericArgumentsList?.Count == genericParameterTypesList?.Count, "number of arguments must match number of parameters");
             GenericArguments = genericArgumentsList;
             IsMutable = isMutable;
         }
@@ -65,7 +65,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         [NotNull]
         public ObjectType AsMutable()
         {
-            Requires.That(nameof(DeclaredMutable), true);
             return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, true);
         }
 
@@ -91,7 +90,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             if (IsMutable)
                 return "mut " + Name;
 
-            return Name.ToString().NotNull();
+            return Name.ToString();
         }
     }
 }

@@ -14,8 +14,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
             [NotNull] Name name,
             [NotNull] DataType type)
         {
-            Requires.NotNull(nameof(name), name);
-            Requires.NotNull(nameof(type), type);
             Name = name;
             Type = type;
         }

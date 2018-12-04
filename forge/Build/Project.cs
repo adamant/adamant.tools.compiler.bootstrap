@@ -19,8 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             [NotNull] ProjectConfig file,
             [NotNull][ItemNotNull] IEnumerable<ProjectReference> references)
         {
-            Requires.NotNull(nameof(file), file);
-            Path = System.IO.Path.GetDirectoryName(file.FullPath).NotNull();
+            Path = System.IO.Path.GetDirectoryName(file.FullPath);
             Name = file.Name ?? throw new InvalidOperationException();
             RootNamespace = (file.RootNamespace ?? "").SplitOrEmpty('.');
             Authors = (file.Authors ?? throw new InvalidOperationException()).ToFixedList();

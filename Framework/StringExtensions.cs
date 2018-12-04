@@ -13,14 +13,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         [NotNull]
         public static string Repeat([NotNull] this string input, int count)
         {
-            Requires.NotNull(nameof(input), input);
-
             if (string.IsNullOrEmpty(input) || count == 0)
                 return string.Empty;
 
             return new StringBuilder(input.Length * count)
-                .Insert(0, input, count).NotNull()
-                .ToString().NotNull();
+                .Insert(0, input, count)
+                .ToString();
         }
 
         [NotNull]
@@ -61,14 +59,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
                         break;
                 }
             }
-            return escaped.ToString().NotNull();
+            return escaped.ToString();
         }
 
         [NotNull]
         public static FixedList<string> SplitOrEmpty([CanBeNull] this string value, params char[] separators)
         {
             if (string.IsNullOrEmpty(value)) return FixedList<string>.Empty;
-            return value.Split(separators).NotNull().ToFixedList();
+            return value.Split(separators).ToFixedList();
         }
     }
 }

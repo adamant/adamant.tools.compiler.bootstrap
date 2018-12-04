@@ -1,3 +1,4 @@
+using System;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
@@ -27,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
             tokens.Context.Diagnostics.Add(
                 ParseError.MissingToken(tokens.Context.File, typeof(T), tokens.Current));
-            throw new ParseFailedException($"Requires {typeof(T).GetFriendlyName()}, found {tokens.Current.GetType().NotNull().GetFriendlyName()}");
+            throw new ParseFailedException($"Requires {typeof(T).GetFriendlyName()}, found {tokens.Current.GetType().GetFriendlyName()}");
         }
 
         [NotNull]
@@ -42,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
             tokens.Context.Diagnostics.Add(
                 ParseError.MissingToken(tokens.Context.File, typeof(T), tokens.Current));
-            throw new ParseFailedException($"Requires {typeof(T).GetFriendlyName()}, found {tokens.Current.GetType().NotNull().GetFriendlyName()}");
+            throw new ParseFailedException($"Requires {typeof(T).GetFriendlyName()}, found {tokens.Current.GetType().GetFriendlyName()}");
         }
         #endregion
 

@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         [NotNull]
         public override string ToString()
         {
-            return Value.ToString().NotNull();
+            return Value.ToString();
         }
     }
 

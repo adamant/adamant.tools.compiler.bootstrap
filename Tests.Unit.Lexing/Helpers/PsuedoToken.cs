@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
 
         public static PsuedoToken For([NotNull] IToken token, [NotNull] CodeText code)
         {
-            var tokenType = token.GetType().NotNull();
+            var tokenType = token.GetType();
             switch (token)
             {
                 case IIdentifierToken identifier:

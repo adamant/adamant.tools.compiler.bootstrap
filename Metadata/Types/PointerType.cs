@@ -10,7 +10,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         public PointerType([NotNull] DataType referent)
         {
-            Requires.NotNull(nameof(referent), referent);
             Referent = referent;
             IsResolved = referent.IsResolved;
         }

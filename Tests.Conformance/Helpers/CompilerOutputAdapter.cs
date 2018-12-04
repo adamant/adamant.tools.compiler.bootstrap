@@ -11,7 +11,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Helpers
 
         public CompilerOutputAdapter([NotNull]ITestOutputHelper testOutput)
         {
-            Requires.NotNull(nameof(testOutput), testOutput);
             this.testOutput = testOutput;
         }
 

@@ -26,7 +26,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
             if (string.IsNullOrWhiteSpace(message))
                 throw new ArgumentException("message", nameof(message));
 
-            Requires.NotNull(nameof(file), file);
             Requires.ValidEnum(nameof(level), level);
             Requires.ValidEnum(nameof(phase), phase);
 

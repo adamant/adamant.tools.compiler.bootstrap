@@ -21,7 +21,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         [NotNull]
         public static Edges InGraph([NotNull] ControlFlowGraph controlFlowGraph)
         {
-            Requires.NotNull(nameof(controlFlowGraph), controlFlowGraph);
             var edges = controlFlowGraph.BasicBlocks.SelectMany(b =>
                     b.Terminator.OutBlocks()
                         .Select(e => new Edge(b, controlFlowGraph.BasicBlocks[e])))

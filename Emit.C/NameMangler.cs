@@ -62,7 +62,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             Mangle(function.FullName, builder);
             builder.Append('´');
             builder.Append(function.Arity);
-            return builder.ToString().NotNull();
+            return builder.ToString();
         }
 
         [NotNull]
@@ -73,7 +73,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             Mangle(constructor.FullName, builder);
             builder.Append('´');
             builder.Append(constructor.Arity);
-            return builder.ToString().NotNull();
+            return builder.ToString();
         }
 
         [NotNull]
@@ -87,7 +87,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 builder.Append('´');
                 builder.Append(type.GenericArity);
             }
-            return builder.ToString().NotNull();
+            return builder.ToString();
         }
 
         [NotNull]
@@ -104,7 +104,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 builder.Append('´');
                 builder.Append(arity);
             }
-            return builder.ToString().NotNull();
+            return builder.ToString();
         }
 
         [NotNull]
@@ -112,7 +112,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             var builder = new StringBuilder(EstimateSize(name));
             Mangle(name, builder);
-            return builder.ToString().NotNull();
+            return builder.ToString();
         }
 
         [NotNull]

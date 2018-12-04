@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
         [Fact]
         public void Item_can_be_null_enumerable()
         {
-            var _ = ItemCanBeNullEnumerable().Select(x => x.NotNull().ToString()).ToList();
+            var _ = ItemCanBeNullEnumerable().Select(x => x.ToString()).ToList();
         }
 
         [NotNull]

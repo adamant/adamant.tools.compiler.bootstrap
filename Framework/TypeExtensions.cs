@@ -11,10 +11,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
             if (type.IsGenericParameter || !type.IsGenericType)
                 return type.Name;
 
-            var name = type.Name.NotNull();
+            var name = type.Name;
             var index = name.IndexOf("`", StringComparison.Ordinal);
             name = name.Substring(0, index);
-            var genericArguments = string.Join(',', type.GetGenericArguments().NotNull().Select(GetFriendlyName));
+            var genericArguments = string.Join(',', type.GetGenericArguments().Select(GetFriendlyName));
             return $"{name}<{genericArguments}>";
         }
     }

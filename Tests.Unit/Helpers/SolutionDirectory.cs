@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers
         public static string Get()
         {
             var directory = Directory.GetCurrentDirectory();
-            while (directory != null && !Directory.GetFiles(directory, "*.sln", SearchOption.TopDirectoryOnly).NotNull().Any())
+            while (directory != null && !Directory.GetFiles(directory, "*.sln", SearchOption.TopDirectoryOnly).Any())
             {
                 directory = Path.GetDirectoryName(directory);
             }

@@ -3,6 +3,7 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Primitives;
@@ -36,16 +37,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
             [NotNull] PackageSyntax packageSyntax,
             [NotNull] FixedDictionary<string, Package> references)
         {
-            return references.Values.NotNull()
-                    .SelectMany(p => p.Declarations).NotNull().Cast<ISymbol>()
-                    .Concat(packageSyntax.CompilationUnits.SelectMany(cu => cu.NotNull().AllNamespacedDeclarations))
+            return references.Values
+                .SelectMany(p => p.Declarations).Cast<ISymbol>()
+                    .Concat(packageSyntax.CompilationUnits.SelectMany(cu => cu.AllNamespacedDeclarations))
                     .ToFixedList();
         }
 
         [NotNull, ItemNotNull]
         private IEnumerable<ISymbol> GetAllGlobalSymbols()
         {
-            return allSymbols.Where(s => s.NotNull().IsGlobal())
+            return allSymbols.Where(s => s.IsGlobal())
                 .Concat(PrimitiveSymbols.Instance);
         }
 

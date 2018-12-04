@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         [NotNull] public Name FullName { get; }
         [NotNull] public SimpleName LookupByName { get; }
         [CanBeNull] public DataType Type { get; internal set; }
-        [NotNull] DataType ISymbol.Type => Type.NotNull();
+        [NotNull] DataType ISymbol.Type => Type;
         [NotNull] public SymbolSet ChildSymbols { get; }
 
         private PrimitiveSymbol(

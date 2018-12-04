@@ -21,11 +21,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             [NotNull, ItemNotNull] IEnumerable<DataType> parameterTypes,
             [NotNull] DataType returnType)
         {
-            Requires.NotNull(nameof(parameterTypes), parameterTypes);
-            Requires.NotNull(nameof(returnType), returnType);
-            ParameterTypes = parameterTypes.ItemsNotNull().ToFixedList();
+            ParameterTypes = parameterTypes.ToFixedList();
             ReturnType = returnType;
-            IsResolved = ParameterTypes.All(pt => pt.NotNull().IsResolved) && ReturnType.IsResolved;
+            IsResolved = ParameterTypes.All(pt => pt.IsResolved) && ReturnType.IsResolved;
         }
 
         public override string ToString()

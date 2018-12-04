@@ -21,8 +21,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
 
         protected CodeBuilder([NotNull] string indentCharacters, [NotNull]  string lineTerminator)
         {
-            Requires.NotNull(nameof(indentCharacters), indentCharacters);
-            Requires.NotNull(nameof(lineTerminator), lineTerminator);
             IndentCharacters = indentCharacters;
             LineTerminator = lineTerminator;
         }
@@ -34,20 +32,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
 
         public virtual void BeginLine([NotNull] string value)
         {
-            Requires.NotNull(nameof(value), value);
             AppendIndent();
             code.Append(value);
         }
 
         public virtual void Append([NotNull] string value)
         {
-            Requires.NotNull(nameof(value), value);
             code.Append(value);
         }
 
         public virtual void EndLine([NotNull] string value)
         {
-            Requires.NotNull(nameof(value), value);
             code.Append(value);
             code.Append(LineTerminator);
         }
@@ -59,7 +54,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
 
         public virtual void AppendLine([NotNull] string value)
         {
-            Requires.NotNull(nameof(value), value);
             AppendIndent();
             code.Append(value);
             code.Append(LineTerminator);

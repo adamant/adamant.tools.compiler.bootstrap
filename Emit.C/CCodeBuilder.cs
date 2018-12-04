@@ -84,7 +84,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         public override void EndBlock()
         // ensures CurrentIndentDepth == old(CurrentIndentDepth) - 1
         {
-            Requires.That(nameof(CurrentIndent), CurrentIndentDepth > 0);
+            Requires.That(nameof(CurrentIndent), CurrentIndentDepth > 0, "indent depth must not be zero");
             base.EndBlock();
             base.AppendLine("}");
             NeedsDeclarationSeparatorLine = true;
@@ -94,7 +94,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         public virtual void EndBlockWithSemicolon()
         // ensures CurrentIndentDepth == old(CurrentIndentDepth) - 1
         {
-            Requires.That(nameof(CurrentIndent), CurrentIndentDepth > 0);
+            Requires.That(nameof(CurrentIndent), CurrentIndentDepth > 0, "indent depth must not be zero");
             base.EndBlock();
             base.AppendLine("};");
             NeedsDeclarationSeparatorLine = true; // These end classes and things that need a separator
@@ -104,7 +104,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         public virtual void EndBlockWith([NotNull] string value)
         // ensures CurrentIndentDepth == old(CurrentIndentDepth) - 1
         {
-            Requires.That(nameof(CurrentIndent), CurrentIndentDepth > 0);
+            Requires.That(nameof(CurrentIndent), CurrentIndentDepth > 0, "indent depth must not be zero");
             base.EndBlock();
             base.AppendLine(value);
             NeedsDeclarationSeparatorLine = true;

@@ -131,7 +131,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                         var conversionOperators = objectType.Symbol.Lookup(SpecialName.OperatorStringLiteral);
                         if (conversionOperators.Count == 1) // TODO actually check we can call it
                         {
-                            return new ImplicitLiteralConversionExpression(expression, objectType, conversionOperators.Single().NotNull());
+                            return new ImplicitLiteralConversionExpression(expression, objectType, conversionOperators.Single());
                         }
                         // TODO if there is more than one
                     }
@@ -191,14 +191,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 case IdentifierNameSyntax identifierName:
                 {
                     DataType type;
-                    switch (identifierName.ReferencedSymbols.NotNull().Count)
+                    switch (identifierName.ReferencedSymbols.Count)
                     {
                         case 0:
                             // Name binding error should already have been reported
                             type = DataType.Unknown;
                             break;
                         case 1:
-                            type = identifierName.ReferencedSymbols.NotNull().Single().NotNull().Type;
+                            type = identifierName.ReferencedSymbols.Single().Type;
                             break;
                         default:
                             diagnostics.Add(NameBindingError.AmbiguousName(file, identifierName.Span));
@@ -388,7 +388,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     break;
                 case SizedIntegerType integerType:
                     // TODO this seems a very strange way to handle this. Shouldn't the symbol be on the type?
-                    symbol = PrimitiveSymbols.Instance.Single(p => p.FullName == integerType.Name).NotNull();
+                {
+                    symbol = PrimitiveSymbols.Instance.Single(p => p.FullName == integerType.Name);
+                }
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(left);
@@ -407,7 +409,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                             type = DataType.Unknown;
                             break;
                         case 1:
-                            var memberSymbol = memberSymbols.Single().NotNull();
+                            var memberSymbol = memberSymbols.Single();
                             type = memberSymbol.Type;
                             break;
                         default:
@@ -609,7 +611,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
 
         private static bool IsIntegerType([NotNull] DataType type)
         {
-            Requires.NotNull(nameof(type), type);
             return type is IntegerType;
         }
 
@@ -698,20 +699,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             {
                 case IdentifierNameSyntax identifierName:
                 {
-                    var referencedSymbols = identifierName.ReferencedSymbols.NotNull();
+                    var referencedSymbols = identifierName.ReferencedSymbols;
                     if (referencedSymbols.Count > 1)
                     {
                         referencedSymbols = ResolveOverload(referencedSymbols, argumentTypes);
                         identifierName.ReferencedSymbols = referencedSymbols;
                     }
 
-                    identifierName.Type.Fulfill(referencedSymbols.Single().NotNull().Type);
+                    identifierName.Type.Fulfill(referencedSymbols.Single().Type);
                 }
                 break;
                 case MemberAccessExpressionSyntax memberAccess:
                 {
                     InferMemberAccessType(memberAccess);
-                    var referencedSymbols = memberAccess.ReferencedSymbols.NotNull();
+                    var referencedSymbols = memberAccess.ReferencedSymbols;
                     if (referencedSymbols.Count > 1)
                     {
                         referencedSymbols = ResolveOverload(referencedSymbols, argumentTypes);

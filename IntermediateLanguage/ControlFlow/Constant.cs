@@ -10,7 +10,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 
         protected Constant([NotNull] DataType type)
         {
-            Requires.NotNull(nameof(type), type);
             Type = type;
         }
     }

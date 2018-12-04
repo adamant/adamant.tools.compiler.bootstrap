@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using JetBrains.Annotations;
@@ -19,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         [DebuggerStepThrough]
         public FixedList([NotNull, ItemNotNull] IEnumerable<T> items)
         {
-            this.items = items.ItemsNotNull().ToList().AsReadOnly().NotNull();
+            this.items = items.ToList().AsReadOnly();
         }
 
         [DebuggerStepThrough]

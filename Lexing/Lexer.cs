@@ -564,7 +564,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                     diagnostics.Add(LexError.UnclosedStringLiteral(file,
                         TextSpan.FromStartEnd(tokenStart, tokenEnd)));
 
-                return TokenFactory.StringLiteral(TextSpan.FromStartEnd(tokenStart, tokenEnd), content.ToString().NotNull());
+                return TokenFactory.StringLiteral(TextSpan.FromStartEnd(tokenStart, tokenEnd), content.ToString());
             }
         }
 

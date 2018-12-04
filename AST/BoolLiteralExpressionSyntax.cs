@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public override string ToString()
         {
-            return Value.ToString().NotNull();
+            return Value.ToString();
         }
     }
 }

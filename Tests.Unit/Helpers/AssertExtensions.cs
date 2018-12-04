@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers
         public static T NotNull<T>([CanBeNull] this FsCheck.NonNull<T> value)
             where T : class
         {
-            return (value ?? throw new ArgumentNullException()).Get.NotNull();
+            return (value ?? throw new ArgumentNullException()).Get;
         }
 
         [NotNull]

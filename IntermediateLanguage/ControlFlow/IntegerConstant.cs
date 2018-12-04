@@ -12,7 +12,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public IntegerConstant(BigInteger value, [NotNull] DataType type)
             : base(type)
         {
-            Requires.NotNull(nameof(type), type);
             Value = value;
         }
 

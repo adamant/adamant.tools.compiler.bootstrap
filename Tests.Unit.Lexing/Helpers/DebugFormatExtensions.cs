@@ -13,14 +13,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
         {
             return string.Join(", ",
                 diagnostics.Select(d =>
-                    $"{d.ErrorCode}@{d.StartPosition.Line}:{d.StartPosition.Column}"))
-                .NotNull();
+                    $"{d.ErrorCode}@{d.StartPosition.Line}:{d.StartPosition.Column}"));
         }
 
         [NotNull]
         public static string DebugFormat([NotNull][ItemCanBeNull] this IEnumerable<PsuedoToken> tokens)
         {
-            return string.Join(", ", tokens).NotNull();
+            return string.Join(", ", tokens);
         }
     }
 }

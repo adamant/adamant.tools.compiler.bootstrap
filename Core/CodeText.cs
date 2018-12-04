@@ -14,18 +14,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
         public int Length => Text.Length;
 
         [NotNull]
-        public TextLines Lines => lines.Value.NotNull();
+        public TextLines Lines => lines.Value;
 
         [NotNull]
         private readonly Lazy<TextLines> lines;
 
         [NotNull]
-        public string this[TextSpan span] => Text.Substring(span.Start, span.Length).NotNull();
+        public string this[TextSpan span] => Text.Substring(span.Start, span.Length);
         public char this[int index] => Text[index];
 
         public CodeText([NotNull] string text)
         {
-            Requires.NotNull(nameof(text), text);
             Text = text;
             lines = new Lazy<TextLines>(GetLines);
         }

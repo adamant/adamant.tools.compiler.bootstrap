@@ -80,7 +80,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             DataType functionType = new FunctionType(parameterTypes, returnType);
 
             if (function.GenericParameters?.Any() ?? false)
-                functionType = new MetaFunctionType(function.GenericParameters.NotNull().Select(p => p.Type.Fulfilled()), functionType);
+                functionType = new MetaFunctionType(function.GenericParameters.Select(p => p.Type.Fulfilled()), functionType);
 
             function.Type.Fulfill(functionType);
             if (diagnosticCount != diagnostics.Count) function.Poison();
@@ -160,7 +160,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 }
                 case InitializerDeclarationSyntaxBase initializer:
                 {
-                    var returnType = function.DeclaringType.NotNull().Type.Fulfilled().Instance;
+                    var returnType = function.DeclaringType.Type.Fulfilled().Instance;
                     initializer.SelfParameterType.BeginFulfilling();
                     switch (returnType)
                     {
@@ -202,7 +202,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             FixedList<DataType> genericParameterTypes = null;
             if (declaration.GenericParameters != null)
             {
-                var genericParameters = declaration.GenericParameters.NotNull();
+                var genericParameters = declaration.GenericParameters;
                 ResolveTypesInGenericParameters(genericParameters, expressionChecker);
                 genericParameterTypes = genericParameters.Select(p => p.Type.Fulfilled()).ToFixedList();
             }

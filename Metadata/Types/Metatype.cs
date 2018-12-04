@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         public Metatype([NotNull] DataType instanceType)
         {
-            Instance = instanceType.NotNull();
+            Instance = instanceType;
         }
 
         [NotNull]

@@ -11,7 +11,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         public StringLiteralToken(TextSpan span, [NotNull] string value)
             : base(span)
         {
-            Requires.NotNull(nameof(value), value);
             Value = value;
         }
 

@@ -14,11 +14,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             [NotNull, ItemNotNull] string[] headerSearchPaths,
             [NotNull] string outputPath)
         {
-            Requires.NotNull(nameof(output), output);
-            Requires.NotNull(nameof(sourceFiles), sourceFiles);
-            Requires.NotNull(nameof(headerSearchPaths), headerSearchPaths);
-            Requires.NotNull(nameof(outputPath), outputPath);
-
             // used to have: -Wno-incompatible-pointer-types
             var options = "-std=c11 -fsanitize=undefined -fsanitize=integer -fsanitize=nullability -Wall -Wno-unused-label";
             // Next thing is needed for windows

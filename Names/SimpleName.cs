@@ -37,7 +37,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
 
         private SimpleName([NotNull] string text, bool isSpecial, int? number)
         {
-            Requires.NotNull(nameof(text), text);
             Text = text;
             IsSpecial = isSpecial;
             Number = number;
@@ -49,7 +48,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
 
         public override bool HasQualifier([NotNull] Name name)
         {
-            Requires.NotNull(nameof(name), name);
             // A simple name doesn't have a qualifier
             return false;
         }

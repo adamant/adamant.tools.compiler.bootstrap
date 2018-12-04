@@ -21,10 +21,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             [NotNull] IConverter<DataType> typeConverter,
             [NotNull] IEmitter<ControlFlowGraph> controlFlowEmitter)
         {
-            Requires.NotNull(nameof(nameMangler), nameMangler);
-            Requires.NotNull(nameof(parameterConverter), parameterConverter);
-            Requires.NotNull(nameof(typeConverter), typeConverter);
-            Requires.NotNull(nameof(controlFlowEmitter), controlFlowEmitter);
             this.nameMangler = nameMangler;
             this.parameterConverter = parameterConverter;
             this.typeConverter = typeConverter;

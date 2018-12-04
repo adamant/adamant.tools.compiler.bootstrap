@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -20,10 +21,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 
         public LiveVariables([NotNull] ControlFlowGraph graph)
         {
-            Requires.NotNull(nameof(graph), graph);
             VariableCount = graph.VariableDeclarations.Count;
             values = graph.BasicBlocks.Select(block =>
-                block.ExpressionStatements.Append<object>(block.Terminator).NotNull()
+                block.ExpressionStatements.Append<object>(block.Terminator)
                     .Select(s => new BitArray(VariableCount)).ToFixedList()).ToFixedList();
         }
 
@@ -34,7 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         [NotNull]
         public BitArray Before([NotNull] Statement statement)
         {
-            return values[statement.BlockNumber][statement.Number].NotNull();
+            return values[statement.BlockNumber][statement.Number];
         }
     }
 }
