@@ -33,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case ILoopKeywordToken _:
                     return ParseLoop();
                 case IIfKeywordToken _:
-                    return ParseIf();
+                    return ParseIf(ParseAs.Statement);
                 case IMatchKeywordToken _:
                     return ParseMatch();
                 case IUnsafeKeywordToken _:

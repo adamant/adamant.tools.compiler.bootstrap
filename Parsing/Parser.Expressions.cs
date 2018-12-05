@@ -645,23 +645,33 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         [MustUseReturnValue]
         [NotNull]
-        private ExpressionSyntax ParseIf()
+        private ExpressionSyntax ParseIf(ParseAs parseAs = ParseAs.Expression)
         {
             var @if = Tokens.Expect<IIfKeywordToken>();
             var condition = ParseExpression();
             var thenBlock = ParseExpressionBlock();
-            var elseClause = AcceptElse();
+            var elseClause = AcceptElse(parseAs);
             var span = TextSpan.Covering(@if, thenBlock.Span, elseClause?.Span);
+            if (parseAs == ParseAs.Statement
+                && elseClause == null
+                && thenBlock is ResultExpressionSyntax)
+            {
+                var semicolon = Tokens.Expect<ISemicolonToken>();
+                span = TextSpan.Covering(span, semicolon);
+            }
             return new IfExpressionSyntax(span, condition, thenBlock, elseClause);
         }
 
         [CanBeNull]
-        private ExpressionSyntax AcceptElse()
+        private ExpressionSyntax AcceptElse(ParseAs parseAs)
         {
             if (!Tokens.Accept<IElseKeywordToken>()) return null;
             var expression = Tokens.Current is IIfKeywordToken
-                ? ParseIf()
+                ? ParseIf(parseAs)
                 : ParseExpressionBlock();
+            if (parseAs == ParseAs.Statement
+                && expression is ResultExpressionSyntax)
+                Tokens.Expect<ISemicolonToken>();
             return expression;
         }
 
