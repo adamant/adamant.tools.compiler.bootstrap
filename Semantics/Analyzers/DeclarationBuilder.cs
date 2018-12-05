@@ -70,7 +70,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         [NotNull, ItemNotNull]
         private static FixedList<Parameter> BuildConstructorParameters([NotNull] ConstructorDeclarationSyntax constructorDeclaration)
         {
-            var selfType = constructorDeclaration.SelfParameterType.Resolved();
+            var selfType = constructorDeclaration.SelfParameterType;
             var selfName = ((QualifiedName)constructorDeclaration.FullName).Qualifier.Qualify(SpecialName.Self);
             var selfParameter = new Parameter(true, selfName, selfType);
             return selfParameter.Yield().Concat(constructorDeclaration.Parameters.Select(BuildParameter))

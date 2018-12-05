@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST.Visitors;
@@ -13,6 +14,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public abstract class FunctionDeclarationSyntax : MemberDeclarationSyntax
     {
+        private DataType selfParameterType;
+        public DataType SelfParameterType
+        {
+            get => selfParameterType;
+            set
+            {
+                if (selfParameterType != null) throw new InvalidOperationException("Can't set type repeatedly");
+                selfParameterType = value ?? throw new ArgumentException();
+            }
+        }
+
         public FixedList<IModiferToken> Modifiers { get; }
         public FixedList<GenericParameterSyntax> GenericParameters { get; }
         public FixedList<ParameterSyntax> Parameters { get; } // For now we will not support pure meta functions

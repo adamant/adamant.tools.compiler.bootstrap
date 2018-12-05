@@ -332,9 +332,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             if (callee is FunctionType functionType)
             {
                 foreach (var (arg, type) in invocation.Arguments.Zip(functionType.ParameterTypes))
-                {
                     InsertImplicitConversionIfNeeded(ref arg.Value, type);
-                }
 
                 // TODO check argument types
                 return invocation.Type = functionType.ReturnType;
@@ -690,15 +688,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
 
         private FixedList<ISymbol> ResolveOverload(FixedList<ISymbol> symbols, DataType selfType, FixedList<DataType> argumentTypes)
         {
-            var argCount = argumentTypes.Count;
-            if (selfType != null) argCount += 1;
             // Filter down to symbols that could possible match
             symbols = symbols.Where(s =>
             {
                 if (s.Type is FunctionType functionType)
                 {
-                    if (functionType.Arity != argCount) return false;
-                    // TODO check compability over argument types
+                    if (functionType.Arity != argumentTypes.Count) return false;
+                    // TODO check compatibility of self type
+                    // TODO check compatibility over argument types
                 }
 
                 return true;

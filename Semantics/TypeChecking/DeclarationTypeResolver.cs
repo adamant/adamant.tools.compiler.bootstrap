@@ -69,7 +69,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             if (function.DeclaringType != null)
                 ResolveSignatureTypesInTypeDeclaration(function.DeclaringType);
 
-            var resolver = new ExpressionTypeResolver(function.File, diagnostics, (Metatype)function.DeclaringType?.Type.Fulfilled());
+            var selfType = ResolveSelfType(function);
+            var resolver = new ExpressionTypeResolver(function.File, diagnostics, selfType);
 
             if (function.GenericParameters != null)
                 ResolveTypesInGenericParameters(function.GenericParameters, resolver);
@@ -84,6 +85,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
 
             function.Type.Fulfill(functionType);
             if (diagnosticCount != diagnostics.Count) function.Poison();
+        }
+
+        private DataType ResolveSelfType(FunctionDeclarationSyntax function)
+        {
+            var declaringType = function.DeclaringType?.Metatype.Instance;
+            if (declaringType == null) return null;
+
+            switch (function)
+            {
+                case ConstructorDeclarationSyntax constructor:
+                    return constructor.SelfParameterType = ((ObjectType)declaringType).ForConstruction();
+                case NamedFunctionDeclarationSyntax namedFunction:
+                    var selfParameter = namedFunction.Parameters.OfType<SelfParameterSyntax>().SingleOrDefault();
+                    if (selfParameter == null) return null; // Static function
+                    selfParameter.Type.BeginFulfilling();
+                    // TODO deal with structs and ref self
+                    var selfType = (ObjectType)declaringType;
+                    if (selfParameter.MutableSelf) selfType = selfType.AsMutable();
+                    return namedFunction.SelfParameterType = selfParameter.Type.Fulfill(selfType);
+                case InitializerDeclarationSyntax _:
+                    throw new NotImplementedException();
+                default:
+                    throw NonExhaustiveMatchException.For(function);
+            }
         }
 
         private static void ResolveTypesInGenericParameters(
@@ -107,29 +132,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
         {
             var types = new List<DataType>();
             foreach (var parameter in function.Parameters)
-            {
-                parameter.Type.BeginFulfilling();
                 switch (parameter)
                 {
                     case NamedParameterSyntax namedParameter:
                     {
-                        var type = expressionResolver
-                            .CheckAndEvaluateTypeExpression(namedParameter.TypeExpression);
+                        parameter.Type.BeginFulfilling();
+                        var type =
+                            expressionResolver.CheckAndEvaluateTypeExpression(namedParameter
+                                .TypeExpression);
                         types.Add(parameter.Type.Fulfill(type));
                     }
                     break;
                     case SelfParameterSyntax _:
-                    {
-                        var type = (function.DeclaringType?.Type.Fulfilled() as Metatype)?.Instance ?? DataType.Unknown;
-                        types.Add(parameter.Type.Fulfill(type));
-                    }
-                    break;
+                        // Skip, we have already handled the self parameter
+                        break;
                     case FieldParameterSyntax fieldParameter:
                         throw new NotImplementedException();
                     default:
                         throw NonExhaustiveMatchException.For(parameter);
                 }
-            }
 
             return types.ToFixedList();
         }
@@ -142,38 +163,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             switch (function)
             {
                 case NamedFunctionDeclarationSyntax namedFunction:
-                {
-                    var returnType = namedFunction.ReturnTypeExpression != null
-                        ? expressionResolver.CheckAndEvaluateTypeExpression(namedFunction
-                            .ReturnTypeExpression)
-                        : DataType.Void;
-                    return function.ReturnType.Fulfill(returnType);
-                }
-                case OperatorDeclarationSyntax operatorDeclaration:
-                {
-                    var returnType = operatorDeclaration.ReturnTypeExpression != null
-                        ? expressionResolver.CheckAndEvaluateTypeExpression(operatorDeclaration
-                            .ReturnTypeExpression)
-                        : DataType.Void;
-                    return function.ReturnType.Fulfill(returnType);
-                }
-                case InitializerDeclarationSyntaxBase initializer:
-                {
-                    var returnType = ((Metatype)function.DeclaringType.Type.Fulfilled()).Instance;
-                    initializer.SelfParameterType.BeginFulfilling();
-                    switch (returnType)
-                    {
-                        case ObjectType objectType:
-                            initializer.SelfParameterType.Fulfill(objectType.ForConstruction());
-                            break;
-                        default:
-                            throw NonExhaustiveMatchException.For(returnType);
-                    }
-                    return function.ReturnType.Fulfill(returnType);
-                }
+                    return ResolveReturnType(function, namedFunction.ReturnTypeExpression, expressionResolver);
+                case OperatorDeclarationSyntax @operator:
+                    return ResolveReturnType(function, @operator.ReturnTypeExpression, expressionResolver);
+                case ConstructorDeclarationSyntax _:
+                case InitializerDeclarationSyntax _:
+                    return function.ReturnType.Fulfill(function.DeclaringType.Metatype.Instance);
                 default:
                     throw NonExhaustiveMatchException.For(function);
             }
+        }
+
+        private static DataType ResolveReturnType(
+            FunctionDeclarationSyntax function,
+            ExpressionSyntax returnTypeExpression,
+            ExpressionTypeResolver expressionResolver)
+        {
+            var returnType = returnTypeExpression != null
+                ? expressionResolver.CheckAndEvaluateTypeExpression(returnTypeExpression)
+                : DataType.Void;
+
+            return function.ReturnType.Fulfill(returnType);
         }
 
         /// <summary>
