@@ -3,12 +3,10 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Primitives;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
 {
@@ -18,56 +16,73 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
         // Gather a list of all the namespaces for validating using statements
         // Also need to account for empty directories?
 
-        [NotNull] private readonly Diagnostics diagnostics;
-        [NotNull, ItemNotNull] private readonly FixedList<ISymbol> allSymbols;
-        [NotNull] private readonly GlobalScope globalScope;
+        private readonly Diagnostics diagnostics;
+        private readonly FixedList<ISymbol> allSymbols;
+        private readonly GlobalScope globalScope;
 
         public DeclarationNameBinder(
-            [NotNull] Diagnostics diagnostics,
-            [NotNull] PackageSyntax packageSyntax,
-            [NotNull] FixedDictionary<string, Package> references)
+             Diagnostics diagnostics,
+             PackageSyntax packageSyntax,
+             FixedDictionary<string, Package> references)
         {
             this.diagnostics = diagnostics;
             allSymbols = GetAllSymbols(packageSyntax, references);
             globalScope = new GlobalScope(GetAllGlobalSymbols());
         }
 
-        [NotNull]
         private static FixedList<ISymbol> GetAllSymbols(
-            [NotNull] PackageSyntax packageSyntax,
-            [NotNull] FixedDictionary<string, Package> references)
+             PackageSyntax packageSyntax,
+             FixedDictionary<string, Package> references)
         {
             return references.Values
-                .SelectMany(p => p.Declarations).Cast<ISymbol>()
-                    .Concat(packageSyntax.CompilationUnits.SelectMany(cu => cu.AllNamespacedDeclarations))
-                    .ToFixedList();
+                .SelectMany(p => p.Declarations)
+                .Concat(packageSyntax.CompilationUnits.SelectMany(GetAllNonMemberDeclarations))
+                .ToFixedList();
         }
 
-        [NotNull, ItemNotNull]
+        /// <summary>
+        /// This gets the symbols for all declarations that are declared outside of a type.
+        /// (i.e. directly in a namespace)
+        /// </summary>
+        private static FixedList<ISymbol> GetAllNonMemberDeclarations(CompilationUnitSyntax compilationUnit)
+        {
+            // MemberDeclarationSyntax is the right type to use here because anything except namespaces can go in a type
+            var declarations = new List<ISymbol>();
+            declarations.AddRange(compilationUnit.Declarations.OfType<MemberDeclarationSyntax>());
+            var namespaces = new Queue<NamespaceDeclarationSyntax>();
+            namespaces.EnqueueRange(compilationUnit.Declarations.OfType<NamespaceDeclarationSyntax>());
+            while (namespaces.TryDequeue(out var ns))
+            {
+                declarations.AddRange(ns.Declarations.OfType<MemberDeclarationSyntax>());
+                namespaces.EnqueueRange(ns.Declarations.OfType<NamespaceDeclarationSyntax>());
+            }
+
+            return declarations.ToFixedList();
+        }
+
         private IEnumerable<ISymbol> GetAllGlobalSymbols()
         {
             return allSymbols.Where(s => s.IsGlobal())
                 .Concat(PrimitiveSymbols.Instance);
         }
 
-        public void BindNamesInPackage([NotNull] PackageSyntax package)
+        public void BindNamesInPackage(PackageSyntax package)
         {
             foreach (var compilationUnit in package.CompilationUnits)
                 BindNamesInCompilationUnit(compilationUnit);
         }
 
-        private void BindNamesInCompilationUnit([NotNull] CompilationUnitSyntax compilationUnit)
+        private void BindNamesInCompilationUnit(CompilationUnitSyntax compilationUnit)
         {
             var containingScope = BuildNamespaceScopes(globalScope, compilationUnit.ImplicitNamespaceName);
             containingScope = BuildUsingDirectivesScope(containingScope, compilationUnit.UsingDirectives);
             foreach (var declaration in compilationUnit.Declarations)
-                BindNamesInDeclaration(containingScope, declaration, declaringType: null);
+                BindNamesInDeclaration(containingScope, declaration);
         }
 
         private void BindNamesInDeclaration(
-            [NotNull] LexicalScope containingScope,
-            [NotNull] DeclarationSyntax declaration,
-            [CanBeNull] TypeDeclarationSyntax declaringType)
+            LexicalScope containingScope,
+            DeclarationSyntax declaration)
         {
             var binder = new ExpressionNameBinder(diagnostics, declaration.File);
             var diagnosticCount = diagnostics.Count;
@@ -81,7 +96,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
                     containingScope = BuildNamespaceScopes(containingScope, ns.Name);
                     containingScope = BuildUsingDirectivesScope(containingScope, ns.UsingDirectives);
                     foreach (var nestedDeclaration in ns.Declarations)
-                        BindNamesInDeclaration(containingScope, nestedDeclaration, declaringType: null);
+                        BindNamesInDeclaration(containingScope, nestedDeclaration);
                 }
                 break;
                 case NamedFunctionDeclarationSyntax function:
@@ -105,7 +120,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
                 case TypeDeclarationSyntax typeDeclaration:
                     // TODO name scope for type declaration
                     foreach (var nestedDeclaration in typeDeclaration.Members)
-                        BindNamesInDeclaration(containingScope, nestedDeclaration, typeDeclaration);
+                        BindNamesInDeclaration(containingScope, nestedDeclaration);
                     break;
                 case FieldDeclarationSyntax fieldDeclaration:
                     binder.VisitExpression(fieldDeclaration.TypeExpression, containingScope);
@@ -119,9 +134,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
         }
 
         private void BindNamesInFunctionParameters(
-            [NotNull] LexicalScope containingScope,
-            [NotNull] FunctionDeclarationSyntax function,
-            [NotNull] ExpressionNameBinder binder)
+             LexicalScope containingScope,
+             FunctionDeclarationSyntax function,
+             ExpressionNameBinder binder)
         {
             if (function.GenericParameters != null)
                 foreach (var parameter in function.GenericParameters)
@@ -143,9 +158,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
         }
 
         private void BindNamesInFunctionBody(
-            [NotNull] LexicalScope containingScope,
-            [NotNull] FunctionDeclarationSyntax function,
-            [NotNull] ExpressionNameBinder binder)
+             LexicalScope containingScope,
+             FunctionDeclarationSyntax function,
+             ExpressionNameBinder binder)
         {
             var symbols = new List<ISymbol>();
             foreach (var parameter in function.Parameters)
@@ -155,10 +170,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
             binder.VisitBlock(function.Body, containingScope);
         }
 
-        [NotNull]
         private LexicalScope BuildNamespaceScopes(
-            [NotNull] LexicalScope containingScope,
-            [NotNull] RootName ns)
+             LexicalScope containingScope,
+             RootName ns)
         {
             Name name;
             switch (ns)
@@ -180,10 +194,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
             return new NestedScope(containingScope, symbolsInNamespace);
         }
 
-        [NotNull]
         private LexicalScope BuildUsingDirectivesScope(
-            [NotNull] LexicalScope containingScope,
-            [NotNull, ItemNotNull] FixedList<UsingDirectiveSyntax> usingDirectives)
+            LexicalScope containingScope,
+            FixedList<UsingDirectiveSyntax> usingDirectives)
         {
             if (!usingDirectives.Any()) return containingScope;
 

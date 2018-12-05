@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
@@ -7,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public abstract class TypeDeclarationSyntax : MemberDeclarationSyntax, INamespacedDeclarationSyntax
+    public abstract class TypeDeclarationSyntax : MemberDeclarationSyntax
     {
         public FixedList<GenericParameterSyntax> GenericParameters { get; }
         public FixedList<MemberDeclarationSyntax> Members { get; }
@@ -25,9 +24,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             GenericParameters = genericParameters;
             foreach (var member in Members) member.DeclaringType = this;
         }
-
-        [DebuggerHidden]
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        DeclarationSyntax IDeclarationSyntax.AsDeclarationSyntax => this;
     }
 }

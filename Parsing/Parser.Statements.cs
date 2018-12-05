@@ -1,14 +1,11 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public partial class Parser
     {
-        [MustUseReturnValue]
-        [NotNull]
         public StatementSyntax ParseStatement()
         {
             switch (Tokens.Current)
@@ -48,8 +45,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         }
 
         // Requires the binding has already been consumed
-        [MustUseReturnValue]
-        [NotNull]
         private StatementSyntax ParseRestOfVariableDeclaration(bool mutableBinding)
         {
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
@@ -68,8 +63,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 initializer);
         }
 
-        [MustUseReturnValue]
-        [CanBeNull]
         public BlockSyntax AcceptBlock()
         {
             var openBrace = Tokens.Current.Span;
@@ -77,8 +70,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return ParseRestOfBlock(openBrace);
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         public BlockSyntax ParseBlock()
         {
             var openBrace = Tokens.Expect<IOpenBraceToken>();
@@ -86,7 +77,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         }
 
         // Requires the open brace has already been consumed
-        [NotNull]
         private BlockSyntax ParseRestOfBlock(TextSpan openBrace)
         {
             var statements = ParseMany<StatementSyntax, ICloseBraceToken>(ParseStatement);
@@ -95,8 +85,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new BlockSyntax(span, statements);
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         public ExpressionBlockSyntax ParseExpressionBlock()
         {
             switch (Tokens.Current)

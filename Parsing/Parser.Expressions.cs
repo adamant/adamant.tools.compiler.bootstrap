@@ -3,13 +3,11 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public partial class Parser
     {
-        [CanBeNull]
         public ExpressionSyntax AcceptExpression()
         {
             switch (Tokens.Current)
@@ -25,8 +23,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
-        [NotNull]
-        [MustUseReturnValue]
         public ExpressionSyntax ParseExpression()
         {
             return ParseExpression(OperatorPrecedence.Min);
@@ -35,8 +31,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         /// <summary>
         /// For expressions, we switch to a precedence climbing parser.
         /// </summary>
-        [MustUseReturnValue]
-        [NotNull]
         public ExpressionSyntax ParseExpression(OperatorPrecedence minPrecedence)
         {
             var expression = ParseAtom();
@@ -241,7 +235,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
-        private static AccessOperator BuildAccessOperator([NotNull] IAccessOperatorToken accessOperatorToken)
+        private static AccessOperator BuildAccessOperator(IAccessOperatorToken accessOperatorToken)
         {
             switch (accessOperatorToken)
             {
@@ -256,11 +250,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
-        [NotNull]
         private static ExpressionSyntax BuildOperatorExpression(
-            [NotNull] ExpressionSyntax left,
-            [NotNull] IOperatorToken operatorToken,
-            [NotNull] ExpressionSyntax right)
+             ExpressionSyntax left,
+             IOperatorToken operatorToken,
+             ExpressionSyntax right)
         {
             BinaryOperator binaryOperator;
             switch (operatorToken)
@@ -309,8 +302,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         }
 
         // An atom is the unit of an expression that occurs between infix operators, i.e. an identifier, literal, group, or new
-        [MustUseReturnValue]
-        [NotNull]
         private ExpressionSyntax ParseAtom()
         {
             switch (Tokens.Current)
@@ -495,7 +486,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
-        [NotNull]
         private ExpressionSyntax ParseUnsafeExpression(ParseAs parseAs = ParseAs.Expression)
         {
             var unsafeKeyword = Tokens.Expect<IUnsafeKeywordToken>();
@@ -512,7 +502,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new UnsafeExpressionSyntax(span, expression);
         }
 
-        [NotNull]
         private ExpressionSyntax ParsePrimitiveType()
         {
             var keyword = Tokens.RequiredToken<IPrimitiveTypeToken>();
@@ -576,7 +565,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new IdentifierNameSyntax(keyword.Span, name);
         }
 
-        [NotNull]
         private ExpressionSyntax ParsePrefixUnaryOperator(UnaryOperator @operator)
         {
             var operatorSpan = Tokens.Required<IOperatorToken>();
@@ -585,8 +573,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new UnaryExpressionSyntax(span, UnaryOperatorFixity.Prefix, @operator, operand);
         }
 
-        [CanBeNull]
-        private ExpressionSyntax ParseRestOfLifetimeType([NotNull] ExpressionSyntax expression, LifetimeOperator lifetimeOperator)
+        private ExpressionSyntax ParseRestOfLifetimeType(ExpressionSyntax expression, LifetimeOperator lifetimeOperator)
         {
             switch (Tokens.Current)
             {
@@ -605,8 +592,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         private ExpressionSyntax ParseForeach()
         {
             var foreachKeyword = Tokens.Expect<IForeachKeywordToken>();
@@ -622,8 +607,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new ForeachExpressionSyntax(span, mutableBinding, identifier.Value, type, expression, block);
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         private WhileExpressionSyntax ParseWhile()
         {
             var whileKeyword = Tokens.Expect<IWhileKeywordToken>();
@@ -633,8 +616,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new WhileExpressionSyntax(span, condition, block);
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         private LoopExpressionSyntax ParseLoop()
         {
             var loopKeyword = Tokens.Expect<ILoopKeywordToken>();
@@ -643,8 +624,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new LoopExpressionSyntax(span, block);
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         private ExpressionSyntax ParseIf(ParseAs parseAs = ParseAs.Expression)
         {
             var @if = Tokens.Expect<IIfKeywordToken>();
@@ -662,7 +641,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new IfExpressionSyntax(span, condition, thenBlock, elseClause);
         }
 
-        [CanBeNull]
         private ExpressionSyntax AcceptElse(ParseAs parseAs)
         {
             if (!Tokens.Accept<IElseKeywordToken>()) return null;
@@ -675,8 +653,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return expression;
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         private ExpressionSyntax ParseMatch()
         {
             var matchKeyword = Tokens.Expect<IMatchKeywordToken>();
@@ -688,8 +664,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new MatchExpressionSyntax(span, value, arms);
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         private MatchArmSyntax ParseMatchArm()
         {
             var pattern = ParsePattern();
@@ -699,8 +673,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new MatchArmSyntax(pattern, expression);
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         private ExpressionSyntax ParseParenthesizedExpression()
         {
             Tokens.Expect<IOpenParenToken>();
@@ -709,15 +681,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return expression;
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         public FixedList<ArgumentSyntax> ParseArguments()
         {
             return AcceptSeparatedList<ArgumentSyntax, ICommaToken>(AcceptArgument);
         }
 
-        [MustUseReturnValue]
-        [CanBeNull]
         private ArgumentSyntax AcceptArgument()
         {
             var isParams = Tokens.Accept<IParamsKeywordToken>();
