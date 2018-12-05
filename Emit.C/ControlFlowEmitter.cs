@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             Requires.That(nameof(variable), variable.Exists, "tried to look up variable that does not exist");
             var initializer = variable.IsParameter ? $" = {nameMangler.Mangle(variable.Name)}" : "";
             var name = variable.Name != null ? " // " + variable.Name : "";
-            code.AppendLine($"{typeConverter.Convert(variable.Type)} ₜ{NameOf(variable.Reference)}{initializer};{name}");
+            code.AppendLine($"{typeConverter.Convert(variable.Type)} _{NameOf(variable.Reference)}{initializer};{name}");
         }
 
         private static string NameOf(VariableReference variable)
@@ -61,7 +61,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             switch (statement)
             {
                 case ReturnStatement _:
-                    code.AppendLine(voidReturn ? "return;" : "return ₜresult;");
+                    code.AppendLine(voidReturn ? "return;" : "return _result;");
                     break;
                 case AssignmentStatement assignment:
                     code.AppendLine(
@@ -80,7 +80,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             switch (place)
             {
                 case VariableReference variable:
-                    return "ₜ" + NameOf(variable);
+                    return "_" + NameOf(variable);
                 default:
                     throw NonExhaustiveMatchException.For(place);
             }
@@ -93,12 +93,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 case IntegerConstant integer:
                     return $"({ConvertType(integer.Type)}){{{integer.Value}}}";
                 case Utf8BytesConstant utf8BytesConstant:
-                    return $"((ₐbyte*)u8\"{utf8BytesConstant.Value.Escape()}\")";
+                    return $"((_byte*)u8\"{utf8BytesConstant.Value.Escape()}\")";
                 case FunctionCall functionCall:
                 {
                     var mangledName = nameMangler.Mangle(functionCall.FunctionName);
                     var arguments = functionCall.Arguments.Select(ConvertValue);
-                    return $"{mangledName}({string.Join(", ", arguments)})";
+                    return $"{mangledName}__{functionCall.Arity}({string.Join(", ", arguments)})";
                 }
                 case ConstructorCall _:
                     // TODO implement this
@@ -114,7 +114,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     var self = ConvertValue(virtualCall.Self);
                     var mangledName = nameMangler.Mangle(virtualCall.FunctionName);
                     var arguments = virtualCall.Arguments.Select(ConvertValue).Prepend(self);
-                    return $"{self}.ₐvtable.{mangledName}({string.Join(", ", arguments)})";
+                    return $"{self}._vtable->{mangledName}({string.Join(", ", arguments)})";
                 }
                 default:
                     throw NonExhaustiveMatchException.For(value);

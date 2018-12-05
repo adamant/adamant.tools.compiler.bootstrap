@@ -23,10 +23,10 @@ void test()
 }
 
 // Inline functions from RuntimeLibrary.h
-extern ᵢString ᵢString·ₐoperator_string_literal(ₐsize count, ₐbyte* bytes);
+extern String String___op_string_literal__2(_size count, _byte* bytes);
 
 
-void ᵢprint_string(ᵢString text)
+void print_string__1(String text)
 {
-    printf("%.*s\n", (int)text.ᵢbyte_count.ₐvalue, (char*)text.ᵢbytes);
+    printf("%.*s\n", (int)text.byte_count._value, (char*)text.bytes);
 }

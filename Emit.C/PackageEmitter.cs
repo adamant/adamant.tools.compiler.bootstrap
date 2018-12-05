@@ -37,9 +37,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
             code.TypeIdDeclaration.AppendLine("// Type ID Declarations");
             // Type ID Enum
-            code.TypeIdDeclaration.AppendLine("enum Type_ID");
+            code.TypeIdDeclaration.AppendLine("enum _Type_ID");
             code.TypeIdDeclaration.BeginBlock();
-            code.TypeIdDeclaration.AppendLine("ₐnever·ₐTypeID = 0,");
+            code.TypeIdDeclaration.AppendLine("_never = 0,");
             // TODO setup primitive types?
 
             code.TypeDeclarations.AppendLine("// Type Declarations");
@@ -62,7 +62,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             {
                 if (parameterTypeName.Equals(Name.From("system", "console", "Console")))
                 {
-                    arguments.Add("ᵢsystem·ᵢconsole·ᵢConsole·ₐnew()");
+                    code.Definitions.AppendLine("system__console__Console console = { 0, malloc(sizeof(system__console__Console___Self)) };");
+                    arguments.Add("system__console__Console___new__1(console)");
                 }
                 else if (parameterTypeName.Equals(Name.From("system", "console", "Arguments")))
                     throw new NotImplementedException();
@@ -76,7 +77,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 code.Definitions.AppendLine("return 0;");
             }
             else
-                code.Definitions.AppendLine($"return {nameMangler.MangleName(entryPoint)}({joinedArguments}).ₐvalue;");
+                code.Definitions.AppendLine($"return {nameMangler.MangleName(entryPoint)}({joinedArguments})._value;");
 
             code.Definitions.EndBlock();
         }
@@ -85,7 +86,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             // Close the Type_ID enum
             code.TypeIdDeclaration.EndBlockWithSemicolon();
-            code.TypeIdDeclaration.AppendLine("typedef enum Type_ID Type_ID;");
+            code.TypeIdDeclaration.AppendLine("typedef enum _Type_ID _Type_ID;");
         }
     }
 }

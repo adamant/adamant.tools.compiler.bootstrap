@@ -5,14 +5,11 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public partial class Parser
     {
-        [MustUseReturnValue]
-        [NotNull, ItemNotNull]
         public FixedList<DeclarationSyntax> ParseTopLevelDeclarations()
         {
             var declarations = new List<DeclarationSyntax>();
@@ -30,8 +27,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return declarations.ToFixedList();
         }
 
-        [MustUseReturnValue]
-        [NotNull, ItemNotNull]
         public FixedList<DeclarationSyntax> ParseDeclarations()
         {
             var declarations = new List<DeclarationSyntax>();
@@ -49,8 +44,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return declarations.ToFixedList();
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         public IEnumerable<DeclarationSyntax> ParseDeclaration()
         {
             var attributes = ParseAttributes();
@@ -93,8 +86,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var _ = Tokens.Accept<ISemicolonToken>();
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         public MemberDeclarationSyntax ParseMemberDeclaration()
         {
             var attributes = ParseAttributes();
@@ -136,11 +127,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         }
 
         #region Parse Namespaces
-        [MustUseReturnValue]
-        [NotNull]
         public NamespaceDeclarationSyntax ParseNamespaceDeclaration(
-            [NotNull] FixedList<AttributeSyntax> attributes,
-            [NotNull] FixedList<IModiferToken> modifiers)
+             FixedList<AttributeSyntax> attributes,
+             FixedList<IModiferToken> modifiers)
         {
             // TODO generate errors for attributes or modifiers
             Tokens.Expect<INamespaceKeywordToken>();
@@ -156,7 +145,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 nameContext, usingDirectives, declarations);
         }
 
-        [MustUseReturnValue]
         private (Name, TextSpan) ParseNamespaceName()
         {
             var nameSegment = Tokens.RequiredToken<IIdentifierToken>();
@@ -176,8 +164,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         #endregion
 
         #region Parse Type Parts
-        [MustUseReturnValue]
-        [NotNull]
         private FixedList<AttributeSyntax> ParseAttributes()
         {
             var attributes = new List<AttributeSyntax>();
@@ -186,7 +172,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return attributes.ToFixedList();
         }
 
-        [MustUseReturnValue]
         private AttributeSyntax AcceptAttribute()
         {
             if (!Tokens.Accept<IHashHashToken>()) return null;
@@ -200,27 +185,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new AttributeSyntax(name, arguments);
         }
 
-        [MustUseReturnValue]
         private ExpressionSyntax AcceptBaseClass()
         {
             if (!Tokens.Accept<IColonToken>()) return null;
             return ParseExpression();
         }
 
-        [MustUseReturnValue]
         private FixedList<ExpressionSyntax> AcceptBaseTypes()
         {
             if (!Tokens.Accept<ILessThanColonToken>()) return null;
             return AcceptOneOrMore<ExpressionSyntax, ICommaToken>(ParseExpression);
         }
 
-        [MustUseReturnValue]
         private FixedList<ExpressionSyntax> ParseInvariants()
         {
             return AcceptMany(AcceptInvariant);
         }
 
-        [MustUseReturnValue]
         private ExpressionSyntax AcceptInvariant()
         {
             if (!Tokens.Accept<IInvariantKeywordToken>()) return null;
@@ -243,34 +224,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         #region Parse Type Declarations
         private ClassDeclarationSyntax ParseClass(
-            [NotNull] FixedList<AttributeSyntax> attributes,
-            [NotNull] FixedList<IModiferToken> modifiers)
+             FixedList<AttributeSyntax> attributes,
+             FixedList<IModiferToken> modifiers)
         {
             Tokens.Expect<IClassKeywordToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(identifier.Value);
+            var bodyParser = NestedParser(name);
             var genericParameters = AcceptGenericParameters();
             var baseClass = AcceptBaseClass();
             var baseTypes = AcceptBaseTypes();
             var genericConstraints = ParseGenericConstraints();
             var invariants = ParseInvariants();
-            var members = ParseTypeBody();
+            var members = bodyParser.ParseTypeBody();
             return new ClassDeclarationSyntax(File, attributes, modifiers, name, identifier.Span,
                 genericParameters, baseClass, baseTypes, genericConstraints, invariants, members);
         }
 
         private TraitDeclarationSyntax ParseTrait(
-            [NotNull] FixedList<AttributeSyntax> attributes,
-            [NotNull] FixedList<IModiferToken> modifiers)
+             FixedList<AttributeSyntax> attributes,
+             FixedList<IModiferToken> modifiers)
         {
             Tokens.Expect<ITraitKeywordToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(identifier.Value);
+            var bodyParser = NestedParser(name);
             var genericParameters = AcceptGenericParameters();
             var baseTypes = AcceptBaseTypes();
             var genericConstraints = ParseGenericConstraints();
             var invariants = ParseInvariants();
-            var members = ParseTypeBody();
+            var members = bodyParser.ParseTypeBody();
             return new TraitDeclarationSyntax(File, attributes, modifiers, name, identifier.Span,
                 genericParameters, baseTypes, genericConstraints, invariants, members);
         }
@@ -282,11 +265,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             Tokens.Expect<IStructKeywordToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(identifier.Value);
+            var bodyParser = NestedParser(name);
             var genericParameters = AcceptGenericParameters();
             var baseTypes = AcceptBaseTypes();
             var genericConstraints = ParseGenericConstraints();
             var invariants = ParseInvariants();
-            var members = ParseTypeBody();
+            var members = bodyParser.ParseTypeBody();
             return new StructDeclarationSyntax(File, attributes, modifiers, name, identifier.Span,
                 genericParameters, baseTypes, genericConstraints, invariants, members);
         }
@@ -303,13 +287,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     Tokens.Expect<IStructKeywordToken>();
                     var identifier = Tokens.RequiredToken<IIdentifierToken>();
                     var name = nameContext.Qualify(identifier.Value);
+                    var bodyParser = NestedParser(name);
                     var genericParameters = AcceptGenericParameters();
                     var baseTypes = AcceptBaseTypes();
                     var genericConstraints = ParseGenericConstraints();
                     var invariants = ParseInvariants();
                     Tokens.Expect<IOpenBraceToken>();
-                    var variants = ParseEnumVariants();
-                    var members = ParseMemberDeclarations();
+                    var variants = bodyParser.ParseEnumVariants();
+                    var members = bodyParser.ParseMemberDeclarations();
                     Tokens.Expect<ICloseBraceToken>();
                     return new EnumStructDeclarationSyntax(File, attributes, modifiers, name,
                         identifier.Span, genericParameters, baseTypes, genericConstraints,
@@ -320,14 +305,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     Tokens.Expect<IClassKeywordToken>();
                     var identifier = Tokens.RequiredToken<IIdentifierToken>();
                     var name = nameContext.Qualify(identifier.Value);
+                    var bodyParser = NestedParser(name);
                     var genericParameters = AcceptGenericParameters();
                     var baseClass = AcceptBaseClass();
                     var baseTypes = AcceptBaseTypes();
                     var genericConstraints = ParseGenericConstraints();
                     var invariants = ParseInvariants();
                     Tokens.Expect<IOpenBraceToken>();
-                    var variants = ParseEnumVariants();
-                    var members = ParseMemberDeclarations();
+                    var variants = bodyParser.ParseEnumVariants();
+                    var members = bodyParser.ParseMemberDeclarations();
                     Tokens.Expect<ICloseBraceToken>();
                     return new EnumClassDeclarationSyntax(File, attributes, modifiers, name,
                         identifier.Span, genericParameters, baseClass, baseTypes,
@@ -466,7 +452,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
 
             var nameSpan = TextSpan.Covering(operatorKeyword, endOperatorSpan);
-            var name = nameContext.Qualify(SimpleName.Special("operator_" + oper));
+            var name = nameContext.Qualify(SimpleName.Special("op_" + oper));
             var parameters = ParseParameters();
             ExpressionSyntax returnType = null;
             if (Tokens.Accept<IRightArrowToken>())

@@ -1,24 +1,27 @@
 ﻿#include <stdint.h>
 
-#define UNUSED(x) (void)(x)
+// Rather than including all of stdlib.h we only declare the one thing we need.
+void* malloc(size_t size);
 
-typedef struct { int32_t ₐvalue; } ₐint;
-typedef struct { uint32_t ₐvalue; } ₐuint;
-typedef struct { uint8_t ₐvalue; } ₐbyte;
-typedef struct { uintptr_t ₐvalue; } ₐsize;
-typedef struct { intptr_t ₐvalue; } ₐoffset;
+#define _UNUSED(x) (void)(x)
+
+typedef struct { int32_t _value; } _int;
+typedef struct { uint32_t _value; } _uint;
+typedef struct { uint8_t _value; } _byte;
+typedef struct { uintptr_t _value; } _size;
+typedef struct { intptr_t _value; } _offset;
 
 /*
 For now, we have moved strings and console IO into the runtime library
 */
 typedef struct {
-    ₐsize ᵢbyte_count;
-    ₐbyte* ᵢbytes;
-} ᵢString;
+    _size byte_count;
+    _byte* bytes;
+} String;
 
-inline ᵢString ᵢString·ₐoperator_string_literal(ₐsize byte_count, ₐbyte* bytes)
+inline String String___op_string_literal__2(_size byte_count, _byte* bytes)
 {
-    return (ᵢString){ byte_count, bytes };
+    return (String){ byte_count, bytes };
 }
 
-void ᵢprint_string(ᵢString text);
+void print_string__1(String text);

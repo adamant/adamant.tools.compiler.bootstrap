@@ -8,6 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     {
         public readonly Name FunctionName;
         public FixedList<Operand> Arguments { get; }
+        public int Arity => Arguments.Count;
 
         public FunctionCall(
             Name functionName,

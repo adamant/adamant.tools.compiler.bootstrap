@@ -106,11 +106,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             var typeName = nameMangler.MangleName(type);
 
             // Struct Declarations
-            var selfType = $"{typeName}·ₐSelf";
-            var vtableType = $"{typeName}·ₐV_Table";
+            var selfType = $"{typeName}___Self";
+            var vtableType = $"{typeName}___VTable";
             code.TypeDeclarations.AppendLine($"typedef struct {selfType} {selfType};");
             code.TypeDeclarations.AppendLine($"typedef struct {vtableType} {vtableType};");
-            code.TypeDeclarations.AppendLine($"typedef struct {{ {vtableType} const* restrict ₐvtable; {selfType}* restrict ₐself; }} {typeName};");
+            code.TypeDeclarations.AppendLine($"typedef struct {{ {vtableType} const* restrict _vtable; {selfType}* restrict _self; }} {typeName};");
 
             code.StructDeclarations.AppendLine($"struct {selfType}");
             code.StructDeclarations.BeginBlock();
