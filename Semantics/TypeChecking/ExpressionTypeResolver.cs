@@ -30,12 +30,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             this.selfType = selfType;
         }
 
-        public void InferStatementType(StatementSyntax statement)
+        public void ResolveTypesInStatement(StatementSyntax statement)
         {
             switch (statement)
             {
                 case VariableDeclarationStatementSyntax variableDeclaration:
-                    ResolveVariableDeclarationType(variableDeclaration);
+                    ResolveTypesInVariableDeclaration(variableDeclaration);
                     break;
                 case ExpressionSyntax expression:
                     InferExpressionType(expression);
@@ -45,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             }
         }
 
-        private void ResolveVariableDeclarationType(
+        private void ResolveTypesInVariableDeclaration(
             VariableDeclarationStatementSyntax variableDeclaration)
         {
             variableDeclaration.Type.BeginFulfilling();
@@ -148,7 +148,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             return actualType;
         }
 
-        public DataType InferExpressionType(ExpressionSyntax expression)
+        private DataType InferExpressionType(ExpressionSyntax expression)
         {
             if (expression == null) return DataType.Unknown;
 
@@ -212,7 +212,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     return expression.Type = DataType.Type;
                 case BlockSyntax blockExpression:
                     foreach (var statement in blockExpression.Statements)
-                        InferStatementType(statement);
+                        ResolveTypesInStatement(statement);
 
                     return expression.Type = DataType.Void;// TODO assign the correct type to the block
                 case NewObjectExpressionSyntax newObjectExpression:
@@ -235,16 +235,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     // TODO check the break types
                     InferExpressionType(foreachExpression.Block);
                     // TODO assign correct type to the expression
-                    return expression.Type = DataType.Unknown;
+                    return expression.Type = DataType.Void;
                 case WhileExpressionSyntax whileExpression:
                     CheckExpressionType(whileExpression.Condition, DataType.Bool);
                     InferExpressionType(whileExpression.Block);
                     // TODO assign correct type to the expression
-                    return expression.Type = DataType.Unknown;
+                    return expression.Type = DataType.Void;
                 case LoopExpressionSyntax loopExpression:
                     InferExpressionType(loopExpression.Block);
                     // TODO assign correct type to the expression
-                    return expression.Type = DataType.Unknown;
+                    return expression.Type = DataType.Void;
                 case InvocationSyntax invocation:
                     return InferInvocationType(invocation);
                 case GenericNameSyntax genericName:
@@ -292,7 +292,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     InferExpressionType(ifExpression.ThenBlock);
                     InferExpressionType(ifExpression.ElseClause);
                     // TODO assign a type to the expression
-                    return ifExpression.Type = DataType.Unknown;
+                    return ifExpression.Type = DataType.Void;
                 case ResultExpressionSyntax resultExpression:
                     InferExpressionType(resultExpression.Expression);
                     return resultExpression.Type = DataType.Never;
@@ -309,8 +309,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     InferExpressionType(assignmentExpression.RightOperand);
                     InsertImplicitConversionIfNeeded(ref assignmentExpression.RightOperand, left);
                     // TODO Check compability of types
-                    //throw new NotImplementedException("Check compability of types");
-                    return DataType.Void;
+                    return assignmentExpression.Type = DataType.Void;
                 case SelfExpressionSyntax _:
                     return selfType ?? DataType.Unknown;
                 default:
@@ -361,9 +360,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             }
         }
 
-        private static ISymbol GetSymbolForType(DataType left)
+        private static ISymbol GetSymbolForType(DataType type)
         {
-            switch (left)
+            switch (type)
             {
                 case UnknownType _:
                     return UnknownSymbol.Instance;
@@ -373,7 +372,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     // TODO this seems a very strange way to handle this. Shouldn't the symbol be on the type?
                     return PrimitiveSymbols.Instance.Single(p => p.FullName == integerType.Name);
                 default:
-                    throw NonExhaustiveMatchException.For(left);
+                    throw NonExhaustiveMatchException.For(type);
             }
         }
 
@@ -443,49 +442,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             throw new NotImplementedException();
         }
 
-
         private DataType InferBinaryExpressionType(
             BinaryExpressionSyntax binaryExpression)
         {
             InferExpressionType(binaryExpression.LeftOperand);
-            var leftOperand = binaryExpression.LeftOperand.Type;
-            var leftOperandCore = leftOperand is LifetimeType l ? l.Referent : leftOperand;
+            var leftType = binaryExpression.LeftOperand.Type;
+            var leftTypeCore = leftType is LifetimeType l ? l.Referent : leftType;
             var @operator = binaryExpression.Operator;
             InferExpressionType(binaryExpression.RightOperand);
-            var rightOperand = binaryExpression.RightOperand.Type;
-            var rightOperandCore = rightOperand is LifetimeType r ? r.Referent : rightOperand;
+            var rightType = binaryExpression.RightOperand.Type;
+            var rightTypeCore = rightType is LifetimeType r ? r.Referent : rightType;
 
-            // If either is unknown, then we can't know whether there is a a problem
-            // (technically not true, for example, we could know that one arg should
-            // be a bool and isn't)
-            if (leftOperand == DataType.Unknown
-                || rightOperand == DataType.Unknown)
-            {
-                switch (@operator)
-                {
-                    case BinaryOperator.EqualsEquals:
-                    case BinaryOperator.NotEqual:
-                    case BinaryOperator.LessThan:
-                    case BinaryOperator.LessThanOrEqual:
-                    case BinaryOperator.GreaterThan:
-                    case BinaryOperator.GreaterThanOrEqual:
-                    case BinaryOperator.And:
-                    case BinaryOperator.Or:
-                        return binaryExpression.Type = DataType.Bool;
-                    default:
-                        return binaryExpression.Type = DataType.Unknown;
-                }
-            }
+            // If either is unknown, then we can't know whether there is a a problem.
+            // Note that the operator could be overloaded
+            if (leftType == DataType.Unknown || rightType == DataType.Unknown)
+                return binaryExpression.Type = DataType.Unknown;
 
             bool typeError;
             switch (@operator)
             {
                 case BinaryOperator.Plus:
-                    typeError = CheckNumericOperator(
-                        binaryExpression.LeftOperand,
-                        binaryExpression.RightOperand,
-                        null);
-                    binaryExpression.Type = !typeError ? leftOperand : DataType.Unknown;
+                    typeError = CheckNumericOperator(ref binaryExpression.LeftOperand, ref binaryExpression.RightOperand, null);
+                    binaryExpression.Type = !typeError ? leftType : DataType.Unknown;
                     break;
                 //case IPlusEqualsToken _:
                 //    typeError = CheckNumericOperator(
@@ -507,7 +485,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 case BinaryOperator.LessThanOrEqual:
                 case BinaryOperator.GreaterThan:
                 case BinaryOperator.GreaterThanOrEqual:
-                    typeError = leftOperandCore != rightOperandCore;
+                    typeError = !(leftTypeCore == DataType.Bool && rightTypeCore == DataType.Bool)
+                        && CheckNumericOperator(ref binaryExpression.LeftOperand, ref binaryExpression.RightOperand, null);
                     binaryExpression.Type = DataType.Bool;
                     break;
                 //case IEqualsToken _:
@@ -517,7 +496,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 //    break;
                 case BinaryOperator.And:
                 case BinaryOperator.Or:
-                    typeError = leftOperand != DataType.Bool || rightOperand != DataType.Bool;
+                    typeError = leftType != DataType.Bool || rightType != DataType.Bool;
 
                     binaryExpression.Type = DataType.Bool;
                     break;
@@ -547,8 +526,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
         }
 
         private bool CheckNumericOperator(
-            ExpressionSyntax leftOperand,
-            ExpressionSyntax rightOperand,
+            ref ExpressionSyntax leftOperand,
+            ref ExpressionSyntax rightOperand,
             DataType resultType)
         {
             var leftType = leftOperand.Type;
@@ -568,11 +547,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     //ImposeIntegerConstantType(rightType, leftOperand);
                     throw new NotImplementedException();
                 //return !IsIntegerType(rightType);
-                case DataType type when IsIntegerType(type):
-                    // TODO it may need to be size
-                    //ImposeIntegerConstantType(leftType, rightOperand);
-                    throw new NotImplementedException();
-                //return !IsIntegerType(rightType);
+                case UnsizedIntegerType integerType:
+                    // TODO this isn't right we might need to convert either of them
+                    InsertImplicitConversionIfNeeded(ref rightOperand, integerType);
+                    return rightOperand.Type is UnsizedIntegerType;
+                case SizedIntegerType integerType:
+                    // TODO this isn't right we might need to convert either of them
+                    InsertImplicitConversionIfNeeded(ref rightOperand, integerType);
+                    return rightOperand.Type is UnsizedIntegerType;
                 case ObjectType _:
                     // Other object types can't be used in numeric expressions
                     return false;
@@ -661,7 +643,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             return TypeExpressionEvaluator.EvaluateExpression(typeExpression);
         }
 
-        public void InferExpressionTypeInInvocation(ExpressionSyntax callee, FixedList<DataType> argumentTypes)
+        private void InferExpressionTypeInInvocation(ExpressionSyntax callee, FixedList<DataType> argumentTypes)
         {
             switch (callee)
             {

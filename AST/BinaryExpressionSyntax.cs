@@ -4,9 +4,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class BinaryExpressionSyntax : ExpressionSyntax
     {
-        public ExpressionSyntax LeftOperand { get; }
+        public ExpressionSyntax LeftOperand;
         public BinaryOperator Operator { get; }
-        public ExpressionSyntax RightOperand { get; }
+        public ExpressionSyntax RightOperand;
 
         public BinaryExpressionSyntax(
             ExpressionSyntax leftOperand,

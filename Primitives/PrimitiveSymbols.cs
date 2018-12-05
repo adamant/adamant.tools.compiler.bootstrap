@@ -1,9 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 {
@@ -12,9 +12,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
     /// </summary>
     public static class PrimitiveSymbols
     {
-        [NotNull] public static readonly FixedList<ISymbol> Instance = BuildPrimitives();
+        public static readonly FixedList<ISymbol> Instance = BuildPrimitives();
 
-        [NotNull]
         private static FixedList<ISymbol> BuildPrimitives()
         {
             // TODO make a symbol for `Type`
@@ -27,17 +26,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 
                 BuildBoolSymbol(),
 
-                BuildIntegerNumericSymbol(DataType.Int8),
-                BuildIntegerNumericSymbol(DataType.Byte),
-                BuildIntegerNumericSymbol(DataType.Int16),
-                BuildIntegerNumericSymbol(DataType.UInt16),
-                BuildIntegerNumericSymbol(DataType.Int),
-                BuildIntegerNumericSymbol(DataType.UInt),
-                BuildIntegerNumericSymbol(DataType.Int64),
-                BuildIntegerNumericSymbol(DataType.UInt64),
+                BuildIntegerTypeSymbol(DataType.Int8, stringType),
+                BuildIntegerTypeSymbol(DataType.Byte, stringType),
+                BuildIntegerTypeSymbol(DataType.Int16, stringType),
+                BuildIntegerTypeSymbol(DataType.UInt16, stringType),
+                BuildIntegerTypeSymbol(DataType.Int, stringType),
+                BuildIntegerTypeSymbol(DataType.UInt, stringType),
+                BuildIntegerTypeSymbol(DataType.Int64, stringType),
+                BuildIntegerTypeSymbol(DataType.UInt64, stringType),
 
-                BuildIntegerNumericSymbol(DataType.Size),
-                BuildIntegerNumericSymbol(DataType.Offset),
+                BuildIntegerTypeSymbol(DataType.Size, stringType),
+                BuildIntegerTypeSymbol(DataType.Offset, stringType),
             }.ToFixedList();
         }
 
@@ -77,14 +76,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             return Symbol.NewSimpleType(DataType.Bool, symbols);
         }
 
-        private static ISymbol BuildIntegerNumericSymbol([NotNull] IntegerType numericType)
+        private static ISymbol BuildIntegerTypeSymbol(
+            IntegerType integerType,
+            DataType stringType)
         {
-            var typeName = numericType.Name;
+            var typeName = integerType.Name;
             var symbols = new List<ISymbol>
             {
-                Symbol.New(typeName.Qualify("remainder"), new FunctionType(new[] {numericType}, numericType))
+                Symbol.New(typeName.Qualify("remainder"), new FunctionType(new[] {integerType}, integerType)),
+                Symbol.New(typeName.Qualify("to_display_string"), new FunctionType(Enumerable.Empty<DataType>(), stringType))
             };
-            return Symbol.NewSimpleType(numericType, symbols);
+            return Symbol.NewSimpleType(integerType, symbols);
         }
     }
 }
