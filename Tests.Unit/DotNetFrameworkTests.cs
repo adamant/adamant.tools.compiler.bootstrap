@@ -1,8 +1,6 @@
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
-using JetBrains.Annotations;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
@@ -12,10 +10,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
     [UnitTest]
     public class DotNetFrameworkTests
     {
-        [NotNull]
+
         private readonly ITestOutputHelper output;
 
-        public DotNetFrameworkTests([NotNull] ITestOutputHelper output)
+        public DotNetFrameworkTests(ITestOutputHelper output)
         {
             this.output = output;
         }
@@ -32,8 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
             Assert.NotEqual(lambda1, lambda2);
         }
 
-        [NotNull]
-        private static MethodInfo GetMethodInfo([NotNull] Func<int, int> f)
+        private static MethodInfo GetMethodInfo(Func<int, int> f)
         {
             return f.Method;
         }
@@ -73,10 +70,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
             Assert.Equal(delayTask, completedTask);
         }
 
-        private static async Task<int> GetValueAsync([NotNull] Func<Task<int>> task)
+        private static async Task<int> GetValueAsync(Func<Task<int>> task)
         {
             await Task.Yield();
             return await task();
+        }
+
+        private string testField = "old";
+
+        [Fact]
+        public void CanPassFieldByRef()
+        {
+            TakeByRef(ref testField);
+        }
+
+        private void TakeByRef(ref string x)
+        {
+            x = "new";
+        }
+
+        [Fact]
+        public void CanPassArrayElementByRef()
+        {
+            var strings = new string[] { "old1", "old2" };
+            TakeByRef(ref strings[0]);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public TextSpan NameSpan { get; }
         public ExpressionSyntax TypeExpression { get; }
-        public ExpressionSyntax Initializer { get; set; }
+        public ExpressionSyntax Initializer;
         public TypePromise Type { get; } = new TypePromise();
 
         [DebuggerHidden]

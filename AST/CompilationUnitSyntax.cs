@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST.Visitors;
@@ -14,6 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [NotNull] public RootName ImplicitNamespaceName { get; }
         [NotNull, ItemNotNull] public FixedList<UsingDirectiveSyntax> UsingDirectives { get; }
         [NotNull, ItemNotNull] public FixedList<DeclarationSyntax> Declarations { get; }
+        [Obsolete("I think we can get rid of INamespacedDeclarationSyntax when this is removed")]
         [NotNull, ItemNotNull] public FixedList<INamespacedDeclarationSyntax> AllNamespacedDeclarations { get; }
         [NotNull, ItemNotNull] public FixedList<MemberDeclarationSyntax> AllMemberDeclarations { get; }
         [NotNull, ItemNotNull] public FixedList<Diagnostic> Diagnostics { get; }

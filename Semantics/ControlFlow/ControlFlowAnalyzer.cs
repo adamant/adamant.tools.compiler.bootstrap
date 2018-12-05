@@ -229,9 +229,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 }
                 case MemberAccessExpressionSyntax memberAccess:
                 {
+                    var self = ConvertToOperand(memberAccess.Expression);
+                    var arguments = invocation.Arguments
+                        .Select(a => ConvertToOperand(a.Value)).ToList();
                     var symbol = memberAccess.ReferencedSymbol;
                     switch (symbol)
                     {
+                        case NamedFunctionDeclarationSyntax function:
+                            return new VirtualFunctionCall(function.Name.UnqualifiedName, self, arguments);
                         default:
                             throw NonExhaustiveMatchException.For(symbol);
                     }

@@ -1,18 +1,17 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class BinaryExpressionSyntax : ExpressionSyntax
     {
-        [NotNull] public ExpressionSyntax LeftOperand { get; }
+        public ExpressionSyntax LeftOperand { get; }
         public BinaryOperator Operator { get; }
-        [NotNull] public ExpressionSyntax RightOperand { get; }
+        public ExpressionSyntax RightOperand { get; }
 
         public BinaryExpressionSyntax(
-            [NotNull] ExpressionSyntax leftOperand,
+            ExpressionSyntax leftOperand,
             BinaryOperator @operator,
-            [NotNull] ExpressionSyntax rightOperand)
+            ExpressionSyntax rightOperand)
             : base(TextSpan.Covering(leftOperand.Span, rightOperand.Span))
         {
             LeftOperand = leftOperand;

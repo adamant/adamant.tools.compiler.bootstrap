@@ -19,10 +19,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         {
             // TODO make a symbol for `Type`
             var stringSymbol = BuildStringSymbol();
+            var stringType = ((Metatype)stringSymbol.Type).Instance;
             return new List<ISymbol>
             {
                 stringSymbol,
-                BuildPrintStringSymbol(stringSymbol),
+                BuildPrintStringSymbol(stringType),
 
                 BuildBoolSymbol(),
 
@@ -39,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
                 BuildIntegerNumericSymbol(DataType.Offset),
             }.ToFixedList();
         }
-        
+
         /// <summary>
         /// For now, we are putting string in the runtime library
         /// </summary>
@@ -62,10 +63,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             return stringSymbol;
         }
 
-        private static ISymbol BuildPrintStringSymbol(ISymbol stringSymbol)
+        private static ISymbol BuildPrintStringSymbol(DataType stringType)
         {
             var name = new SimpleName("print_string");
-            var type = new FunctionType(new[] { stringSymbol.Type }, DataType.Void);
+            var type = new FunctionType(new[] { stringType }, DataType.Void);
             return Symbol.New(name, type);
         }
 

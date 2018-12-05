@@ -1,21 +1,18 @@
-using JetBrains.Annotations;
-
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class ArgumentSyntax : Syntax
     {
         public bool IsParams { get; }
-        [CanBeNull] public ExpressionSyntax Value { get; }
+        public ExpressionSyntax Value;
 
         public ArgumentSyntax(
             bool isParams,
-            [CanBeNull] ExpressionSyntax value)
+            ExpressionSyntax value)
         {
             IsParams = isParams;
             Value = value;
         }
 
-        [NotNull]
         public override string ToString()
         {
             if (IsParams) return $"params {Value}";

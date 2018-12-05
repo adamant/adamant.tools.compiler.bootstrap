@@ -1,18 +1,17 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class InvocationSyntax : ExpressionSyntax
     {
-        [NotNull] public ExpressionSyntax Callee { get; set; }
-        [NotNull, ItemNotNull] public FixedList<ArgumentSyntax> Arguments { get; }
+        public ExpressionSyntax Callee { get; set; }
+        public FixedList<ArgumentSyntax> Arguments { get; }
 
         public InvocationSyntax(
             TextSpan span,
-            [NotNull] ExpressionSyntax callee,
-            [NotNull, ItemNotNull] FixedList<ArgumentSyntax> arguments)
+            ExpressionSyntax callee,
+            FixedList<ArgumentSyntax> arguments)
             : base(span)
         {
             Callee = callee;

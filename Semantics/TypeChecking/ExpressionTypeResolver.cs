@@ -56,7 +56,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             {
                 var type = CheckAndEvaluateTypeExpression(variableDeclaration.TypeExpression);
                 variableDeclaration.Type.Fulfill(type);
-                variableDeclaration.Initializer = ImplicitConversion(variableDeclaration.Initializer, type);
+                InsertImplicitConversionIfNeeded(ref variableDeclaration.Initializer, type);
                 // TODO check that the initializer type is compatible with the variable type
             }
             else if (variableDeclaration.Initializer != null)
@@ -76,12 +76,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
         /// <summary>
         /// Create an implicit conversion if allowed and needed
         /// </summary>
-        private ExpressionSyntax ImplicitConversion(
-            ExpressionSyntax expression,
+        private void InsertImplicitConversionIfNeeded(
+            ref ExpressionSyntax expression,
             DataType targetType)
         {
-            if (expression == null) return null;
-
             switch (expression.Type)
             {
                 case SizedIntegerType expressionType:
@@ -91,11 +89,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                         case SizedIntegerType expectedType:
                             if (expectedType.Bits > expressionType.Bits
                                 && (!expressionType.IsSigned || expectedType.IsSigned))
-                                return new ImplicitNumericConversionExpression(expression, expectedType);
+                                expression = new ImplicitNumericConversionExpression(expression, expectedType);
                             break;
                         case FloatingPointType expectedType:
                             if (expressionType.Bits < expectedType.Bits)
-                                return new ImplicitNumericConversionExpression(expression, expectedType);
+                                expression = new ImplicitNumericConversionExpression(expression, expectedType);
                             break;
                     }
                 }
@@ -104,7 +102,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 {
                     if (targetType is FloatingPointType expectedType
                         && expressionType.Bits < expectedType.Bits)
-                        return new ImplicitNumericConversionExpression(expression, expectedType);
+                        expression = new ImplicitNumericConversionExpression(expression, expectedType);
                 }
                 break;
                 case IntegerConstantType expressionType:
@@ -115,7 +113,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                             var requireSigned = expressionType.Value < 0;
                             if (expectedType.Bits >= bits
                                && (!requireSigned || expectedType.IsSigned))
-                                return new ImplicitNumericConversionExpression(expression, expectedType);
+                                expression = new ImplicitNumericConversionExpression(expression, expectedType);
                             break;
                         case FloatingPointType expectedType:
                             throw new NotImplementedException();
@@ -128,7 +126,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                         var conversionOperators = objectType.Symbol.Lookup(SpecialName.OperatorStringLiteral);
                         if (conversionOperators.Count == 1) // TODO actually check we can call it
                         {
-                            return new ImplicitLiteralConversionExpression(expression, objectType, conversionOperators.Single());
+                            expression = new ImplicitLiteralConversionExpression(expression, objectType, conversionOperators.Single());
                         }
                         // TODO if there is more than one
                     }
@@ -137,7 +135,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             }
 
             // No conversion
-            return expression;
         }
 
         public DataType CheckExpressionType(
@@ -163,7 +160,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                         InferExpressionType(returnExpression.ReturnValue);
                         if (returnType != null) // TODO report an error
                         {
-                            returnExpression.ReturnValue = ImplicitConversion(returnExpression.ReturnValue, returnType);
+                            InsertImplicitConversionIfNeeded(ref returnExpression.ReturnValue, returnType);
                             if (returnType != returnExpression.ReturnValue.Type)
                                 diagnostics.Add(TypeError.CannotConvert(file,
                                     returnExpression.ReturnValue, returnType));
@@ -249,28 +246,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     // TODO assign correct type to the expression
                     return expression.Type = DataType.Unknown;
                 case InvocationSyntax invocation:
-                {
-                    // This could:
-                    // * Invoke a stand alone function
-                    // * Invoke a static function
-                    // * Invoke a method
-                    // * Invoke a function pointer
-                    var argumentTypes = invocation.Arguments.Select(a => InferExpressionType(a.Value)).ToFixedList();
-                    InferExpressionTypeInInvocation(invocation.Callee, argumentTypes);
-                    var callee = invocation.Callee.Type;
-
-                    if (callee is FunctionType functionType)
-                    {
-                        // TODO check argument types
-                        return expression.Type = functionType.ReturnType;
-                    }
-                    // If it is unknown, we already reported an error
-                    if (callee == DataType.Unknown)
-                        return expression.Type = DataType.Unknown;
-
-                    diagnostics.Add(TypeError.MustBeCallable(file, invocation.Callee));
-                    return expression.Type = DataType.Unknown;
-                }
+                    return InferInvocationType(invocation);
                 case GenericNameSyntax genericName:
                 {
                     foreach (var argument in genericName.Arguments)
@@ -331,7 +307,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 case AssignmentExpressionSyntax assignmentExpression:
                     var left = InferExpressionType(assignmentExpression.LeftOperand);
                     InferExpressionType(assignmentExpression.RightOperand);
-                    assignmentExpression.RightOperand = ImplicitConversion(assignmentExpression.RightOperand, left);
+                    InsertImplicitConversionIfNeeded(ref assignmentExpression.RightOperand, left);
                     // TODO Check compability of types
                     //throw new NotImplementedException("Check compability of types");
                     return DataType.Void;
@@ -340,6 +316,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
+        }
+
+        private DataType InferInvocationType(InvocationSyntax invocation)
+        {
+            // This could:
+            // * Invoke a stand alone function
+            // * Invoke a static function
+            // * Invoke a method
+            // * Invoke a function pointer
+            var argumentTypes = invocation.Arguments.Select(a => InferExpressionType(a.Value)).ToFixedList();
+            InferExpressionTypeInInvocation(invocation.Callee, argumentTypes);
+            var callee = invocation.Callee.Type;
+
+            if (callee is FunctionType functionType)
+            {
+                foreach (var (arg, type) in invocation.Arguments.Zip(functionType.ParameterTypes))
+                {
+                    InsertImplicitConversionIfNeeded(ref arg.Value, type);
+                }
+
+                // TODO check argument types
+                return invocation.Type = functionType.ReturnType;
+            }
+
+            // If it is unknown, we already reported an error
+            if (callee == DataType.Unknown) return invocation.Type = DataType.Unknown;
+
+            diagnostics.Add(TypeError.MustBeCallable(file, invocation.Callee));
+            return invocation.Type = DataType.Unknown;
         }
 
         private DataType InferMemberAccessType(MemberAccessExpressionSyntax memberAccess)
@@ -665,7 +670,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 case IdentifierNameSyntax identifierName:
                 {
                     var symbols = identifierName.LookupInContainingScope();
-                    symbols = ResolveOverload(symbols, argumentTypes);
+                    symbols = ResolveOverload(symbols, null, argumentTypes);
                     AssignReferencedSymbolAndType(identifierName, symbols);
                 }
                 break;
@@ -674,7 +679,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     var left = InferExpressionType(memberAccess.Expression);
                     var containingSymbol = GetSymbolForType(left);
                     var symbols = containingSymbol.Lookup(memberAccess.Member.Name);
-                    symbols = ResolveOverload(symbols, argumentTypes);
+                    symbols = ResolveOverload(symbols, left, argumentTypes);
                     memberAccess.Type = AssignReferencedSymbolAndType(memberAccess.Member, symbols);
                 }
                 break;
@@ -683,14 +688,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             }
         }
 
-        private FixedList<ISymbol> ResolveOverload(FixedList<ISymbol> symbols, FixedList<DataType> argumentTypes)
+        private FixedList<ISymbol> ResolveOverload(FixedList<ISymbol> symbols, DataType selfType, FixedList<DataType> argumentTypes)
         {
+            var argCount = argumentTypes.Count;
+            if (selfType != null) argCount += 1;
             // Filter down to symbols that could possible match
             symbols = symbols.Where(s =>
             {
                 if (s.Type is FunctionType functionType)
                 {
-                    if (functionType.Arity != argumentTypes.Count) return false;
+                    if (functionType.Arity != argCount) return false;
                     // TODO check compability over argument types
                 }
 
