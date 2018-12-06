@@ -3,12 +3,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
     public abstract class Claim
     {
         public int Variable { get; }
-        public int Object { get; }
+        public int ObjectId { get; }
 
-        protected Claim(int variable, int @object)
+        protected Claim(int variable, int objectId)
         {
             Variable = variable;
-            Object = @object;
+            ObjectId = objectId;
         }
     }
 }

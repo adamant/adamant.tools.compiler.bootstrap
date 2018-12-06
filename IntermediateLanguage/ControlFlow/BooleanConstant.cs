@@ -1,9 +1,13 @@
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
-    public class BooleanConstant : Operand
+    public class BooleanConstant : Constant
     {
         public bool Value { get; }
+
         public BooleanConstant(bool value)
+            : base(DataType.Bool)
         {
             Value = value;
         }

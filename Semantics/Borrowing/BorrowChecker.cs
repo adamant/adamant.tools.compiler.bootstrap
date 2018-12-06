@@ -1,289 +1,309 @@
-//using System.Collections;
-//using System.Collections.Generic;
-//using System.Linq;
-//using Adamant.Tools.Compiler.Bootstrap.Core;
-//using Adamant.Tools.Compiler.Bootstrap.Framework;
-//using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyses;
-//using Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing;
-//using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
-//using Adamant.Tools.Compiler.Bootstrap.Semantics.IntermediateLanguage;
-//using JetBrains.Annotations;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.AST;
+using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 
-//namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
-//{
-//    public class BorrowChecker
-//    {
-//        public void Check([NotNull][ItemNotNull] IEnumerable<MemberDeclarationAnalysis> declarations)
-//        {
-//            foreach (var declaration in declarations)
-//                Check(declaration);
-//        }
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
+{
+    public class BorrowChecker
+    {
+        private readonly CodeFile file;
+        private readonly Diagnostics diagnostics;
+        private int nextObjectId = 1;
 
-//        public void Check([NotNull] MemberDeclarationAnalysis declaration)
-//        {
-//            switch (declaration)
-//            {
-//                case FunctionDeclarationAnalysis function:
-//                    Check(function);
-//                    break;
+        private int NewObjectId()
+        {
+            var objectId = nextObjectId;
+            nextObjectId += 1;
+            return objectId;
+        }
 
-//                case TypeDeclarationAnalysis typeDeclaration:
-//                    Check(typeDeclaration);
-//                    break;
-//            }
-//        }
+        private BorrowChecker(CodeFile file, Diagnostics diagnostics)
+        {
+            this.file = file;
+            this.diagnostics = diagnostics;
+        }
 
-//        private static void Check(TypeDeclarationAnalysis typeDeclaration)
-//        {
-//            // Currently nothing to check
-//        }
+        public static void Check(
+            IEnumerable<MemberDeclarationSyntax> declarations,
+            Diagnostics diagnostics)
+        {
+            foreach (var declaration in declarations)
+            {
+                var borrowChecker = new BorrowChecker(declaration.File, diagnostics);
+                borrowChecker.Check(declaration);
+            }
+        }
 
-//        private static void Check([NotNull] FunctionDeclarationAnalysis function)
-//        {
-//            if (function.ControlFlow == null)
-//                return; // We can't do borrow checking because we couldn't even get a control flow graph
+        public void Check(MemberDeclarationSyntax declaration)
+        {
+            switch (declaration)
+            {
+                case TypeDeclarationSyntax typeDeclaration:
+                    Check(typeDeclaration);
+                    break;
+                case FunctionDeclarationSyntax function:
+                    Check(function);
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.For(declaration);
+            }
+        }
 
-//            // TODO we need to check definite assignment as well
+        private static void Check(TypeDeclarationSyntax _type)
+        {
+            // Currently nothing to check
+        }
 
-//            var diagnostics = function.Diagnostics;
-//            var edges = function.ControlFlow.Edges;
+        private void Check(FunctionDeclarationSyntax function)
+        {
+            // We can't do borrow checking because of errors or no body
+            if (function.Poisoned || function.ControlFlow == null)
+                return;
 
-//            // Compute aliveness at point after each statement
-//            var liveBefore = ComputeLiveness(function.ControlFlow, edges);
+            // TODO we need to check definite assignment as well
 
-//            // Now do borrow checking with claims
-//            var blocks = new Queue<BasicBlock>();
-//            blocks.Enqueue(function.ControlFlow.EntryBlock);
-//            var claims = new Claims();
-//            var nextObject = 1;
+            var edges = function.ControlFlow.Edges;
 
-//            while (blocks.Any())
-//            {
-//                var block = blocks.Dequeue().NotNull();
-//                var claimsBeforeStatement = new HashSet<Claim>();
+            // Compute aliveness at point after each statement
+            var liveBefore = ComputeLiveness(function.ControlFlow, edges);
 
-//                if (block == function.ControlFlow.EntryBlock)
-//                    foreach (var parameter in function.ControlFlow.VariableDeclarations.Where(v =>
-//                        v.IsParameter))
-//                    {
-//                        claimsBeforeStatement.Add(new Loan(parameter.Number, nextObject));
-//                        nextObject += 1;
-//                    }
+            // Now do borrow checking with claims
+            var blocks = new Queue<BasicBlock>();
+            blocks.Enqueue(function.ControlFlow.EntryBlock);
+            var claims = new Claims();
 
-//                foreach (var predecessor in edges.To(block).Select(b => b.Terminator))
-//                    claimsBeforeStatement.UnionWith(claims.After(predecessor.NotNull()));
+            while (blocks.Any())
+            {
+                var block = blocks.Dequeue();
+                var claimsBeforeStatement = new HashSet<Claim>();
 
-//                foreach (var statement in block.ExpressionStatements)
-//                {
-//                    var claimsAfterStatement = claims.After(statement);
-//                    claimsAfterStatement.UnionWith(claimsBeforeStatement);
+                if (block == function.ControlFlow.EntryBlock)
+                    foreach (var parameter in function.ControlFlow.VariableDeclarations.Where(v =>
+                        v.IsParameter))
+                    {
+                        claimsBeforeStatement.Add(new Loan(parameter.Number, nextObjectId));
+                        nextObjectId += 1;
+                    }
 
-//                    // Create/drop any claims modified by the statement
-//                    switch (statement)
-//                    {
-//                        case NewObjectStatement newObjectStatement:
-//                        {
-//                            var title = new Title(newObjectStatement.ResultInto.CoreVariable(), nextObject);
-//                            nextObject += 1;
-//                            claimsAfterStatement.Add(title);
-//                            break;
-//                        }
-//                        case AssignmentStatement assignmentStatement:
-//                            AcquireLoans(assignmentStatement.Value, claimsBeforeStatement);
-//                            break;
-//                        case DeleteStatement deleteStatement:
-//                        {
-//                            var title = GetTitle(deleteStatement.VariableNumber, claimsBeforeStatement);
-//                            CheckCanMove(title.Object, claimsBeforeStatement, function, deleteStatement.Span, diagnostics);
-//                            claimsAfterStatement.RemoveWhere(c => c.Variable == title.Variable);
-//                            break;
-//                        }
-//                        default:
-//                            throw NonExhaustiveMatchException.For(statement);
-//                    }
+                foreach (var predecessor in edges.To(block).Select(b => b.Terminator))
+                    claimsBeforeStatement.UnionWith(claims.After(predecessor));
 
-//                    // TODO drop claims due to liveness
+                foreach (var statement in block.ExpressionStatements)
+                {
+                    var claimsAfterStatement = claims.After(statement);
+                    claimsAfterStatement.UnionWith(claimsBeforeStatement);
 
-//                    // Get Ready for next statement
-//                    claimsBeforeStatement = claimsAfterStatement;
-//                }
+                    // Create/drop any claims modified by the statement
+                    switch (statement)
+                    {
+                        case AssignmentStatement assignmentStatement:
+                            AcquireClaims(assignmentStatement.Place, assignmentStatement.Value, claimsBeforeStatement, claimsAfterStatement);
+                            break;
+                        case DeleteStatement deleteStatement:
+                        {
+                            var title = GetTitle(deleteStatement.VariableNumber, claimsBeforeStatement);
+                            CheckCanMove(title.ObjectId, claimsBeforeStatement, deleteStatement.Span);
+                            claimsAfterStatement.RemoveWhere(c => c.Variable == title.Variable);
+                            break;
+                        }
+                        default:
+                            throw NonExhaustiveMatchException.For(statement);
+                    }
 
-//                switch (block.Terminator)
-//                {
-//                    case ReturnStatement _: // Add only applies to copy types so no loans
-//                        break;
-//                    default:
-//                        throw NonExhaustiveMatchException.For(block.Terminator);
-//                }
-//            }
-//        }
+                    // TODO drop claims due to liveness
 
-//        private static void CheckCanMove(
-//            int @object,
-//            [NotNull] HashSet<Claim> claims,
-//            [NotNull] FunctionDeclarationAnalysis function,
-//            [NotNull] TextSpan span,
-//            [NotNull] Diagnostics diagnostics)
-//        {
-//            var canTake = claims.OfType<Loan>().SelectMany(l => l.Restrictions)
-//                .Any(r => r.Place == @object && !r.CanTake);
+                    // Get Ready for next statement
+                    claimsBeforeStatement = claimsAfterStatement;
+                }
 
-//            if (!canTake)
-//                diagnostics.Add(BorrowError.BorrowedValueDoesNotLiveLongEnough(function.Context.File, span));
-//        }
+                switch (block.Terminator)
+                {
+                    case ReturnStatement _: // Add only applies to copy types so no loans
+                        break;
+                    default:
+                        throw NonExhaustiveMatchException.For(block.Terminator);
+                }
+            }
+        }
 
-//        [CanBeNull]
-//        private static void AcquireLoans([NotNull] IValue value, [NotNull, ItemNotNull] HashSet<Claim> claims)
-//        {
-//            switch (value)
-//            {
-//                case IntegerOperation operation:
-//                    AcquireLoan(operation.LeftOperand, claims);
-//                    AcquireLoan(operation.RightOperand, claims);
-//                    break;
-//                case IntegerConstant _:
-//                    // no loans to acquire
-//                    break;
-//                default:
-//                    throw NonExhaustiveMatchException.For(value);
-//            }
-//        }
+        private void CheckCanMove(int objectId, HashSet<Claim> claims, TextSpan span)
+        {
+            var canTake = claims.OfType<Loan>().SelectMany(l => l.Restrictions)
+                .Any(r => r.Place == objectId && !r.CanTake);
 
-//        private static void AcquireLoan(Operand operand, HashSet<Claim> claims)
-//        {
-//            switch (operand)
-//            {
-//                case IntegerConstant _:
-//                    // no loans to acquire
-//                    break;
-//                default:
-//                    throw NonExhaustiveMatchException.For(operand);
-//            }
-//            //var coreVariable = value.CoreVariable();
-//            //// Copy types don't have claims right now
-//            //return claims.SingleOrDefault(t => t.Variable == coreVariable);
-//            //if (claim != null) // copy types don't have claims right now
-//            //{
-//            //    var loan = new Loan(assignmentStatement.Place.CoreVariable(),
-//            //        assignmentStatement.Value,
-//            //        claim.Object);
-//            //    claimsAfterStatement.Add(loan);
-//            //}
-//        }
+            if (!canTake)
+                diagnostics.Add(BorrowError.BorrowedValueDoesNotLiveLongEnough(file, span));
+        }
 
-//        //private static Title GetTitle([NotNull] RValue rvalue, [NotNull] HashSet<Claim> claims)
-//        //{
-//        //    var coreVariable = rvalue.CoreVariable();
-//        //    return GetTitle(coreVariable, claims);
-//        //}
+        private void AcquireClaims(
+            Place assignToPlace,
+            Value value,
+            HashSet<Claim> claimsBeforeStatement,
+            HashSet<Claim> claimsAfterStatement)
+        {
+            switch (value)
+            {
+                case ConstructorCall constructorCall:
+                    foreach (var argument in constructorCall.Arguments)
+                        AcquireClaim(assignToPlace, argument, claimsBeforeStatement, claimsAfterStatement);
+                    // We have made a new object, assign it a new id
+                    var objectId = NewObjectId();
+                    // Variable acquires title on any new objects
+                    var title = new Title(assignToPlace.CoreVariable(), objectId);
+                    claimsAfterStatement.Add(title);
+                    break;
+                case UnaryOperation unaryOperation:
+                    AcquireClaim(assignToPlace, unaryOperation.Operand, claimsBeforeStatement, claimsAfterStatement);
+                    break;
+                case BinaryOperation binaryOperation:
+                    AcquireClaim(assignToPlace, binaryOperation.LeftOperand, claimsBeforeStatement, claimsAfterStatement);
+                    AcquireClaim(assignToPlace, binaryOperation.RightOperand, claimsBeforeStatement, claimsAfterStatement);
+                    break;
+                case IntegerConstant _:
+                    // no loans to acquire
+                    break;
+                case Operand operand:
+                    AcquireClaim(assignToPlace, operand, claimsBeforeStatement, claimsAfterStatement);
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.For(value);
+            }
+        }
 
-//        [NotNull]
-//        private static Title GetTitle([NotNull] int variable, [NotNull] HashSet<Claim> claims)
-//        {
-//            return claims.OfType<Title>().Single(t => t.Variable == variable).NotNull();
-//        }
+        private static void AcquireClaim(
+            Place assignToPlace,
+            Operand operand,
+            HashSet<Claim> claimsBeforeStatement,
+            HashSet<Claim> claimsAfterStatement)
+        {
+            switch (operand)
+            {
+                case CopyPlace copyPlace:
+                    var coreVariable = copyPlace.Place.CoreVariable();
+                    var claim = claimsBeforeStatement.SingleOrDefault(t => t.Variable == coreVariable);
+                    // Copy types don't have claims right now
+                    if (claim != null) // copy types don't have claims right now
+                    {
+                        var loan = new Loan(assignToPlace.CoreVariable(),
+                            operand,
+                            claim.ObjectId);
+                        claimsAfterStatement.Add(loan);
+                    }
+                    break;
+                case Constant _:
+                    // no loans to acquire
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.For(operand);
+            }
+        }
 
-//        private static LiveVariables ComputeLiveness([NotNull] ControlFlowGraph function, [NotNull] Edges edges)
-//        {
-//            var blocks = new Queue<BasicBlock>();
-//            blocks.Enqueue(function.ExitBlock);
-//            var liveVariables = new LiveVariables(function);
-//            var numberOfVariables = function.VariableDeclarations.Count;
+        private static Title GetTitle(int variable, HashSet<Claim> claims)
+        {
+            return claims.OfType<Title>().Single(t => t.Variable == variable);
+        }
 
-//            while (blocks.TryDequeue(out var block))
-//            {
-//                var liveBeforeBlock = new BitArray(liveVariables.Before(block.Statements.First()));
+        private static LiveVariables ComputeLiveness(ControlFlowGraph function, Edges edges)
+        {
+            var blocks = new Queue<BasicBlock>();
+            blocks.Enqueue(function.ExitBlock);
+            var liveVariables = new LiveVariables(function);
+            var numberOfVariables = function.VariableDeclarations.Count;
 
-//                var liveAfterBlock = new BitArray(numberOfVariables);
-//                foreach (var successor in edges.From(block))
-//                    liveAfterBlock.Or(liveVariables.Before(successor.Statements.Last()));
+            while (blocks.TryDequeue(out var block))
+            {
+                var liveBeforeBlock = new BitArray(liveVariables.Before(block.Statements.First()));
 
-//                var liveAfterStatement = liveAfterBlock;
+                var liveAfterBlock = new BitArray(numberOfVariables);
+                foreach (var successor in edges.From(block))
+                    liveAfterBlock.Or(liveVariables.Before(successor.Statements.Last()));
 
-//                foreach (var statement in block.Statements.Reverse())
-//                {
-//                    var liveSet = liveVariables.Before(statement);
-//                    liveSet.Or(liveAfterStatement);
-//                    switch (statement)
-//                    {
-//                        case AssignmentStatement assignment:
-//                            KillVariables(liveSet, assignment.Place);
-//                            EnlivenVariables(liveSet, assignment.Value);
-//                            break;
-//                        //case AddStatement addStatement:
-//                        //    KillVariables(liveSet, addStatement.LValue);
-//                        //    EnlivenVariables(liveSet, addStatement.LeftOperand);
-//                        //    EnlivenVariables(liveSet, addStatement.RightOperand);
-//                        //    break;
-//                        case DeleteStatement deleteStatement:
-//                            liveSet[deleteStatement.VariableNumber] = true;
-//                            break;
-//                        //case NewObjectStatement newObjectStatement:
-//                        //    KillVariables(liveSet, newObjectStatement.ResultInto);
-//                        //    foreach (var argument in newObjectStatement.Arguments)
-//                        //        EnlivenVariables(liveSet, argument);
-//                        //    break;
-//                        //case IntegerLiteralStatement integerLiteralStatement:
-//                        //    EnlivenVariables(liveSet, integerLiteralStatement.Place);
-//                        //    break;
-//                        case ReturnStatement _:
-//                            // No affect on variables?
-//                            // TODO should we check the liveSet is empty?
-//                            break;
-//                        default:
-//                            throw NonExhaustiveMatchException.For(statement);
-//                    }
+                var liveAfterStatement = liveAfterBlock;
 
-//                    // For the next statement
-//                    liveAfterStatement = liveSet;
-//                }
+                foreach (var statement in block.Statements.Reverse())
+                {
+                    var liveSet = liveVariables.Before(statement);
+                    liveSet.Or(liveAfterStatement);
+                    switch (statement)
+                    {
+                        case AssignmentStatement assignment:
+                            KillVariables(liveSet, assignment.Place);
+                            EnlivenVariables(liveSet, assignment.Value);
+                            break;
+                        case DeleteStatement deleteStatement:
+                            liveSet[deleteStatement.VariableNumber] = true;
+                            break;
+                        case ReturnStatement _:
+                            // No affect on variables?
+                            // TODO should we check the liveSet is empty?
+                            break;
+                        default:
+                            throw NonExhaustiveMatchException.For(statement);
+                    }
 
-//                switch (block.Terminator)
-//                {
-//                    case ReturnStatement _:
-//                        break;
-//                    default:
-//                        throw NonExhaustiveMatchException.For(block.Terminator);
-//                }
+                    // For the next statement
+                    liveAfterStatement = liveSet;
+                }
 
-//                if (!liveBeforeBlock.Equals(liveVariables.Before(block.Statements.First())))
-//                    foreach (var basicBlock in edges.To(block)
-//                        .Where(fromBlock => !blocks.Contains(fromBlock)).ToList())
-//                        blocks.Enqueue(basicBlock);
-//            }
-//            return liveVariables;
-//        }
+                switch (block.Terminator)
+                {
+                    case ReturnStatement _:
+                        break;
+                    default:
+                        throw NonExhaustiveMatchException.For(block.Terminator);
+                }
 
-//        private static void KillVariables([NotNull] BitArray variables, [NotNull] Place lvalue)
-//        {
-//            switch (lvalue)
-//            {
-//                case Dereference dereference:
-//                    KillVariables(variables, dereference.DereferencedValue);
-//                    break;
-//                case VariableReference variableReference:
-//                    variables[variableReference.VariableNumber] = false;
-//                    break;
-//                default:
-//                    throw NonExhaustiveMatchException.For(lvalue);
-//            }
-//        }
-//        private static void EnlivenVariables([NotNull] BitArray variables, [NotNull] IValue value)
-//        {
-//            switch (value)
-//            {
-//                //case Dereference dereference:
-//                //    EnlivenVariables(variables, dereference.DereferencedValue);
-//                //    break;
-//                //case VariableReference variableReference:
-//                //    variables[variableReference.VariableNumber] = true;
-//                //    break;
-//                case Constant _:
-//                    // No variables
-//                    break;
-//                default:
-//                    throw NonExhaustiveMatchException.For(value);
-//            }
-//        }
-//    }
-//}
+                if (!liveBeforeBlock.Equals(liveVariables.Before(block.Statements.First())))
+                    foreach (var basicBlock in edges.To(block)
+                        .Where(fromBlock => !blocks.Contains(fromBlock)).ToList())
+                        blocks.Enqueue(basicBlock);
+            }
+            return liveVariables;
+        }
+
+        private static void KillVariables(BitArray variables, Place lvalue)
+        {
+            switch (lvalue)
+            {
+                case Dereference dereference:
+                    KillVariables(variables, dereference.DereferencedValue);
+                    break;
+                case VariableReference variableReference:
+                    variables[variableReference.VariableNumber] = false;
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.For(lvalue);
+            }
+        }
+        private static void EnlivenVariables(BitArray variables, Value value)
+        {
+            switch (value)
+            {
+                case ConstructorCall constructorCall:
+                    foreach (var argument in constructorCall.Arguments)
+                        EnlivenVariables(variables, argument);
+                    break;
+                case UnaryOperation unaryOperation:
+                    EnlivenVariables(variables, unaryOperation.Operand);
+                    break;
+                case BinaryOperation binaryOperation:
+                    EnlivenVariables(variables, binaryOperation.LeftOperand);
+                    EnlivenVariables(variables, binaryOperation.RightOperand);
+                    break;
+                case CopyPlace copyPlace:
+                    variables[copyPlace.Place.CoreVariable()] = true;
+                    break;
+                case Constant _:
+                    // No variables
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.For(value);
+            }
+        }
+    }
+}

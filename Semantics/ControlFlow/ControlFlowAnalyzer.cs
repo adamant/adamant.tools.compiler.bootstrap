@@ -153,10 +153,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         {
             switch (expression)
             {
-                //case NewObjectExpressionAnalysis newObjectExpression:
-                //    var args = newObjectExpression.Arguments.Select(a => ConvertToLValue(a.Value));
-                //    statements.Add(new NewObjectStatement(place, newObjectExpression.Type.AssertResolved(), args));
-                //    break;
+                case NewObjectExpressionSyntax newObjectExpression:
+                    var args = newObjectExpression.Arguments.Select(a => ConvertToOperand(a.Value)).ToFixedList();
+                    return new ConstructorCall((ObjectType)newObjectExpression.Type, args);
                 case IdentifierNameSyntax identifier:
                 {
                     var symbol = identifier.ReferencedSymbol;

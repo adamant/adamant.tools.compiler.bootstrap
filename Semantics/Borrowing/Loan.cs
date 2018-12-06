@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 {
@@ -11,35 +10,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
     /// </summary>
     public class Loan : Claim
     {
-        [NotNull] public FixedList<Restriction> Restrictions { get; }
+        public FixedList<Restriction> Restrictions { get; }
 
         /// <param name="variable">Variable the reference is loaned to</param>
-        /// <param name="rvalue">The value loaned from</param>
-        /// <param name="object">Which object is loaned</param>
-        public Loan(int variable, [NotNull] Value rvalue, int @object)
-            : base(variable, @object)
+        /// <param name="operand">The operand loaned from</param>
+        /// <param name="objectId">Which object is loaned</param>
+        public Loan(int variable, Operand operand, int objectId)
+            : base(variable, objectId)
         {
             var restrictions = new List<Restriction>();
-            GatherRestrictions(rvalue, restrictions);
+            GatherRestrictions(operand, restrictions);
             Restrictions = restrictions.ToFixedList();
         }
 
-        public Loan(int variable, int @object)
-            : base(variable, @object)
+        public Loan(int variable, int objectId)
+            : base(variable, objectId)
         {
             Restrictions = Enumerable.Empty<Restriction>().ToFixedList();
         }
 
-        private static void GatherRestrictions([NotNull] Value rvalue, [NotNull] List<Restriction> restrictions)
+        private static void GatherRestrictions(Operand operand, List<Restriction> restrictions)
         {
-            switch (rvalue)
+            switch (operand)
             {
                 case CopyPlace copyPlace:
                     //case VariableReference variable:
                     restrictions.Add(new Restriction(copyPlace.Place.CoreVariable(), false));
                     break;
                 default:
-                    throw NonExhaustiveMatchException.For(rvalue);
+                    throw NonExhaustiveMatchException.For(operand);
             }
         }
     }

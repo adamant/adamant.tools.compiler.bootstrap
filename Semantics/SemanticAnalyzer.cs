@@ -4,6 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking;
@@ -42,8 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             ControlFlowAnalyzer.BuildGraphs(memberDeclarations);
 
-            //var borrowChecker = new BorrowChecker();
-            //borrowChecker.Check(declarationAnalyses);
+            BorrowChecker.Check(memberDeclarations, diagnostics);
 
             // Build final declaration objects and find the entry point
             var declarationBuilder = new DeclarationBuilder();
