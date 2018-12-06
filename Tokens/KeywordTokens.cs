@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
     public static partial class TokenTypes
     {
-        [NotNull, ItemNotNull]
         private static readonly IReadOnlyList<Type> Keyword = new List<Type>()
         {
             typeof(PublishedKeywordToken),
@@ -96,480 +93,322 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 
     public static partial class TokenFactory
     {
-        [NotNull]
         public static IPublishedKeywordToken PublishedKeyword(TextSpan span)
         {
             return new PublishedKeywordToken(span);
         }
-
-        [NotNull]
         public static IPublicKeywordToken PublicKeyword(TextSpan span)
         {
             return new PublicKeywordToken(span);
         }
-
-        [NotNull]
         public static IProtectedKeywordToken ProtectedKeyword(TextSpan span)
         {
             return new ProtectedKeywordToken(span);
         }
-
-        [NotNull]
         public static ILetKeywordToken LetKeyword(TextSpan span)
         {
             return new LetKeywordToken(span);
         }
-
-        [NotNull]
         public static IVarKeywordToken VarKeyword(TextSpan span)
         {
             return new VarKeywordToken(span);
         }
-
-        [NotNull]
         public static IVoidKeywordToken VoidKeyword(TextSpan span)
         {
             return new VoidKeywordToken(span);
         }
-
-        [NotNull]
         public static IIntKeywordToken IntKeyword(TextSpan span)
         {
             return new IntKeywordToken(span);
         }
-
-        [NotNull]
         public static IInt8KeywordToken Int8Keyword(TextSpan span)
         {
             return new Int8KeywordToken(span);
         }
-
-        [NotNull]
         public static IInt16KeywordToken Int16Keyword(TextSpan span)
         {
             return new Int16KeywordToken(span);
         }
-
-        [NotNull]
         public static IInt64KeywordToken Int64Keyword(TextSpan span)
         {
             return new Int64KeywordToken(span);
         }
-
-        [NotNull]
         public static IUIntKeywordToken UIntKeyword(TextSpan span)
         {
             return new UIntKeywordToken(span);
         }
-
-        [NotNull]
         public static IUInt16KeywordToken UInt16Keyword(TextSpan span)
         {
             return new UInt16KeywordToken(span);
         }
-
-        [NotNull]
         public static IUInt64KeywordToken UInt64Keyword(TextSpan span)
         {
             return new UInt64KeywordToken(span);
         }
-
-        [NotNull]
         public static IByteKeywordToken ByteKeyword(TextSpan span)
         {
             return new ByteKeywordToken(span);
         }
-
-        [NotNull]
         public static ISizeKeywordToken SizeKeyword(TextSpan span)
         {
             return new SizeKeywordToken(span);
         }
-
-        [NotNull]
         public static IOffsetKeywordToken OffsetKeyword(TextSpan span)
         {
             return new OffsetKeywordToken(span);
         }
-
-        [NotNull]
         public static IBoolKeywordToken BoolKeyword(TextSpan span)
         {
             return new BoolKeywordToken(span);
         }
-
-        [NotNull]
         public static INeverKeywordToken NeverKeyword(TextSpan span)
         {
             return new NeverKeywordToken(span);
         }
-
-        [NotNull]
         public static IReturnKeywordToken ReturnKeyword(TextSpan span)
         {
             return new ReturnKeywordToken(span);
         }
-
-        [NotNull]
         public static IClassKeywordToken ClassKeyword(TextSpan span)
         {
             return new ClassKeywordToken(span);
         }
-
-        [NotNull]
         public static IFunctionKeywordToken FunctionKeyword(TextSpan span)
         {
             return new FunctionKeywordToken(span);
         }
-
-        [NotNull]
         public static INewKeywordToken NewKeyword(TextSpan span)
         {
             return new NewKeywordToken(span);
         }
-
-        [NotNull]
         public static IInitKeywordToken InitKeyword(TextSpan span)
         {
             return new InitKeywordToken(span);
         }
-
-        [NotNull]
         public static IDeleteKeywordToken DeleteKeyword(TextSpan span)
         {
             return new DeleteKeywordToken(span);
         }
-
-        [NotNull]
         public static IOwnedKeywordToken OwnedKeyword(TextSpan span)
         {
             return new OwnedKeywordToken(span);
         }
-
-        [NotNull]
         public static IForeverKeywordToken ForeverKeyword(TextSpan span)
         {
             return new ForeverKeywordToken(span);
         }
-
-        [NotNull]
         public static INamespaceKeywordToken NamespaceKeyword(TextSpan span)
         {
             return new NamespaceKeywordToken(span);
         }
-
-        [NotNull]
         public static IUsingKeywordToken UsingKeyword(TextSpan span)
         {
             return new UsingKeywordToken(span);
         }
-
-        [NotNull]
         public static IForeachKeywordToken ForeachKeyword(TextSpan span)
         {
             return new ForeachKeywordToken(span);
         }
-
-        [NotNull]
         public static IInKeywordToken InKeyword(TextSpan span)
         {
             return new InKeywordToken(span);
         }
-
-        [NotNull]
         public static IIfKeywordToken IfKeyword(TextSpan span)
         {
             return new IfKeywordToken(span);
         }
-
-        [NotNull]
         public static IElseKeywordToken ElseKeyword(TextSpan span)
         {
             return new ElseKeywordToken(span);
         }
-
-        [NotNull]
         public static IStructKeywordToken StructKeyword(TextSpan span)
         {
             return new StructKeywordToken(span);
         }
-
-        [NotNull]
         public static IEnumKeywordToken EnumKeyword(TextSpan span)
         {
             return new EnumKeywordToken(span);
         }
-
-        [NotNull]
         public static IUnsafeKeywordToken UnsafeKeyword(TextSpan span)
         {
             return new UnsafeKeywordToken(span);
         }
-
-        [NotNull]
         public static ISafeKeywordToken SafeKeyword(TextSpan span)
         {
             return new SafeKeywordToken(span);
         }
-
-        [NotNull]
         public static ISelfKeywordToken SelfKeyword(TextSpan span)
         {
             return new SelfKeywordToken(span);
         }
-
-        [NotNull]
         public static ISelfTypeKeywordToken SelfTypeKeyword(TextSpan span)
         {
             return new SelfTypeKeywordToken(span);
         }
-
-        [NotNull]
         public static IBaseKeywordToken BaseKeyword(TextSpan span)
         {
             return new BaseKeywordToken(span);
         }
-
-        [NotNull]
         public static ITypeKeywordToken TypeKeyword(TextSpan span)
         {
             return new TypeKeywordToken(span);
         }
-
-        [NotNull]
         public static IMutableKeywordToken MutableKeyword(TextSpan span)
         {
             return new MutableKeywordToken(span);
         }
-
-        [NotNull]
         public static IParamsKeywordToken ParamsKeyword(TextSpan span)
         {
             return new ParamsKeywordToken(span);
         }
-
-        [NotNull]
         public static IMayKeywordToken MayKeyword(TextSpan span)
         {
             return new MayKeywordToken(span);
         }
-
-        [NotNull]
         public static INoKeywordToken NoKeyword(TextSpan span)
         {
             return new NoKeywordToken(span);
         }
-
-        [NotNull]
         public static IThrowKeywordToken ThrowKeyword(TextSpan span)
         {
             return new ThrowKeywordToken(span);
         }
-
-        [NotNull]
         public static IRefKeywordToken RefKeyword(TextSpan span)
         {
             return new RefKeywordToken(span);
         }
-
-        [NotNull]
         public static IAbstractKeywordToken AbstractKeyword(TextSpan span)
         {
             return new AbstractKeywordToken(span);
         }
-
-        [NotNull]
         public static IGetKeywordToken GetKeyword(TextSpan span)
         {
             return new GetKeywordToken(span);
         }
-
-        [NotNull]
         public static ISetKeywordToken SetKeyword(TextSpan span)
         {
             return new SetKeywordToken(span);
         }
-
-        [NotNull]
         public static IRequiresKeywordToken RequiresKeyword(TextSpan span)
         {
             return new RequiresKeywordToken(span);
         }
-
-        [NotNull]
         public static IEnsuresKeywordToken EnsuresKeyword(TextSpan span)
         {
             return new EnsuresKeywordToken(span);
         }
-
-        [NotNull]
         public static IInvariantKeywordToken InvariantKeyword(TextSpan span)
         {
             return new InvariantKeywordToken(span);
         }
-
-        [NotNull]
         public static IWhereKeywordToken WhereKeyword(TextSpan span)
         {
             return new WhereKeywordToken(span);
         }
-
-        [NotNull]
         public static IConstKeywordToken ConstKeyword(TextSpan span)
         {
             return new ConstKeywordToken(span);
         }
-
-        [NotNull]
         public static IUninitializedKeywordToken UninitializedKeyword(TextSpan span)
         {
             return new UninitializedKeywordToken(span);
         }
-
-        [NotNull]
         public static INoneKeywordToken NoneKeyword(TextSpan span)
         {
             return new NoneKeywordToken(span);
         }
-
-        [NotNull]
         public static IOperatorKeywordToken OperatorKeyword(TextSpan span)
         {
             return new OperatorKeywordToken(span);
         }
-
-        [NotNull]
         public static IImplicitKeywordToken ImplicitKeyword(TextSpan span)
         {
             return new ImplicitKeywordToken(span);
         }
-
-        [NotNull]
         public static IExplicitKeywordToken ExplicitKeyword(TextSpan span)
         {
             return new ExplicitKeywordToken(span);
         }
-
-        [NotNull]
         public static IMoveKeywordToken MoveKeyword(TextSpan span)
         {
             return new MoveKeywordToken(span);
         }
-
-        [NotNull]
         public static ICopyKeywordToken CopyKeyword(TextSpan span)
         {
             return new CopyKeywordToken(span);
         }
-
-        [NotNull]
         public static IMatchKeywordToken MatchKeyword(TextSpan span)
         {
             return new MatchKeywordToken(span);
         }
-
-        [NotNull]
         public static ILoopKeywordToken LoopKeyword(TextSpan span)
         {
             return new LoopKeywordToken(span);
         }
-
-        [NotNull]
         public static IWhileKeywordToken WhileKeyword(TextSpan span)
         {
             return new WhileKeywordToken(span);
         }
-
-        [NotNull]
         public static IBreakKeywordToken BreakKeyword(TextSpan span)
         {
             return new BreakKeywordToken(span);
         }
-
-        [NotNull]
         public static INextKeywordToken NextKeyword(TextSpan span)
         {
             return new NextKeywordToken(span);
         }
-
-        [NotNull]
         public static IOverrideKeywordToken OverrideKeyword(TextSpan span)
         {
             return new OverrideKeywordToken(span);
         }
-
-        [NotNull]
         public static IAnyKeywordToken AnyKeyword(TextSpan span)
         {
             return new AnyKeywordToken(span);
         }
-
-        [NotNull]
         public static ITrueKeywordToken TrueKeyword(TextSpan span)
         {
             return new TrueKeywordToken(span);
         }
-
-        [NotNull]
         public static IFalseKeywordToken FalseKeyword(TextSpan span)
         {
             return new FalseKeywordToken(span);
         }
-
-        [NotNull]
         public static IAsKeywordToken AsKeyword(TextSpan span)
         {
             return new AsKeywordToken(span);
         }
-
-        [NotNull]
         public static IAndKeywordToken AndKeyword(TextSpan span)
         {
             return new AndKeywordToken(span);
         }
-
-        [NotNull]
         public static IOrKeywordToken OrKeyword(TextSpan span)
         {
             return new OrKeywordToken(span);
         }
-
-        [NotNull]
         public static INotKeywordToken NotKeyword(TextSpan span)
         {
             return new NotKeywordToken(span);
         }
-
-        [NotNull]
         public static ITraitKeywordToken TraitKeyword(TextSpan span)
         {
             return new TraitKeywordToken(span);
         }
-
-        [NotNull]
         public static IFloatKeywordToken FloatKeyword(TextSpan span)
         {
             return new FloatKeywordToken(span);
         }
-
-        [NotNull]
         public static IFloat32KeywordToken Float32Keyword(TextSpan span)
         {
             return new Float32KeywordToken(span);
         }
-
-        [NotNull]
         public static IUnderscoreKeywordToken UnderscoreKeyword(TextSpan span)
         {
             return new UnderscoreKeywordToken(span);
         }
-
-        [NotNull]
         public static IExternalKeywordToken ExternalKeyword(TextSpan span)
         {
             return new ExternalKeywordToken(span);
         }
-
     }
 
     public partial interface IPublishedKeywordToken : IKeywordToken { }

@@ -1,6 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
@@ -8,16 +7,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         public bool IsParams { get; }
 
-        [NotNull] public ExpressionSyntax TypeExpression { get; }
-        [CanBeNull] public ExpressionSyntax DefaultValue { get; }
+        public ExpressionSyntax TypeExpression { get; }
+        public ExpressionSyntax DefaultValue { get; }
 
         public NamedParameterSyntax(
             TextSpan span,
             bool isParams,
             bool mutableBinding,
-            [NotNull] Name fullName,
-            [NotNull] ExpressionSyntax typeExpression,
-            [CanBeNull] ExpressionSyntax defaultValue)
+            Name fullName,
+            ExpressionSyntax typeExpression,
+            ExpressionSyntax defaultValue)
             : base(span, mutableBinding, fullName)
         {
             IsParams = isParams;

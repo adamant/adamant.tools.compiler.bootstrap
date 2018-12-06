@@ -61,14 +61,12 @@
     }.AsReadOnly();
 #>
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
     public static partial class TokenFactory
     {
 <# foreach(var token in tokens) {#>
-        [NotNull]
         public static I<#=token#>Token <#=token#>(TextSpan span)
         {
             return new <#=token#>Token(span);

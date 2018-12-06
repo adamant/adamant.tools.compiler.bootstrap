@@ -1,13 +1,12 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class DeleteExpressionSyntax : ExpressionSyntax
     {
-        [NotNull] public ExpressionSyntax Expression { get; }
+        public ExpressionSyntax Expression { get; }
 
-        public DeleteExpressionSyntax(TextSpan span, [NotNull] ExpressionSyntax expression)
+        public DeleteExpressionSyntax(TextSpan span, ExpressionSyntax expression)
             : base(span)
         {
             Expression = expression;

@@ -1,25 +1,24 @@
 using System;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
     public abstract class CodeBuilder
     {
-        [NotNull] private readonly StringBuilder code = new StringBuilder();
-        [NotNull] public string Code => code.ToString();
-        [NotNull] public readonly string IndentCharacters;
-        [NotNull] public readonly string LineTerminator;
+        private readonly StringBuilder code = new StringBuilder();
+        public string Code => code.ToString();
+        public readonly string IndentCharacters;
+        public readonly string LineTerminator;
         public int CurrentIndentDepth { get; private set; }
-        [NotNull] public string CurrentIndent => IndentCharacters.Repeat(CurrentIndentDepth);
+        public string CurrentIndent => IndentCharacters.Repeat(CurrentIndentDepth);
 
-        protected CodeBuilder([NotNull] string indentCharacters)
+        protected CodeBuilder(string indentCharacters)
             : this(indentCharacters, Environment.NewLine)
         {
         }
 
-        protected CodeBuilder([NotNull] string indentCharacters, [NotNull]  string lineTerminator)
+        protected CodeBuilder(string indentCharacters, string lineTerminator)
         {
             IndentCharacters = indentCharacters;
             LineTerminator = lineTerminator;
@@ -30,18 +29,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
             code.Insert(code.Length, IndentCharacters, CurrentIndentDepth);
         }
 
-        public virtual void BeginLine([NotNull] string value)
+        public virtual void BeginLine(string value)
         {
             AppendIndent();
             code.Append(value);
         }
 
-        public virtual void Append([NotNull] string value)
+        public virtual void Append(string value)
         {
             code.Append(value);
         }
 
-        public virtual void EndLine([NotNull] string value)
+        public virtual void EndLine(string value)
         {
             code.Append(value);
             code.Append(LineTerminator);
@@ -52,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
             code.Append(LineTerminator);
         }
 
-        public virtual void AppendLine([NotNull] string value)
+        public virtual void AppendLine(string value)
         {
             AppendIndent();
             code.Append(value);

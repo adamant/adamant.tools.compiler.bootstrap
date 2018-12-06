@@ -2,14 +2,12 @@ using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public class CompilationUnitParser
     {
-        [MustUseReturnValue]
-        public CompilationUnitSyntax Parse([NotNull] ITokenIterator tokens)
+        public CompilationUnitSyntax Parse(ITokenIterator tokens)
         {
             var implicitNamespaceName = ParseImplicitNamespaceName(tokens);
             var parser = new Parser(tokens, implicitNamespaceName);
@@ -22,8 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 tokens.Context.Diagnostics.Build());
         }
 
-        [NotNull]
-        private static RootName ParseImplicitNamespaceName([NotNull] ITokenIterator tokens)
+        private static RootName ParseImplicitNamespaceName(ITokenIterator tokens)
         {
             RootName name = GlobalNamespaceName.Instance;
             foreach (var segment in tokens.Context.File.Reference.Namespace)

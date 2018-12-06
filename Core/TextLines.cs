@@ -1,26 +1,23 @@
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
     public class TextLines
     {
-        [NotNull] public readonly string Text; // TODO don't keep a reference to the whole string, we only need the length
+        public readonly string Text; // TODO don't keep a reference to the whole string, we only need the length
         public int Count => startOfLine.Count;
-        [NotNull] public readonly IReadOnlyList<int> StartOfLine;
-        [NotNull] private readonly List<int> startOfLine;
+        public readonly IReadOnlyList<int> StartOfLine;
+        private readonly List<int> startOfLine;
 
-        public TextLines([NotNull] string text)
+        public TextLines(string text)
         {
             Text = text;
             startOfLine = LineStarts(text);
             StartOfLine = startOfLine.AsReadOnly();
         }
 
-        [NotNull]
-        private static List<int> LineStarts([NotNull] string text)
+        private static List<int> LineStarts(string text)
         {
             var length = text.Length;
             var startOfLine = new List<int> { 0 }; // there is always a first line

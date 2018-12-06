@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
@@ -14,7 +13,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         {
         }
 
-        [NotNull]
         public abstract IEnumerable<int> OutBlocks();
     }
 }

@@ -2,22 +2,21 @@ using System;
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Forge.Config;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
 {
     internal class Project
     {
-        [NotNull] public string Path { get; }
-        [NotNull] public FixedList<string> RootNamespace { get; }
-        [NotNull] public string Name { get; }
-        [NotNull] public FixedList<string> Authors { get; }
+        public string Path { get; }
+        public FixedList<string> RootNamespace { get; }
+        public string Name { get; }
+        public FixedList<string> Authors { get; }
         public ProjectTemplate Template { get; }
-        [NotNull] [ItemNotNull] public FixedList<ProjectReference> References { get; }
+        public FixedList<ProjectReference> References { get; }
 
         public Project(
-            [NotNull] ProjectConfig file,
-            [NotNull][ItemNotNull] IEnumerable<ProjectReference> references)
+            ProjectConfig file,
+            IEnumerable<ProjectReference> references)
         {
             Path = System.IO.Path.GetDirectoryName(file.FullPath);
             Name = file.Name ?? throw new InvalidOperationException();

@@ -1,6 +1,5 @@
 using System.Numerics;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
@@ -8,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     {
         public readonly BigInteger Value;
 
-        public IntegerConstant(BigInteger value, [NotNull] DataType type)
+        public IntegerConstant(BigInteger value, DataType type)
             : base(type)
         {
             Value = value;

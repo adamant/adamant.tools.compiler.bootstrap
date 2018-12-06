@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Names
 {
@@ -12,12 +11,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
     /// </summary>
     public class QualifiedName : Name, IEquatable<QualifiedName>
     {
-        [NotNull] public Name Qualifier { get; }
-        [NotNull] public override SimpleName UnqualifiedName { get; }
+        public Name Qualifier { get; }
+        public override SimpleName UnqualifiedName { get; }
 
         public QualifiedName(
-            [NotNull] Name qualifier,
-            [NotNull] SimpleName simpleName)
+            Name qualifier,
+            SimpleName simpleName)
         {
             Qualifier = qualifier;
             UnqualifiedName = simpleName;
@@ -27,12 +26,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public override IEnumerable<SimpleName> Segments => Qualifier.Segments.Append(UnqualifiedName);
 
-        public override bool HasQualifier([NotNull] Name name)
+        public override bool HasQualifier(Name name)
         {
             return Qualifier.Equals(name);
         }
 
-        [NotNull]
         public override string ToString()
         {
             return $"{Qualifier}.{UnqualifiedName}";

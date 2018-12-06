@@ -1,11 +1,10 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
     internal class EscapedIdentifierToken : IdentifierToken, IEscapedIdentifierToken
     {
-        public EscapedIdentifierToken(TextSpan span, [NotNull] string value)
+        public EscapedIdentifierToken(TextSpan span, string value)
             : base(span, value)
         {
         }
@@ -13,8 +12,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 
     public static partial class TokenFactory
     {
-        [NotNull]
-        public static IEscapedIdentifierToken EscapedIdentifier(TextSpan span, [NotNull] string value)
+
+        public static IEscapedIdentifierToken EscapedIdentifier(TextSpan span, string value)
         {
             return new EscapedIdentifierToken(span, value);
         }

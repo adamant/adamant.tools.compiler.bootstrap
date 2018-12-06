@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
@@ -10,21 +9,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
     [DebuggerTypeProxy(typeof(CollectionDebugView<>))]
     public class Diagnostics : IEnumerable<Diagnostic>
     {
-        [NotNull] private readonly List<Diagnostic> items = new List<Diagnostic>();
+        private readonly List<Diagnostic> items = new List<Diagnostic>();
 
         public int Count => items.Count;
 
-        public void Add([NotNull] Diagnostic diagnostic)
+        public void Add(Diagnostic diagnostic)
         {
             items.Add(diagnostic);
         }
 
-        public void Add([NotNull, ItemNotNull] IEnumerable<Diagnostic> diagnostics)
+        public void Add(IEnumerable<Diagnostic> diagnostics)
         {
             items.AddRange(diagnostics);
         }
 
-        [NotNull]
         public FixedList<Diagnostic> Build()
         {
             items.Sort();

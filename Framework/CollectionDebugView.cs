@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
@@ -14,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
     public sealed class CollectionDebugView<T>
         where T : class
     {
-        [NotNull] private readonly IEnumerable<T> collection;
+        private readonly IEnumerable<T> collection;
 
         public CollectionDebugView(IEnumerable<T> collection)
         {

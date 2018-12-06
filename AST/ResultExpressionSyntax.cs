@@ -1,15 +1,14 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class ResultExpressionSyntax : ExpressionBlockSyntax
     {
-        [NotNull] public ExpressionSyntax Expression { get; }
+        public ExpressionSyntax Expression { get; }
 
         public ResultExpressionSyntax(
             TextSpan span,
-            [NotNull] ExpressionSyntax expression)
+            ExpressionSyntax expression)
             : base(span)
         {
             Expression = expression;

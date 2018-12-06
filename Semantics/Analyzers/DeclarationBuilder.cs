@@ -6,14 +6,12 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 {
     public class DeclarationBuilder
     {
-        [NotNull, ItemNotNull]
-        public FixedList<Declaration> Build([NotNull, ItemNotNull] IEnumerable<DeclarationSyntax> declarationSyntaxes)
+        public FixedList<Declaration> Build(IEnumerable<DeclarationSyntax> declarationSyntaxes)
         {
             var declarations = new List<Declaration>();
             foreach (var namespacedDeclaration in declarationSyntaxes.Where(d => !d.Poisoned))
@@ -54,21 +52,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             return declarations.ToFixedList();
         }
 
-        [CanBeNull]
-        private FixedList<GenericParameter> BuildGenericParameters([ItemNotNull] [CanBeNull] FixedList<GenericParameterSyntax> parameters)
+        private FixedList<GenericParameter> BuildGenericParameters(FixedList<GenericParameterSyntax> parameters)
         {
             if (parameters == null) return null;
             throw new System.NotImplementedException();
         }
 
-        [NotNull, ItemNotNull]
-        private static FixedList<Parameter> BuildParameters([NotNull, ItemNotNull] FixedList<ParameterSyntax> parameters)
+        private static FixedList<Parameter> BuildParameters(FixedList<ParameterSyntax> parameters)
         {
             return parameters.Select(BuildParameter).ToFixedList();
         }
 
-        [NotNull, ItemNotNull]
-        private static FixedList<Parameter> BuildConstructorParameters([NotNull] ConstructorDeclarationSyntax constructorDeclaration)
+        private static FixedList<Parameter> BuildConstructorParameters(ConstructorDeclarationSyntax constructorDeclaration)
         {
             var selfType = constructorDeclaration.SelfParameterType;
             var selfName = ((QualifiedName)constructorDeclaration.FullName).Qualifier.Qualify(SpecialName.Self);
@@ -77,8 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                 .ToFixedList();
         }
 
-        [NotNull]
-        private static Parameter BuildParameter([NotNull] ParameterSyntax parameter)
+        private static Parameter BuildParameter(ParameterSyntax parameter)
         {
             switch (parameter)
             {

@@ -1,12 +1,11 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
 {
     public static class FakeCodeFile
     {
-        [NotNull]
-        public static CodeFile For([NotNull] string text)
+
+        public static CodeFile For(string text)
         {
             return new CodeFile(FakeCodeReference.Instance, new CodeText(text));
         }

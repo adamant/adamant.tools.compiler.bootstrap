@@ -1,7 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using JetBrains.Annotations;
 using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers
@@ -9,15 +8,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers
     public static class AssertExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [NotNull]
-        public static T NotNull<T>([CanBeNull] this FsCheck.NonNull<T> value)
+
+        public static T NotNull<T>(this FsCheck.NonNull<T> value)
             where T : class
         {
             return (value ?? throw new ArgumentNullException()).Get;
         }
 
-        [NotNull]
-        public static T AssertOfType<T>([CanBeNull] this object value)
+        public static T AssertOfType<T>(this object value)
         {
             if (value is T t)
                 return t;
@@ -27,14 +25,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers
             throw new InvalidOperationException("Not reachable");
         }
 
-        public static void AssertOfType([CanBeNull] this object value, [NotNull] Type type)
+        public static void AssertOfType(this object value, Type type)
         {
             Assert.NotNull(type);
             Assert.True(type.IsAssignableFrom(value?.GetType()));
         }
 
         public static void AssertDiagnostic(
-            [CanBeNull] this Diagnostic diagnostic,
+            this Diagnostic diagnostic,
             DiagnosticPhase phase,
             int errorCode,
             int start,

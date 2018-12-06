@@ -2,30 +2,25 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
     public static class EnumerableExtensions
     {
-        [NotNull]
-        [ItemCanBeNull]
         [DebuggerStepThrough]
-        public static IEnumerable<T> Yield<T>([CanBeNull] this T value)
+        public static IEnumerable<T> Yield<T>(this T value)
         {
             yield return value;
         }
 
-        [NotNull, ItemNotNull]
         [DebuggerStepThrough]
-        public static IEnumerable<T> YieldValue<T>([CanBeNull] this T value)
+        public static IEnumerable<T> YieldValue<T>(this T value)
             where T : class
         {
             if (value != null)
                 yield return value;
         }
 
-        [NotNull]
         [DebuggerStepThrough]
         public static IEnumerable<T> YieldValue<T>(this T? value)
             where T : struct
@@ -34,38 +29,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
                 yield return value.Value;
         }
 
-        [NotNull]
         [DebuggerStepThrough]
-        public static FixedList<T> ToFixedList<T>([NotNull] this IEnumerable<T> values)
+        public static FixedList<T> ToFixedList<T>(this IEnumerable<T> values)
             where T : class
         {
             return new FixedList<T>(values);
         }
 
-        [NotNull]
         [DebuggerStepThrough]
         public static IEnumerable<Tuple<TFirst, TSecond>> Zip<TFirst, TSecond>(
-            [NotNull] this IEnumerable<TFirst> first,
-            [NotNull] IEnumerable<TSecond> second)
+            this IEnumerable<TFirst> first,
+            IEnumerable<TSecond> second)
         {
             return first.Zip(second, Tuple.Create);
         }
 
-        [NotNull]
         [DebuggerStepThrough]
         public static IEnumerable<TResult> CrossJoin<TFirst, TSecond, TResult>(
-            [NotNull] this IEnumerable<TFirst> first,
-            [NotNull] IEnumerable<TSecond> second,
-            [NotNull] Func<TFirst, TSecond, TResult> resultSelector)
+            this IEnumerable<TFirst> first,
+            IEnumerable<TSecond> second,
+            Func<TFirst, TSecond, TResult> resultSelector)
         {
             return first.SelectMany(_ => second, resultSelector);
         }
 
-        [NotNull]
         [DebuggerStepThrough]
         public static IEnumerable<Tuple<TFirst, TSecond>> CrossJoin<TFirst, TSecond>(
-            [NotNull] this IEnumerable<TFirst> first,
-            [NotNull] IEnumerable<TSecond> second)
+            this IEnumerable<TFirst> first,
+            IEnumerable<TSecond> second)
         {
             return first.SelectMany(_ => second, Tuple.Create);
         }

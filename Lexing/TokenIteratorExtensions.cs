@@ -1,30 +1,29 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using JetBrains.Annotations;
 using ITriviaToken = Adamant.Tools.Compiler.Bootstrap.Tokens.ITriviaToken;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Lexing
 {
     public static class TokenIteratorExtensions
     {
-        [NotNull]
-        public static ITokenIterator WhereNotTrivia([NotNull] this ITokenIterator tokens)
+
+        public static ITokenIterator WhereNotTrivia(this ITokenIterator tokens)
         {
             return new WhereNotTriviaIterator(tokens);
         }
 
         private class WhereNotTriviaIterator : ITokenIterator
         {
-            [NotNull] private readonly ITokenIterator tokens;
+            private readonly ITokenIterator tokens;
 
-            public WhereNotTriviaIterator([NotNull] ITokenIterator tokens)
+            public WhereNotTriviaIterator(ITokenIterator tokens)
             {
                 this.tokens = tokens;
                 if (Current is ITriviaToken)
                     Next();
             }
 
-            [NotNull] public ParseContext Context => tokens.Context;
+            public ParseContext Context => tokens.Context;
 
             public bool Next()
             {
@@ -37,7 +36,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                 return true;
             }
 
-            [NotNull]
             public IToken Current => tokens.Current;
         }
     }

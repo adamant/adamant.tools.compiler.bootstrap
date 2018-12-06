@@ -4,7 +4,6 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
@@ -96,7 +95,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.Definitions.EndBlock();
         }
 
-        private string Convert([ItemNotNull] IEnumerable<Parameter> parameters)
+        private string Convert(IEnumerable<Parameter> parameters)
         {
             return string.Join(", ", parameters.Select(parameterConverter.Convert));
         }

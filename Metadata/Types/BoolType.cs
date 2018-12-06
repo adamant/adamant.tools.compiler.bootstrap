@@ -1,11 +1,9 @@
-using JetBrains.Annotations;
-
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     public class BoolType : SimpleType
     {
         #region Singleton
-        [NotNull] internal static readonly BoolType Instance = new BoolType();
+        internal static readonly BoolType Instance = new BoolType();
 
         private BoolType()
             : base("bool")

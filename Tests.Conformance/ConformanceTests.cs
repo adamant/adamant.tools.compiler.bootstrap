@@ -11,7 +11,6 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Helpers;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
-using JetBrains.Annotations;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Categories;
@@ -23,9 +22,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
     [Category("Compile")]
     public class ConformanceTests : IClassFixture<RuntimeLibraryFixture>
     {
-        [NotNull] private readonly ITestOutputHelper testOutput;
+        private readonly ITestOutputHelper testOutput;
 
-        public ConformanceTests([NotNull] ITestOutputHelper testOutput)
+        public ConformanceTests(ITestOutputHelper testOutput)
         {
             this.testOutput = testOutput;
         }
@@ -36,13 +35,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             Assert.NotEmpty(GetConformanceTestCases());
         }
 
-        [NotNull] private static readonly Regex ExitCodePattern = new Regex(@"// exit code: (?<exitCode>\d+)", RegexOptions.Compiled);
-        [NotNull] private const string ExpectedOutputFormat = "/\\* {0}:\n(?<output>\\**[^/])*\\*/";
-        [NotNull] private static readonly Regex ErrorPattern = new Regex(@"// ERROR([ \t].*)?", RegexOptions.Compiled | RegexOptions.Multiline);
+        private static readonly Regex ExitCodePattern = new Regex(@"// exit code: (?<exitCode>\d+)", RegexOptions.Compiled);
+        private const string ExpectedOutputFormat = "/\\* {0}:\n(?<output>\\**[^/])*\\*/";
+        private static readonly Regex ErrorPattern = new Regex(@"// ERROR([ \t].*)?", RegexOptions.Compiled | RegexOptions.Multiline);
 
         [Theory]
         [MemberData(nameof(GetConformanceTestCases))]
-        public void Test_cases([NotNull] TestCase testCase)
+        public void Test_cases(TestCase testCase)
         {
             // Setup
             var codeFile = CodeFile.Load(testCase.FullCodePath);
@@ -98,8 +97,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             Assert.Equal(ExpectedExitCode(code), process.ExitCode);
         }
 
-        [NotNull]
-        private static List<int> ExpectedCompileErrorLines([NotNull] CodeFile codeFile, [NotNull] string code)
+        private static List<int> ExpectedCompileErrorLines(CodeFile codeFile, string code)
         {
             return ErrorPattern.Matches(code)
                 .Select(match => codeFile.Code.Lines.LineIndexContainingOffset(match.Index) + 1)
@@ -107,16 +105,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
         }
 
         private static void EmitCode(
-            [NotNull] Package package,
-            [NotNull] string path)
+            Package package,
+            string path)
         {
             var codeEmitter = new CodeEmitter();
             codeEmitter.Emit(package);
             File.WriteAllText(path, codeEmitter.GetEmittedCode(), Encoding.UTF8);
         }
 
-        [NotNull]
-        private string CompileToExecutable([NotNull] string codePath)
+        private string CompileToExecutable(string codePath)
         {
             var compiler = new CLangCompiler();
             var sourceFiles = new[] { codePath, RuntimeLibraryFixture.GetRuntimeLibraryPath() };
@@ -127,7 +124,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             return outputPath;
         }
 
-        [NotNull]
         private static Process Execute(string executable)
         {
             var startInfo = new ProcessStartInfo(executable)
@@ -142,20 +138,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             return Process.Start(startInfo);
         }
 
-        private static int ExpectedExitCode([NotNull] string code)
+        private static int ExpectedExitCode(string code)
         {
             var exitCode = ExitCodePattern.Match(code).Groups["exitCode"]?.Captures.SingleOrDefault()?.Value ?? "0";
             return int.Parse(exitCode);
         }
 
-        [NotNull]
-        private static string ExpectedOutput([NotNull] string code, [NotNull] string channel)
+        private static string ExpectedOutput(string code, string channel)
         {
             var regex = new Regex(string.Format(ExpectedOutputFormat, channel));
             return regex.Match(code).Groups["output"]?.Captures.SingleOrDefault()?.Value ?? "";
         }
 
-        [NotNull]
         public static TheoryData<TestCase> GetConformanceTestCases()
         {
             var testCases = new TheoryData<TestCase>();

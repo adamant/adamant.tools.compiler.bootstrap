@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
     public static partial class TokenTypes
     {
-        [NotNull]
+
         public static readonly FixedDictionary<string, Func<TextSpan, IKeywordToken>> KeywordFactories;
 
         private static readonly int KeywordTokenLength = "KeywordToken".Length;
@@ -19,7 +18,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             KeywordFactories = BuildKeywordFactories();
         }
 
-        [NotNull]
         private static FixedDictionary<string, Func<TextSpan, IKeywordToken>> BuildKeywordFactories()
         {
             var factories = new Dictionary<string, Func<TextSpan, IKeywordToken>>();
@@ -61,7 +59,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             return factories.ToFixedDictionary();
         }
 
-        private static Func<TextSpan, T> CompileFactory<T>([NotNull] Type tokenType)
+        private static Func<TextSpan, T> CompileFactory<T>(Type tokenType)
             where T : IToken
         {
             var spanParam = Expression.Parameter(typeof(TextSpan), "span");

@@ -1,14 +1,12 @@
-using JetBrains.Annotations;
-
 namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
 {
     internal class ProjectReference
     {
-        [NotNull] public string Name { get; }
-        [NotNull] public Project Project { get; }
+        public string Name { get; }
+        public Project Project { get; }
         public bool Trusted { get; }
 
-        public ProjectReference([NotNull] string name, [NotNull]  Project project, bool trusted)
+        public ProjectReference(string name, Project project, bool trusted)
         {
             Name = name;
             Project = project;

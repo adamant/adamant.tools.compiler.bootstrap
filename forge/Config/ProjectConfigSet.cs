@@ -1,15 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Forge.Config
 {
     internal class ProjectConfigSet : IEnumerable<ProjectConfig>
     {
-        [NotNull] private readonly Dictionary<string, ProjectConfig> configs = new Dictionary<string, ProjectConfig>();
+        private readonly Dictionary<string, ProjectConfig> configs = new Dictionary<string, ProjectConfig>();
 
-        [NotNull]
         public ProjectConfig Load(string packagePath)
         {
             var config = ProjectConfig.Load(packagePath);
@@ -31,13 +29,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Config
             return configs[fullPath];
         }
 
-        [NotNull]
         public IEnumerator<ProjectConfig> GetEnumerator()
         {
             return configs.Values.GetEnumerator();
         }
 
-        [NotNull]
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();

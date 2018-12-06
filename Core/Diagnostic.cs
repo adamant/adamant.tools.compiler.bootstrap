@@ -1,27 +1,26 @@
 using System;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
     public class Diagnostic : IComparable<Diagnostic>
     {
-        [NotNull] public readonly CodeFile File;
+        public readonly CodeFile File;
         public readonly TextSpan Span;
         public readonly TextPosition StartPosition;
         public readonly TextPosition EndPosition;
         public readonly DiagnosticLevel Level;
         public readonly DiagnosticPhase Phase;
         public readonly int ErrorCode;
-        [NotNull] public readonly string Message;
+        public readonly string Message;
 
         public Diagnostic(
-            [NotNull] CodeFile file,
+            CodeFile file,
             TextSpan span,
             DiagnosticLevel level,
             DiagnosticPhase phase,
             int errorCode,
-            [NotNull] string message)
+            string message)
         {
             if (string.IsNullOrWhiteSpace(message))
                 throw new ArgumentException("message", nameof(message));

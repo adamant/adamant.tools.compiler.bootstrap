@@ -1,19 +1,18 @@
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class ImplicitLiteralConversionExpression : ImplicitConversionExpression
     {
-        [NotNull] public ExpressionSyntax Expression { get; }
-        [NotNull] public DataType ConvertToType { get; }
-        [NotNull] public ISymbol ConversionFunction { get; }
+        public ExpressionSyntax Expression { get; }
+        public DataType ConvertToType { get; }
+        public ISymbol ConversionFunction { get; }
 
         public ImplicitLiteralConversionExpression(
-            [NotNull] ExpressionSyntax expression,
-            [NotNull] DataType convertToType,
-            [NotNull] ISymbol conversionFunction)
+            ExpressionSyntax expression,
+            DataType convertToType,
+            ISymbol conversionFunction)
             : base(expression.Span, convertToType)
         {
             Expression = expression;

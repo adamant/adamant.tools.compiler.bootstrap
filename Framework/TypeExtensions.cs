@@ -1,12 +1,11 @@
 using System;
 using System.Linq;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
     public static class TypeExtensions
     {
-        public static string GetFriendlyName([NotNull] this Type type)
+        public static string GetFriendlyName(this Type type)
         {
             if (type.IsGenericParameter || !type.IsGenericType)
                 return type.Name;

@@ -4,13 +4,12 @@ using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.AST.Visitors;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
 {
     public class ExpressionNameBinder : ExpressionVisitor<LexicalScope>
     {
-        public override void VisitBlock([CanBeNull] BlockSyntax block, [NotNull] LexicalScope containingScope)
+        public override void VisitBlock(BlockSyntax block, LexicalScope containingScope)
         {
             if (block == null) return;
 
@@ -27,8 +26,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
         }
 
         public override void VisitIdentifierName(
-            [NotNull] IdentifierNameSyntax identifierName,
-            [NotNull] LexicalScope containingScope)
+            IdentifierNameSyntax identifierName,
+            LexicalScope containingScope)
         {
             identifierName.ContainingScope = containingScope;
         }

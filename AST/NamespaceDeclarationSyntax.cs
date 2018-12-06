@@ -1,7 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
@@ -13,20 +12,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         /// declared using the package qualifier `namespace ::example { }`.
         /// </summary>
         public bool InGlobalNamespace { get; }
-        [NotNull] public Name Name { get; }
-        [NotNull] public Name FullName { get; }
-        [NotNull] public RootName NameContext { get; }
-        [NotNull] public FixedList<UsingDirectiveSyntax> UsingDirectives { get; }
-        [NotNull] public FixedList<DeclarationSyntax> Declarations { get; }
+        public Name Name { get; }
+        public Name FullName { get; }
+        public RootName NameContext { get; }
+        public FixedList<UsingDirectiveSyntax> UsingDirectives { get; }
+        public FixedList<DeclarationSyntax> Declarations { get; }
 
         public NamespaceDeclarationSyntax(
-            [NotNull] CodeFile file,
+            CodeFile file,
             bool inGlobalNamespace,
-            [NotNull] Name name,
+            Name name,
             TextSpan nameSpan,
-            [NotNull] RootName nameContext,
-            [NotNull] FixedList<UsingDirectiveSyntax> usingDirectives,
-            [NotNull] FixedList<DeclarationSyntax> declarations)
+            RootName nameContext,
+            FixedList<UsingDirectiveSyntax> usingDirectives,
+            FixedList<DeclarationSyntax> declarations)
             : base(file, nameSpan)
         {
             Name = name;

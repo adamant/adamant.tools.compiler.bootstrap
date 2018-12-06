@@ -1,6 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
@@ -11,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     /// </summary>
     public abstract class ImplicitConversionExpression : ExpressionSyntax
     {
-        protected ImplicitConversionExpression(TextSpan span, [NotNull] DataType convertToType)
+        protected ImplicitConversionExpression(TextSpan span, DataType convertToType)
             : base(span)
         {
             Type = convertToType;

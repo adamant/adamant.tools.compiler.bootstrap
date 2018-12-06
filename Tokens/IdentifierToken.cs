@@ -1,13 +1,12 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
     internal abstract class IdentifierToken : Token, IIdentifierToken
     {
-        [NotNull] public string Value { get; }
+        public string Value { get; }
 
-        protected IdentifierToken(TextSpan span, [NotNull] string value)
+        protected IdentifierToken(TextSpan span, string value)
             : base(span)
         {
             Value = value;

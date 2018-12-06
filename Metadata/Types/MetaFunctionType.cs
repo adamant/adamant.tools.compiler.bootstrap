@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
@@ -14,14 +13,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// </summary>
     public class MetaFunctionType : ReferenceType
     {
-        [NotNull, ItemNotNull] public FixedList<DataType> ParameterTypes { get; }
+        public FixedList<DataType> ParameterTypes { get; }
         public int Arity => ParameterTypes.Count;
-        [NotNull] public DataType ResultType { get; }
+        public DataType ResultType { get; }
         public override bool IsResolved { get; }
 
         public MetaFunctionType(
-            [NotNull, ItemNotNull] IEnumerable<DataType> parameterTypes,
-            [NotNull] DataType resultType)
+            IEnumerable<DataType> parameterTypes,
+            DataType resultType)
         {
             ParameterTypes = parameterTypes.ToFixedList();
             ResultType = resultType;

@@ -1,16 +1,14 @@
-using JetBrains.Annotations;
-
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
     public class Code
     {
-        [NotNull] public readonly CCodeBuilder Includes = new CCodeBuilder();
-        [NotNull] public readonly CCodeBuilder TypeIdDeclaration = new CCodeBuilder();
-        [NotNull] public readonly CCodeBuilder TypeDeclarations = new CCodeBuilder();
-        [NotNull] public readonly CCodeBuilder FunctionDeclarations = new CCodeBuilder();
-        [NotNull] public readonly CCodeBuilder StructDeclarations = new CCodeBuilder();
-        [NotNull] public readonly CCodeBuilder GlobalDefinitions = new CCodeBuilder();
-        [NotNull] public readonly CCodeBuilder Definitions = new CCodeBuilder();
+        public readonly CCodeBuilder Includes = new CCodeBuilder();
+        public readonly CCodeBuilder TypeIdDeclaration = new CCodeBuilder();
+        public readonly CCodeBuilder TypeDeclarations = new CCodeBuilder();
+        public readonly CCodeBuilder FunctionDeclarations = new CCodeBuilder();
+        public readonly CCodeBuilder StructDeclarations = new CCodeBuilder();
+        public readonly CCodeBuilder GlobalDefinitions = new CCodeBuilder();
+        public readonly CCodeBuilder Definitions = new CCodeBuilder();
 
         public override string ToString()
         {

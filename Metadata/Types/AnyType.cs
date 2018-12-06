@@ -1,11 +1,9 @@
-using JetBrains.Annotations;
-
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     public class AnyType : ReferenceType
     {
         #region Singleton
-        [NotNull] internal static readonly AnyType Instance = new AnyType();
+        internal static readonly AnyType Instance = new AnyType();
 
         private AnyType() { }
         #endregion

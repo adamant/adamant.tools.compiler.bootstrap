@@ -1,5 +1,4 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
@@ -8,9 +7,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
     /// template file the code was generated from.
     public abstract class CodeReference
     {
-        [NotNull] public readonly FixedList<string> Namespace;
+        public readonly FixedList<string> Namespace;
 
-        protected CodeReference([NotNull] FixedList<string> @namespace)
+        protected CodeReference(FixedList<string> @namespace)
         {
             Namespace = @namespace;
         }

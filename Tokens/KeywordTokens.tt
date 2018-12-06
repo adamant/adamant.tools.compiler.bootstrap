@@ -92,30 +92,26 @@ using System;
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
     public static partial class TokenTypes
     {
-        [NotNull, ItemNotNull]
         private static readonly IReadOnlyList<Type> Keyword = new List<Type>()
         {
 <# foreach(var keyword in keywords) {#>
             typeof(<#=keyword#>KeywordToken),
 <#}#>
-        }.AsReadOnly().NotNull();
+        }.AsReadOnly();
     }
 
     public static partial class TokenFactory
     {
 <# foreach(var keyword in keywords) {#>
-        [NotNull]
         public static I<#=keyword#>KeywordToken <#=keyword#>Keyword(TextSpan span)
         {
             return new <#=keyword#>KeywordToken(span);
         }
-
 <#}#>
     }
 <# foreach(var keyword in keywords) {#>

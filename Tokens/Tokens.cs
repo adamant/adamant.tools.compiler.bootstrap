@@ -1,311 +1,259 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
     public static partial class TokenFactory
     {
-        [NotNull]
         public static IWhitespaceToken Whitespace(TextSpan span)
         {
             return new WhitespaceToken(span);
         }
 
-        [NotNull]
         public static ICommentToken Comment(TextSpan span)
         {
             return new CommentToken(span);
         }
 
-        [NotNull]
         public static IUnexpectedToken Unexpected(TextSpan span)
         {
             return new UnexpectedToken(span);
         }
 
-        [NotNull]
         public static IEndOfFileToken EndOfFile(TextSpan span)
         {
             return new EndOfFileToken(span);
         }
 
-        [NotNull]
         public static IOpenBraceToken OpenBrace(TextSpan span)
         {
             return new OpenBraceToken(span);
         }
 
-        [NotNull]
         public static ICloseBraceToken CloseBrace(TextSpan span)
         {
             return new CloseBraceToken(span);
         }
 
-        [NotNull]
         public static IOpenParenToken OpenParen(TextSpan span)
         {
             return new OpenParenToken(span);
         }
 
-        [NotNull]
         public static ICloseParenToken CloseParen(TextSpan span)
         {
             return new CloseParenToken(span);
         }
 
-        [NotNull]
         public static IOpenBracketToken OpenBracket(TextSpan span)
         {
             return new OpenBracketToken(span);
         }
 
-        [NotNull]
         public static ICloseBracketToken CloseBracket(TextSpan span)
         {
             return new CloseBracketToken(span);
         }
 
-        [NotNull]
         public static ISemicolonToken Semicolon(TextSpan span)
         {
             return new SemicolonToken(span);
         }
 
-        [NotNull]
         public static ICommaToken Comma(TextSpan span)
         {
             return new CommaToken(span);
         }
 
-        [NotNull]
         public static IPipeToken Pipe(TextSpan span)
         {
             return new PipeToken(span);
         }
 
-        [NotNull]
         public static IColonToken Colon(TextSpan span)
         {
             return new ColonToken(span);
         }
 
-        [NotNull]
         public static IRightArrowToken RightArrow(TextSpan span)
         {
             return new RightArrowToken(span);
         }
 
-        [NotNull]
         public static IHashToken Hash(TextSpan span)
         {
             return new HashToken(span);
         }
 
-        [NotNull]
         public static IHashHashToken HashHash(TextSpan span)
         {
             return new HashHashToken(span);
         }
 
-        [NotNull]
         public static IDotToken Dot(TextSpan span)
         {
             return new DotToken(span);
         }
 
-        [NotNull]
         public static IColonColonToken ColonColon(TextSpan span)
         {
             return new ColonColonToken(span);
         }
 
-        [NotNull]
         public static IDotDotToken DotDot(TextSpan span)
         {
             return new DotDotToken(span);
         }
 
-        [NotNull]
         public static ILessThanDotDotToken LessThanDotDot(TextSpan span)
         {
             return new LessThanDotDotToken(span);
         }
 
-        [NotNull]
         public static IDotDotLessThanToken DotDotLessThan(TextSpan span)
         {
             return new DotDotLessThanToken(span);
         }
 
-        [NotNull]
         public static ILessThanDotDotLessThanToken LessThanDotDotLessThan(TextSpan span)
         {
             return new LessThanDotDotLessThanToken(span);
         }
 
-        [NotNull]
         public static IAtSignToken AtSign(TextSpan span)
         {
             return new AtSignToken(span);
         }
 
-        [NotNull]
         public static ICaretToken Caret(TextSpan span)
         {
             return new CaretToken(span);
         }
 
-        [NotNull]
         public static ICaretDotToken CaretDot(TextSpan span)
         {
             return new CaretDotToken(span);
         }
 
-        [NotNull]
         public static IPlusToken Plus(TextSpan span)
         {
             return new PlusToken(span);
         }
 
-        [NotNull]
         public static IMinusToken Minus(TextSpan span)
         {
             return new MinusToken(span);
         }
 
-        [NotNull]
         public static IAsteriskToken Asterisk(TextSpan span)
         {
             return new AsteriskToken(span);
         }
 
-        [NotNull]
         public static ISlashToken Slash(TextSpan span)
         {
             return new SlashToken(span);
         }
 
-        [NotNull]
         public static IEqualsToken Equals(TextSpan span)
         {
             return new EqualsToken(span);
         }
 
-        [NotNull]
         public static IEqualsEqualsToken EqualsEquals(TextSpan span)
         {
             return new EqualsEqualsToken(span);
         }
 
-        [NotNull]
         public static INotEqualToken NotEqual(TextSpan span)
         {
             return new NotEqualToken(span);
         }
 
-        [NotNull]
         public static IGreaterThanToken GreaterThan(TextSpan span)
         {
             return new GreaterThanToken(span);
         }
 
-        [NotNull]
         public static IGreaterThanOrEqualToken GreaterThanOrEqual(TextSpan span)
         {
             return new GreaterThanOrEqualToken(span);
         }
 
-        [NotNull]
         public static ILessThanToken LessThan(TextSpan span)
         {
             return new LessThanToken(span);
         }
 
-        [NotNull]
         public static ILessThanOrEqualToken LessThanOrEqual(TextSpan span)
         {
             return new LessThanOrEqualToken(span);
         }
 
-        [NotNull]
         public static IPlusEqualsToken PlusEquals(TextSpan span)
         {
             return new PlusEqualsToken(span);
         }
 
-        [NotNull]
         public static IMinusEqualsToken MinusEquals(TextSpan span)
         {
             return new MinusEqualsToken(span);
         }
 
-        [NotNull]
         public static IAsteriskEqualsToken AsteriskEquals(TextSpan span)
         {
             return new AsteriskEqualsToken(span);
         }
 
-        [NotNull]
         public static ISlashEqualsToken SlashEquals(TextSpan span)
         {
             return new SlashEqualsToken(span);
         }
 
-        [NotNull]
         public static IDollarToken Dollar(TextSpan span)
         {
             return new DollarToken(span);
         }
 
-        [NotNull]
         public static IDollarLessThanToken DollarLessThan(TextSpan span)
         {
             return new DollarLessThanToken(span);
         }
 
-        [NotNull]
         public static IDollarLessThanNotEqualToken DollarLessThanNotEqual(TextSpan span)
         {
             return new DollarLessThanNotEqualToken(span);
         }
 
-        [NotNull]
         public static IDollarGreaterThanToken DollarGreaterThan(TextSpan span)
         {
             return new DollarGreaterThanToken(span);
         }
 
-        [NotNull]
         public static IDollarGreaterThanNotEqualToken DollarGreaterThanNotEqual(TextSpan span)
         {
             return new DollarGreaterThanNotEqualToken(span);
         }
 
-        [NotNull]
         public static IQuestionToken Question(TextSpan span)
         {
             return new QuestionToken(span);
         }
 
-        [NotNull]
         public static IQuestionQuestionToken QuestionQuestion(TextSpan span)
         {
             return new QuestionQuestionToken(span);
         }
 
-        [NotNull]
         public static IQuestionDotToken QuestionDot(TextSpan span)
         {
             return new QuestionDotToken(span);
         }
 
-        [NotNull]
         public static ILessThanColonToken LessThanColon(TextSpan span)
         {
             return new LessThanColonToken(span);
         }
 
-        [NotNull]
         public static IEqualsGreaterThanToken EqualsGreaterThan(TextSpan span)
         {
             return new EqualsGreaterThanToken(span);

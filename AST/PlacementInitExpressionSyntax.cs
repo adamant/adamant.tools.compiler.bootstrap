@@ -1,20 +1,19 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class PlacementInitExpressionSyntax : ExpressionSyntax
     {
-        [NotNull] public ExpressionSyntax PlaceExpression { get; }
-        [NotNull] public ExpressionSyntax Initializer { get; }
-        [NotNull] public FixedList<ArgumentSyntax> Arguments { get; }
+        public ExpressionSyntax PlaceExpression { get; }
+        public ExpressionSyntax Initializer { get; }
+        public FixedList<ArgumentSyntax> Arguments { get; }
 
         public PlacementInitExpressionSyntax(
             TextSpan span,
-            [NotNull] ExpressionSyntax placeExpression,
-            [NotNull] ExpressionSyntax initializer,
-            [NotNull] FixedList<ArgumentSyntax> arguments)
+            ExpressionSyntax placeExpression,
+            ExpressionSyntax initializer,
+            FixedList<ArgumentSyntax> arguments)
             : base(span)
         {
             PlaceExpression = placeExpression;

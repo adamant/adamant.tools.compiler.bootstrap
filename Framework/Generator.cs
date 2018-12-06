@@ -1,15 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
     public class Generator<T> : IEnumerable<T>
     {
-        [NotNull] private readonly Func<T> generator;
+        private readonly Func<T> generator;
 
-        public Generator([NotNull] Func<T> generator)
+        public Generator(Func<T> generator)
         {
             this.generator = generator;
         }

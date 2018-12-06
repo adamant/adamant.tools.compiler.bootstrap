@@ -5,22 +5,18 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Lexing
 {
     public class Lexer
     {
-        [MustUseReturnValue]
-        [NotNull]
-        public ITokenIterator Lex([NotNull] ParseContext context)
+
+        public ITokenIterator Lex(ParseContext context)
         {
             return new TokenIterator(context, Lex(context.File, context.Diagnostics));
         }
 
-        [MustUseReturnValue]
-        [NotNull, ItemNotNull]
-        private static IEnumerable<IToken> Lex([NotNull] CodeFile file, [NotNull] Diagnostics diagnostics)
+        private static IEnumerable<IToken> Lex(CodeFile file, Diagnostics diagnostics)
         {
             var code = file.Code;
             var text = code.Text;
@@ -568,28 +564,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [MustUseReturnValue]
+
         private static bool IsIntegerCharacter(char c)
         {
             return c >= '0' && c <= '9';
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [MustUseReturnValue]
+
         private static bool IsIdentifierStartCharacter(char c)
         {
             return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [MustUseReturnValue]
+
         private static bool IsIdentifierCharacter(char c)
         {
             return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || char.IsNumber(c);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        [MustUseReturnValue]
+
         private static bool IsHexDigit(char c)
         {
             return (c >= '0' && c <= '9')

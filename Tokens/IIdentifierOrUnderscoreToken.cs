@@ -1,10 +1,8 @@
-using JetBrains.Annotations;
-
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
     public partial interface IIdentifierOrUnderscoreToken : IToken
     {
-        [NotNull] string Value { get; }
+        string Value { get; }
     }
 
     public partial interface IIdentifierToken : IIdentifierOrUnderscoreToken { }

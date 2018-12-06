@@ -1,6 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
@@ -9,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public bool RefSelf { get; }
         public bool MutableSelf { get; }
 
-        public SelfParameterSyntax(TextSpan span, [NotNull] Name fullName, bool refSelf, bool mutableSelf)
+        public SelfParameterSyntax(TextSpan span, Name fullName, bool refSelf, bool mutableSelf)
             : base(span, false, fullName)
         {
             RefSelf = refSelf;

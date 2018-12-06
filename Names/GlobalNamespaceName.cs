@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Names
 {
@@ -10,15 +9,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
     public class GlobalNamespaceName : RootName
     {
         #region Singleton
-        [NotNull] public static readonly GlobalNamespaceName Instance = new GlobalNamespaceName();
+        public static readonly GlobalNamespaceName Instance = new GlobalNamespaceName();
 
         private GlobalNamespaceName() { }
         #endregion
 
         public override IEnumerable<SimpleName> Segments => Enumerable.Empty<SimpleName>();
 
-        [NotNull]
-        public override Name Qualify([NotNull] Name name)
+        public override Name Qualify(Name name)
         {
             return name;
         }

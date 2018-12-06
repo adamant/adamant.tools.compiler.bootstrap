@@ -5,24 +5,23 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
     public class PackageEmitter : IEmitter<Package>
     {
-        [NotNull] private readonly NameMangler nameMangler;
-        [NotNull] private readonly IEmitter<Declaration> declarationEmitter;
+        private readonly NameMangler nameMangler;
+        private readonly IEmitter<Declaration> declarationEmitter;
 
         public PackageEmitter(
-            [NotNull] NameMangler nameMangler,
-            [NotNull] IEmitter<Declaration> declarationEmitter)
+            NameMangler nameMangler,
+            IEmitter<Declaration> declarationEmitter)
         {
             this.nameMangler = nameMangler;
             this.declarationEmitter = declarationEmitter;
         }
 
-        public void Emit([NotNull] Package package, [NotNull] Code code)
+        public void Emit(Package package, Code code)
         {
             foreach (var declaration in package.Declarations)
                 declarationEmitter.Emit(declaration, code);
@@ -30,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             EmitEntryPointAdapter(package.EntryPoint, code);
         }
 
-        public void EmitPreamble([NotNull] Code code)
+        public void EmitPreamble(Code code)
         {
             // Setup the beginning of each section
             code.Includes.AppendLine($"#include \"{CodeEmitter.RuntimeLibraryHeaderFileName}\"");
@@ -49,7 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.Definitions.AppendLine("// Definitions");
         }
 
-        public void EmitEntryPointAdapter([CanBeNull] FunctionDeclaration entryPoint, [NotNull] Code code)
+        public void EmitEntryPointAdapter(FunctionDeclaration entryPoint, Code code)
         {
             if (entryPoint == null) return;
 
@@ -82,7 +81,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.Definitions.EndBlock();
         }
 
-        public void EmitPostamble([NotNull] Code code)
+        public void EmitPostamble(Code code)
         {
             // Close the Type_ID enum
             code.TypeIdDeclaration.EndBlockWithSemicolon();

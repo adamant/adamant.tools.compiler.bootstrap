@@ -1,17 +1,15 @@
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
     public static class StringExtensions
     {
-        [NotNull]
+
         private static readonly Regex LineEndings = new Regex(@"\r\n|\n\r|\n|\r", RegexOptions.Compiled);
 
-        [NotNull]
-        public static string Repeat([NotNull] this string input, int count)
+        public static string Repeat(this string input, int count)
         {
             if (string.IsNullOrEmpty(input) || count == 0)
                 return string.Empty;
@@ -21,14 +19,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
                 .ToString();
         }
 
-        [NotNull]
-        public static string NormalizeLineEndings([NotNull] this string input, [NotNull] string lineEnding)
+        public static string NormalizeLineEndings(this string input, string lineEnding)
         {
             return LineEndings.Replace(input, lineEnding);
         }
 
-        [NotNull]
-        public static string Escape([NotNull] this string input)
+        public static string Escape(this string input)
         {
             var escaped = new StringBuilder(input.Length + 2);
             foreach (var c in input)
@@ -62,8 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
             return escaped.ToString();
         }
 
-        [NotNull]
-        public static FixedList<string> SplitOrEmpty([CanBeNull] this string value, params char[] separators)
+        public static FixedList<string> SplitOrEmpty(this string value, params char[] separators)
         {
             if (string.IsNullOrEmpty(value)) return FixedList<string>.Empty;
             return value.Split(separators).ToFixedList();

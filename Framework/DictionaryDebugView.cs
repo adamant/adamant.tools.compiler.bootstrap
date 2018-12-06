@@ -2,13 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
     public sealed class DictionaryDebugView<K, V>
     {
-        [NotNull] private readonly IReadOnlyDictionary<K, V> dictionary;
+        private readonly IReadOnlyDictionary<K, V> dictionary;
 
         public DictionaryDebugView(IReadOnlyDictionary<K, V> dictionary)
         {

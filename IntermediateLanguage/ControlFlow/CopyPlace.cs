@@ -1,12 +1,10 @@
-using JetBrains.Annotations;
-
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class CopyPlace : Operand
     {
-        [NotNull] public readonly Place Place;
+        public readonly Place Place;
 
-        public CopyPlace([NotNull] Place place)
+        public CopyPlace(Place place)
         {
             Place = place;
         }

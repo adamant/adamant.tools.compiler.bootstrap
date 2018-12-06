@@ -5,18 +5,17 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using JetBrains.Annotations;
 using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
 {
     public class LexResult
     {
-        [NotNull] public readonly CodeFile File;
-        [NotNull] public readonly FixedList<IToken> Tokens;
-        [NotNull] public readonly FixedList<Diagnostic> Diagnostics;
+        public readonly CodeFile File;
+        public readonly FixedList<IToken> Tokens;
+        public readonly FixedList<Diagnostic> Diagnostics;
 
-        public LexResult([NotNull] ITokenIterator iterator)
+        public LexResult(ITokenIterator iterator)
         {
             var tokens = new List<IToken>();
             do
@@ -29,7 +28,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             Diagnostics = iterator.Context.Diagnostics.Build();
         }
 
-        [NotNull]
         public IToken AssertSingleToken()
         {
             Assert.True(2 == Tokens.Count, $"Expected token count {1}, was {Tokens.Count - 1} (excluding EOF)");
@@ -48,7 +46,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             Assert.Empty(Diagnostics);
         }
 
-        [NotNull]
         public Diagnostic AssertSingleDiagnostic()
         {
             return Assert.Single(Diagnostics);
@@ -59,13 +56,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             Assert.Equal(expectedCount, Diagnostics.Count);
         }
 
-        [NotNull]
         public string TokensToString()
         {
             return string.Concat(Tokens.Select(t => t.Text(File.Code)));
         }
 
-        [NotNull]
         public FixedList<PsuedoToken> ToPsuedoTokens()
         {
             return Tokens.Select(t => PsuedoToken.For(t, File.Code)).ToFixedList();

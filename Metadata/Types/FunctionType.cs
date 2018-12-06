@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
@@ -12,14 +11,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// </summary>
     public class FunctionType : ReferenceType
     {
-        [NotNull, ItemNotNull] public readonly FixedList<DataType> ParameterTypes;
+        public readonly FixedList<DataType> ParameterTypes;
         public int Arity => ParameterTypes.Count;
-        [NotNull] public readonly DataType ReturnType;
+        public readonly DataType ReturnType;
         public override bool IsResolved { get; }
 
         public FunctionType(
-            [NotNull, ItemNotNull] IEnumerable<DataType> parameterTypes,
-            [NotNull] DataType returnType)
+            IEnumerable<DataType> parameterTypes,
+            DataType returnType)
         {
             ParameterTypes = parameterTypes.ToFixedList();
             ReturnType = returnType;

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
-using JetBrains.Annotations;
 using Xunit;
 using Xunit.Categories;
 
@@ -14,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C
     [Category("Emit")]
     public class ResourcesSpec
     {
-        [NotNull]
+
         private readonly IReadOnlyList<byte> byteOrderMarkUtf8 = Encoding.UTF8.GetPreamble().ToList().AsReadOnly();
 
         /// <summary>
@@ -24,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C
         [Theory]
         [InlineData(CodeEmitter.RuntimeLibraryCodeFileName)]
         [InlineData(CodeEmitter.RuntimeLibraryHeaderFileName)]
-        public void Resources_start_with_BOM([NotNull] string filename)
+        public void Resources_start_with_BOM(string filename)
         {
             var projectDir = Path.Combine(SolutionDirectory.Get(), "Emit.C");
 
@@ -32,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C
             AssertStartsWithUtf8Bom(codeFileBytes);
         }
 
-        private void AssertStartsWithUtf8Bom([NotNull] byte[] bytes)
+        private void AssertStartsWithUtf8Bom(byte[] bytes)
         {
             Assert.True(bytes.Length >= byteOrderMarkUtf8.Count, $"Length = {bytes.Length}");
             for (var i = 0; i < byteOrderMarkUtf8.Count; i++)

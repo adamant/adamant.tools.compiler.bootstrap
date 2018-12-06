@@ -1,6 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
-using JetBrains.Annotations;
-
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     /// <summary>
@@ -19,15 +16,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     {
         // The type this is a metatype for. Named instance because it represents
         // the single object instance that is of this metatype.
-        [NotNull] public DataType Instance { get; }
+        public DataType Instance { get; }
         public override bool IsResolved => Instance.IsResolved;
 
-        public Metatype([NotNull] DataType instanceType)
+        public Metatype(DataType instanceType)
         {
             Instance = instanceType;
         }
 
-        [NotNull]
         public override string ToString()
         {
             switch (Instance)

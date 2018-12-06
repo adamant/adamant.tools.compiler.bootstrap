@@ -1,6 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
@@ -14,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         /// Whether we need a blank separator line before the next statement
         public bool NeedsStatementSeparatorLine { get; private set; }
 
-        public CCodeBuilder([NotNull] string indentCharacters = "    ")
+        public CCodeBuilder(string indentCharacters = "    ")
             : base(indentCharacters, LineTerminator)
         {
         }
@@ -72,7 +71,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             NeedsStatementSeparatorLine = false;
         }
 
-        public virtual void BeginBlockWith([NotNull] string value)
+        public virtual void BeginBlockWith(string value)
         // ensures CurrentIndentDepth == old(CurrentIndentDepth) + 1
         {
             base.AppendLine(value);
@@ -101,7 +100,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             NeedsStatementSeparatorLine = false; // Statements shouldn't come after blocks with semicolons
         }
 
-        public virtual void EndBlockWith([NotNull] string value)
+        public virtual void EndBlockWith(string value)
         // ensures CurrentIndentDepth == old(CurrentIndentDepth) - 1
         {
             Requires.That(nameof(CurrentIndent), CurrentIndentDepth > 0, "indent depth must not be zero");

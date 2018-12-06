@@ -1,14 +1,13 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
     internal class StringLiteralToken : Token, IStringLiteralToken
     {
-        [NotNull] public string Value { get; }
+        public string Value { get; }
 
-        public StringLiteralToken(TextSpan span, [NotNull] string value)
+        public StringLiteralToken(TextSpan span, string value)
             : base(span)
         {
             Value = value;
@@ -23,8 +22,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 
     public static partial class TokenFactory
     {
-        [NotNull]
-        public static IStringLiteralToken StringLiteral(TextSpan span, [NotNull] string value)
+
+        public static IStringLiteralToken StringLiteral(TextSpan span, string value)
         {
             return new StringLiteralToken(span, value);
         }

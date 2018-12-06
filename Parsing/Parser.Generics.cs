@@ -3,14 +3,11 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public partial class Parser
     {
-        [MustUseReturnValue]
-        [CanBeNull]
         public FixedList<GenericParameterSyntax> AcceptGenericParameters()
         {
             if (!Tokens.Accept<IOpenBracketToken>()) return null;
@@ -19,8 +16,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return parameters;
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         public GenericParameterSyntax ParseGenericParameter()
         {
             Name name;
@@ -59,15 +54,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new GenericParameterSyntax(false, isParams, name, typeExpression);
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         public FixedList<GenericConstraintSyntax> ParseGenericConstraints()
         {
             return AcceptMany(AcceptGenericConstraint);
         }
 
-        [MustUseReturnValue]
-        [CanBeNull]
         public GenericConstraintSyntax AcceptGenericConstraint()
         {
             if (!Tokens.Accept<IWhereKeywordToken>()) return null;

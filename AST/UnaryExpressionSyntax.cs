@@ -1,7 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
@@ -9,13 +8,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         public UnaryOperatorFixity Fixty { get; }
         public UnaryOperator Operator { get; }
-        [NotNull] public ExpressionSyntax Operand { get; }
+        public ExpressionSyntax Operand { get; }
 
         public UnaryExpressionSyntax(
             TextSpan span,
             UnaryOperatorFixity fixty,
             UnaryOperator @operator,
-            [NotNull] ExpressionSyntax operand)
+            ExpressionSyntax operand)
             : base(span)
         {
             Operator = @operator;

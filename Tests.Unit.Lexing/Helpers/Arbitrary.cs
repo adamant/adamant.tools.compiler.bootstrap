@@ -7,7 +7,6 @@ using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using Fare;
 using FsCheck;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
 {
@@ -28,7 +27,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             return Gen.Sized(size => GenPsuedoTokenList(size, size));
         }
 
-        [NotNull]
         private static Gen<List<PsuedoToken>> GenPsuedoTokenList(int size, int length)
         {
             Requires.Positive(nameof(size), size);
@@ -39,10 +37,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             return GenPsuedoTokenList(size, length - 1).Select(list => AppendPsuedoToken(size, list));
         }
 
-        [NotNull]
         private static List<PsuedoToken> AppendPsuedoToken(
             int size,
-            [NotNull] List<PsuedoToken> tokens)
+            List<PsuedoToken> tokens)
         {
             var lastToken = tokens.LastOrDefault();
             // TODO this is a huge hack calling Sample() FIX IT!
@@ -57,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             return tokens;
         }
 
-        private static bool SeparateTokens([NotNull] PsuedoToken t1, [NotNull] PsuedoToken t2)
+        private static bool SeparateTokens(PsuedoToken t1, PsuedoToken t2)
         {
             switch (t1.Text)
             {
@@ -115,7 +112,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             }
         }
 
-        [NotNull]
         private static Gen<PsuedoToken> GenPsuedoToken()
         {
             return Gen.Frequency(
@@ -128,14 +124,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
                 GenStringLiteral().WithWeight(5));
         }
 
-        [NotNull]
         private static Gen<PsuedoToken> GenSymbol()
         {
             return Gen.Elements(Symbols.AsEnumerable())
                 .Select(item => new PsuedoToken(item.Value, item.Key));
         }
 
-        [NotNull]
         private static Gen<string> GenRegex(string pattern)
         {
             return Gen.Sized(size =>
@@ -147,14 +141,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             });
         }
 
-        [NotNull]
         private static Gen<PsuedoToken> GenWhitespace()
         {
             return GenRegex("[ \t\n\r]")
                 .Select(s => new PsuedoToken(typeof(IWhitespaceToken), s));
         }
 
-        [NotNull]
         private static Gen<PsuedoToken> GenComment()
         {
             // Covers both block comments and line comments
@@ -163,7 +155,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
                 .Select(s => new PsuedoToken(typeof(ICommentToken), s));
         }
 
-        [NotNull]
         private static Gen<PsuedoToken> GenBareIdentifier()
         {
             return GenRegex(@"[a-zA-Z_][a-zA-Z_0-9]*")
@@ -171,7 +162,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
                 .Select(s => new PsuedoToken(typeof(IBareIdentifierToken), s, s));
         }
 
-        [NotNull]
         private static Gen<PsuedoToken> GenEscapedIdentifier()
         {
             return GenRegex(@"\\[a-zA-Z_0-9]+")
@@ -179,14 +169,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
                 .Select(s => new PsuedoToken(typeof(IEscapedIdentifierToken), s, s.Substring(1)));
         }
 
-        [NotNull]
         private static Gen<PsuedoToken> GenIntegerLiteral()
         {
             return GenRegex(@"0|[1-9][0-9]*")
                 .Select(s => new PsuedoToken(typeof(IIntegerLiteralToken), s, BigInteger.Parse(s)));
         }
 
-        [NotNull]
         private static Gen<PsuedoToken> GenStringLiteral()
         {
             // @"""([^\\]|\\(r|n|0|t|'|""|\\|u\([0-9a-fA-F]{1,6}\)))*"""
@@ -208,7 +196,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
                 });
         }
 
-        [NotNull]
         public static FixedDictionary<string, Type> Symbols = new Dictionary<string, Type>()
         {
             { "{", typeof(IOpenBraceToken) },

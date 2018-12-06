@@ -1,5 +1,4 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
@@ -10,8 +9,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     {
         TextSpan Span { get; }
 
-        [Pure]
-        [NotNull]
-        string Text([NotNull] CodeText code);
+        string Text(CodeText code);
     }
 }

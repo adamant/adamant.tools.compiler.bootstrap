@@ -1,15 +1,13 @@
-using JetBrains.Annotations;
-
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class ThrowEffectEntrySyntax : Syntax
     {
         public bool IsParams { get; }
-        [NotNull] public ExpressionSyntax ExceptionType { get; }
+        public ExpressionSyntax ExceptionType { get; }
 
         public ThrowEffectEntrySyntax(
             bool isParams,
-            [NotNull] ExpressionSyntax exceptionType)
+            ExpressionSyntax exceptionType)
         {
             IsParams = isParams;
             ExceptionType = exceptionType;

@@ -1,18 +1,17 @@
 using Adamant.Tools.Compiler.Bootstrap.Emit.C.Properties;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
     public class CodeEmitter : Emitter
     {
-        [NotNull] public static string RuntimeLibraryCode => Resources.RuntimeLibraryCode;
-        [NotNull] public const string RuntimeLibraryCodeFileName = "RuntimeLibrary.c";
-        [NotNull] public static string RuntimeLibraryHeader => Resources.RuntimeLibraryHeader;
-        [NotNull] public const string RuntimeLibraryHeaderFileName = "RuntimeLibrary.h";
+        public static string RuntimeLibraryCode => Resources.RuntimeLibraryCode;
+        public const string RuntimeLibraryCodeFileName = "RuntimeLibrary.c";
+        public static string RuntimeLibraryHeader => Resources.RuntimeLibraryHeader;
+        public const string RuntimeLibraryHeaderFileName = "RuntimeLibrary.h";
 
-        [NotNull] private readonly PackageEmitter packageEmitter;
-        [NotNull] private readonly Code code = new Code();
+        private readonly PackageEmitter packageEmitter;
+        private readonly Code code = new Code();
 
         public CodeEmitter()
         {
@@ -25,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             packageEmitter.EmitPreamble(code);
         }
 
-        public override void Emit([NotNull] Package package)
+        public override void Emit(Package package)
         {
             packageEmitter.Emit(package, code);
         }

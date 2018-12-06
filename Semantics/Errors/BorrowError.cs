@@ -1,5 +1,4 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
 {
@@ -12,8 +11,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
     /// </summary>
     public static class BorrowError
     {
-        [NotNull]
-        public static Diagnostic BorrowedValueDoesNotLiveLongEnough([NotNull] CodeFile file, TextSpan span)
+
+        public static Diagnostic BorrowedValueDoesNotLiveLongEnough(CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 4001, $"Borrowed values does not live long enough");
         }

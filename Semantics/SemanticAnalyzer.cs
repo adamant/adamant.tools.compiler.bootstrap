@@ -9,16 +9,15 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Validation;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
     public class SemanticAnalyzer
     {
-        [NotNull]
+
         public Package Analyze(
-            [NotNull] PackageSyntax packageSyntax,
-            [NotNull] FixedDictionary<string, Package> references)
+            PackageSyntax packageSyntax,
+            FixedDictionary<string, Package> references)
         {
             // First pull over all the lexer and parser errors from the compilation units
             var diagnostics = AllDiagnostics(packageSyntax);
@@ -53,8 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             return new Package(packageSyntax.Name, diagnostics.Build(), references, declarations, entryPoint);
         }
 
-        [NotNull]
-        private static Diagnostics AllDiagnostics([NotNull] PackageSyntax packageSyntax)
+        private static Diagnostics AllDiagnostics(PackageSyntax packageSyntax)
         {
             var diagnostics = new Diagnostics();
             foreach (var compilationUnit in packageSyntax.CompilationUnits)
@@ -62,10 +60,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             return diagnostics;
         }
 
-        [CanBeNull]
         private static FunctionDeclaration DetermineEntryPoint(
-            [NotNull] FixedList<Declaration> declarations,
-            [NotNull] Diagnostics diagnostics)
+            FixedList<Declaration> declarations,
+            Diagnostics diagnostics)
         {
             var mainFunctions = declarations.OfType<FunctionDeclaration>()
                 .Where(f => f.FullName.UnqualifiedName.Text == "main" && !f.FullName.UnqualifiedName.IsSpecial)

@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
@@ -10,12 +9,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
     [DebuggerTypeProxy(typeof(DictionaryDebugView<,>))]
     public class FixedDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue>
     {
-        [NotNull] public static readonly FixedDictionary<TKey, TValue> Empty = new FixedDictionary<TKey, TValue>(new Dictionary<TKey, TValue>());
+        public static readonly FixedDictionary<TKey, TValue> Empty = new FixedDictionary<TKey, TValue>(new Dictionary<TKey, TValue>());
 
-        [NotNull] private readonly IReadOnlyDictionary<TKey, TValue> items;
+        private readonly IReadOnlyDictionary<TKey, TValue> items;
 
         [DebuggerStepThrough]
-        public FixedDictionary([NotNull] IDictionary<TKey, TValue> items)
+        public FixedDictionary(IDictionary<TKey, TValue> items)
         {
             this.items = new ReadOnlyDictionary<TKey, TValue>(new Dictionary<TKey, TValue>(items));
         }

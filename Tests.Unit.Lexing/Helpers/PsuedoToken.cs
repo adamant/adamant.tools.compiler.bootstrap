@@ -5,20 +5,18 @@ using System.Numerics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
 {
     public class PsuedoToken
     {
-        [NotNull]
+
         public readonly Type TokenType;
 
-        [NotNull]
         public readonly string Text;
         public readonly object Value;
 
-        public PsuedoToken([NotNull] Type tokenType, [NotNull] string text, object value = null)
+        public PsuedoToken(Type tokenType, string text, object value = null)
         {
             TokenType = tokenType;
             Text = text;
@@ -30,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             return new PsuedoToken(typeof(IEndOfFileToken), "");
         }
 
-        public static PsuedoToken For([NotNull] IToken token, [NotNull] CodeText code)
+        public static PsuedoToken For(IToken token, CodeText code)
         {
             var tokenType = token.GetType();
             switch (token)

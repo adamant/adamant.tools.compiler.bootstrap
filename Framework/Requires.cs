@@ -1,7 +1,6 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
@@ -13,14 +12,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
     public static class Requires
     {
         [DebuggerHidden]
-        public static void Positive([NotNull] string parameter, int value)
+        public static void Positive(string parameter, int value)
         {
             if (value < 0)
                 throw new ArgumentOutOfRangeException(parameter, value, "Must be greater than or equal to zero");
         }
 
         [DebuggerHidden]
-        public static void InString([NotNull] string inString, [NotNull] string parameter, int value)
+        public static void InString(string inString, string parameter, int value)
         {
             // Start is allowed to be equal to length to allow for a zero length span after the last character
             if (value < 0 || value >= inString.Length)
@@ -28,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         }
 
         [DebuggerHidden]
-        public static void ValidEnum<E>([NotNull] string parameter, E value)
+        public static void ValidEnum<E>(string parameter, E value)
             where E : Enum
         {
             if (!Enum.IsDefined(typeof(E), value))
@@ -36,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         }
 
         [DebuggerHidden]
-        public static void That([NotNull] string parameter, bool condition, string message)
+        public static void That(string parameter, bool condition, string message)
         {
             if (!condition)
                 throw new ArgumentException(message, parameter);

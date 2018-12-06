@@ -3,7 +3,6 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
@@ -33,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             }
         }
 
-        protected NameSyntax([NotNull] SimpleName name, TextSpan span)
+        protected NameSyntax(SimpleName name, TextSpan span)
             : base(span)
         {
             Name = name;

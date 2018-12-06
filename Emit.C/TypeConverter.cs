@@ -1,20 +1,19 @@
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
     public class TypeConverter : IConverter<DataType>
     {
-        [NotNull] private readonly NameMangler nameMangler;
+        private readonly NameMangler nameMangler;
 
-        public TypeConverter([NotNull] NameMangler nameMangler)
+        public TypeConverter(NameMangler nameMangler)
         {
             this.nameMangler = nameMangler;
         }
 
-        public string Convert([NotNull] DataType type)
+        public string Convert(DataType type)
         {
             switch (type)
             {

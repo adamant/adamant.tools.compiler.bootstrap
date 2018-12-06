@@ -1,19 +1,18 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class LifetimeTypeSyntax : TypeSyntax
     {
-        [NotNull] public ExpressionSyntax ReferentTypeExpression { get; }
-        [NotNull] public LifetimeOperator Operator { get; }
-        [NotNull] public ILifetimeNameToken Lifetime { get; }
+        public ExpressionSyntax ReferentTypeExpression { get; }
+        public LifetimeOperator Operator { get; }
+        public ILifetimeNameToken Lifetime { get; }
 
         public LifetimeTypeSyntax(
-            [NotNull] ExpressionSyntax referentTypeExpression,
+            ExpressionSyntax referentTypeExpression,
             LifetimeOperator lifetimeOperator,
-            [NotNull] ILifetimeNameToken lifetime)
+            ILifetimeNameToken lifetime)
             : base(TextSpan.Covering(referentTypeExpression.Span, lifetime.Span))
         {
             ReferentTypeExpression = referentTypeExpression;

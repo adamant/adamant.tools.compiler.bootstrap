@@ -1,6 +1,5 @@
 using System.Numerics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
@@ -15,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
 
         // Helpful for debugging
-        [NotNull]
+
         public override string ToString()
         {
             return Value.ToString();
@@ -24,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 
     public static partial class TokenFactory
     {
-        [NotNull]
+
         public static IIntegerLiteralToken IntegerLiteral(TextSpan span, BigInteger value)
         {
             return new IntegerLiteralToken(span, value);

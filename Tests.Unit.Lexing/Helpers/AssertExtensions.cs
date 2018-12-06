@@ -1,7 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using JetBrains.Annotations;
 using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
@@ -9,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
     public static class AssertExtensions
     {
         public static void AssertIdentifier(
-            [CanBeNull] this IToken token,
+            this IToken token,
             int expectedStart,
             int expectedLength,
             string expectedValue)
@@ -22,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
         }
 
         public static void AssertStringLiteral(
-            [CanBeNull] this IToken token,
+            this IToken token,
             int expectedStart,
             int expectedLength,
             string expectedValue)
@@ -35,7 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
         }
 
         public static void AssertIs<T>(
-            [CanBeNull] this IToken token,
+            this IToken token,
             int expectedStart,
             int expectedLength)
             where T : IToken
@@ -46,14 +45,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             Assert.True(expectedLength == token.Span.Length, $"Expected token length {expectedLength}, was {token.Span.Length}");
         }
 
-        public static void AssertError([CanBeNull] this Diagnostic diagnostic, int errorCode, int start, int length)
+        public static void AssertError(this Diagnostic diagnostic, int errorCode, int start, int length)
         {
             Assert.NotNull(diagnostic);
             Assert.Equal(DiagnosticLevel.CompilationError, diagnostic.Level);
             AssertLexingDiagnostic(diagnostic, errorCode, start, length);
         }
 
-        public static void AssertLexingDiagnostic([CanBeNull] this Diagnostic diagnostic, int errorCode, int start, int length)
+        public static void AssertLexingDiagnostic(this Diagnostic diagnostic, int errorCode, int start, int length)
         {
             diagnostic.AssertDiagnostic(DiagnosticPhase.Lexing, errorCode, start, length);
         }

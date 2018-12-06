@@ -1,6 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Fakes
 {
@@ -8,10 +7,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Fakes
     {
         public TextSpan Span { get; }
 
-        [CanBeNull]
         public readonly object FakeValue;
 
-        public FakeToken(TextSpan span, [CanBeNull] object fakeValue)
+        public FakeToken(TextSpan span, object fakeValue)
         {
             Span = span;
             FakeValue = fakeValue;

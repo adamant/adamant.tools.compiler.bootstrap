@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using JetBrains.Annotations;
 using Xunit.Abstractions;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Helpers
@@ -14,11 +13,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Helpers
     /// </summary>
     public class TestCase : IXunitSerializable
     {
-        [NotNull] public string FullCodePath { get; private set; }
-        [NotNull] public string RelativeCodePath { get; private set; }
+        public string FullCodePath { get; private set; }
+        public string RelativeCodePath { get; private set; }
 
-        [NotNull] private readonly Lazy<string> code;
-        [NotNull] public string Code => code.Value;
+        private readonly Lazy<string> code;
+        public string Code => code.Value;
 
         [Obsolete("Required by IXunitSerializable", true)]
         public TestCase()
@@ -26,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Helpers
             code = new Lazy<string>(GetCode);
         }
 
-        public TestCase([NotNull] string fullCodePath, [NotNull] string relativeCodePath)
+        public TestCase(string fullCodePath, string relativeCodePath)
         {
             FullCodePath = fullCodePath;
             RelativeCodePath = relativeCodePath;
@@ -43,12 +42,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Helpers
                 .Replace(Path.AltDirectorySeparatorChar, '.');
         }
 
-        public virtual void Serialize([NotNull] IXunitSerializationInfo info)
+        public virtual void Serialize(IXunitSerializationInfo info)
         {
             info.AddValue(nameof(FullCodePath), FullCodePath);
             info.AddValue(nameof(RelativeCodePath), RelativeCodePath);
         }
-        public virtual void Deserialize([NotNull] IXunitSerializationInfo info)
+        public virtual void Deserialize(IXunitSerializationInfo info)
         {
             FullCodePath = info.GetValue<string>(nameof(FullCodePath));
             RelativeCodePath = info.GetValue<string>(nameof(RelativeCodePath));

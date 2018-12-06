@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
@@ -10,10 +9,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     /// </summary>
     internal class VariableNumbers
     {
-        [NotNull] private readonly Dictionary<string, int> nextNumber = new Dictionary<string, int>();
+        private readonly Dictionary<string, int> nextNumber = new Dictionary<string, int>();
 
-        [NotNull]
-        public SimpleName VariableName([NotNull] string text)
+        public SimpleName VariableName(string text)
         {
             if (text == "_") return SpecialName.Underscore;
             // Just try putting in first index, if it isn't already there, no problem

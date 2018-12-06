@@ -2,7 +2,6 @@ using System;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
@@ -15,32 +14,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     /// </summary>
     internal static class ParseError
     {
-        [NotNull]
-        public static Diagnostic IncompleteDeclaration([NotNull] CodeFile file, TextSpan span)
+
+        public static Diagnostic IncompleteDeclaration(CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3001, "Incomplete declaration");
         }
 
-        [NotNull]
-        public static Diagnostic UnexpectedToken([NotNull] CodeFile file, TextSpan span)
+        public static Diagnostic UnexpectedToken(CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3002, $"Unexpected token `{file.Code[span]}`");
         }
 
-        [NotNull]
-        public static Diagnostic MissingToken([NotNull] CodeFile file, [NotNull] Type expected, [NotNull] IToken found)
+        public static Diagnostic MissingToken(CodeFile file, Type expected, IToken found)
         {
             return new Diagnostic(file, found.Span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3003, $"Expected `{expected.GetFriendlyName()}` found `{found.Text(file.Code)}`");
         }
 
-        [NotNull]
-        public static Diagnostic OwnedNotValidAsGenericLifetimeParameter([NotNull] CodeFile file, TextSpan span)
+        public static Diagnostic OwnedNotValidAsGenericLifetimeParameter(CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3004, "The lifetime `$owned` cannot be used as a generic lifetime parameter.");
         }
 
-        [NotNull]
-        public static Diagnostic DeclarationNotAllowedInExternal([NotNull] CodeFile file, TextSpan span)
+        public static Diagnostic DeclarationNotAllowedInExternal(CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3004, "Only function declarations are allowed in external blocks");
         }

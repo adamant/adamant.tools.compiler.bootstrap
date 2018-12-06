@@ -1,5 +1,4 @@
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
@@ -9,14 +8,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     /// </summary>
     public class DeclaredValue : Value
     {
-        [NotNull] public Name Name { get; }
+        public Name Name { get; }
 
-        public DeclaredValue([NotNull] Name name)
+        public DeclaredValue(Name name)
         {
             Name = name;
         }
 
-        [NotNull]
         public override string ToString()
         {
             return Name.ToString();

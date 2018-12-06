@@ -10,7 +10,6 @@ using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using FsCheck;
 using FsCheck.Xunit;
-using JetBrains.Annotations;
 using Xunit;
 using Xunit.Categories;
 
@@ -20,8 +19,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
     [Category("Lex")]
     public class LexerSpec
     {
-        [NotNull]
-        private LexResult Lex([NotNull] string text)
+
+        private LexResult Lex(string text)
         {
             var lexer = new Lexer();
             var context = FakeParseContext.For(text);
@@ -32,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
         [InlineData("hello", "hello")]
         [InlineData(@"\class", "class")]
         // TODO [InlineData(@"\""Hello World!""", "Hello World!", Skip = "Escaped String Identifiers Not Implemented")]
-        public void Identifier_value([NotNull] string identifier, [NotNull] string value)
+        public void Identifier_value(string identifier, string value)
         {
             var result = Lex(identifier);
             var token = result.AssertSingleToken();
@@ -46,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
         [InlineData(@"""\u(2660)""", "\u2660")] // basic unicode escape sequences
         [InlineData(@""" \u(FFFF) \u(a) """, " \uFFFF \u000A ")]
         [InlineData(@""" \u(10FFFF) """, " \uDBFF\uDFFF ")] // Surrogate Pair
-        public void String_literal_value([NotNull] string literal, [NotNull] string value)
+        public void String_literal_value(string literal, string value)
         {
             var result = Lex(literal);
             var token = result.AssertSingleToken();
@@ -56,7 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
 
         [Theory]
         [MemberData(nameof(SymbolsTheoryData))]
-        public void Symbols([NotNull] string symbol, [NotNull] Type tokenType)
+        public void Symbols(string symbol, Type tokenType)
         {
             var result = Lex(symbol);
             var token = result.AssertSingleToken();
@@ -91,7 +90,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
         [InlineData(@"//c")]
         [InlineData(@"//\r")]
         [InlineData(@"// foo")]
-        public void Comments([NotNull] string comment)
+        public void Comments(string comment)
         {
             var result = Lex(comment);
             var token = result.AssertSingleToken();
@@ -141,7 +140,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
         [InlineData(@"""\u()""", "u()")]
         [InlineData(@"""\u(110000)""", "u(110000)")] // 1 too high
         // TODO can't put use a surrogate pair as a unicode escape, they must be unicode scalars
-        public void Invalid_escape_sequence([NotNull] string literal, [NotNull] string expectedValue)
+        public void Invalid_escape_sequence(string literal, string expectedValue)
         {
             var result = Lex(literal);
             var token = result.AssertSingleToken();
@@ -167,7 +166,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
         [InlineData(" ~ ")]
         [InlineData(" ` ")]
         [InlineData(" \u0007 ")] // Bell Character
-        public void Unexpected_character([NotNull] string text)
+        public void Unexpected_character(string text)
         {
             var result = Lex(text);
             result.AssertTokens(3);

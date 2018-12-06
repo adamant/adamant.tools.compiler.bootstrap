@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using JetBrains.Annotations;
 using Newtonsoft.Json;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Forge.Config
@@ -28,7 +27,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Config
         [JsonProperty("dependencies")]
         public Dictionary<string, ProjectDependencyConfig> Dependencies { get; set; } = new Dictionary<string, ProjectDependencyConfig>();
 
-        [NotNull]
         public static ProjectConfig Load(string path)
         {
             var extension = Path.GetExtension(path);

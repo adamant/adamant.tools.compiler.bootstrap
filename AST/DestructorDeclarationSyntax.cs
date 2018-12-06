@@ -2,23 +2,22 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class DestructorDeclarationSyntax : FunctionDeclarationSyntax
     {
         public DestructorDeclarationSyntax(
-            [NotNull] CodeFile file,
-            [NotNull] FixedList<IModiferToken> modifiers,
-            [NotNull] Name fullName,
+            CodeFile file,
+            FixedList<IModiferToken> modifiers,
+            Name fullName,
             TextSpan nameSpan,
-            [NotNull] FixedList<ParameterSyntax> parameters,
-            [NotNull] FixedList<EffectSyntax> mayEffects,
-            [NotNull] FixedList<EffectSyntax> noEffects,
-            [NotNull] FixedList<ExpressionSyntax> requires,
-            [NotNull] FixedList<ExpressionSyntax> ensures,
-            [NotNull] BlockSyntax body)
+            FixedList<ParameterSyntax> parameters,
+            FixedList<EffectSyntax> mayEffects,
+            FixedList<EffectSyntax> noEffects,
+            FixedList<ExpressionSyntax> requires,
+            FixedList<ExpressionSyntax> ensures,
+            BlockSyntax body)
             : base(file, modifiers, fullName, nameSpan, null, parameters,
                 FixedList<GenericConstraintSyntax>.Empty, mayEffects, noEffects, requires, ensures, body)
         {

@@ -7,7 +7,6 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
 {
@@ -27,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             this.diagnostics = diagnostics;
         }
 
-        public void ResolveTypesInDeclarations([NotNull, ItemNotNull] FixedList<MemberDeclarationSyntax> declarations)
+        public void ResolveTypesInDeclarations(FixedList<MemberDeclarationSyntax> declarations)
         {
             ResolveSignatureTypesInDeclarations(declarations);
             // Function bodies are checked after signatures to ensure that all function invocation
@@ -36,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
         }
 
         private void ResolveSignatureTypesInDeclarations(
-             [ItemNotNull] IEnumerable<DeclarationSyntax> declarations)
+             IEnumerable<DeclarationSyntax> declarations)
         {
             foreach (var declaration in declarations)
                 ResolveSignatureTypesInDeclaration(declaration);
@@ -112,7 +111,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
         }
 
         private static void ResolveTypesInGenericParameters(
-            [NotNull, ItemNotNull] FixedList<GenericParameterSyntax> genericParameters,
+            FixedList<GenericParameterSyntax> genericParameters,
              ExpressionTypeResolver expressionResolver)
         {
             foreach (var parameter in genericParameters)
@@ -125,7 +124,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             }
         }
 
-        [NotNull, ItemNotNull]
         private FixedList<DataType> ResolveTypesInParameters(
              FunctionDeclarationSyntax function,
              ExpressionTypeResolver expressionResolver)
@@ -261,7 +259,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
         }
 
         private void ResolveBodyTypesInDeclarations(
-             [ItemNotNull] IEnumerable<DeclarationSyntax> declarations)
+             IEnumerable<DeclarationSyntax> declarations)
         {
             foreach (var declaration in declarations)
                 ResolveBodyTypesInDeclaration(declaration);

@@ -1,11 +1,10 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public abstract class DeclarationSyntax : Syntax
     {
-        [NotNull] public CodeFile File { get; }
+        public CodeFile File { get; }
         public bool Poisoned { get; private set; }
 
         /// <summary>
@@ -18,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         /// </summary>
         public TextSpan NameSpan { get; }
 
-        protected DeclarationSyntax([NotNull] CodeFile file, TextSpan nameSpan)
+        protected DeclarationSyntax(CodeFile file, TextSpan nameSpan)
         {
             NameSpan = nameSpan;
             File = file;

@@ -1,18 +1,16 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
     public class CLangCompiler
     {
         public int Compile(
-            [NotNull] ICompilerOutput output,
-            [NotNull, ItemNotNull] string[] sourceFiles,
-            [NotNull, ItemNotNull] string[] headerSearchPaths,
-            [NotNull] string outputPath)
+            ICompilerOutput output,
+            string[] sourceFiles,
+            string[] headerSearchPaths,
+            string outputPath)
         {
             // used to have: -Wno-incompatible-pointer-types
             var options = "-std=c11 -fsanitize=undefined -fsanitize=integer -fsanitize=nullability -Wall -Wno-unused-label";

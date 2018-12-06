@@ -1,11 +1,10 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 {
     public class ExpressionVisitor<A>
     {
-        public virtual void VisitStatement([CanBeNull] StatementSyntax statement, A args)
+        public virtual void VisitStatement(StatementSyntax statement, A args)
         {
             switch (statement)
             {
@@ -23,13 +22,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             }
         }
 
-        public virtual void VisitVariableDeclarationStatement([NotNull] VariableDeclarationStatementSyntax variableDeclaration, A args)
+        public virtual void VisitVariableDeclarationStatement(VariableDeclarationStatementSyntax variableDeclaration, A args)
         {
             VisitExpression(variableDeclaration.TypeExpression, args);
             VisitExpression(variableDeclaration.Initializer, args);
         }
 
-        public virtual void VisitExpression([CanBeNull] ExpressionSyntax expression, A args)
+        public virtual void VisitExpression(ExpressionSyntax expression, A args)
         {
             switch (expression)
             {
@@ -101,7 +100,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             }
         }
 
-        public virtual void VisitImplicitConversionExpression([CanBeNull] ImplicitConversionExpression implicitConversionExpression, A args)
+        public virtual void VisitImplicitConversionExpression(ImplicitConversionExpression implicitConversionExpression, A args)
         {
             switch (implicitConversionExpression)
             {
@@ -119,12 +118,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             }
         }
 
-        public virtual void VisitImplicitLiteralConversionExpression([NotNull] ImplicitLiteralConversionExpression implicitLiteralConversionExpression, A args)
+        public virtual void VisitImplicitLiteralConversionExpression(ImplicitLiteralConversionExpression implicitLiteralConversionExpression, A args)
         {
             VisitExpression(implicitLiteralConversionExpression.Expression, args);
         }
 
-        public virtual void VisitImplicitNumericConversionExpression([NotNull] ImplicitNumericConversionExpression implicitNumericConversionExpression, A args)
+        public virtual void VisitImplicitNumericConversionExpression(ImplicitNumericConversionExpression implicitNumericConversionExpression, A args)
         {
             VisitExpression(implicitNumericConversionExpression.Expression, args);
         }
@@ -133,19 +132,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         {
         }
 
-        public virtual void VisitResultExpression([NotNull] ResultExpressionSyntax resultExpression, A args)
+        public virtual void VisitResultExpression(ResultExpressionSyntax resultExpression, A args)
         {
             VisitExpression(resultExpression.Expression, args);
         }
 
-        public virtual void VisitIfExpression([NotNull] IfExpressionSyntax ifExpression, A args)
+        public virtual void VisitIfExpression(IfExpressionSyntax ifExpression, A args)
         {
             VisitExpression(ifExpression.Condition, args);
             VisitExpression(ifExpression.ThenBlock, args);
             VisitExpression(ifExpression.ElseClause, args);
         }
 
-        public virtual void VisitLoopExpression([NotNull] LoopExpressionSyntax loopExpression, A args)
+        public virtual void VisitLoopExpression(LoopExpressionSyntax loopExpression, A args)
         {
             VisitExpression(loopExpression.Block, args);
         }
@@ -162,68 +161,68 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         {
         }
 
-        public virtual void VisitUnsafeExpression([NotNull] UnsafeExpressionSyntax unsafeExpression, A args)
+        public virtual void VisitUnsafeExpression(UnsafeExpressionSyntax unsafeExpression, A args)
         {
             VisitExpression(unsafeExpression.Expression, args);
         }
 
-        public virtual void VisitMemberAccessExpression([NotNull] MemberAccessExpressionSyntax memberAccessExpression, A args)
+        public virtual void VisitMemberAccessExpression(MemberAccessExpressionSyntax memberAccessExpression, A args)
         {
             VisitExpression(memberAccessExpression.Expression, args);
         }
 
-        public virtual void VisitNewObjectExpression([NotNull] NewObjectExpressionSyntax newObjectExpression, A args)
+        public virtual void VisitNewObjectExpression(NewObjectExpressionSyntax newObjectExpression, A args)
         {
             VisitExpression(newObjectExpression.Constructor, args);
             foreach (var argument in newObjectExpression.Arguments) VisitArgument(argument, args);
         }
 
-        public virtual void VisitArgument([NotNull] ArgumentSyntax argument, A args)
+        public virtual void VisitArgument(ArgumentSyntax argument, A args)
         {
             VisitExpression(argument.Value, args);
         }
 
-        public virtual void VisitLifetimeType([NotNull] LifetimeTypeSyntax lifetimeType, A args)
+        public virtual void VisitLifetimeType(LifetimeTypeSyntax lifetimeType, A args)
         {
             VisitExpression(lifetimeType.ReferentTypeExpression, args);
         }
 
-        public virtual void VisitBlock([NotNull] BlockSyntax block, A args)
+        public virtual void VisitBlock(BlockSyntax block, A args)
         {
             foreach (var statement in block.Statements) VisitStatement(statement, args);
         }
 
-        public virtual void VisitAssignmentExpression([NotNull] AssignmentExpressionSyntax assignmentExpression, A args)
+        public virtual void VisitAssignmentExpression(AssignmentExpressionSyntax assignmentExpression, A args)
         {
             VisitExpression(assignmentExpression.LeftOperand, args);
             VisitExpression(assignmentExpression.RightOperand, args);
         }
 
-        public virtual void VisitUnaryExpression([NotNull] UnaryExpressionSyntax unaryExpression, A args)
+        public virtual void VisitUnaryExpression(UnaryExpressionSyntax unaryExpression, A args)
         {
             VisitExpression(unaryExpression.Operand, args);
         }
 
-        public virtual void VisitIdentifierName([NotNull] IdentifierNameSyntax identifierName, A args)
+        public virtual void VisitIdentifierName(IdentifierNameSyntax identifierName, A args)
         {
         }
 
-        public virtual void VisitLiteralExpression([NotNull] LiteralExpressionSyntax literalExpression, A args)
+        public virtual void VisitLiteralExpression(LiteralExpressionSyntax literalExpression, A args)
         {
         }
 
-        public virtual void VisitInvocation([NotNull] InvocationSyntax invocation, A args)
+        public virtual void VisitInvocation(InvocationSyntax invocation, A args)
         {
             VisitExpression(invocation.Callee, args);
             foreach (var argument in invocation.Arguments) VisitArgument(argument, args);
         }
 
-        public virtual void VisitReturnExpression([NotNull] ReturnExpressionSyntax returnExpression, A args)
+        public virtual void VisitReturnExpression(ReturnExpressionSyntax returnExpression, A args)
         {
             VisitExpression(returnExpression.ReturnValue, args);
         }
 
-        public virtual void VisitBinaryExpression([NotNull] BinaryExpressionSyntax binaryExpression, A args)
+        public virtual void VisitBinaryExpression(BinaryExpressionSyntax binaryExpression, A args)
         {
             VisitExpression(binaryExpression.LeftOperand, args);
             VisitExpression(binaryExpression.RightOperand, args);

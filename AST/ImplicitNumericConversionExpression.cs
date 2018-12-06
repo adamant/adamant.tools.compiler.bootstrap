@@ -1,16 +1,15 @@
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class ImplicitNumericConversionExpression : ImplicitConversionExpression
     {
-        [NotNull] public ExpressionSyntax Expression { get; }
-        [NotNull] public NumericType ConvertToType { get; }
+        public ExpressionSyntax Expression { get; }
+        public NumericType ConvertToType { get; }
 
         public ImplicitNumericConversionExpression(
-            [NotNull] ExpressionSyntax expression,
-            [NotNull] NumericType convertToType)
+            ExpressionSyntax expression,
+            NumericType convertToType)
             : base(expression.Span, convertToType)
         {
             Expression = expression;

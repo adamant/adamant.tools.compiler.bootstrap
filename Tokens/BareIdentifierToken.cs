@@ -1,11 +1,10 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
     internal class BareIdentifierToken : IdentifierToken, IBareIdentifierToken
     {
-        public BareIdentifierToken(TextSpan span, [NotNull] string value)
+        public BareIdentifierToken(TextSpan span, string value)
             : base(span, value)
         {
         }
@@ -13,8 +12,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 
     public static partial class TokenFactory
     {
-        [NotNull]
-        public static IIdentifierToken BareIdentifier(TextSpan span, [NotNull] string value)
+
+        public static IIdentifierToken BareIdentifier(TextSpan span, string value)
         {
             return new BareIdentifierToken(span, value);
         }

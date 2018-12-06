@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
@@ -12,12 +11,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
     public class FixedList<T> : IReadOnlyList<T>
         where T : class
     {
-        [NotNull] public static readonly FixedList<T> Empty = new FixedList<T>(Enumerable.Empty<T>());
+        public static readonly FixedList<T> Empty = new FixedList<T>(Enumerable.Empty<T>());
 
-        [NotNull, ItemNotNull] private readonly IReadOnlyList<T> items;
+        private readonly IReadOnlyList<T> items;
 
         [DebuggerStepThrough]
-        public FixedList([NotNull, ItemNotNull] IEnumerable<T> items)
+        public FixedList(IEnumerable<T> items)
         {
             this.items = items.ToList().AsReadOnly();
         }

@@ -9,27 +9,25 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.API
 {
     public class AdamantCompiler
     {
-        [NotNull]
+
         public Task<Package> CompilePackageAsync(
-            [NotNull] string name,
-            [NotNull] [ItemNotNull] IEnumerable<ICodeFileSource> files,
+            string name,
+            IEnumerable<ICodeFileSource> files,
             FixedDictionary<string, Task<Package>> references)
         {
             return CompilePackageAsync(name, files, references, TaskScheduler.Default);
         }
 
-        [NotNull]
         public Task<Package> CompilePackageAsync(
-            [NotNull] string name,
-            [NotNull] [ItemNotNull] IEnumerable<ICodeFileSource> fileSources,
+            string name,
+            IEnumerable<ICodeFileSource> fileSources,
             FixedDictionary<string, Task<Package>> references,
-            [CanBeNull] TaskScheduler taskScheduler)
+            TaskScheduler taskScheduler)
         {
             var lexer = new Lexer();
             var parser = new CompilationUnitParser();
@@ -54,20 +52,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             throw new NotImplementedException();
         }
 
-        [NotNull]
         public Package CompilePackage(
-            [NotNull] string name,
-            [NotNull][ItemNotNull] IEnumerable<ICodeFileSource> fileSources,
-            [NotNull] FixedDictionary<string, Package> references)
+            string name,
+            IEnumerable<ICodeFileSource> fileSources,
+            FixedDictionary<string, Package> references)
         {
             return CompilePackage(name, fileSources.Select(s => s.Load()), references);
         }
 
-        [NotNull]
         public Package CompilePackage(
-            [NotNull] string name,
-            [NotNull] [ItemNotNull] IEnumerable<CodeFile> files,
-            [NotNull] FixedDictionary<string, Package> references)
+            string name,
+            IEnumerable<CodeFile> files,
+            FixedDictionary<string, Package> references)
         {
             var lexer = new Lexer();
             var parser = new CompilationUnitParser();

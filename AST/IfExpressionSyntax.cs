@@ -1,19 +1,18 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class IfExpressionSyntax : ExpressionSyntax
     {
-        [NotNull] public ExpressionSyntax Condition { get; }
-        [NotNull] public ExpressionBlockSyntax ThenBlock { get; }
-        [CanBeNull] public ExpressionSyntax ElseClause { get; }
+        public ExpressionSyntax Condition { get; }
+        public ExpressionBlockSyntax ThenBlock { get; }
+        public ExpressionSyntax ElseClause { get; }
 
         public IfExpressionSyntax(
             TextSpan span,
-            [NotNull] ExpressionSyntax condition,
-            [NotNull] ExpressionBlockSyntax thenBlock,
-            [CanBeNull] ExpressionSyntax elseClause)
+            ExpressionSyntax condition,
+            ExpressionBlockSyntax thenBlock,
+            ExpressionSyntax elseClause)
             : base(span)
         {
             Condition = condition;

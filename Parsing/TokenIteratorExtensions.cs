@@ -2,7 +2,6 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
@@ -16,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     public static class TokenIteratorExtensions
     {
         #region Required
-        public static TextSpan Required<T>([NotNull] this ITokenIterator tokens)
+        public static TextSpan Required<T>(this ITokenIterator tokens)
             where T : IToken
         {
             if (tokens.Current is T token)
@@ -30,8 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             throw new ParseFailedException($"Requires {typeof(T).GetFriendlyName()}, found {tokens.Current.GetType().GetFriendlyName()}");
         }
 
-        [NotNull]
-        public static T RequiredToken<T>([NotNull] this ITokenIterator tokens)
+        public static T RequiredToken<T>(this ITokenIterator tokens)
             where T : IToken
         {
             if (tokens.Current is T token)
@@ -47,8 +45,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         #endregion
 
         #region Accept
-        [MustUseReturnValue]
-        public static bool Accept<T>([NotNull] this ITokenIterator tokens)
+
+        public static bool Accept<T>(this ITokenIterator tokens)
             where T : class, IToken
         {
             if (tokens.Current is T)
@@ -60,9 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return false;
         }
 
-        [MustUseReturnValue]
-        [CanBeNull]
-        public static T AcceptToken<T>([NotNull] this ITokenIterator tokens)
+        public static T AcceptToken<T>(this ITokenIterator tokens)
             where T : class, IToken
         {
             if (tokens.Current is T token)
@@ -76,7 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         #endregion
 
         #region Expect
-        public static TextSpan Expect<T>([NotNull] this ITokenIterator tokens)
+        public static TextSpan Expect<T>(this ITokenIterator tokens)
             where T : IToken
         {
             if (tokens.Current is T token)
@@ -91,9 +87,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new TextSpan(tokens.Current.Span.Start, 0);
         }
 
-        [MustUseReturnValue]
-        [CanBeNull]
-        public static IIdentifierToken ExpectIdentifier([NotNull] this ITokenIterator tokens)
+        public static IIdentifierToken ExpectIdentifier(this ITokenIterator tokens)
         {
             if (tokens.Current is IIdentifierToken identifier)
             {
@@ -110,7 +104,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         /// <summary>
         /// The current token is unexpected, report an error and consume it.
         /// </summary>
-        public static TextSpan UnexpectedToken([NotNull] this ITokenIterator tokens)
+        public static TextSpan UnexpectedToken(this ITokenIterator tokens)
         {
             // TODO shouldn't we ignore or combine unexpected token errors until we parse something successfully?
             var span = tokens.Current.Span;
@@ -119,8 +113,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return span;
         }
 
-        [MustUseReturnValue]
-        public static bool AtEnd<T>([NotNull] this ITokenIterator tokens)
+        public static bool AtEnd<T>(this ITokenIterator tokens)
             where T : IToken
         {
             switch (tokens.Current)

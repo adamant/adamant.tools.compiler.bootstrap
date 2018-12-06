@@ -1,14 +1,12 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public partial class Parser
     {
-        [MustUseReturnValue]
-        [NotNull]
+
         private PatternSyntax ParsePattern()
         {
             var pattern = ParsePatternAtom();
@@ -27,8 +25,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
-        [MustUseReturnValue]
-        [NotNull]
         private PatternSyntax ParsePatternAtom()
         {
             switch (Tokens.Current)

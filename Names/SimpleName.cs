@@ -3,39 +3,36 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Names
 {
     public class SimpleName : Name, IEquatable<SimpleName>
     {
-        [NotNull] private static readonly Regex NeedsQuoted = new Regex(@"[\\ #ₛ]", RegexOptions.Compiled);
+        private static readonly Regex NeedsQuoted = new Regex(@"[\\ #ₛ]", RegexOptions.Compiled);
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [NotNull] public override SimpleName UnqualifiedName => this;
-        [NotNull] public readonly string Text;
+        public override SimpleName UnqualifiedName => this;
+        public readonly string Text;
         public readonly int? Number;
-        [NotNull] public readonly bool IsSpecial;
+        public readonly bool IsSpecial;
 
-        public SimpleName([NotNull] string text)
+        public SimpleName(string text)
             : this(text, false, null)
         {
         }
 
-        [NotNull]
-        public static SimpleName Variable([NotNull] string text, int number)
+        public static SimpleName Variable(string text, int number)
         {
             return new SimpleName(text, false, number);
         }
 
-        [NotNull]
-        public static SimpleName Special([NotNull] string text)
+        public static SimpleName Special(string text)
         {
             return new SimpleName(text, true, null);
         }
 
-        private SimpleName([NotNull] string text, bool isSpecial, int? number)
+        private SimpleName(string text, bool isSpecial, int? number)
         {
             Text = text;
             IsSpecial = isSpecial;
@@ -44,15 +41,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        [NotNull] public override IEnumerable<SimpleName> Segments => this.Yield();
+        public override IEnumerable<SimpleName> Segments => this.Yield();
 
-        public override bool HasQualifier([NotNull] Name name)
+        public override bool HasQualifier(Name name)
         {
             // A simple name doesn't have a qualifier
             return false;
         }
 
-        [NotNull]
         public SimpleName WithoutNumber()
         {
             if (Number == null) return this;

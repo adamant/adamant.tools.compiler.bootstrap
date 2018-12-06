@@ -1,11 +1,9 @@
-using JetBrains.Annotations;
-
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     public class StringConstantType : SimpleType
     {
         #region Singleton
-        [NotNull] internal static readonly StringConstantType Instance = new StringConstantType();
+        internal static readonly StringConstantType Instance = new StringConstantType();
 
         private StringConstantType()
             : base("string")

@@ -1,5 +1,4 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Names
 {
@@ -12,16 +11,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         /// <summary>
         /// The unqualified (i.e. SimpleName) portion of the name
         /// </summary>
-        [NotNull]
+
         public abstract SimpleName UnqualifiedName { get; }
 
         /// <summary>
         /// Construct a name from its segments
         /// </summary>
-        [NotNull]
+
         public static Name From(
-            [NotNull] string firstSegment,
-            [NotNull, ItemNotNull] params string[] segments)
+            string firstSegment,
+            params string[] segments)
         {
             Name name = new SimpleName(firstSegment);
             foreach (var segment in segments)
@@ -29,8 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
             return name;
         }
 
-        [NotNull]
-        public override Name Qualify([NotNull] Name name)
+        public override Name Qualify(Name name)
         {
             switch (name)
             {
@@ -43,9 +41,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
             }
         }
 
-        public abstract bool HasQualifier([NotNull] Name name);
+        public abstract bool HasQualifier(Name name);
 
-        [NotNull]
         public abstract override string ToString();
     }
 }

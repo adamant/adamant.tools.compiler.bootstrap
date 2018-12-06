@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <PackageReference Include="FsCheck.Xunit" Version="2.12.1" />
-    <PackageReference Include="JetBrains.Annotations" Version="2018.2.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>

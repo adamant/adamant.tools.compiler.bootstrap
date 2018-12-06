@@ -1,16 +1,14 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 {
     public class Claims
     {
-        [NotNull]
+
         private readonly Dictionary<Statement, HashSet<Claim>> claims = new Dictionary<Statement, HashSet<Claim>>();
 
-        [NotNull]
-        public HashSet<Claim> After([NotNull] Statement statement)
+        public HashSet<Claim> After(Statement statement)
         {
             if (claims.TryGetValue(statement, out var existingClaims))
                 return existingClaims;

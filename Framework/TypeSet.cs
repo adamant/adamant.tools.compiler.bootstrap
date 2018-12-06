@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
     /// A set of types
     public class TypeSet<TBase>
     {
-        [NotNull] private readonly ISet<Type> types = new HashSet<Type>();
+        private readonly ISet<Type> types = new HashSet<Type>();
 
         public bool Add<T>()
             where T : TBase
@@ -21,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
             return types.Contains(typeof(T));
         }
 
-        public bool Contains([NotNull] Type type)
+        public bool Contains(Type type)
         {
             return types.Contains(type);
         }

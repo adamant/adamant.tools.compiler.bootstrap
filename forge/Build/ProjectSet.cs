@@ -12,7 +12,6 @@ using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using Adamant.Tools.Compiler.Bootstrap.Forge.Config;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
 {
@@ -21,16 +20,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
     /// </summary>
     internal class ProjectSet : IEnumerable<Project>
     {
-        [NotNull] private readonly Dictionary<string, Project> projects = new Dictionary<string, Project>();
+        private readonly Dictionary<string, Project> projects = new Dictionary<string, Project>();
 
-        public void AddAll([NotNull] ProjectConfigSet configs)
+        public void AddAll(ProjectConfigSet configs)
         {
             foreach (var config in configs)
                 GetOrAdd(config, configs);
         }
 
-        [NotNull]
-        private Project GetOrAdd([NotNull] ProjectConfig config, [NotNull] ProjectConfigSet configs)
+        private Project GetOrAdd(ProjectConfig config, ProjectConfigSet configs)
         {
             var projectDir = System.IO.Path.GetDirectoryName(config.FullPath);
             if (projects.TryGetValue(projectDir, out var existingProject))
@@ -50,19 +48,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             return project;
         }
 
-        [NotNull]
         public IEnumerator<Project> GetEnumerator()
         {
             return projects.Values.GetEnumerator();
         }
 
-        [NotNull]
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
         }
 
-        [NotNull]
         public async Task Build(TaskScheduler taskScheduler, bool verbose)
         {
             var taskFactory = new TaskFactory(taskScheduler);
@@ -88,12 +83,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             await Task.WhenAll(projectBuilds.Values);
         }
 
-        [NotNull]
         private static async Task<Package> Build(
-            [NotNull] AdamantCompiler compiler,
-            [NotNull] Project project,
-            [NotNull] Task<FixedDictionary<Project, Task<Package>>> projectBuildsTask,
-            [NotNull] object consoleLock)
+            AdamantCompiler compiler,
+            Project project,
+            Task<FixedDictionary<Project, Task<Package>>> projectBuildsTask,
+            object consoleLock)
         {
             var projectBuilds = await projectBuildsTask;
             var sourceDir = Path.Combine(project.Path, "src");
@@ -131,19 +125,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             return package;
         }
 
-        [NotNull]
         private static CodeFile LoadCode(
-            [NotNull] string path,
-            [NotNull] string sourceDir,
-            [NotNull, ItemNotNull] FixedList<string> rootNamespace)
+            string path,
+            string sourceDir,
+            FixedList<string> rootNamespace)
         {
             var relativeDirectory = Path.GetDirectoryName(Path.GetRelativePath(sourceDir, path));
             var ns = rootNamespace.Concat(relativeDirectory.SplitOrEmpty(Path.DirectorySeparatorChar)).ToFixedList();
             return CodeFile.Load(path, ns);
         }
 
-        [NotNull]
-        private static string PrepareCacheDir([NotNull] Project project)
+        private static string PrepareCacheDir(Project project)
         {
             var cacheDir = Path.Combine(project.Path, ".forge-cache");
             Directory.CreateDirectory(cacheDir); // Ensure the cache directory exists
@@ -157,9 +149,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
         }
 
         private static bool OutputDiagnostics(
-            [NotNull] Project project,
-            [NotNull] Package package,
-            [NotNull] object consoleLock)
+            Project project,
+            Package package,
+            object consoleLock)
         {
             var diagnostics = package.Diagnostics;
             if (!diagnostics.Any()) return false;
@@ -190,8 +182,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             return true;
         }
 
-        [NotNull]
-        private static string EmitCode([NotNull] Project project, [NotNull]  Package package, [NotNull] string cacheDir)
+        private static string EmitCode(Project project, Package package, string cacheDir)
         {
             var emittedPackages = new HashSet<Package>();
             var packagesToEmit = new Queue<Package>();
@@ -215,12 +206,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
                 {
                     outputPath = System.IO.Path.Combine(cacheDir, "program.c");
                 }
-                    break;
+                break;
                 case ProjectTemplate.Lib:
                 {
                     outputPath = System.IO.Path.Combine(cacheDir, "lib.c");
                 }
-                    break;
+                break;
                 default:
                     throw NonExhaustiveMatchException.ForEnum(project.Template);
             }
@@ -231,10 +222,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
         }
 
         private static bool CompileCode(
-            [NotNull] Project project,
-            [NotNull] string cacheDir,
-            [NotNull] string codePath,
-            [NotNull] object consoleLock)
+            Project project,
+            string cacheDir,
+            string codePath,
+            object consoleLock)
         {
             var compiler = new CLangCompiler();
 
@@ -252,12 +243,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
                 {
                     outputPath = System.IO.Path.ChangeExtension(codePath, "exe");
                 }
-                    break;
+                break;
                 case ProjectTemplate.Lib:
                 {
                     outputPath = System.IO.Path.ChangeExtension(codePath, "dll");
                 }
-                    break;
+                break;
                 default:
                     throw NonExhaustiveMatchException.ForEnum(project.Template);
             }
@@ -272,8 +263,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             }
         }
 
-        [NotNull]
-        [ItemNotNull]
         private List<Project> TopologicalSort()
         {
             var projectAlive = projects.Values.ToDictionary(p => p, p => SortState.Alive);
@@ -284,7 +273,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             return sorted;
         }
 
-        private static void TopologicalSortVisit([NotNull] Project project, [NotNull] Dictionary<Project, SortState> state, [NotNull][ItemNotNull] List<Project> sorted)
+        private static void TopologicalSortVisit(Project project, Dictionary<Project, SortState> state, List<Project> sorted)
         {
             switch (state[project])
             {
