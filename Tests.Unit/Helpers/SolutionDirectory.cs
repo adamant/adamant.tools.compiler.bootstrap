@@ -1,6 +1,5 @@
 using System.IO;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers
 {

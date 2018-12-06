@@ -84,7 +84,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
             LexicalScope containingScope,
             DeclarationSyntax declaration)
         {
-            var binder = new ExpressionNameBinder(diagnostics, declaration.File);
+            var binder = new ExpressionNameBinder();
             var diagnosticCount = diagnostics.Count;
             switch (declaration)
             {

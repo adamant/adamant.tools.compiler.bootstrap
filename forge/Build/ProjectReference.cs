@@ -1,4 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build

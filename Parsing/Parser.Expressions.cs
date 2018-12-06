@@ -602,7 +602,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             ExpressionSyntax type = null;
             if (Tokens.Accept<IColonToken>())
                 type = ParseExpression();
-            var inKeyword = Tokens.Expect<IInKeywordToken>();
+            Tokens.Expect<IInKeywordToken>();
             var expression = ParseExpression();
             var block = ParseBlock();
             var span = TextSpan.Covering(foreachKeyword, block.Span);

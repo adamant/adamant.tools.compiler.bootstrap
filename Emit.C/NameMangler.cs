@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
     /// </summary>
     public class NameMangler
     {
-        IdnMapping mapping = new IdnMapping();
+        readonly IdnMapping mapping = new IdnMapping();
 
         // Note, we don't have to worry about whether the identifier starts with
         // a number because it will end up prefixed anyway.

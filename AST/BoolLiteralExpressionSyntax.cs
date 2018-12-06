@@ -1,5 +1,4 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {

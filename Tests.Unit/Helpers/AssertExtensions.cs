@@ -1,7 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 using Xunit;
 

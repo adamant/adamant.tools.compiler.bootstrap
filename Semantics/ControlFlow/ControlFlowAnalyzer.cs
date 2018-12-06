@@ -185,7 +185,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     else
                         throw new NotImplementedException();
                 case IfExpressionSyntax ifExpression:
-                    //ConvertToStatement(ifExpression.Condition);
                     // TODO assign the result into the temp, branch and execute then or else, assign result
                     throw new NotImplementedException();
                 case UnsafeExpressionSyntax unsafeExpression:
@@ -251,9 +250,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     var rightOperand = ConvertToOperand(expression.RightOperand);
                     return new BinaryOperation(leftOperand, expression.Operator, rightOperand, (SimpleType)expression.Type);
                 }
-                //case IAsKeywordToken _:
-                //    ConvertExpressionAnalysisToStatement(binaryOperator.LeftOperand, statements);
-                //    break;
                 default:
                     throw NonExhaustiveMatchException.ForEnum(expression.Operator);
             }
@@ -311,8 +307,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case IdentifierNameSyntax identifier:
                     // TODO what if this isn't just a variable?
                     return graph.VariableFor(identifier.ReferencedSymbol.FullName.UnqualifiedName);
-                //case VariableExpression variableExpression:
-                //    return LookupVariable(variableExpression.Name);
                 default:
                     throw NonExhaustiveMatchException.For(value);
             }

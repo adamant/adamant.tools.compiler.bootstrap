@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Names

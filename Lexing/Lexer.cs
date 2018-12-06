@@ -4,7 +4,6 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using JetBrains.Annotations;
 

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
-using Void = Adamant.Tools.Compiler.Bootstrap.Framework.Void;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 {

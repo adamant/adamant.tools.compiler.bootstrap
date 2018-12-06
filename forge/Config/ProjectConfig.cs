@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 

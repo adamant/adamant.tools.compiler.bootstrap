@@ -1,10 +1,8 @@
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
 using JetBrains.Annotations;
 using Xunit;

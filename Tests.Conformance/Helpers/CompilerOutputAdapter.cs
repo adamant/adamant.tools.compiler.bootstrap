@@ -1,5 +1,4 @@
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;
 using Xunit.Abstractions;
 

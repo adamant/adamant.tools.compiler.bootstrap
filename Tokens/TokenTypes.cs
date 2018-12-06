@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Reflection;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using JetBrains.Annotations;

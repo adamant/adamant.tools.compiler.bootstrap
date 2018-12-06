@@ -10,7 +10,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
     [UnitTest]
     public class DotNetFrameworkTests
     {
-
         private readonly ITestOutputHelper output;
 
         public DotNetFrameworkTests(ITestOutputHelper output)

@@ -1,5 +1,4 @@
 using Adamant.Tools.Compiler.Bootstrap.Emit.C.Properties;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
 using JetBrains.Annotations;
 

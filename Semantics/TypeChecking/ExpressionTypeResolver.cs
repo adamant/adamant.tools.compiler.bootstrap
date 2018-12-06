@@ -258,24 +258,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                         InferExpressionType(argument.Value);
 
                     genericName.NameType.BeginFulfilling();
-                    var nameType = InferNameType(genericName.Name, genericName.Span);
-                    //if (nameType is OverloadedType overloadedType)
-                    //{
-                    //    nameType = overloadedType.Types.OfType<GenericType>()
-                    //        .Single(t => t.GenericArity == genericName.Arity).NotNull();
-                    //}
+                    var nameType = InferNameType(genericName);
 
                     // TODO check that argument types match function type
                     genericName.NameType.Fulfill(nameType);
 
                     switch (nameType)
                     {
-                        // TODO implement
-                        //case Metatype metatype:
-                        //    genericInvocation.Type.Computed(
-                        //        metatype.WithGenericArguments(
-                        //            genericInvocation.Arguments.Select(a => a.Value.Type.AssertComputed())));
-                        //    break;
                         case MetaFunctionType metaFunctionType:
                             return genericName.Type = metaFunctionType.ResultType;
                         case UnknownType _:
@@ -301,9 +290,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 case ResultExpressionSyntax resultExpression:
                     InferExpressionType(resultExpression.Expression);
                     return resultExpression.Type = DataType.Never;
-                //                case UninitializedExpressionSyntax uninitializedExpression:
-                //                    // TODO assign a type to the expression
-                //                    return uninitializedExpression.Type.Computed(DataType.Unknown);
                 case MemberAccessExpressionSyntax memberAccess:
                     return InferMemberAccessType(memberAccess);
                 case BreakExpressionSyntax breakExpression:
@@ -407,48 +393,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             }
         }
 
-        private DataType InferNameType(
-            SimpleName name,
-            TextSpan span)
+        private DataType InferNameType(GenericNameSyntax genericName)
         {
-            //var declaration = context.Scope.Lookup(name);
-            //switch (declaration)
-            //{
-            //    case TypeDeclarationSyntax typeDeclaration:
-            //        DeclarationTypeChecker.CheckTypeDeclaration(typeDeclaration);
-            //        return typeDeclaration.Type.Fulfilled();
-            //    case ParameterSyntax parameter:
-            //        return parameter.Type.Fulfilled();
-            //    case VariableDeclarationStatementSyntax variableDeclaration:
-            //        return variableDeclaration.Type.Fulfilled();
-            //    case GenericParameterSyntax genericParameter:
-            //        return genericParameter.Type.Fulfilled();
-            //    case ForeachExpressionSyntax foreachExpression:
-            //        return foreachExpression.VariableType.AssertComputed();
-            //    case FunctionDeclarationSyntax functionDeclaration:
-            //        return functionDeclaration.Type.AssertComputed();
-            //    case null:
-            //        diagnostics.Add(NameBindingError.CouldNotBindName(context.File, span));
-            //        return DataType.Unknown; // unknown
-            //    case TypeDeclaration typeDeclaration:
-            //        return typeDeclaration.Type.AssertResolved();
-            //    case CompositeSymbol composite:
-            //        foreach (var typeDeclaration in composite.Symbols.OfType<TypeDeclarationSyntax>())
-            //        {
-            //            TypeChecker.CheckTypeDeclaration(typeDeclaration);
-            //            typeDeclaration.Type.Fulfilled();
-            //        }
-            //        return new OverloadedType(composite.Symbols.SelectMany(s => s.Types));
-            //    default:
-            //        throw NonExhaustiveMatchException.For(declaration);
-            //}
             throw new NotImplementedException();
         }
 
-        private void CheckArgument(
-            ArgumentSyntax argument)
+        private void CheckArgument(ArgumentSyntax argument)
         {
-            //            InferExpressionType(argument.Value);
             throw new NotImplementedException();
         }
 
@@ -475,10 +426,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     compatible = NumericOperatorTypesAreCompatible(ref binaryExpression.LeftOperand, ref binaryExpression.RightOperand, null);
                     binaryExpression.Type = compatible ? leftType : DataType.Unknown;
                     break;
-                //case IAsteriskEqualsToken _:
-                //    typeError = leftOperand != rightOperand || leftOperand == ObjectType.Bool;
-                //    binaryOperatorExpression.Type.Computed(!typeError ? leftOperand : DataType.Unknown);
-                //    break;
                 case BinaryOperator.EqualsEquals:
                 case BinaryOperator.NotEqual:
                 case BinaryOperator.LessThan:
@@ -489,29 +436,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                         || NumericOperatorTypesAreCompatible(ref binaryExpression.LeftOperand, ref binaryExpression.RightOperand, null);
                     binaryExpression.Type = DataType.Bool;
                     break;
-                //case IEqualsToken _:
-                //    typeError = leftOperandCore != rightOperandCore;
-                //    if (!typeError)
-                //        binaryOperatorExpression.Type.Computed(leftOperand);
-                //    break;
                 case BinaryOperator.And:
                 case BinaryOperator.Or:
                     compatible = leftType == DataType.Bool && rightType == DataType.Bool;
                     binaryExpression.Type = DataType.Bool;
                     break;
-                //case IDollarToken _:
-                //case IDollarLessThanToken _:
-                //case IDollarLessThanNotEqualToken _:
-                //case IDollarGreaterThanToken _:
-                //case IDollarGreaterThanNotEqualToken _:
-                //    typeError = leftOperand != ObjectType.Type;
-                //    break;
-                //case IAsKeywordToken _:
-                //    var asType = EvaluateExpression(binaryOperatorExpression.RightOperand);
-                //    // TODO check that left operand can be converted to this
-                //    typeError = false;
-                //    binaryOperatorExpression.Type.Computed(asType);
-                //    break;
                 default:
                     throw NonExhaustiveMatchException.For(@operator);
             }
@@ -536,14 +465,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 case PointerType _:
                 {
                     // TODO it may need to be size
-                    //ImposeIntegerConstantType(UnsizedIntegerType.Offset, rightOperand);
                     throw new NotImplementedException();
-                    //return rightType != DataType.Size &&
-                    //       rightType != DataType.Offset;
                 }
                 case IntegerConstantType _:
                     // TODO may need to promote based on size
-                    //ImposeIntegerConstantType(rightType, leftOperand);
                     throw new NotImplementedException();
                 //return !IsIntegerType(rightType);
                 case UnsizedIntegerType integerType:
@@ -565,11 +490,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     // exactly which types this doesn't work on.
                     throw NonExhaustiveMatchException.For(leftType);
             }
-        }
-
-        private static bool IsIntegerType(DataType type)
-        {
-            return type is IntegerType;
         }
 
         private DataType InferUnaryExpressionType(UnaryExpressionSyntax unaryExpression)
