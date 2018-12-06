@@ -58,8 +58,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             {
                 var type = CheckAndEvaluateTypeExpression(variableDeclaration.TypeExpression);
                 variableDeclaration.Type.Fulfill(type);
-                InsertImplicitConversionIfNeeded(ref variableDeclaration.Initializer, type);
-                // TODO check that the initializer type is compatible with the variable type
+                if (variableDeclaration.Initializer != null)
+                {
+                    InsertImplicitConversionIfNeeded(ref variableDeclaration.Initializer, type);
+                    // TODO check that the initializer type is compatible with the variable type
+                }
             }
             else if (variableDeclaration.Initializer != null)
             {
@@ -209,7 +212,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     return InferUnaryExpressionType(unaryOperatorExpression);
                 case LifetimeTypeSyntax lifetimeType:
                     InferExpressionType(lifetimeType.ReferentTypeExpression);
-                    if (lifetimeType.ReferentTypeExpression.Type != DataType.Type)
+                    if (!IsType(lifetimeType.ReferentTypeExpression.Type))
                         diagnostics.Add(TypeError.MustBeATypeExpression(file, lifetimeType.ReferentTypeExpression.Span));
                     return expression.Type = DataType.Type;
                 case BlockSyntax blockExpression:
@@ -317,6 +320,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
+        }
+
+        private static bool IsType(DataType dataType)
+        {
+            return dataType == DataType.Type || dataType is Metatype;
         }
 
         private DataType InferInvocationType(InvocationSyntax invocation)
@@ -629,8 +637,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             }
 
             var type = InferExpressionType(typeExpression);
-            if (!(type is Metatype)
-                && type != DataType.Type)
+            if (!IsType(typeExpression.Type))
             {
                 diagnostics.Add(TypeError.MustBeATypeExpression(file, typeExpression.Span));
                 return DataType.Unknown;
