@@ -1,7 +1,25 @@
 ﻿#include "RuntimeLibrary.h"
 #include <stdio.h>
-//#include <windows.h>
 
+// Reminder: `extern` function declarations are so the compiler knows what
+// object file to put the non-inline copies of inlined functions in.
+
+// Integer types
+extern inline _int _int__add(_int x, _int y);
+
+// String type
+extern String String___op_string_literal__2(_size count, _byte* bytes);
+
+// Direct support for console IO through the runtime for now
+void print_string__1(String text)
+{
+    printf("%.*s\n", (int)text.byte_count._value, (char*)text.bytes);
+}
+
+// Test of calling windows memory allocation functions, rather than including
+// windows.h, we directly declare the functions. This demonstrates that external
+// function calls could do this.
+//#include <windows.h>
 typedef void* LPVOID;
 typedef LPVOID HANDLE;
 typedef size_t SIZE_T;
@@ -20,13 +38,4 @@ void test()
     HeapFree(GetProcessHeap(), 0, ptr);
     //void* ptr = aligned_alloc(8, 32);
     //free(ptr);
-}
-
-// Inline functions from RuntimeLibrary.h
-extern String String___op_string_literal__2(_size count, _byte* bytes);
-
-
-void print_string__1(String text)
-{
-    printf("%.*s\n", (int)text.byte_count._value, (char*)text.bytes);
 }

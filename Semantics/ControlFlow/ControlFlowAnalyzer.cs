@@ -217,6 +217,49 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
         }
 
+        private Operand ConvertToOperand(ExpressionSyntax expression)
+        {
+            var value = ConvertToValue(expression);
+            if (value is Operand operand) return operand;
+            var tempVariable = graph.Let(expression.Type.AssertResolved());
+            graph.AddAssignment(tempVariable.Reference, value);
+            return new CopyPlace(tempVariable.Reference);
+        }
+
+        private Value ConvertBinaryExpressionToValue(BinaryExpressionSyntax expression)
+        {
+            switch (expression.Operator)
+            {
+                case BinaryOperator.Plus:
+                case BinaryOperator.EqualsEquals:
+                case BinaryOperator.NotEqual:
+                case BinaryOperator.LessThan:
+                case BinaryOperator.LessThanOrEqual:
+                case BinaryOperator.GreaterThan:
+                case BinaryOperator.GreaterThanOrEqual:
+                {
+                    // TODO handle calls to overloaded operators
+                    var leftOperand = ConvertToOperand(expression.LeftOperand);
+                    var rightOperand = ConvertToOperand(expression.RightOperand);
+                    return new BinaryOperation(leftOperand, expression.Operator, rightOperand, (SimpleType)expression.Type);
+                }
+                case BinaryOperator.And:
+                case BinaryOperator.Or:
+                {
+                    // TODO handle calls to overloaded operators
+                    // TODO handle short circuiting if needed
+                    var leftOperand = ConvertToOperand(expression.LeftOperand);
+                    var rightOperand = ConvertToOperand(expression.RightOperand);
+                    return new BinaryOperation(leftOperand, expression.Operator, rightOperand, (SimpleType)expression.Type);
+                }
+                //case IAsKeywordToken _:
+                //    ConvertExpressionAnalysisToStatement(binaryOperator.LeftOperand, statements);
+                //    break;
+                default:
+                    throw NonExhaustiveMatchException.ForEnum(expression.Operator);
+            }
+        }
+
         private Value ConvertUnaryExpressionToValue(UnaryExpressionSyntax expression)
         {
             switch (expression.Operator)
@@ -259,47 +302,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 }
                 default:
                     throw NonExhaustiveMatchException.For(invocation.Callee);
-            }
-        }
-
-        private Operand ConvertToOperand(ExpressionSyntax expression)
-        {
-            var value = ConvertToValue(expression);
-            if (value is Operand operand) return operand;
-            var tempVariable = graph.Let(expression.Type.AssertResolved());
-            graph.AddAssignment(tempVariable.Reference, value);
-            return new CopyPlace(tempVariable.Reference);
-        }
-
-        private Value ConvertBinaryExpressionToValue(BinaryExpressionSyntax expression)
-        {
-            switch (expression.Operator)
-            {
-                case BinaryOperator.Plus:
-                case BinaryOperator.EqualsEquals:
-                case BinaryOperator.NotEqual:
-                case BinaryOperator.LessThan:
-                case BinaryOperator.LessThanOrEqual:
-                case BinaryOperator.GreaterThan:
-                case BinaryOperator.GreaterThanOrEqual:
-                {
-                    var leftOperand = ConvertToOperand(expression.LeftOperand);
-                    var rightOperand = ConvertToOperand(expression.RightOperand);
-                    return new BinaryOperation(leftOperand, expression.Operator, rightOperand);
-                }
-                case BinaryOperator.And:
-                case BinaryOperator.Or:
-                {
-                    // TODO handle short circuiting if needed
-                    var leftOperand = ConvertToOperand(expression.LeftOperand);
-                    var rightOperand = ConvertToOperand(expression.RightOperand);
-                    return new BinaryOperation(leftOperand, expression.Operator, rightOperand);
-                }
-                //case IAsKeywordToken _:
-                //    ConvertExpressionAnalysisToStatement(binaryOperator.LeftOperand, statements);
-                //    break;
-                default:
-                    throw NonExhaustiveMatchException.ForEnum(expression.Operator);
             }
         }
 

@@ -61,6 +61,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             return mapping.GetAscii(builder.ToString());
         }
 
+        public string Mangle(SimpleType type)
+        {
+            return Mangle(type.Name);
+        }
+
         public string Mangle(ObjectType type)
         {
             // builder with room for the characters we are likely to add

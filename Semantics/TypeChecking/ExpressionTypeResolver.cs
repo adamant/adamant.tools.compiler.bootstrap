@@ -465,7 +465,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             {
                 case BinaryOperator.Plus:
                     compatible = NumericOperatorTypesAreCompatible(ref binaryExpression.LeftOperand, ref binaryExpression.RightOperand, null);
-                    binaryExpression.Type = !compatible ? leftType : DataType.Unknown;
+                    binaryExpression.Type = compatible ? leftType : DataType.Unknown;
                     break;
                 //case IAsteriskEqualsToken _:
                 //    typeError = leftOperand != rightOperand || leftOperand == ObjectType.Bool;
@@ -545,7 +545,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 case SizedIntegerType integerType:
                     // TODO this isn't right we might need to convert either of them
                     InsertImplicitConversionIfNeeded(ref rightOperand, integerType);
-                    return rightOperand.Type is UnsizedIntegerType;
+                    return rightOperand.Type is SizedIntegerType;
                 case ObjectType _:
                 case BoolType _:
                 case VoidType _: // This might need a special error message

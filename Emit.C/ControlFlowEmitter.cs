@@ -116,6 +116,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     var arguments = virtualCall.Arguments.Select(ConvertValue).Prepend(self);
                     return $"{self}._vtable->{mangledName}({string.Join(", ", arguments)})";
                 }
+                case BinaryOperation binaryOperation:
+                {
+                    var left = ConvertValue(binaryOperation.LeftOperand);
+                    var right = ConvertValue(binaryOperation.RightOperand);
+                    var operationType = nameMangler.Mangle(binaryOperation.Type);
+                    string @operator;
+                    switch (binaryOperation.Operator)
+                    {
+                        // If a binary operator was emitting for a boolean operation,
+                        // then it doesn't short circuit, we just call the function
+                        case BinaryOperator.And:
+                            @operator = "and";
+                            break;
+                        case BinaryOperator.Or:
+                            @operator = "or";
+                            break;
+                        case BinaryOperator.Plus:
+                            @operator = "add";
+                            break;
+                        default:
+                            throw NonExhaustiveMatchException.For(binaryOperation.Operator);
+                    }
+                    return $"{operationType}__{@operator}({left}, {right})";
+                }
                 default:
                     throw NonExhaustiveMatchException.For(value);
             }
