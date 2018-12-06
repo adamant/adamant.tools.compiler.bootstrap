@@ -3,6 +3,8 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -458,23 +460,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             if (leftType == DataType.Unknown || rightType == DataType.Unknown)
                 return binaryExpression.Type = DataType.Unknown;
 
-            bool typeError;
+            bool compatible;
             switch (@operator)
             {
                 case BinaryOperator.Plus:
-                    typeError = CheckNumericOperator(ref binaryExpression.LeftOperand, ref binaryExpression.RightOperand, null);
-                    binaryExpression.Type = !typeError ? leftType : DataType.Unknown;
+                    compatible = NumericOperatorTypesAreCompatible(ref binaryExpression.LeftOperand, ref binaryExpression.RightOperand, null);
+                    binaryExpression.Type = !compatible ? leftType : DataType.Unknown;
                     break;
-                //case IPlusEqualsToken _:
-                //    typeError = CheckNumericOperator(
-                //        binaryOperatorExpression.LeftOperand,
-                //        binaryOperatorExpression.RightOperand,
-                //        binaryOperatorExpression.LeftOperand.Type.AssertComputed());
-                //    //typeError = (leftOperand != rightOperand || leftOperand == ObjectType.Bool)
-                //    //    // TODO really pointer arithmetic should allow `size` and `offset`, but we don't have constants working correct yet
-                //    //    && !(leftOperand is PointerType && (rightOperand == ObjectType.Size || rightOperand == ObjectType.Int));
-                //    binaryOperatorExpression.Type.Computed(!typeError ? leftOperand : DataType.Unknown);
-                //    break;
                 //case IAsteriskEqualsToken _:
                 //    typeError = leftOperand != rightOperand || leftOperand == ObjectType.Bool;
                 //    binaryOperatorExpression.Type.Computed(!typeError ? leftOperand : DataType.Unknown);
@@ -485,8 +477,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 case BinaryOperator.LessThanOrEqual:
                 case BinaryOperator.GreaterThan:
                 case BinaryOperator.GreaterThanOrEqual:
-                    typeError = !(leftTypeCore == DataType.Bool && rightTypeCore == DataType.Bool)
-                        && CheckNumericOperator(ref binaryExpression.LeftOperand, ref binaryExpression.RightOperand, null);
+                    compatible = (leftTypeCore == DataType.Bool && rightTypeCore == DataType.Bool)
+                        || NumericOperatorTypesAreCompatible(ref binaryExpression.LeftOperand, ref binaryExpression.RightOperand, null);
                     binaryExpression.Type = DataType.Bool;
                     break;
                 //case IEqualsToken _:
@@ -496,8 +488,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 //    break;
                 case BinaryOperator.And:
                 case BinaryOperator.Or:
-                    typeError = leftType != DataType.Bool || rightType != DataType.Bool;
-
+                    compatible = leftType == DataType.Bool && rightType == DataType.Bool;
                     binaryExpression.Type = DataType.Bool;
                     break;
                 //case IDollarToken _:
@@ -516,7 +507,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 default:
                     throw NonExhaustiveMatchException.For(@operator);
             }
-            if (typeError)
+            if (!compatible)
                 diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandsOfType(file,
                     binaryExpression.Span, @operator,
                     binaryExpression.LeftOperand.Type,
@@ -525,7 +516,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             return binaryExpression.Type;
         }
 
-        private bool CheckNumericOperator(
+        private bool NumericOperatorTypesAreCompatible(
             ref ExpressionSyntax leftOperand,
             ref ExpressionSyntax rightOperand,
             DataType resultType)
@@ -556,9 +547,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     InsertImplicitConversionIfNeeded(ref rightOperand, integerType);
                     return rightOperand.Type is UnsizedIntegerType;
                 case ObjectType _:
+                case BoolType _:
+                case VoidType _: // This might need a special error message
+                case StringConstantType _: // String concatenation will be handled outside this function
                     // Other object types can't be used in numeric expressions
                     return false;
                 default:
+                    // In theory we could just return false here, but this way we are forced to note
+                    // exactly which types this doesn't work on.
                     throw NonExhaustiveMatchException.For(leftType);
             }
         }

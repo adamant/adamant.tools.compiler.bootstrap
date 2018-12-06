@@ -1,7 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using JetBrains.Annotations;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
     public enum UnaryOperator
     {
@@ -15,7 +14,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
     public static class UnaryOperatorExtensions
     {
-        [NotNull]
         public static string ToSymbolString(this UnaryOperator @operator)
         {
             switch (@operator)

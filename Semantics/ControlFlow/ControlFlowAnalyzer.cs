@@ -5,6 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.AST.Visitors;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
@@ -94,18 +95,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case IdentifierNameSyntax _:
                     // Ignore, reading from variable does nothing.
                     break;
-                case BinaryExpressionSyntax binaryOperatorExpression:
-                    switch (binaryOperatorExpression.Operator)
-                    {
-                        //case BinaryOperator. EqualsToken _:
-                        //    var lvalue = ConvertToLValue(binaryOperatorExpression.LeftOperand);
-                        //    ConvertToAssignmentStatement(lvalue, binaryOperatorExpression.RightOperand, statements);
-                        //    break;
-                        default:
-                            // Could be side effects possibly.
-                            ConvertToAssignmentStatement(expression);
-                            break;
-                    }
+                case UnaryExpressionSyntax _:
+                case BinaryExpressionSyntax _:
+                case InvocationSyntax _:
+                    ConvertToAssignmentStatement(expression);
                     break;
                 case ReturnExpressionSyntax returnExpression:
                     if (returnExpression.ReturnValue != null)
@@ -133,9 +126,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case UnsafeExpressionSyntax unsafeExpression:
                     ConvertToStatement(unsafeExpression.Expression);
                     break;
-                case InvocationSyntax invocation:
-                    ConvertToAssignmentStatement(invocation);
+                case AssignmentExpressionSyntax assignmentExpression:
+                {
+                    var place = ConvertToPlace(assignmentExpression.LeftOperand);
+                    var value = ConvertToValue(assignmentExpression.RightOperand);
+                    graph.AddAssignment(place, value);
                     break;
+                }
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
@@ -147,8 +144,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             if (expression.Type is VoidType) graph.AddAction(value);
             else
             {
-                var place = graph.Let(expression.Type.AssertResolved());
-                graph.AddAssignment(place.Reference, value);
+                var tempVariable = graph.Let(expression.Type.AssertResolved());
+                graph.AddAssignment(tempVariable.Reference, value);
             }
         }
 
@@ -173,12 +170,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                             return new DeclaredValue(symbol.FullName);
                     }
                 }
+                case UnaryExpressionSyntax unaryExpression:
+                    return ConvertUnaryExpressionToValue(unaryExpression);
                 case BinaryExpressionSyntax binaryExpression:
                     return ConvertBinaryExpressionToValue(binaryExpression);
                 case IntegerLiteralExpressionSyntax _:
                     throw new InvalidOperationException("Integer literals should have an implicit conversion around them");
                 case StringLiteralExpressionSyntax _:
                     throw new InvalidOperationException("String literals should have an implicit conversion around them");
+                case BoolLiteralExpressionSyntax boolLiteral:
+                    return new BooleanConstant(boolLiteral.Value);
                 case ImplicitNumericConversionExpression implicitNumericConversion:
                     if (implicitNumericConversion.Expression.Type.AssertResolved() is IntegerConstantType constantType)
                         return new IntegerConstant(constantType.Value, implicitNumericConversion.Type.AssertResolved());
@@ -216,6 +217,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
         }
 
+        private Value ConvertUnaryExpressionToValue(UnaryExpressionSyntax expression)
+        {
+            switch (expression.Operator)
+            {
+                case UnaryOperator.Not:
+                    var operand = ConvertToOperand(expression.Operand);
+                    return new UnaryOperation(expression.Operator, operand);
+                case UnaryOperator.Plus:
+                    // This is a no-op
+                    return ConvertToValue(expression.Operand);
+                default:
+                    throw NonExhaustiveMatchException.ForEnum(expression.Operator);
+            }
+        }
+
         private Value ConvertInvocationToValue(InvocationSyntax invocation)
         {
             switch (invocation.Callee)
@@ -250,40 +266,50 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         {
             var value = ConvertToValue(expression);
             if (value is Operand operand) return operand;
-            var temp = graph.Let(expression.Type.AssertResolved());
-            graph.AddAssignment(temp.Reference, value);
-            return new CopyPlace(temp.Reference);
+            var tempVariable = graph.Let(expression.Type.AssertResolved());
+            graph.AddAssignment(tempVariable.Reference, value);
+            return new CopyPlace(tempVariable.Reference);
         }
 
-        private Value ConvertBinaryExpressionToValue(BinaryExpressionSyntax binary)
+        private Value ConvertBinaryExpressionToValue(BinaryExpressionSyntax expression)
         {
-            switch (binary.Operator)
+            switch (expression.Operator)
             {
-                //case PlusToken _:
-                //    currentBlock.Add(new AddStatement(lvalue,
-                //        ConvertToLValue(cfg, binaryOperator.LeftOperand),
-                //        ConvertToLValue(cfg, binaryOperator.RightOperand)));
-                //    break;
+                case BinaryOperator.Plus:
+                case BinaryOperator.EqualsEquals:
+                case BinaryOperator.NotEqual:
                 case BinaryOperator.LessThan:
                 case BinaryOperator.LessThanOrEqual:
                 case BinaryOperator.GreaterThan:
                 case BinaryOperator.GreaterThanOrEqual:
-                    // TODO generate the correct value
-                    throw new NotImplementedException();
+                {
+                    var leftOperand = ConvertToOperand(expression.LeftOperand);
+                    var rightOperand = ConvertToOperand(expression.RightOperand);
+                    return new BinaryOperation(leftOperand, expression.Operator, rightOperand);
+                }
+                case BinaryOperator.And:
+                case BinaryOperator.Or:
+                {
+                    // TODO handle short circuiting if needed
+                    var leftOperand = ConvertToOperand(expression.LeftOperand);
+                    var rightOperand = ConvertToOperand(expression.RightOperand);
+                    return new BinaryOperation(leftOperand, expression.Operator, rightOperand);
+                }
                 //case IAsKeywordToken _:
                 //    ConvertExpressionAnalysisToStatement(binaryOperator.LeftOperand, statements);
                 //    break;
                 default:
-                    throw NonExhaustiveMatchException.For(binary.Operator);
+                    throw NonExhaustiveMatchException.ForEnum(expression.Operator);
             }
         }
 
-        private Place ConvertToLValue(ExpressionSyntax value)
+        private Place ConvertToPlace(ExpressionSyntax value)
         {
             switch (value)
             {
                 case IdentifierNameSyntax identifier:
-                    return graph.VariableFor(identifier.Name);
+                    // TODO what if this isn't just a variable?
+                    return graph.VariableFor(identifier.ReferencedSymbol.FullName.UnqualifiedName);
                 //case VariableExpression variableExpression:
                 //    return LookupVariable(variableExpression.Name);
                 default:

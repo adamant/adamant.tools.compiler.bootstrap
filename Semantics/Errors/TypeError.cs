@@ -1,8 +1,9 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using JetBrains.Annotations;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
 {
@@ -15,72 +16,63 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
     /// </summary>
     public static class TypeError
     {
-        [NotNull]
-        public static Diagnostic NotImplemented([NotNull] CodeFile file, TextSpan span, [NotNull] string message)
+        public static Diagnostic NotImplemented(CodeFile file, TextSpan span, string message)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3000, message);
         }
 
-        [NotNull]
         public static Diagnostic OperatorCannotBeAppliedToOperandsOfType(
-            [NotNull] CodeFile file,
+            CodeFile file,
             TextSpan span,
-            [NotNull] BinaryOperator @operator,
-            [CanBeNull] DataType leftOperandType,
-            [CanBeNull] DataType rightOperandType)
+            BinaryOperator @operator,
+            DataType leftOperandType,
+            DataType rightOperandType)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3001,
                 $"Operator `{@operator}` cannot be applied to operands of type `{leftOperandType}` and `{rightOperandType}`.");
         }
 
-        [NotNull]
         public static Diagnostic OperatorCannotBeAppliedToOperandOfType(
-            [NotNull] CodeFile file,
+            CodeFile file,
             TextSpan span,
-            [NotNull] UnaryOperator @operator,
-            [CanBeNull] DataType operandType)
+            UnaryOperator @operator,
+            DataType operandType)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3002,
                 $"Operator `{@operator}` cannot be applied to operand of type `{operandType}`.");
         }
 
-        [NotNull]
-        public static Diagnostic MustBeATypeExpression([NotNull] CodeFile file, TextSpan span)
+        public static Diagnostic MustBeATypeExpression(CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3003,
                 "Expression must be of type `type` (i.e. it must evaluate to a type)");
         }
 
-        [NotNull]
-        public static Diagnostic NameRefersToFunctionNotType([NotNull] CodeFile file, TextSpan span, string name)
+        public static Diagnostic NameRefersToFunctionNotType(CodeFile file, TextSpan span, string name)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3004,
                 $"The name `{name}` refers to a function not a type.");
         }
 
-        [NotNull]
-        public static Diagnostic MustBeABoolExpression([NotNull] CodeFile file, TextSpan span)
+        public static Diagnostic MustBeABoolExpression(CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3005,
                 "Expression must be of type `bool`");
         }
 
-        [NotNull]
-        public static Diagnostic CircularDefinition([NotNull] CodeFile file, TextSpan span, [NotNull] Name typeDeclarationName)
+        public static Diagnostic CircularDefinition(CodeFile file, TextSpan span, Name typeDeclarationName)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3006,
                 $"Declaration of type `{typeDeclarationName}` is part of a circular definition");
         }
 
-        [NotNull]
-        public static Diagnostic CannotConvert([NotNull] CodeFile file, [NotNull] ExpressionSyntax expression, [NotNull] DataType type)
+        public static Diagnostic CannotConvert(CodeFile file, ExpressionSyntax expression, DataType type)
         {
             return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3007,
                 $"Cannot convert expression `{file.Code[expression.Span]}` to type `{type}`");
         }
 
-        [NotNull]
-        public static Diagnostic MustBeCallable([NotNull] CodeFile file, [NotNull] ExpressionSyntax expression)
+        public static Diagnostic MustBeCallable(CodeFile file, ExpressionSyntax expression)
         {
             return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3008,
                 $"Expression must be of callable type to be invoked `{file.Code[expression.Span]}`");
