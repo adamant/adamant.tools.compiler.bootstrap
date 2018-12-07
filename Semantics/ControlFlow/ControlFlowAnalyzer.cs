@@ -115,14 +115,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         graph.AddDelete(graph.VariableFor(variableDeclaration.Name.UnqualifiedName), new TextSpan(block.Span.End, 0));
                     break;
                 case ForeachExpressionSyntax @foreach:
-                    // TODO actually convert the expression
-                    break;
+                    throw new NotImplementedException();
                 case WhileExpressionSyntax @while:
-                    // TODO actually convert the expression
-                    break;
+                    throw new NotImplementedException();
                 case LoopExpressionSyntax loop:
-                    // TODO actually convert the expression
-                    break;
+                    throw new NotImplementedException();
+                case IfExpressionSyntax ifExpression:
+                    var condition = ConvertToOperand(ifExpression.Condition);
+                    throw new NotImplementedException();
                 case UnsafeExpressionSyntax unsafeExpression:
                     ConvertToStatement(unsafeExpression.Expression);
                     break;
