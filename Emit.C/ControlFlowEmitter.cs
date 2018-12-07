@@ -97,7 +97,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 case FunctionCall functionCall:
                 {
                     var mangledName = nameMangler.Mangle(functionCall.FunctionName);
-                    var arguments = functionCall.Arguments.Select(ConvertValue);
+                    var arguments = functionCall.Self.YieldValue().Concat(functionCall.Arguments).Select(ConvertValue);
                     return $"{mangledName}__{functionCall.Arity}({string.Join(", ", arguments)})";
                 }
                 case ConstructorCall _:
@@ -135,8 +135,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                         case BinaryOperator.Plus:
                             @operator = "add";
                             break;
+                        case BinaryOperator.Minus:
+                            @operator = "sub";
+                            break;
+                        case BinaryOperator.Asterisk:
+                            @operator = "mul";
+                            break;
+                        case BinaryOperator.Slash:
+                            @operator = "div";
+                            break;
+                        case BinaryOperator.EqualsEquals:
+                            @operator = "eq";
+                            break;
+                        case BinaryOperator.NotEqual:
+                            @operator = "ne";
+                            break;
+                        case BinaryOperator.LessThan:
+                            @operator = "lt";
+                            break;
+                        case BinaryOperator.LessThanOrEqual:
+                            @operator = "lte";
+                            break;
+                        case BinaryOperator.GreaterThan:
+                            @operator = "gt";
+                            break;
+                        case BinaryOperator.GreaterThanOrEqual:
+                            @operator = "gte";
+                            break;
                         default:
-                            throw NonExhaustiveMatchException.For(binaryOperation.Operator);
+                            throw NonExhaustiveMatchException.ForEnum(binaryOperation.Operator);
                     }
                     return $"{operationType}__{@operator}({left}, {right})";
                 }

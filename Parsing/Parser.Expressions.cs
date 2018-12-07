@@ -273,6 +273,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IPlusToken _:
                     binaryOperator = BinaryOperator.Plus;
                     break;
+                case IMinusToken _:
+                    binaryOperator = BinaryOperator.Minus;
+                    break;
+                case IAsteriskToken _:
+                    binaryOperator = BinaryOperator.Asterisk;
+                    break;
+                case ISlashToken _:
+                    binaryOperator = BinaryOperator.Slash;
+                    break;
                 case IEqualsEqualsToken _:
                     binaryOperator = BinaryOperator.EqualsEquals;
                     break;

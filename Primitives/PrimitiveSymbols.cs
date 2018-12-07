@@ -66,7 +66,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         {
             var name = new SimpleName("print_string");
             var type = new FunctionType(new[] { stringType }, DataType.Void);
-            return Symbol.New(name, type);
+            return Symbol.NewFunction(name, type);
         }
 
         private static ISymbol BuildBoolSymbol()
@@ -83,8 +83,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             var typeName = integerType.Name;
             var symbols = new List<ISymbol>
             {
-                Symbol.New(typeName.Qualify("remainder"), new FunctionType(new[] {integerType}, integerType)),
-                Symbol.New(typeName.Qualify("to_display_string"), new FunctionType(Enumerable.Empty<DataType>(), stringType))
+                Symbol.NewFunction(typeName.Qualify("remainder"), new FunctionType(new[] {integerType}, integerType)),
+                Symbol.NewFunction(typeName.Qualify("to_display_string"), new FunctionType(Enumerable.Empty<DataType>(), stringType))
             };
             return Symbol.NewSimpleType(integerType, symbols);
         }

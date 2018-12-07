@@ -229,6 +229,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             switch (expression.Operator)
             {
                 case BinaryOperator.Plus:
+                case BinaryOperator.Minus:
+                case BinaryOperator.Asterisk:
+                case BinaryOperator.Slash:
                 case BinaryOperator.EqualsEquals:
                 case BinaryOperator.NotEqual:
                 case BinaryOperator.LessThan:
@@ -239,7 +242,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     // TODO handle calls to overloaded operators
                     var leftOperand = ConvertToOperand(expression.LeftOperand);
                     var rightOperand = ConvertToOperand(expression.RightOperand);
-                    return new BinaryOperation(leftOperand, expression.Operator, rightOperand, (SimpleType)expression.Type);
+                    // What matters is the type we are operating on, for comparisons, that is different than the result type which is bool
+                    var operandType = (SimpleType)expression.LeftOperand.Type;
+                    return new BinaryOperation(leftOperand, expression.Operator, rightOperand, operandType);
                 }
                 case BinaryOperator.And:
                 case BinaryOperator.Or:
@@ -289,8 +294,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     var symbol = memberAccess.ReferencedSymbol;
                     switch (symbol)
                     {
-                        case NamedFunctionDeclarationSyntax function:
-                            return new VirtualFunctionCall(function.Name.UnqualifiedName, self, arguments);
+                        case IFunctionSymbol function:
+                            switch (memberAccess.Expression.Type)
+                            {
+                                case SimpleType _:
+                                    // case StructType _:
+                                    // Full name because this isn't a member
+                                    return new FunctionCall(function.FullName, self, arguments);
+                                default:
+                                    return new VirtualFunctionCall(function.FullName.UnqualifiedName, self, arguments);
+                            }
                         default:
                             throw NonExhaustiveMatchException.For(symbol);
                     }

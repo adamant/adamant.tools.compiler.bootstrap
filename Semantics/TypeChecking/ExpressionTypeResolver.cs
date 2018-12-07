@@ -54,27 +54,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             if (variableDeclaration.Initializer != null)
                 InferExpressionType(variableDeclaration.Initializer);
 
+            DataType type;
             if (variableDeclaration.TypeExpression != null)
-            {
-                var type = CheckAndEvaluateTypeExpression(variableDeclaration.TypeExpression);
-                variableDeclaration.Type.Fulfill(type);
-                if (variableDeclaration.Initializer != null)
-                {
-                    InsertImplicitConversionIfNeeded(ref variableDeclaration.Initializer, type);
-                    // TODO check that the initializer type is compatible with the variable type
-                }
-            }
+                type = CheckAndEvaluateTypeExpression(variableDeclaration.TypeExpression);
             else if (variableDeclaration.Initializer != null)
             {
-                // We'll assume the expression type is it
-                variableDeclaration.Type.Fulfill(variableDeclaration.Initializer.Type);
+                type = variableDeclaration.Initializer.Type;
+                // Use the initializer type unless it is constant
+                switch (type)
+                {
+                    case IntegerConstantType integerConstant:
+                        var value = integerConstant.Value;
+                        var byteCount = value.GetByteCount();
+                        type = byteCount <= 4 ? DataType.Int : DataType.Int64;
+                        break;
+                    case StringConstantType stringConstant:
+                        throw new NotImplementedException();
+                }
             }
             else
             {
-                diagnostics.Add(TypeError.NotImplemented(file,
-                    variableDeclaration.NameSpan,
+                diagnostics.Add(TypeError.NotImplemented(file, variableDeclaration.NameSpan,
                     "Inference of local variable types not implemented"));
-                variableDeclaration.Type.Fulfill(DataType.Unknown);
+                type = DataType.Unknown;
+            }
+
+            variableDeclaration.Type.Fulfill(type);
+            if (variableDeclaration.Initializer != null)
+            {
+                InsertImplicitConversionIfNeeded(ref variableDeclaration.Initializer, type);
+                // TODO check that the initializer type is compatible with the variable type
             }
         }
 
@@ -423,6 +432,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             switch (@operator)
             {
                 case BinaryOperator.Plus:
+                case BinaryOperator.Minus:
+                case BinaryOperator.Asterisk:
+                case BinaryOperator.Slash:
                     compatible = NumericOperatorTypesAreCompatible(ref binaryExpression.LeftOperand, ref binaryExpression.RightOperand, null);
                     binaryExpression.Type = compatible ? leftType : DataType.Unknown;
                     break;

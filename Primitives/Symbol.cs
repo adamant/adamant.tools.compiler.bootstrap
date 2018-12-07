@@ -44,5 +44,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             var getterName = ((QualifiedName)propertyName).Qualifier.Qualify(SimpleName.Special("get_" + propertyName.UnqualifiedName.Text));
             return new AccessorSymbol(getterName, propertyName, type);
         }
+
+        public static FunctionSymbol NewFunction(Name fullName, FunctionType type = null)
+        {
+            return new FunctionSymbol(fullName, type);
+        }
     }
 }

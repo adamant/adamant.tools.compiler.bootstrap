@@ -5,16 +5,47 @@ void* malloc(size_t size);
 
 #define _UNUSED(x) (void)(x)
 
-// Integer types
+// `bool` type
+typedef struct { _Bool _value; } _bool;
+
+// `int` type
 typedef struct { int32_t _value; } _int;
+
+inline _int _int__add(_int x, _int y) { return (_int){ x._value + y._value }; }
+inline _int _int__sub(_int x, _int y) { return (_int){ x._value - y._value }; }
+inline _int _int__mul(_int x, _int y) { return (_int){ x._value * y._value }; }
+inline _int _int__div(_int x, _int y) { return (_int){ x._value / y._value }; }
+inline _int _int__remainder__1(_int x, _int y) { return (_int){ x._value % y._value }; }
+
+inline _bool _int__eq(_int x, _int y) { return (_bool){ x._value == y._value }; }
+inline _bool _int__ne(_int x, _int y) { return (_bool){ x._value != y._value }; }
+inline _bool _int__lt(_int x, _int y) { return (_bool){ x._value < y._value }; }
+inline _bool _int__lte(_int x, _int y) { return (_bool){ x._value <= y._value }; }
+inline _bool _int__gt(_int x, _int y) { return (_bool){ x._value > y._value }; }
+inline _bool _int__gte(_int x, _int y) { return (_bool){ x._value >= y._value }; }
+
+// `uint` type
 typedef struct { uint32_t _value; } _uint;
+
+inline _uint _uint__add(_uint x, _uint y) { return (_uint){ x._value + y._value }; }
+inline _uint _uint__sub(_uint x, _uint y) { return (_uint){ x._value - y._value }; }
+inline _uint _uint__mul(_uint x, _uint y) { return (_uint){ x._value * y._value }; }
+inline _uint _uint__div(_uint x, _uint y) { return (_uint){ x._value / y._value }; }
+inline _uint _uint__remainder__1(_uint x, _uint y) { return (_uint){ x._value % y._value }; }
+
+inline _bool _uint__eq(_uint x, _uint y) { return (_bool){ x._value == y._value }; }
+inline _bool _uint__ne(_uint x, _uint y) { return (_bool){ x._value != y._value }; }
+inline _bool _uint__lt(_uint x, _uint y) { return (_bool){ x._value < y._value }; }
+inline _bool _uint__lte(_uint x, _uint y) { return (_bool){ x._value <= y._value }; }
+inline _bool _uint__gt(_uint x, _uint y) { return (_bool){ x._value > y._value }; }
+inline _bool _uint__gte(_uint x, _uint y) { return (_bool){ x._value >= y._value }; }
+
+// Other integer types
 typedef struct { uint8_t _value; } _byte;
 typedef struct { uintptr_t _value; } _size;
 typedef struct { intptr_t _value; } _offset;
 
-inline _int _int__add(_int x, _int y) { return (_int){ x._value + y._value }; }
-
-// String type
+// `String` type
 // Note: For now, we have moved strings
 typedef struct {
     _size byte_count;

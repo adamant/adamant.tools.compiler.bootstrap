@@ -91,9 +91,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
 
             // Execute and check results
             var process = Execute(exePath);
+
             process.WaitForExit();
-            Assert.Equal(ExpectedOutput(code, "stdout"), process.StandardOutput.ReadToEnd());
-            Assert.Equal(ExpectedOutput(code, "stderr"), process.StandardError.ReadToEnd());
+            var stdout = process.StandardOutput.ReadToEnd();
+            testOutput.WriteLine("stdout:");
+            testOutput.WriteLine(stdout);
+            Assert.Equal(ExpectedOutput(code, "stdout"), stdout);
+            var stderr = process.StandardError.ReadToEnd();
+            testOutput.WriteLine("stderr:");
+            testOutput.WriteLine(stderr);
+            Assert.Equal(ExpectedOutput(code, "stderr"), stderr);
             Assert.Equal(ExpectedExitCode(code), process.ExitCode);
         }
 

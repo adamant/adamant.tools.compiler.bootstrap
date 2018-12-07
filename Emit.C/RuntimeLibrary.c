@@ -4,10 +4,35 @@
 // Reminder: `extern` function declarations are so the compiler knows what
 // object file to put the non-inline copies of inlined functions in.
 
-// Integer types
+// `int` type
 extern inline _int _int__add(_int x, _int y);
+extern inline _int _int__sub(_int x, _int y);
+extern inline _int _int__mul(_int x, _int y);
+extern inline _int _int__div(_int x, _int y);
+extern inline _int _int__remainder__1(_int x, _int y);
 
-// String type
+extern inline _bool _int__eq(_int x, _int y);
+extern inline _bool _int__ne(_int x, _int y);
+extern inline _bool _int__lt(_int x, _int y);
+extern inline _bool _int__lte(_int x, _int y);
+extern inline _bool _int__gt(_int x, _int y);
+extern inline _bool _int__gte(_int x, _int y);
+
+// `uint` type
+extern inline _uint _uint__add(_uint x, _uint y);
+extern inline _uint _uint__sub(_uint x, _uint y);
+extern inline _uint _uint__mul(_uint x, _uint y);
+extern inline _uint _uint__div(_uint x, _uint y);
+extern inline _uint _uint__remainder__1(_uint x, _uint y);
+
+extern inline _bool _uint__eq(_uint x, _uint y);
+extern inline _bool _uint__ne(_uint x, _uint y);
+extern inline _bool _uint__lt(_uint x, _uint y);
+extern inline _bool _uint__lte(_uint x, _uint y);
+extern inline _bool _uint__gt(_uint x, _uint y);
+extern inline _bool _uint__gte(_uint x, _uint y);
+
+// `String` type
 extern String String___op_string_literal__2(_size count, _byte* bytes);
 
 // Direct support for console IO through the runtime for now

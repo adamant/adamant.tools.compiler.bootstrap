@@ -7,21 +7,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     public class FunctionCall : Value
     {
         public readonly Name FunctionName;
+        public readonly Operand Self;
         public FixedList<Operand> Arguments { get; }
         public int Arity => Arguments.Count;
 
-        public FunctionCall(
-            Name functionName,
-            IEnumerable<Operand> arguments)
+        public FunctionCall(Name functionName, Operand self, IEnumerable<Operand> arguments)
         {
             FunctionName = functionName;
+            Self = self;
             Arguments = arguments.ToFixedList();
+        }
+
+        public FunctionCall(Name functionName, IEnumerable<Operand> arguments)
+            : this(functionName, null, arguments)
+        {
         }
 
         public FunctionCall(
             Name functionName,
             params Operand[] arguments)
-            : this(functionName, arguments as IEnumerable<Operand>)
+            : this(functionName, null, arguments)
         {
         }
 

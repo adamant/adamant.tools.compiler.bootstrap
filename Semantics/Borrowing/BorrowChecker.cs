@@ -104,6 +104,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                         case AssignmentStatement assignmentStatement:
                             AcquireClaims(assignmentStatement.Place, assignmentStatement.Value, claimsBeforeStatement, claimsAfterStatement);
                             break;
+                        case ActionStatement actionStatement:
+                            AcquireClaims(null, actionStatement.Value, claimsBeforeStatement, claimsAfterStatement);
+                            break;
                         case DeleteStatement deleteStatement:
                         {
                             var title = GetTitle(deleteStatement.VariableNumber, claimsBeforeStatement);
@@ -170,6 +173,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                 case Operand operand:
                     AcquireClaim(assignToPlace, operand, claimsBeforeStatement, claimsAfterStatement);
                     break;
+                case FunctionCall functionCall:
+                    if (functionCall.Self != null)
+                        AcquireClaim(assignToPlace, functionCall.Self, claimsBeforeStatement, claimsAfterStatement);
+                    foreach (var argument in functionCall.Arguments)
+                        AcquireClaim(assignToPlace, argument, claimsBeforeStatement, claimsAfterStatement);
+                    break;
                 default:
                     throw NonExhaustiveMatchException.For(value);
             }
@@ -235,6 +244,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             KillVariables(liveSet, assignment.Place);
                             EnlivenVariables(liveSet, assignment.Value);
                             break;
+                        case ActionStatement action:
+                            EnlivenVariables(liveSet, action.Value);
+                            break;
                         case DeleteStatement deleteStatement:
                             liveSet[deleteStatement.VariableNumber] = true;
                             break;
@@ -297,6 +309,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     break;
                 case CopyPlace copyPlace:
                     variables[copyPlace.Place.CoreVariable()] = true;
+                    break;
+                case FunctionCall functionCall:
+                    if (functionCall.Self != null) EnlivenVariables(variables, functionCall.Self);
+                    foreach (var argument in functionCall.Arguments)
+                        EnlivenVariables(variables, argument);
                     break;
                 case Constant _:
                     // No variables
