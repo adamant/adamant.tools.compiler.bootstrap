@@ -50,9 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
         private void ResolveTypesInVariableDeclaration(
             VariableDeclarationStatementSyntax variableDeclaration)
         {
-            variableDeclaration.Type.BeginFulfilling();
-            if (variableDeclaration.Initializer != null)
-                InferExpressionType(variableDeclaration.Initializer);
+            InferExpressionType(variableDeclaration.Initializer);
 
             DataType type;
             if (variableDeclaration.TypeExpression != null)
@@ -79,7 +77,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 type = DataType.Unknown;
             }
 
-            variableDeclaration.Type.Fulfill(type);
+            variableDeclaration.Type = type;
             if (variableDeclaration.Initializer != null)
             {
                 InsertImplicitConversionIfNeeded(ref variableDeclaration.Initializer, type);
@@ -562,14 +560,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
         /// </summary>
         public DataType CheckAndEvaluateTypeExpression(ExpressionSyntax typeExpression)
         {
-            if (typeExpression == null)
-            {
-                // TODO report error?
-                return DataType.Unknown;
-            }
+            if (typeExpression == null) return DataType.Unknown;
 
             var type = InferExpressionType(typeExpression);
-            if (!IsType(typeExpression.Type))
+            if (!IsType(type))
             {
                 diagnostics.Add(TypeError.MustBeATypeExpression(file, typeExpression.Span));
                 return DataType.Unknown;

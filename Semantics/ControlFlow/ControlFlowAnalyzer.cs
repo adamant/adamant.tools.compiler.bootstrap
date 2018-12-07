@@ -66,7 +66,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         value = ConvertToValue(variableDeclaration.Initializer);
 
                     var variable = graph.AddVariable(variableDeclaration.MutableBinding,
-                        variableDeclaration.Type.Fulfilled(),
+                        variableDeclaration.Type,
                         variableDeclaration.Name.UnqualifiedName);
                     if (value != null) graph.AddAssignment(variable.Reference, value);
                     break;
@@ -82,7 +82,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
         private static bool IsOwned(VariableDeclarationStatementSyntax declaration)
         {
-            if (declaration.Type.Resolved() is LifetimeType type)
+            if (declaration.Type is LifetimeType type)
                 return type.IsOwned;
 
             return false;
