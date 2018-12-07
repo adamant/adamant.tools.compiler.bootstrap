@@ -8,9 +8,9 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Primitives;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 {
-    public class DeclarationNameBinder
+    public class LexicalScopesBuilder
     {
         // TODO do we need a list of all the namespaces for validating using statements?
         // Gather a list of all the namespaces for validating using statements
@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
         private readonly FixedList<ISymbol> allSymbols;
         private readonly GlobalScope globalScope;
 
-        public DeclarationNameBinder(
+        public LexicalScopesBuilder(
              Diagnostics diagnostics,
              PackageSyntax packageSyntax,
              FixedDictionary<string, Package> references)
@@ -84,7 +84,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
             LexicalScope containingScope,
             DeclarationSyntax declaration)
         {
-            var binder = new ExpressionNameBinder();
+            var binder = new ExpressionLexicalScopesBuilder();
             var diagnosticCount = diagnostics.Count;
             switch (declaration)
             {
@@ -136,7 +136,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
         private void BindNamesInFunctionParameters(
              LexicalScope containingScope,
              FunctionDeclarationSyntax function,
-             ExpressionNameBinder binder)
+             ExpressionLexicalScopesBuilder binder)
         {
             if (function.GenericParameters != null)
                 foreach (var parameter in function.GenericParameters)
@@ -160,7 +160,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
         private void BindNamesInFunctionBody(
              LexicalScope containingScope,
              FunctionDeclarationSyntax function,
-             ExpressionNameBinder binder)
+             ExpressionLexicalScopesBuilder binder)
         {
             var symbols = new List<ISymbol>();
             foreach (var parameter in function.Parameters)

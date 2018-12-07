@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Validation;
 
@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // First pull over all the lexer and parser errors from the compilation units
             var diagnostics = AllDiagnostics(packageSyntax);
 
-            var nameBinder = new DeclarationNameBinder(diagnostics, packageSyntax, references);
+            var nameBinder = new LexicalScopesBuilder(diagnostics, packageSyntax, references);
             nameBinder.BindNamesInPackage(packageSyntax);
 
             // Make a list of all the member declarations (i.e. not namespaces)

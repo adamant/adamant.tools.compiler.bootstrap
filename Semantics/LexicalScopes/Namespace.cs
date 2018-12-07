@@ -1,6 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 {
     internal class Namespace
     {

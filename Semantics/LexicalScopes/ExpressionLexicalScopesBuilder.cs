@@ -5,9 +5,9 @@ using Adamant.Tools.Compiler.Bootstrap.AST.Visitors;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NameBinding
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 {
-    public class ExpressionNameBinder : ExpressionVisitor<LexicalScope>
+    public class ExpressionLexicalScopesBuilder : ExpressionVisitor<LexicalScope>
     {
         public override void VisitBlock(BlockSyntax block, LexicalScope containingScope)
         {
