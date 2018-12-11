@@ -195,8 +195,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     {
                         case VariableDeclarationStatementSyntax _:
                         case ParameterSyntax _:
-                            return new CopyPlace(
-                                graph.VariableFor(symbol.FullName.UnqualifiedName));
+                            return graph.VariableFor(symbol.FullName.UnqualifiedName);
                         default:
                             return new DeclaredValue(symbol.FullName);
                     }
@@ -253,7 +252,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             if (value is Operand operand) return operand;
             var tempVariable = graph.Let(expression.Type.AssertResolved());
             currentBlock.AddAssignment(tempVariable.Reference, value);
-            return new CopyPlace(tempVariable.Reference);
+            return tempVariable.Reference;
         }
 
         private Value ConvertBinaryExpressionToValue(

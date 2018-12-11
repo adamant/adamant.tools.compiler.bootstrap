@@ -199,8 +199,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         {
             switch (operand)
             {
-                case CopyPlace copyPlace:
-                    var coreVariable = copyPlace.Place.CoreVariable();
+                case Place place:
+                    var coreVariable = place.CoreVariable();
                     var claim = claimsBeforeStatement.SingleOrDefault(t => t.Variable == coreVariable);
                     // Copy types don't have claims right now
                     if (claim != null) // copy types don't have claims right now
@@ -310,8 +310,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     EnlivenVariables(variables, binaryOperation.LeftOperand);
                     EnlivenVariables(variables, binaryOperation.RightOperand);
                     break;
-                case CopyPlace copyPlace:
-                    variables[copyPlace.Place.CoreVariable()] = true;
+                case Place place:
+                    variables[place.CoreVariable()] = true;
                     break;
                 case FunctionCall functionCall:
                     if (functionCall.Self != null) EnlivenVariables(variables, functionCall.Self);

@@ -33,9 +33,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         {
             switch (operand)
             {
-                case CopyPlace copyPlace:
+                case Place place:
                     //case VariableReference variable:
-                    restrictions.Add(new Restriction(copyPlace.Place.CoreVariable(), false));
+                    restrictions.Add(new Restriction(place.CoreVariable(), false));
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(operand);

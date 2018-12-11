@@ -116,8 +116,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     return nameMangler.Mangle(declaredValue.Name);
                 case FieldAccessValue fieldAccess:
                     return $"{ConvertValue(fieldAccess.Expression)}.{nameMangler.Mangle(fieldAccess.Field.UnqualifiedName)}";
-                case CopyPlace copyPlace:
-                    return ConvertPlace(copyPlace.Place);
+                case Place place:
+                    return ConvertPlace(place);
                 case VirtualFunctionCall virtualCall:
                 {
                     var self = ConvertValue(virtualCall.Self);
