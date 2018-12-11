@@ -258,6 +258,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             liveSet[deleteStatement.VariableNumber] = true;
                             break;
                         case IfStatement _:
+                        case GotoStatement _:
                             // We already or'ed together the live variables from successor blocks
                             break;
                         case ReturnStatement _:

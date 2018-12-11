@@ -63,6 +63,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 case IfStatement ifStatement:
                     code.AppendLine($"if({ConvertValue(ifStatement.Condition)}._value) goto bb{ifStatement.ThenBlockNumber}; else goto bb{ifStatement.ElseBlockNumber};");
                     break;
+                case GotoStatement gotoStatement:
+                    code.AppendLine($"goto bb{gotoStatement.GotoBlockNumber};");
+                    break;
                 case ReturnStatement _:
                     code.AppendLine(voidReturn ? "return;" : "return _result;");
                     break;

@@ -49,7 +49,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
             var currentBlock = graph.NewBlock();
             foreach (var statement in function.Body.Statements)
-                currentBlock = ConvertToStatement(currentBlock, statement);
+                currentBlock = ConvertToStatement(currentBlock, statement, null);
 
             // Generate the implicit return statement
             if (currentBlock != null && !currentBlock.IsTerminated)
@@ -58,7 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             function.ControlFlow = graph.Build();
         }
 
-        private BlockBuilder ConvertToStatement(BlockBuilder currentBlock, StatementSyntax statement)
+        private BlockBuilder ConvertToStatement(BlockBuilder currentBlock, StatementSyntax statement, BlockBuilder breakToBlock)
         {
             switch (statement)
             {
@@ -76,7 +76,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case ExpressionSyntax expression:
                 {
                     if (expression.Type is VoidType || expression.Type is NeverType)
-                        currentBlock = ConvertExpressionToStatement(currentBlock, expression);
+                        currentBlock = ConvertExpressionToStatement(currentBlock, expression, breakToBlock);
                     else
                     {
                         var tempVariable = graph.Let(expression.Type.AssertResolved());
@@ -102,7 +102,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         /// <summary>
         /// Converts an expression of type `void` or `never` to a statement
         /// </summary>
-        private BlockBuilder ConvertExpressionToStatement(BlockBuilder currentBlock, ExpressionSyntax expression)
+        private BlockBuilder ConvertExpressionToStatement(BlockBuilder currentBlock, ExpressionSyntax expression, BlockBuilder breakToBlock)
         {
             // expression m
             switch (expression)
@@ -124,12 +124,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     return null;
                 case ForeachExpressionSyntax _:
                 case WhileExpressionSyntax _:
-                case LoopExpressionSyntax _:
                     throw new NotImplementedException();
+                case LoopExpressionSyntax loopExpression:
+                    var loopEntry = graph.NewBlock();
+                    currentBlock.AddGoto(loopEntry);
+                    var breakTo = graph.NewBlock();
+                    var loopExit = ConvertExpressionToStatement(loopEntry, loopExpression.Block, breakTo);
+                    loopExit?.AddGoto(loopEntry);
+                    return breakTo;
+                case BreakExpressionSyntax _:
+                    currentBlock.AddGoto(breakToBlock ?? throw new InvalidOperationException());
+                    return null;
                 case IfExpressionSyntax ifExpression:
                     var condition = ConvertToOperand(currentBlock, ifExpression.Condition);
                     var thenEntry = graph.NewBlock();
-                    var thenExit = ConvertExpressionToStatement(thenEntry, ifExpression.ThenBlock);
+                    var thenExit = ConvertExpressionToStatement(thenEntry, ifExpression.ThenBlock, breakToBlock);
                     BlockBuilder elseEntry;
                     BlockBuilder exit = null;
                     if (ifExpression.ElseClause == null)
@@ -140,7 +149,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     else
                     {
                         elseEntry = graph.NewBlock();
-                        var elseExit = ConvertExpressionToStatement(elseEntry, ifExpression.ElseClause);
+                        var elseExit = ConvertExpressionToStatement(elseEntry, ifExpression.ElseClause, breakToBlock);
                         if (thenExit != null || elseExit != null)
                         {
                             exit = graph.NewBlock();
@@ -152,14 +161,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     return exit;
                 case BlockSyntax block:
                     foreach (var statementInBlock in block.Statements)
-                        currentBlock = ConvertToStatement(currentBlock, statementInBlock);
+                        currentBlock = ConvertToStatement(currentBlock, statementInBlock, breakToBlock);
 
                     // Now we need to delete any owned variables
                     foreach (var variableDeclaration in block.Statements.OfType<VariableDeclarationStatementSyntax>().Where(IsOwned))
                         currentBlock.AddDelete(graph.VariableFor(variableDeclaration.Name.UnqualifiedName), new TextSpan(block.Span.End, 0));
                     return currentBlock;
                 case UnsafeExpressionSyntax unsafeExpression:
-                    return ConvertToStatement(currentBlock, unsafeExpression.Expression);
+                    return ConvertToStatement(currentBlock, unsafeExpression.Expression, breakToBlock);
                 case AssignmentExpressionSyntax assignmentExpression:
                 {
                     var place = ConvertToPlace(assignmentExpression.LeftOperand);
@@ -171,18 +180,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     throw NonExhaustiveMatchException.For(expression);
             }
         }
-
-        //private BlockBuilder ConvertToAssignmentStatement(BlockBuilder currentBlock, ExpressionSyntax expression)
-        //{
-        //    var value = ConvertToValue(currentBlock, expression);
-        //    if (expression.Type is VoidType) currentBlock.AddAction(value);
-        //    else
-        //    {
-        //        var tempVariable = graph.Let(expression.Type.AssertResolved());
-        //        currentBlock.AddAssignment(tempVariable.Reference, value);
-        //    }
-        //    return currentBlock;
-        //}
 
         private Value ConvertToValue(BlockBuilder currentBlock, ExpressionSyntax expression)
         {
