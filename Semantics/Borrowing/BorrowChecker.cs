@@ -124,19 +124,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     claimsBeforeStatement = claimsAfterStatement;
                 }
 
-                switch (block.Terminator)
+                var claimsAfterBlock = claims.After(block.Terminator);
+                if (!claimsBeforeStatement.SetEquals(claimsAfterBlock))
                 {
-                    case IfStatement ifStatement:
-                        blocks.Enqueue(function.ControlFlow.BasicBlocks[ifStatement.ThenBlockNumber]);
-                        blocks.Enqueue(function.ControlFlow.BasicBlocks[ifStatement.ElseBlockNumber]);
-                        break;
-                    case GotoStatement gotoStatement:
-                        blocks.Enqueue(function.ControlFlow.BasicBlocks[gotoStatement.GotoBlockNumber]);
-                        break;
-                    case ReturnStatement _: // Add only applies to copy types so no loans
-                        break;
-                    default:
-                        throw NonExhaustiveMatchException.For(block.Terminator);
+                    claimsAfterBlock.UnionWith(claimsBeforeStatement);
+                    switch (block.Terminator)
+                    {
+                        case IfStatement ifStatement:
+                            blocks.Enqueue(function.ControlFlow.BasicBlocks[ifStatement.ThenBlockNumber]);
+                            blocks.Enqueue(function.ControlFlow.BasicBlocks[ifStatement.ElseBlockNumber]);
+                            break;
+                        case GotoStatement gotoStatement:
+                            blocks.Enqueue(function.ControlFlow.BasicBlocks[gotoStatement.GotoBlockNumber]);
+                            break;
+                        case ReturnStatement _: // Add only applies to copy types so no loans
+                            break;
+                        default:
+                            throw NonExhaustiveMatchException.For(block.Terminator);
+                    }
                 }
             }
         }
@@ -203,7 +208,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     var coreVariable = place.CoreVariable();
                     var claim = claimsBeforeStatement.SingleOrDefault(t => t.Variable == coreVariable);
                     // Copy types don't have claims right now
-                    if (claim != null) // copy types don't have claims right now
+                    if (claim != null && assignToPlace != null) // copy types don't have claims right now
                     {
                         var loan = new Loan(assignToPlace.CoreVariable(),
                             operand,
@@ -273,7 +278,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     liveAfterStatement = liveSet;
                 }
 
-                if (!liveBeforeBlock.Equals(liveVariables.Before(block.Statements.First())))
+                if (!liveBeforeBlock.ValuesEqual(liveVariables.Before(block.Statements.First())))
                     foreach (var basicBlock in edges.To(block)
                         .Where(fromBlock => !blocks.Contains(fromBlock)).ToList())
                         blocks.Enqueue(basicBlock);

@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 
         public override string ToString()
         {
-            return $"{LeftOperand} {Operator} {RightOperand}";
+            return $"{LeftOperand} {Operator.ToSymbolString()} {RightOperand}";
         }
     }
 }

@@ -126,8 +126,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case WhileExpressionSyntax _:
                     throw new NotImplementedException();
                 case LoopExpressionSyntax loopExpression:
-                    var loopEntry = graph.NewBlock();
-                    currentBlock.AddGoto(loopEntry);
+                    var loopEntry = graph.NewEntryBlock(currentBlock);
                     var breakTo = graph.NewBlock();
                     var loopExit = ConvertExpressionToStatement(loopEntry, loopExpression.Block, breakTo);
                     loopExit?.AddGoto(loopEntry);
@@ -176,6 +175,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     currentBlock.AddAssignment(place, value);
                     return currentBlock;
                 }
+                case ResultExpressionSyntax resultExpression:
+                    // Must be an expression of type `never`
+                    return ConvertExpressionToStatement(currentBlock, resultExpression.Expression, breakToBlock);
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }

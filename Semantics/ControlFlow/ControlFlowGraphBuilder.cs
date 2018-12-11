@@ -48,6 +48,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             return block;
         }
 
+        public BlockBuilder NewEntryBlock(BlockBuilder currentBlock)
+        {
+            if (!currentBlock.Statements.Any()) return currentBlock;
+            var entryBlock = NewBlock();
+            currentBlock.AddGoto(entryBlock);
+            return entryBlock;
+        }
+
         public ControlFlowGraph Build()
         {
             // We assume that the first block is the entry block
