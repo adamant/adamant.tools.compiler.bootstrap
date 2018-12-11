@@ -4,11 +4,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     {
         public Value Value { get; }
 
-        public ActionStatement(
-            int blockNumber,
-            int number,
-            Value value)
-            : base(blockNumber, number)
+        public ActionStatement(Value value)
         {
             Value = value;
         }

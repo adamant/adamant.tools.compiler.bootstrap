@@ -60,6 +60,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.AppendLine("// " + statement);
             switch (statement)
             {
+                case IfStatement ifStatement:
+                    code.AppendLine($"if({ConvertValue(ifStatement.Condition)}._value) goto bb{ifStatement.ThenBlockNumber}; else goto bb{ifStatement.ElseBlockNumber};");
+                    break;
                 case ReturnStatement _:
                     code.AppendLine(voidReturn ? "return;" : "return _result;");
                     break;
@@ -94,6 +97,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     return $"({ConvertType(integer.Type)}){{{integer.Value}}}";
                 case Utf8BytesConstant utf8BytesConstant:
                     return $"((_byte*)u8\"{utf8BytesConstant.Value.Escape()}\")";
+                case BooleanConstant boolean:
+                    var booleanValue = boolean.Value ? 1 : 0;
+                    return $"({ConvertType(boolean.Type)}){{{booleanValue}}}";
                 case FunctionCall functionCall:
                 {
                     var mangledName = nameMangler.Mangle(functionCall.FunctionName);

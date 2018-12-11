@@ -8,11 +8,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     /// </summary>
     public abstract class BlockTerminatorStatement : Statement
     {
-        protected BlockTerminatorStatement(int blockNumber, int number)
-            : base(blockNumber, number)
-        {
-        }
-
         public abstract IEnumerable<int> OutBlocks();
     }
 }

@@ -13,7 +13,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         public int VariableCount { get; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-
         private readonly FixedList<FixedList<BitArray>> values;
 
         public LiveVariables(ControlFlowGraph graph)
@@ -28,7 +27,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         /// Note, this will allow you to ask for the live variables before the
         /// block terminator as if it were a statement.
         /// </summary>
-
         public BitArray Before(Statement statement)
         {
             return values[statement.BlockNumber][statement.Number];

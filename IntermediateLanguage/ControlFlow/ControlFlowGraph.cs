@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public DataType ReturnType => ReturnVariable.Type;
         public FixedList<BasicBlock> BasicBlocks { get; }
         public BasicBlock EntryBlock => BasicBlocks.First();
-        public BasicBlock ExitBlock => BasicBlocks.Last();
+        public IEnumerable<BasicBlock> ExitBlocks => BasicBlocks.Where(b => b.Terminator is ReturnStatement);
         public Edges Edges { get; }
 
         public ControlFlowGraph(

@@ -5,12 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public Place Place { get; }
         public Value Value { get; }
 
-        public AssignmentStatement(
-            int blockNumber,
-            int number,
-            Place place,
-            Value value)
-            : base(blockNumber, number)
+        public AssignmentStatement(Place place, Value value)
         {
             Place = place;
             Value = value;

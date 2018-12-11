@@ -38,43 +38,54 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private void BuildGraph(FunctionDeclarationSyntax function)
         {
             // Temp Variable for return
-            // TODO don't emit temp variables for unused parameters
             if (function is ConstructorDeclarationSyntax constructor)
                 graph.AddParameter(true, constructor.SelfParameterType, SpecialName.Self);
             else
                 graph.Let(function.ReturnType.Resolved());
+
+            // TODO don't emit temp variables for unused parameters
             foreach (var parameter in function.Parameters.Where(p => !p.Unused))
                 graph.AddParameter(parameter.MutableBinding, parameter.Type.Resolved(), parameter.Name.UnqualifiedName);
 
+            var currentBlock = graph.NewBlock();
             foreach (var statement in function.Body.Statements)
-                ConvertToStatement(statement);
+                currentBlock = ConvertToStatement(currentBlock, statement);
 
             // Generate the implicit return statement
-            if (graph.CurrentBlockNumber == 0)
-                graph.AddBlockReturn();
+            if (currentBlock != null && !currentBlock.IsTerminated)
+                currentBlock.AddReturn();
 
             function.ControlFlow = graph.Build();
         }
 
-        private void ConvertToStatement(StatementSyntax statement)
+        private BlockBuilder ConvertToStatement(BlockBuilder currentBlock, StatementSyntax statement)
         {
             switch (statement)
             {
                 case VariableDeclarationStatementSyntax variableDeclaration:
-                    Value value = null;
-                    if (variableDeclaration.Initializer != null)
-                        value = ConvertToValue(variableDeclaration.Initializer);
-
+                {
                     var variable = graph.AddVariable(variableDeclaration.MutableBinding,
-                        variableDeclaration.Type,
-                        variableDeclaration.Name.UnqualifiedName);
-                    if (value != null) graph.AddAssignment(variable.Reference, value);
-                    break;
-
+                        variableDeclaration.Type, variableDeclaration.Name.UnqualifiedName);
+                    if (variableDeclaration.Initializer != null)
+                    {
+                        var value = ConvertToValue(currentBlock, variableDeclaration.Initializer);
+                        currentBlock.AddAssignment(variable.Reference, value);
+                    }
+                    return currentBlock;
+                }
                 case ExpressionSyntax expression:
-                    ConvertToStatement(expression);
-                    break;
+                {
+                    if (expression.Type is VoidType || expression.Type is NeverType)
+                        currentBlock = ConvertExpressionToStatement(currentBlock, expression);
+                    else
+                    {
+                        var tempVariable = graph.Let(expression.Type.AssertResolved());
+                        var value = ConvertToValue(currentBlock, expression);
+                        currentBlock.AddAssignment(tempVariable.Reference, value);
+                    }
 
+                    return currentBlock;
+                }
                 default:
                     throw NonExhaustiveMatchException.For(statement);
             }
@@ -88,73 +99,97 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             return false;
         }
 
-        private void ConvertToStatement(ExpressionSyntax expression)
+        /// <summary>
+        /// Converts an expression of type `void` or `never` to a statement
+        /// </summary>
+        private BlockBuilder ConvertExpressionToStatement(BlockBuilder currentBlock, ExpressionSyntax expression)
         {
+            // expression m
             switch (expression)
             {
-                case IdentifierNameSyntax _:
-                    // Ignore, reading from variable does nothing.
-                    break;
                 case UnaryExpressionSyntax _:
                 case BinaryExpressionSyntax _:
-                case InvocationSyntax _:
-                    ConvertToAssignmentStatement(expression);
-                    break;
+                    throw new NotImplementedException();
+                case InvocationSyntax invocation:
+                    //return ConvertToAssignmentStatement(currentBlock, expression);
+                    currentBlock.AddAction(ConvertInvocationToValue(currentBlock, invocation));
+                    return currentBlock;
                 case ReturnExpressionSyntax returnExpression:
                     if (returnExpression.ReturnValue != null)
-                        graph.AddAssignment(graph.ReturnVariable.Reference, ConvertToValue(returnExpression.ReturnValue));
+                        currentBlock.AddAssignment(graph.ReturnVariable.Reference, ConvertToValue(currentBlock, returnExpression.ReturnValue));
 
-                    graph.AddBlockReturn();
-                    break;
+                    currentBlock.AddReturn();
+
+                    // There is no exit from a return block, hence null for exit block
+                    return null;
+                case ForeachExpressionSyntax _:
+                case WhileExpressionSyntax _:
+                case LoopExpressionSyntax _:
+                    throw new NotImplementedException();
+                case IfExpressionSyntax ifExpression:
+                    var condition = ConvertToOperand(currentBlock, ifExpression.Condition);
+                    var thenEntry = graph.NewBlock();
+                    var thenExit = ConvertExpressionToStatement(thenEntry, ifExpression.ThenBlock);
+                    BlockBuilder elseEntry;
+                    BlockBuilder exit = null;
+                    if (ifExpression.ElseClause == null)
+                    {
+                        elseEntry = exit = graph.NewBlock();
+                        thenExit?.AddGoto(exit);
+                    }
+                    else
+                    {
+                        elseEntry = graph.NewBlock();
+                        var elseExit = ConvertExpressionToStatement(elseEntry, ifExpression.ElseClause);
+                        if (thenExit != null || elseExit != null)
+                        {
+                            exit = graph.NewBlock();
+                            thenExit?.AddGoto(exit);
+                            elseExit?.AddGoto(exit);
+                        }
+                    }
+                    currentBlock.AddIf(condition, thenEntry, elseEntry);
+                    return exit;
                 case BlockSyntax block:
                     foreach (var statementInBlock in block.Statements)
-                        ConvertToStatement(statementInBlock);
+                        currentBlock = ConvertToStatement(currentBlock, statementInBlock);
 
                     // Now we need to delete any owned variables
                     foreach (var variableDeclaration in block.Statements.OfType<VariableDeclarationStatementSyntax>().Where(IsOwned))
-                        graph.AddDelete(graph.VariableFor(variableDeclaration.Name.UnqualifiedName), new TextSpan(block.Span.End, 0));
-                    break;
-                case ForeachExpressionSyntax @foreach:
-                    throw new NotImplementedException();
-                case WhileExpressionSyntax @while:
-                    throw new NotImplementedException();
-                case LoopExpressionSyntax loop:
-                    throw new NotImplementedException();
-                case IfExpressionSyntax ifExpression:
-                    var condition = ConvertToOperand(ifExpression.Condition);
-                    throw new NotImplementedException();
+                        currentBlock.AddDelete(graph.VariableFor(variableDeclaration.Name.UnqualifiedName), new TextSpan(block.Span.End, 0));
+                    return currentBlock;
                 case UnsafeExpressionSyntax unsafeExpression:
-                    ConvertToStatement(unsafeExpression.Expression);
-                    break;
+                    return ConvertToStatement(currentBlock, unsafeExpression.Expression);
                 case AssignmentExpressionSyntax assignmentExpression:
                 {
                     var place = ConvertToPlace(assignmentExpression.LeftOperand);
-                    var value = ConvertToValue(assignmentExpression.RightOperand);
-                    graph.AddAssignment(place, value);
-                    break;
+                    var value = ConvertToValue(currentBlock, assignmentExpression.RightOperand);
+                    currentBlock.AddAssignment(place, value);
+                    return currentBlock;
                 }
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
         }
 
-        private void ConvertToAssignmentStatement(ExpressionSyntax expression)
-        {
-            var value = ConvertToValue(expression);
-            if (expression.Type is VoidType) graph.AddAction(value);
-            else
-            {
-                var tempVariable = graph.Let(expression.Type.AssertResolved());
-                graph.AddAssignment(tempVariable.Reference, value);
-            }
-        }
+        //private BlockBuilder ConvertToAssignmentStatement(BlockBuilder currentBlock, ExpressionSyntax expression)
+        //{
+        //    var value = ConvertToValue(currentBlock, expression);
+        //    if (expression.Type is VoidType) currentBlock.AddAction(value);
+        //    else
+        //    {
+        //        var tempVariable = graph.Let(expression.Type.AssertResolved());
+        //        currentBlock.AddAssignment(tempVariable.Reference, value);
+        //    }
+        //    return currentBlock;
+        //}
 
-        private Value ConvertToValue(ExpressionSyntax expression)
+        private Value ConvertToValue(BlockBuilder currentBlock, ExpressionSyntax expression)
         {
             switch (expression)
             {
                 case NewObjectExpressionSyntax newObjectExpression:
-                    var args = newObjectExpression.Arguments.Select(a => ConvertToOperand(a.Value)).ToFixedList();
+                    var args = newObjectExpression.Arguments.Select(a => ConvertToOperand(currentBlock, a.Value)).ToFixedList();
                     return new ConstructorCall((ObjectType)newObjectExpression.Type, args);
                 case IdentifierNameSyntax identifier:
                 {
@@ -170,9 +205,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     }
                 }
                 case UnaryExpressionSyntax unaryExpression:
-                    return ConvertUnaryExpressionToValue(unaryExpression);
+                    return ConvertUnaryExpressionToValue(currentBlock, unaryExpression);
                 case BinaryExpressionSyntax binaryExpression:
-                    return ConvertBinaryExpressionToValue(binaryExpression);
+                    return ConvertBinaryExpressionToValue(currentBlock, binaryExpression);
                 case IntegerLiteralExpressionSyntax _:
                     throw new InvalidOperationException("Integer literals should have an implicit conversion around them");
                 case StringLiteralExpressionSyntax _:
@@ -185,10 +220,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     else
                         throw new NotImplementedException();
                 case IfExpressionSyntax ifExpression:
-                    // TODO assign the result into the temp, branch and execute then or else, assign result
+                    // TODO deal with the value of the if expression
                     throw new NotImplementedException();
                 case UnsafeExpressionSyntax unsafeExpression:
-                    return ConvertToValue(unsafeExpression.Expression);
+                    return ConvertToValue(currentBlock, unsafeExpression.Expression);
                 case ImplicitLiteralConversionExpression implicitLiteralConversion:
                 {
                     var conversionFunction = implicitLiteralConversion.ConversionFunction.FullName;
@@ -199,10 +234,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     return new FunctionCall(conversionFunction, sizeArgument, bytesArgument);
                 }
                 case InvocationSyntax invocation:
-                    return ConvertInvocationToValue(invocation);
+                    return ConvertInvocationToValue(currentBlock, invocation);
                 case MemberAccessExpressionSyntax memberAccess:
                 {
-                    var value = ConvertToOperand(memberAccess.Expression);
+                    var value = ConvertToOperand(currentBlock, memberAccess.Expression);
                     var symbol = memberAccess.ReferencedSymbol;
                     if (symbol is IAccessorSymbol accessor)
                         return new VirtualFunctionCall(accessor.PropertyName.UnqualifiedName, value);
@@ -215,16 +250,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
         }
 
-        private Operand ConvertToOperand(ExpressionSyntax expression)
+        private Operand ConvertToOperand(BlockBuilder currentBlock, ExpressionSyntax expression)
         {
-            var value = ConvertToValue(expression);
+            var value = ConvertToValue(currentBlock, expression);
             if (value is Operand operand) return operand;
             var tempVariable = graph.Let(expression.Type.AssertResolved());
-            graph.AddAssignment(tempVariable.Reference, value);
+            currentBlock.AddAssignment(tempVariable.Reference, value);
             return new CopyPlace(tempVariable.Reference);
         }
 
-        private Value ConvertBinaryExpressionToValue(BinaryExpressionSyntax expression)
+        private Value ConvertBinaryExpressionToValue(
+            BlockBuilder exitBlock,
+            BinaryExpressionSyntax expression)
         {
             switch (expression.Operator)
             {
@@ -240,8 +277,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case BinaryOperator.GreaterThanOrEqual:
                 {
                     // TODO handle calls to overloaded operators
-                    var leftOperand = ConvertToOperand(expression.LeftOperand);
-                    var rightOperand = ConvertToOperand(expression.RightOperand);
+                    var leftOperand = ConvertToOperand(exitBlock, expression.LeftOperand);
+                    var rightOperand = ConvertToOperand(exitBlock, expression.RightOperand);
                     // What matters is the type we are operating on, for comparisons, that is different than the result type which is bool
                     var operandType = (SimpleType)expression.LeftOperand.Type;
                     return new BinaryOperation(leftOperand, expression.Operator, rightOperand, operandType);
@@ -251,8 +288,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 {
                     // TODO handle calls to overloaded operators
                     // TODO handle short circuiting if needed
-                    var leftOperand = ConvertToOperand(expression.LeftOperand);
-                    var rightOperand = ConvertToOperand(expression.RightOperand);
+                    var leftOperand = ConvertToOperand(exitBlock, expression.LeftOperand);
+                    var rightOperand = ConvertToOperand(exitBlock, expression.RightOperand);
                     return new BinaryOperation(leftOperand, expression.Operator, rightOperand, (SimpleType)expression.Type);
                 }
                 default:
@@ -260,22 +297,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
         }
 
-        private Value ConvertUnaryExpressionToValue(UnaryExpressionSyntax expression)
+        private Value ConvertUnaryExpressionToValue(
+            BlockBuilder currentBlock,
+            UnaryExpressionSyntax expression)
         {
             switch (expression.Operator)
             {
                 case UnaryOperator.Not:
-                    var operand = ConvertToOperand(expression.Operand);
+                    var operand = ConvertToOperand(currentBlock, expression.Operand);
                     return new UnaryOperation(expression.Operator, operand);
                 case UnaryOperator.Plus:
                     // This is a no-op
-                    return ConvertToValue(expression.Operand);
+                    return ConvertToValue(currentBlock, expression.Operand);
                 default:
                     throw NonExhaustiveMatchException.ForEnum(expression.Operator);
             }
         }
 
-        private Value ConvertInvocationToValue(InvocationSyntax invocation)
+        private Value ConvertInvocationToValue(BlockBuilder currentBlock, InvocationSyntax invocation)
         {
             switch (invocation.Callee)
             {
@@ -283,14 +322,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 {
                     var symbol = identifier.ReferencedSymbol;
                     var arguments = invocation.Arguments
-                        .Select(a => ConvertToOperand(a.Value)).ToList();
+                        .Select(a => ConvertToOperand(currentBlock, a.Value)).ToList();
                     return new FunctionCall(symbol.FullName, arguments);
                 }
                 case MemberAccessExpressionSyntax memberAccess:
                 {
-                    var self = ConvertToOperand(memberAccess.Expression);
+                    var self = ConvertToOperand(currentBlock, memberAccess.Expression);
                     var arguments = invocation.Arguments
-                        .Select(a => ConvertToOperand(a.Value)).ToList();
+                        .Select(a => ConvertToOperand(currentBlock, a.Value)).ToList();
                     var symbol = memberAccess.ReferencedSymbol;
                     switch (symbol)
                     {

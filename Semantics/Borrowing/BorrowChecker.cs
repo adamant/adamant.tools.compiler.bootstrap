@@ -126,6 +126,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 
                 switch (block.Terminator)
                 {
+                    case IfStatement ifStatement:
+                        blocks.Enqueue(function.ControlFlow.BasicBlocks[ifStatement.ThenBlockNumber]);
+                        blocks.Enqueue(function.ControlFlow.BasicBlocks[ifStatement.ElseBlockNumber]);
+                        break;
+                    case GotoStatement gotoStatement:
+                        blocks.Enqueue(function.ControlFlow.BasicBlocks[gotoStatement.GotoBlockNumber]);
+                        break;
                     case ReturnStatement _: // Add only applies to copy types so no loans
                         break;
                     default:
@@ -220,7 +227,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         private static LiveVariables ComputeLiveness(ControlFlowGraph function, Edges edges)
         {
             var blocks = new Queue<BasicBlock>();
-            blocks.Enqueue(function.ExitBlock);
+            blocks.EnqueueRange(function.ExitBlocks);
             var liveVariables = new LiveVariables(function);
             var numberOfVariables = function.VariableDeclarations.Count;
 
@@ -250,8 +257,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                         case DeleteStatement deleteStatement:
                             liveSet[deleteStatement.VariableNumber] = true;
                             break;
+                        case IfStatement _:
+                            // We already or'ed together the live variables from successor blocks
+                            break;
                         case ReturnStatement _:
-                            // No affect on variables?
+                            // No effect on variables?
                             // TODO should we check the liveSet is empty?
                             break;
                         default:
@@ -260,14 +270,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 
                     // For the next statement
                     liveAfterStatement = liveSet;
-                }
-
-                switch (block.Terminator)
-                {
-                    case ReturnStatement _:
-                        break;
-                    default:
-                        throw NonExhaustiveMatchException.For(block.Terminator);
                 }
 
                 if (!liveBeforeBlock.Equals(liveVariables.Before(block.Statements.First())))

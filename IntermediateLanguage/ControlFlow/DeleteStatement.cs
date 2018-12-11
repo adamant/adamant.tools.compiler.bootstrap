@@ -7,8 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public readonly int VariableNumber;
         public readonly TextSpan Span;
 
-        public DeleteStatement(int blockNumber, int number, int variableNumber, TextSpan span)
-            : base(blockNumber, number)
+        public DeleteStatement(int variableNumber, TextSpan span)
         {
             VariableNumber = variableNumber;
             Span = span;

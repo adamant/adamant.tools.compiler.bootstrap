@@ -8,14 +8,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
     public abstract class Statement
     {
-        public readonly int BlockNumber;
-        public readonly int Number;
-
-        protected Statement(int blockNumber, int number)
-        {
-            BlockNumber = blockNumber;
-            Number = number;
-        }
+        public int BlockNumber { get; internal set; }
+        public int Number { get; internal set; }
 
         // Useful for debugging
         public abstract override string ToString();

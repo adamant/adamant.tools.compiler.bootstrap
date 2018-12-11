@@ -1,24 +1,30 @@
-using System;
 using System.Collections.Generic;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class IfStatement : BlockTerminatorStatement
     {
-        public IfStatement(int blockNumber, int number)
-            : base(blockNumber, number)
+        public Operand Condition { get; }
+        public int ThenBlockNumber { get; }
+        public int ElseBlockNumber { get; }
+
+        public IfStatement(Operand condition, int thenBlockNumber, int elseBlockNumber)
         {
+            Condition = condition;
+            ThenBlockNumber = thenBlockNumber;
+            ElseBlockNumber = elseBlockNumber;
         }
 
         public override IEnumerable<int> OutBlocks()
         {
-            throw new NotImplementedException();
+            yield return ThenBlockNumber;
+            yield return ElseBlockNumber;
         }
 
         // Useful for debugging
         public override string ToString()
         {
-            throw new NotImplementedException();
+            return $"if {Condition} -> bb{ThenBlockNumber} else -> bb{ElseBlockNumber}";
         }
     }
 }

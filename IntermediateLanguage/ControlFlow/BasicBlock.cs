@@ -28,6 +28,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             ExpressionStatements = expressionStatements.ToFixedList();
             Terminator = terminator;
             Statements = ExpressionStatements.Append<Statement>(terminator).ToFixedList();
+            foreach (var (statement, i) in Statements.Enumerate())
+            {
+                statement.BlockNumber = number;
+                statement.Number = i;
+            }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

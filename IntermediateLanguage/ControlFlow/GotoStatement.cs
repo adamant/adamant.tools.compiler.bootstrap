@@ -6,8 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     {
         public readonly int GotoBlockNumber;
 
-        public GotoStatement(int blockNumber, int number, int gotoBlockNumber)
-            : base(blockNumber, number)
+        public GotoStatement(int gotoBlockNumber)
         {
             GotoBlockNumber = gotoBlockNumber;
         }

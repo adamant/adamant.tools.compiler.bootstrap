@@ -7,9 +7,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     /// </summary>
     public abstract class ExpressionStatement : Statement
     {
-        protected ExpressionStatement(int blockNumber, int number)
-            : base(blockNumber, number)
-        {
-        }
     }
 }

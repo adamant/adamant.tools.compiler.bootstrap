@@ -5,11 +5,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class ReturnStatement : BlockTerminatorStatement
     {
-        public ReturnStatement(int blockNumber, int number)
-            : base(blockNumber, number)
-        {
-        }
-
         public override IEnumerable<int> OutBlocks()
         {
             return Enumerable.Empty<int>();

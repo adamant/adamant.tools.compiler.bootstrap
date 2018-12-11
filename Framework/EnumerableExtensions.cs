@@ -60,5 +60,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         {
             return first.SelectMany(_ => second, Tuple.Create);
         }
+
+        [DebuggerStepThrough]
+        public static IEnumerable<(T, int)> Enumerate<T>(this IEnumerable<T> source)
+        {
+            return source.Select((v, i) => (v, i));
+        }
     }
 }

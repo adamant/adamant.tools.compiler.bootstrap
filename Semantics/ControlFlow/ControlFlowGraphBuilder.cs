@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -11,10 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
     {
         private readonly List<LocalVariableDeclaration> variables = new List<LocalVariableDeclaration>();
         public LocalVariableDeclaration ReturnVariable => variables.First();
-        private readonly List<BasicBlock> blocks = new List<BasicBlock>();
-        private List<ExpressionStatement> statements = new List<ExpressionStatement>();
-        public int CurrentBlockNumber => blocks.Count;
-        public int NextStatementNumber => statements.Count;
+        private readonly List<BlockBuilder> blockBuilders = new List<BlockBuilder>();
 
         public LocalVariableDeclaration AddVariable(bool mutableBinding, DataType type, SimpleName name = null)
         {
@@ -45,37 +41,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             return variables.Single(v => v.Name == name).Reference;
         }
 
-        public void AddAssignment(Place place, Value value)
+        public BlockBuilder NewBlock()
         {
-            statements.Add(new AssignmentStatement(CurrentBlockNumber, NextStatementNumber, place, value));
-        }
-
-        public void AddAction(Value value)
-        {
-            statements.Add(new ActionStatement(CurrentBlockNumber, NextStatementNumber, value));
-        }
-
-        public void AddDelete(VariableReference variable, TextSpan span)
-        {
-            statements.Add(new DeleteStatement(CurrentBlockNumber, NextStatementNumber, variable.VariableNumber, span));
-        }
-
-        private BasicBlock AddBlock(BlockTerminatorStatement terminator)
-        {
-            var block = new BasicBlock(CurrentBlockNumber, statements, terminator);
-            blocks.Add(block);
-            statements = new List<ExpressionStatement>();
+            var block = new BlockBuilder(blockBuilders.Count);
+            blockBuilders.Add(block);
             return block;
-        }
-
-        public BasicBlock AddBlockReturn()
-        {
-            return AddBlock(new ReturnStatement(CurrentBlockNumber, NextStatementNumber));
         }
 
         public ControlFlowGraph Build()
         {
-            return new ControlFlowGraph(this.variables, this.blocks);
+            // We assume that the first block is the entry block
+            var blocks = new List<BasicBlock>();
+            foreach (var block in blockBuilders)
+            {
+                var statements = block.Statements
+                    .Take(block.Statements.Count - 1)
+                    .Cast<ExpressionStatement>();
+                var terminator = block.Terminator;
+                blocks.Add(new BasicBlock(block.BlockNumber, statements, terminator));
+            }
+
+            return new ControlFlowGraph(variables, blocks);
         }
     }
 }
