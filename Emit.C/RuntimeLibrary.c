@@ -4,6 +4,10 @@
 // Reminder: `extern` function declarations are so the compiler knows what
 // object file to put the non-inline copies of inlined functions in.
 
+// `bool` type
+extern inline _bool _bool__and(_bool x, _bool y);
+extern inline _bool _bool__or(_bool x, _bool y);
+
 // `int` type
 extern inline _int _int__add(_int x, _int y);
 extern inline _int _int__sub(_int x, _int y);
@@ -38,7 +42,15 @@ extern String String___op_string_literal__2(_size count, _byte* bytes);
 // Direct support for console IO through the runtime for now
 void print_string__1(String text)
 {
-    printf("%.*s\n", (int)text.byte_count._value, (char*)text.bytes);
+    printf("%.*s", (int)text.byte_count._value, (char*)text.bytes);
+}
+
+String _uint__to_display_string__0(_uint value)
+{
+    int length = snprintf(NULL, 0, "%u", value._value);
+    char* str = malloc(length+1);
+    snprintf(str, length + 1, "%u", value._value);
+    return (String){(_size){length}, (_byte*)str};
 }
 
 // Test of calling windows memory allocation functions, rather than including

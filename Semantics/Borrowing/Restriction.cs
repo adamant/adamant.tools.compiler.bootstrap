@@ -1,6 +1,9 @@
+using System;
+using System.Collections.Generic;
+
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 {
-    public class Restriction
+    public class Restriction : IEquatable<Restriction>
     {
         public int Place { get; }
 
@@ -24,6 +27,41 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             CanMutate = false; // When would this be true?
             CanBorrowMutable = false; // When would this be true?
             CanBorrowImmutable = !mutableBorrow;
+        }
+
+        public override string ToString()
+        {
+            return $"%{Place}...";
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as Restriction);
+        }
+
+        public bool Equals(Restriction other)
+        {
+            return other != null &&
+                   Place == other.Place &&
+                   CanTake == other.CanTake &&
+                   CanMutate == other.CanMutate &&
+                   CanBorrowMutable == other.CanBorrowMutable &&
+                   CanBorrowImmutable == other.CanBorrowImmutable;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Place, CanTake, CanMutate, CanBorrowMutable, CanBorrowImmutable);
+        }
+
+        public static bool operator ==(Restriction restriction1, Restriction restriction2)
+        {
+            return EqualityComparer<Restriction>.Default.Equals(restriction1, restriction2);
+        }
+
+        public static bool operator !=(Restriction restriction1, Restriction restriction2)
+        {
+            return !(restriction1 == restriction2);
         }
     }
 }

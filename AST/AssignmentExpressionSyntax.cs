@@ -5,23 +5,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public class AssignmentExpressionSyntax : ExpressionSyntax
     {
         public ExpressionSyntax LeftOperand;
-        public AssignmentOperation Operation { get; }
+        public AssignmentOperator Operator { get; }
         public ExpressionSyntax RightOperand;
 
         public AssignmentExpressionSyntax(
             ExpressionSyntax leftOperand,
-            AssignmentOperation operation,
+            AssignmentOperator @operator,
             ExpressionSyntax rightOperand)
             : base(TextSpan.Covering(leftOperand.Span, rightOperand.Span))
         {
             LeftOperand = leftOperand;
             RightOperand = rightOperand;
-            Operation = operation;
+            Operator = @operator;
         }
 
         public override string ToString()
         {
-            return $"{LeftOperand} {Operation} {RightOperand}";
+            return $"{LeftOperand} {Operator.ToSymbolString()} {RightOperand}";
         }
     }
 }

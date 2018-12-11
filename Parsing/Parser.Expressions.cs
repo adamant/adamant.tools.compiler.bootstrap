@@ -261,15 +261,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             switch (operatorToken)
             {
                 case IEqualsToken _:
-                    return new AssignmentExpressionSyntax(left, AssignmentOperation.Direct, right);
+                    return new AssignmentExpressionSyntax(left, AssignmentOperator.Direct, right);
                 case IPlusEqualsToken _:
-                    return new AssignmentExpressionSyntax(left, AssignmentOperation.Plus, right);
+                    return new AssignmentExpressionSyntax(left, AssignmentOperator.Plus, right);
                 case IMinusEqualsToken _:
-                    return new AssignmentExpressionSyntax(left, AssignmentOperation.Minus, right);
+                    return new AssignmentExpressionSyntax(left, AssignmentOperator.Minus, right);
                 case IAsteriskEqualsToken _:
-                    return new AssignmentExpressionSyntax(left, AssignmentOperation.Asterisk, right);
+                    return new AssignmentExpressionSyntax(left, AssignmentOperator.Asterisk, right);
                 case ISlashEqualsToken _:
-                    return new AssignmentExpressionSyntax(left, AssignmentOperation.Slash, right);
+                    return new AssignmentExpressionSyntax(left, AssignmentOperator.Slash, right);
                 case IPlusToken _:
                     binaryOperator = BinaryOperator.Plus;
                     break;

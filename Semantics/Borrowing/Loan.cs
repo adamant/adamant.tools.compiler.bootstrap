@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -8,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
     /// <summary>
     /// A loaning out of a reference into a variable
     /// </summary>
-    public class Loan : Claim
+    public class Loan : Claim, IEquatable<Loan>
     {
         public FixedList<Restriction> Restrictions { get; }
 
@@ -40,6 +41,46 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                 default:
                     throw NonExhaustiveMatchException.For(operand);
             }
+        }
+
+        public override string ToString()
+        {
+            return $"Loan of #{ObjectId} to %{Variable} ({string.Join(",", Restrictions)})";
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as Loan);
+        }
+
+        public override bool Equals(Claim other)
+        {
+            return Equals(other as Loan);
+        }
+
+        public bool Equals(Loan other)
+        {
+            return other != null &&
+                   base.Equals(other) &&
+                   Restrictions.SequenceEqual(other.Restrictions);
+        }
+
+        public override int GetHashCode()
+        {
+            var hash = new HashCode();
+            hash.Add(base.GetHashCode());
+            foreach (var restriction in Restrictions) hash.Add(restriction);
+            return hash.ToHashCode();
+        }
+
+        public static bool operator ==(Loan loan1, Loan loan2)
+        {
+            return EqualityComparer<Loan>.Default.Equals(loan1, loan2);
+        }
+
+        public static bool operator !=(Loan loan1, Loan loan2)
+        {
+            return !(loan1 == loan2);
         }
     }
 }

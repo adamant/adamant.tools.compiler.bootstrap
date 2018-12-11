@@ -77,9 +77,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             blocks.Enqueue(function.ControlFlow.EntryBlock);
             var claims = new Claims();
 
-            while (blocks.Any())
+            while (blocks.TryDequeue(out var block))
             {
-                var block = blocks.Dequeue();
                 var claimsBeforeStatement = new HashSet<Claim>();
 
                 if (block == function.ControlFlow.EntryBlock)
@@ -213,7 +212,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                         var loan = new Loan(assignToPlace.CoreVariable(),
                             operand,
                             claim.ObjectId);
-                        claimsAfterStatement.Add(loan);
+                        if (!claimsAfterStatement.Contains(loan))
+                            claimsAfterStatement.Add(loan);
                     }
                     break;
                 case Constant _:

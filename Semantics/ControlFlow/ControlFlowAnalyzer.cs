@@ -172,6 +172,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 {
                     var place = ConvertToPlace(assignmentExpression.LeftOperand);
                     var value = ConvertToValue(currentBlock, assignmentExpression.RightOperand);
+                    if (assignmentExpression.Operator != AssignmentOperator.Direct)
+                    {
+                        var type = (SimpleType)assignmentExpression.RightOperand.Type;
+                        var rightOperand = ConvertToOperand(currentBlock, value, type);
+                        BinaryOperator binaryOperator;
+                        switch (assignmentExpression.Operator)
+                        {
+                            case AssignmentOperator.Plus:
+                                binaryOperator = BinaryOperator.Plus;
+                                break;
+                            case AssignmentOperator.Minus:
+                                binaryOperator = BinaryOperator.Minus;
+                                break;
+                            case AssignmentOperator.Asterisk:
+                                binaryOperator = BinaryOperator.Asterisk;
+                                break;
+                            case AssignmentOperator.Slash:
+                                binaryOperator = BinaryOperator.Slash;
+                                break;
+                            default:
+                                throw NonExhaustiveMatchException.ForEnum(assignmentExpression.Operator);
+                        }
+                        value = new BinaryOperation(place, binaryOperator, rightOperand, type);
+                    }
                     currentBlock.AddAssignment(place, value);
                     return currentBlock;
                 }
@@ -251,8 +275,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private Operand ConvertToOperand(BlockBuilder currentBlock, ExpressionSyntax expression)
         {
             var value = ConvertToValue(currentBlock, expression);
+            return ConvertToOperand(currentBlock, value, expression.Type);
+        }
+
+        private Operand ConvertToOperand(BlockBuilder currentBlock, Value value, DataType type)
+        {
             if (value is Operand operand) return operand;
-            var tempVariable = graph.Let(expression.Type.AssertResolved());
+            var tempVariable = graph.Let(type.AssertResolved());
             currentBlock.AddAssignment(tempVariable.Reference, value);
             return tempVariable.Reference;
         }
