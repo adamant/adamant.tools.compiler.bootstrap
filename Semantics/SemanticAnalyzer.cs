@@ -14,7 +14,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
     public class SemanticAnalyzer
     {
-
         public Package Analyze(
             PackageSyntax packageSyntax,
             FixedDictionary<string, Package> references)
@@ -22,8 +21,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // First pull over all the lexer and parser errors from the compilation units
             var diagnostics = AllDiagnostics(packageSyntax);
 
-            var nameBinder = new LexicalScopesBuilder(diagnostics, packageSyntax, references);
-            nameBinder.BindNamesInPackage(packageSyntax);
+            var scopesBuilder = new LexicalScopesBuilder(diagnostics, packageSyntax, references);
+            scopesBuilder.BuildScopesInPackage(packageSyntax);
 
             // Make a list of all the member declarations (i.e. not namespaces)
             var memberDeclarations = packageSyntax.CompilationUnits

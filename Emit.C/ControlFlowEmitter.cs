@@ -38,8 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             Requires.That(nameof(variable), variable.Exists, "tried to look up variable that does not exist");
             var initializer = variable.IsParameter ? $" = {nameMangler.Mangle(variable.Name)}" : "";
-            var name = variable.Name != null ? " // " + variable.Name : "";
-            code.AppendLine($"{typeConverter.Convert(variable.Type)} _{NameOf(variable.Reference)}{initializer};{name}");
+            code.AppendLine($"{typeConverter.Convert(variable.Type)} _{NameOf(variable.Reference)}{initializer}; // {variable}");
         }
 
         private static string NameOf(VariableReference variable)
