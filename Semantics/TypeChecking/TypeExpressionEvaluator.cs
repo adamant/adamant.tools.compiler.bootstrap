@@ -86,8 +86,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 case BinaryExpressionSyntax _:
                     // TODO evaluate to type
                     return DataType.Unknown;
-                case MutableTypeSyntax mutableType:
-                    return EvaluateExpression(mutableType.ReferencedTypeExpression); // TODO make the type mutable
+                case MutableExpressionSyntax mutableType:
+                    return EvaluateExpression(mutableType.Expression); // TODO make the type mutable
                 default:
                     throw NonExhaustiveMatchException.For(typeExpression);
             }

@@ -286,8 +286,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 case UnsafeExpressionSyntax unsafeExpression:
                     InferExpressionType(unsafeExpression.Expression);
                     return unsafeExpression.Type = unsafeExpression.Expression.Type;
-                case MutableTypeSyntax mutableType:
-                    return mutableType.Type = CheckAndEvaluateTypeExpression(mutableType.ReferencedTypeExpression);// TODO make that type mutable
+                case MutableExpressionSyntax mutableType:
+                    return mutableType.Type = CheckAndEvaluateTypeExpression(mutableType.Expression);// TODO make that type mutable
                 case IfExpressionSyntax ifExpression:
                     CheckExpressionType(ifExpression.Condition, DataType.Bool);
                     InferExpressionType(ifExpression.ThenBlock);
@@ -310,6 +310,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     return assignmentExpression.Type = DataType.Void;
                 case SelfExpressionSyntax _:
                     return selfType ?? DataType.Unknown;
+                case MoveExpressionSyntax moveExpression:
+                    return moveExpression.Type = InferExpressionType(moveExpression.Expression);
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }

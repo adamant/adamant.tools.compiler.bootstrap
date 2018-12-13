@@ -72,15 +72,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
                 foreach (var expectedCompileErrorLine in expectedCompileErrorLines)
                 {
                     // Assert a single error on the given line
-                    Assert.Single(diagnostics.Where(d =>
+                    var errorsOnLine = diagnostics.Count(d =>
                         d.StartPosition.Line == expectedCompileErrorLine
-                        && d.Level >= DiagnosticLevel.CompilationError));
+                        && d.Level >= DiagnosticLevel.CompilationError);
+                    Assert.True(errorsOnLine == 1,
+                        $"Expected single error on line {expectedCompileErrorLine}, found {errorsOnLine}");
                 }
+
                 // Done with test
                 return;
             }
-            else
-                Assert.Empty(diagnostics);
+
+            Assert.True(!diagnostics.Any(), $"Expected no compiler errors, found {diagnostics.Count}");
 
             // Emit Code
             var codePath = Path.ChangeExtension(testCase.FullCodePath, "c");

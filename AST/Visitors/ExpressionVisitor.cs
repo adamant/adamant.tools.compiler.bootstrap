@@ -92,12 +92,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case ImplicitConversionExpression implicitConversion:
                     VisitImplicitConversionExpression(implicitConversion, args);
                     break;
+                case MutableExpressionSyntax mutableExpression:
+                    VisitMutableExpression(mutableExpression, args);
+                    break;
+                case MoveExpressionSyntax moveExpression:
+                    VisitMoveExpression(moveExpression, args);
+                    break;
                 case null:
                     // Ignore
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
+        }
+
+        public virtual void VisitMoveExpression(MoveExpressionSyntax moveExpression, A args)
+        {
+            VisitExpression(moveExpression.Expression, args);
+        }
+
+        public virtual void VisitMutableExpression(MutableExpressionSyntax mutableExpression, A args)
+        {
+            VisitExpression(mutableExpression.Expression, args);
         }
 
         public virtual void VisitImplicitConversionExpression(ImplicitConversionExpression implicitConversionExpression, A args)

@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public override string ToString()
         {
-            return $"new {Constructor}({Arguments})";
+            return $"new {Constructor}({string.Join(", ", Arguments)})";
         }
     }
 }

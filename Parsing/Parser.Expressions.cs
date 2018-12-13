@@ -403,18 +403,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     return new NoneLiteralExpressionSyntax(literal);
                 }
                 case IPrimitiveTypeToken _:
-                {
                     return ParsePrimitiveType();
-                }
                 case IIdentifierToken _:
-                {
-                    // TODO ParseSimpleName()
-                    var identifier = Tokens.RequiredToken<IIdentifierToken>();
-                    var name = new SimpleName(identifier.Value);
-                    var syntax = new IdentifierNameSyntax(identifier.Span, name);
-                    if (!Tokens.Accept<IDollarToken>()) return syntax;
-                    return ParseRestOfLifetimeType(syntax, LifetimeOperator.Equal) ?? syntax;
-                }
+                    return ParseSimpleName();
                 case IForeachKeywordToken _:
                     return ParseForeach();
                 case IWhileKeywordToken _:
@@ -441,9 +432,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IMutableKeywordToken _:
                 {
                     var mutableKeyword = Tokens.Expect<IMutableKeywordToken>();
-                    var referencedType = ParseExpression();
-                    var span = TextSpan.Covering(mutableKeyword, referencedType.Span);
-                    return new MutableTypeSyntax(span, referencedType);
+                    var expression = ParseExpression();
+                    var span = TextSpan.Covering(mutableKeyword, expression.Span);
+                    return new MutableExpressionSyntax(span, expression);
+                }
+                case IMoveKeywordToken _:
+                {
+                    var moveKeyword = Tokens.Expect<IMoveKeywordToken>();
+                    var expression = ParseExpression();
+                    var span = TextSpan.Covering(moveKeyword, expression.Span);
+                    return new MoveExpressionSyntax(span, expression);
                 }
                 case IIfKeywordToken _:
                     return ParseIf();
@@ -586,6 +584,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         private ExpressionSyntax ParseRestOfLifetimeType(ExpressionSyntax expression, LifetimeOperator lifetimeOperator)
         {
+            Tokens.Expect<ILifetimeOperatorToken>();
             switch (Tokens.Current)
             {
                 case IIdentifierToken _:
