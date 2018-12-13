@@ -5,7 +5,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 {
     public class Claims
     {
-
         private readonly Dictionary<Statement, HashSet<Claim>> claims = new Dictionary<Statement, HashSet<Claim>>();
 
         public HashSet<Claim> After(Statement statement)

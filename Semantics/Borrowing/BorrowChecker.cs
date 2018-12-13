@@ -4,6 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
@@ -64,27 +65,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             if (function.Poisoned || function.ControlFlow == null)
                 return;
 
-            var edges = function.ControlFlow.Edges;
-
-            // Now do borrow checking with claims
+            // Do borrow checking with claims
             var blocks = new Queue<BasicBlock>();
             blocks.Enqueue(function.ControlFlow.EntryBlock);
             var claims = new Claims();
+            // Compute parameter claims once in case for some reason we process the entry block repeatedly
+            var parameterClaims = AcquireParameterClaims(function);
 
             while (blocks.TryDequeue(out var block))
             {
-                var claimsBeforeStatement = new HashSet<Claim>();
-
-                if (block == function.ControlFlow.EntryBlock)
-                    foreach (var parameter in function.ControlFlow.VariableDeclarations.Where(v =>
-                        v.IsParameter))
-                    {
-                        claimsBeforeStatement.Add(new Loan(parameter.Number, nextObjectId));
-                        nextObjectId += 1;
-                    }
-
-                foreach (var predecessor in edges.To(block).Select(b => b.Terminator))
-                    claimsBeforeStatement.UnionWith(claims.After(predecessor));
+                var claimsBeforeStatement = ClaimsBeforeBlock(function, block, claims, parameterClaims);
 
                 foreach (var statement in block.ExpressionStatements)
                 {
@@ -137,6 +127,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     }
                 }
             }
+        }
+
+        private HashSet<Claim> ClaimsBeforeBlock(
+            FunctionDeclarationSyntax function,
+            BasicBlock block,
+            Claims claims,
+            HashSet<Claim> parameterClaims)
+        {
+            var claimsBeforeStatement = new HashSet<Claim>();
+
+            if (block == function.ControlFlow.EntryBlock)
+                claimsBeforeStatement.UnionWith(parameterClaims);
+
+            foreach (var predecessor in function.ControlFlow.Edges.To(block).Select(b => b.Terminator))
+                claimsBeforeStatement.UnionWith(claims.After(predecessor));
+
+            return claimsBeforeStatement;
+        }
+
+        private HashSet<Claim> AcquireParameterClaims(FunctionDeclarationSyntax function)
+        {
+            var claimsBeforeStatement = new HashSet<Claim>();
+            foreach (var parameter in function.ControlFlow.VariableDeclarations
+                .Where(v => v.IsParameter && v.Type is ReferenceType))
+            {
+                claimsBeforeStatement.Add(new Loan(parameter.Number, nextObjectId));
+                nextObjectId += 1;
+            }
+
+            return claimsBeforeStatement;
         }
 
         private void CheckCanMove(int objectId, HashSet<Claim> claims, TextSpan span)
