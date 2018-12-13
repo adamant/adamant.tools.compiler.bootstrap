@@ -7,6 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Validation;
@@ -42,6 +43,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             ShadowChecker.Check(memberDeclarations, diagnostics);
 
             ControlFlowAnalyzer.BuildGraphs(memberDeclarations);
+
+            // TODO we need to check definite assignment as well
+
+            LivenessAnalyzer.Analyze(memberDeclarations);
 
             BorrowChecker.Check(memberDeclarations, diagnostics);
 

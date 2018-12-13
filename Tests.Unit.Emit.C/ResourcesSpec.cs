@@ -13,7 +13,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C
     [Category("Emit")]
     public class ResourcesSpec
     {
-
         private readonly IReadOnlyList<byte> byteOrderMarkUtf8 = Encoding.UTF8.GetPreamble().ToList().AsReadOnly();
 
         /// <summary>

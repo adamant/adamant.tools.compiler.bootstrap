@@ -1,9 +1,10 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
-    public class PointerType : DataType
+    public class PointerType : ValueType
     {
         public readonly DataType Referent;
         public override bool IsResolved { get; }
+        public override ValueSemantics Semantics => ValueSemantics.Copy;
 
         public PointerType(DataType referent)
         {
