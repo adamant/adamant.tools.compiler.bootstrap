@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
         public static new readonly SymbolSet Empty = new SymbolSet(Enumerable.Empty<ISymbol>());
 
         public SymbolSet(IEnumerable<ISymbol> symbols)
-        : base(GroupSymbols(symbols))
+            : base(GroupSymbols(symbols))
         {
         }
 

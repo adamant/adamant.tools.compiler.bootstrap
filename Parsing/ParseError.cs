@@ -11,6 +11,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     /// 2001-2999: Parsing Errors
     /// 3001-3999: Type Errors
     /// 4001-4999: Borrow Checking Errors
+    /// 5001-5999: Name Binding Errors
+    /// 6001-6999: Other Semantic Errors
     /// </summary>
     internal static class ParseError
     {

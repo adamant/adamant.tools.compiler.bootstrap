@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
-using Adamant.Tools.Compiler.Bootstrap.AST.Visitors;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
@@ -15,11 +14,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 {
     public class ControlFlowAnalyzer
     {
-        public static void BuildGraphs(IEnumerable<DeclarationSyntax> declarations)
+        public static void BuildGraphs(IEnumerable<MemberDeclarationSyntax> declarations)
         {
-            var visitor = new GetFunctionDeclarationsVisitor();
-            visitor.VisitDeclarations(declarations);
-            foreach (var function in visitor.FunctionDeclarations.Where(ShouldBuildGraph))
+            foreach (var function in declarations.OfType<FunctionDeclarationSyntax>().Where(ShouldBuildGraph))
             {
                 var builder = new ControlFlowAnalyzer();
                 builder.BuildGraph(function);

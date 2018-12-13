@@ -17,16 +17,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
     /// * Check: there is a type something is expected to be compatible with, check that it is
     /// * Infer:
     /// </summary>
-    public class DeclarationTypeResolver
+    public class TypeResolver
     {
         private readonly Diagnostics diagnostics;
 
-        public DeclarationTypeResolver(Diagnostics diagnostics)
+        private TypeResolver(Diagnostics diagnostics)
         {
             this.diagnostics = diagnostics;
         }
 
-        public void ResolveTypesInDeclarations(FixedList<MemberDeclarationSyntax> declarations)
+        public static void Check(FixedList<MemberDeclarationSyntax> memberDeclarations, Diagnostics diagnostics)
+        {
+            var typeChecker = new TypeResolver(diagnostics);
+            typeChecker.ResolveTypesInDeclarations(memberDeclarations);
+        }
+
+        private void ResolveTypesInDeclarations(FixedList<MemberDeclarationSyntax> declarations)
         {
             ResolveSignatureTypesInDeclarations(declarations);
             // Function bodies are checked after signatures to ensure that all function invocation

@@ -7,6 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Validation;
 
@@ -31,13 +32,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // TODO we can't do full type checking without some IL gen and code execution, how to handle that?
 
             // Do type checking
-            var typeChecker = new DeclarationTypeResolver(diagnostics);
-            typeChecker.ResolveTypesInDeclarations(memberDeclarations);
+            TypeResolver.Check(memberDeclarations, diagnostics);
 
 #if DEBUG
             TypeResolutionValidator.Validate(memberDeclarations);
             // TODO validate that all ReferencedSymbols lists have a single value non-errored code
 #endif
+
+            ShadowChecker.Check(memberDeclarations, diagnostics);
 
             ControlFlowAnalyzer.BuildGraphs(memberDeclarations);
 
