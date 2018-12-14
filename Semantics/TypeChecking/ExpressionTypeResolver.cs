@@ -286,8 +286,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 case UnsafeExpressionSyntax unsafeExpression:
                     InferExpressionType(unsafeExpression.Expression);
                     return unsafeExpression.Type = unsafeExpression.Expression.Type;
-                case MutableExpressionSyntax mutableType:
-                    return mutableType.Type = CheckAndEvaluateTypeExpression(mutableType.Expression);// TODO make that type mutable
+                case MutableExpressionSyntax mutableExpression:
+                {
+                    var expressionType = InferExpressionType(mutableExpression.Expression);
+                    DataType type;
+                    if (expressionType is Metatype metatype)
+                        type = DataType.Type; // It names/describes a type
+                    else
+                    {
+                        // TODO check that the type actually is mutable so we can mutably borrow it
+                        type = expressionType;
+                    }
+
+                    return mutableExpression.Type = type;
+                }
                 case IfExpressionSyntax ifExpression:
                     CheckExpressionType(ifExpression.Condition, DataType.Bool);
                     InferExpressionType(ifExpression.ThenBlock);
