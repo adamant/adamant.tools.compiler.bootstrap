@@ -432,7 +432,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IMutableKeywordToken _:
                 {
                     var mutableKeyword = Tokens.Expect<IMutableKeywordToken>();
-                    var expression = ParseExpression();
+                    var expression = ParseExpression(OperatorPrecedence.AboveAssignment);
                     var span = TextSpan.Covering(mutableKeyword, expression.Span);
                     return new MutableExpressionSyntax(span, expression);
                 }

@@ -290,7 +290,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 {
                     var expressionType = InferExpressionType(mutableExpression.Expression);
                     DataType type;
-                    if (expressionType is Metatype metatype)
+                    if (expressionType is Metatype)
                         type = DataType.Type; // It names/describes a type
                     else
                     {
