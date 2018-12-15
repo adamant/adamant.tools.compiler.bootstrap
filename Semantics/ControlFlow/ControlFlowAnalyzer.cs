@@ -264,6 +264,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     return new FieldAccessValue(value,
                         memberAccess.ReferencedSymbol.FullName);
                 }
+                case MutableExpressionSyntax mutable:
+                    // TODO shouldn't borrowing be explicit in the IR and don't we
+                    // need to be able to check mutability on borrows?
+                    return ConvertToValue(currentBlock, mutable.Expression);
+                case MoveExpressionSyntax move:
+                    // TODO should this be explicit in IR?
+                    return ConvertToValue(currentBlock, move.Expression);
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
