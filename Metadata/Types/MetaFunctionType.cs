@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
@@ -21,6 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public MetaFunctionType(
             IEnumerable<DataType> parameterTypes,
             DataType resultType)
+            : base(Lifetime.Forever)
         {
             ParameterTypes = parameterTypes.ToFixedList();
             ResultType = resultType;

@@ -80,12 +80,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
                 case "=":
                     return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == "=>" || t2.Text == "/="
                         || t2.Text == ">" || t2.Text == ">=";
-                case "$":
-                    return t2.Text == ">" || t2.Text == ">="
-                        || t2.Text == "<" || t2.Text == "<=" || t2.Text == "<:" || t2.Text == "<.." || t2.Text == "<..<";
-                case "$>":
-                case "$<":
-                    return t2.Text == "≠" || t2.Text == "/=";
                 case "?":
                     return t2.Text == "." || t2.Text == ".." || t2.Text == "..<"
                         || t2.Text == "?" || t2.Text == "?." || t2.Text == "??";
@@ -244,12 +238,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             { "*=", typeof(IAsteriskEqualsToken) },
             { "/=", typeof(ISlashEqualsToken) },
             { "$", typeof(IDollarToken) },
-            { "$<", typeof(IDollarLessThanToken) },
-            { "$<≠", typeof(IDollarLessThanNotEqualToken) },
-            { "$</=", typeof(IDollarLessThanNotEqualToken) },
-            { "$>", typeof(IDollarGreaterThanToken) },
-            { "$>≠", typeof(IDollarGreaterThanNotEqualToken) },
-            { "$>/=", typeof(IDollarGreaterThanNotEqualToken) },
             { "=>", typeof(IEqualsGreaterThanToken) },
             { "#", typeof(IHashToken) },
             { "##", typeof(IHashHashToken) },

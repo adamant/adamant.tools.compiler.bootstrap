@@ -39,15 +39,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                         return new LifetimeType(objectType, lifetime);
                     return DataType.Unknown;
                 }
-                case LifetimeRelationSyntax lifetimeRelation:
-                {
-                    var type = EvaluateExpression(lifetimeRelation.ReferentTypeExpression);
-                    if (type == DataType.Unknown) return DataType.Unknown;
-                    var lifetime = EvaluateLifetime(lifetimeRelation.Lifetime);
-                    if (type is ObjectType objectType)
-                        return new LifetimeBoundType(objectType, lifetimeRelation.Operator, lifetime);
-                    return DataType.Unknown;
-                }
                 case RefTypeSyntax refType:
                 {
                     var referent = EvaluateExpression(refType.ReferencedType);
@@ -92,7 +83,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             switch (lifetimeToken)
             {
                 case IOwnedKeywordToken _:
-                    lifetime = OwnedLifetime.Instance;
+                    lifetime = Lifetime.Owned;
                     break;
                 case IRefKeywordToken _:
                     lifetime = RefLifetime.Instance;

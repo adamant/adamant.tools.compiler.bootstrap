@@ -5,7 +5,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         #region Singleton
         internal static readonly AnyType Instance = new AnyType();
 
-        private AnyType() { }
+        private AnyType()
+            : base(Lifetimes.Lifetime.Forever)
+        { }
         #endregion
 
         public override bool IsResolved => true;

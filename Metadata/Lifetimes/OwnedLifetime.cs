@@ -2,10 +2,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes
 {
     public class OwnedLifetime : Lifetime
     {
-        // TODO expose this as a property on lifetime instead `Lifetime.Owned`
         #region Singleton
-
-        public static readonly OwnedLifetime Instance = new OwnedLifetime();
+        internal static readonly OwnedLifetime Instance = new OwnedLifetime();
 
         private OwnedLifetime() { }
         #endregion

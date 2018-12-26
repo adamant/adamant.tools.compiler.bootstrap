@@ -95,20 +95,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case MoveExpressionSyntax moveExpression:
                     VisitMoveExpression(moveExpression, args);
                     break;
-                case LifetimeRelationSyntax lifetimeRelation:
-                    VisitLifetimeRelation(lifetimeRelation, args);
-                    break;
                 case null:
                     // Ignore
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
-        }
-
-        public virtual void VisitLifetimeRelation(LifetimeRelationSyntax lifetimeRelation, A args)
-        {
-            VisitExpression(lifetimeRelation.ReferentTypeExpression, args);
         }
 
         public virtual void VisitMoveExpression(MoveExpressionSyntax moveExpression, A args)

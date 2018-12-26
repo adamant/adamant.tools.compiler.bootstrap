@@ -20,6 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public override bool IsResolved => Instance.IsResolved;
 
         public Metatype(DataType instanceType)
+            : base(Lifetimes.Lifetime.Forever)
         {
             Instance = instanceType;
         }

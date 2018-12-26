@@ -101,55 +101,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                         yield return TokenFactory.Pipe(SymbolSpan());
                         break;
                     case '$':
-                        switch (NextChar())
-                        {
-                            case '<':
-                                switch (CharAt(2))
-                                {
-                                    case '≠':
-                                        // it is `$<≠`
-                                        yield return TokenFactory.DollarLessThanNotEqual(SymbolSpan(3));
-                                        break;
-                                    case '/':
-                                        if (CharAtIs(3, '='))
-                                            // it is `$</=`
-                                            yield return TokenFactory.DollarLessThanNotEqual(
-                                                SymbolSpan(4));
-                                        else
-                                            goto default;
-                                        break;
-                                    default:
-                                        // it is `$<`
-                                        yield return TokenFactory.DollarLessThan(SymbolSpan(2));
-                                        break;
-                                }
-                                break;
-                            case '>':
-                                switch (CharAt(2))
-                                {
-                                    case '≠':
-                                        // it is `$>≠`
-                                        yield return TokenFactory.DollarGreaterThanNotEqual(SymbolSpan(3));
-                                        break;
-                                    case '/':
-                                        if (CharAtIs(3, '='))
-                                            // it is `$>/=`
-                                            yield return TokenFactory.DollarGreaterThanNotEqual(
-                                                SymbolSpan(4));
-                                        else
-                                            goto default;
-                                        break;
-                                    default:
-                                        // it is `$>`
-                                        yield return TokenFactory.DollarGreaterThan(SymbolSpan(2));
-                                        break;
-                                }
-                                break;
-                            default:
-                                // it is `=`
-                                yield return TokenFactory.Dollar(SymbolSpan());
-                                break;
-                        }
+                        yield return TokenFactory.Dollar(SymbolSpan());
                         break;
                     case '→':
                         yield return TokenFactory.RightArrow(SymbolSpan());

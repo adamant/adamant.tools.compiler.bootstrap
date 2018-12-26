@@ -324,12 +324,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     return selfType ?? DataType.Unknown;
                 case MoveExpressionSyntax moveExpression:
                     return moveExpression.Type = InferExpressionType(moveExpression.Expression);
-                case LifetimeRelationSyntax lifetimeRelation:
-                {
-                    var referent = (Metatype)InferExpressionType(lifetimeRelation.ReferentTypeExpression);
-                    var lifetime = TypeExpressionEvaluator.EvaluateLifetime(lifetimeRelation.Lifetime);
-                    return lifetimeRelation.Type = new LifetimeBoundType((ObjectType)referent.Instance, lifetimeRelation.Operator, lifetime);
-                }
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
@@ -340,7 +334,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             switch (dataType)
             {
                 case Metatype _:
-                case LifetimeBoundType _:
                 case LifetimeType _:
                 case DataType t when t == DataType.Type:
                     return true;

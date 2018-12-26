@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
@@ -19,6 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public FunctionType(
             IEnumerable<DataType> parameterTypes,
             DataType returnType)
+            : base(Lifetime.Forever)
         {
             ParameterTypes = parameterTypes.ToFixedList();
             ReturnType = returnType;

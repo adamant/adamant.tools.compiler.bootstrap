@@ -214,26 +214,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             return new DollarToken(span);
         }
 
-        public static IDollarLessThanToken DollarLessThan(TextSpan span)
-        {
-            return new DollarLessThanToken(span);
-        }
-
-        public static IDollarLessThanNotEqualToken DollarLessThanNotEqual(TextSpan span)
-        {
-            return new DollarLessThanNotEqualToken(span);
-        }
-
-        public static IDollarGreaterThanToken DollarGreaterThan(TextSpan span)
-        {
-            return new DollarGreaterThanToken(span);
-        }
-
-        public static IDollarGreaterThanNotEqualToken DollarGreaterThanNotEqual(TextSpan span)
-        {
-            return new DollarGreaterThanNotEqualToken(span);
-        }
-
         public static IQuestionToken Question(TextSpan span)
         {
             return new QuestionToken(span);
@@ -634,42 +614,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     internal partial class DollarToken : Token, IDollarToken
     {
         public DollarToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
-    public partial interface IDollarLessThanToken : IToken { }
-    internal partial class DollarLessThanToken : Token, IDollarLessThanToken
-    {
-        public DollarLessThanToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
-    public partial interface IDollarLessThanNotEqualToken : IToken { }
-    internal partial class DollarLessThanNotEqualToken : Token, IDollarLessThanNotEqualToken
-    {
-        public DollarLessThanNotEqualToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
-    public partial interface IDollarGreaterThanToken : IToken { }
-    internal partial class DollarGreaterThanToken : Token, IDollarGreaterThanToken
-    {
-        public DollarGreaterThanToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
-    public partial interface IDollarGreaterThanNotEqualToken : IToken { }
-    internal partial class DollarGreaterThanNotEqualToken : Token, IDollarGreaterThanNotEqualToken
-    {
-        public DollarGreaterThanNotEqualToken(TextSpan span)
             : base(span)
         {
         }

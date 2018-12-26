@@ -34,6 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             IEnumerable<DataType> genericParameterTypes,
             IEnumerable<DataType> genericArguments,
             bool isMutable)
+            : base(Lifetime.Forever)
         {
             Name = symbol.FullName;
             DeclaredMutable = declaredMutable;

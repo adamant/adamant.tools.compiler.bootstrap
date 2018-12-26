@@ -156,42 +156,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                             continue;
                         }
                         break;
-                    case IDollarLessThanToken _:
-                        if (minPrecedence <= OperatorPrecedence.Lifetime)
-                        {
-                            Tokens.Expect<IDollarLessThanToken>();
-                            var lifetime = ParseLifetimeName();
-                            expression = new LifetimeRelationSyntax(expression, LifetimeRelationOperator.LessThanOrEqualTo, lifetime);
-                            continue;
-                        }
-                        break;
-                    case IDollarLessThanNotEqualToken _:
-                        if (minPrecedence <= OperatorPrecedence.Lifetime)
-                        {
-                            Tokens.Expect<IDollarLessThanNotEqualToken>();
-                            var lifetime = ParseLifetimeName();
-                            expression = new LifetimeRelationSyntax(expression, LifetimeRelationOperator.StrictlyLessThan, lifetime);
-                            continue;
-                        }
-                        break;
-                    case IDollarGreaterThanToken _:
-                        if (minPrecedence <= OperatorPrecedence.Lifetime)
-                        {
-                            Tokens.Expect<IDollarGreaterThanToken>();
-                            var lifetime = ParseLifetimeName();
-                            expression = new LifetimeRelationSyntax(expression, LifetimeRelationOperator.GreaterThanOrEqualTo, lifetime);
-                            continue;
-                        }
-                        break;
-                    case IDollarGreaterThanNotEqualToken _:
-                        if (minPrecedence <= OperatorPrecedence.Lifetime)
-                        {
-                            Tokens.Expect<IDollarGreaterThanNotEqualToken>();
-                            var lifetime = ParseLifetimeName();
-                            expression = new LifetimeRelationSyntax(expression, LifetimeRelationOperator.StrictlyGreaterThan, lifetime);
-                            continue;
-                        }
-                        break;
                     case IQuestionToken _:
                         if (minPrecedence <= OperatorPrecedence.Unary)
                         {
