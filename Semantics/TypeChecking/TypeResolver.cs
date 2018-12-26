@@ -4,6 +4,7 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
@@ -100,7 +101,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             switch (function)
             {
                 case ConstructorDeclarationSyntax constructor:
-                    return constructor.SelfParameterType = ((ObjectType)declaringType).ForConstruction();
+                    return constructor.SelfParameterType = ((ObjectType)declaringType).ForConstructor();
                 case NamedFunctionDeclarationSyntax namedFunction:
                     var selfParameter = namedFunction.Parameters.OfType<SelfParameterSyntax>().SingleOrDefault();
                     if (selfParameter == null) return null; // Static function
@@ -108,7 +109,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     // TODO deal with structs and ref self
                     var selfType = (ObjectType)declaringType;
                     if (selfParameter.MutableSelf) selfType = selfType.AsMutable();
-                    return namedFunction.SelfParameterType = selfParameter.Type.Fulfill(selfType);
+                    var lifetimeType = new LifetimeType(selfType, AnonymousLifetime.Instance);
+                    return namedFunction.SelfParameterType = selfParameter.Type.Fulfill(lifetimeType);
                 case InitializerDeclarationSyntax _:
                     throw new NotImplementedException();
                 default:

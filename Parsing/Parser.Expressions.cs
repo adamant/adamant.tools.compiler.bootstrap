@@ -150,35 +150,45 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     case IDollarToken _:
                         if (minPrecedence <= OperatorPrecedence.Lifetime)
                         {
-                            expression = ParseRestOfLifetimeType(expression, LifetimeOperator.Equal) ?? expression;
+                            Tokens.Expect<IDollarToken>();
+                            var lifetime = ParseLifetimeName();
+                            expression = new LifetimeNameSyntax(expression, lifetime);
                             continue;
                         }
                         break;
                     case IDollarLessThanToken _:
                         if (minPrecedence <= OperatorPrecedence.Lifetime)
                         {
-                            expression = ParseRestOfLifetimeType(expression, LifetimeOperator.LessThanOrEqualTo) ?? expression;
+                            Tokens.Expect<IDollarLessThanToken>();
+                            var lifetime = ParseLifetimeName();
+                            expression = new LifetimeRelationSyntax(expression, LifetimeRelationOperator.LessThanOrEqualTo, lifetime);
                             continue;
                         }
                         break;
                     case IDollarLessThanNotEqualToken _:
                         if (minPrecedence <= OperatorPrecedence.Lifetime)
                         {
-                            expression = ParseRestOfLifetimeType(expression, LifetimeOperator.StrictlyLessThan) ?? expression;
+                            Tokens.Expect<IDollarLessThanNotEqualToken>();
+                            var lifetime = ParseLifetimeName();
+                            expression = new LifetimeRelationSyntax(expression, LifetimeRelationOperator.StrictlyLessThan, lifetime);
                             continue;
                         }
                         break;
                     case IDollarGreaterThanToken _:
                         if (minPrecedence <= OperatorPrecedence.Lifetime)
                         {
-                            expression = ParseRestOfLifetimeType(expression, LifetimeOperator.GreaterThanOrEqualTo) ?? expression;
+                            Tokens.Expect<IDollarGreaterThanToken>();
+                            var lifetime = ParseLifetimeName();
+                            expression = new LifetimeRelationSyntax(expression, LifetimeRelationOperator.GreaterThanOrEqualTo, lifetime);
                             continue;
                         }
                         break;
                     case IDollarGreaterThanNotEqualToken _:
                         if (minPrecedence <= OperatorPrecedence.Lifetime)
                         {
-                            expression = ParseRestOfLifetimeType(expression, LifetimeOperator.StrictlyGreaterThan) ?? expression;
+                            Tokens.Expect<IDollarGreaterThanNotEqualToken>();
+                            var lifetime = ParseLifetimeName();
+                            expression = new LifetimeRelationSyntax(expression, LifetimeRelationOperator.StrictlyGreaterThan, lifetime);
                             continue;
                         }
                         break;
@@ -455,31 +465,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var span = TextSpan.Covering(dot, member.Span);
                     return new MemberAccessExpressionSyntax(span, null, AccessOperator.Standard, member);
                 }
-                case IDollarToken _:
-                {
-                    var dollar = Tokens.Expect<IDollarToken>();
-                    var lifetimeName = Tokens.RequiredToken<ILifetimeNameToken>();
-                    var span = TextSpan.Covering(dollar, lifetimeName.Span);
-                    SimpleName name;
-                    switch (lifetimeName)
-                    {
-                        case IIdentifierToken identifier:
-                            name = new SimpleName(identifier.Value);
-                            break;
-                        case IRefKeywordToken _:
-                            name = SpecialName.Ref;
-                            break;
-                        case IOwnedKeywordToken _:
-                            name = SpecialName.Owned;
-                            break;
-                        case IForeverKeywordToken _:
-                            name = SpecialName.Forever;
-                            break;
-                        default:
-                            throw NonExhaustiveMatchException.For(lifetimeName);
-                    }
-                    return new LifetimeNameSyntax(span, name);
-                }
                 case IAsteriskToken _:
                 case ISlashToken _:
                 case IQuestionToken _:
@@ -582,23 +567,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new UnaryExpressionSyntax(span, UnaryOperatorFixity.Prefix, @operator, operand);
         }
 
-        private ExpressionSyntax ParseRestOfLifetimeType(ExpressionSyntax expression, LifetimeOperator lifetimeOperator)
+        private ILifetimeNameToken ParseLifetimeName()
         {
-            Tokens.Expect<ILifetimeOperatorToken>();
             switch (Tokens.Current)
             {
                 case IIdentifierToken _:
-                    var identifier = Tokens.RequiredToken<IIdentifierToken>();
-                    return new LifetimeTypeSyntax(expression, lifetimeOperator, identifier);
+                    return Tokens.RequiredToken<IIdentifierToken>();
                 case IOwnedKeywordToken _:
-                    var ownedKeyword = Tokens.RequiredToken<IOwnedKeywordToken>();
-                    return new LifetimeTypeSyntax(expression, lifetimeOperator, ownedKeyword);
+                    return Tokens.RequiredToken<IOwnedKeywordToken>();
                 case IRefKeywordToken _:
-                    var refKeyword = Tokens.RequiredToken<IRefKeywordToken>();
-                    return new LifetimeTypeSyntax(expression, lifetimeOperator, refKeyword);
+                    return Tokens.RequiredToken<IRefKeywordToken>();
+                case IForeverKeywordToken _:
+                    return Tokens.RequiredToken<IForeverKeywordToken>();
                 default:
-                    Tokens.Expect<ILifetimeNameToken>();
-                    return null;
+                    return Tokens.ExpectIdentifier();
             }
         }
 

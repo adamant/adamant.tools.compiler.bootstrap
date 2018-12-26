@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
@@ -70,9 +71,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// Make a mutable version of this type regardless of whether it was declared
         /// mutable for use as the constructor parameter.
         /// </summary>
-        public ObjectType ForConstruction()
+        public LifetimeType ForConstructor()
         {
-            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, true);
+            var objectType = new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, true);
+            return new LifetimeType(objectType, AnonymousLifetime.Instance);
         }
 
         public ObjectType WithGenericArguments(IEnumerable<DataType> genericArguments)

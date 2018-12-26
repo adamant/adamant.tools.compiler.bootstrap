@@ -1,21 +1,25 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class LifetimeNameSyntax : ExpressionSyntax
+    public class LifetimeNameSyntax : TypeSyntax
     {
-        public SimpleName Name { get; }
+        public ExpressionSyntax ReferentTypeExpression { get; }
+        public ILifetimeNameToken Lifetime { get; }
 
-        public LifetimeNameSyntax(TextSpan span, SimpleName name)
-            : base(span)
+        public LifetimeNameSyntax(
+            ExpressionSyntax referentTypeExpression,
+            ILifetimeNameToken lifetime)
+            : base(TextSpan.Covering(referentTypeExpression.Span, lifetime.Span))
         {
-            Name = name;
+            ReferentTypeExpression = referentTypeExpression;
+            Lifetime = lifetime;
         }
 
         public override string ToString()
         {
-            return "$" + Name;
+            return $"{ReferentTypeExpression}${Lifetime}";
         }
     }
 }

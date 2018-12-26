@@ -3,15 +3,15 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class LifetimeTypeSyntax : TypeSyntax
+    public class LifetimeRelationSyntax : TypeSyntax
     {
         public ExpressionSyntax ReferentTypeExpression { get; }
-        public LifetimeOperator Operator { get; }
+        public LifetimeRelationOperator Operator { get; }
         public ILifetimeNameToken Lifetime { get; }
 
-        public LifetimeTypeSyntax(
+        public LifetimeRelationSyntax(
             ExpressionSyntax referentTypeExpression,
-            LifetimeOperator lifetimeOperator,
+            LifetimeRelationOperator lifetimeOperator,
             ILifetimeNameToken lifetime)
             : base(TextSpan.Covering(referentTypeExpression.Span, lifetime.Span))
         {
@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public override string ToString()
         {
-            return $"{ReferentTypeExpression}{Operator}{Lifetime}";
+            return $"{ReferentTypeExpression}${Operator.ToSymbolString()}{Lifetime}";
         }
     }
 }

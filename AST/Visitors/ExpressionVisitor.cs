@@ -56,8 +56,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case BlockSyntax block:
                     VisitBlock(block, args);
                     break;
-                case LifetimeTypeSyntax lifetimeType:
-                    VisitLifetimeType(lifetimeType, args);
+                case LifetimeNameSyntax lifetimeName:
+                    VisitLifetimeName(lifetimeName, args);
                     break;
                 case NewObjectExpressionSyntax newObjectExpression:
                     VisitNewObjectExpression(newObjectExpression, args);
@@ -67,9 +67,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                     break;
                 case UnsafeExpressionSyntax unsafeExpression:
                     VisitUnsafeExpression(unsafeExpression, args);
-                    break;
-                case LifetimeNameSyntax lifetimeName:
-                    VisitLifetimeName(lifetimeName, args);
                     break;
                 case SelfExpressionSyntax selfExpression:
                     VisitSelfExpression(selfExpression, args);
@@ -98,12 +95,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case MoveExpressionSyntax moveExpression:
                     VisitMoveExpression(moveExpression, args);
                     break;
+                case LifetimeRelationSyntax lifetimeRelation:
+                    VisitLifetimeRelation(lifetimeRelation, args);
+                    break;
                 case null:
                     // Ignore
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
+        }
+
+        public virtual void VisitLifetimeRelation(LifetimeRelationSyntax lifetimeRelation, A args)
+        {
+            VisitExpression(lifetimeRelation.ReferentTypeExpression, args);
         }
 
         public virtual void VisitMoveExpression(MoveExpressionSyntax moveExpression, A args)
@@ -173,10 +178,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         {
         }
 
-        public virtual void VisitLifetimeName(LifetimeNameSyntax lifetimeName, A args)
-        {
-        }
-
         public virtual void VisitUnsafeExpression(UnsafeExpressionSyntax unsafeExpression, A args)
         {
             VisitExpression(unsafeExpression.Expression, args);
@@ -198,9 +199,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             VisitExpression(argument.Value, args);
         }
 
-        public virtual void VisitLifetimeType(LifetimeTypeSyntax lifetimeType, A args)
+        public virtual void VisitLifetimeName(LifetimeNameSyntax lifetimeName, A args)
         {
-            VisitExpression(lifetimeType.ReferentTypeExpression, args);
+            VisitExpression(lifetimeName.ReferentTypeExpression, args);
         }
 
         public virtual void VisitBlock(BlockSyntax block, A args)

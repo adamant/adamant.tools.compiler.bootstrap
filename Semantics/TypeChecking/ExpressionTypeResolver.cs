@@ -131,7 +131,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                             throw new NotImplementedException();
                     }
                     break;
-                case StringConstantType expressionType:
+                case StringConstantType _:
                 {
                     if (targetType is ObjectType objectType)
                     {
@@ -217,7 +217,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 }
                 case UnaryExpressionSyntax unaryOperatorExpression:
                     return InferUnaryExpressionType(unaryOperatorExpression);
-                case LifetimeTypeSyntax lifetimeType:
+                case LifetimeNameSyntax lifetimeType:
                     InferExpressionType(lifetimeType.ReferentTypeExpression);
                     if (!IsType(lifetimeType.ReferentTypeExpression.Type))
                         diagnostics.Add(TypeError.MustBeATypeExpression(file, lifetimeType.ReferentTypeExpression.Span));
@@ -324,6 +324,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     return selfType ?? DataType.Unknown;
                 case MoveExpressionSyntax moveExpression:
                     return moveExpression.Type = InferExpressionType(moveExpression.Expression);
+                case LifetimeRelationSyntax lifetimeRelation:
+                {
+                    var referent = (Metatype)InferExpressionType(lifetimeRelation.ReferentTypeExpression);
+                    var lifetime = TypeExpressionEvaluator.EvaluateLifetime(lifetimeRelation.Lifetime);
+                    return lifetimeRelation.Type = new LifetimeBoundType((ObjectType)referent.Instance, lifetimeRelation.Operator, lifetime);
+                }
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
@@ -331,7 +337,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
 
         private static bool IsType(DataType dataType)
         {
-            return dataType == DataType.Type || dataType is Metatype;
+            switch (dataType)
+            {
+                case Metatype _:
+                case LifetimeBoundType _:
+                case LifetimeType _:
+                case DataType t when t == DataType.Type:
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         private DataType InferInvocationType(InvocationSyntax invocation)

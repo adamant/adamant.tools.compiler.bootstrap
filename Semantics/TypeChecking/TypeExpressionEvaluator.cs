@@ -1,6 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
@@ -8,9 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
 {
     public class TypeExpressionEvaluator
     {
-
-        public static DataType EvaluateExpression(
-            ExpressionSyntax typeExpression)
+        public static DataType EvaluateExpression(ExpressionSyntax typeExpression)
         {
             switch (typeExpression)
             {
@@ -31,28 +30,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                             throw NonExhaustiveMatchException.For(identifierType);
                     }
                 }
-                case LifetimeTypeSyntax lifetimeType:
+                case LifetimeNameSyntax lifetimeType:
                 {
                     var type = EvaluateExpression(lifetimeType.ReferentTypeExpression);
                     if (type == DataType.Unknown) return DataType.Unknown;
-                    var lifetimeToken = lifetimeType.Lifetime;
-                    Lifetime lifetime;
-                    switch (lifetimeToken)
-                    {
-                        case IOwnedKeywordToken _:
-                            lifetime = OwnedLifetime.Instance;
-                            break;
-                        case IRefKeywordToken _:
-                            lifetime = RefLifetime.Instance;
-                            break;
-                        case IIdentifierToken identifier:
-                            lifetime = new NamedLifetime(identifier.Value);
-                            break;
-                        default:
-                            throw NonExhaustiveMatchException.For(lifetimeToken);
-                    }
+                    var lifetime = EvaluateLifetime(lifetimeType.Lifetime);
                     if (type is ObjectType objectType)
                         return new LifetimeType(objectType, lifetime);
+                    return DataType.Unknown;
+                }
+                case LifetimeRelationSyntax lifetimeRelation:
+                {
+                    var type = EvaluateExpression(lifetimeRelation.ReferentTypeExpression);
+                    if (type == DataType.Unknown) return DataType.Unknown;
+                    var lifetime = EvaluateLifetime(lifetimeRelation.Lifetime);
+                    if (type is ObjectType objectType)
+                        return new LifetimeBoundType(objectType, lifetimeRelation.Operator, lifetime);
                     return DataType.Unknown;
                 }
                 case RefTypeSyntax refType:
@@ -91,6 +84,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 default:
                     throw NonExhaustiveMatchException.For(typeExpression);
             }
+        }
+
+        public static Lifetime EvaluateLifetime(ILifetimeNameToken lifetimeToken)
+        {
+            Lifetime lifetime;
+            switch (lifetimeToken)
+            {
+                case IOwnedKeywordToken _:
+                    lifetime = OwnedLifetime.Instance;
+                    break;
+                case IRefKeywordToken _:
+                    lifetime = RefLifetime.Instance;
+                    break;
+                case IIdentifierToken identifier:
+                    lifetime = new NamedLifetime(identifier.Value);
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.For(lifetimeToken);
+            }
+
+            return lifetime;
         }
     }
 }

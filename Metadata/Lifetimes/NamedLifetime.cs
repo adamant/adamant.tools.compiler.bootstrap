@@ -1,4 +1,4 @@
-namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes
 {
     public class NamedLifetime : Lifetime
     {
