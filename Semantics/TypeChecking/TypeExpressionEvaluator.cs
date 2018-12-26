@@ -30,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                             throw NonExhaustiveMatchException.For(identifierType);
                     }
                 }
-                case LifetimeNameSyntax lifetimeType:
+                case ReferenceLifetimeSyntax lifetimeType:
                 {
                     var type = EvaluateExpression(lifetimeType.ReferentTypeExpression);
                     if (type == DataType.Unknown) return DataType.Unknown;

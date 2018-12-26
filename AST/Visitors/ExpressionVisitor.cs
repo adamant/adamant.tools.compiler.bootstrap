@@ -56,7 +56,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case BlockSyntax block:
                     VisitBlock(block, args);
                     break;
-                case LifetimeNameSyntax lifetimeName:
+                case ReferenceLifetimeSyntax lifetimeName:
                     VisitLifetimeName(lifetimeName, args);
                     break;
                 case NewObjectExpressionSyntax newObjectExpression:
@@ -191,9 +191,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             VisitExpression(argument.Value, args);
         }
 
-        public virtual void VisitLifetimeName(LifetimeNameSyntax lifetimeName, A args)
+        public virtual void VisitLifetimeName(ReferenceLifetimeSyntax referenceLifetime, A args)
         {
-            VisitExpression(lifetimeName.ReferentTypeExpression, args);
+            VisitExpression(referenceLifetime.ReferentTypeExpression, args);
         }
 
         public virtual void VisitBlock(BlockSyntax block, A args)

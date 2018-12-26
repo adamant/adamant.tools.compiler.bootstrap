@@ -152,7 +152,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         {
                             Tokens.Expect<IDollarToken>();
                             var lifetime = ParseLifetimeName();
-                            expression = new LifetimeNameSyntax(expression, lifetime);
+                            expression = new ReferenceLifetimeSyntax(expression, lifetime);
                             continue;
                         }
                         break;

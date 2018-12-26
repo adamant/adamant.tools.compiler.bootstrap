@@ -3,12 +3,12 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class LifetimeNameSyntax : TypeSyntax
+    public class ReferenceLifetimeSyntax : TypeSyntax
     {
         public ExpressionSyntax ReferentTypeExpression { get; }
         public ILifetimeNameToken Lifetime { get; }
 
-        public LifetimeNameSyntax(
+        public ReferenceLifetimeSyntax(
             ExpressionSyntax referentTypeExpression,
             ILifetimeNameToken lifetime)
             : base(TextSpan.Covering(referentTypeExpression.Span, lifetime.Span))

@@ -217,7 +217,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 }
                 case UnaryExpressionSyntax unaryOperatorExpression:
                     return InferUnaryExpressionType(unaryOperatorExpression);
-                case LifetimeNameSyntax lifetimeType:
+                case ReferenceLifetimeSyntax lifetimeType:
                     InferExpressionType(lifetimeType.ReferentTypeExpression);
                     if (!IsType(lifetimeType.ReferentTypeExpression.Type))
                         diagnostics.Add(TypeError.MustBeATypeExpression(file, lifetimeType.ReferentTypeExpression.Span));
