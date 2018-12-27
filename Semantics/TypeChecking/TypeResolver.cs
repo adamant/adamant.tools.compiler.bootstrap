@@ -109,8 +109,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     // TODO deal with structs and ref self
                     var selfType = (ObjectType)declaringType;
                     if (selfParameter.MutableSelf) selfType = selfType.AsMutable();
-                    var lifetimeType = new LifetimeType(selfType, AnonymousLifetime.Instance);
-                    return namedFunction.SelfParameterType = selfParameter.Type.Fulfill(lifetimeType);
+                    return namedFunction.SelfParameterType = selfParameter.Type.Fulfill(selfType);
                 case InitializerDeclarationSyntax _:
                     throw new NotImplementedException();
                 default:
@@ -226,31 +225,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 case ClassDeclarationSyntax classDeclaration:
                     var classType = new ObjectType(declaration,
                         classDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
-                        genericParameterTypes);
+                        genericParameterTypes,
+                        Lifetime.None);
                     declaration.Type.Fulfill(new Metatype(classType));
                     break;
                 case StructDeclarationSyntax structDeclaration:
                     var structType = new ObjectType(declaration,
                         structDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
-                        genericParameterTypes);
+                        genericParameterTypes,
+                        Lifetime.None);
                     declaration.Type.Fulfill(new Metatype(structType));
                     break;
                 case EnumStructDeclarationSyntax enumStructDeclaration:
                     var enumStructType = new ObjectType(declaration,
                         enumStructDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
-                        genericParameterTypes);
+                        genericParameterTypes,
+                        Lifetime.None);
                     declaration.Type.Fulfill(new Metatype(enumStructType));
                     break;
                 case EnumClassDeclarationSyntax enumStructDeclaration:
                     var enumClassType = new ObjectType(declaration,
                         enumStructDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
-                        genericParameterTypes);
+                        genericParameterTypes,
+                        Lifetime.None);
                     declaration.Type.Fulfill(new Metatype(enumClassType));
                     break;
                 case TraitDeclarationSyntax declarationSyntax:
                     var type = new ObjectType(declaration,
                         declarationSyntax.Modifiers.Any(m => m is IMutableKeywordToken),
-                        genericParameterTypes);
+                        genericParameterTypes,
+                        Lifetime.None);
                     declaration.Type.Fulfill(new Metatype(type));
                     break;
                 default:

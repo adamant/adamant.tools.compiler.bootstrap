@@ -33,8 +33,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             bool declaredMutable,
             IEnumerable<DataType> genericParameterTypes,
             IEnumerable<DataType> genericArguments,
-            bool isMutable)
-            : base(Lifetime.Forever)
+            bool isMutable,
+            Lifetime lifetime)
+            : base(lifetime)
         {
             Name = symbol.FullName;
             DeclaredMutable = declaredMutable;
@@ -48,15 +49,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         }
 
         public ObjectType(
-             ISymbol symbol,
+            ISymbol symbol,
             bool declaredMutable,
-            IEnumerable<DataType> genericParameterTypes)
-            : this(symbol, declaredMutable, genericParameterTypes, null, false)
+            IEnumerable<DataType> genericParameterTypes,
+            Lifetime lifetime)
+            : this(symbol, declaredMutable, genericParameterTypes, null, false, lifetime)
         {
         }
 
-        public ObjectType(ISymbol symbol, bool declaredMutable)
-            : this(symbol, declaredMutable, null, null, false)
+        public ObjectType(ISymbol symbol, bool declaredMutable, Lifetime lifetime)
+            : this(symbol, declaredMutable, null, null, false, lifetime)
         {
         }
 
@@ -65,30 +67,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// </summary>
         public ObjectType AsMutable()
         {
-            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, true);
+            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, true, Lifetime);
         }
 
         /// <summary>
         /// Make a mutable version of this type regardless of whether it was declared
         /// mutable for use as the constructor parameter.
         /// </summary>
-        public LifetimeType ForConstructor()
+        public ObjectType ForConstructor()
         {
-            var objectType = new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, true);
-            return new LifetimeType(objectType, AnonymousLifetime.Instance);
+            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, true, AnonymousLifetime.Instance);
         }
 
         public ObjectType WithGenericArguments(IEnumerable<DataType> genericArguments)
         {
-            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, genericArguments, IsMutable);
+            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, genericArguments, IsMutable, Lifetime);
+        }
+
+        public override ReferenceType WithLifetime(Lifetime lifetime)
+        {
+            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, IsMutable, lifetime);
         }
 
         public override string ToString()
         {
-            if (IsMutable)
-                return "mut " + Name;
-
-            return Name.ToString();
+            var value = Name.ToString();
+            if (!(Lifetime is NoLifetime)) value += "$" + Lifetime;
+            if (IsMutable) value = "mut " + value;
+            return value;
         }
     }
 }

@@ -29,6 +29,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             IsResolved = ParameterTypes.All(pt => pt.IsResolved) && ResultType.IsResolved;
         }
 
+        public override ReferenceType WithLifetime(Lifetime lifetime)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public override string ToString()
         {
             return $"[{string.Join(", ", ParameterTypes)}] -> {ResultType}";

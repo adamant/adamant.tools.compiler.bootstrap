@@ -11,5 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         {
             Lifetime = lifetime;
         }
+
+        public abstract ReferenceType WithLifetime(Lifetime lifetime);
     }
 }

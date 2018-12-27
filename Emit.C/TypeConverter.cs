@@ -23,8 +23,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     return nameMangler.Mangle(simpleType.Name);
                 case ObjectType t:
                     return nameMangler.Mangle(t);
-                case LifetimeType lifetimeType:
-                    return Convert(lifetimeType.Referent);
                 case PointerType ptr:
                     var referenced = ptr.Referent.AssertResolved();
                     if (referenced == DataType.Any)

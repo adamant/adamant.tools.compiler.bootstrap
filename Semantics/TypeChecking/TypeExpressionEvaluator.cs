@@ -4,6 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
+using ReferenceType = Adamant.Tools.Compiler.Bootstrap.Metadata.Types.ReferenceType;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
 {
@@ -30,13 +31,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                             throw NonExhaustiveMatchException.For(identifierType);
                     }
                 }
-                case ReferenceLifetimeSyntax lifetimeType:
+                case ReferenceLifetimeSyntax referenceLifetime:
                 {
-                    var type = EvaluateExpression(lifetimeType.ReferentTypeExpression);
+                    var type = EvaluateExpression(referenceLifetime.ReferentTypeExpression);
                     if (type == DataType.Unknown) return DataType.Unknown;
-                    var lifetime = EvaluateLifetime(lifetimeType.Lifetime);
-                    if (type is ObjectType objectType)
-                        return new LifetimeType(objectType, lifetime);
+                    var lifetime = EvaluateLifetime(referenceLifetime.Lifetime);
+                    if (type is ReferenceType referenceType)
+                        return referenceType.WithLifetime(lifetime);
                     return DataType.Unknown;
                 }
                 case RefTypeSyntax refType:

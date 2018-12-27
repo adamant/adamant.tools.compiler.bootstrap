@@ -90,7 +90,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
         private static bool IsOwned(VariableDeclarationStatementSyntax declaration)
         {
-            if (declaration.Type is LifetimeType type)
+            if (declaration.Type is ReferenceType type)
                 return type.IsOwned;
 
             return false;

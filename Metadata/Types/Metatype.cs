@@ -1,3 +1,5 @@
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
+
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     /// <summary>
@@ -23,6 +25,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             : base(Lifetimes.Lifetime.Forever)
         {
             Instance = instanceType;
+        }
+
+        public override ReferenceType WithLifetime(Lifetime lifetime)
+        {
+            throw new System.NotImplementedException();
         }
 
         public override string ToString()

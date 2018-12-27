@@ -1,3 +1,5 @@
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
+
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     public class AnyType : ReferenceType
@@ -11,6 +13,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         #endregion
 
         public override bool IsResolved => true;
+
+        public override ReferenceType WithLifetime(Lifetime lifetime)
+        {
+            throw new System.NotImplementedException();
+        }
 
         public override string ToString() => "Any";
     }

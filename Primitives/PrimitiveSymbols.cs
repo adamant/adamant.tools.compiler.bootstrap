@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -56,7 +57,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             };
 
             var stringSymbol = Symbol.NewType(typeName, symbols);
-            var stringType = new ObjectType(stringSymbol, false);
+            var stringType = new ObjectType(stringSymbol, false, Lifetime.None);
             stringSymbol.Type = new Metatype(stringType);
             stringLiteralOperator.Type = new FunctionType(new DataType[] { DataType.Size, DataType.BytePointer }, stringType);
             return stringSymbol;

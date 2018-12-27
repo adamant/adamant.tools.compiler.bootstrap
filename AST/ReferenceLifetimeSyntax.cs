@@ -6,7 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public class ReferenceLifetimeSyntax : TypeSyntax
     {
         public ExpressionSyntax ReferentTypeExpression { get; }
-        public ILifetimeNameToken Lifetime { get; }
+        public ILifetimeNameToken Lifetime { get; } // TODO this shouldn't be a token
 
         public ReferenceLifetimeSyntax(
             ExpressionSyntax referentTypeExpression,

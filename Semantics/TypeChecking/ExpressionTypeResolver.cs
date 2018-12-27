@@ -334,7 +334,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             switch (dataType)
             {
                 case Metatype _:
-                case LifetimeType _:
                 case DataType t when t == DataType.Type:
                     return true;
                 default:
@@ -437,11 +436,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
         {
             InferExpressionType(binaryExpression.LeftOperand);
             var leftType = binaryExpression.LeftOperand.Type;
-            var leftTypeCore = leftType is LifetimeType l ? l.Referent : leftType;
             var @operator = binaryExpression.Operator;
             InferExpressionType(binaryExpression.RightOperand);
             var rightType = binaryExpression.RightOperand.Type;
-            var rightTypeCore = rightType is LifetimeType r ? r.Referent : rightType;
 
             // If either is unknown, then we can't know whether there is a a problem.
             // Note that the operator could be overloaded
@@ -464,7 +461,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 case BinaryOperator.LessThanOrEqual:
                 case BinaryOperator.GreaterThan:
                 case BinaryOperator.GreaterThanOrEqual:
-                    compatible = (leftTypeCore == DataType.Bool && rightTypeCore == DataType.Bool)
+                    compatible = (leftType == DataType.Bool && rightType == DataType.Bool)
                         || NumericOperatorTypesAreCompatible(ref binaryExpression.LeftOperand, ref binaryExpression.RightOperand, null);
                     binaryExpression.Type = DataType.Bool;
                     break;

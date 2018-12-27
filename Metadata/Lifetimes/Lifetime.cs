@@ -4,6 +4,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes
     {
         public static Lifetime Owned = OwnedLifetime.Instance;
         public static Lifetime Forever = ForeverLifetime.Instance;
+        public static Lifetime None = NoLifetime.Instance;
 
         public abstract bool IsOwned { get; }
         public abstract override string ToString();
