@@ -47,6 +47,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
             constructorDeclaration?.Type.Resolved();
         }
 
+        public override void VisitVariableDeclarationStatement(
+            VariableDeclarationStatementSyntax variableDeclaration,
+            Void args)
+        {
+            base.VisitVariableDeclarationStatement(variableDeclaration, args);
+            variableDeclaration.Type.AssertResolved();
+        }
+
         public override void VisitExpression(ExpressionSyntax expression, Void args)
         {
             base.VisitExpression(expression, args);
