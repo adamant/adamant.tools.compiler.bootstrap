@@ -565,36 +565,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
 
         private DataType InferUnaryExpressionType(UnaryExpressionSyntax unaryExpression)
         {
-            InferExpressionType(unaryExpression.Operand);
-            var operand = unaryExpression.Operand.Type;
+            var operandType = InferExpressionType(unaryExpression.Operand);
             var @operator = unaryExpression.Operator;
 
             // If either is unknown, then we can't know whether there is a a problem
             // (technically not true, for example, we could know that one arg should
             // be a bool and isn't)
-            if (operand == DataType.Unknown)
+            if (operandType == DataType.Unknown)
                 return unaryExpression.Type = DataType.Unknown;
 
             bool typeError;
             switch (@operator)
             {
                 case UnaryOperator.Not:
-                    typeError = operand != DataType.Bool;
+                    typeError = operandType != DataType.Bool;
                     unaryExpression.Type = DataType.Bool;
                     break;
                 case UnaryOperator.At:
                     typeError = false; // TODO check that the expression can have a pointer taken
-                    if (operand is Metatype)
+                    if (operandType is Metatype)
                         unaryExpression.Type = DataType.Type; // constructing a type
                     else
-                        unaryExpression.Type = new PointerType(operand); // taking the address of something
+                        unaryExpression.Type = new PointerType(operandType); // taking the address of something
                     break;
                 case UnaryOperator.Question:
                     typeError = false; // TODO check that the expression can have a pointer taken
-                    unaryExpression.Type = new PointerType(operand);
+                    unaryExpression.Type = new PointerType(operandType);
                     break;
                 case UnaryOperator.Caret:
-                    switch (operand)
+                    switch (operandType)
                     {
                         case PointerType pointerType:
                             unaryExpression.Type = pointerType.Referent;
@@ -606,12 +605,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                             break;
                     }
                     break;
+                case UnaryOperator.Minus:
+                    switch (operandType)
+                    {
+                        case IntegerConstantType integerType:
+                            typeError = false;
+                            unaryExpression.Type = integerType;
+                            break;
+                        case SizedIntegerType sizedIntegerType:
+                            typeError = false;
+                            unaryExpression.Type = sizedIntegerType;
+                            break;
+                        default:
+                            unaryExpression.Type = DataType.Unknown;
+                            typeError = true;
+                            break;
+                    }
+                    break;
                 default:
-                    throw NonExhaustiveMatchException.For(@operator);
+                    throw NonExhaustiveMatchException.ForEnum(@operator);
             }
             if (typeError)
                 diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandOfType(file,
-                    unaryExpression.Span, @operator, operand));
+                    unaryExpression.Span, @operator, operandType));
 
             return unaryExpression.Type;
         }

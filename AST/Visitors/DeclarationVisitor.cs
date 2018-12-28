@@ -19,12 +19,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case MemberDeclarationSyntax memberDeclaration:
                     VisitMemberDeclaration(memberDeclaration, args);
                     break;
+                case NamespaceDeclarationSyntax namespaceDeclaration:
+                    VisitNamespaceDeclaration(namespaceDeclaration, args);
+                    break;
                 case null:
                     // Ignore
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
             }
+        }
+
+        public virtual void VisitNamespaceDeclaration(NamespaceDeclarationSyntax namespaceDeclaration, A args)
+        {
+            foreach (var usingDirective in namespaceDeclaration.UsingDirectives)
+                VisitUsingDirective(usingDirective, args);
+
+            foreach (var declaration in namespaceDeclaration.Declarations)
+                VisitDeclaration(declaration, args);
+        }
+
+        public virtual void VisitUsingDirective(UsingDirectiveSyntax usingDirective, A args)
+        {
         }
 
         public virtual void VisitMemberDeclaration(MemberDeclarationSyntax memberDeclaration, A args)
