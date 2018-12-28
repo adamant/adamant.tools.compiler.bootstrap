@@ -335,7 +335,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 case SelfExpressionSyntax _:
                     return selfType ?? DataType.Unknown;
                 case MoveExpressionSyntax moveExpression:
-                    return moveExpression.Type = InferExpressionType(moveExpression.Expression, lvalue: true);
+                {
+                    var type = InferExpressionType(moveExpression.Expression, lvalue: true);
+                    if (type is ReferenceType referenceType && !referenceType.IsOwned)
+                    {
+                        diagnostics.Add(TypeError.CannotMoveBorrowedValue(file, moveExpression));
+                        type = referenceType.WithLifetime(Lifetime.Owned);
+                    }
+                    return moveExpression.Type = type;
+                }
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
@@ -392,9 +400,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
         /// <summary>
         /// Tests whether a variable of the target type could be assigned from a variable of the source type
         /// </summary>
-        private bool IsAssignableFrom(DataType target, DataType source)
+        private static bool IsAssignableFrom(DataType target, DataType source)
         {
-            return target.Equals(source);
+            if (target.Equals(source)) return true;
+            if (target is ObjectType targetReference && !targetReference.IsOwned)
+            {
+                if (source is ObjectType sourceReference)
+                    // If they are equal except for lifetimes, it is fine
+                    return targetReference.WithLifetime(Lifetime.None)
+                        .Equals(sourceReference.WithLifetime(Lifetime.None));
+            }
+
+            return false;
         }
 
         private DataType InferMemberAccessType(MemberAccessExpressionSyntax memberAccess)

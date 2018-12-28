@@ -79,5 +79,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
             return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3008,
                 $"Expression must be of callable type to be invoked `{file.Code[expression.Span]}`");
         }
+
+        public static Diagnostic CannotMoveBorrowedValue(CodeFile file, MoveExpressionSyntax expression)
+        {
+            return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3009,
+                $"Cannot move borrowed value `{file.Code[expression.Expression.Span]}`");
+        }
     }
 }
