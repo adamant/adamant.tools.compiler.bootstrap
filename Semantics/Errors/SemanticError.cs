@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
@@ -30,6 +31,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
             // TODO that use span needs converted to a line and column
             return new Diagnostic(file, bindingSpan, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6003,
                 $"Variable binding can't shadow. Shadowed binding used at {useSpan}");
+        }
+
+        public static Diagnostic CantMove(CodeFile file, ExpressionSyntax expression)
+        {
+            return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6003,
+                $"Can't move out of expression");
         }
     }
 }

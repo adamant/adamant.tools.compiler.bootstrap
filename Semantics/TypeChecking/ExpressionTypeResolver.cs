@@ -163,7 +163,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             return actualType;
         }
 
-        private DataType InferExpressionType(ExpressionSyntax expression, bool lvalue = false)
+        private DataType InferExpressionType(ExpressionSyntax expression)
         {
             if (expression == null) return DataType.Unknown;
 
@@ -216,10 +216,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                             type = DataType.Unknown;
                             break;
                     }
-
-                    // Referencing an owned variable doesn't give you ownership (without a move expression)
-                    if (!lvalue && type is ReferenceType referenceType && referenceType.IsOwned)
-                        type = referenceType.WithLifetime(AnonymousLifetime.Instance);
 
                     return identifierName.Type = type;
                 }
@@ -325,7 +321,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     InferExpressionType(breakExpression.Value);
                     return breakExpression.Type = DataType.Never;
                 case AssignmentExpressionSyntax assignmentExpression:
-                    var left = InferExpressionType(assignmentExpression.LeftOperand, lvalue: true);
+                    var left = InferExpressionType(assignmentExpression.LeftOperand);
                     InferExpressionType(assignmentExpression.RightOperand);
                     InsertImplicitConversionIfNeeded(ref assignmentExpression.RightOperand, left);
                     var right = assignmentExpression.RightOperand.Type;
@@ -336,7 +332,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     return selfType ?? DataType.Unknown;
                 case MoveExpressionSyntax moveExpression:
                 {
-                    var type = InferExpressionType(moveExpression.Expression, lvalue: true);
+                    var type = InferExpressionType(moveExpression.Expression);
                     if (type is ReferenceType referenceType && !referenceType.IsOwned)
                     {
                         diagnostics.Add(TypeError.CannotMoveBorrowedValue(file, moveExpression));

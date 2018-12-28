@@ -40,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public DataType AssertResolved()
         {
             if (!IsResolved)
-                throw new ArgumentException($"Type {this} not resolved");
+                throw new InvalidOperationException($"Type {this} not resolved");
 
             return this;
         }

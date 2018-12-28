@@ -8,6 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Moving;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Validation;
@@ -39,6 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             TypeResolutionValidator.Validate(memberDeclarations);
             // TODO validate that all ReferencedSymbols lists have a single value non-errored code
 #endif
+            MoveChecker.Check(memberDeclarations, diagnostics);
 
             ShadowChecker.Check(memberDeclarations, diagnostics);
 
