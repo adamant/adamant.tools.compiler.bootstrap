@@ -624,6 +624,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             if (typeExpression == null) return DataType.Unknown;
 
             var type = InferExpressionType(typeExpression);
+            if (type is UnknownType) return DataType.Unknown;
             if (!IsType(type))
             {
                 diagnostics.Add(TypeError.MustBeATypeExpression(file, typeExpression.Span));

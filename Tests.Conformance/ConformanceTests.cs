@@ -49,6 +49,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             var compiler = new AdamantCompiler();
             var references = new Dictionary<string, Package>();
 
+            // Reference Standard Library
+            references.Add("adamant.stdlib", CompileStdLib(compiler));
+
             // Analyze
             var package = compiler.CompilePackage("testPackage", codeFile.Yield(), references.ToFixedDictionary());
 
@@ -113,6 +116,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             testOutput.WriteLine(stderr);
             Assert.Equal(ExpectedOutput(code, "stderr"), stderr);
             Assert.Equal(ExpectedExitCode(code), process.ExitCode);
+        }
+
+        private static Package CompileStdLib(AdamantCompiler compiler)
+        {
+            var sourceDir = Path.Combine(SolutionDirectory.Get(), @"stdlib\src");
+            var sourcePaths = Directory.EnumerateFiles(sourceDir, "*.ad", SearchOption.AllDirectories);
+            var rootNamespace = FixedList<string>.Empty;
+            var codeFiles = sourcePaths.Select(p => LoadCode(p, sourceDir, rootNamespace)).ToList();
+            return compiler.CompilePackage("adamant.stdlib",
+                codeFiles,
+                FixedDictionary<string, Package>.Empty);
+        }
+
+        private static CodeFile LoadCode(
+            string path,
+            string sourceDir,
+            FixedList<string> rootNamespace)
+        {
+            var relativeDirectory = Path.GetDirectoryName(Path.GetRelativePath(sourceDir, path));
+            var ns = rootNamespace.Concat(relativeDirectory.SplitOrEmpty(Path.DirectorySeparatorChar)).ToFixedList();
+            return CodeFile.Load(path, ns);
         }
 
         private static List<int> ExpectedCompileErrorLines(CodeFile codeFile, string code)

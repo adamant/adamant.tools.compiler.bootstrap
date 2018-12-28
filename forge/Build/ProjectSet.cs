@@ -30,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
 
         private Project GetOrAdd(ProjectConfig config, ProjectConfigSet configs)
         {
-            var projectDir = System.IO.Path.GetDirectoryName(config.FullPath);
+            var projectDir = Path.GetDirectoryName(config.FullPath);
             if (projects.TryGetValue(projectDir, out var existingProject))
                 return existingProject;
 

@@ -50,6 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moving
                     expression.ValueSemantics = ValueSemantics.Never;
                     break;
                 case ReferenceType _:
+                case UnknownType _:
                     expression.ValueSemantics = ValueSemantics.Copy;
                     break;
                 case ValueType valueType:
@@ -110,7 +111,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moving
 
         private void CheckArguments(ExpressionSyntax callee, FixedList<ArgumentSyntax> arguments)
         {
-            var parameterTypes = ((FunctionType)callee.Type).ParameterTypes;
+            var calleeType = callee.Type;
+            if (calleeType is UnknownType) return;
+
+            var parameterTypes = ((FunctionType)calleeType).ParameterTypes;
 
             foreach (var (type, argument) in parameterTypes.Zip(arguments))
                 CheckAssignment(type, argument.Value);
