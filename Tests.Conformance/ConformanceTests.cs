@@ -37,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
 
         private static readonly Regex ExitCodePattern = new Regex(@"// exit code: (?<exitCode>\d+)", RegexOptions.Compiled);
         private const string ExpectedOutputFormat = "/\\* {0}:\n(?<output>\\**[^/])*\\*/";
-        private static readonly Regex ErrorPattern = new Regex(@"// ERROR([ \t].*)?", RegexOptions.Compiled | RegexOptions.Multiline);
+        private static readonly Regex ErrorPattern = new Regex(@"//[ \t]*ERROR([ \t].*)?", RegexOptions.Compiled | RegexOptions.Multiline);
 
         [Theory]
         [MemberData(nameof(GetConformanceTestCases))]
@@ -67,23 +67,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
                 }
             }
 
+            var errorDiagnostics = diagnostics
+                .Where(d => d.Level >= DiagnosticLevel.CompilationError).ToList();
+
             if (expectedCompileErrorLines.Any())
             {
                 foreach (var expectedCompileErrorLine in expectedCompileErrorLines)
                 {
                     // Assert a single error on the given line
-                    var errorsOnLine = diagnostics.Count(d =>
-                        d.StartPosition.Line == expectedCompileErrorLine
-                        && d.Level >= DiagnosticLevel.CompilationError);
+                    var errorsOnLine = errorDiagnostics.Count(e =>
+                        e.StartPosition.Line == expectedCompileErrorLine);
                     Assert.True(errorsOnLine == 1,
                         $"Expected single error on line {expectedCompileErrorLine}, found {errorsOnLine}");
                 }
-
-                // Done with test
-                return;
             }
 
-            Assert.True(!diagnostics.Any(), $"Expected no compiler errors, found {diagnostics.Count}");
+            foreach (var error in errorDiagnostics)
+            {
+                var errorLine = error.StartPosition.Line;
+                if (expectedCompileErrorLines.All(line => line != errorLine))
+                    Assert.True(false, $"Unexpected error on line {error.StartPosition.Line}");
+            }
+
+            // We got only expected errors, but need to not go one to emit code
+            if (errorDiagnostics.Any())
+                return;
 
             // Emit Code
             var codePath = Path.ChangeExtension(testCase.FullCodePath, "c");
