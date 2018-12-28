@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using Adamant.Tools.Compiler.Bootstrap.Tokens;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using ReferenceType = Adamant.Tools.Compiler.Bootstrap.Metadata.Types.ReferenceType;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
@@ -78,25 +78,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             }
         }
 
-        public static Lifetime EvaluateLifetime(ILifetimeNameToken lifetimeToken)
+        public static Lifetime EvaluateLifetime(SimpleName lifetimeName)
         {
-            Lifetime lifetime;
-            switch (lifetimeToken)
+            if (lifetimeName.IsSpecial)
             {
-                case IOwnedKeywordToken _:
-                    lifetime = Lifetime.Owned;
-                    break;
-                case IRefKeywordToken _:
-                    lifetime = RefLifetime.Instance;
-                    break;
-                case IIdentifierToken identifier:
-                    lifetime = new NamedLifetime(identifier.Value);
-                    break;
-                default:
-                    throw NonExhaustiveMatchException.For(lifetimeToken);
+                if (lifetimeName == SpecialName.Owned) return Lifetime.Owned;
+                if (lifetimeName == SpecialName.Ref) return RefLifetime.Instance;
+                if (lifetimeName == SpecialName.Forever) return Lifetime.Forever;
+                throw NonExhaustiveMatchException.For(lifetimeName.Text);
             }
 
-            return lifetime;
+            return new NamedLifetime(lifetimeName.Text);
         }
     }
 }

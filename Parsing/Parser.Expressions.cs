@@ -19,6 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case ICloseBraceToken _:
                 case ISemicolonToken _:
                 case ICommaToken _:
+                case IRightArrowToken _:
                     return null;
                 default:
                     return ParseExpression();
@@ -151,8 +152,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         if (minPrecedence <= OperatorPrecedence.Lifetime)
                         {
                             Tokens.Expect<IDollarToken>();
-                            var lifetime = ParseLifetimeName();
-                            expression = new ReferenceLifetimeSyntax(expression, lifetime);
+                            var (nameSpan, lifetime) = ParseLifetimeName();
+                            expression = new ReferenceLifetimeSyntax(expression, nameSpan, lifetime);
                             continue;
                         }
                         break;
@@ -429,6 +430,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var span = TextSpan.Covering(dot, member.Span);
                     return new MemberAccessExpressionSyntax(span, null, AccessOperator.Standard, member);
                 }
+                case IDollarToken _:
+                {
+                    var dollar = Tokens.Required<IDollarToken>();
+                    var (span, lifetime) = ParseLifetimeName();
+                    span = TextSpan.Covering(dollar, span);
+                    return new LifetimeExpressionSyntax(span, lifetime);
+                }
                 case IAsteriskToken _:
                 case ISlashToken _:
                 case IQuestionToken _:
@@ -531,20 +539,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new UnaryExpressionSyntax(span, UnaryOperatorFixity.Prefix, @operator, operand);
         }
 
-        private ILifetimeNameToken ParseLifetimeName()
+        private (TextSpan, SimpleName) ParseLifetimeName()
         {
             switch (Tokens.Current)
             {
                 case IIdentifierToken _:
-                    return Tokens.RequiredToken<IIdentifierToken>();
+                    var identifier = Tokens.RequiredToken<IIdentifierToken>();
+                    return (identifier.Span, new SimpleName(identifier.Value));
                 case IOwnedKeywordToken _:
-                    return Tokens.RequiredToken<IOwnedKeywordToken>();
+                    var ownedKeyword = Tokens.RequiredToken<IOwnedKeywordToken>();
+                    return (ownedKeyword.Span, SpecialName.Owned);
                 case IRefKeywordToken _:
-                    return Tokens.RequiredToken<IRefKeywordToken>();
+                    var refKeyword = Tokens.RequiredToken<IRefKeywordToken>();
+                    return (refKeyword.Span, SpecialName.Ref);
                 case IForeverKeywordToken _:
-                    return Tokens.RequiredToken<IForeverKeywordToken>();
+                    var foreverKeyword = Tokens.RequiredToken<IForeverKeywordToken>();
+                    return (foreverKeyword.Span, SpecialName.Forever);
                 default:
-                    return Tokens.ExpectIdentifier();
+                    var span = Tokens.Expect<IIdentifierToken>();
+                    return (span, null);
             }
         }
 

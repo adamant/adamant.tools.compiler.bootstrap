@@ -87,17 +87,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new TextSpan(tokens.Current.Span.Start, 0);
         }
 
-        public static IIdentifierToken ExpectIdentifier(this ITokenIterator tokens)
+        public static (TextSpan, IIdentifierToken) ExpectIdentifier(this ITokenIterator tokens)
         {
             if (tokens.Current is IIdentifierToken identifier)
             {
                 tokens.Next();
-                return identifier;
+                return (identifier.Span, identifier);
             }
 
             tokens.Context.Diagnostics.Add(
                 ParseError.MissingToken(tokens.Context.File, typeof(IIdentifierToken), tokens.Current));
-            return null;
+            return (new TextSpan(tokens.Current.Span.Start, 0), null);
         }
         #endregion
 

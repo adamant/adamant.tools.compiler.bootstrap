@@ -9,6 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public class NamedFunctionDeclarationSyntax : FunctionDeclarationSyntax, IFunctionSymbol
     {
         public bool IsExternalFunction { get; set; }
+        public ExpressionSyntax LifetimeBounds { get; }
         public ExpressionSyntax ReturnTypeExpression { get; }
 
         public NamedFunctionDeclarationSyntax(
@@ -17,7 +18,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             Name fullName,
             TextSpan nameSpan,
             FixedList<GenericParameterSyntax> genericParameters,
-            FixedList<ParameterSyntax> parameters, // For now we will not support pure meta functions
+            FixedList<ParameterSyntax>
+                parameters, // For now we will not support pure meta functions
+            ExpressionSyntax lifetimeBounds,
             ExpressionSyntax returnTypeExpression,
             FixedList<GenericConstraintSyntax> genericConstraints,
             FixedList<EffectSyntax> mayEffects,
@@ -28,6 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             : base(file, modifiers, fullName, nameSpan, genericParameters, parameters,
                 genericConstraints, mayEffects, noEffects, requires, ensures, body)
         {
+            LifetimeBounds = lifetimeBounds;
             ReturnTypeExpression = returnTypeExpression;
         }
 

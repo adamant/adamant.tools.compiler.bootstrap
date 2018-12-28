@@ -7,6 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class OperatorDeclarationSyntax : FunctionDeclarationSyntax
     {
+        public ExpressionSyntax LifetimeBounds { get; }
         public ExpressionSyntax ReturnTypeExpression { get; }
 
         public OperatorDeclarationSyntax(
@@ -16,6 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             TextSpan nameSpan,
             FixedList<GenericParameterSyntax> genericParameters,
             FixedList<ParameterSyntax> parameters,
+            ExpressionSyntax lifetimeBounds,
             ExpressionSyntax returnTypeExpression,
             FixedList<GenericConstraintSyntax> genericConstraints,
             FixedList<EffectSyntax> mayEffects,
@@ -25,6 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             BlockSyntax body)
             : base(file, modifiers, fullName, nameSpan, genericParameters, parameters, genericConstraints, mayEffects, noEffects, requires, ensures, body)
         {
+            LifetimeBounds = lifetimeBounds;
             ReturnTypeExpression = returnTypeExpression;
         }
 

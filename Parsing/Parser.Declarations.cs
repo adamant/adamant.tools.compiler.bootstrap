@@ -153,9 +153,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
             while (Tokens.Accept<IDotToken>())
             {
-                nameSegment = Tokens.ExpectIdentifier();
+                TextSpan segmentSpan;
+                (segmentSpan, nameSegment) = Tokens.ExpectIdentifier();
+                // We need the span to cover a trailing dot
+                span = TextSpan.Covering(span, segmentSpan);
                 if (nameSegment == null) break;
-                span = TextSpan.Covering(span, nameSegment.Span);
                 name = name.Qualify(nameSegment.Value);
             }
 
@@ -393,6 +395,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var name = nameContext.Qualify(identifier.Value);
             var bodyParser = NestedParser(name);
             var parameters = bodyParser.ParseParameters();
+            var lifetimeBounds = bodyParser.ParseLifetimeBounds();
             ExpressionSyntax returnType = null;
             if (Tokens.Accept<IRightArrowToken>())
                 returnType = ParseExpression();
@@ -402,7 +405,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var (requires, ensures) = ParseFunctionContracts();
             var body = bodyParser.ParseFunctionBody();
             return new NamedFunctionDeclarationSyntax(File, modifiers, name, identifier.Span,
-                genericParameters, parameters, returnType, genericConstraints, mayEffects,
+                genericParameters, parameters, lifetimeBounds, returnType, genericConstraints, mayEffects,
                 noEffects, requires, ensures, body);
         }
 
@@ -453,17 +456,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
             var nameSpan = TextSpan.Covering(operatorKeyword, endOperatorSpan);
             var name = nameContext.Qualify(SimpleName.Special("op_" + oper));
-            var parameters = ParseParameters();
+            var bodyParser = NestedParser(name);
+            var parameters = bodyParser.ParseParameters();
+            var lifetimeBounds = bodyParser.ParseLifetimeBounds();
             ExpressionSyntax returnType = null;
             if (Tokens.Accept<IRightArrowToken>())
-                returnType = ParseExpression();
+                returnType = bodyParser.ParseExpression();
             var genericConstraints = ParseGenericConstraints();
             var mayEffects = ParseMayEffects();
             var noEffects = ParseNoEffects();
             var (requires, ensures) = ParseFunctionContracts();
-            var body = ParseBlock();
+            var body = bodyParser.ParseBlock();
             return new OperatorDeclarationSyntax(File, modifiers, name, nameSpan, genericParameters,
-                parameters, returnType, genericConstraints, mayEffects, noEffects, requires,
+                parameters, lifetimeBounds, returnType, genericConstraints, mayEffects, noEffects, requires,
                 ensures, body);
         }
 
@@ -533,6 +538,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var name = nameContext.Qualify(SimpleName.Special("get_" + identifier.Value));
             var bodyParser = NestedParser(name);
             var parameters = bodyParser.ParseParameters();
+            var lifetimeBounds = bodyParser.ParseLifetimeBounds();
             Tokens.Expect<IRightArrowToken>();
             var returnType = ParseExpression();
             var mayEffects = ParseMayEffects();
@@ -540,7 +546,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var (requires, ensures) = ParseFunctionContracts();
             var body = bodyParser.ParseBlock();
             return new GetterDeclarationSyntax(File, attributes, modifiers, propertyName, name,
-                identifier.Span, parameters, returnType, mayEffects, noEffects, requires, ensures,
+                identifier.Span, parameters, lifetimeBounds, returnType, mayEffects, noEffects, requires, ensures,
                 body);
         }
 
@@ -560,6 +566,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var body = bodyParser.ParseBlock();
             return new SetterDeclarationSyntax(File, attributes, modifiers, propertyName, name,
                 identifier.Span, parameters, mayEffects, noEffects, requires, ensures, body);
+        }
+
+        private ExpressionSyntax ParseLifetimeBounds()
+        {
+            switch (Tokens.Current)
+            {
+                case IRightArrowToken _: // No Lifetime Bounds
+                case IOpenBraceToken _: // No return, starting body
+                    return null;
+                default:
+                    return AcceptExpression();
+            }
         }
 
         private FixedList<ParameterSyntax> ParseParameters()

@@ -10,6 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         public FixedList<AttributeSyntax> Attributes { get; }
         public Name PropertyName { get; }
+        public ExpressionSyntax LifetimeBounds { get; }
         public ExpressionSyntax ReturnTypeExpression { get; }
 
         public GetterDeclarationSyntax(
@@ -20,6 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             Name fullName,
             TextSpan nameSpan,
             FixedList<ParameterSyntax> parameters,
+            ExpressionSyntax lifetimeBounds,
             ExpressionSyntax returnTypeExpression,
             FixedList<EffectSyntax> mayEffects,
             FixedList<EffectSyntax> noEffects,
@@ -31,6 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         {
             Attributes = attributes;
             PropertyName = propertyName;
+            LifetimeBounds = lifetimeBounds;
             ReturnTypeExpression = returnTypeExpression;
         }
 
