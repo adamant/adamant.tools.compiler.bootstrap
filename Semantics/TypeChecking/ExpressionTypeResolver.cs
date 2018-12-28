@@ -5,6 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -81,7 +82,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             if (variableDeclaration.Initializer != null)
             {
                 InsertImplicitConversionIfNeeded(ref variableDeclaration.Initializer, type);
-                // TODO check that the initializer type is compatible with the variable type
+                var initializerType = variableDeclaration.Initializer.Type;
+                if (!IsAssignableFrom(type, initializerType))
+                    diagnostics.Add(TypeError.CannotConvert(file, variableDeclaration.Initializer, initializerType, type));
             }
         }
 
@@ -156,11 +159,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             var actualType = InferExpressionType(expression);
             // TODO check for type compatibility not equality
             if (!expectedType.Equals(actualType))
-                diagnostics.Add(TypeError.CannotConvert(file, expression, expectedType));
+                diagnostics.Add(TypeError.CannotConvert(file, expression, actualType, expectedType));
             return actualType;
         }
 
-        private DataType InferExpressionType(ExpressionSyntax expression)
+        private DataType InferExpressionType(ExpressionSyntax expression, bool lvalue = false)
         {
             if (expression == null) return DataType.Unknown;
 
@@ -173,9 +176,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                         if (returnType != null) // TODO report an error
                         {
                             InsertImplicitConversionIfNeeded(ref returnExpression.ReturnValue, returnType);
-                            if (returnType != returnExpression.ReturnValue.Type)
+                            var type = returnExpression.ReturnValue.Type;
+                            if (returnType != type)
                                 diagnostics.Add(TypeError.CannotConvert(file,
-                                    returnExpression.ReturnValue, returnType));
+                                    returnExpression.ReturnValue, type, returnType));
                         }
                     }
                     else
@@ -213,6 +217,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                             break;
                     }
 
+                    // Referencing an owned variable doesn't give you ownership (without a move expression)
+                    if (!lvalue && type is ReferenceType referenceType && referenceType.IsOwned)
+                        type = referenceType.WithLifetime(AnonymousLifetime.Instance);
+
                     return identifierName.Type = type;
                 }
                 case UnaryExpressionSyntax unaryOperatorExpression:
@@ -229,12 +237,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     return expression.Type = DataType.Void;// TODO assign the correct type to the block
                 case NewObjectExpressionSyntax newObjectExpression:
                     foreach (var argument in newObjectExpression.Arguments)
-                        CheckArgument(argument);
+                        InferArgumentType(argument);
+
                     // TODO verify argument types against called function
-                    return expression.Type = CheckAndEvaluateTypeExpression(newObjectExpression.Constructor);
+                    var constructedType = (ObjectType)CheckAndEvaluateTypeExpression(newObjectExpression.Constructor);
+                    return expression.Type = constructedType.WithLifetime(Lifetime.Owned);
                 case PlacementInitExpressionSyntax placementInitExpression:
                     foreach (var argument in placementInitExpression.Arguments)
-                        CheckArgument(argument);
+                        InferArgumentType(argument);
 
                     // TODO verify argument types against called function
 
@@ -315,15 +325,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     InferExpressionType(breakExpression.Value);
                     return breakExpression.Type = DataType.Never;
                 case AssignmentExpressionSyntax assignmentExpression:
-                    var left = InferExpressionType(assignmentExpression.LeftOperand);
+                    var left = InferExpressionType(assignmentExpression.LeftOperand, lvalue: true);
                     InferExpressionType(assignmentExpression.RightOperand);
                     InsertImplicitConversionIfNeeded(ref assignmentExpression.RightOperand, left);
-                    // TODO Check compability of types
+                    var right = assignmentExpression.RightOperand.Type;
+                    if (!IsAssignableFrom(left, right))
+                        diagnostics.Add(TypeError.CannotConvert(file, assignmentExpression.RightOperand, right, left));
                     return assignmentExpression.Type = DataType.Void;
                 case SelfExpressionSyntax _:
                     return selfType ?? DataType.Unknown;
                 case MoveExpressionSyntax moveExpression:
-                    return moveExpression.Type = InferExpressionType(moveExpression.Expression);
+                    return moveExpression.Type = InferExpressionType(moveExpression.Expression, lvalue: true);
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
@@ -348,16 +360,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             // * Invoke a static function
             // * Invoke a method
             // * Invoke a function pointer
-            var argumentTypes = invocation.Arguments.Select(a => InferExpressionType(a.Value)).ToFixedList();
+            var argumentTypes = invocation.Arguments.Select(InferArgumentType).ToFixedList();
             InferExpressionTypeInInvocation(invocation.Callee, argumentTypes);
             var callee = invocation.Callee.Type;
 
             if (callee is FunctionType functionType)
             {
                 foreach (var (arg, type) in invocation.Arguments.Zip(functionType.ParameterTypes))
+                {
                     InsertImplicitConversionIfNeeded(ref arg.Value, type);
+                    CheckArgumentTypeCompatibility(type, arg);
+                }
 
-                // TODO check argument types
                 return invocation.Type = functionType.ReturnType;
             }
 
@@ -366,6 +380,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
 
             diagnostics.Add(TypeError.MustBeCallable(file, invocation.Callee));
             return invocation.Type = DataType.Unknown;
+        }
+
+        private void CheckArgumentTypeCompatibility(DataType type, ArgumentSyntax arg)
+        {
+            var fromType = arg.Value.Type;
+            if (!IsAssignableFrom(type, fromType))
+                diagnostics.Add(TypeError.CannotConvert(file, arg.Value, fromType, type));
+        }
+
+        /// <summary>
+        /// Tests whether a variable of the target type could be assigned from a variable of the source type
+        /// </summary>
+        private bool IsAssignableFrom(DataType target, DataType source)
+        {
+            return target.Equals(source);
         }
 
         private DataType InferMemberAccessType(MemberAccessExpressionSyntax memberAccess)
@@ -426,9 +455,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             throw new NotImplementedException();
         }
 
-        private void CheckArgument(ArgumentSyntax argument)
+        private DataType InferArgumentType(ArgumentSyntax argument)
         {
-            throw new NotImplementedException();
+            return InferExpressionType(argument.Value);
         }
 
         private DataType InferBinaryExpressionType(

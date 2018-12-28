@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -13,11 +14,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     // is an *unbound type*. One with generic arguments supplied for all
     // parameters is *a constructed type*. One with some but not all arguments
     // supplied is *partially constructed type*.
-    public class ObjectType : ReferenceType
+    public class ObjectType : ReferenceType, IEquatable<ObjectType>
     {
         public ISymbol Symbol { get; }
         public Name Name { get; }
-        public bool DeclaredMutable { get; }
+        public bool DeclaredMutable { get; } // TODO maybe this should be removed or computed from the symbol
 
         public FixedList<DataType> GenericParameterTypes { get; }
         public bool IsGeneric => GenericParameterTypes != null;
@@ -96,5 +97,39 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             if (IsMutable) value = "mut " + value;
             return value;
         }
+
+        #region Equality
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as ObjectType);
+        }
+
+        public bool Equals(ObjectType other)
+        {
+            return other != null &&
+                   EqualityComparer<ISymbol>.Default.Equals(Symbol, other.Symbol) &&
+                   EqualityComparer<Name>.Default.Equals(Name, other.Name) &&
+                   DeclaredMutable == other.DeclaredMutable &&
+                   EqualityComparer<FixedList<DataType>>.Default.Equals(GenericParameterTypes, other.GenericParameterTypes) &&
+                   EqualityComparer<FixedList<DataType>>.Default.Equals(GenericArguments, other.GenericArguments) &&
+                   IsMutable == other.IsMutable &&
+                   EqualityComparer<Lifetime>.Default.Equals(Lifetime, other.Lifetime);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Symbol, Name, DeclaredMutable, GenericParameterTypes, GenericArguments, IsMutable, Lifetime);
+        }
+
+        public static bool operator ==(ObjectType type1, ObjectType type2)
+        {
+            return EqualityComparer<ObjectType>.Default.Equals(type1, type2);
+        }
+
+        public static bool operator !=(ObjectType type1, ObjectType type2)
+        {
+            return !(type1 == type2);
+        }
+        #endregion
     }
 }
