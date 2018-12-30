@@ -77,6 +77,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moving
             CheckAssignment(assignToType, value);
         }
 
+        public override void VisitVariableDeclarationStatement(
+            VariableDeclarationStatementSyntax variableDeclaration,
+            Void args)
+        {
+            base.VisitVariableDeclarationStatement(variableDeclaration, args);
+            var assignToType = variableDeclaration.Type;
+            var value = variableDeclaration.Initializer;
+            if (value != null)
+                CheckAssignment(assignToType, value);
+        }
+
         private void CheckAssignment(DataType assignToType, ExpressionSyntax value)
         {
             if (assignToType is ReferenceType referenceType
