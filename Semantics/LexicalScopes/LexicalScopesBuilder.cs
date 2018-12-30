@@ -133,7 +133,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                 declaration.Poison();
         }
 
-        private void BuildScopesInFunctionParameters(
+        private static void BuildScopesInFunctionParameters(
              LexicalScope containingScope,
              FunctionDeclarationSyntax function,
              ExpressionLexicalScopesBuilder binder)
@@ -157,7 +157,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                 }
         }
 
-        private void BuildScopesInFunctionBody(
+        private static void BuildScopesInFunctionBody(
              LexicalScope containingScope,
              FunctionDeclarationSyntax function,
              ExpressionLexicalScopesBuilder binder)

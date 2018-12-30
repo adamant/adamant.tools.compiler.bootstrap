@@ -50,7 +50,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             var references = new Dictionary<string, Package>();
 
             // Reference Standard Library
-            references.Add("adamant.stdlib", CompileStdLib(compiler));
+            var stdLibPackage = CompileStdLib(compiler);
+            references.Add("adamant.stdlib", stdLibPackage);
 
             // Analyze
             var package = compiler.CompilePackage("testPackage", codeFile.Yield(), references.ToFixedDictionary());
@@ -98,7 +99,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
 
             // Emit Code
             var codePath = Path.ChangeExtension(testCase.FullCodePath, "c");
-            EmitCode(package, codePath);
+            EmitCode(package, stdLibPackage, codePath);
 
             // Compile Code to Executable
             var exePath = CompileToExecutable(codePath);
@@ -146,12 +147,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
                 .ToList();
         }
 
-        private static void EmitCode(
-            Package package,
-            string path)
+        private static void EmitCode(Package package, Package stdLibPackage, string path)
         {
             var codeEmitter = new CodeEmitter();
             codeEmitter.Emit(package);
+            codeEmitter.Emit(stdLibPackage);
             File.WriteAllText(path, codeEmitter.GetEmittedCode(), Encoding.UTF8);
         }
 

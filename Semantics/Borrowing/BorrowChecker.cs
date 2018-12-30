@@ -204,6 +204,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     foreach (var argument in functionCall.Arguments)
                         AcquireClaim(assignToPlace, argument, claimsBeforeStatement, claimsAfterStatement);
                     break;
+                case VirtualFunctionCall virtualFunctionCall:
+                    if (virtualFunctionCall.Self != null)
+                        AcquireClaim(assignToPlace, virtualFunctionCall.Self, claimsBeforeStatement, claimsAfterStatement);
+                    foreach (var argument in virtualFunctionCall.Arguments)
+                        AcquireClaim(assignToPlace, argument, claimsBeforeStatement, claimsAfterStatement);
+                    break;
                 default:
                     throw NonExhaustiveMatchException.For(value);
             }
