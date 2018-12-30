@@ -12,8 +12,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Scopes
 
         public NestedScope(
             LexicalScope containingScope,
-            IEnumerable<ISymbol> symbols)
-            : base(symbols)
+            IEnumerable<ISymbol> symbols,
+            IEnumerable<ISymbol> nestedSymbols)
+            : base(symbols, nestedSymbols)
         {
             ContainingScope = containingScope;
         }

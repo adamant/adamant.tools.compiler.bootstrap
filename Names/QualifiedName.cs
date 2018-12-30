@@ -31,6 +31,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
             return Qualifier.Equals(name);
         }
 
+        public override bool IsNestedIn(Name name)
+        {
+            return Qualifier.Equals(name) || Qualifier.IsNestedIn(name);
+        }
+
         public override string ToString()
         {
             return $"{Qualifier}.{UnqualifiedName}";

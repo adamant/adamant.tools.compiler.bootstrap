@@ -49,6 +49,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
             return false;
         }
 
+        public override bool IsNestedIn(Name name)
+        {
+            // A simple name isn't nested in any other names
+            return false;
+        }
+
         public SimpleName WithoutNumber()
         {
             if (Number == null) return this;

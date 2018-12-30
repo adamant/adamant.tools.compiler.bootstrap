@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         {
             this.diagnostics = diagnostics;
             allSymbols = GetAllSymbols(packageSyntax, references);
-            globalScope = new GlobalScope(GetAllGlobalSymbols());
+            globalScope = new GlobalScope(GetAllGlobalSymbols(), allSymbols);
         }
 
         private static FixedList<ISymbol> GetAllSymbols(
@@ -166,7 +166,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             foreach (var parameter in function.Parameters)
                 symbols.Add(parameter);
 
-            containingScope = new NestedScope(containingScope, symbols);
+            containingScope = new NestedScope(containingScope, symbols, Enumerable.Empty<ISymbol>());
             binder.VisitBlock(function.Body, containingScope);
         }
 
@@ -191,7 +191,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             }
 
             var symbolsInNamespace = allSymbols.Where(s => s.FullName.HasQualifier(name));
-            return new NestedScope(containingScope, symbolsInNamespace);
+            var symbolsNestedInNamespace = allSymbols.Where(s => s.FullName.IsNestedIn(name));
+            return new NestedScope(containingScope, symbolsInNamespace, symbolsNestedInNamespace);
         }
 
         private LexicalScope BuildUsingDirectivesScope(
@@ -202,7 +203,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 
             var importedSymbols = usingDirectives
                 .SelectMany(d => allSymbols.Where(s => s.FullName.HasQualifier(d.Name)));
-            return new NestedScope(containingScope, importedSymbols);
+            return new NestedScope(containingScope, importedSymbols, Enumerable.Empty<ISymbol>());
         }
     }
 }

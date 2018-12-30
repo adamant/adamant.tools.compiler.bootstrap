@@ -43,6 +43,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
 
         public abstract bool HasQualifier(Name name);
 
+        public abstract bool IsNestedIn(Name name);
+
         public abstract override string ToString();
     }
 }
