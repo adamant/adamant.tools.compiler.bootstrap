@@ -61,7 +61,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             {
                 if (parameterTypeName.Equals(Name.From("system", "console", "Console")))
                 {
-                    code.Definitions.AppendLine("system__console__Console console = { 0, malloc(sizeof(system__console__Console___Self)) };");
+                    code.Definitions.AppendLine("system__console__Console console = { &system__console__Console___vtable, malloc(sizeof(system__console__Console___Self)) };");
                     arguments.Add("system__console__Console___new__1(console)");
                 }
                 else if (parameterTypeName.Equals(Name.From("system", "console", "Arguments")))

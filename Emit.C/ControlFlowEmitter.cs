@@ -121,8 +121,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 {
                     var self = ConvertValue(virtualCall.Self);
                     var mangledName = nameMangler.Mangle(virtualCall.FunctionName);
+                    var arity = virtualCall.Arguments.Count + 1;
                     var arguments = virtualCall.Arguments.Select(ConvertValue).Prepend(self);
-                    return $"{self}._vtable->{mangledName}({string.Join(", ", arguments)})";
+                    return $"{self}._vtable->{mangledName}__{arity}({string.Join(", ", arguments)})";
                 }
                 case BinaryOperation binaryOperation:
                 {

@@ -107,13 +107,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             // Struct Declarations
             var selfType = $"{typeName}___Self";
             var vtableType = $"{typeName}___VTable";
-            code.TypeDeclarations.AppendLine($"typedef struct {selfType} {selfType};");
-            code.TypeDeclarations.AppendLine($"typedef struct {vtableType} {vtableType};");
-            code.TypeDeclarations.AppendLine($"typedef struct {{ {vtableType} const* restrict _vtable; {selfType}* restrict _self; }} {typeName};");
+            var types = code.TypeDeclarations;
+            types.AppendLine($"typedef struct {selfType} {selfType};");
+            types.AppendLine($"typedef struct {vtableType} {vtableType};");
+            types.AppendLine($"typedef struct {{ {vtableType} const* restrict _vtable; {selfType}* restrict _self; }} {typeName};");
 
-            code.StructDeclarations.AppendLine($"struct {selfType}");
-            code.StructDeclarations.BeginBlock();
-            code.StructDeclarations.EndBlockWithSemicolon();
+            var structs = code.StructDeclarations;
+            structs.AppendLine($"struct {selfType}");
+            structs.BeginBlock();
+            structs.EndBlockWithSemicolon();
+            structs.AppendLine($"struct {vtableType}");
+            structs.BeginBlock();
+            foreach (var function in type.Members.OfType<FunctionDeclaration>())
+            {
+                var name = nameMangler.MangleUnqualifiedName(function);
+                var parameters = Convert(function.Parameters);
+                var returnType = typeConverter.Convert(function.ReturnType.AssertResolved());
+                structs.AppendLine($"{returnType} (*{name})({parameters});");
+            }
+            structs.EndBlockWithSemicolon();
+
+            var globals = code.StructDeclarations;
+            globals.AppendLine($"const {vtableType} {typeName}___vtable = ({vtableType})");
+            globals.BeginBlock();
+            foreach (var function in type.Members.OfType<FunctionDeclaration>())
+            {
+                var fieldName = nameMangler.MangleUnqualifiedName(function);
+                var functionName = nameMangler.MangleName(function);
+                globals.AppendLine($".{fieldName} = {functionName},");
+            }
+            globals.EndBlockWithSemicolon();
         }
     }
 }

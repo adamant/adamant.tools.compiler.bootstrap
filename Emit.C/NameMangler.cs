@@ -37,6 +37,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             builder.Append(function.Arity);
             return mapping.GetAscii(builder.ToString());
         }
+        public string MangleUnqualifiedName(FunctionDeclaration function)
+        {
+            // builder with room for the characters we are likely to add
+            var builder = new StringBuilder(EstimateSize(function.FullName.UnqualifiedName) + 5);
+            Mangle(function.FullName.UnqualifiedName, builder);
+            builder.Append("__");
+            builder.Append(function.Arity);
+            return mapping.GetAscii(builder.ToString());
+        }
 
         public string MangleName(ConstructorDeclaration constructor)
         {
