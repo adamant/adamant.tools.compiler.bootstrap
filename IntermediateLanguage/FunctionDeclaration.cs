@@ -16,12 +16,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 
         public FunctionDeclaration(
             bool isExternal,
+            bool isMember,
             Name name,
             DataType type,
             FixedList<Parameter> parameters,
             DataType returnType,
             ControlFlowGraph controlFlow)
-            : base(name, type, SymbolSet.Empty)
+            : base(isMember, name, type, SymbolSet.Empty)
         {
             Parameters = parameters;
             ReturnType = returnType;

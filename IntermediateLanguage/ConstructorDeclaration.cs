@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
             FixedList<Parameter> parameters,
             DataType returnType,
             ControlFlowGraph controlFlow)
-            : base(fullName, type, SymbolSet.Empty)
+            : base(true, fullName, type, SymbolSet.Empty)
         {
             ReturnType = returnType;
             ControlFlow = controlFlow;

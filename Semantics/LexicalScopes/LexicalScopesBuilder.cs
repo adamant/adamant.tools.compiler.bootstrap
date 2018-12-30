@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
              FixedDictionary<string, Package> references)
         {
             return references.Values
-                .SelectMany(p => p.Declarations)
+                .SelectMany(p => p.Declarations.Where(d => !d.IsMember))
                 .Concat(packageSyntax.CompilationUnits.SelectMany(GetAllNonMemberDeclarations))
                 .ToFixedList();
         }

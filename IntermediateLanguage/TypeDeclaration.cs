@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
             DataType type,
             IEnumerable<GenericParameter> genericParameters,
             FixedList<Declaration> members)
-            : base(name, type, new SymbolSet(members))
+            : base(false, name, type, new SymbolSet(members))
         {
             Members = members;
             GenericParameters = genericParameters?.ToFixedList();
