@@ -177,7 +177,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                         {
                             InsertImplicitConversionIfNeeded(ref returnExpression.ReturnValue, returnType);
                             var type = returnExpression.ReturnValue.Type;
-                            if (returnType != type)
+                            if (!IsAssignableFrom(returnType, type))
                                 diagnostics.Add(TypeError.CannotConvert(file,
                                     returnExpression.ReturnValue, type, returnType));
                         }
