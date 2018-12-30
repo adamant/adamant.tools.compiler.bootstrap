@@ -1,5 +1,8 @@
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
@@ -34,6 +37,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             BaseTypes = baseTypes;
             GenericConstraints = genericConstraints;
             Invariants = invariants;
+        }
+
+        public void CreateDefaultConstructor()
+        {
+            if (Members.Any(m => m is ConstructorDeclarationSyntax)) return;
+            var metatype = (Metatype)Type.Resolved();
+            var constructor = new DefaultConstructor((ObjectType)metatype.Instance);
+            ChildSymbols = new SymbolSet(ChildSymbols.Values.SelectMany(s => s).Append(constructor));
         }
 
         public override string ToString()

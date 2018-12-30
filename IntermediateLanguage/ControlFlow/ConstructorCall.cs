@@ -7,6 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     {
         public readonly ObjectType Type;
         public FixedList<Operand> Arguments { get; }
+        public int Arity => Arguments.Count + 1;
 
         public ConstructorCall(
              ObjectType type,

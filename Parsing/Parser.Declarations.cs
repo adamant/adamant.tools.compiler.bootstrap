@@ -478,7 +478,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             var newKeywordSpan = Tokens.Expect<INewKeywordToken>();
             var identifier = Tokens.AcceptToken<IIdentifierToken>();
-            var name = nameContext.Qualify(SimpleName.Special("new" + (identifier != null ? "_" + identifier.Value : "")));
+            var name = nameContext.Qualify(SpecialName.Constructor(identifier?.Value));
             var bodyParser = NestedParser(name);
             var genericParameters = AcceptGenericParameters();
             var parameters = bodyParser.ParseParameters();

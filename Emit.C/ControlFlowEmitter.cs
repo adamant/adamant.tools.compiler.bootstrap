@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
@@ -108,9 +107,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     var arguments = functionCall.Self.YieldValue().Concat(functionCall.Arguments).Select(ConvertValue);
                     return $"{mangledName}__{functionCall.Arity}({string.Join(", ", arguments)})";
                 }
-                case ConstructorCall _:
-                    // TODO implement this
-                    throw new NotImplementedException();
+                case ConstructorCall constructorCall:
+                {
+                    var typeName = nameMangler.Mangle(constructorCall.Type);
+                    var selfArgument = $"({typeName}){{&{typeName}___vtable, malloc(sizeof({typeName}___Self))}}";
+                    var arguments = selfArgument.YieldValue().Concat(constructorCall.Arguments.Select(ConvertValue));
+                    return $"{typeName}___new__{constructorCall.Arity}({string.Join(", ", arguments)})";
+                }
                 case DeclaredValue declaredValue:
                     return nameMangler.Mangle(declaredValue.Name);
                 case FieldAccessValue fieldAccess:

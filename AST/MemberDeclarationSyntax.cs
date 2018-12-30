@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         DataType ISymbol.Type => Type.Fulfilled();
 
-        public SymbolSet ChildSymbols { get; }
+        public SymbolSet ChildSymbols { get; protected set; }
 
         protected MemberDeclarationSyntax(
             CodeFile file,

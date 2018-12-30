@@ -5,6 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         // The name of the `UnknownSymbol`
         public static readonly SimpleName Unknown = SimpleName.Special("unknown");
 
+        public static readonly SimpleName New = SimpleName.Special("new");
         public static readonly SimpleName Self = SimpleName.Special("self");
         public static readonly SimpleName Base = SimpleName.Special("base");
         public static readonly SimpleName Ref = SimpleName.Special("ref");
@@ -32,5 +33,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         public static readonly SimpleName Float = SimpleName.Special("float");
 
         public static readonly SimpleName OperatorStringLiteral = SimpleName.Special("op_string_literal");
+
+        public static SimpleName Constructor(string name = null)
+        {
+            return name == null ? New : SimpleName.Special("new_" + name);
+        }
     }
 }

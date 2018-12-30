@@ -25,10 +25,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
                 $"The name `{file.Code[span]}` is ambiguous.");
         }
 
-        public static Diagnostic CouldNotBindMember(CodeFile file, in TextSpan span)
+        public static Diagnostic CouldNotBindMember(CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5003,
                 $"Could not find member `{file.Code[span]}` on object.");
+        }
+
+        public static Diagnostic CouldNotBindConstructor(CodeFile file, TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5001,
+                $"Type doesn't have a constructor with this name and number of arguments.");
+        }
+
+        public static Diagnostic AmbiguousConstructor(CodeFile file, TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5002,
+                $"Constructor call is ambiguous.");
         }
     }
 }

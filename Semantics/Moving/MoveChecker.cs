@@ -94,7 +94,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moving
         {
             base.VisitInvocation(invocation, args);
 
-            CheckArguments(invocation.Callee, invocation.Arguments);
+            CheckArguments(invocation.Callee.Type, invocation.Arguments);
 
             // Functions returning ownership are effectively move
             if (invocation.Type is ReferenceType returnType && returnType.IsOwned)
@@ -105,15 +105,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moving
         {
             base.VisitNewObjectExpression(newObjectExpression, args);
 
-            CheckArguments(newObjectExpression.Constructor, newObjectExpression.Arguments);
+            CheckArguments(newObjectExpression.ConstructorType, newObjectExpression.Arguments);
             newObjectExpression.ValueSemantics = ValueSemantics.Move;
         }
 
-        private void CheckArguments(ExpressionSyntax callee, FixedList<ArgumentSyntax> arguments)
+        private void CheckArguments(DataType calleeType, FixedList<ArgumentSyntax> arguments)
         {
-            var calleeType = callee.Type;
             if (calleeType is UnknownType) return;
-
+            // TODO what if it isn't a function type?
             var parameterTypes = ((FunctionType)calleeType).ParameterTypes;
 
             foreach (var (type, argument) in parameterTypes.Zip(arguments))

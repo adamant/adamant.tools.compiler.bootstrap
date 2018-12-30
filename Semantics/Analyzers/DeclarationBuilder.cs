@@ -6,6 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
 {
@@ -31,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                             classDeclaration.FullName,
                             classDeclaration.Type.Resolved(),
                             BuildGenericParameters(classDeclaration.GenericParameters),
-                            Build(classDeclaration.Members)));
+                            BuildClassMembers(classDeclaration, declarations)));
                         break;
                     case ConstructorDeclarationSyntax constructorDeclaration:
                     {
@@ -52,7 +53,41 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             return declarations.ToFixedList();
         }
 
-        private FixedList<GenericParameter> BuildGenericParameters(FixedList<GenericParameterSyntax> parameters)
+        private FixedList<Declaration> BuildClassMembers(
+            ClassDeclarationSyntax classDeclaration,
+            List<Declaration> declarations)
+        {
+            var members = Build(classDeclaration.Members);
+            if (members.Any(m => m is ConstructorDeclaration)) return members;
+
+            var defaultConstructor = BuildDefaultConstructor(classDeclaration);
+            members = members.Append(defaultConstructor).ToFixedList();
+            // We have to add it to the list of all declarations too, or it won't be found by the emitter
+            declarations.Add(defaultConstructor);
+            return members;
+        }
+
+        private static ConstructorDeclaration BuildDefaultConstructor(
+            ClassDeclarationSyntax classDeclaration)
+        {
+            var className = classDeclaration.FullName;
+            var constructorName = className.Qualify(SpecialName.New);
+            var selfType = ((Metatype)classDeclaration.Type.Resolved()).Instance;
+            var selfName = className.Qualify(SpecialName.Self);
+            var selfParameter = new Parameter(true, selfName, selfType);
+            var parameters = selfParameter.Yield().ToFixedList();
+            var constructorType = new FunctionType(selfType.Yield(), selfType);
+
+            var graph = new ControlFlowGraphBuilder();
+            graph.AddParameter(true, selfType, SpecialName.Self);
+            var block = graph.NewBlock();
+            block.AddReturn();
+            var defaultConstructor = new ConstructorDeclaration(constructorName, constructorType,
+                parameters, selfType, graph.Build());
+            return defaultConstructor;
+        }
+
+        private static FixedList<GenericParameter> BuildGenericParameters(FixedList<GenericParameterSyntax> parameters)
         {
             if (parameters == null) return null;
             throw new System.NotImplementedException();

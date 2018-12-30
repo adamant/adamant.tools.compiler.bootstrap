@@ -228,6 +228,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                         genericParameterTypes,
                         Lifetime.None);
                     declaration.Type.Fulfill(new Metatype(classType));
+                    classDeclaration.CreateDefaultConstructor();
                     break;
                 case StructDeclarationSyntax structDeclaration:
                     var structType = new ObjectType(declaration,

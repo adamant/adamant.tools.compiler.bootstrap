@@ -232,12 +232,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
 
                     return expression.Type = DataType.Void;// TODO assign the correct type to the block
                 case NewObjectExpressionSyntax newObjectExpression:
-                    foreach (var argument in newObjectExpression.Arguments)
-                        InferArgumentType(argument);
-
-                    // TODO verify argument types against called function
-                    var constructedType = (ObjectType)CheckAndEvaluateTypeExpression(newObjectExpression.Constructor);
-                    return expression.Type = constructedType.WithLifetime(Lifetime.Owned);
+                    return InferConstructorCallType(newObjectExpression);
                 case PlacementInitExpressionSyntax placementInitExpression:
                     foreach (var argument in placementInitExpression.Arguments)
                         InferArgumentType(argument);
@@ -343,6 +338,42 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
+        }
+
+        private DataType InferConstructorCallType(NewObjectExpressionSyntax expression)
+        {
+            var argumentTypes = expression.Arguments.Select(InferArgumentType).ToFixedList();
+            // TODO handle named constructors here
+            var constructedType = (ObjectType)CheckAndEvaluateTypeExpression(expression.Constructor);
+            var typeSymbol = GetSymbolForType(constructedType);
+            var constructors = typeSymbol.ChildSymbols[SpecialName.New];
+            constructors = ResolveOverload(constructors, null, argumentTypes);
+            switch (constructors.Count)
+            {
+                case 0:
+                    diagnostics.Add(NameBindingError.CouldNotBindConstructor(file, expression.Span));
+                    expression.ConstructorSymbol = UnknownSymbol.Instance;
+                    expression.ConstructorType = DataType.Unknown;
+                    break;
+                case 1:
+                    var constructorSymbol = constructors.Single();
+                    expression.ConstructorSymbol = constructorSymbol;
+                    var constructorType = constructorSymbol.Type;
+                    expression.ConstructorType = constructorType;
+                    if (constructorType is FunctionType functionType)
+                        foreach (var (arg, type) in expression.Arguments.Zip(functionType.ParameterTypes))
+                        {
+                            InsertImplicitConversionIfNeeded(ref arg.Value, type);
+                            CheckArgumentTypeCompatibility(type, arg);
+                        }
+                    break;
+                default:
+                    diagnostics.Add(NameBindingError.AmbiguousConstructor(file, expression.Span));
+                    expression.ConstructorSymbol = UnknownSymbol.Instance;
+                    expression.ConstructorType = DataType.Unknown;
+                    break;
+            }
+            return expression.Type = constructedType.WithLifetime(Lifetime.Owned);
         }
 
         private static bool IsType(DataType dataType)
