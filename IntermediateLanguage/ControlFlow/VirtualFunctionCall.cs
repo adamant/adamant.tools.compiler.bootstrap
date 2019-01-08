@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
@@ -10,7 +11,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public readonly Operand Self;
         public readonly FixedList<Operand> Arguments;
 
-        public VirtualFunctionCall(SimpleName functionName, Operand self, IEnumerable<Operand> arguments)
+        public VirtualFunctionCall(
+            TextSpan span,
+            SimpleName functionName,
+            Operand self,
+            IEnumerable<Operand> arguments)
+            : base(span)
         {
             FunctionName = functionName;
             Self = self;
@@ -18,17 +24,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         }
 
         public VirtualFunctionCall(
+            TextSpan span,
             SimpleName functionName,
             Operand self,
             params Operand[] arguments)
-            : this(functionName, self, arguments as IEnumerable<Operand>)
+            : this(span, functionName, self, arguments as IEnumerable<Operand>)
         {
         }
 
         // Useful for debugging
         public override string ToString()
         {
-            return $"virt_call {FunctionName}({string.Join(", ", Arguments)});";
+            return $"virt_call {Self}.{FunctionName}({string.Join(", ", Arguments)});";
         }
     }
 }

@@ -74,6 +74,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 case ActionStatement action:
                     code.AppendLine(ConvertValue(action.Value) + ";");
                     break;
+                case DeleteStatement deleteStatement:
+                {
+                    var self = ConvertValue(deleteStatement.Place);
+                    var typeName = nameMangler.Mangle(deleteStatement.Type);
+                    // TODO once deletes are implemented, call them
+                    //code.AppendLine($"{self}._vtable->{typeName}___delete__1({self});");
+                    code.AppendLine($"free({self}._self);");
+                    break;
+                }
                 default:
                     throw NonExhaustiveMatchException.For(statement);
             }

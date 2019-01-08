@@ -1,10 +1,13 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
+
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class VariableReference : Place
     {
         public readonly int VariableNumber;
 
-        public VariableReference(int variableNumber)
+        public VariableReference(int variableNumber, TextSpan span)
+            : base(span)
         {
             VariableNumber = variableNumber;
         }

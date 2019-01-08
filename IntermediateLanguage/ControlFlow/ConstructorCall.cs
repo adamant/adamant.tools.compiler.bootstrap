@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
@@ -9,9 +10,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public FixedList<Operand> Arguments { get; }
         public int Arity => Arguments.Count + 1;
 
-        public ConstructorCall(
-             ObjectType type,
-             FixedList<Operand> arguments)
+        public ConstructorCall(ObjectType type, FixedList<Operand> arguments, TextSpan span)
+            : base(span)
         {
             Type = type;
             Arguments = arguments;

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
@@ -9,7 +10,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
     public abstract class Value
     {
+        public TextSpan Span { get; }
+
         // Useful for debugging
         public abstract override string ToString();
+
+        protected Value(TextSpan span)
+        {
+            Span = span;
+        }
     }
 }

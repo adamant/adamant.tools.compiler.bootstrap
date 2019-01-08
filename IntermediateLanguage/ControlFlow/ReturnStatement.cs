@@ -10,6 +10,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             return Enumerable.Empty<int>();
         }
 
+        public override Statement Clone()
+        {
+            return new ReturnStatement();
+        }
+
         public override string ToString()
         {
             return "return";

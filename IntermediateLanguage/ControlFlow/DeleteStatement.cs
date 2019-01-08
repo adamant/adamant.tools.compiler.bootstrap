@@ -1,22 +1,29 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class DeleteStatement : ExpressionStatement
     {
-        public readonly int VariableNumber;
-        public readonly TextSpan Span;
+        public Place Place { get; }
+        public ObjectType Type { get; }
 
-        public DeleteStatement(int variableNumber, TextSpan span)
+        public DeleteStatement(Place place, ObjectType type, TextSpan span)
+            : base(span)
         {
-            VariableNumber = variableNumber;
-            Span = span;
+            Place = place;
+            Type = type;
+        }
+
+        public override Statement Clone()
+        {
+            return new DeleteStatement(Place, Type, Span);
         }
 
         // Useful for debugging
         public override string ToString()
         {
-            return $"delete {VariableNumber} // at {Span}";
+            return $"delete {Place} // at {Span}";
         }
     }
 }

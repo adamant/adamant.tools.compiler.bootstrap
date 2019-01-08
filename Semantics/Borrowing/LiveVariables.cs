@@ -31,5 +31,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         {
             return values[statement.BlockNumber][statement.Number];
         }
+
+        public BitArray After(Statement statement)
+        {
+            return values[statement.BlockNumber][statement.Number + 1];
+        }
     }
 }

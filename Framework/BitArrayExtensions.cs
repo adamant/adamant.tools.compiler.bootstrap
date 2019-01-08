@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
@@ -13,6 +14,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
                     return false;
 
             return true;
+        }
+
+        public static IEnumerable<int> TrueIndexes(this BitArray array)
+        {
+            for (var i = 0; i < array.Length; i++)
+                if (array[i])
+                    yield return i;
         }
     }
 }

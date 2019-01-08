@@ -13,5 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 
         // Useful for debugging
         public abstract override string ToString();
+
+        public abstract Statement Clone();
     }
 }

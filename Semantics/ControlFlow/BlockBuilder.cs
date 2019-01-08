@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 {
@@ -18,19 +19,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             BlockNumber = blockNumber;
         }
 
-        public void AddAssignment(Place place, Value value)
+        public void Add(Statement statement)
         {
-            statements.Add(new AssignmentStatement(place, value));
+            // We have to clone the statement because the statement number will
+            // be assigned into it. Each block needs to have separate statements.
+            statements.Add(statement.Clone());
         }
 
-        public void AddAction(Value value)
+        public void AddAssignment(Place place, Value value, TextSpan span)
         {
-            statements.Add(new ActionStatement(value));
+            statements.Add(new AssignmentStatement(place, value, span));
         }
 
-        public void AddDelete(VariableReference variable, TextSpan span)
+        public void AddAction(Value value, TextSpan span)
         {
-            statements.Add(new DeleteStatement(variable.VariableNumber, span));
+            statements.Add(new ActionStatement(value, span));
+        }
+
+        public void AddDelete(
+            Place place,
+            ObjectType type,
+            TextSpan span)
+        {
+            statements.Add(new DeleteStatement(place, type, span));
         }
 
         public void AddGoto(BlockBuilder exit)

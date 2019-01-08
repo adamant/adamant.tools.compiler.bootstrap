@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
@@ -66,7 +65,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     if (variableDeclaration.Initializer != null)
                     {
                         var value = ConvertToValue(currentBlock, variableDeclaration.Initializer);
-                        currentBlock.AddAssignment(variable.Reference, value);
+                        currentBlock.AddAssignment(variable.Reference, value, variableDeclaration.Initializer.Span);
                     }
                     return currentBlock;
                 }
@@ -78,7 +77,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     {
                         var tempVariable = graph.Let(expression.Type.AssertResolved());
                         var value = ConvertToValue(currentBlock, expression);
-                        currentBlock.AddAssignment(tempVariable.Reference, value);
+                        currentBlock.AddAssignment(tempVariable.Reference, value, expression.Span);
                     }
 
                     return currentBlock;
@@ -109,11 +108,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     throw new NotImplementedException();
                 case InvocationSyntax invocation:
                     //return ConvertToAssignmentStatement(currentBlock, expression);
-                    currentBlock.AddAction(ConvertInvocationToValue(currentBlock, invocation));
+                    currentBlock.AddAction(ConvertInvocationToValue(currentBlock, invocation), invocation.Span);
                     return currentBlock;
                 case ReturnExpressionSyntax returnExpression:
                     if (returnExpression.ReturnValue != null)
-                        currentBlock.AddAssignment(graph.ReturnVariable.Reference, ConvertToValue(currentBlock, returnExpression.ReturnValue));
+                        currentBlock.AddAssignment(graph.ReturnVariable.Reference,
+                            ConvertToValue(currentBlock, returnExpression.ReturnValue),
+                            returnExpression.ReturnValue.Span);
 
                     currentBlock.AddReturn();
 
@@ -158,10 +159,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case BlockSyntax block:
                     foreach (var statementInBlock in block.Statements)
                         currentBlock = ConvertToStatement(currentBlock, statementInBlock, breakToBlock);
-
-                    // Now we need to delete any owned variables
-                    foreach (var variableDeclaration in block.Statements.OfType<VariableDeclarationStatementSyntax>().Where(IsOwned))
-                        currentBlock.AddDelete(graph.VariableFor(variableDeclaration.Name.UnqualifiedName), new TextSpan(block.Span.End, 0));
                     return currentBlock;
                 case UnsafeExpressionSyntax unsafeExpression:
                     return ConvertToStatement(currentBlock, unsafeExpression.Expression, breakToBlock);
@@ -193,7 +190,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         }
                         value = new BinaryOperation(place, binaryOperator, rightOperand, type);
                     }
-                    currentBlock.AddAssignment(place, value);
+                    currentBlock.AddAssignment(place, value, assignmentExpression.Span);
                     return currentBlock;
                 }
                 case ResultExpressionSyntax resultExpression:
@@ -210,7 +207,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             {
                 case NewObjectExpressionSyntax newObjectExpression:
                     var args = newObjectExpression.Arguments.Select(a => ConvertToOperand(currentBlock, a.Value)).ToFixedList();
-                    return new ConstructorCall((ObjectType)newObjectExpression.Type, args);
+                    return new ConstructorCall((ObjectType)newObjectExpression.Type, args, newObjectExpression.Span);
                 case IdentifierNameSyntax identifier:
                 {
                     var symbol = identifier.ReferencedSymbol;
@@ -220,7 +217,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         case ParameterSyntax _:
                             return graph.VariableFor(symbol.FullName.UnqualifiedName);
                         default:
-                            return new DeclaredValue(symbol.FullName);
+                            return new DeclaredValue(symbol.FullName, identifier.Span);
                     }
                 }
                 case UnaryExpressionSyntax unaryExpression:
@@ -232,10 +229,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case StringLiteralExpressionSyntax _:
                     throw new InvalidOperationException("String literals should have an implicit conversion around them");
                 case BoolLiteralExpressionSyntax boolLiteral:
-                    return new BooleanConstant(boolLiteral.Value);
+                    return new BooleanConstant(boolLiteral.Value, boolLiteral.Span);
                 case ImplicitNumericConversionExpression implicitNumericConversion:
                     if (implicitNumericConversion.Expression.Type.AssertResolved() is IntegerConstantType constantType)
-                        return new IntegerConstant(constantType.Value, implicitNumericConversion.Type.AssertResolved());
+                        return new IntegerConstant(constantType.Value, implicitNumericConversion.Type.AssertResolved(), implicitNumericConversion.Span);
                     else
                         throw new NotImplementedException();
                 case IfExpressionSyntax ifExpression:
@@ -248,9 +245,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     var conversionFunction = implicitLiteralConversion.ConversionFunction.FullName;
                     var literal = (StringLiteralExpressionSyntax)implicitLiteralConversion.Expression;
                     var constantLength = Utf8BytesConstant.Encoding.GetByteCount(literal.Value);
-                    var sizeArgument = new IntegerConstant(constantLength, DataType.Size);
-                    var bytesArgument = new Utf8BytesConstant(literal.Value);
-                    return new FunctionCall(conversionFunction, sizeArgument, bytesArgument);
+                    var sizeArgument = new IntegerConstant(constantLength, DataType.Size, literal.Span);
+                    var bytesArgument = new Utf8BytesConstant(literal.Value, literal.Span);
+                    return new FunctionCall(implicitLiteralConversion.Span, conversionFunction, sizeArgument, bytesArgument);
                 }
                 case InvocationSyntax invocation:
                     return ConvertInvocationToValue(currentBlock, invocation);
@@ -259,10 +256,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     var value = ConvertToOperand(currentBlock, memberAccess.Expression);
                     var symbol = memberAccess.ReferencedSymbol;
                     if (symbol is IAccessorSymbol accessor)
-                        return new VirtualFunctionCall(accessor.PropertyName.UnqualifiedName, value);
+                        return new VirtualFunctionCall(memberAccess.Span, accessor.PropertyName.UnqualifiedName, value);
 
                     return new FieldAccessValue(value,
-                        memberAccess.ReferencedSymbol.FullName);
+                        memberAccess.ReferencedSymbol.FullName, memberAccess.Span);
                 }
                 case MutableExpressionSyntax mutable:
                     // TODO shouldn't borrowing be explicit in the IR and don't we
@@ -286,7 +283,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         {
             if (value is Operand operand) return operand;
             var tempVariable = graph.Let(type.AssertResolved());
-            currentBlock.AddAssignment(tempVariable.Reference, value);
+            currentBlock.AddAssignment(tempVariable.Reference, value, value.Span);
             return tempVariable.Reference;
         }
 
@@ -336,7 +333,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             {
                 case UnaryOperator.Not:
                     var operand = ConvertToOperand(currentBlock, expression.Operand);
-                    return new UnaryOperation(expression.Operator, operand);
+                    return new UnaryOperation(expression.Operator, operand, expression.Span);
                 case UnaryOperator.Plus:
                     // This is a no-op
                     return ConvertToValue(currentBlock, expression.Operand);
@@ -354,7 +351,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     var symbol = identifier.ReferencedSymbol;
                     var arguments = invocation.Arguments
                         .Select(a => ConvertToOperand(currentBlock, a.Value)).ToList();
-                    return new FunctionCall(symbol.FullName, arguments);
+                    return new FunctionCall(symbol.FullName, arguments, invocation.Span);
                 }
                 case MemberAccessExpressionSyntax memberAccess:
                 {
@@ -370,9 +367,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                                 case SimpleType _:
                                     // case StructType _:
                                     // Full name because this isn't a member
-                                    return new FunctionCall(function.FullName, self, arguments);
+                                    return new FunctionCall(function.FullName, self, arguments, invocation.Span);
                                 default:
-                                    return new VirtualFunctionCall(function.FullName.UnqualifiedName, self, arguments);
+                                    return new VirtualFunctionCall(invocation.Span, function.FullName.UnqualifiedName, self, arguments);
                             }
                         default:
                             throw NonExhaustiveMatchException.For(symbol);

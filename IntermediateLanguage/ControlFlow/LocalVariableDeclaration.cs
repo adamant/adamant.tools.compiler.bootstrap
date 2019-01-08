@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
@@ -27,7 +28,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             Name = name;
             MutableBinding = mutableBinding;
             Type = type;
-            Reference = new VariableReference(number);
+            // TODO correct span?
+            Reference = new VariableReference(number, new TextSpan(0, 0));
         }
 
         // Useful for debugging

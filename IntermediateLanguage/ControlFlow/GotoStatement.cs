@@ -16,6 +16,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             yield return GotoBlockNumber;
         }
 
+        public override Statement Clone()
+        {
+            return new GotoStatement(GotoBlockNumber);
+        }
+
         public override string ToString()
         {
             return $"goto bb{GotoBlockNumber}";

@@ -1,4 +1,5 @@
 using System.Text;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
@@ -10,8 +11,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 
         public readonly string Value;
 
-        public Utf8BytesConstant(string value)
-            : base(DataType.BytePointer)
+        public Utf8BytesConstant(string value, TextSpan span)
+            : base(DataType.BytePointer, span)
         {
             Value = value;
         }

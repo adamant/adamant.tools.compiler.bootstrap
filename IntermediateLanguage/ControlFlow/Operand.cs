@@ -1,3 +1,5 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
+
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     /// <summary>
@@ -6,5 +8,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     /// </summary>
     public abstract class Operand : Value
     {
+        protected Operand(TextSpan span)
+            : base(span)
+        {
+        }
     }
 }

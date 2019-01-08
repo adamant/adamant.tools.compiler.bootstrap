@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
@@ -14,6 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             BinaryOperator @operator,
             Operand rightOperand,
             SimpleType type)
+            : base(TextSpan.Covering(leftOperand.Span, rightOperand.Span))
         {
             LeftOperand = leftOperand;
             Operator = @operator;

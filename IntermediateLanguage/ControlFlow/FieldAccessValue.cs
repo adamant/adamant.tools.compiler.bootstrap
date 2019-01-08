@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
@@ -7,7 +8,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public Operand Expression { get; }
         public Name Field { get; }
 
-        public FieldAccessValue(Operand expression, Name field)
+        public FieldAccessValue(Operand expression, Name field, TextSpan span)
+            : base(span)
         {
             Expression = expression;
             Field = field;

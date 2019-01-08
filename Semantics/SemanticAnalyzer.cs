@@ -6,6 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Deletes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Moving;
@@ -44,11 +45,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             ShadowChecker.Check(memberDeclarations, diagnostics);
 
-            ControlFlowAnalyzer.BuildGraphs(memberDeclarations);
-
             // TODO we need to check definite assignment as well
 
-            LivenessAnalyzer.Analyze(memberDeclarations);
+            // --------------------------------------------------
+            // This is where the representation transitions to IR
+            ControlFlowAnalyzer.BuildGraphs(memberDeclarations);
+            // --------------------------------------------------
+
+            var liveness = LivenessAnalyzer.Analyze(memberDeclarations);
+
+            DeleteInserter.Transform(memberDeclarations, liveness);
 
             BorrowChecker.Check(memberDeclarations, diagnostics);
 

@@ -21,6 +21,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             yield return ElseBlockNumber;
         }
 
+        public override Statement Clone()
+        {
+            return new IfStatement(Condition, ThenBlockNumber, ElseBlockNumber);
+        }
+
         // Useful for debugging
         public override string ToString()
         {

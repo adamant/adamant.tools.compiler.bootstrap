@@ -1,3 +1,5 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
+
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     /// <summary>
@@ -7,5 +9,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     /// </summary>
     public abstract class ExpressionStatement : Statement
     {
+        public TextSpan Span { get; }
+
+        protected ExpressionStatement(TextSpan span)
+        {
+            Span = span;
+        }
     }
 }

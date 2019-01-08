@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,23 +11,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
 {
     public class LivenessAnalyzer
     {
-        public static void Analyze(FixedList<MemberDeclarationSyntax> memberDeclarations)
+        public static FixedDictionary<FunctionDeclarationSyntax, LiveVariables> Analyze(FixedList<MemberDeclarationSyntax> memberDeclarations)
         {
+            var analyses = new Dictionary<FunctionDeclarationSyntax, LiveVariables>();
             var livenessAnalyzer = new LivenessAnalyzer();
             foreach (var function in memberDeclarations.OfType<FunctionDeclarationSyntax>())
-                livenessAnalyzer.AnalyzeFunction(function);
+            {
+                var liveness = livenessAnalyzer.AnalyzeFunction(function);
+                if (liveness != null)
+                    analyses.Add(function, liveness);
+            }
+
+            return analyses.ToFixedDictionary();
         }
 
-        private void AnalyzeFunction(FunctionDeclarationSyntax function)
+        private LiveVariables AnalyzeFunction(FunctionDeclarationSyntax function)
         {
             // We can't check because of errors or no body
             if (function.Poisoned || function.ControlFlow == null)
-                return;
+                return null;
 
             var edges = function.ControlFlow.Edges;
 
             // Compute aliveness at point after each statement
-            var liveBefore = ComputeLiveness(function.ControlFlow, edges);
+            return ComputeLiveness(function.ControlFlow, edges);
         }
 
         private static LiveVariables ComputeLiveness(ControlFlowGraph function, Edges edges)
@@ -59,9 +67,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
                         case ActionStatement action:
                             EnlivenVariables(liveSet, action.Value);
                             break;
-                        case DeleteStatement deleteStatement:
-                            liveSet[deleteStatement.VariableNumber] = true;
-                            break;
+                        case DeleteStatement _:
+                            throw new InvalidOperationException("Delete statements are supposed to be added after liveness analysis");
+                        //liveSet[deleteStatement.Place.CoreVariable()] = true;
+                        //break;
                         case IfStatement _:
                         case GotoStatement _:
                             // We already or'ed together the live variables from successor blocks

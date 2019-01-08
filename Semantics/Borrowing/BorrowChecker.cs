@@ -92,7 +92,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             break;
                         case DeleteStatement deleteStatement:
                         {
-                            var title = GetTitle(deleteStatement.VariableNumber, claimsBeforeStatement);
+                            var title = GetTitle(deleteStatement.Place.CoreVariable(), claimsBeforeStatement);
                             CheckCanMove(title.ObjectId, claimsBeforeStatement, deleteStatement.Span);
                             claimsAfterStatement.RemoveWhere(c => c.Variable == title.Variable);
                             break;
@@ -161,10 +161,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 
         private void CheckCanMove(int objectId, HashSet<Claim> claims, TextSpan span)
         {
-            var canTake = claims.OfType<Loan>().SelectMany(l => l.Restrictions)
+            var cantTake = claims.OfType<Loan>().SelectMany(l => l.Restrictions)
                 .Any(r => r.Place == objectId && !r.CanTake);
 
-            if (!canTake)
+            if (cantTake)
                 diagnostics.Add(BorrowError.BorrowedValueDoesNotLiveLongEnough(file, span));
         }
 

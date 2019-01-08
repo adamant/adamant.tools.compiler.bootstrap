@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -11,6 +12,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private readonly List<LocalVariableDeclaration> variables = new List<LocalVariableDeclaration>();
         public LocalVariableDeclaration ReturnVariable => variables.First();
         private readonly List<BlockBuilder> blockBuilders = new List<BlockBuilder>();
+
+        public ControlFlowGraphBuilder() { }
+
+        public ControlFlowGraphBuilder(FixedList<LocalVariableDeclaration> variables)
+        {
+            this.variables = variables.ToList();
+        }
 
         public LocalVariableDeclaration AddVariable(bool mutableBinding, DataType type, SimpleName name = null)
         {
@@ -48,6 +56,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             return block;
         }
 
+        /// Used to create a new block for the entry into a loop if needed.
+        /// Doesn't create a new block if the current block is empty.
         public BlockBuilder NewEntryBlock(BlockBuilder currentBlock)
         {
             if (!currentBlock.Statements.Any()) return currentBlock;
