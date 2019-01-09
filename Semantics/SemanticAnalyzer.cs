@@ -4,6 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Deletes;
@@ -44,6 +45,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             MoveChecker.Check(memberDeclarations, diagnostics);
 
             ShadowChecker.Check(memberDeclarations, diagnostics);
+
+            BindingMutabilityChecker.Check(memberDeclarations, diagnostics);
 
             // TODO we need to check definite assignment as well
 

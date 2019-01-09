@@ -7,6 +7,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
     public abstract class Declaration : ISymbol
     {
+        // Declarations are not mutable bindings
+        bool ISymbol.MutableBinding => false;
         public bool IsMember { get; }
         public Name FullName { get; }
         [DebuggerHidden]

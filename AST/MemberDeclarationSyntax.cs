@@ -8,6 +8,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public abstract class MemberDeclarationSyntax : DeclarationSyntax, ISymbol
     {
+        // Declarations are not mutable bindings
+        bool ISymbol.MutableBinding => false;
+
         public TypeDeclarationSyntax DeclaringType { get; internal set; }
 
         public Name FullName { get; }

@@ -7,6 +7,9 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
 {
+    /// <summary>
+    /// Enforces rules disallowing local variable shadowing
+    /// </summary>
     internal class ShadowChecker : ExpressionVisitor<BindingScope>
     {
         private readonly FunctionDeclarationSyntax function;

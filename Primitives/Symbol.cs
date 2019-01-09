@@ -8,6 +8,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 {
     internal class Symbol : ISymbol
     {
+        // These are all declarations not local variables
+        bool ISymbol.MutableBinding => false;
         public Name FullName { get; }
         public DataType Type { get; internal set; }
         public SymbolSet ChildSymbols { get; }

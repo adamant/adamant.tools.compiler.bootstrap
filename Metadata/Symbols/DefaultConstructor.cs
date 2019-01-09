@@ -6,6 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
 {
     public class DefaultConstructor : ISymbol
     {
+        bool ISymbol.MutableBinding => false;
         public Name FullName { get; }
         public DataType Type { get; }
         public SymbolSet ChildSymbols => SymbolSet.Empty;

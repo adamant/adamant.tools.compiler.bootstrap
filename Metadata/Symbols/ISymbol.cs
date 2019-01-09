@@ -5,6 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
 {
     public interface ISymbol
     {
+        bool MutableBinding { get; }
         Name FullName { get; }
         DataType Type { get; }
         SymbolSet ChildSymbols { get; }

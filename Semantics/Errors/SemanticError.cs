@@ -35,8 +35,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
 
         public static Diagnostic CantMove(CodeFile file, ExpressionSyntax expression)
         {
-            return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6003,
+            return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6004,
                 $"Can't move out of expression");
+        }
+
+        public static Diagnostic CantAssignToImmutable(CodeFile file, TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6005,
+                $"Can't assign to immutable variable");
         }
     }
 }

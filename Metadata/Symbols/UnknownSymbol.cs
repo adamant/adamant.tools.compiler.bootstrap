@@ -11,6 +11,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
         private UnknownSymbol() { }
         #endregion
 
+        // We don't know what this is, so it might be mutable (fewer errors this way)
+        public bool MutableBinding => true;
         public Name FullName => SpecialName.Unknown;
         public DataType Type => DataType.Unknown;
         public SymbolSet ChildSymbols => SymbolSet.Empty;

@@ -7,6 +7,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class GenericParameterSyntax : Syntax, ISymbol
     {
+        // Generic parameters are not mutable bindings
+        bool ISymbol.MutableBinding => false;
         public bool IsLifetime { get; }
         public bool IsParams { get; }
         public Name FullName { get; }

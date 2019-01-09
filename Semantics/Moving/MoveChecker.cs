@@ -12,6 +12,9 @@ using Void = Adamant.Tools.Compiler.Bootstrap.Framework.Void;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moving
 {
+    /// <summary>
+    /// Computes ValueSemantics for all expression
+    /// </summary>
     public class MoveChecker : ExpressionVisitor<Void>
     {
         private readonly FunctionDeclarationSyntax function;
