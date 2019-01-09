@@ -281,6 +281,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IOrKeywordToken _:
                     binaryOperator = BinaryOperator.Or;
                     break;
+                case IDotDotToken _:
+                    binaryOperator = BinaryOperator.DotDot;
+                    break;
                 default:
                     throw NonExhaustiveMatchException.For(operatorToken);
             }

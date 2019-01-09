@@ -544,7 +544,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     binaryExpression.Type = DataType.Bool;
                     break;
                 default:
-                    throw NonExhaustiveMatchException.For(@operator);
+                    throw NonExhaustiveMatchException.ForEnum(@operator);
             }
             if (!compatible)
                 diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandsOfType(file,

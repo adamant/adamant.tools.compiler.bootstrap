@@ -95,12 +95,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case MoveExpressionSyntax moveExpression:
                     VisitMoveExpression(moveExpression, args);
                     break;
+                case ForeachExpressionSyntax foreachExpression:
+                    VisitForeachExpression(foreachExpression, args);
+                    break;
                 case null:
                     // Ignore
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
+        }
+
+        public virtual void VisitForeachExpression(ForeachExpressionSyntax foreachExpression, A args)
+        {
+            VisitExpression(foreachExpression.TypeExpression, args);
+            VisitExpression(foreachExpression.InExpression, args);
+            VisitExpression(foreachExpression.Block, args);
         }
 
         public virtual void VisitMoveExpression(MoveExpressionSyntax moveExpression, A args)

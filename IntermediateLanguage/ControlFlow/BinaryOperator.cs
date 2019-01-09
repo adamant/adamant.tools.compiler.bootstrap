@@ -16,6 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         GreaterThanOrEqual,
         And,
         Or,
+        DotDot
     }
 
     public static class BinaryOperatorExtensions
@@ -48,6 +49,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
                     return "and";
                 case BinaryOperator.Or:
                     return "or";
+                case BinaryOperator.DotDot:
+                    return "..";
                 default:
                     throw NonExhaustiveMatchException.For(@operator);
             }
