@@ -65,6 +65,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             if (function.Poisoned || function.ControlFlow == null)
                 return;
 
+            var variables = function.ControlFlow.VariableDeclarations;
             // Do borrow checking with claims
             var blocks = new Queue<BasicBlock>();
             blocks.Enqueue(function.ControlFlow.EntryBlock);
@@ -85,10 +86,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     switch (statement)
                     {
                         case AssignmentStatement assignmentStatement:
-                            AcquireClaims(assignmentStatement.Place, assignmentStatement.Value, claimsBeforeStatement, claimsAfterStatement);
+                            AcquireClaims(assignmentStatement.Place, assignmentStatement.Value, claimsBeforeStatement, claimsAfterStatement, variables);
                             break;
                         case ActionStatement actionStatement:
-                            AcquireClaims(null, actionStatement.Value, claimsBeforeStatement, claimsAfterStatement);
+                            AcquireClaims(null, actionStatement.Value, claimsBeforeStatement, claimsAfterStatement, variables);
                             break;
                         case DeleteStatement deleteStatement:
                         {
@@ -172,7 +173,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             Place assignToPlace,
             Value value,
             HashSet<Claim> claimsBeforeStatement,
-            HashSet<Claim> claimsAfterStatement)
+            HashSet<Claim> claimsAfterStatement,
+            FixedList<LocalVariableDeclaration> variables)
         {
             switch (value)
             {
@@ -200,18 +202,40 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     break;
                 case FunctionCall functionCall:
                     if (functionCall.Self != null)
-                        AcquireClaim(assignToPlace, functionCall.Self, claimsBeforeStatement, claimsAfterStatement);
+                        AcquireClaim(assignToPlace, functionCall.Self, claimsBeforeStatement,
+                            claimsAfterStatement);
                     foreach (var argument in functionCall.Arguments)
-                        AcquireClaim(assignToPlace, argument, claimsBeforeStatement, claimsAfterStatement);
+                        AcquireClaim(assignToPlace, argument, claimsBeforeStatement,
+                            claimsAfterStatement);
+                    AcquireOwnershipIfMoved(assignToPlace, variables, claimsAfterStatement);
                     break;
                 case VirtualFunctionCall virtualFunctionCall:
                     if (virtualFunctionCall.Self != null)
                         AcquireClaim(assignToPlace, virtualFunctionCall.Self, claimsBeforeStatement, claimsAfterStatement);
                     foreach (var argument in virtualFunctionCall.Arguments)
                         AcquireClaim(assignToPlace, argument, claimsBeforeStatement, claimsAfterStatement);
+                    AcquireOwnershipIfMoved(assignToPlace, variables, claimsAfterStatement);
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(value);
+            }
+        }
+
+        private void AcquireOwnershipIfMoved(
+            Place assignToPlace,
+            FixedList<LocalVariableDeclaration> variables,
+            HashSet<Claim> claimsAfterStatement)
+        {
+            if (assignToPlace == null) return;
+            var assignToVariable = variables[assignToPlace.CoreVariable()];
+            if (assignToVariable.Type is ReferenceType referenceType
+                && referenceType.IsOwned)
+            {
+                // We have taken ownership of a new object, assign it a new id
+                var objectId = NewObjectId();
+                // Variable acquires title on any new objects
+                var title = new Title(assignToPlace.CoreVariable(), objectId);
+                claimsAfterStatement.Add(title);
             }
         }
 
