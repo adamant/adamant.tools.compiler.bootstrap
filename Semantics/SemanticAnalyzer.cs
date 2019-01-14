@@ -46,9 +46,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             ShadowChecker.Check(memberDeclarations, diagnostics);
 
+            // TODO we need to check definite assignment as part of this
             BindingMutabilityChecker.Check(memberDeclarations, diagnostics);
-
-            // TODO we need to check definite assignment as well
 
             // --------------------------------------------------
             // This is where the representation transitions to IR
