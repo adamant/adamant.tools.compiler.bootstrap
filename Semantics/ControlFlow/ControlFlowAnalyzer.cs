@@ -157,6 +157,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     currentBlock.AddIf(condition, thenEntry, elseEntry);
                     return exit;
                 case BlockSyntax block:
+                    // It is ok that we lose knowledge of where this block ends because the liveness
+                    // check will see that variables are dead at the end of the block. We will insert
+                    // delete statements at the earliest possible point, so everything will be deleted
+                    // at or before the end of the block.
                     foreach (var statementInBlock in block.Statements)
                         currentBlock = ConvertToStatement(currentBlock, statementInBlock, breakToBlock);
                     return currentBlock;
