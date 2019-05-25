@@ -9,6 +9,9 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 {
+    /// <summary>
+    /// Check for borrow errors
+    /// </summary>
     public class BorrowChecker
     {
         private readonly CodeFile file;

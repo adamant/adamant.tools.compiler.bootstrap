@@ -14,7 +14,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
 {
     public class AdamantCompiler
     {
-
         public Task<Package> CompilePackageAsync(
             string name,
             IEnumerable<ICodeFileSource> files,

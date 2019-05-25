@@ -40,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
 #if DEBUG
             TypeResolutionValidator.Validate(memberDeclarations);
-            // TODO validate that all ReferencedSymbols lists have a single value non-errored code
+            // TODO validate that all `ReferencedSymbol` properties have been set
 #endif
             MoveChecker.Check(memberDeclarations, diagnostics);
 

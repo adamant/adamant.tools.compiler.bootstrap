@@ -11,6 +11,9 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Deletes
 {
+    /// <summary>
+    /// Insert explicit delete statements when values are dropped
+    /// </summary>
     public class DeleteInserter
     {
         public static void Transform(

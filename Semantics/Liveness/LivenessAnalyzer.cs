@@ -9,6 +9,9 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
 {
+    /// <summary>
+    /// Compute where variables are live and return a structure of that
+    /// </summary>
     public class LivenessAnalyzer
     {
         public static FixedDictionary<FunctionDeclarationSyntax, LiveVariables> Analyze(FixedList<MemberDeclarationSyntax> memberDeclarations)
