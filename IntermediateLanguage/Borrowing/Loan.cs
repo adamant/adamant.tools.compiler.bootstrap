@@ -4,7 +4,7 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
+namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
 {
     /// <summary>
     /// A loaning out of a reference into a variable

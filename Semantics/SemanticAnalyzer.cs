@@ -19,6 +19,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 {
     public class SemanticAnalyzer
     {
+        /// <summary>
+        /// Whether to store the liveness analysis for each function and method.
+        /// Default Value: false
+        /// </summary>
+        public bool SaveLivenessAnalysis = false;
+
+        /// <summary>
+        /// Whether to store the borrow checker claims for each function and method.
+        /// Default Value: false
+        /// </summary>
+        public bool SaveBorrowClaims = false;
+
         public Package Analyze(
             PackageSyntax packageSyntax,
             FixedDictionary<string, Package> references)
@@ -54,11 +66,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             ControlFlowAnalyzer.BuildGraphs(memberDeclarations);
             // --------------------------------------------------
 
-            var liveness = LivenessAnalyzer.Analyze(memberDeclarations);
+            var liveness = LivenessAnalyzer.Analyze(memberDeclarations, SaveLivenessAnalysis);
 
             DeleteInserter.Transform(memberDeclarations, liveness);
 
-            BorrowChecker.Check(memberDeclarations, diagnostics);
+            BorrowChecker.Check(memberDeclarations, diagnostics, SaveBorrowClaims);
 
             // Build final declaration objects and find the entry point
             var declarationBuilder = new DeclarationBuilder();

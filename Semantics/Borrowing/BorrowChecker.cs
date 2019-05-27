@@ -3,6 +3,7 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
@@ -16,6 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
     {
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
+        private readonly bool saveBorrowClaims;
         private int nextObjectId = 1;
 
         private int NewObjectId()
@@ -25,19 +27,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             return objectId;
         }
 
-        private BorrowChecker(CodeFile file, Diagnostics diagnostics)
+        private BorrowChecker(CodeFile file, Diagnostics diagnostics, bool saveBorrowClaims)
         {
             this.file = file;
             this.diagnostics = diagnostics;
+            this.saveBorrowClaims = saveBorrowClaims;
         }
 
         public static void Check(
             IEnumerable<MemberDeclarationSyntax> declarations,
-            Diagnostics diagnostics)
+            Diagnostics diagnostics,
+            bool saveBorrowClaims)
         {
             foreach (var declaration in declarations)
             {
-                var borrowChecker = new BorrowChecker(declaration.File, diagnostics);
+                var borrowChecker = new BorrowChecker(declaration.File, diagnostics, saveBorrowClaims);
                 borrowChecker.Check(declaration);
             }
         }
@@ -131,6 +135,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     }
                 }
             }
+
+            if (saveBorrowClaims) function.ControlFlow.BorrowClaims = claims;
         }
 
         private HashSet<Claim> ClaimsBeforeBlock(

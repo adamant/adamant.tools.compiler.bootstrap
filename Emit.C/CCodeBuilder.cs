@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
     {
         public new const string LineTerminator = "\n";
 
-        /// Whether we need a black separator line before the next declaration
+        /// Whether we need a blank separator line before the next declaration
         public bool NeedsDeclarationSeparatorLine { get; private set; }
 
         /// Whether we need a blank separator line before the next statement

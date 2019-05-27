@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
+namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
 {
     public class Restriction : IEquatable<Restriction>
     {

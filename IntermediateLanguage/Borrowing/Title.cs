@@ -1,6 +1,6 @@
 using System;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
+namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
 {
     public class Title : Claim, IEquatable<Title>
     {

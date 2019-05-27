@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
 {
@@ -14,7 +14,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
     /// </summary>
     public class LivenessAnalyzer
     {
-        public static FixedDictionary<FunctionDeclarationSyntax, LiveVariables> Analyze(FixedList<MemberDeclarationSyntax> memberDeclarations)
+        public static FixedDictionary<FunctionDeclarationSyntax, LiveVariables> Analyze(
+            FixedList<MemberDeclarationSyntax> memberDeclarations,
+            bool saveLivenessAnalysis)
         {
             var analyses = new Dictionary<FunctionDeclarationSyntax, LiveVariables>();
             var livenessAnalyzer = new LivenessAnalyzer();
@@ -22,7 +24,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
             {
                 var liveness = livenessAnalyzer.AnalyzeFunction(function);
                 if (liveness != null)
+                {
                     analyses.Add(function, liveness);
+                    if (saveLivenessAnalysis) function.ControlFlow.LiveVariables = liveness;
+                }
             }
 
             return analyses.ToFixedDictionary();

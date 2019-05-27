@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
+namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
 {
     public class Claims
     {

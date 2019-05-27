@@ -74,6 +74,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             var errorDiagnostics = diagnostics
                 .Where(d => d.Level >= DiagnosticLevel.CompilationError).ToList();
 
+            var assembler = new Assembler();
+            testOutput.WriteLine(assembler.Disassemble(package));
+
             if (expectedCompileErrorLines.Any())
             {
                 foreach (var expectedCompileErrorLine in expectedCompileErrorLines)
@@ -93,7 +96,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
                     Assert.True(false, $"Unexpected error on line {error.StartPosition.Line}");
             }
 
-            // We got only expected errors, but need to not go one to emit code
+            // We got only expected errors, but need to not go on to emit code
             if (errorDiagnostics.Any())
                 return;
 

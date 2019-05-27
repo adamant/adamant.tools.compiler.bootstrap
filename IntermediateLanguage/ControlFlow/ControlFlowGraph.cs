@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
@@ -14,6 +15,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public BasicBlock EntryBlock => BasicBlocks.First();
         public IEnumerable<BasicBlock> ExitBlocks => BasicBlocks.Where(b => b.Terminator is ReturnStatement);
         public Edges Edges { get; }
+
+        /// <summary>
+        /// If requested, the semantic analyzer will store the live variables here
+        /// </summary>
+        public LiveVariables LiveVariables { get; set; }
+
+        /// <summary>
+        /// If requested, the semantic analyzer will store the borrow claims here
+        /// </summary>
+        public Claims BorrowClaims { get; set; }
 
         public ControlFlowGraph(
             IEnumerable<LocalVariableDeclaration> variableDeclarations,
