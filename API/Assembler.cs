@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
@@ -47,9 +48,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.Append(parameters);
             builder.Append(")");
             builder.EndLine();
-            builder.BeginLine("\t=> ");
+            builder.BeginLine(builder.IndentCharacters);
+            builder.Append("=> ");
             builder.EndLine(function.ReturnType.ToString());
             builder.BeginBlock();
+            Disassemble(function.ControlFlow, builder);
             builder.EndBlock();
         }
 
@@ -68,9 +71,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.Append(parameters);
             builder.Append(")");
             builder.EndLine();
-            builder.BeginLine("\t=> ");
+            builder.BeginLine(builder.IndentCharacters);
+            builder.Append("=> ");
             builder.EndLine(constructor.ReturnType.ToString());
             builder.BeginBlock();
+            Disassemble(constructor.ControlFlow, builder);
             builder.EndBlock();
         }
 
@@ -86,6 +91,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                 Disassemble(member, builder);
             }
             builder.EndBlock();
+        }
+
+        private void Disassemble(ControlFlowGraph controlFlow, AssemblyBuilder builder)
+        {
+            foreach (var block in controlFlow.BasicBlocks) Disassemble(block, builder);
+        }
+
+        private void Disassemble(BasicBlock block, AssemblyBuilder builder)
+        {
+            var labelIndent = Math.Max(builder.CurrentIndentDepth - 1, 0);
+            builder.Append(string.Concat(Enumerable.Repeat(builder.IndentCharacters, labelIndent)));
+            builder.Append("bb");
+            builder.Append(block.Number.ToString());
+            builder.EndLine(":");
+            foreach (var statement in block.Statements)
+                builder.AppendLine(statement.ToString());
         }
     }
 }
