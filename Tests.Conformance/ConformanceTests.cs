@@ -46,7 +46,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             // Setup
             var codeFile = CodeFile.Load(testCase.FullCodePath);
             var code = codeFile.Code.Text;
-            var compiler = new AdamantCompiler();
+            var compiler = new AdamantCompiler()
+            {
+                SaveBorrowClaims = true,
+            };
             var references = new Dictionary<string, Package>();
 
             // Reference Standard Library

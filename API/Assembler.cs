@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
 
@@ -95,18 +96,33 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
 
         private void Disassemble(ControlFlowGraph controlFlow, AssemblyBuilder builder)
         {
-            foreach (var block in controlFlow.BasicBlocks) Disassemble(block, builder);
+            foreach (var block in controlFlow.BasicBlocks)
+                Disassemble(block, controlFlow.BorrowClaims, builder);
         }
 
-        private void Disassemble(BasicBlock block, AssemblyBuilder builder)
+        private void Disassemble(
+            BasicBlock block,
+            Claims borrowClaims,
+            AssemblyBuilder builder)
         {
+
             var labelIndent = Math.Max(builder.CurrentIndentDepth - 1, 0);
             builder.Append(string.Concat(Enumerable.Repeat(builder.IndentCharacters, labelIndent)));
             builder.Append("bb");
             builder.Append(block.Number.ToString());
             builder.EndLine(":");
             foreach (var statement in block.Statements)
+            {
                 builder.AppendLine(statement.ToString());
+                if (borrowClaims != null)
+                {
+                    foreach (var claim in borrowClaims.After(statement))
+                    {
+                        builder.BeginLine("// ");
+                        builder.EndLine(claim.ToString());
+                    }
+                }
+            }
         }
     }
 }

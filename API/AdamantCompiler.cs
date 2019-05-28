@@ -14,6 +14,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
 {
     public class AdamantCompiler
     {
+        /// <summary>
+        /// Whether to store the liveness analysis for each function and method.
+        /// Default Value: false
+        /// </summary>
+        public bool SaveLivenessAnalysis = false;
+
+        /// <summary>
+        /// Whether to store the borrow checker claims for each function and method.
+        /// Default Value: false
+        /// </summary>
+        public bool SaveBorrowClaims = false;
+
         public Task<Package> CompilePackageAsync(
             string name,
             IEnumerable<ICodeFileSource> files,
@@ -76,7 +88,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                 .ToFixedList();
             var packageSyntax = new PackageSyntax(name, compilationUnits);
 
-            var analyzer = new SemanticAnalyzer();
+            var analyzer = new SemanticAnalyzer()
+            {
+                SaveLivenessAnalysis = SaveLivenessAnalysis,
+                SaveBorrowClaims = SaveBorrowClaims,
+            };
 
             return analyzer.Analyze(packageSyntax, references);
         }
