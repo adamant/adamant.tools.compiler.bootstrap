@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
 {
@@ -31,7 +32,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
 
         public override string ToString()
         {
-            return $"%{Place}...";
+            var builder = new StringBuilder("%");
+            builder.Append(Place);
+            if (CanTake) builder.Append("T");
+            if (CanMutate) builder.Append("Mut");
+            if (CanBorrowMutable) builder.Append("Bm");
+            if (CanBorrowImmutable) builder.Append("Bi");
+            return builder.ToString();
         }
 
         public override bool Equals(object obj)
