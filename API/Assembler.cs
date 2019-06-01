@@ -96,8 +96,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
 
         private void Disassemble(ControlFlowGraph controlFlow, AssemblyBuilder builder)
         {
+            foreach (var declaration in controlFlow.VariableDeclarations)
+                Disassemble(declaration, builder);
+
+            if (controlFlow.VariableDeclarations.Any(v => v.Exists))
+                builder.BlankLine();
+
             foreach (var block in controlFlow.BasicBlocks)
                 Disassemble(block, controlFlow.BorrowClaims, builder);
+        }
+
+        private void Disassemble(LocalVariableDeclaration declaration, AssemblyBuilder builder)
+        {
+            if (declaration.Exists)
+                builder.AppendLine(declaration.ToString());
         }
 
         private void Disassemble(

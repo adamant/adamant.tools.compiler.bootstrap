@@ -36,7 +36,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public override string ToString()
         {
             var binding = MutableBinding ? "var" : "let";
-            var result = $"{binding} %{Number}: {Type};";
+            var variableName = Number == 0 ? "result" : Number.ToString();
+            var result = $"{binding} %{variableName}: {Type};";
             if (Name != null)
                 result += $" // {Name}";
             return result;
