@@ -1,10 +1,11 @@
 using System;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
 {
     public class Title : Claim, IEquatable<Title>
     {
-        public Title(int variable, int objectId)
+        public Title(VariableNumber variable, int objectId)
            : base(variable, objectId)
         {
         }

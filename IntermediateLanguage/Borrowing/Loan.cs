@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
         /// <param name="variable">Variable the reference is loaned to</param>
         /// <param name="operand">The operand loaned from</param>
         /// <param name="objectId">Which object is loaned</param>
-        public Loan(int variable, Operand operand, int objectId)
+        public Loan(VariableNumber variable, Operand operand, int objectId)
             : base(variable, objectId)
         {
             var restrictions = new List<Restriction>();
@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
             Restrictions = restrictions.ToFixedList();
         }
 
-        public Loan(int variable, int objectId)
+        public Loan(VariableNumber variable, int objectId)
             : base(variable, objectId)
         {
             Restrictions = Enumerable.Empty<Restriction>().ToFixedList();

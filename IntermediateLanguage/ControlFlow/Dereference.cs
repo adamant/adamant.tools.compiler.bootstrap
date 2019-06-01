@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             DereferencedValue = dereferencedValue;
         }
 
-        public override int CoreVariable()
+        public override VariableNumber CoreVariable()
         {
             return DereferencedValue.CoreVariable();
         }

@@ -4,9 +4,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class VariableReference : Place
     {
-        public readonly int VariableNumber;
+        public readonly VariableNumber VariableNumber;
 
-        public VariableReference(int variableNumber, TextSpan span)
+        public VariableReference(VariableNumber variableNumber, TextSpan span)
             : base(span)
         {
             VariableNumber = variableNumber;
@@ -14,11 +14,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 
         public override string ToString()
         {
-            var variableName = VariableNumber == 0 ? "result" : VariableNumber.ToString();
-            return $"%{variableName}";
+            return $"%{VariableNumber}";
         }
 
-        public override int CoreVariable()
+        public override VariableNumber CoreVariable()
         {
             return VariableNumber;
         }

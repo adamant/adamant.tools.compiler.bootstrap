@@ -4,11 +4,9 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Deletes
@@ -56,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Deletes
                         {
                             // The delete happens after the last statement
                             var span = new TextSpan(statement.Span.End, 0);
-                            blockBuilder.AddDelete(new VariableReference(variableNumber, span), type, span);
+                            blockBuilder.AddDelete(new VariableReference(variable.Number, span), type, span);
                         }
                     }
                 }

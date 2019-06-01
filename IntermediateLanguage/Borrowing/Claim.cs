@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
 {
     public abstract class Claim : IEquatable<Claim>
     {
-        public int Variable { get; }
+        public VariableNumber Variable { get; }
         public int ObjectId { get; }
 
-        protected Claim(int variable, int objectId)
+        protected Claim(VariableNumber variable, int objectId)
         {
             Variable = variable;
             ObjectId = objectId;

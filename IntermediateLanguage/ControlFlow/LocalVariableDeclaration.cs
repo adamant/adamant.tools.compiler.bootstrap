@@ -6,7 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class LocalVariableDeclaration
     {
-        public readonly int Number; // The declaration number is used as its name in the IR
+        public readonly VariableNumber Number; // The declaration number is used as its name in the IR
 
         // If this declaration corresponds to an argument or local variable, what it was named. Not guaranteed unique
         public readonly SimpleName Name;
@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             bool isParameter,
             bool mutableBinding,
             DataType type,
-            int number,
+            VariableNumber number,
             SimpleName name = null)
         {
             IsParameter = isParameter;
@@ -36,8 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public override string ToString()
         {
             var binding = MutableBinding ? "var" : "let";
-            var variableName = Number == 0 ? "result" : Number.ToString();
-            var result = $"{binding} %{variableName}: {Type};";
+            var result = $"{binding} %{Number}: {Type};";
             if (Name != null)
                 result += $" // {Name}";
             return result;

@@ -37,12 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             Requires.That(nameof(variable), variable.Exists, "tried to look up variable that does not exist");
             var initializer = variable.IsParameter ? $" = {nameMangler.Mangle(variable.Name)}" : "";
-            code.AppendLine($"{typeConverter.Convert(variable.Type)} _{NameOf(variable.Reference)}{initializer}; // {variable}");
-        }
-
-        private static string NameOf(VariableReference variable)
-        {
-            return variable.VariableNumber == 0 ? "result" : variable.VariableNumber.ToString();
+            code.AppendLine($"{typeConverter.Convert(variable.Type)} _{variable.Reference.VariableNumber}{initializer}; // {variable}");
         }
 
         private void EmitBlock(BasicBlock block, bool voidReturn, CCodeBuilder code)
@@ -93,7 +88,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             switch (place)
             {
                 case VariableReference variable:
-                    return "_" + NameOf(variable);
+                    return "_" + variable.VariableNumber;
                 default:
                     throw NonExhaustiveMatchException.For(place);
             }

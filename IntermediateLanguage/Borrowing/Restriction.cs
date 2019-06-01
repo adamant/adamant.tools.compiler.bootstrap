@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
 {
     public class Restriction : IEquatable<Restriction>
     {
-        public int Place { get; }
+        public VariableNumber Place { get; }
 
         // Whether one can move the value out of this place
         public bool CanTake { get; }
@@ -20,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
         // Whether one can borrow the data in this place immutably
         public bool CanBorrowImmutable { get; }
 
-        public Restriction(int place, bool mutableBorrow)
+        public Restriction(VariableNumber place, bool mutableBorrow)
         {
             Place = place;
             // Any restriction implies you can't take

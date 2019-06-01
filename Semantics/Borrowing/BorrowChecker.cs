@@ -171,8 +171,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 
         private void CheckCanMove(int objectId, HashSet<Claim> claims, TextSpan span)
         {
-            var cantTake = claims.OfType<Loan>().SelectMany(l => l.Restrictions)
-                .Any(r => r.Place == objectId && !r.CanTake);
+            var cantTake = claims.OfType<Loan>()
+                .Where(l => l.ObjectId == objectId)
+                .SelectMany(l => l.Restrictions)
+                .Any(r => !r.CanTake);
 
             if (cantTake)
                 diagnostics.Add(BorrowError.BorrowedValueDoesNotLiveLongEnough(file, span));
@@ -236,7 +238,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             HashSet<Claim> claimsAfterStatement)
         {
             if (assignToPlace == null) return;
-            var assignToVariable = variables[assignToPlace.CoreVariable()];
+            var assignToVariable = variables.Single(v => v.Number == assignToPlace.CoreVariable());
             if (assignToVariable.Type is ReferenceType referenceType
                 && referenceType.IsOwned)
             {
@@ -277,7 +279,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             }
         }
 
-        private static Title GetTitle(int variable, HashSet<Claim> claims)
+        private static Title GetTitle(VariableNumber variable, HashSet<Claim> claims)
         {
             return claims.OfType<Title>().Single(t => t.Variable == variable);
         }
