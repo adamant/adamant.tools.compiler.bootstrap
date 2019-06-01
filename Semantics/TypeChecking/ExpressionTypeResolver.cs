@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -209,6 +210,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                         case 1:
                             identifierName.ReferencedSymbol = symbols.Single();
                             type = symbols.Single().Type;
+                            if (type is ObjectType objectType && objectType.Mutability == Mutability.Mutable)
+                                type = objectType.AsUpgradable();
                             break;
                         default:
                             diagnostics.Add(NameBindingError.AmbiguousName(file, identifierName.Span));
@@ -291,12 +294,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 {
                     var expressionType = InferExpressionType(mutableExpression.Expression);
                     DataType type;
-                    if (expressionType is Metatype)
-                        type = DataType.Type; // It names/describes a type
-                    else
+                    switch (expressionType)
                     {
-                        // TODO check that the type actually is mutable so we can mutably borrow it
-                        type = expressionType;
+                        case Metatype metatype:
+                        {
+                            type = DataType.Type; // It names/describes a type
+                            if (!(metatype.Instance is ObjectType objectType && objectType.DeclaredMutable))
+                                diagnostics.Add(TypeError.TypeDeclaredImmutable(file, mutableExpression.Expression));
+                            break;
+                        }
+                        case TypeType _:
+                            // TODO we need to check whether it is valid to use `mut` on this
+                            type = DataType.Type; // It names/describes a type
+                            break;
+                        default:
+                            switch (expressionType)
+                            {
+                                // If it is already mutable we can't redeclare it mutable (i.e. `mut mut x` is error)
+                                case ObjectType objectType
+                                    when objectType.Mutability.IsUpgradable:
+                                    type = objectType.AsMutable();
+                                    break;
+                                default:
+                                    diagnostics.Add(TypeError.ExpressionCantBeMutable(file,
+                                        mutableExpression.Expression));
+                                    type = expressionType;
+                                    break;
+                            }
+                            break;
                     }
 
                     return mutableExpression.Type = type;
@@ -333,6 +358,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                         diagnostics.Add(TypeError.CannotMoveBorrowedValue(file, moveExpression));
                         type = referenceType.WithLifetime(Lifetime.Owned);
                     }
+                    if (type is ObjectType objectType) type = objectType.AsOwned();
                     return moveExpression.Type = type;
                 }
                 default:
@@ -373,7 +399,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     expression.ConstructorType = DataType.Unknown;
                     break;
             }
-            return expression.Type = constructedType.WithLifetime(Lifetime.Owned);
+
+            return expression.Type = constructedType.AsOwned();
         }
 
         private static bool IsType(DataType dataType)
@@ -430,12 +457,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
         private static bool IsAssignableFrom(DataType target, DataType source)
         {
             if (target.Equals(source)) return true;
-            if (target is ObjectType targetReference && !targetReference.IsOwned)
+            if (target is ObjectType targetReference && source is ObjectType sourceReference)
             {
-                if (source is ObjectType sourceReference)
-                    // If they are equal except for lifetimes, it is fine
-                    return targetReference.WithLifetime(Lifetime.None)
-                        .Equals(sourceReference.WithLifetime(Lifetime.None));
+                if (targetReference.IsOwned && !sourceReference.IsOwned) return false;
+
+                if (!targetReference.Mutability.IsAssignableFrom(sourceReference.Mutability))
+                    return false;
+
+                // If they are equal except for lifetimes and mutability compatible, it is fine
+                return EqualityComparer<ISymbol>.Default.Equals(targetReference.Symbol, sourceReference.Symbol) &&
+                       EqualityComparer<Name>.Default.Equals(targetReference.Name, sourceReference.Name) &&
+                       targetReference.DeclaredMutable == sourceReference.DeclaredMutable &&
+                       EqualityComparer<FixedList<DataType>>.Default.Equals(targetReference.GenericParameterTypes, sourceReference.GenericParameterTypes) &&
+                       EqualityComparer<FixedList<DataType>>.Default.Equals(targetReference.GenericArguments, sourceReference.GenericArguments);
             }
 
             return false;

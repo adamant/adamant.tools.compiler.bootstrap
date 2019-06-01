@@ -88,7 +88,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
                     var errorsOnLine = errorDiagnostics.Count(e =>
                         e.StartPosition.Line == expectedCompileErrorLine);
                     Assert.True(errorsOnLine == 1,
-                        $"Expected single error on line {expectedCompileErrorLine}, found {errorsOnLine}");
+                        $"Expected one error on line {expectedCompileErrorLine}, found {errorsOnLine}");
                 }
             }
 

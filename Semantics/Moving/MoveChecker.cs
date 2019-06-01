@@ -72,6 +72,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moving
             moveExpression.ValueSemantics = ValueSemantics.Move;
         }
 
+        public override void VisitMutableExpression(MutableExpressionSyntax mutableExpression, Void args)
+        {
+            base.VisitMutableExpression(mutableExpression, args);
+
+            mutableExpression.ValueSemantics = mutableExpression.Expression.ValueSemantics;
+        }
+
         public override void VisitAssignmentExpression(AssignmentExpressionSyntax assignmentExpression, Void args)
         {
             base.VisitAssignmentExpression(assignmentExpression, args);

@@ -72,7 +72,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     // TODO evaluate to type
                     return DataType.Unknown;
                 case MutableExpressionSyntax mutableType:
-                    return EvaluateExpression(mutableType.Expression); // TODO make the type mutable
+                {
+                    var type = EvaluateExpression(mutableType.Expression);
+                    switch (type)
+                    {
+                        case ObjectType objectType when objectType.DeclaredMutable:
+                            return objectType.AsMutable();
+                        default:
+                            return DataType.Unknown;
+                    }
+                }
                 default:
                     throw NonExhaustiveMatchException.For(typeExpression);
             }

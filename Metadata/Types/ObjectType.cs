@@ -18,14 +18,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     {
         public ISymbol Symbol { get; }
         public Name Name { get; }
-        public bool DeclaredMutable { get; } // TODO maybe this should be removed or computed from the symbol
+        /// <summary>
+        /// Whether this type was declared `mut class` or just `class`
+        /// </summary>
+        public bool DeclaredMutable { get; }
 
         public FixedList<DataType> GenericParameterTypes { get; }
         public bool IsGeneric => GenericParameterTypes != null;
         public int? GenericArity => GenericParameterTypes?.Count;
         public FixedList<DataType> GenericArguments { get; }
 
-        public bool IsMutable { get; }
+        public Mutability Mutability { get; }
         // TODO deal with the generic parameters and arguments
         public override bool IsResolved => true;
 
@@ -34,33 +37,33 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             bool declaredMutable,
             IEnumerable<DataType> genericParameterTypes,
             IEnumerable<DataType> genericArguments,
-            bool isMutable,
+            Mutability mutability,
             Lifetime lifetime)
             : base(lifetime)
         {
             Name = symbol.FullName;
             DeclaredMutable = declaredMutable;
+            Mutability = mutability;
             Symbol = symbol;
             var genericParameterTypesList = genericParameterTypes?.ToFixedList();
             GenericParameterTypes = genericParameterTypesList;
             var genericArgumentsList = (genericArguments ?? genericParameterTypesList?.Select(t => default(DataType)))?.ToFixedList();
             Requires.That(nameof(genericArguments), genericArgumentsList?.Count == genericParameterTypesList?.Count, "number of arguments must match number of parameters");
             GenericArguments = genericArgumentsList;
-            IsMutable = isMutable;
         }
 
-        public ObjectType(
+        public static ObjectType Declaration(
             ISymbol symbol,
-            bool declaredMutable,
-            IEnumerable<DataType> genericParameterTypes,
-            Lifetime lifetime)
-            : this(symbol, declaredMutable, genericParameterTypes, null, false, lifetime)
+            bool mutable,
+            IEnumerable<DataType> genericParameterTypes = null)
         {
-        }
-
-        public ObjectType(ISymbol symbol, bool declaredMutable, Lifetime lifetime)
-            : this(symbol, declaredMutable, null, null, false, lifetime)
-        {
+            return new ObjectType(
+                symbol,
+                mutable,
+                genericParameterTypes,
+                null, // generic arguments
+                Mutability.Immutable,
+                Lifetime.None);
         }
 
         /// <summary>
@@ -68,33 +71,55 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// </summary>
         public ObjectType AsMutable()
         {
-            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, true, Lifetime);
+            Requires.That("DeclaredMutable", DeclaredMutable, "must be declared as a mutable type to use mutably");
+            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability.Mutable, Lifetime);
+        }
+
+        /// <summary>
+        /// Use this type with indeterminate mutability. Note that if it is declared immutable, then
+        /// there can be no indeterminate mutability and this function returns and immutable type.
+        /// </summary>
+        public ObjectType AsUpgradable()
+        {
+            if (!DeclaredMutable && Mutability == Mutability.Immutable) return this; // no change
+            var mutability = DeclaredMutable ? Mutability.ExplicitlyUpgradable : Mutability.Immutable;
+            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, mutability, Lifetime);
+        }
+
+        /// <summary>
+        /// Changes the lifetime to owned and if possible changes the mutability to downgradable
+        /// </summary>
+        /// <returns></returns>
+        public ObjectType AsOwned()
+        {
+            var expectedMutability = DeclaredMutable ? Mutability.ImplicitlyUpgradable : Mutability.Immutable;
+            if (Lifetime == Lifetime.Owned && Mutability == expectedMutability) return this;
+            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, expectedMutability, Lifetime.Owned);
         }
 
         /// <summary>
         /// Make a mutable version of this type regardless of whether it was declared
         /// mutable for use as the constructor parameter.
         /// </summary>
-        public ObjectType ForConstructor()
+        public ObjectType ForConstructorSelf()
         {
-            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, true, AnonymousLifetime.Instance);
+            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability.Mutable, AnonymousLifetime.Instance);
         }
 
         public ObjectType WithGenericArguments(IEnumerable<DataType> genericArguments)
         {
-            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, genericArguments, IsMutable, Lifetime);
+            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, genericArguments, Mutability, Lifetime);
         }
 
         public override ReferenceType WithLifetime(Lifetime lifetime)
         {
-            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, IsMutable, lifetime);
+            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability, lifetime);
         }
 
         public override string ToString()
         {
-            var value = Name.ToString();
+            var value = $"{Mutability}{Name}";
             if (!(Lifetime is NoLifetime)) value += "$" + Lifetime;
-            if (IsMutable) value = "mut " + value;
             return value;
         }
 
@@ -112,13 +137,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                    DeclaredMutable == other.DeclaredMutable &&
                    EqualityComparer<FixedList<DataType>>.Default.Equals(GenericParameterTypes, other.GenericParameterTypes) &&
                    EqualityComparer<FixedList<DataType>>.Default.Equals(GenericArguments, other.GenericArguments) &&
-                   IsMutable == other.IsMutable &&
+                   Mutability == other.Mutability &&
                    EqualityComparer<Lifetime>.Default.Equals(Lifetime, other.Lifetime);
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Symbol, Name, DeclaredMutable, GenericParameterTypes, GenericArguments, IsMutable, Lifetime);
+            return HashCode.Combine(Symbol, Name, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability, Lifetime);
         }
 
         public static bool operator ==(ObjectType type1, ObjectType type2)

@@ -85,5 +85,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
             return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3009,
                 $"Cannot move borrowed value `{file.Code[expression.Expression.Span]}`");
         }
+
+        public static Diagnostic TypeDeclaredImmutable(CodeFile file, ExpressionSyntax expression)
+        {
+            return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3010,
+                $"Type can't be made mutable because it was declared immutable `{file.Code[expression.Span]}`");
+        }
+
+        public static Diagnostic ExpressionCantBeMutable(CodeFile file, ExpressionSyntax expression)
+        {
+            return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3011,
+                $"Expression can't be made mutable `{file.Code[expression.Span]}`");
+        }
     }
 }
