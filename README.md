@@ -48,3 +48,7 @@ None Currently
 
 * Unit tests are in projects named `Tests.Unit.*`. This way, it is not inconsistent when further namespaces are nested inside them. If `Tests` were at the end of the name, then many namespaces would have it at the end, while nested ones would have it in the middle. This also allows conformance and integration tests to be grouped with them by placing them all under the `Tests` namespace.
 * Namespace hierarchies are kept fairly flat. This is to avoid issues of needing too many `using` statements and moving types between them. A namespace should contain all classes that represent the same "kind" of entity without much regard to sub-kinds. Originally, this was not the case. Types were separated into many sub-namespaces, but this ended up being more trouble than it was worth. In practice, one still just used the go to type functionality to find types.
+
+## Line Count
+
+A line count can be obtained from Visual Studio by running "Find All" with regular expressions across all `*.cs` files using the regex `^.*[^\s{}].*.$`. This matches all lines that aren't blank or only curly braces. Note that this does match lines that are only comments and includes a few generated code files.

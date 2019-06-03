@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
         public static Diagnostic BorrowedValueDoesNotLiveLongEnough(CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 4001,
-                $"Borrowed values does not live long enough");
+                $"Borrowed value does not live long enough");
         }
     }
 }
