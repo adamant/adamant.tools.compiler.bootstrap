@@ -3,29 +3,32 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
 {
-    public class Title : Claim, IEquatable<Title>
+    /// <summary>
+    /// A claim that a particular variable is the owner of an object
+    /// </summary>
+    public class Ownership : Claim, IEquatable<Ownership>
     {
-        public Title(VariableNumber variable, int objectId)
+        public Ownership(VariableNumber variable, int objectId)
            : base(variable, objectId)
         {
         }
 
         public override string ToString()
         {
-            return $"Title to #{ObjectId} for %{Variable}";
+            return $"%{Variable} owns #{ObjectId}";
         }
 
         public override bool Equals(object obj)
         {
-            return Equals(obj as Title);
+            return Equals(obj as Ownership);
         }
 
         public override bool Equals(Claim other)
         {
-            return Equals(other as Title);
+            return Equals(other as Ownership);
         }
 
-        public bool Equals(Title other)
+        public bool Equals(Ownership other)
         {
             return other != null &&
                    base.Equals(other);

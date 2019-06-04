@@ -100,6 +100,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             break;
                         case DeleteStatement deleteStatement:
                         {
+                            // The variable we are deleting through is supposed to have title
                             var title = GetTitle(deleteStatement.Place.CoreVariable(), claimsBeforeStatement);
                             CheckCanMove(title.ObjectId, claimsBeforeStatement, deleteStatement.Span);
                             claimsAfterStatement.RemoveWhere(c => c.Variable == title.Variable);
@@ -162,7 +163,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             foreach (var parameter in function.ControlFlow.VariableDeclarations
                 .Where(v => v.IsParameter && v.Type is ReferenceType))
             {
-                claimsBeforeStatement.Add(new Loan(parameter.Number, nextObjectId));
+                claimsBeforeStatement.Add(new Borrows(parameter.Number, nextObjectId));
                 nextObjectId += 1;
             }
 
@@ -171,10 +172,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 
         private void CheckCanMove(int objectId, HashSet<Claim> claims, TextSpan span)
         {
-            var cantTake = claims.OfType<Loan>()
-                .Where(l => l.ObjectId == objectId)
-                .SelectMany(l => l.Restrictions)
-                .Any(r => !r.CanTake);
+            var cantTake = claims.Any(c => c.ObjectId == objectId && !(c is Ownership));
 
             if (cantTake)
                 diagnostics.Add(BorrowError.BorrowedValueDoesNotLiveLongEnough(file, span));
@@ -195,7 +193,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     // We have made a new object, assign it a new id
                     var objectId = NewObjectId();
                     // Variable acquires title on any new objects
-                    var title = new Title(assignToPlace.CoreVariable(), objectId);
+                    var title = new Ownership(assignToPlace.CoreVariable(), objectId);
                     claimsAfterStatement.Add(title);
                     break;
                 case UnaryOperation unaryOperation:
@@ -245,7 +243,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                 // We have taken ownership of a new object, assign it a new id
                 var objectId = NewObjectId();
                 // Variable acquires title on any new objects
-                var title = new Title(assignToPlace.CoreVariable(), objectId);
+                var title = new Ownership(assignToPlace.CoreVariable(), objectId);
                 claimsAfterStatement.Add(title);
             }
         }
@@ -264,9 +262,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     // Copy types don't have claims right now
                     if (claim != null && assignToPlace != null) // copy types don't have claims right now
                     {
-                        var loan = new Loan(assignToPlace.CoreVariable(),
-                            operand,
-                            claim.ObjectId);
+                        var loan = new Borrows(assignToPlace.CoreVariable(), claim.ObjectId);
                         if (!claimsAfterStatement.Contains(loan))
                             claimsAfterStatement.Add(loan);
                     }
@@ -279,9 +275,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             }
         }
 
-        private static Title GetTitle(VariableNumber variable, HashSet<Claim> claims)
+        private static Ownership GetTitle(VariableNumber variable, HashSet<Claim> claims)
         {
-            return claims.OfType<Title>().Single(t => t.Variable == variable);
+            return claims.OfType<Ownership>().SingleOrDefault(t => t.Variable == variable);
         }
     }
 }
