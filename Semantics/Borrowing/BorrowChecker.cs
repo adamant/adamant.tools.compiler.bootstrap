@@ -100,10 +100,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             break;
                         case DeleteStatement deleteStatement:
                         {
-                            // The variable we are deleting through is supposed to have title
+                            // The variable we are deleting through is supposed to have the title
                             var title = GetTitle(deleteStatement.Place.CoreVariable(), claimsBeforeStatement);
-                            CheckCanMove(title.ObjectId, claimsBeforeStatement, deleteStatement.Span);
-                            claimsAfterStatement.RemoveWhere(c => c.Variable == title.Variable);
+                            CheckCanDelete(title.ObjectId, claimsBeforeStatement, deleteStatement.Span);
+                            claimsAfterStatement.Remove(title);
                             break;
                         }
                         default:
@@ -170,11 +170,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             return claimsBeforeStatement;
         }
 
-        private void CheckCanMove(int objectId, HashSet<Claim> claims, TextSpan span)
+        private void CheckCanDelete(int objectId, HashSet<Claim> claims, TextSpan span)
         {
-            var cantTake = claims.Any(c => c.ObjectId == objectId && !(c is Ownership));
+            var isBorrowedOrShared = claims.Any(c => c.ObjectId == objectId && !(c is Ownership));
 
-            if (cantTake)
+            if (isBorrowedOrShared)
+                // TODO this should be a different error message
                 diagnostics.Add(BorrowError.BorrowedValueDoesNotLiveLongEnough(file, span));
         }
 
