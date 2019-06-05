@@ -148,6 +148,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     }
                 }
                 break;
+                case ObjectType objectType:
+                    if (targetType is ObjectType targetObjectType
+                        && targetObjectType.Symbol == objectType.Symbol)
+                    {
+                        // TODO check for full compatibility and insert an ImplicitImmutabilityConversionExpression
+                        throw new NotImplementedException();
+                    }
+                    break;
             }
 
             // No conversion
@@ -595,7 +603,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             DataType resultType)
         {
             var leftType = leftOperand.Type;
-            var rightType = rightOperand.Type;
             switch (leftType)
             {
                 case PointerType _:
