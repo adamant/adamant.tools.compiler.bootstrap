@@ -44,9 +44,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             return AddVariable(true, type);
         }
 
-        public VariableReference VariableFor(SimpleName name)
+        public LocalVariableDeclaration VariableFor(SimpleName name)
         {
-            return variables.Single(v => v.Name == name).Reference;
+            return variables.Single(v => v.Name == name);
         }
 
         public BlockBuilder NewBlock()

@@ -14,6 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public readonly bool MutableBinding;
         public readonly DataType Type;
         public bool Exists => Type != DataType.Void && Type != DataType.Never;
+        public readonly VariableReference AssignReference;
         public readonly VariableReference Reference;
 
         public LocalVariableDeclaration(
@@ -29,7 +30,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             MutableBinding = mutableBinding;
             Type = type;
             // TODO correct span?
-            Reference = new VariableReference(number, new TextSpan(0, 0));
+            AssignReference = new VariableReference(number, VariableReferenceKind.Assign, new TextSpan(0, 0));
+            // TODO should this be `Share` if the type is immutable?
+            Reference = new VariableReference(number, VariableReferenceKind.Borrow, new TextSpan(0, 0));
         }
 
         // Useful for debugging

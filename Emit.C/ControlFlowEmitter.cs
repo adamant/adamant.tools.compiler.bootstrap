@@ -37,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             Requires.That(nameof(variable), variable.Exists, "tried to look up variable that does not exist");
             var initializer = variable.IsParameter ? $" = {nameMangler.Mangle(variable.Name)}" : "";
-            code.AppendLine($"{typeConverter.Convert(variable.Type)} _{variable.Reference.VariableNumber}{initializer}; // {variable}");
+            code.AppendLine($"{typeConverter.Convert(variable.Type)} _{variable.Number}{initializer}; // {variable}");
         }
 
         private void EmitBlock(BasicBlock block, bool voidReturn, CCodeBuilder code)

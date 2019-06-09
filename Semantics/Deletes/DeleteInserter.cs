@@ -54,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Deletes
                         {
                             // The delete happens after the last statement
                             var span = new TextSpan(statement.Span.End, 0);
-                            blockBuilder.AddDelete(new VariableReference(variable.Number, span), type, span);
+                            blockBuilder.AddDelete(new VariableReference(variable.Number, VariableReferenceKind.Borrow, span), type, span);
                         }
                     }
                 }

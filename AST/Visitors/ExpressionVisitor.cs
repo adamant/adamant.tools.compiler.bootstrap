@@ -133,12 +133,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case ImplicitLiteralConversionExpression implicitLiteralConversionExpression:
                     VisitImplicitLiteralConversionExpression(implicitLiteralConversionExpression, args);
                     break;
+                case ImplicitImmutabilityConversionExpression implicitImmutabilityConversionExpression:
+                    VisitImplicitImmutabilityConversionExpression(implicitImmutabilityConversionExpression, args);
+                    break;
                 case null:
                     // Ignore
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(implicitConversionExpression);
             }
+        }
+
+        private void VisitImplicitImmutabilityConversionExpression(ImplicitImmutabilityConversionExpression implicitImmutabilityConversionExpression, A args)
+        {
+            VisitExpression(implicitImmutabilityConversionExpression.Expression, args);
         }
 
         public virtual void VisitImplicitLiteralConversionExpression(ImplicitLiteralConversionExpression implicitLiteralConversionExpression, A args)

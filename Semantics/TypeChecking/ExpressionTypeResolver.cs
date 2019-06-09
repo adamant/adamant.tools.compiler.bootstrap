@@ -150,10 +150,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 break;
                 case ObjectType objectType:
                     if (targetType is ObjectType targetObjectType
-                        && targetObjectType.Symbol == objectType.Symbol)
+                        && targetObjectType.Mutability == Mutability.Immutable
+                        && targetObjectType.EqualExceptLifetimeAndMutability(objectType)
+                        && objectType.Mutability != Mutability.Immutable)
                     {
-                        // TODO check for full compatibility and insert an ImplicitImmutabilityConversionExpression
-                        throw new NotImplementedException();
+                        // TODO if source type is explicitly mutable, issue warning about using `mut` in immutable context
+                        // TODO what about different lifetimes? Shouldn't this implicit conversion not change lifetimes?
+                        expression = new ImplicitImmutabilityConversionExpression(expression, targetObjectType);
                     }
                     break;
             }
@@ -473,11 +476,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     return false;
 
                 // If they are equal except for lifetimes and mutability compatible, it is fine
-                return EqualityComparer<ISymbol>.Default.Equals(targetReference.Symbol, sourceReference.Symbol) &&
-                       EqualityComparer<Name>.Default.Equals(targetReference.Name, sourceReference.Name) &&
-                       targetReference.DeclaredMutable == sourceReference.DeclaredMutable &&
-                       EqualityComparer<FixedList<DataType>>.Default.Equals(targetReference.GenericParameterTypes, sourceReference.GenericParameterTypes) &&
-                       EqualityComparer<FixedList<DataType>>.Default.Equals(targetReference.GenericArguments, sourceReference.GenericArguments);
+                return targetReference.EqualExceptLifetimeAndMutability(sourceReference);
             }
 
             return false;

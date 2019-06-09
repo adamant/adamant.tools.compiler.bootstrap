@@ -65,7 +65,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     if (variableDeclaration.Initializer != null)
                     {
                         var value = ConvertToValue(currentBlock, variableDeclaration.Initializer);
-                        currentBlock.AddAssignment(variable.Reference, value, variableDeclaration.Initializer.Span);
+                        currentBlock.AddAssignment(variable.AssignReference, value, variableDeclaration.Initializer.Span);
                     }
                     return currentBlock;
                 }
@@ -77,7 +77,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     {
                         var tempVariable = graph.Let(expression.Type.AssertResolved());
                         var value = ConvertToValue(currentBlock, expression);
-                        currentBlock.AddAssignment(tempVariable.Reference, value, expression.Span);
+                        currentBlock.AddAssignment(tempVariable.AssignReference, value, expression.Span);
                     }
 
                     return currentBlock;
@@ -112,7 +112,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     return currentBlock;
                 case ReturnExpressionSyntax returnExpression:
                     if (returnExpression.ReturnValue != null)
-                        currentBlock.AddAssignment(graph.ReturnVariable.Reference,
+                        currentBlock.AddAssignment(graph.ReturnVariable.AssignReference,
                             ConvertToValue(currentBlock, returnExpression.ReturnValue),
                             returnExpression.ReturnValue.Span);
 
@@ -219,7 +219,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     {
                         case VariableDeclarationStatementSyntax _:
                         case ParameterSyntax _:
-                            return graph.VariableFor(symbol.FullName.UnqualifiedName);
+                            return graph.VariableFor(symbol.FullName.UnqualifiedName).Reference;
                         default:
                             return new DeclaredValue(symbol.FullName, identifier.Span);
                     }
@@ -272,6 +272,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case MoveExpressionSyntax move:
                     // TODO should this be explicit in IR?
                     return ConvertToValue(currentBlock, move.Expression);
+                case ImplicitImmutabilityConversionExpression implicitImmutabilityConversion:
+                {
+                    var operand = ConvertToOperand(currentBlock, implicitImmutabilityConversion.Expression);
+                    switch (operand)
+                    {
+                        case BooleanConstant _:
+                        case Utf8BytesConstant _:
+                        case IntegerConstant _:
+                            return operand;
+                        case Dereference _:
+                            throw new NotImplementedException();
+                        case VariableReference varReference:
+                            return varReference.AsShared();
+                        default:
+                            throw NonExhaustiveMatchException.For(expression);
+                    }
+                }
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
@@ -287,7 +304,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         {
             if (value is Operand operand) return operand;
             var tempVariable = graph.Let(type.AssertResolved());
-            currentBlock.AddAssignment(tempVariable.Reference, value, value.Span);
+            currentBlock.AddAssignment(tempVariable.AssignReference, value, value.Span);
             return tempVariable.Reference;
         }
 
@@ -390,7 +407,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             {
                 case IdentifierNameSyntax identifier:
                     // TODO what if this isn't just a variable?
-                    return graph.VariableFor(identifier.ReferencedSymbol.FullName.UnqualifiedName);
+                    return graph.VariableFor(identifier.ReferencedSymbol.FullName.UnqualifiedName).AssignReference;
                 default:
                     throw NonExhaustiveMatchException.For(value);
             }

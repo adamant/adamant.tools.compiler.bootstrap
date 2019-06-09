@@ -123,6 +123,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             return value;
         }
 
+
+
         #region Equality
         public override bool Equals(object obj)
         {
@@ -156,5 +158,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             return !(type1 == type2);
         }
         #endregion
+
+        public bool EqualExceptLifetimeAndMutability(ObjectType other)
+        {
+            return EqualityComparer<ISymbol>.Default.Equals(Symbol, other.Symbol)
+                   && EqualityComparer<Name>.Default.Equals(Name, other.Name)
+                   && DeclaredMutable == other.DeclaredMutable
+                   && EqualityComparer<FixedList<DataType>>.Default.Equals(
+                       GenericParameterTypes, other.GenericParameterTypes)
+                   && EqualityComparer<FixedList<DataType>>.Default.Equals(GenericArguments,
+                       other.GenericArguments);
+        }
     }
 }
