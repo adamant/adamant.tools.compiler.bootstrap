@@ -128,7 +128,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                 builder.AppendLine(statement.ToString());
                 if (borrowClaims != null)
                 {
-                    foreach (var claim in borrowClaims.After(statement))
+                    foreach (var claim in borrowClaims.After(statement).AsEnumerable())
                     {
                         builder.BeginLine("// ");
                         builder.EndLine(claim.ToString());

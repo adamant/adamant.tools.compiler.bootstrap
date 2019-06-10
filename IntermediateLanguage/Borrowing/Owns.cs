@@ -8,6 +8,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
     /// </summary>
     public class Owns : Claim, IEquatable<Owns>
     {
+        public new Variable Holder => (Variable)base.Holder;
+
         public Owns(Variable holder, Lifetime lifetime)
            : base(holder, lifetime)
         {

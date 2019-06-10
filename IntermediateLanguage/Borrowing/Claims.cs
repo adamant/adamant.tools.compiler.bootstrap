@@ -1,0 +1,82 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
+
+namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
+{
+    /// <summary>
+    /// A list of claims outstanding
+    /// </summary>
+    public class Claims
+    {
+        private readonly List<Claim> claimsList = new List<Claim>();
+        private readonly HashSet<Claim> claimsSet = new HashSet<Claim>();
+
+        public IEnumerable<Claim> AsEnumerable()
+        {
+            return claimsList;
+        }
+
+        public bool Add(Claim claim)
+        {
+            var added = claimsSet.Add(claim);
+            if (added)
+                claimsList.Add(claim);
+            return added;
+        }
+
+        public void AddRange(IEnumerable<Claim> claims)
+        {
+            foreach (var claim in claims)
+                Add(claim);
+        }
+
+        public void AddRange(Claims claims)
+        {
+            foreach (var claim in claims.claimsList)
+                Add(claim);
+        }
+        public bool Remove(Claim claim)
+        {
+            var removed = claimsSet.Remove(claim);
+            if (removed) claimsList.Remove(claim);
+            return removed;
+        }
+
+        public Owns OwnedBy(Variable variable)
+        {
+            return claimsList.OfType<Owns>().SingleOrDefault(o => o.Holder == variable);
+        }
+
+        public Owns OwnerOf(Lifetime lifetime)
+        {
+            return claimsList.OfType<Owns>().SingleOrDefault(o => o.Lifetime == lifetime);
+        }
+
+        public bool IsBorrowedOrShared(Lifetime lifetime)
+        {
+            return claimsList.Any(c => c.Lifetime == lifetime && !(c is Owns));
+        }
+
+        public bool SequenceEqual(Claims other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return claimsList.SequenceEqual(other.claimsList);
+        }
+
+        public override int GetHashCode()
+        {
+            return claimsList.GetHashCode();
+        }
+
+        /// <summary>
+        /// Each variable should refer to at most one lifetime, this returns that lifetime
+        /// </summary>
+        public Lifetime? LifetimeOf(Variable variable)
+        {
+            return claimsList.SingleOrDefault(c => c.Holder.Equals(variable))?.Lifetime;
+        }
+    }
+}

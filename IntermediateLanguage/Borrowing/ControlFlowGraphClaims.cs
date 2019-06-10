@@ -8,14 +8,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
     /// </summary>
     public class ControlFlowGraphClaims
     {
-        private readonly Dictionary<Statement, HashSet<Claim>> claims = new Dictionary<Statement, HashSet<Claim>>();
+        public readonly Claims ParameterClaims;
+        private readonly Dictionary<Statement, Claims> claims = new Dictionary<Statement, Claims>();
 
-        public HashSet<Claim> After(Statement statement)
+        public ControlFlowGraphClaims(Claims parameterClaims)
+        {
+            ParameterClaims = parameterClaims;
+        }
+
+        public Claims After(Statement statement)
         {
             if (claims.TryGetValue(statement, out var existingClaims))
                 return existingClaims;
 
-            var newClaims = new HashSet<Claim>();
+            var newClaims = new Claims();
             claims.Add(statement, newClaims);
             return newClaims;
         }
