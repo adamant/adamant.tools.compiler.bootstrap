@@ -3,7 +3,10 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
 {
-    public class Claims
+    /// <summary>
+    /// The claims for each statement in a control flow graph
+    /// </summary>
+    public class ControlFlowGraphClaims
     {
         private readonly Dictionary<Statement, HashSet<Claim>> claims = new Dictionary<Statement, HashSet<Claim>>();
 

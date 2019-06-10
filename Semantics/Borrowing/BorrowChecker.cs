@@ -7,7 +7,6 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 {
@@ -77,7 +76,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             // Do borrow checking with claims
             var blocks = new Queue<BasicBlock>();
             blocks.Enqueue(function.ControlFlow.EntryBlock);
-            var claims = new Claims();
+            var claims = new ControlFlowGraphClaims();
             // Compute parameter claims once in case for some reason we process the entry block repeatedly
             var parameterClaims = AcquireParameterClaims(function);
 
@@ -144,7 +143,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         private HashSet<Claim> ClaimsBeforeBlock(
             FunctionDeclarationSyntax function,
             BasicBlock block,
-            Claims claims,
+            ControlFlowGraphClaims claims,
             HashSet<Claim> parameterClaims)
         {
             var claimsBeforeStatement = new HashSet<Claim>();
@@ -268,6 +267,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         {
             switch (operand)
             {
+                case VariableReference varRef:
+                {
+
+                }
+                break;
                 case Place place:
                     var coreVariable = place.CoreVariable();
                     var claim = claimsBeforeStatement.SingleOrDefault(t => t.Holder.Equals(coreVariable));

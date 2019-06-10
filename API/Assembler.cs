@@ -114,7 +114,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
 
         private void Disassemble(
             BasicBlock block,
-            Claims borrowClaims,
+            ControlFlowGraphClaims borrowClaims,
             AssemblyBuilder builder)
         {
 
