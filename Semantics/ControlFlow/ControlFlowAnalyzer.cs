@@ -246,12 +246,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     return ConvertToValue(currentBlock, unsafeExpression.Expression);
                 case ImplicitLiteralConversionExpression implicitLiteralConversion:
                 {
-                    var conversionFunction = implicitLiteralConversion.ConversionFunction.FullName;
+                    var conversionFunction = implicitLiteralConversion.ConversionFunction;
                     var literal = (StringLiteralExpressionSyntax)implicitLiteralConversion.Expression;
                     var constantLength = Utf8BytesConstant.Encoding.GetByteCount(literal.Value);
                     var sizeArgument = new IntegerConstant(constantLength, DataType.Size, literal.Span);
                     var bytesArgument = new Utf8BytesConstant(literal.Value, literal.Span);
-                    return new FunctionCall(implicitLiteralConversion.Span, conversionFunction, sizeArgument, bytesArgument);
+                    return new FunctionCall(implicitLiteralConversion.Span,
+                        conversionFunction.FullName,
+                        (FunctionType)conversionFunction.Type,
+                        sizeArgument,
+                        bytesArgument);
                 }
                 case InvocationSyntax invocation:
                     return ConvertInvocationToValue(currentBlock, invocation);
@@ -372,7 +376,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     var symbol = identifier.ReferencedSymbol;
                     var arguments = invocation.Arguments
                         .Select(a => ConvertToOperand(currentBlock, a.Value)).ToList();
-                    return new FunctionCall(symbol.FullName, arguments, invocation.Span);
+                    return new FunctionCall(symbol.FullName, (FunctionType)symbol.Type, arguments, invocation.Span);
                 }
                 case MemberAccessExpressionSyntax memberAccess:
                 {
@@ -388,7 +392,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                                 case SimpleType _:
                                     // case StructType _:
                                     // Full name because this isn't a member
-                                    return new FunctionCall(function.FullName, self, arguments, invocation.Span);
+                                    return new FunctionCall(function.FullName, (FunctionType)function.Type, self, arguments, invocation.Span);
                                 default:
                                     return new VirtualFunctionCall(invocation.Span, function.FullName.UnqualifiedName, self, arguments);
                             }
