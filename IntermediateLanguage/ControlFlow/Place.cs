@@ -9,6 +9,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         {
         }
 
-        public abstract VariableNumber CoreVariable();
+        public abstract Variable CoreVariable();
     }
 }

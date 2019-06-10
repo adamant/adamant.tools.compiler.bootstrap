@@ -22,14 +22,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
         public LocalVariableDeclaration AddVariable(bool mutableBinding, DataType type, SimpleName name = null)
         {
-            var variable = new LocalVariableDeclaration(false, mutableBinding, type, new VariableNumber(variables.Count), name);
+            var variable = new LocalVariableDeclaration(false, mutableBinding, type, new Variable(variables.Count), name);
             variables.Add(variable);
             return variable;
         }
 
         public LocalVariableDeclaration AddParameter(bool mutableBinding, DataType type, SimpleName name)
         {
-            var variable = new LocalVariableDeclaration(true, mutableBinding, type, new VariableNumber(variables.Count), name);
+            var variable = new LocalVariableDeclaration(true, mutableBinding, type, new Variable(variables.Count), name);
             variables.Add(variable);
             return variable;
         }

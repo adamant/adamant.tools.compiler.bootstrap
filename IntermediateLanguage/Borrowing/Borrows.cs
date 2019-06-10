@@ -12,14 +12,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
     /// </summary>
     public class Borrows : Claim, IEquatable<Borrows>
     {
-        public Borrows(VariableNumber variable, int objectId)
-            : base(variable, objectId)
+        public Borrows(IClaimHolder claimHolder, Lifetime lifetime)
+            : base(claimHolder, lifetime)
         {
         }
 
         public override string ToString()
         {
-            return $"%{Variable} borrows #{ObjectId}";
+            return $"{Holder} borrows {Lifetime}";
         }
 
         public override bool Equals(object obj)

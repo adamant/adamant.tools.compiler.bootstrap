@@ -10,14 +10,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
     /// </summary>
     public class Shares : Claim, IEquatable<Shares>
     {
-        public Shares(VariableNumber variable, int objectId)
-            : base(variable, objectId)
+        public Shares(Variable holder, Lifetime lifetime)
+            : base(holder, lifetime)
         {
         }
 
         public override string ToString()
         {
-            return $"%{Variable} shares #{ObjectId}";
+            return $"{Holder} shares {Lifetime}";
         }
 
         public override bool Equals(object obj)

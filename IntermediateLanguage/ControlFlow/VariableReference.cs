@@ -5,13 +5,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class VariableReference : Place
     {
-        public readonly VariableNumber VariableNumber;
+        public readonly Variable Variable;
         public readonly VariableReferenceKind Kind;
 
-        public VariableReference(VariableNumber variableNumber, VariableReferenceKind kind, TextSpan span)
+        public VariableReference(Variable variable, VariableReferenceKind kind, TextSpan span)
             : base(span)
         {
-            VariableNumber = variableNumber;
+            Variable = variable;
             Kind = kind;
         }
 
@@ -29,20 +29,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
                 case VariableReferenceKind.Share:
                     mutability = "imm ";
                     break;
+                // TODO what about move?
                 default:
                     throw NonExhaustiveMatchException.ForEnum(Kind);
             }
-            return $"{mutability}%{VariableNumber}";
+            return mutability + Variable;
         }
 
-        public override VariableNumber CoreVariable()
+        public override Variable CoreVariable()
         {
-            return VariableNumber;
+            return Variable;
         }
 
         public Value AsShared()
         {
-            return Kind == VariableReferenceKind.Share ? this : new VariableReference(VariableNumber, VariableReferenceKind.Share, Span);
+            return Kind == VariableReferenceKind.Share ? this : new VariableReference(Variable, VariableReferenceKind.Share, Span);
         }
     }
 }

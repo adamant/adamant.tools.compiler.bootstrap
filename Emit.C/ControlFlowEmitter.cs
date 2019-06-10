@@ -22,8 +22,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             var definitions = code.Definitions;
 
-            foreach (var variable in cfg.VariableDeclarations.Where(v => v.Exists))
-                EmitVariable(variable, definitions);
+            foreach (var declaration in cfg.VariableDeclarations.Where(v => v.Exists))
+                EmitVariable(declaration, definitions);
 
             if (cfg.VariableDeclarations.Any(v => v.Exists))
                 definitions.BlankLine();
@@ -33,11 +33,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 EmitBlock(block, voidReturn, definitions);
         }
 
-        private void EmitVariable(LocalVariableDeclaration variable, CCodeBuilder code)
+        private void EmitVariable(LocalVariableDeclaration declaration, CCodeBuilder code)
         {
-            Requires.That(nameof(variable), variable.Exists, "tried to look up variable that does not exist");
-            var initializer = variable.IsParameter ? $" = {nameMangler.Mangle(variable.Name)}" : "";
-            code.AppendLine($"{typeConverter.Convert(variable.Type)} _{variable.Number}{initializer}; // {variable}");
+            Requires.That(nameof(declaration), declaration.Exists, "tried to look up variable that does not exist");
+            var initializer = declaration.IsParameter ? $" = {nameMangler.Mangle(declaration.Name)}" : "";
+            code.AppendLine($"{typeConverter.Convert(declaration.Type)} _{declaration.Variable.Name}{initializer}; // {declaration}");
         }
 
         private void EmitBlock(BasicBlock block, bool voidReturn, CCodeBuilder code)
@@ -87,8 +87,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             switch (place)
             {
-                case VariableReference variable:
-                    return "_" + variable.VariableNumber;
+                case VariableReference reference:
+                    return "_" + reference.Variable.Name;
                 default:
                     throw NonExhaustiveMatchException.For(place);
             }

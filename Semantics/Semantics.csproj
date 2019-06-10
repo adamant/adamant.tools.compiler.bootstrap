@@ -14,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AST\AST.csproj" />
     <ProjectReference Include="..\Core\Core.csproj" />
+    <ProjectReference Include="..\Framework\Framework.csproj" />
     <ProjectReference Include="..\IntermediateLanguage\IntermediateLanguage.csproj" />
     <ProjectReference Include="..\Primitives\Primitives.csproj" />
     <ProjectReference Include="..\Scopes\Scopes.csproj" />

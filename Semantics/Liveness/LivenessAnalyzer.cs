@@ -111,7 +111,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
                     KillVariables(variables, dereference.DereferencedValue);
                     break;
                 case VariableReference variableReference:
-                    variables[variableReference.VariableNumber.Value] = false;
+                    variables[variableReference.Variable.Number] = false;
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(lvalue);
@@ -133,7 +133,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
                     EnlivenVariables(variables, binaryOperation.RightOperand);
                     break;
                 case Place place:
-                    variables[place.CoreVariable().Value] = true;
+                    variables[place.CoreVariable().Number] = true;
                     break;
                 case FunctionCall functionCall:
                     if (functionCall.Self != null) EnlivenVariables(variables, functionCall.Self);

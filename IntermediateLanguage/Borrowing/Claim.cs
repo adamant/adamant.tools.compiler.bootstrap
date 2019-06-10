@@ -6,13 +6,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
 {
     public abstract class Claim : IEquatable<Claim>
     {
-        public VariableNumber Variable { get; }
-        public int ObjectId { get; }
+        public IClaimHolder Holder { get; }
+        public Lifetime Lifetime { get; }
 
-        protected Claim(VariableNumber variable, int objectId)
+        protected Claim(IClaimHolder holder, Lifetime lifetime)
         {
-            Variable = variable;
-            ObjectId = objectId;
+            Holder = holder;
+            Lifetime = lifetime;
         }
 
         public abstract override string ToString();
@@ -25,13 +25,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
         public virtual bool Equals(Claim other)
         {
             return other != null &&
-                   Variable == other.Variable &&
-                   ObjectId == other.ObjectId;
+                   Holder == other.Holder &&
+                   Lifetime == other.Lifetime;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Variable, ObjectId);
+            return HashCode.Combine(Holder, Lifetime);
         }
 
         public static bool operator ==(Claim claim1, Claim claim2)

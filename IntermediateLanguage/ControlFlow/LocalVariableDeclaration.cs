@@ -6,7 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class LocalVariableDeclaration
     {
-        public readonly VariableNumber Number; // The declaration number is used as its name in the IR
+        public readonly Variable Variable; // The declaration number is used as its name in the IR
 
         // If this declaration corresponds to an argument or local variable, what it was named. Not guaranteed unique
         public readonly SimpleName Name;
@@ -21,25 +21,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             bool isParameter,
             bool mutableBinding,
             DataType type,
-            VariableNumber number,
+            Variable variable,
             SimpleName name = null)
         {
             IsParameter = isParameter;
-            Number = number;
+            Variable = variable;
             Name = name;
             MutableBinding = mutableBinding;
             Type = type;
             // TODO correct span?
-            AssignReference = new VariableReference(number, VariableReferenceKind.Assign, new TextSpan(0, 0));
+            AssignReference = new VariableReference(variable, VariableReferenceKind.Assign, new TextSpan(0, 0));
             // TODO should this be `Share` if the type is immutable?
-            Reference = new VariableReference(number, VariableReferenceKind.Borrow, new TextSpan(0, 0));
+            Reference = new VariableReference(variable, VariableReferenceKind.Borrow, new TextSpan(0, 0));
         }
 
         // Useful for debugging
         public override string ToString()
         {
             var binding = MutableBinding ? "var" : "let";
-            var result = $"{binding} %{Number}: {Type};";
+            var result = $"{binding} {Variable}: {Type};";
             if (Name != null)
                 result += $" // {Name}";
             return result;

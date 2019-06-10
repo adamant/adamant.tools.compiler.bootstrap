@@ -7,6 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 {
@@ -18,13 +19,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
         private readonly bool saveBorrowClaims;
-        private int nextObjectId = 1;
+        private int nextLifetimeNumber = 1;
 
-        private int NewObjectId()
+        private Lifetime NewLifetime()
         {
-            var objectId = nextObjectId;
-            nextObjectId += 1;
-            return objectId;
+            var lifetimeNumber = nextLifetimeNumber;
+            nextLifetimeNumber += 1;
+            return new Lifetime(lifetimeNumber);
         }
 
         private BorrowChecker(CodeFile file, Diagnostics diagnostics, bool saveBorrowClaims)
@@ -93,16 +94,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     switch (statement)
                     {
                         case AssignmentStatement assignmentStatement:
-                            AcquireClaims(assignmentStatement.Place, assignmentStatement.Value, claimsBeforeStatement, claimsAfterStatement, variables);
+                            CheckStatement(assignmentStatement.Place, assignmentStatement.Value, claimsBeforeStatement, claimsAfterStatement, variables);
                             break;
                         case ActionStatement actionStatement:
-                            AcquireClaims(null, actionStatement.Value, claimsBeforeStatement, claimsAfterStatement, variables);
+                            CheckStatement(null, actionStatement.Value, claimsBeforeStatement, claimsAfterStatement, variables);
                             break;
                         case DeleteStatement deleteStatement:
                         {
                             // The variable we are deleting through is supposed to have the title
                             var title = GetTitle(deleteStatement.Place.CoreVariable(), claimsBeforeStatement);
-                            CheckCanDelete(title.ObjectId, claimsBeforeStatement, deleteStatement.Span);
+                            CheckCanDelete(title.Lifetime, claimsBeforeStatement, deleteStatement.Span);
                             claimsAfterStatement.Remove(title);
                             break;
                         }
@@ -163,23 +164,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             foreach (var parameter in function.ControlFlow.VariableDeclarations
                 .Where(v => v.IsParameter && v.Type is ReferenceType))
             {
-                claimsBeforeStatement.Add(new Borrows(parameter.Number, nextObjectId));
-                nextObjectId += 1;
+                claimsBeforeStatement.Add(new Borrows(parameter.Variable, NewLifetime()));
             }
 
             return claimsBeforeStatement;
         }
 
-        private void CheckCanDelete(int objectId, HashSet<Claim> claims, TextSpan span)
+        private void CheckCanDelete(Lifetime lifetime, HashSet<Claim> claims, TextSpan span)
         {
-            var isBorrowedOrShared = claims.Any(c => c.ObjectId == objectId && !(c is Ownership));
+            var isBorrowedOrShared = claims.Any(c => c.Lifetime == lifetime && !(c is Owns));
 
             if (isBorrowedOrShared)
                 // TODO this should be a different error message
                 diagnostics.Add(BorrowError.BorrowedValueDoesNotLiveLongEnough(file, span));
         }
 
-        private void AcquireClaims(
+        private void CheckStatement(
             Place assignToPlace,
             Value value,
             HashSet<Claim> claimsBeforeStatement,
@@ -190,42 +190,53 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             {
                 case ConstructorCall constructorCall:
                     foreach (var argument in constructorCall.Arguments)
-                        AcquireClaim(assignToPlace, argument, claimsBeforeStatement, claimsAfterStatement);
+                        AcquireClaim(assignToPlace?.CoreVariable(), argument, claimsBeforeStatement, claimsAfterStatement);
                     // We have made a new object, assign it a new id
-                    var objectId = NewObjectId();
+                    var objectId = NewLifetime();
                     // Variable acquires title on any new objects
-                    var title = new Ownership(assignToPlace.CoreVariable(), objectId);
+                    var title = new Owns(assignToPlace.CoreVariable(), objectId);
                     claimsAfterStatement.Add(title);
                     break;
                 case UnaryOperation unaryOperation:
-                    AcquireClaim(assignToPlace, unaryOperation.Operand, claimsBeforeStatement, claimsAfterStatement);
+                    AcquireClaim(assignToPlace?.CoreVariable(), unaryOperation.Operand, claimsBeforeStatement, claimsAfterStatement);
                     break;
                 case BinaryOperation binaryOperation:
-                    AcquireClaim(assignToPlace, binaryOperation.LeftOperand, claimsBeforeStatement, claimsAfterStatement);
-                    AcquireClaim(assignToPlace, binaryOperation.RightOperand, claimsBeforeStatement, claimsAfterStatement);
+                    AcquireClaim(assignToPlace?.CoreVariable(), binaryOperation.LeftOperand, claimsBeforeStatement, claimsAfterStatement);
+                    AcquireClaim(assignToPlace?.CoreVariable(), binaryOperation.RightOperand, claimsBeforeStatement, claimsAfterStatement);
                     break;
                 case IntegerConstant _:
                     // no loans to acquire
                     break;
                 case Operand operand:
-                    AcquireClaim(assignToPlace, operand, claimsBeforeStatement, claimsAfterStatement);
+                    AcquireClaim(assignToPlace?.CoreVariable(), operand, claimsBeforeStatement, claimsAfterStatement);
                     break;
                 case FunctionCall functionCall:
+                {
+                    var callLifetime = NewLifetime();
+                    var callClaims = new HashSet<Claim>();
                     if (functionCall.Self != null)
-                        AcquireClaim(assignToPlace, functionCall.Self, claimsBeforeStatement,
-                            claimsAfterStatement);
+                        AcquireClaim(callLifetime, functionCall.Self, claimsBeforeStatement, callClaims);
                     foreach (var argument in functionCall.Arguments)
-                        AcquireClaim(assignToPlace, argument, claimsBeforeStatement,
+                        AcquireClaim(callLifetime, argument, claimsBeforeStatement, callClaims);
+                    if (assignToPlace != null)
+                    {
+                        AcquireClaim(assignToPlace.CoreVariable(), callLifetime, claimsBeforeStatement, claimsAfterStatement);
+                        // For now, we just add all the call claims, this should be based on the function type instead
+                        claimsAfterStatement.AddRange(callClaims);
+                    }
+                }
+                break;
+                case VirtualFunctionCall virtualFunctionCall:
+                {
+                    if (virtualFunctionCall.Self != null)
+                        AcquireClaim(assignToPlace?.CoreVariable(), virtualFunctionCall.Self,
+                            claimsBeforeStatement, claimsAfterStatement);
+                    foreach (var argument in virtualFunctionCall.Arguments)
+                        AcquireClaim(assignToPlace?.CoreVariable(), argument, claimsBeforeStatement,
                             claimsAfterStatement);
                     AcquireOwnershipIfMoved(assignToPlace, variables, claimsAfterStatement);
-                    break;
-                case VirtualFunctionCall virtualFunctionCall:
-                    if (virtualFunctionCall.Self != null)
-                        AcquireClaim(assignToPlace, virtualFunctionCall.Self, claimsBeforeStatement, claimsAfterStatement);
-                    foreach (var argument in virtualFunctionCall.Arguments)
-                        AcquireClaim(assignToPlace, argument, claimsBeforeStatement, claimsAfterStatement);
-                    AcquireOwnershipIfMoved(assignToPlace, variables, claimsAfterStatement);
-                    break;
+                }
+                break;
                 default:
                     throw NonExhaustiveMatchException.For(value);
             }
@@ -237,35 +248,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             HashSet<Claim> claimsAfterStatement)
         {
             if (assignToPlace == null) return;
-            var assignToVariable = variables.Single(v => v.Number == assignToPlace.CoreVariable());
+            var assignToVariable = variables.Single(v => v.Variable == assignToPlace.CoreVariable());
             if (assignToVariable.Type is ReferenceType referenceType
                 && referenceType.IsOwned)
             {
                 // We have taken ownership of a new object, assign it a new id
-                var objectId = NewObjectId();
+                var objectId = NewLifetime();
                 // Variable acquires title on any new objects
-                var title = new Ownership(assignToPlace.CoreVariable(), objectId);
+                var title = new Owns(assignToPlace.CoreVariable(), objectId);
                 claimsAfterStatement.Add(title);
             }
         }
 
         private static void AcquireClaim(
-            Place assignToPlace,
+            IClaimHolder claimHolder,
             Operand operand,
             HashSet<Claim> claimsBeforeStatement,
-            HashSet<Claim> claimsAfterStatement)
+            HashSet<Claim> statementClaims)
         {
             switch (operand)
             {
                 case Place place:
                     var coreVariable = place.CoreVariable();
-                    var claim = claimsBeforeStatement.SingleOrDefault(t => t.Variable == coreVariable);
+                    var claim = claimsBeforeStatement.SingleOrDefault(t => t.Holder.Equals(coreVariable));
                     // Copy types don't have claims right now
-                    if (claim != null && assignToPlace != null) // copy types don't have claims right now
+                    if (claim != null) // copy types don't have claims right now
                     {
-                        var loan = new Borrows(assignToPlace.CoreVariable(), claim.ObjectId);
-                        if (!claimsAfterStatement.Contains(loan))
-                            claimsAfterStatement.Add(loan);
+                        var loan = new Borrows(claimHolder, claim.Lifetime);
+                        if (!statementClaims.Contains(loan))
+                            statementClaims.Add(loan);
                     }
                     break;
                 case Constant _:
@@ -276,9 +287,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             }
         }
 
-        private static Ownership GetTitle(VariableNumber variable, HashSet<Claim> claims)
+        private static void AcquireClaim(
+            IClaimHolder claimHolder,
+            Lifetime lifetime,
+            HashSet<Claim> claimsBeforeStatement,
+            HashSet<Claim> statementClaims)
         {
-            return claims.OfType<Ownership>().SingleOrDefault(t => t.Variable == variable);
+            statementClaims.Add(new Borrows(claimHolder, lifetime));
+        }
+
+        private static Owns GetTitle(Variable variable, HashSet<Claim> claims)
+        {
+            return claims.OfType<Owns>().SingleOrDefault(t => t.Holder.Equals(variable));
         }
     }
 }

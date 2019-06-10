@@ -6,29 +6,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
     /// <summary>
     /// A claim that a particular variable is the owner of an object
     /// </summary>
-    public class Ownership : Claim, IEquatable<Ownership>
+    public class Owns : Claim, IEquatable<Owns>
     {
-        public Ownership(VariableNumber variable, int objectId)
-           : base(variable, objectId)
+        public Owns(Variable holder, Lifetime lifetime)
+           : base(holder, lifetime)
         {
         }
 
         public override string ToString()
         {
-            return $"%{Variable} owns #{ObjectId}";
+            return $"{Holder} owns {Lifetime}";
         }
 
         public override bool Equals(object obj)
         {
-            return Equals(obj as Ownership);
+            return Equals(obj as Owns);
         }
 
         public override bool Equals(Claim other)
         {
-            return Equals(other as Ownership);
+            return Equals(other as Owns);
         }
 
-        public bool Equals(Ownership other)
+        public bool Equals(Owns other)
         {
             return other != null &&
                    base.Equals(other);
