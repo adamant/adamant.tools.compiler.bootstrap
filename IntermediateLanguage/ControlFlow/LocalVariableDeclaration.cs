@@ -32,7 +32,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             // TODO correct span?
             AssignReference = new VariableReference(variable, VariableReferenceKind.Assign, new TextSpan(0, 0));
             // TODO should this be `Share` if the type is immutable?
-            Reference = new VariableReference(variable, VariableReferenceKind.Borrow, new TextSpan(0, 0));
+            VariableReferenceKind kind;
+            if (type is ObjectType objectType && objectType.Mutability == Mutability.Immutable)
+                kind = VariableReferenceKind.Share;
+            else
+                kind = VariableReferenceKind.Borrow;
+            Reference = new VariableReference(variable, kind, new TextSpan(0, 0));
         }
 
         // Useful for debugging
