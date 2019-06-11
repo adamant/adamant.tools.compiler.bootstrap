@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
     /// </summary>
     public class Shares : Claim, IEquatable<Shares>
     {
-        public Shares(Variable holder, Lifetime lifetime)
+        public Shares(IClaimHolder holder, Lifetime lifetime)
             : base(holder, lifetime)
         {
         }

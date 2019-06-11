@@ -292,7 +292,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             // TODO check if we can share from this variable
                             var sharingLifetime = outstandingClaims.LifetimeOf(varRef.Variable);
                             if (sharingLifetime != null)
-                                outstandingClaims.Add(new Borrows(claimHolder,
+                                outstandingClaims.Add(new Shares(claimHolder,
                                     sharingLifetime.Value));
                             break;
                         default:
