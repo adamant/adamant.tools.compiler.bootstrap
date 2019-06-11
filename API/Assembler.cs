@@ -50,7 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.Append(")");
             builder.EndLine();
             builder.BeginLine(builder.IndentCharacters);
-            builder.Append("=> ");
+            builder.Append("-> ");
             builder.EndLine(function.ReturnType.ToString());
             builder.BeginBlock();
             Disassemble(function.ControlFlow, builder);
@@ -73,7 +73,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.Append(")");
             builder.EndLine();
             builder.BeginLine(builder.IndentCharacters);
-            builder.Append("=> ");
+            builder.Append("-> ");
             builder.EndLine(constructor.ReturnType.ToString());
             builder.BeginBlock();
             Disassemble(constructor.ControlFlow, builder);
