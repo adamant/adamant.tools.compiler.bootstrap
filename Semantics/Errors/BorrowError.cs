@@ -24,5 +24,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 4002,
                 $"Can't borrow reference mutably while it is immutably borrowed.");
         }
+
+        public static Diagnostic CantBorrowMutablyWhileBorrowedMutably(CodeFile file, TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 4003,
+                $"Can't borrow reference mutably while it is mutably borrowed by something else.");
+        }
+
+        public static Diagnostic CantBorrowImmutablyWhileBorrowedMutably(CodeFile file, TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 4004,
+                $"Can't borrow reference immutably while it is mutably borrowed by something else.");
+        }
     }
 }

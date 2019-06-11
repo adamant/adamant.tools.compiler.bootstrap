@@ -6,7 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
     /// <summary>
     /// A claim that a particular variable is the owner of an object
     /// </summary>
-    public class Owns : Claim, IEquatable<Owns>
+    public class Owns : Claim, IEquatable<Owns>, IExclusive
     {
         public new Variable Holder => (Variable)base.Holder;
 

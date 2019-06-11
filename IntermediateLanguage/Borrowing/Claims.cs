@@ -57,7 +57,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
 
         public bool IsBorrowedOrShared(Lifetime lifetime)
         {
-            return claimsList.Any(c => c.Lifetime == lifetime && !(c is Owns));
+            return claimsList.OfType<ILoan>().Any(c => c.Lifetime == lifetime);
         }
 
         public bool SequenceEqual(Claims other)
@@ -101,8 +101,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
             }
 
             var lifetimes = affectedLifetimes.ToQueue();
-            Lifetime lifetime;
-            while (lifetimes.TryDequeue(out lifetime))
+            while (lifetimes.TryDequeue(out var lifetime))
             {
                 if (claimsList.Any(c => c.Lifetime == lifetime)) continue;
 
@@ -128,9 +127,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
             return claimsList.Any();
         }
 
-        public bool IsShared(Lifetime? lifetime)
+        public bool IsShared(Lifetime lifetime)
         {
             return claimsList.OfType<Shares>().Any(s => s.Lifetime == lifetime);
+        }
+
+        public IClaimHolder CurrentBorrower(Lifetime lifetime)
+        {
+            return claimsList.OfType<IExclusive>().Last(c => c.Lifetime == lifetime).Holder;
         }
     }
 }

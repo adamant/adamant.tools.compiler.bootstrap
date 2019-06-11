@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
     /// a share. When there are multiple borrow claims, the most recent one takes
     /// precedence.
     /// </summary>
-    public class Borrows : Claim, IEquatable<Borrows>
+    public class Borrows : Claim, IEquatable<Borrows>, ILoan, IExclusive
     {
         public Borrows(IClaimHolder claimHolder, Lifetime lifetime)
             : base(claimHolder, lifetime)

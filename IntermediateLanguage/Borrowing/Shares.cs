@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
     /// A claim that a given variable shares an object. That is an immutable
     /// borrow.
     /// </summary>
-    public class Shares : Claim, IEquatable<Shares>
+    public class Shares : Claim, IEquatable<Shares>, ILoan
     {
         public Shares(IClaimHolder holder, Lifetime lifetime)
             : base(holder, lifetime)

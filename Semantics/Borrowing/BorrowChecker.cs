@@ -292,23 +292,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     switch (varRef.Kind)
                     {
                         case VariableReferenceKind.Borrow:
+                        {
                             // TODO check if we can borrow from this variable
                             var borrowingLifetime = outstandingClaims.LifetimeOf(varRef.Variable);
-                            if (borrowingLifetime != null)
-                            {
-                                if (outstandingClaims.IsShared(borrowingLifetime))
-                                    diagnostics.Add(BorrowError.CantBorrowMutablyWhileBorrowedImmutably(file, operand.Span));
-                                outstandingClaims.Add(new Borrows(claimHolder,
-                                    borrowingLifetime.Value));
-                            }
-                            break;
+                            if (borrowingLifetime == null) break;
+                            var lifetime = borrowingLifetime.Value;
+
+                            if (outstandingClaims.IsShared(lifetime))
+                                diagnostics.Add(BorrowError.CantBorrowMutablyWhileBorrowedImmutably(file, operand.Span));
+                            else if (!outstandingClaims.CurrentBorrower(lifetime).Equals(varRef.Variable))
+                                diagnostics.Add(BorrowError.CantBorrowMutablyWhileBorrowedMutably(file, operand.Span));
+                            else
+                                outstandingClaims.Add(new Borrows(claimHolder, lifetime));
+                        }
+                        break;
                         case VariableReferenceKind.Share:
+                        {
                             // TODO check if we can share from this variable
                             var sharingLifetime = outstandingClaims.LifetimeOf(varRef.Variable);
-                            if (sharingLifetime != null)
-                                outstandingClaims.Add(new Shares(claimHolder,
-                                    sharingLifetime.Value));
-                            break;
+                            if (sharingLifetime == null)
+                                break;
+                            var lifetime = sharingLifetime.Value;
+                            if (!outstandingClaims.IsShared(lifetime) &&
+                                !outstandingClaims.CurrentBorrower(lifetime).Equals(varRef.Variable))
+                                diagnostics.Add(BorrowError.CantBorrowImmutablyWhileBorrowedMutably(file, operand.Span));
+                            else
+                                outstandingClaims.Add(new Shares(claimHolder, lifetime));
+                        }
+                        break;
                         default:
                             throw NonExhaustiveMatchException.ForEnum(varRef.Kind);
                     }
