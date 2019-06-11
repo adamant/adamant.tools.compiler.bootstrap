@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
@@ -77,6 +78,49 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
         public Lifetime? LifetimeOf(Variable variable)
         {
             return claimsList.SingleOrDefault(c => c.Holder.Equals(variable))?.Lifetime;
+        }
+
+        /// <summary>
+        /// Removes all claims held by the given variables. This may cause other claims to be removed if
+        /// they were held only by the lifetimes released.
+        /// </summary>
+        public void Release(IEnumerable<Variable> variables)
+        {
+            var variableSet = variables.Cast<IClaimHolder>().ToHashSet();
+            var affectedLifetimes = new HashSet<Lifetime>();
+
+            for (var i = claimsList.Count - 1; i >= 0; i--)
+            {
+                var claim = claimsList[i];
+                if (variableSet.Contains(claim.Holder))
+                {
+                    affectedLifetimes.Add(claim.Lifetime);
+                    claimsList.RemoveAt(i);
+                    claimsSet.Remove(claim);
+                }
+            }
+
+            var lifetimes = affectedLifetimes.ToQueue();
+            Lifetime lifetime;
+            while (lifetimes.TryDequeue(out lifetime))
+            {
+                if (claimsList.Any(c => c.Lifetime == lifetime)) continue;
+
+                // Nothing is holding this lifetime, remove it
+                for (var i = claimsList.Count - 1; i >= 0; i--)
+                {
+                    var claim = claimsList[i];
+                    if (claim.Holder.Equals(lifetime))
+                    {
+                        claimsList.RemoveAt(i);
+                        claimsSet.Remove(claim);
+
+                        // That may release other lifetimes
+                        if (affectedLifetimes.Add(claim.Lifetime))
+                            lifetimes.Enqueue(claim.Lifetime);
+                    }
+                }
+            }
         }
     }
 }

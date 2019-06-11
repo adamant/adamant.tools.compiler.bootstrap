@@ -70,7 +70,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             DeleteInserter.Transform(memberDeclarations, liveness);
 
-            BorrowChecker.Check(memberDeclarations, diagnostics, SaveBorrowClaims);
+            BorrowChecker.Check(memberDeclarations, liveness, diagnostics, SaveBorrowClaims);
 
             // Build final declaration objects and find the entry point
             var declarationBuilder = new DeclarationBuilder();

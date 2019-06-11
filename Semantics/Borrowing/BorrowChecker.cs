@@ -17,6 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
     public class BorrowChecker
     {
         private readonly CodeFile file;
+        private readonly FixedDictionary<FunctionDeclarationSyntax, LiveVariables> liveness;
         private readonly Diagnostics diagnostics;
         private readonly bool saveBorrowClaims;
         private int nextLifetimeNumber = 1;
@@ -28,21 +29,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             return new Lifetime(lifetimeNumber);
         }
 
-        private BorrowChecker(CodeFile file, Diagnostics diagnostics, bool saveBorrowClaims)
+        private BorrowChecker(
+            CodeFile file,
+            FixedDictionary<FunctionDeclarationSyntax, LiveVariables> liveness,
+            Diagnostics diagnostics,
+            bool saveBorrowClaims)
         {
             this.file = file;
+            this.liveness = liveness;
             this.diagnostics = diagnostics;
             this.saveBorrowClaims = saveBorrowClaims;
         }
 
         public static void Check(
             IEnumerable<MemberDeclarationSyntax> declarations,
+            FixedDictionary<FunctionDeclarationSyntax, LiveVariables> liveness,
             Diagnostics diagnostics,
             bool saveBorrowClaims)
         {
             foreach (var declaration in declarations)
             {
-                var borrowChecker = new BorrowChecker(declaration.File, diagnostics, saveBorrowClaims);
+                var borrowChecker = new BorrowChecker(declaration.File, liveness, diagnostics, saveBorrowClaims);
                 borrowChecker.Check(declaration);
             }
         }
@@ -74,6 +81,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                 return;
 
             var variables = function.ControlFlow.VariableDeclarations;
+            var liveVariables = liveness[function];
             // Do borrow checking with claims
             var blocks = new Queue<BasicBlock>();
             blocks.Enqueue(function.ControlFlow.EntryBlock);
@@ -103,15 +111,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                         {
                             // The variable we are deleting through is supposed to have the title
                             var title = claimsBeforeStatement.OwnedBy(deleteStatement.Place.CoreVariable());
-                            CheckCanDelete(title.Lifetime, claimsBeforeStatement, deleteStatement.Span);
-                            claimsAfterStatement.Remove(title);
+                            if (title != null)// TODO this should be an error
+                            {
+                                CheckCanDelete(title.Lifetime, claimsBeforeStatement, deleteStatement.Span);
+                                claimsAfterStatement.Remove(title);
+                            }
                             break;
                         }
                         default:
                             throw NonExhaustiveMatchException.For(statement);
                     }
 
-                    // TODO drop claims due to liveness
+                    var liveAfter = liveVariables.After(statement);
+                    claimsAfterStatement.Release(liveAfter.FalseIndexes().Select(i => new Variable(i)));
 
                     // Get Ready for next statement
                     claimsBeforeStatement = claimsAfterStatement;

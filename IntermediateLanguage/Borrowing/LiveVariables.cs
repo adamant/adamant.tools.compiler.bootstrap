@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -13,14 +14,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
         public int VariableCount { get; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-        private readonly FixedList<FixedList<BitArray>> values;
+        private readonly FixedList<List<BitArray>> values;
 
         public LiveVariables(ControlFlowGraph graph)
         {
             VariableCount = graph.VariableDeclarations.Count;
             values = graph.BasicBlocks.Select(block =>
                 block.ExpressionStatements.Append<object>(block.Terminator)
-                    .Select(s => new BitArray(VariableCount)).ToFixedList()).ToFixedList();
+                    .Select(s => new BitArray(VariableCount)).ToList()).ToFixedList();
         }
 
         /// <summary>
@@ -35,6 +36,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
         public BitArray After(Statement statement)
         {
             return values[statement.BlockNumber][statement.Number + 1];
+        }
+
+        /// <summary>
+        /// Returns the new liveness array for between the two statements
+        /// </summary>
+        public BitArray AddStatementAfter(Statement statement)
+        {
+            var liveVariables = new BitArray(VariableCount);
+            // The live variables after the statement should be based on what they were before
+            liveVariables.Or(After(statement));
+            values[statement.BlockNumber].Insert(statement.Number + 1, liveVariables);
+            return liveVariables;
         }
     }
 }

@@ -66,5 +66,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         {
             return source.Select((v, i) => (v, i));
         }
+
+        [DebuggerStepThrough]
+        public static Queue<T> ToQueue<T>(this IEnumerable<T> source)
+        {
+            return new Queue<T>(source);
+        }
     }
 }

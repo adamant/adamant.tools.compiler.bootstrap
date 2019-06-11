@@ -22,5 +22,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
                 if (array[i])
                     yield return i;
         }
+
+        public static IEnumerable<int> FalseIndexes(this BitArray array)
+        {
+            for (var i = 0; i < array.Length; i++)
+                if (!array[i])
+                    yield return i;
+        }
     }
 }
