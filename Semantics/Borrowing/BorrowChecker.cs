@@ -232,7 +232,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                         AcquireClaim(callLifetime, argument, outstandingClaims);
                     if (assignToPlace != null)
                     {
-                        AcquireClaim(assignToPlace.CoreVariable(), callLifetime, claimsBeforeStatement, claimsAfterStatement);
+                        var variableDeclaration = VariableDeclaration(assignToPlace, variables);
+                        if (variableDeclaration.Type is ObjectType objectType
+                        && objectType.Mutability == Mutability.Mutable)
+                            AcquireBorrow(assignToPlace.CoreVariable(), callLifetime, claimsAfterStatement);
+                        else
+                            AcquireShare(assignToPlace.CoreVariable(), callLifetime, claimsAfterStatement);
                         // For now, we just add all the call claims, this should be based on the function type instead
                         claimsAfterStatement.AddRange(outstandingClaims);
                     }
@@ -259,7 +264,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             Claims claimsAfterStatement)
         {
             if (assignToPlace == null) return;
-            var assignToVariable = variables.Single(v => v.Variable == assignToPlace.CoreVariable());
+            var assignToVariable = VariableDeclaration(assignToPlace, variables);
             if (assignToVariable.Type is ReferenceType referenceType
                 && referenceType.IsOwned)
             {
@@ -269,6 +274,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                 var title = new Owns(assignToPlace.CoreVariable(), objectId);
                 claimsAfterStatement.Add(title);
             }
+        }
+
+        private static LocalVariableDeclaration VariableDeclaration(Place assignToPlace, FixedList<LocalVariableDeclaration> variables)
+        {
+            return variables.Single(v => v.Variable == assignToPlace.CoreVariable());
         }
 
         private static void AcquireClaim(
@@ -318,13 +328,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             }
         }
 
-        private static void AcquireClaim(
+        private static void AcquireBorrow(
             IClaimHolder claimHolder,
             Lifetime lifetime,
-            Claims claimsBeforeStatement,
-            Claims statementClaims)
+            Claims outstandingClaims)
         {
-            statementClaims.Add(new Borrows(claimHolder, lifetime));
+            outstandingClaims.Add(new Borrows(claimHolder, lifetime));
+        }
+
+        private static void AcquireShare(
+            IClaimHolder claimHolder,
+            Lifetime lifetime,
+            Claims outstandingClaims)
+        {
+            outstandingClaims.Add(new Shares(claimHolder, lifetime));
         }
     }
 }
