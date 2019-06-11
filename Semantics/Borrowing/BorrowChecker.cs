@@ -281,7 +281,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             return variables.Single(v => v.Variable == assignToPlace.CoreVariable());
         }
 
-        private static void AcquireClaim(
+        private void AcquireClaim(
             IClaimHolder claimHolder,
             Operand operand,
             Claims outstandingClaims)
@@ -295,8 +295,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             // TODO check if we can borrow from this variable
                             var borrowingLifetime = outstandingClaims.LifetimeOf(varRef.Variable);
                             if (borrowingLifetime != null)
+                            {
+                                if (outstandingClaims.IsShared(borrowingLifetime))
+                                    diagnostics.Add(BorrowError.CantBorrowMutablyWhileBorrowedImmutably(file, operand.Span));
                                 outstandingClaims.Add(new Borrows(claimHolder,
                                     borrowingLifetime.Value));
+                            }
                             break;
                         case VariableReferenceKind.Share:
                             // TODO check if we can share from this variable

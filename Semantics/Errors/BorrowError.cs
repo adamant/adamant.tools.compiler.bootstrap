@@ -18,5 +18,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 4001,
                 $"Borrowed value does not live long enough");
         }
+
+        public static Diagnostic CantBorrowMutablyWhileBorrowedImmutably(CodeFile file, TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 4002,
+                $"Can't borrow reference mutably while it is immutably borrowed.");
+        }
     }
 }

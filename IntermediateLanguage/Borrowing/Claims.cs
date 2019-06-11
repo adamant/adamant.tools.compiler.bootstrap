@@ -127,5 +127,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
         {
             return claimsList.Any();
         }
+
+        public bool IsShared(Lifetime? lifetime)
+        {
+            return claimsList.OfType<Shares>().Any(s => s.Lifetime == lifetime);
+        }
     }
 }

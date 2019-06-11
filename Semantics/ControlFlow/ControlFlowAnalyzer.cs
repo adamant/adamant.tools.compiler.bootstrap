@@ -65,7 +65,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     if (variableDeclaration.Initializer != null)
                     {
                         var value = ConvertToValue(currentBlock, variableDeclaration.Initializer);
-                        currentBlock.AddAssignment(variable.AssignReference, value, variableDeclaration.Initializer.Span);
+                        currentBlock.AddAssignment(variable.AssignReference(variableDeclaration.Initializer.Span), value, variableDeclaration.Initializer.Span);
                     }
                     return currentBlock;
                 }
@@ -77,7 +77,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     {
                         var tempVariable = graph.Let(expression.Type.AssertResolved());
                         var value = ConvertToValue(currentBlock, expression);
-                        currentBlock.AddAssignment(tempVariable.AssignReference, value, expression.Span);
+                        currentBlock.AddAssignment(tempVariable.AssignReference(expression.Span), value, expression.Span);
                     }
 
                     return currentBlock;
@@ -112,7 +112,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     return currentBlock;
                 case ReturnExpressionSyntax returnExpression:
                     if (returnExpression.ReturnValue != null)
-                        currentBlock.AddAssignment(graph.ReturnVariable.AssignReference,
+                        currentBlock.AddAssignment(graph.ReturnVariable.AssignReference(returnExpression.ReturnValue.Span),
                             ConvertToValue(currentBlock, returnExpression.ReturnValue),
                             returnExpression.ReturnValue.Span);
 
@@ -219,7 +219,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     {
                         case VariableDeclarationStatementSyntax _:
                         case ParameterSyntax _:
-                            return graph.VariableFor(symbol.FullName.UnqualifiedName).Reference;
+                            return graph.VariableFor(symbol.FullName.UnqualifiedName).Reference(identifier.Span);
                         default:
                             return new DeclaredValue(symbol.FullName, identifier.Span);
                     }
@@ -308,8 +308,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         {
             if (value is Operand operand) return operand;
             var tempVariable = graph.Let(type.AssertResolved());
-            currentBlock.AddAssignment(tempVariable.AssignReference, value, value.Span);
-            return tempVariable.Reference;
+            currentBlock.AddAssignment(tempVariable.AssignReference(value.Span), value, value.Span);
+            return tempVariable.Reference(value.Span);
         }
 
         private Value ConvertBinaryExpressionToValue(
@@ -411,7 +411,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             {
                 case IdentifierNameSyntax identifier:
                     // TODO what if this isn't just a variable?
-                    return graph.VariableFor(identifier.ReferencedSymbol.FullName.UnqualifiedName).AssignReference;
+                    return graph.VariableFor(identifier.ReferencedSymbol.FullName.UnqualifiedName).AssignReference(value.Span);
                 default:
                     throw NonExhaustiveMatchException.For(value);
             }
