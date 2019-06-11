@@ -230,32 +230,46 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                         AcquireClaim(callLifetime, functionCall.Self, outstandingClaims);
                     foreach (var argument in functionCall.Arguments)
                         AcquireClaim(callLifetime, argument, outstandingClaims);
-                    if (assignToPlace != null)
-                    {
-                        var variableDeclaration = VariableDeclaration(assignToPlace, variables);
-                        if (variableDeclaration.Type is ObjectType objectType
-                        && objectType.Mutability == Mutability.Mutable)
-                            AcquireBorrow(assignToPlace.CoreVariable(), callLifetime, claimsAfterStatement);
-                        else
-                            AcquireShare(assignToPlace.CoreVariable(), callLifetime, claimsAfterStatement);
-                        // For now, we just add all the call claims, this should be based on the function type instead
-                        claimsAfterStatement.AddRange(outstandingClaims);
-                    }
+
+                    AcquireReturnClaim(assignToPlace, callLifetime, outstandingClaims, claimsAfterStatement, variables);
                 }
                 break;
                 case VirtualFunctionCall virtualFunctionCall:
                 {
+                    var callLifetime = NewLifetime();
+                    var outstandingClaims = new Claims();
+                    outstandingClaims.AddRange(claimsBeforeStatement);
                     if (virtualFunctionCall.Self != null)
-                        AcquireClaim(assignToPlace?.CoreVariable(), virtualFunctionCall.Self, claimsAfterStatement);
+                        AcquireClaim(callLifetime, virtualFunctionCall.Self, outstandingClaims);
                     foreach (var argument in virtualFunctionCall.Arguments)
-                        AcquireClaim(assignToPlace?.CoreVariable(), argument,
-                            claimsAfterStatement);
-                    AcquireOwnershipIfMoved(assignToPlace, variables, claimsAfterStatement);
+                        AcquireClaim(callLifetime, argument, outstandingClaims);
+
+                    AcquireReturnClaim(assignToPlace, callLifetime, outstandingClaims, claimsAfterStatement, variables);
                 }
                 break;
                 default:
                     throw NonExhaustiveMatchException.For(value);
             }
+        }
+
+        private static void AcquireReturnClaim(
+            Place assignToPlace,
+            Lifetime callLifetime,
+            Claims outstandingClaims,
+            Claims claimsAfterStatement,
+            FixedList<LocalVariableDeclaration> variables)
+        {
+            if (assignToPlace == null) return;
+
+            var variableDeclaration = VariableDeclaration(assignToPlace, variables);
+            if (variableDeclaration.Type is ObjectType objectType
+                && objectType.Mutability == Mutability.Mutable)
+                AcquireBorrow(assignToPlace.CoreVariable(), callLifetime, claimsAfterStatement);
+            else
+                AcquireShare(assignToPlace.CoreVariable(), callLifetime, claimsAfterStatement);
+
+            // TODO For now, we just add all the call claims, this should be based on the function type instead
+            claimsAfterStatement.AddRange(outstandingClaims);
         }
 
         private void AcquireOwnershipIfMoved(
