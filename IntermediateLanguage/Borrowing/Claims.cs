@@ -122,5 +122,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
                 }
             }
         }
+
+        public bool Any()
+        {
+            return claimsList.Any();
+        }
     }
 }

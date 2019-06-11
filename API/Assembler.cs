@@ -102,6 +102,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             if (controlFlow.VariableDeclarations.Any(v => v.Exists))
                 builder.BlankLine();
 
+            if (Disassemble(controlFlow.BorrowClaims?.ParameterClaims, builder))
+                builder.BlankLine();
+
             foreach (var block in controlFlow.BasicBlocks)
                 Disassemble(block, controlFlow.BorrowClaims, builder);
         }
@@ -126,15 +129,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             foreach (var statement in block.Statements)
             {
                 builder.AppendLine(statement.ToString());
-                if (borrowClaims != null)
-                {
-                    foreach (var claim in borrowClaims.After(statement).AsEnumerable())
-                    {
-                        builder.BeginLine("// ");
-                        builder.EndLine(claim.ToString());
-                    }
-                }
+                Disassemble(borrowClaims?.After(statement), builder);
             }
+        }
+
+        private bool Disassemble(Claims claims, AssemblyBuilder builder)
+        {
+            if (claims == null) return false;
+
+            foreach (var claim in claims.AsEnumerable())
+            {
+                builder.BeginLine("// ");
+                builder.EndLine(claim.ToString());
+            }
+
+            return claims.Any();
         }
     }
 }
