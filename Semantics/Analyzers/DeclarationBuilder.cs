@@ -75,7 +75,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             var constructorName = className.Qualify(SpecialName.New);
             var selfType = ((Metatype)classDeclaration.Type.Resolved()).Instance;
             var selfName = className.Qualify(SpecialName.Self);
-            var selfParameter = new Parameter(true, selfName, selfType);
+            var selfParameter = new Parameter(false, selfName, selfType);
             var parameters = selfParameter.Yield().ToFixedList();
             var constructorType = new FunctionType(selfType.Yield(), selfType);
 
@@ -103,7 +103,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         {
             var selfType = constructorDeclaration.SelfParameterType;
             var selfName = ((QualifiedName)constructorDeclaration.FullName).Qualifier.Qualify(SpecialName.Self);
-            var selfParameter = new Parameter(true, selfName, selfType);
+            var selfParameter = new Parameter(false, selfName, selfType);
             return selfParameter.Yield().Concat(constructorDeclaration.Parameters.Select(BuildParameter))
                 .ToFixedList();
         }
