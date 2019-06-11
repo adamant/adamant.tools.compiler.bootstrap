@@ -31,6 +31,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         public static readonly PointerType BytePointer = new PointerType(Byte);
 
+        public virtual bool Exists => true;
+
         /// <summary>
         /// A resolved type is one that has no unknown or unresolved parts
         /// </summary>

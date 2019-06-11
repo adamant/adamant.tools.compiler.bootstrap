@@ -60,6 +60,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
                 foreach (var successor in edges.From(block))
                     liveAfterBlock.Or(liveVariables.Before(successor.Statements.Last()));
 
+                if (block.Terminator is ReturnStatement && function.ReturnVariable.Exists)
+                    liveAfterBlock[0] = true; // the return value is live after a block that returns
+
                 var liveAfterStatement = liveAfterBlock;
 
                 foreach (var statement in block.Statements.Reverse())

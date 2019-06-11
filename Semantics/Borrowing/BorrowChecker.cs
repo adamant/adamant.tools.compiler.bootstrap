@@ -325,16 +325,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     }
                     break;
                 case Place place:
-                    //var coreVariable = place.CoreVariable();
-                    //var claim = claimsBeforeStatement.SingleOrDefault(t => t.Holder.Equals(coreVariable));
-                    //// Copy types don't have claims right now
-                    //if (claim != null) // copy types don't have claims right now
-                    //{
-                    //    var loan = new Borrows(claimHolder, claim.Lifetime);
-                    //    statementClaims.Add(loan);
-                    //}
                     throw new NotImplementedException();
-                    break;
                 case Constant _:
                     // no loans to acquire
                     break;

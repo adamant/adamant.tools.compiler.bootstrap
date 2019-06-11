@@ -10,6 +10,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         { }
         #endregion
 
+        public override bool Exists => false;
+
         public override bool IsResolved => true;
     }
 }

@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public readonly bool IsParameter;
         public readonly bool MutableBinding;
         public readonly DataType Type;
-        public bool Exists => Type != DataType.Void && Type != DataType.Never;
+        public bool Exists => Type.Exists;
         private readonly VariableReferenceKind referenceKind;
 
         public LocalVariableDeclaration(
