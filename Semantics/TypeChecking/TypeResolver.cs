@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
     ///
     /// * Resolve: includes type inference, checking and evaluation, whichever is appropriate
     /// * Check: there is a type something is expected to be compatible with, check that it is
-    /// * Infer:
+    /// * Infer: infer what type something has
     /// </summary>
     public class TypeResolver
     {

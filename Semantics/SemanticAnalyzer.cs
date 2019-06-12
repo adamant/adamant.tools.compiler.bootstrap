@@ -87,6 +87,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // because there are no references to it outside the scope.
             //DeleteInserter.Transform(memberDeclarations, liveness);
 
+            // Plan for inserting deletes:
+            // ---------------------------
+            // When generating the CFG, output statements for when variables go out of scope. Then track another level
+            // of liveness between alive and dead. This would be a new state, perhaps called "liminal" or "pending", which
+            // indicated that the variable would not be used again, but may need to exist as the owner of something borrowed
+            // until all outstanding borrows are resolved. Delete statements could then be inserted after borrow checking
+            // at the point where values are no longer used. The variable leaving scope statements could then be ignored
+            // or removed.
             BorrowChecker.Check(memberDeclarations, liveness, diagnostics, SaveBorrowClaims);
 
             // Build final declaration objects and find the entry point
