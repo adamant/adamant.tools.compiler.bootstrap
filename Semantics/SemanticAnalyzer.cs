@@ -45,8 +45,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             var memberDeclarations = packageSyntax.CompilationUnits
                 .SelectMany(cu => cu.AllMemberDeclarations).ToFixedList();
 
-            // TODO we can't do full type checking without some IL gen and code execution, how to handle that?
-
             // Do type checking
             TypeResolver.Check(memberDeclarations, diagnostics);
 
@@ -58,7 +56,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             ShadowChecker.Check(memberDeclarations, diagnostics);
 
-            // TODO we need to check definite assignment as part of this
+            // TODO we need to check definite assignment as part of this.
+            // Notes: the Roslyn compiler does this by having a base class for data flow passes. This
+            // calculates data flow by visiting through the tree in control flow order. It stores state
+            // only at labels and before loops. If it does a join on a backward edge that changes state,
+            // it makes a note of this and then makes a full pass through the function again, visiting in control
+            // flow order again.
+            // Note: The Rust MIR proposal actually suggests checking definite assignment on the MIR. That
+            // seems like it might make it difficult to match a spec though.
+            // Note: Given that Adamant will never have goto or arbitrary switch statements, it should be possible
+            // to do data flow analysis in a very top down way. I.e. proceed through the control flow and repeat
+            // things like loops until they stabilize. The only question might be with nested loops whether it makes
+            // sense to stabilize an inner loop before repeating an outer loop or not.
             BindingMutabilityChecker.Check(memberDeclarations, diagnostics);
 
             // --------------------------------------------------
@@ -68,7 +77,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             var liveness = LivenessAnalyzer.Analyze(memberDeclarations, SaveLivenessAnalysis);
 
-            DeleteInserter.Transform(memberDeclarations, liveness);
+            // TODO inserting deletes based only on liveness led to issues.
+            // There are cases when a variable is no longer directly used, but another variable has borrowed the value.
+            // The owner then shows as dead, so we inserted the delete. But really, we needed to wait until the
+            // borrow is gone to delete it. However, we can't just wait for all borrows to be dead to insert a delete
+            // because things are guaranteed to be deleted when the owner goes out of scope. A borrow that extends
+            // beyond the scope should be an error. We had been detecting this by noticing the borrow claim extended
+            // past the delete statement. That worked, because the owning variable must always be dead after the scope
+            // because there are no references to it outside the scope.
+            //DeleteInserter.Transform(memberDeclarations, liveness);
 
             BorrowChecker.Check(memberDeclarations, liveness, diagnostics, SaveBorrowClaims);
 
