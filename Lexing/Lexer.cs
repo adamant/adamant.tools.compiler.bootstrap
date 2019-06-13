@@ -235,7 +235,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                             yield return TokenFactory.GreaterThan(SymbolSpan());
                         break;
                     case '≥':
-                    case '⩾':
                         yield return TokenFactory.GreaterThanOrEqual(SymbolSpan());
                         break;
                     case '<':
@@ -269,7 +268,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                         }
                         break;
                     case '≤':
-                    case '⩽':
                         yield return TokenFactory.LessThanOrEqual(SymbolSpan());
                         break;
                     case '"':

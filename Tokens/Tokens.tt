@@ -41,9 +41,9 @@
         "EqualsEquals", // `==` U+003D", U+003D
         "NotEqual", // `≠` U+2260, `=/=` U+003D, U+002F, U+003D
         "GreaterThan", // `>` U+003E
-        "GreaterThanOrEqual", // `≥` U+2265", `⩾` U+2A7E", `>=` U+003E", U+003D
+        "GreaterThanOrEqual", // `≥` U+2265", `>=` U+003E", U+003D
         "LessThan", // `<` U+003C
-        "LessThanOrEqual", // `≤` U+2264", `⩽` U+2A7D", `<=` U+003C", U+003D
+        "LessThanOrEqual", // `≤` U+2264", `<=` U+003C", U+003D
         "PlusEquals", // `+=` U+002B", U+003D
         "MinusEquals", // `-=` U+002D", U+003D
         "AsteriskEquals", // `*=` U+002A", U+003D
