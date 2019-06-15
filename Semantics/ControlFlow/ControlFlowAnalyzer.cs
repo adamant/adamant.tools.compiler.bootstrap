@@ -95,6 +95,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         var value = ConvertToValue(variableDeclaration.Initializer);
                         currentBlock.AddAssignment(variable.AssignReference(variableDeclaration.Initializer.Span), value, variableDeclaration.Initializer.Span);
                     }
+                    // Variable isn't in scope until after the initializer
+                    VariableInScope(variable);
                     return;
                 }
                 case ExpressionSyntax expression:
@@ -135,7 +137,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case BinaryExpressionSyntax _:
                     throw new NotImplementedException();
                 case InvocationSyntax invocation:
-                    //return ConvertToAssignmentStatement(currentBlock, expression);
                     currentBlock.AddAction(ConvertInvocationToValue(invocation), invocation.Span);
                     return;
                 case ReturnExpressionSyntax returnExpression:
@@ -198,12 +199,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     return;
                 case BlockSyntax block:
                 {
+                    // Starting a new nested scope, we track the variables separately
+                    var scopeVariables = variablesInCurrentScope;
+                    variablesInCurrentScope = new List<Variable>();
                     // It is ok that we lose knowledge of where this block ends because the liveness
                     // check will see that variables are dead at the end of the block. We will insert
                     // delete statements at the earliest possible point, so everything will be deleted
                     // at or before the end of the block.
                     foreach (var statementInBlock in block.Statements)
                         ConvertToStatement(statementInBlock);
+
+                    // Back in the outer scope
+                    variablesInCurrentScope = scopeVariables;
                     return;
                 }
                 case UnsafeExpressionSyntax unsafeExpression:
