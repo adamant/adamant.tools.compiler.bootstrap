@@ -37,7 +37,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private List<Variable> variablesInCurrentScope;
 
         /// <summary>
-        /// The block we are currently adding statements to
+        /// The block we are currently adding statements to. Thus after control flow statements this
+        /// is the block the control flow exits to.
         /// </summary>
         private BlockBuilder currentBlock;
 
@@ -64,7 +65,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             currentBlock = graph.NewBlock();
             breakToBlock = null;
             foreach (var statement in function.Body.Statements)
-                currentBlock = ConvertToStatement(statement);
+                ConvertToStatement(statement);
 
             // Generate the implicit return statement
             if (currentBlock != null && !currentBlock.IsTerminated)
@@ -81,7 +82,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             variablesInCurrentScope.Add(declaration.Variable);
         }
 
-        private BlockBuilder ConvertToStatement(StatementSyntax statement)
+        private void ConvertToStatement(StatementSyntax statement)
         {
             switch (statement)
             {
@@ -94,12 +95,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         var value = ConvertToValue(variableDeclaration.Initializer);
                         currentBlock.AddAssignment(variable.AssignReference(variableDeclaration.Initializer.Span), value, variableDeclaration.Initializer.Span);
                     }
-                    return currentBlock;
+                    return;
                 }
                 case ExpressionSyntax expression:
                 {
                     if (expression.Type is VoidType || expression.Type is NeverType)
-                        currentBlock = ConvertExpressionToStatement(expression);
+                        ConvertExpressionToStatement(expression);
                     else
                     {
                         var tempVariable = graph.Let(expression.Type.AssertResolved());
@@ -107,7 +108,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         currentBlock.AddAssignment(tempVariable.AssignReference(expression.Span), value, expression.Span);
                     }
 
-                    return currentBlock;
+                    return;
                 }
                 default:
                     throw NonExhaustiveMatchException.For(statement);
@@ -125,7 +126,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         /// <summary>
         /// Converts an expression of type `void` or `never` to a statement
         /// </summary>
-        private BlockBuilder ConvertExpressionToStatement(ExpressionSyntax expression)
+        private void ConvertExpressionToStatement(ExpressionSyntax expression)
         {
             // expression m
             switch (expression)
@@ -136,7 +137,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case InvocationSyntax invocation:
                     //return ConvertToAssignmentStatement(currentBlock, expression);
                     currentBlock.AddAction(ConvertInvocationToValue(invocation), invocation.Span);
-                    return currentBlock;
+                    return;
                 case ReturnExpressionSyntax returnExpression:
                     if (returnExpression.ReturnValue != null)
                         currentBlock.AddAssignment(graph.ReturnVariable.AssignReference(returnExpression.ReturnValue.Span),
@@ -146,7 +147,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     currentBlock.AddReturn();
 
                     // There is no exit from a return block, hence null for exit block
-                    return null;
+                    currentBlock = null;
+                    return;
                 case ForeachExpressionSyntax _:
                 case WhileExpressionSyntax _:
                     throw new NotImplementedException();
@@ -155,19 +157,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     var loopEntry = graph.NewEntryBlock(currentBlock);
                     currentBlock = loopEntry;
                     breakToBlock = graph.NewBlock();
-                    var loopExit = ConvertExpressionToStatement(loopExpression.Block);
-                    loopExit?.AddGoto(loopEntry);
-                    return breakToBlock;
+                    ConvertExpressionToStatement(loopExpression.Block);
+                    currentBlock?.AddGoto(loopEntry);
+                    currentBlock = breakToBlock;
+                    return;
                 }
                 case BreakExpressionSyntax _:
                     currentBlock.AddGoto(breakToBlock ?? throw new InvalidOperationException());
-                    return null;
+                    currentBlock = null;
+                    return;
                 case IfExpressionSyntax ifExpression:
                     var containingBlock = currentBlock;
                     var condition = ConvertToOperand(ifExpression.Condition);
                     var thenEntry = graph.NewBlock();
                     currentBlock = thenEntry;
-                    var thenExit = ConvertExpressionToStatement(ifExpression.ThenBlock);
+                    ConvertExpressionToStatement(ifExpression.ThenBlock);
+                    var thenExit = currentBlock;
                     BlockBuilder elseEntry;
                     BlockBuilder exit = null;
                     if (ifExpression.ElseClause == null)
@@ -179,7 +184,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     {
                         elseEntry = graph.NewBlock();
                         currentBlock = elseEntry;
-                        var elseExit = ConvertExpressionToStatement(ifExpression.ElseClause);
+                        ConvertExpressionToStatement(ifExpression.ElseClause);
+                        var elseExit = currentBlock;
                         if (thenExit != null || elseExit != null)
                         {
                             exit = graph.NewBlock();
@@ -188,7 +194,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         }
                     }
                     containingBlock.AddIf(condition, thenEntry, elseEntry);
-                    return exit;
+                    currentBlock = exit;
+                    return;
                 case BlockSyntax block:
                 {
                     // It is ok that we lose knowledge of where this block ends because the liveness
@@ -196,11 +203,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     // delete statements at the earliest possible point, so everything will be deleted
                     // at or before the end of the block.
                     foreach (var statementInBlock in block.Statements)
-                        currentBlock = ConvertToStatement(statementInBlock);
-                    return currentBlock;
+                        ConvertToStatement(statementInBlock);
+                    return;
                 }
                 case UnsafeExpressionSyntax unsafeExpression:
-                    return ConvertToStatement(unsafeExpression.Expression);
+                    ConvertToStatement(unsafeExpression.Expression);
+                    return;
                 case AssignmentExpressionSyntax assignmentExpression:
                 {
                     var place = ConvertToPlace(assignmentExpression.LeftOperand);
@@ -230,11 +238,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         value = new BinaryOperation(place, binaryOperator, rightOperand, type);
                     }
                     currentBlock.AddAssignment(place, value, assignmentExpression.Span);
-                    return currentBlock;
+                    return;
                 }
                 case ResultExpressionSyntax resultExpression:
                     // Must be an expression of type `never`
-                    return ConvertExpressionToStatement(resultExpression.Expression);
+                    ConvertExpressionToStatement(resultExpression.Expression);
+                    return;
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
