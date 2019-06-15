@@ -39,13 +39,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
             if (function.Poisoned || function.ControlFlow == null)
                 return null;
 
-            var edges = function.ControlFlow.Edges;
-
             // Compute aliveness at point after each statement
-            return ComputeLiveness(function.ControlFlow, edges);
+            return ComputeLiveness(function.ControlFlow);
         }
 
-        private static LiveVariables ComputeLiveness(ControlFlowGraph function, Edges edges)
+        /// <summary>
+        /// Perform a backwards data flow analysis to determine where each variable is live or dead
+        /// </summary>
+        private static LiveVariables ComputeLiveness(ControlFlowGraph function)
         {
             var blocks = new Queue<BasicBlock>();
             blocks.EnqueueRange(function.ExitBlocks);
@@ -57,7 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
                 var liveBeforeBlock = new BitArray(liveVariables.Before(block.Statements.First()));
 
                 var liveAfterBlock = new BitArray(numberOfVariables);
-                foreach (var successor in edges.From(block))
+                foreach (var successor in function.Edges.From(block))
                     liveAfterBlock.Or(liveVariables.Before(successor.Statements.Last()));
 
                 if (block.Terminator is ReturnStatement && function.ReturnVariable.Exists)
@@ -102,7 +103,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
                 }
 
                 if (!liveBeforeBlock.ValuesEqual(liveVariables.Before(block.Statements.First())))
-                    foreach (var basicBlock in edges.To(block)
+                    foreach (var basicBlock in function.Edges.To(block)
                         .Where(fromBlock => !blocks.Contains(fromBlock)).ToList())
                         blocks.Enqueue(basicBlock);
             }
