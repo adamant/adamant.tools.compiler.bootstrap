@@ -90,6 +90,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
                             // No effect on variables?
                             // TODO should we check the liveSet is empty?
                             break;
+                        case EndScopeStatement _:
+                            // TODO use end scope statement to track liminal state
+                            break;
                         default:
                             throw NonExhaustiveMatchException.For(statement);
                     }

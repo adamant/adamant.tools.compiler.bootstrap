@@ -41,6 +41,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
             return spans.Where(s => s != null).Select(s => s.Value).Aggregate(Covering);
         }
 
+        /// <summary>
+        /// Returns a zero length span that occurs at the end of the current span
+        /// </summary>
+        [System.Diagnostics.Contracts.Pure]
+        public TextSpan AtEnd()
+        {
+            return new TextSpan(End, 0);
+        }
+
         [System.Diagnostics.Contracts.Pure]
 
         public string GetText(string text)

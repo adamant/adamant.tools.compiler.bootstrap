@@ -118,6 +118,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             }
                             break;
                         }
+                        case EndScopeStatement _:
+                            // No effect on borrow checker, used for liveness only
+                            break;
                         default:
                             throw NonExhaustiveMatchException.For(statement);
                     }

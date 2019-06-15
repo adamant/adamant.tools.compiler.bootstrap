@@ -36,10 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             statements.Add(new ActionStatement(value, span));
         }
 
-        public void AddDelete(
-            Place place,
-            ObjectType type,
-            TextSpan span)
+        public void AddDelete(Place place, ObjectType type, TextSpan span)
         {
             statements.Add(new DeleteStatement(place, type, span));
         }
@@ -57,6 +54,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         public void AddReturn()
         {
             statements.Add(new ReturnStatement());
+        }
+
+        public void AddEndScope(Place place, TextSpan span)
+        {
+            statements.Add(new EndScopeStatement(place, span));
         }
 
         public override string ToString()

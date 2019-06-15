@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
@@ -69,7 +70,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
             // Generate the implicit return statement
             if (currentBlock != null && !currentBlock.IsTerminated)
+            {
+                EndVariableScopes(function.Body.Span.AtEnd());
                 currentBlock.AddReturn();
+            }
 
             function.ControlFlow = graph.Build();
         }
@@ -80,6 +84,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             if (!IsOwned(declaration.Type)) return;
 
             variablesInCurrentScope.Add(declaration.Variable);
+        }
+
+        private void EndVariableScopes(TextSpan span)
+        {
+            foreach (var variable in variablesInCurrentScope.AsEnumerable().Reverse())
+                currentBlock.AddEndScope(new VariableReference(variable, VariableReferenceKind.Borrow, span), span);
         }
 
         private void ConvertToStatement(StatementSyntax statement)
@@ -145,6 +155,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                             ConvertToValue(returnExpression.ReturnValue),
                             returnExpression.ReturnValue.Span);
 
+                    EndVariableScopes(returnExpression.Span.AtEnd());
                     currentBlock.AddReturn();
 
                     // There is no exit from a return block, hence null for exit block
@@ -163,7 +174,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     currentBlock = breakToBlock;
                     return;
                 }
-                case BreakExpressionSyntax _:
+                case BreakExpressionSyntax breakExpression:
+                    EndVariableScopes(breakExpression.Span.AtEnd());
                     currentBlock.AddGoto(breakToBlock ?? throw new InvalidOperationException());
                     currentBlock = null;
                     return;
@@ -250,6 +262,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case ResultExpressionSyntax resultExpression:
                     // Must be an expression of type `never`
                     ConvertExpressionToStatement(resultExpression.Expression);
+                    EndVariableScopes(resultExpression.Span.AtEnd());
                     return;
                 default:
                     throw NonExhaustiveMatchException.For(expression);
