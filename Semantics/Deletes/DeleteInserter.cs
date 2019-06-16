@@ -34,7 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Deletes
             foreach (var block in graph.BasicBlocks)
             {
                 var blockBuilder = builder.NewBlock();
-                if (block.Number != blockBuilder.BlockNumber)
+                if (block.Name != blockBuilder.BlockName)
                     throw new Exception("New block number does not match old block number");
 
                 foreach (var statement in block.ExpressionStatements)

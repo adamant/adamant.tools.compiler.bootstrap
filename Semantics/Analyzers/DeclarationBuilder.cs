@@ -80,8 +80,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             var constructorType = new FunctionType(selfType.Yield(), selfType);
 
             var graph = new ControlFlowGraphBuilder();
-            graph.AddReturnVariable(DataType.Void);
-            graph.AddParameter(true, selfType, Scope.Outer, SpecialName.Self);
+            graph.AddSelfParameter(selfType);
             var block = graph.NewBlock();
             block.AddReturn(classDeclaration.NameSpan, Scope.Outer);
 

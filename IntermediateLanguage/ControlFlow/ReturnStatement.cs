@@ -11,9 +11,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         {
         }
 
-        public override IEnumerable<int> OutBlocks()
+        public override IEnumerable<BasicBlockName> OutBlocks()
         {
-            return Enumerable.Empty<int>();
+            return Enumerable.Empty<BasicBlockName>();
         }
 
         public override Statement Clone()

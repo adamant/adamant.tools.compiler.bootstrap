@@ -123,8 +123,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
 
             var labelIndent = Math.Max(builder.CurrentIndentDepth - 1, 0);
             builder.Append(string.Concat(Enumerable.Repeat(builder.IndentCharacters, labelIndent)));
-            builder.Append("bb");
-            builder.Append(block.Number.ToString());
+            builder.Append(block.Name.ToString());
             builder.EndLine(":");
             foreach (var statement in block.Statements)
             {

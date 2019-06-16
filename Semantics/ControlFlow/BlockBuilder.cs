@@ -8,15 +8,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 {
     public class BlockBuilder
     {
-        public readonly int BlockNumber;
+        public readonly BasicBlockName BlockName;
         private readonly List<Statement> statements = new List<Statement>();
         public IReadOnlyList<Statement> Statements => statements;
         public bool IsTerminated => statements.LastOrDefault() is BlockTerminatorStatement;
         public BlockTerminatorStatement Terminator => (BlockTerminatorStatement)statements.LastOrDefault();
 
-        public BlockBuilder(int blockNumber)
+        public BlockBuilder(BasicBlockName blockName)
         {
-            BlockNumber = blockNumber;
+            BlockName = blockName;
         }
 
         public void Add(Statement statement)
@@ -43,12 +43,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
         public void AddGoto(BlockBuilder exit, TextSpan span, Scope scope)
         {
-            statements.Add(new GotoStatement(exit.BlockNumber, span, scope));
+            statements.Add(new GotoStatement(exit.BlockName, span, scope));
         }
 
         public void AddIf(Operand condition, BlockBuilder thenBlock, BlockBuilder elseBlock, TextSpan span, Scope scope)
         {
-            statements.Add(new IfStatement(condition, thenBlock.BlockNumber, elseBlock.BlockNumber, span, scope));
+            statements.Add(new IfStatement(condition, thenBlock.BlockName, elseBlock.BlockName, span, scope));
         }
 
         public void AddReturn(TextSpan span, Scope scope)
@@ -63,7 +63,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
         public override string ToString()
         {
-            return $"bb{BlockNumber}";
+            return BlockName.ToString();
         }
     }
 }

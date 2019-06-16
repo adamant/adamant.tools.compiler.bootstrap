@@ -139,11 +139,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     switch (block.Terminator)
                     {
                         case IfStatement ifStatement:
-                            blocks.Enqueue(function.ControlFlow.BasicBlocks[ifStatement.ThenBlockNumber]);
-                            blocks.Enqueue(function.ControlFlow.BasicBlocks[ifStatement.ElseBlockNumber]);
+                            blocks.Enqueue(function.ControlFlow[ifStatement.ThenBlock]);
+                            blocks.Enqueue(function.ControlFlow[ifStatement.ElseBlock]);
                             break;
                         case GotoStatement gotoStatement:
-                            blocks.Enqueue(function.ControlFlow.BasicBlocks[gotoStatement.GotoBlockNumber]);
+                            blocks.Enqueue(function.ControlFlow[gotoStatement.GotoBlock]);
                             break;
                         case ReturnStatement _: // Add only applies to copy types so no loans
                             break;

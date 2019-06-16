@@ -14,6 +14,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         {
         }
 
-        public abstract IEnumerable<int> OutBlocks();
+        public abstract IEnumerable<BasicBlockName> OutBlocks();
     }
 }

@@ -59,10 +59,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         {
             // Temp Variable for return
             if (function is ConstructorDeclarationSyntax constructor)
-            {
-                graph.AddReturnVariable(DataType.Void);
-                graph.AddParameter(true, constructor.SelfParameterType, CurrentScope, SpecialName.Self);
-            }
+                graph.AddSelfParameter(constructor.SelfParameterType);
             else
                 graph.AddReturnVariable(function.ReturnType.Resolved());
 
@@ -97,7 +94,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         /// </summary>
         private void ExitScope(TextSpan span)
         {
-            currentBlock.AddExitScope(span, CurrentScope);
+            currentBlock?.AddExitScope(span, CurrentScope);
         }
 
         private void EndScope(TextSpan span)
@@ -204,7 +201,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     return;
                 }
                 case BreakExpressionSyntax breakExpression:
-                    EndScope(breakExpression.Span.AtEnd());
+                    ExitScope(breakExpression.Span.AtEnd());
                     currentBlock.AddGoto(
                         breakToBlock ?? throw new InvalidOperationException(),
                         breakExpression.Span,
@@ -290,7 +287,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case ResultExpressionSyntax resultExpression:
                     // Must be an expression of type `never`
                     ConvertExpressionToStatement(resultExpression.Expression);
-                    EndScope(resultExpression.Span.AtEnd());
+                    ExitScope(resultExpression.Span.AtEnd());
                     return;
                 default:
                     throw NonExhaustiveMatchException.For(expression);

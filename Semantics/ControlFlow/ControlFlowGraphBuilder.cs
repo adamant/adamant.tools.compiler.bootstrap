@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -35,8 +36,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             return variable;
         }
 
+        public LocalVariableDeclaration AddSelfParameter(DataType type)
+        {
+            Requires.That("variableNumber", variables.Count == 0, "Self parameter must have variable number 0");
+            var variable = new LocalVariableDeclaration(true, false, type, new Variable(variables.Count), null, SpecialName.Self);
+            variables.Add(variable);
+            return variable;
+        }
+
         public LocalVariableDeclaration AddReturnVariable(DataType type)
         {
+            Requires.That("variableNumber", variables.Count == 0, "Return variable must have variable number 0");
             var variable = new LocalVariableDeclaration(false, false, type, new Variable(variables.Count), null);
             variables.Add(variable);
             return variable;
@@ -59,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
         public BlockBuilder NewBlock()
         {
-            var block = new BlockBuilder(blockBuilders.Count);
+            var block = new BlockBuilder(new BasicBlockName(blockBuilders.Count));
             blockBuilders.Add(block);
             return block;
         }
@@ -84,7 +94,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     .Take(block.Statements.Count - 1)
                     .Cast<ExpressionStatement>();
                 var terminator = block.Terminator;
-                blocks.Add(new BasicBlock(block.BlockNumber, statements, terminator));
+                blocks.Add(new BasicBlock(block.BlockName, statements, terminator));
             }
 
             return new ControlFlowGraph(variables, blocks);

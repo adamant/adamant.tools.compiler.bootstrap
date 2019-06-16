@@ -18,9 +18,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 
         internal static Edges InGraph(ControlFlowGraph controlFlowGraph)
         {
-            var edges = controlFlowGraph.BasicBlocks.SelectMany(b =>
-                    b.Terminator.OutBlocks()
-                        .Select(e => new Edge(b, controlFlowGraph.BasicBlocks[e])))
+            var edges = controlFlowGraph.BasicBlocks.SelectMany(a =>
+                    a.Terminator.OutBlocks()
+                        .Select(b => new Edge(a, controlFlowGraph.BasicBlocks[b.Number])))
                 .ToList();
             return new Edges(edges);
         }

@@ -42,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
         private void EmitBlock(BasicBlock block, bool voidReturn, CCodeBuilder code)
         {
-            code.AppendLine($"bb{block.Number}:");
+            code.AppendLine($"{block.Name}:");
             code.BeginBlock();
             foreach (var statement in block.Statements) EmitStatement(statement, voidReturn, code);
             code.EndBlock();
@@ -54,10 +54,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             switch (statement)
             {
                 case IfStatement ifStatement:
-                    code.AppendLine($"if({ConvertValue(ifStatement.Condition)}._value) goto bb{ifStatement.ThenBlockNumber}; else goto bb{ifStatement.ElseBlockNumber};");
+                    code.AppendLine($"if({ConvertValue(ifStatement.Condition)}._value) goto {ifStatement.ThenBlock}; else goto {ifStatement.ElseBlock};");
                     break;
                 case GotoStatement gotoStatement:
-                    code.AppendLine($"goto bb{gotoStatement.GotoBlockNumber};");
+                    code.AppendLine($"goto {gotoStatement.GotoBlock};");
                     break;
                 case ReturnStatement _:
                     code.AppendLine(voidReturn ? "return;" : "return _result;");

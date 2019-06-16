@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
     public abstract class Statement
     {
-        public int BlockNumber { get; internal set; }
+        public BasicBlockName Block { get; internal set; }
         public int Number { get; internal set; }
 
         public Scope Scope { get; }

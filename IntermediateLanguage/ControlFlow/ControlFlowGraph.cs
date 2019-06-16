@@ -34,5 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             BasicBlocks = basicBlocks.ToFixedList();
             Edges = Edges.InGraph(this);
         }
+
+        public BasicBlock this[BasicBlockName block] => BasicBlocks[block.Number];
     }
 }

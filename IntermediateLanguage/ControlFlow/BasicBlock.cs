@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     public class BasicBlock
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public readonly int Number; // The block number is used as its name in IR
+        public readonly BasicBlockName Name;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public FixedList<ExpressionStatement> ExpressionStatements { get; }
@@ -20,23 +20,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         public FixedList<Statement> Statements { get; }
 
-        public BasicBlock(int number,
+        public BasicBlock(BasicBlockName name,
             IEnumerable<ExpressionStatement> expressionStatements,
             BlockTerminatorStatement terminator)
         {
-            Number = number;
+            Name = name;
             ExpressionStatements = expressionStatements.ToFixedList();
             Terminator = terminator;
             Statements = ExpressionStatements.Append<Statement>(terminator).ToFixedList();
             foreach (var (statement, i) in Statements.Enumerate())
             {
-                statement.BlockNumber = number;
+                statement.Block = name;
                 statement.Number = i;
             }
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private string DebuggerDisplay =>
-            $"BB #{Number}, Statements={Statements.Count}";
+            $"BB #{Name.Number}, Statements={Statements.Count}";
     }
 }

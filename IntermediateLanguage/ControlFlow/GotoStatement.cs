@@ -5,27 +5,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class GotoStatement : BlockTerminatorStatement
     {
-        public readonly int GotoBlockNumber;
+        public readonly BasicBlockName GotoBlock;
 
-        public GotoStatement(int gotoBlockNumber, TextSpan span, Scope scope)
+        public GotoStatement(BasicBlockName gotoBlock, TextSpan span, Scope scope)
             : base(span, scope)
         {
-            GotoBlockNumber = gotoBlockNumber;
+            GotoBlock = gotoBlock;
         }
 
-        public override IEnumerable<int> OutBlocks()
+        public override IEnumerable<BasicBlockName> OutBlocks()
         {
-            yield return GotoBlockNumber;
+            yield return GotoBlock;
         }
 
         public override Statement Clone()
         {
-            return new GotoStatement(GotoBlockNumber, Span, Scope);
+            return new GotoStatement(GotoBlock, Span, Scope);
         }
 
         public override string ToString()
         {
-            return $"goto bb{GotoBlockNumber} // at {Span} in {Scope}";
+            return $"goto {GotoBlock} // at {Span} in {Scope}";
         }
     }
 }

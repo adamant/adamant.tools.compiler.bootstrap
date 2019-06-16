@@ -6,32 +6,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     public class IfStatement : BlockTerminatorStatement
     {
         public Operand Condition { get; }
-        public int ThenBlockNumber { get; }
-        public int ElseBlockNumber { get; }
+        public BasicBlockName ThenBlock { get; }
+        public BasicBlockName ElseBlock { get; }
 
-        public IfStatement(Operand condition, int thenBlockNumber, int elseBlockNumber, TextSpan span, Scope scope)
+        public IfStatement(Operand condition, BasicBlockName thenBlock, BasicBlockName elseBlock, TextSpan span, Scope scope)
             : base(span, scope)
         {
             Condition = condition;
-            ThenBlockNumber = thenBlockNumber;
-            ElseBlockNumber = elseBlockNumber;
+            ThenBlock = thenBlock;
+            ElseBlock = elseBlock;
         }
 
-        public override IEnumerable<int> OutBlocks()
+        public override IEnumerable<BasicBlockName> OutBlocks()
         {
-            yield return ThenBlockNumber;
-            yield return ElseBlockNumber;
+            yield return ThenBlock;
+            yield return ElseBlock;
         }
 
         public override Statement Clone()
         {
-            return new IfStatement(Condition, ThenBlockNumber, ElseBlockNumber, Span, Scope);
+            return new IfStatement(Condition, ThenBlock, ElseBlock, Span, Scope);
         }
 
         // Useful for debugging
         public override string ToString()
         {
-            return $"if {Condition} -> bb{ThenBlockNumber} else -> bb{ElseBlockNumber} // at {Span} in {Scope}";
+            return $"if {Condition} -> {ThenBlock} else -> {ElseBlock} // at {Span} in {Scope}";
         }
     }
 }

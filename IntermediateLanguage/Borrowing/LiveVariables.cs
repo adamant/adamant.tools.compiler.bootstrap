@@ -30,12 +30,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
         /// </summary>
         public BitArray Before(Statement statement)
         {
-            return values[statement.BlockNumber][statement.Number];
+            return values[statement.Block.Number][statement.Number];
         }
 
         public BitArray After(Statement statement)
         {
-            return values[statement.BlockNumber][statement.Number + 1];
+            return values[statement.Block.Number][statement.Number + 1];
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
             var liveVariables = new BitArray(VariableCount);
             // The live variables after the statement should be based on what they were before
             liveVariables.Or(After(statement));
-            values[statement.BlockNumber].Insert(statement.Number + 1, liveVariables);
+            values[statement.Block.Number].Insert(statement.Number + 1, liveVariables);
             return liveVariables;
         }
     }
