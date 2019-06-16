@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
@@ -8,6 +9,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     /// </summary>
     public abstract class BlockTerminatorStatement : Statement
     {
+        protected BlockTerminatorStatement(TextSpan span, Scope scope)
+            : base(span, scope)
+        {
+        }
+
         public abstract IEnumerable<int> OutBlocks();
     }
 }

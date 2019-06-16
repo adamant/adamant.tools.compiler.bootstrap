@@ -78,7 +78,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     code.AppendLine($"free({self}._self);");
                     break;
                 }
-                case EndScopeStatement _:
+                case ExitScopeStatement _:
                     // End scope isn't emitted, it is just a marker
                     break;
                 default:

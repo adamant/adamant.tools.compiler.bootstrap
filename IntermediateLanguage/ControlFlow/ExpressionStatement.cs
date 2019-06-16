@@ -9,11 +9,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     /// </summary>
     public abstract class ExpressionStatement : Statement
     {
-        public TextSpan Span { get; }
-
-        protected ExpressionStatement(TextSpan span)
+        protected ExpressionStatement(TextSpan span, Scope scope)
+            : base(span, scope)
         {
-            Span = span;
         }
     }
 }

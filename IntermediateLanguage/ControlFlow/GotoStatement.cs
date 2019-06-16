@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
@@ -6,7 +7,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     {
         public readonly int GotoBlockNumber;
 
-        public GotoStatement(int gotoBlockNumber)
+        public GotoStatement(int gotoBlockNumber, TextSpan span, Scope scope)
+            : base(span, scope)
         {
             GotoBlockNumber = gotoBlockNumber;
         }
@@ -18,12 +20,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 
         public override Statement Clone()
         {
-            return new GotoStatement(GotoBlockNumber);
+            return new GotoStatement(GotoBlockNumber, Span, Scope);
         }
 
         public override string ToString()
         {
-            return $"goto bb{GotoBlockNumber}";
+            return $"goto bb{GotoBlockNumber} // at {Span} in {Scope}";
         }
     }
 }

@@ -8,8 +8,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public Place Place { get; }
         public ObjectType Type { get; }
 
-        public DeleteStatement(Place place, ObjectType type, TextSpan span)
-            : base(span)
+        public DeleteStatement(Place place, ObjectType type, TextSpan span, Scope scope)
+            : base(span, scope)
         {
             Place = place;
             Type = type;
@@ -17,13 +17,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 
         public override Statement Clone()
         {
-            return new DeleteStatement(Place, Type, Span);
+            return new DeleteStatement(Place, Type, Span, Scope);
         }
 
         // Useful for debugging
         public override string ToString()
         {
-            return $"delete {Place} // at {Span}";
+            return $"delete {Place} // at {Span} in {Scope}";
         }
     }
 }

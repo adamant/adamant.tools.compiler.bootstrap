@@ -42,6 +42,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
         }
 
         /// <summary>
+        /// Returns a zero length span that occurs at the start of the current span
+        /// </summary>
+        public TextSpan AtStart()
+        {
+            return new TextSpan(Start, 0);
+        }
+
+        /// <summary>
         /// Returns a zero length span that occurs at the end of the current span
         /// </summary>
         [System.Diagnostics.Contracts.Pure]

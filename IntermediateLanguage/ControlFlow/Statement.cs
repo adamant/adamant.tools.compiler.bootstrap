@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
@@ -11,9 +12,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public int BlockNumber { get; internal set; }
         public int Number { get; internal set; }
 
-        // Useful for debugging
-        public abstract override string ToString();
+        public Scope Scope { get; }
+        public TextSpan Span { get; }
+
+        protected Statement(TextSpan span, Scope scope)
+        {
+            Span = span;
+            Scope = scope;
+        }
 
         public abstract Statement Clone();
+
+        // Useful for debugging
+        public abstract override string ToString();
     }
 }

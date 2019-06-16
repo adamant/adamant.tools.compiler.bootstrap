@@ -6,21 +6,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     {
         public Value Value { get; }
 
-        public ActionStatement(Value value, TextSpan span)
-            : base(span)
+        public ActionStatement(Value value, TextSpan span, Scope scope)
+            : base(span, scope)
         {
             Value = value;
         }
 
         public override Statement Clone()
         {
-            return new ActionStatement(Value, Span);
+            return new ActionStatement(Value, Span, Scope);
         }
 
         // Useful for debugging
         public override string ToString()
         {
-            return Value.ToString();
+            return $"{Value} // at {Span} in {Scope}";
         }
     }
 }

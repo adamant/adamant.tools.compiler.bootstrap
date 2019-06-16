@@ -6,25 +6,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     /// Marks the end of the scope of a variable that owns its value. Thus the
     /// value should not live beyond here.
     /// </summary>
-    public class EndScopeStatement : ExpressionStatement
+    public class ExitScopeStatement : ExpressionStatement
     {
-        public Place Place { get; }
-
-        public EndScopeStatement(Place place, TextSpan span)
-            : base(span)
+        public ExitScopeStatement(TextSpan span, Scope scope)
+            : base(span, scope)
         {
-            Place = place;
         }
 
         public override Statement Clone()
         {
-            return new EndScopeStatement(Place, Span);
+            return new ExitScopeStatement(Span, Scope);
         }
 
         // Useful for debugging
         public override string ToString()
         {
-            return $"end_scope {Place} // at {Span}";
+            return $"exit {Scope} // at {Span}";
         }
     }
 }

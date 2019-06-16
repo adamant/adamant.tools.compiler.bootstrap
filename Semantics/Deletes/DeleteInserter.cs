@@ -54,7 +54,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Deletes
                         {
                             // The delete happens after the last statement
                             var span = new TextSpan(statement.Span.End, 0);
-                            blockBuilder.AddDelete(new VariableReference(variable.Variable, VariableReferenceKind.Borrow, span), type, span);
+                            throw new NotImplementedException();
+                            //blockBuilder.AddDelete(new VariableReference(variable.Variable, VariableReferenceKind.Borrow, span), type, span);
                             // Account for the added statement in the liveness analysis
                             var newLiveness = liveness.AddStatementAfter(statement);
                             // The variable being deleted is now live between the statement and the delete

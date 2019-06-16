@@ -33,11 +33,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private readonly ControlFlowGraphBuilder graph = new ControlFlowGraphBuilder();
 
         /// <summary>
-        /// Note this is only the variables in the current scope, not in nested scopes.
-        /// </summary>
-        private List<Variable> variablesInCurrentScope;
-
-        /// <summary>
         /// The block we are currently adding statements to. Thus after control flow statements this
         /// is the block the control flow exits to.
         /// </summary>
@@ -48,11 +43,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         /// </summary>
         private BlockBuilder breakToBlock;
 
+        private Scope nextScope;
+        private readonly Stack<Scope> scopes = new Stack<Scope>();
+        private Scope CurrentScope => scopes.Peek();
+
+        private ControlFlowAnalyzer()
+        {
+            // We start in the outer scope and need that on the stack
+            var scope = Scope.Outer;
+            scopes.Push(scope);
+            nextScope = scope.Next();
+        }
 
         private void BuildGraph(FunctionDeclarationSyntax function)
         {
-            variablesInCurrentScope = new List<Variable>();
-
             // Temp Variable for return
             if (function is ConstructorDeclarationSyntax constructor)
                 graph.AddParameter(true, constructor.SelfParameterType, SpecialName.Self);
@@ -61,7 +65,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
             // TODO don't emit temp variables for unused parameters
             foreach (var parameter in function.Parameters.Where(p => !p.Unused))
-                VariableInScope(graph.AddParameter(parameter.MutableBinding, parameter.Type.Resolved(), parameter.Name.UnqualifiedName));
+                graph.AddParameter(parameter.MutableBinding, parameter.Type.Resolved(), parameter.Name.UnqualifiedName);
 
             currentBlock = graph.NewBlock();
             breakToBlock = null;
@@ -71,25 +75,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             // Generate the implicit return statement
             if (currentBlock != null && !currentBlock.IsTerminated)
             {
-                EndVariableScopes(function.Body.Span.AtEnd());
-                currentBlock.AddReturn();
+                var span = function.Body.Span.AtEnd();
+                EndScope(span);
+                currentBlock.AddReturn(span, Scope.Outer); // We officially ended the outer scope, but this is in it
             }
 
             function.ControlFlow = graph.Build();
         }
 
-        private void VariableInScope(LocalVariableDeclaration declaration)
+        private void EnterNewScope()
         {
-            // Only track owned references
-            if (!IsOwned(declaration.Type)) return;
-
-            variablesInCurrentScope.Add(declaration.Variable);
+            scopes.Push(nextScope);
+            nextScope = nextScope.Next();
         }
 
-        private void EndVariableScopes(TextSpan span)
+        /// <summary>
+        /// An exist point for the current scope that doesn't end it. For example, a break statement
+        /// </summary>
+        private void ExitScope(TextSpan span)
         {
-            foreach (var variable in variablesInCurrentScope.AsEnumerable().Reverse())
-                currentBlock.AddEndScope(new VariableReference(variable, VariableReferenceKind.Borrow, span), span);
+            currentBlock.AddExitScope(span, CurrentScope);
+        }
+
+        private void EndScope(TextSpan span)
+        {
+            // In some cases we will have left the current block by a terminator,
+            // so we don't need to emit an exit statement.
+            currentBlock?.AddExitScope(span, CurrentScope);
+            scopes.Pop();
         }
 
         private void ConvertToStatement(StatementSyntax statement)
@@ -103,10 +116,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     if (variableDeclaration.Initializer != null)
                     {
                         var value = ConvertToValue(variableDeclaration.Initializer);
-                        currentBlock.AddAssignment(variable.AssignReference(variableDeclaration.Initializer.Span), value, variableDeclaration.Initializer.Span);
+                        currentBlock.AddAssignment(
+                            variable.AssignReference(variableDeclaration.Initializer.Span),
+                            value,
+                            variableDeclaration.Initializer.Span,
+                            CurrentScope);
                     }
-                    // Variable isn't in scope until after the initializer
-                    VariableInScope(variable);
                     return;
                 }
                 case ExpressionSyntax expression:
@@ -117,7 +132,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     {
                         var tempVariable = graph.Let(expression.Type.AssertResolved());
                         var value = ConvertToValue(expression);
-                        currentBlock.AddAssignment(tempVariable.AssignReference(expression.Span), value, expression.Span);
+                        currentBlock.AddAssignment(
+                            tempVariable.AssignReference(expression.Span),
+                            value,
+                            expression.Span,
+                            CurrentScope);
                     }
 
                     return;
@@ -147,16 +166,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case BinaryExpressionSyntax _:
                     throw new NotImplementedException();
                 case InvocationSyntax invocation:
-                    currentBlock.AddAction(ConvertInvocationToValue(invocation), invocation.Span);
+                    currentBlock.AddAction(ConvertInvocationToValue(invocation), invocation.Span, CurrentScope);
                     return;
                 case ReturnExpressionSyntax returnExpression:
                     if (returnExpression.ReturnValue != null)
-                        currentBlock.AddAssignment(graph.ReturnVariable.AssignReference(returnExpression.ReturnValue.Span),
+                        currentBlock.AddAssignment(
+                            graph.ReturnVariable.AssignReference(returnExpression.ReturnValue.Span),
                             ConvertToValue(returnExpression.ReturnValue),
-                            returnExpression.ReturnValue.Span);
+                            returnExpression.ReturnValue.Span,
+                            CurrentScope);
 
-                    EndVariableScopes(returnExpression.Span.AtEnd());
-                    currentBlock.AddReturn();
+                    ExitScope(returnExpression.Span.AtEnd());
+                    currentBlock.AddReturn(returnExpression.Span, CurrentScope);
 
                     // There is no exit from a return block, hence null for exit block
                     currentBlock = null;
@@ -166,17 +187,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     throw new NotImplementedException();
                 case LoopExpressionSyntax loopExpression:
                 {
-                    var loopEntry = graph.NewEntryBlock(currentBlock);
+                    var loopEntry = graph.NewEntryBlock(currentBlock,
+                                            loopExpression.Block.Span.AtStart(),
+                                            CurrentScope);
                     currentBlock = loopEntry;
                     breakToBlock = graph.NewBlock();
                     ConvertExpressionToStatement(loopExpression.Block);
-                    currentBlock?.AddGoto(loopEntry);
+                    currentBlock?.AddGoto(loopEntry,
+                        loopExpression.Block.Span.AtEnd(),
+                        CurrentScope);
                     currentBlock = breakToBlock;
                     return;
                 }
                 case BreakExpressionSyntax breakExpression:
-                    EndVariableScopes(breakExpression.Span.AtEnd());
-                    currentBlock.AddGoto(breakToBlock ?? throw new InvalidOperationException());
+                    EndScope(breakExpression.Span.AtEnd());
+                    currentBlock.AddGoto(
+                        breakToBlock ?? throw new InvalidOperationException(),
+                        breakExpression.Span,
+                        CurrentScope);
                     currentBlock = null;
                     return;
                 case IfExpressionSyntax ifExpression:
@@ -191,7 +219,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     if (ifExpression.ElseClause == null)
                     {
                         elseEntry = exit = graph.NewBlock();
-                        thenExit?.AddGoto(exit);
+                        thenExit?.AddGoto(exit, ifExpression.ThenBlock.Span.AtEnd(), CurrentScope);
                     }
                     else
                     {
@@ -202,27 +230,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         if (thenExit != null || elseExit != null)
                         {
                             exit = graph.NewBlock();
-                            thenExit?.AddGoto(exit);
-                            elseExit?.AddGoto(exit);
+                            thenExit?.AddGoto(exit, ifExpression.ThenBlock.Span.AtEnd(), CurrentScope);
+                            elseExit?.AddGoto(exit, ifExpression.ElseClause.Span.AtEnd(), CurrentScope);
                         }
                     }
-                    containingBlock.AddIf(condition, thenEntry, elseEntry);
+                    containingBlock.AddIf(condition, thenEntry, elseEntry, ifExpression.Condition.Span, CurrentScope);
                     currentBlock = exit;
                     return;
                 case BlockSyntax block:
                 {
-                    // Starting a new nested scope, we track the variables separately
-                    var scopeVariables = variablesInCurrentScope;
-                    variablesInCurrentScope = new List<Variable>();
-                    // It is ok that we lose knowledge of where this block ends because the liveness
-                    // check will see that variables are dead at the end of the block. We will insert
-                    // delete statements at the earliest possible point, so everything will be deleted
-                    // at or before the end of the block.
+                    // Starting a new nested scope
+                    EnterNewScope();
+
                     foreach (var statementInBlock in block.Statements)
                         ConvertToStatement(statementInBlock);
 
-                    // Back in the outer scope
-                    variablesInCurrentScope = scopeVariables;
+                    // Ending that scope
+                    EndScope(block.Span.AtEnd());
                     return;
                 }
                 case UnsafeExpressionSyntax unsafeExpression:
@@ -256,13 +280,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         }
                         value = new BinaryOperation(place, binaryOperator, rightOperand, type);
                     }
-                    currentBlock.AddAssignment(place, value, assignmentExpression.Span);
+                    currentBlock.AddAssignment(place, value, assignmentExpression.Span, CurrentScope);
                     return;
                 }
                 case ResultExpressionSyntax resultExpression:
                     // Must be an expression of type `never`
                     ConvertExpressionToStatement(resultExpression.Expression);
-                    EndVariableScopes(resultExpression.Span.AtEnd());
+                    EndScope(resultExpression.Span.AtEnd());
                     return;
                 default:
                     throw NonExhaustiveMatchException.For(expression);
@@ -372,7 +396,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         {
             if (value is Operand operand) return operand;
             var tempVariable = graph.Let(type.AssertResolved());
-            currentBlock.AddAssignment(tempVariable.AssignReference(value.Span), value, value.Span);
+            currentBlock.AddAssignment(tempVariable.AssignReference(value.Span), value, value.Span, CurrentScope);
             return tempVariable.Reference(value.Span);
         }
 

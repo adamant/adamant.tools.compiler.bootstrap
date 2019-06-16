@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
@@ -8,7 +9,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public int ThenBlockNumber { get; }
         public int ElseBlockNumber { get; }
 
-        public IfStatement(Operand condition, int thenBlockNumber, int elseBlockNumber)
+        public IfStatement(Operand condition, int thenBlockNumber, int elseBlockNumber, TextSpan span, Scope scope)
+            : base(span, scope)
         {
             Condition = condition;
             ThenBlockNumber = thenBlockNumber;
@@ -23,13 +25,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 
         public override Statement Clone()
         {
-            return new IfStatement(Condition, ThenBlockNumber, ElseBlockNumber);
+            return new IfStatement(Condition, ThenBlockNumber, ElseBlockNumber, Span, Scope);
         }
 
         // Useful for debugging
         public override string ToString()
         {
-            return $"if {Condition} -> bb{ThenBlockNumber} else -> bb{ElseBlockNumber}";
+            return $"if {Condition} -> bb{ThenBlockNumber} else -> bb{ElseBlockNumber} // at {Span} in {Scope}";
         }
     }
 }

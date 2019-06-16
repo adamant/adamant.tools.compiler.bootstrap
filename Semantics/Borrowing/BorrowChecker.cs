@@ -118,7 +118,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             }
                             break;
                         }
-                        case EndScopeStatement _:
+                        case ExitScopeStatement _:
                             // No effect on borrow checker, used for liveness only
                             break;
                         default:

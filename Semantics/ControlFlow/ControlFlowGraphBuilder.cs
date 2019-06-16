@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
@@ -58,11 +59,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
         /// Used to create a new block for the entry into a loop if needed.
         /// Doesn't create a new block if the current block is empty.
-        public BlockBuilder NewEntryBlock(BlockBuilder currentBlock)
+        public BlockBuilder NewEntryBlock(BlockBuilder currentBlock, TextSpan span, Scope scope)
         {
             if (!currentBlock.Statements.Any()) return currentBlock;
             var entryBlock = NewBlock();
-            currentBlock.AddGoto(entryBlock);
+            currentBlock.AddGoto(entryBlock, span, scope);
             return entryBlock;
         }
 
