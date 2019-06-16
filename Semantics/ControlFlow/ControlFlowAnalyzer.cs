@@ -59,13 +59,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         {
             // Temp Variable for return
             if (function is ConstructorDeclarationSyntax constructor)
-                graph.AddParameter(true, constructor.SelfParameterType, SpecialName.Self);
+            {
+                graph.AddReturnVariable(DataType.Void);
+                graph.AddParameter(true, constructor.SelfParameterType, CurrentScope, SpecialName.Self);
+            }
             else
-                graph.Let(function.ReturnType.Resolved());
+                graph.AddReturnVariable(function.ReturnType.Resolved());
 
             // TODO don't emit temp variables for unused parameters
             foreach (var parameter in function.Parameters.Where(p => !p.Unused))
-                graph.AddParameter(parameter.MutableBinding, parameter.Type.Resolved(), parameter.Name.UnqualifiedName);
+                graph.AddParameter(parameter.MutableBinding, parameter.Type.Resolved(), CurrentScope, parameter.Name.UnqualifiedName);
 
             currentBlock = graph.NewBlock();
             breakToBlock = null;
@@ -112,7 +115,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case VariableDeclarationStatementSyntax variableDeclaration:
                 {
                     var variable = graph.AddVariable(variableDeclaration.MutableBinding,
-                        variableDeclaration.Type, variableDeclaration.Name.UnqualifiedName);
+                                        variableDeclaration.Type, CurrentScope,
+                                        variableDeclaration.Name.UnqualifiedName);
                     if (variableDeclaration.Initializer != null)
                     {
                         var value = ConvertToValue(variableDeclaration.Initializer);
@@ -130,7 +134,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         ConvertExpressionToStatement(expression);
                     else
                     {
-                        var tempVariable = graph.Let(expression.Type.AssertResolved());
+                        var tempVariable = graph.Let(expression.Type.AssertResolved(), CurrentScope);
                         var value = ConvertToValue(expression);
                         currentBlock.AddAssignment(
                             tempVariable.AssignReference(expression.Span),
@@ -395,7 +399,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private Operand ConvertToOperand(Value value, DataType type)
         {
             if (value is Operand operand) return operand;
-            var tempVariable = graph.Let(type.AssertResolved());
+            var tempVariable = graph.Let(type.AssertResolved(), CurrentScope);
             currentBlock.AddAssignment(tempVariable.AssignReference(value.Span), value, value.Span, CurrentScope);
             return tempVariable.Reference(value.Span);
         }

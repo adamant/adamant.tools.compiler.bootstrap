@@ -21,28 +21,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             this.variables = variables.ToList();
         }
 
-        public LocalVariableDeclaration AddVariable(bool mutableBinding, DataType type, SimpleName name = null)
+        public LocalVariableDeclaration AddVariable(bool mutableBinding, DataType type, Scope scope, SimpleName name = null)
         {
-            var variable = new LocalVariableDeclaration(false, mutableBinding, type, new Variable(variables.Count), name);
+            var variable = new LocalVariableDeclaration(false, mutableBinding, type, new Variable(variables.Count), scope, name);
             variables.Add(variable);
             return variable;
         }
 
-        public LocalVariableDeclaration AddParameter(bool mutableBinding, DataType type, SimpleName name)
+        public LocalVariableDeclaration AddParameter(bool mutableBinding, DataType type, Scope scope, SimpleName name)
         {
-            var variable = new LocalVariableDeclaration(true, mutableBinding, type, new Variable(variables.Count), name);
+            var variable = new LocalVariableDeclaration(true, mutableBinding, type, new Variable(variables.Count), scope, name);
             variables.Add(variable);
             return variable;
         }
 
-        public LocalVariableDeclaration Let(DataType type)
+        public LocalVariableDeclaration AddReturnVariable(DataType type)
         {
-            return AddVariable(false, type);
+            var variable = new LocalVariableDeclaration(false, false, type, new Variable(variables.Count), null);
+            variables.Add(variable);
+            return variable;
         }
 
-        public LocalVariableDeclaration Var(DataType type)
+        public LocalVariableDeclaration Let(DataType type, Scope scope)
         {
-            return AddVariable(true, type);
+            return AddVariable(false, type, scope);
+        }
+
+        public LocalVariableDeclaration Var(DataType type, Scope scope)
+        {
+            return AddVariable(true, type, scope);
         }
 
         public LocalVariableDeclaration VariableFor(SimpleName name)

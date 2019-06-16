@@ -7,6 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     public class LocalVariableDeclaration
     {
         public readonly Variable Variable; // The declaration number is used as its name in the IR
+        public readonly Scope? Scope;
 
         // If this declaration corresponds to an argument or local variable, what it was named. Not guaranteed unique
         public readonly SimpleName Name;
@@ -21,10 +22,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             bool mutableBinding,
             DataType type,
             Variable variable,
+            Scope? scope,
             SimpleName name = null)
         {
             IsParameter = isParameter;
             Variable = variable;
+            Scope = scope;
             Name = name;
             MutableBinding = mutableBinding;
             Type = type;
@@ -49,8 +52,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         {
             var binding = MutableBinding ? "var" : "let";
             var result = $"{binding} {Variable}: {Type};";
+            if (Scope != null || Name != null)
+                result += " //";
+            if (Scope != null)
+                result += $" in {Scope}";
             if (Name != null)
-                result += $" // {Name}";
+                result += $" for {Name}";
             return result;
         }
     }
