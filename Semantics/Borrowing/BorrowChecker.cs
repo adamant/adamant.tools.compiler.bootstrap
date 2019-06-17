@@ -110,23 +110,47 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                         case DeleteStatement deleteStatement:
                         {
                             // The variable we are deleting through is supposed to have the title
-                            var title = claimsBeforeStatement.OwnedBy(deleteStatement.Place.CoreVariable());
-                            if (title != null)// TODO this should be an error
-                            {
-                                CheckCanDelete(title.Lifetime, claimsBeforeStatement, deleteStatement.Span);
-                                claimsAfterStatement.Remove(title);
-                            }
-                            break;
+                            //var title = claimsBeforeStatement.OwnedBy(deleteStatement.Place.CoreVariable());
+                            //if (title != null)// TODO this should be an error
+                            //{
+                            //    CheckCanDelete(title.Lifetime, claimsBeforeStatement, deleteStatement.Span);
+                            //    claimsAfterStatement.Remove(title);
+                            //}
+                            //break;
+                            throw new NotSupportedException("There should be no delete statements in the IL at this phase");
                         }
-                        case ExitScopeStatement _:
-                            // No effect on borrow checker, used for liveness only
+                        case ExitScopeStatement exitScopeStatement:
+                            // Any claims held by variables in this scope are released
+                            var variablesInScope = function.ControlFlow.VariableDeclarations
+                                .Where(d => d.Scope == exitScopeStatement.Scope)
+                                .Select(d => d.Variable)
+                                .ToList();
+                            var lifetimesOwnedByVariablesInScope = variablesInScope
+                                .Select(v => claimsAfterStatement.OwnedBy(v)).Where(o => o != null)
+                                .Select(o => o.Lifetime)
+                                .ToList();
+                            claimsAfterStatement.Release(variablesInScope);
+                            var erroredLifetimes = lifetimesOwnedByVariablesInScope
+                                .Where(l => claimsAfterStatement.IsBorrowedOrShared(l));
+                            var erroredVariables = erroredLifetimes.SelectMany(l =>
+                                claimsAfterStatement.ClaimsOn(l).Select(c => c.Holder)
+                                    .OfType<Variable>()).Distinct();
+                            foreach (var variable in erroredVariables)
+                            {
+                                var declaration = function.ControlFlow.VariableDeclarations
+                                                            .Single(d => d.Variable == variable);
+                                diagnostics.Add(BorrowError.BorrowedValueDoesNotLiveLongEnough(file, exitScopeStatement.Span, declaration.Name));
+                            }
                             break;
                         default:
                             throw NonExhaustiveMatchException.For(statement);
                     }
 
                     var liveAfter = liveVariables.After(statement);
-                    claimsAfterStatement.Release(liveAfter.FalseIndexes().Select(i => new Variable(i)));
+                    var droppedVariables = liveAfter.FalseIndexes()
+                        .Select(i => new Variable(i))
+                        .Where(v => !VariableOwnsBorrowedValue(v, claimsAfterStatement));
+                    claimsAfterStatement.Release(droppedVariables);
 
                     // Get Ready for next statement
                     claimsBeforeStatement = claimsAfterStatement;
@@ -156,6 +180,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             if (saveBorrowClaims) function.ControlFlow.BorrowClaims = claims;
         }
 
+        private static bool VariableOwnsBorrowedValue(Variable variable, Claims outstandingClaims)
+        {
+            var ownerShip = outstandingClaims.OwnedBy(variable);
+            // If it doesn't have ownership, then it doesn't own a borrowed value
+            if (ownerShip == null) return false;
+            return outstandingClaims.IsBorrowedOrShared(ownerShip.Lifetime);
+        }
+
         private Claims ClaimsBeforeBlock(
             FunctionDeclarationSyntax function,
             BasicBlock block,
@@ -177,21 +209,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             var claimsBeforeStatement = new Claims();
             foreach (var parameter in function.ControlFlow.VariableDeclarations
                 .Where(v => v.IsParameter && v.Type is ReferenceType))
-            {
                 claimsBeforeStatement.Add(new Borrows(parameter.Variable, NewLifetime()));
-            }
 
             return claimsBeforeStatement;
         }
 
-        private void CheckCanDelete(Lifetime lifetime, Claims claims, TextSpan span)
-        {
-            var isBorrowedOrShared = claims.IsBorrowedOrShared(lifetime);
+        //private void CheckCanDelete(Lifetime lifetime, Claims claims, TextSpan span)
+        //{
+        //    var isBorrowedOrShared = claims.IsBorrowedOrShared(lifetime);
 
-            if (isBorrowedOrShared)
-                // TODO this should be a different error message
-                diagnostics.Add(BorrowError.BorrowedValueDoesNotLiveLongEnough(file, span));
-        }
+        //    if (isBorrowedOrShared)
+        //        // TODO this should be a different error message
+        //        diagnostics.Add(BorrowError.BorrowedValueDoesNotLiveLongEnough(file, span));
+        //}
 
         private void CheckStatement(
             Place assignToPlace,

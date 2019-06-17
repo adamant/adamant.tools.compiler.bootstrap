@@ -17,5 +17,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         {
             return "scope " + number;
         }
+
+        public static bool operator ==(Scope a, Scope b)
+        {
+            return a.number == b.number;
+        }
+
+        public static bool operator !=(Scope a, Scope b)
+        {
+            return a.number != b.number;
+        }
+
+        public override int GetHashCode()
+        {
+            return number.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            var other = obj as Scope?;
+            return this == other;
+        }
     }
 }

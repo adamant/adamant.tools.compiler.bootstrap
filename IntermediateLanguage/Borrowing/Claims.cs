@@ -136,5 +136,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
         {
             return claimsList.OfType<IExclusive>().Last(c => c.Lifetime == lifetime).Holder;
         }
+
+        public IEnumerable<Claim> ClaimsOn(Lifetime lifetime)
+        {
+            return claimsList.Where(c => c.Lifetime == lifetime);
+        }
     }
 }

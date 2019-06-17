@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
 {
@@ -13,10 +14,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
     /// </summary>
     public static class BorrowError
     {
-        public static Diagnostic BorrowedValueDoesNotLiveLongEnough(CodeFile file, TextSpan span)
+        public static Diagnostic BorrowedValueDoesNotLiveLongEnough(
+            CodeFile file,
+            TextSpan span,
+            SimpleName variable)
         {
-            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 4001,
-                $"Borrowed value does not live long enough");
+            var msg = variable == null ? "Borrowed value does not live long enough"
+                : $"Value borrowed by `{variable}` does not live long enough";
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 4001, msg);
         }
 
         public static Diagnostic CantBorrowMutablyWhileBorrowedImmutably(CodeFile file, TextSpan span)
