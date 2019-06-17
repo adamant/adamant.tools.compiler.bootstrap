@@ -100,8 +100,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moving
 
         private void CheckAssignment(DataType assignToType, ExpressionSyntax value)
         {
-            if (assignToType is ReferenceType referenceType
-                && referenceType.IsOwned)
+            if (assignToType is ReferenceType referenceType && referenceType.IsOwned)
             {
                 if (value.ValueSemantics != ValueSemantics.Move)
                 {
