@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         internal static readonly AnyType Instance = new AnyType();
 
         private AnyType()
-            : base(Lifetimes.Lifetime.Forever)
+            : base(Lifetime.Forever)
         { }
         #endregion
 
