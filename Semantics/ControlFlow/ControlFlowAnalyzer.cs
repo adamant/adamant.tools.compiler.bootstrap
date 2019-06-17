@@ -363,8 +363,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     // need to be able to check mutability on borrows?
                     return ConvertToValue(mutable.Expression);
                 case MoveExpressionSyntax move:
+                {
                     // TODO should this be explicit in IR?
-                    return ConvertToValue(move.Expression);
+                    var operand = ConvertToOperand(move.Expression);
+                    switch (operand)
+                    {
+                        case VariableReference variableReference:
+                            return variableReference.AsMove(move.Span);
+                        default:
+                            throw new NotImplementedException();
+                    }
+                }
                 case ImplicitImmutabilityConversionExpression implicitImmutabilityConversion:
                 {
                     var operand = ConvertToOperand(implicitImmutabilityConversion.Expression);

@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         internal static readonly TypeType Instance = new TypeType();
 
         private TypeType()
-            : base(Lifetimes.Lifetime.None)
+            : base(Lifetime.None)
         { }
         #endregion
 

@@ -29,7 +29,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
                 case VariableReferenceKind.Share:
                     mutability = "imm ";
                     break;
-                // TODO what about move?
+                case VariableReferenceKind.Move:
+                    mutability = "move ";
+                    break;
                 default:
                     throw NonExhaustiveMatchException.ForEnum(Kind);
             }
@@ -44,6 +46,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public Value AsShared()
         {
             return Kind == VariableReferenceKind.Share ? this : new VariableReference(Variable, VariableReferenceKind.Share, Span);
+        }
+
+        public Value AsMove(TextSpan span)
+        {
+            return new VariableReference(Variable, VariableReferenceKind.Move, span);
+
         }
     }
 }

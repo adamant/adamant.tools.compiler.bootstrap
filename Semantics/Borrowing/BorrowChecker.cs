@@ -367,6 +367,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                                 outstandingClaims.Add(new Shares(claimHolder, lifetime));
                         }
                         break;
+                        case VariableReferenceKind.Move:
+                        {
+                            var lifetime = outstandingClaims.LifetimeOf(varRef.Variable);
+                            if (lifetime == null) throw new NotImplementedException();
+                            var currentOwner = outstandingClaims.OwnerOf(lifetime.Value);
+                            outstandingClaims.Remove(currentOwner);
+                            if (claimHolder is Variable newHolder)
+                                outstandingClaims.Add(new Owns(newHolder, lifetime.Value));
+                            else
+                                throw new NotImplementedException();
+                        }
+                        break;
                         default:
                             throw NonExhaustiveMatchException.ForEnum(varRef.Kind);
                     }
