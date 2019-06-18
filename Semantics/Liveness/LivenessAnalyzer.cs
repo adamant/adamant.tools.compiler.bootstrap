@@ -59,7 +59,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
 
                 var liveAfterBlock = new BitArray(numberOfVariables);
                 foreach (var successor in function.Edges.From(block))
-                    liveAfterBlock.Or(liveVariables.Before(successor.Statements.Last()));
+                    liveAfterBlock.Or(liveVariables.Before(successor.Statements.First()));
 
                 if (block.Terminator is ReturnStatement && function.ReturnVariable.Exists)
                     liveAfterBlock[0] = true; // the return value is live after a block that returns

@@ -76,6 +76,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 
         private void Check(FunctionDeclarationSyntax function)
         {
+            // TODO change to always generate control flow for functions and remove this
             // We can't do borrow checking because of errors or no body
             if (function.Poisoned || function.ControlFlow == null)
                 return;
