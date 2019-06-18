@@ -40,16 +40,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
                 $"Can't move out of expression");
         }
 
-        public static Diagnostic CantAssignToImmutable(CodeFile file, TextSpan span)
+        public static Diagnostic VariableMayAlreadyBeAssigned(CodeFile file, TextSpan span, SimpleName name)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6005,
-                $"Can't assign to immutable variable");
+                $"Variable `{name}` declared with `let` may already be assigned");
         }
 
         public static Diagnostic VariableMayNotHaveBeenAssigned(CodeFile file, TextSpan span, SimpleName name)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6006,
-                $"Variable {name} may not have been assigned before use");
+                $"Variable `{name}` may not have been assigned before use");
         }
     }
 }

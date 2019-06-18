@@ -4,17 +4,19 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
 {
-    public class DefiniteAssignmentChecker : IDataFlowAnalysisChecker<VariableFlags>
+    /// <summary>
+    /// Uses a data flow analysis of variables that are definitely unassigned to
+    /// determine if binding mutability is violated.
+    /// </summary>
+    public class BindingMutabilityChecker : IDataFlowAnalysisChecker<VariableFlags>
     {
         private readonly FunctionDeclarationSyntax function;
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
 
-        public DefiniteAssignmentChecker(
-            FunctionDeclarationSyntax function,
-            Diagnostics diagnostics)
+        public BindingMutabilityChecker(FunctionDeclarationSyntax function, Diagnostics diagnostics)
         {
             this.function = function;
             this.file = function.File;
@@ -23,9 +25,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
 
         public VariableFlags StartState()
         {
-            var state = new VariableFlags(function, false);
+            // All variables start definitely unassigned
+            var state = new VariableFlags(function, true);
             // All parameters are assigned
-            state = state.Set(function.Parameters, true);
+            state = state.Set(function.Parameters, false);
             return state;
         }
 
@@ -36,22 +39,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
             switch (assignmentExpression.LeftOperand)
             {
                 case IdentifierNameSyntax identifier:
-                    return state.Set(identifier.ReferencedSymbol, true);
+                    var symbol = identifier.ReferencedSymbol;
+                    if (state.SymbolMap.TryGetValue(symbol, out var i)
+                        && !state[i]
+                        && !symbol.MutableBinding)
+                    {
+                        diagnostics.Add(SemanticError.VariableMayAlreadyBeAssigned(file, identifier.Span, identifier.Name));
+                    }
+                    return state.Set(symbol, false);
                 default:
                     throw new NotImplementedException("Complex assignments not yet implemented");
             }
         }
 
-        public VariableFlags IdentifierName(
-            IdentifierNameSyntax identifierName,
-            VariableFlags state)
+        public VariableFlags IdentifierName(IdentifierNameSyntax identifierName, VariableFlags state)
         {
-            if (state.SymbolMap.TryGetValue(identifierName.ReferencedSymbol, out var i)
-                && !state[i])
-            {
-                diagnostics.Add(SemanticError.VariableMayNotHaveBeenAssigned(file, identifierName.Span, identifierName.Name));
-            }
-
             return state;
         }
 
@@ -60,7 +62,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
             VariableFlags state)
         {
             if (variableDeclaration.Initializer == null) return state;
-            return state.Set(variableDeclaration, true);
+            return state.Set(variableDeclaration, false);
         }
     }
 }
