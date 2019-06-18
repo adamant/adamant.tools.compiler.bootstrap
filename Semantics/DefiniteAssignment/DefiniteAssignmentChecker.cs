@@ -9,7 +9,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
 {
-    public class DefiniteAssignmentChecker : IDataFlowAnalysisChecker<VariablesDefinitelyAssigned>
+    public class DefiniteAssignmentChecker : IDataFlowAnalysisChecker<VariablesAssigned>
     {
         private readonly FunctionDeclarationSyntax function;
         private readonly CodeFile file;
@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
             this.diagnostics = diagnostics;
         }
 
-        public VariablesDefinitelyAssigned StartState()
+        public VariablesAssigned StartState()
         {
             var symbolMap = function.ChildSymbols.Values.SelectMany(l => l).Enumerate()
                                 .ToFixedDictionary(t => t.Item1, t => t.Item2);
@@ -33,12 +33,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
             foreach (var parameter in function.Parameters)
                 assigned[symbolMap[parameter]] = true;
 
-            return new VariablesDefinitelyAssigned(symbolMap, assigned);
+            return new VariablesAssigned(symbolMap, assigned);
         }
 
-        public VariablesDefinitelyAssigned Assignment(
+        public VariablesAssigned Assignment(
             AssignmentExpressionSyntax assignmentExpression,
-            VariablesDefinitelyAssigned state)
+            VariablesAssigned state)
         {
             var newState = state.Clone();
             switch (assignmentExpression.LeftOperand)
@@ -53,9 +53,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
             return newState;
         }
 
-        public VariablesDefinitelyAssigned IdentifierName(
+        public VariablesAssigned IdentifierName(
             IdentifierNameSyntax identifierName,
-            VariablesDefinitelyAssigned state)
+            VariablesAssigned state)
         {
             if (state.SymbolMap.TryGetValue(identifierName.ReferencedSymbol, out var i)
                 && !state.IsDefinitelyAssigned(i))
@@ -66,9 +66,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
             return state;
         }
 
-        public VariablesDefinitelyAssigned VariableDeclaration(
+        public VariablesAssigned VariableDeclaration(
             VariableDeclarationStatementSyntax variableDeclaration,
-            VariablesDefinitelyAssigned state)
+            VariablesAssigned state)
         {
             if (variableDeclaration.Initializer == null) return state;
             var newState = state.Clone();

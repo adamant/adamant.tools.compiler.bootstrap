@@ -4,7 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
 {
-    public class DefiniteAssignmentStrategy : IDataFlowAnalysisStrategy<VariablesDefinitelyAssigned>
+    public class DefiniteAssignmentStrategy : IDataFlowAnalysisStrategy<VariablesAssigned>
     {
         #region Singleton
         public static DefiniteAssignmentStrategy Instance = new DefiniteAssignmentStrategy();
@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
         private DefiniteAssignmentStrategy() { }
         #endregion
 
-        public IDataFlowAnalysisChecker<VariablesDefinitelyAssigned> CheckerFor(
+        public IDataFlowAnalysisChecker<VariablesAssigned> CheckerFor(
             FunctionDeclarationSyntax function,
             Diagnostics diagnostics)
         {

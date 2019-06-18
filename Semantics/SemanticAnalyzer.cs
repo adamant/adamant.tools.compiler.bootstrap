@@ -72,7 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // to do data flow analysis in a very top down way. I.e. proceed through the control flow and repeat
             // things like loops until they stabilize. The only question might be with nested loops whether it makes
             // sense to stabilize an inner loop before repeating an outer loop or not.
-            BindingMutabilityChecker.Check(memberDeclarations, diagnostics);
+            OldBindingMutabilityChecker.Check(memberDeclarations, diagnostics);
 
             // --------------------------------------------------
             // This is where the representation transitions to IR

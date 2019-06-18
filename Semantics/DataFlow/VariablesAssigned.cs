@@ -1,16 +1,15 @@
 using System.Collections;
-using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
 {
-    public class VariablesDefinitelyAssigned
+    public class VariablesAssigned
     {
         public readonly FixedDictionary<ISymbol, int> SymbolMap;
         private readonly BitArray assigned;
 
-        public VariablesDefinitelyAssigned(
+        public VariablesAssigned(
             FixedDictionary<ISymbol, int> symbolMap,
             BitArray assigned)
         {
@@ -23,9 +22,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
             return assigned[i];
         }
 
-        public VariablesDefinitelyAssigned Clone()
+        public VariablesAssigned Clone()
         {
-            return new VariablesDefinitelyAssigned(SymbolMap, (BitArray)assigned.Clone());
+            return new VariablesAssigned(SymbolMap, (BitArray)assigned.Clone());
         }
 
         public void Assigned(ISymbol symbol)

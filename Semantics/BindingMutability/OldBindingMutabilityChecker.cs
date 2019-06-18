@@ -11,12 +11,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
     /// <summary>
     /// Enforces that you can't assign into a variable declared with `let`
     /// </summary>
-    internal class BindingMutabilityChecker : ExpressionVisitor<bool>
+    internal class OldBindingMutabilityChecker : ExpressionVisitor<bool>
     {
         private readonly FunctionDeclarationSyntax function;
         private readonly Diagnostics diagnostics;
 
-        private BindingMutabilityChecker(FunctionDeclarationSyntax function, Diagnostics diagnostics)
+        private OldBindingMutabilityChecker(FunctionDeclarationSyntax function, Diagnostics diagnostics)
         {
             this.function = function;
             this.diagnostics = diagnostics;
@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
         {
             if (function.Body == null) return;
 
-            var moveChecker = new BindingMutabilityChecker(function, diagnostics);
+            var moveChecker = new OldBindingMutabilityChecker(function, diagnostics);
             moveChecker.VisitExpression(function.Body, false);
         }
 
