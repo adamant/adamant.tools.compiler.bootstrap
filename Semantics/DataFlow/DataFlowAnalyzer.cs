@@ -42,8 +42,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
 
         public override void VisitAssignmentExpression(AssignmentExpressionSyntax assignmentExpression, Void args)
         {
-            base.VisitAssignmentExpression(assignmentExpression, args);
+            VisitLValueExpression(assignmentExpression.LeftOperand, args);
+            VisitExpression(assignmentExpression.RightOperand, args);
             currentState = checker.Assignment(assignmentExpression, currentState);
+        }
+
+        private static void VisitLValueExpression(ExpressionSyntax expression, Void args)
+        {
+            switch (expression)
+            {
+                case IdentifierNameSyntax identifierName:
+                case null:
+                    // Ignore
+                    break;
+                // TODO we will need to visit other expression types that also contain rvalues
+                default:
+                    throw NonExhaustiveMatchException.For(expression);
+            }
         }
 
         public override void VisitIdentifierName(IdentifierNameSyntax identifierName, Void args)
