@@ -7,6 +7,8 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Moving;
@@ -51,9 +53,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             TypeResolutionValidator.Validate(memberDeclarations);
             // TODO validate that all `ReferencedSymbol` properties have been set
 #endif
+            // TODO the move checker should be handled by the data flow analysis and type checking
             MoveChecker.Check(memberDeclarations, diagnostics);
 
             ShadowChecker.Check(memberDeclarations, diagnostics);
+
+            DataFlowAnalysis.Check(DefiniteAssignmentStrategy.Instance, memberDeclarations, diagnostics);
 
             // TODO we need to check definite assignment as part of this.
             // Notes: the Roslyn compiler does this by having a base class for data flow passes. This

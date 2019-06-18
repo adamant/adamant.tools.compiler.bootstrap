@@ -1,5 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
 {
@@ -43,6 +44,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6005,
                 $"Can't assign to immutable variable");
+        }
+
+        public static Diagnostic VariableMayNotHaveBeenAssigned(CodeFile file, TextSpan span, SimpleName name)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6006,
+                $"Variable {name} may not have been assigned before use");
         }
     }
 }

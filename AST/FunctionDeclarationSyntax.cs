@@ -69,11 +69,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
              FixedList<ParameterSyntax> parameters,
              BlockSyntax body)
         {
-            var visitor = new GetVariableDeclarationsVisitor();
-            visitor.VisitExpression(body, default);
+            var variableDeclarations = GetVariableDeclarations(body);
             return parameters
                 .Concat(genericParameters ?? Enumerable.Empty<ISymbol>())
-                .Concat(visitor.VariableDeclarations);
+                .Concat(variableDeclarations);
+        }
+
+        private static IReadOnlyList<VariableDeclarationStatementSyntax> GetVariableDeclarations(BlockSyntax body)
+        {
+            var visitor = new GetVariableDeclarationsVisitor();
+            visitor.VisitExpression(body, default);
+            var variableDeclarations = visitor.VariableDeclarations;
+            return variableDeclarations;
+        }
+
+        public IReadOnlyList<VariableDeclarationStatementSyntax> GetVariableDeclarations()
+        {
+            return GetVariableDeclarations(Body);
         }
     }
 }

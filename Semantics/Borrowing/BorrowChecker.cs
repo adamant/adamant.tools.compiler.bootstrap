@@ -207,8 +207,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         private Claims AcquireParameterClaims(FunctionDeclarationSyntax function)
         {
             var claimsBeforeStatement = new Claims();
-            foreach (var parameter in function.ControlFlow.VariableDeclarations
-                .Where(v => v.IsParameter && v.Type is ReferenceType))
+            foreach (var parameter in function.ControlFlow.Parameters
+                .Where(v => v.Type is ReferenceType))
                 claimsBeforeStatement.Add(new Borrows(parameter.Variable, NewLifetime()));
 
             return claimsBeforeStatement;

@@ -9,6 +9,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     public class ControlFlowGraph
     {
         public FixedList<LocalVariableDeclaration> VariableDeclarations { get; }
+        public IEnumerable<LocalVariableDeclaration> Parameters =>
+            VariableDeclarations.Where(v => v.IsParameter);
         public LocalVariableDeclaration ReturnVariable => VariableDeclarations[0];
         public DataType ReturnType => ReturnVariable.Type;
         public FixedList<BasicBlock> BasicBlocks { get; }
