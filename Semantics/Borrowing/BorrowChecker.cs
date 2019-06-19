@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
@@ -19,6 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         private readonly CodeFile file;
         private readonly FixedDictionary<FunctionDeclarationSyntax, LiveVariables> liveness;
         private readonly Diagnostics diagnostics;
+        private readonly HashSet<TextSpan> reportedDiagnosticSpans = new HashSet<TextSpan>();
         private readonly bool saveBorrowClaims;
         private int nextLifetimeNumber = 1;
 
@@ -140,7 +142,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             {
                                 var declaration = function.ControlFlow.VariableDeclarations
                                                             .Single(d => d.Variable == variable);
-                                diagnostics.Add(BorrowError.BorrowedValueDoesNotLiveLongEnough(file, exitScopeStatement.Span, declaration.Name));
+                                ReportDiagnostic(BorrowError.BorrowedValueDoesNotLiveLongEnough(file, exitScopeStatement.Span, declaration.Name));
                             }
                             break;
                         default:
@@ -214,15 +216,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 
             return claimsBeforeStatement;
         }
-
-        //private void CheckCanDelete(Lifetime lifetime, Claims claims, TextSpan span)
-        //{
-        //    var isBorrowedOrShared = claims.IsBorrowedOrShared(lifetime);
-
-        //    if (isBorrowedOrShared)
-        //        // TODO this should be a different error message
-        //        diagnostics.Add(BorrowError.BorrowedValueDoesNotLiveLongEnough(file, span));
-        //}
 
         private void CheckStatement(
             Place assignToPlace,
@@ -347,9 +340,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             var lifetime = borrowingLifetime.Value;
 
                             if (outstandingClaims.IsShared(lifetime))
-                                diagnostics.Add(BorrowError.CantBorrowMutablyWhileBorrowedImmutably(file, operand.Span));
+                                ReportDiagnostic(BorrowError.CantBorrowMutablyWhileBorrowedImmutably(file, operand.Span));
                             else if (!outstandingClaims.CurrentBorrower(lifetime).Equals(varRef.Variable))
-                                diagnostics.Add(BorrowError.CantBorrowMutablyWhileBorrowedMutably(file, operand.Span));
+                                ReportDiagnostic(BorrowError.CantBorrowMutablyWhileBorrowedMutably(file, operand.Span));
                             else
                                 outstandingClaims.Add(new Borrows(claimHolder, lifetime));
                         }
@@ -363,7 +356,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             var lifetime = sharingLifetime.Value;
                             if (!outstandingClaims.IsShared(lifetime) &&
                                 !outstandingClaims.CurrentBorrower(lifetime).Equals(varRef.Variable))
-                                diagnostics.Add(BorrowError.CantBorrowImmutablyWhileBorrowedMutably(file, operand.Span));
+                                ReportDiagnostic(BorrowError.CantBorrowImmutablyWhileBorrowedMutably(file, operand.Span));
                             else
                                 outstandingClaims.Add(new Shares(claimHolder, lifetime));
                         }
@@ -408,6 +401,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             Claims outstandingClaims)
         {
             outstandingClaims.Add(new Shares(claimHolder, lifetime));
+        }
+
+        private void ReportDiagnostic(Diagnostic diagnostic)
+        {
+            // Presumably, if we have the exact same span, that means we reported this error before
+            if (reportedDiagnosticSpans.Contains(diagnostic.Span)) return;
+
+            reportedDiagnosticSpans.Add(diagnostic.Span);
+            diagnostics.Add(diagnostic);
         }
     }
 }

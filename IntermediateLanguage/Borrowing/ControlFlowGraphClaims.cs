@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
     public class ControlFlowGraphClaims
     {
         public readonly Claims ParameterClaims;
-        private readonly Dictionary<Statement, Claims> claims = new Dictionary<Statement, Claims>();
+        private readonly Dictionary<Statement, Claims> claimsAfter = new Dictionary<Statement, Claims>();
 
         public ControlFlowGraphClaims(Claims parameterClaims)
         {
@@ -18,11 +18,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
 
         public Claims After(Statement statement)
         {
-            if (claims.TryGetValue(statement, out var existingClaims))
+            if (claimsAfter.TryGetValue(statement, out var existingClaims))
                 return existingClaims;
 
             var newClaims = new Claims();
-            claims.Add(statement, newClaims);
+            claimsAfter.Add(statement, newClaims);
             return newClaims;
         }
     }
