@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
@@ -377,7 +376,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             throw NonExhaustiveMatchException.ForEnum(varRef.Kind);
                     }
                     break;
-                case Place place:
+                case Place _:
                     throw new NotImplementedException();
                 case Constant _:
                     // no loans to acquire

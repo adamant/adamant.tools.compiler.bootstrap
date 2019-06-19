@@ -79,14 +79,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 type = DataType.Unknown;
             }
 
-            variableDeclaration.Type = type;
             if (variableDeclaration.Initializer != null)
             {
                 InsertImplicitConversionIfNeeded(ref variableDeclaration.Initializer, type);
                 var initializerType = variableDeclaration.Initializer.Type;
-                if (!IsAssignableFrom(type, initializerType))
-                    diagnostics.Add(TypeError.CannotConvert(file, variableDeclaration.Initializer, initializerType, type));
+                // If the source is an owned reference, then the declaration is implicitly owned
+                if (type is ObjectType targetType && initializerType is ObjectType sourceType
+                      && sourceType.Lifetime == Lifetime.Owned
+                      && targetType.Lifetime == Lifetime.None
+                      && IsAssignableFrom(targetType.AsOwned(), sourceType))
+                    variableDeclaration.Type = targetType.AsOwned();
+                else
+                {
+                    if (!IsAssignableFrom(type, initializerType))
+                        diagnostics.Add(TypeError.CannotConvert(file, variableDeclaration.Initializer, initializerType, type));
+
+                    variableDeclaration.Type = type;
+                }
             }
+            else
+                variableDeclaration.Type = type;
         }
 
         /// <summary>
