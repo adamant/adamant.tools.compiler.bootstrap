@@ -76,6 +76,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         }
 
         /// <summary>
+        /// Use this type as an immutable type. 
+        /// </summary>
+        public ObjectType AsImmutable()
+        {
+            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability.Immutable, Lifetime);
+        }
+
+        /// <summary>
         /// Use this type with indeterminate mutability. Note that if it is declared immutable, then
         /// there can be no indeterminate mutability and this function returns and immutable type.
         /// </summary>

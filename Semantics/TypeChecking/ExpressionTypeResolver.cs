@@ -166,8 +166,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                         && objectType.Mutability != Mutability.Immutable)
                     {
                         // TODO if source type is explicitly mutable, issue warning about using `mut` in immutable context
-                        // TODO what about different lifetimes? Shouldn't this implicit conversion not change lifetimes?
-                        expression = new ImplicitImmutabilityConversionExpression(expression, targetObjectType);
+                        // Take the object type and make it immutable so that we preserve the lifetime of the type
+                        expression = new ImplicitImmutabilityConversionExpression(expression, objectType.AsImmutable());
                     }
                     break;
             }
@@ -195,16 +195,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 case ReturnExpressionSyntax returnExpression:
                     if (returnExpression.ReturnValue != null)
                     {
-                        InferExpressionType(returnExpression.ReturnValue);
-                        if (returnType != null)
-                        {
-                            InsertImplicitConversionIfNeeded(ref returnExpression.ReturnValue, returnType);
-                            var type = returnExpression.ReturnValue.Type;
-                            if (!IsAssignableFrom(returnType, type))
-                                diagnostics.Add(TypeError.CannotConvert(file,
-                                    returnExpression.ReturnValue, type, returnType));
-                        }
-                        else throw new NotImplementedException("Null return type. Report an error?");
+                        if (returnType == null)
+                            throw new NotImplementedException("Null return type. Report an error?");
+
+                        // If we return ownership, there is an implicit move
+                        if (returnType is ObjectType objectType && objectType.IsOwned)
+                            InferMoveExpressionType(returnExpression.ReturnValue);
+                        else
+                            InferExpressionType(returnExpression.ReturnValue);
+                        InsertImplicitConversionIfNeeded(ref returnExpression.ReturnValue, returnType);
+                        var type = returnExpression.ReturnValue.Type;
+                        if (!IsAssignableFrom(returnType, type))
+                            diagnostics.Add(TypeError.CannotConvert(file,
+                                returnExpression.ReturnValue, type, returnType));
                     }
                     else if (returnType == DataType.Never)
                         diagnostics.Add(TypeError.CantReturnFromNeverFunction(file, returnExpression.Span));
