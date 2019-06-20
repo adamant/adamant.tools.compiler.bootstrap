@@ -1,3 +1,5 @@
+using Adamant.Tools.Compiler.Bootstrap.Names;
+
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     /// <summary>
@@ -9,18 +11,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// `throw`, `return` and `break` which never produce a result. It is also
     /// used as the type of a `loop` statement with no breaks in it.
     /// </summary>
-    public class NeverType : SimpleType
+    public class NeverType : EmptyType
     {
         #region Singleton
         internal static readonly NeverType Instance = new NeverType();
 
         private NeverType()
-            : base("never")
+            : base(SpecialName.Never)
         { }
         #endregion
-
-        public override bool IsEmpty => true;
-
-        public override bool IsKnown => true;
     }
 }

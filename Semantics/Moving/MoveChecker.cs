@@ -54,6 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moving
                     break;
                 case ReferenceType _:
                 case UnknownType _:
+                case VoidType _:
                     expression.ValueSemantics = ValueSemantics.Copy;
                     break;
                 case ValueType valueType:
