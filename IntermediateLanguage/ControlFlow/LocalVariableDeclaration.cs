@@ -6,16 +6,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class LocalVariableDeclaration
     {
-        public readonly Variable Variable; // The declaration number is used as its name in the IR
+        /// <summary>
+        /// Which IL variable is being declared
+        /// </summary>
+        public readonly Variable Variable;
+
+        /// <summary>
+        /// What scope is this variable in. The %result or self parameter of a
+        /// constructor don't have scopes.
+        /// </summary>
         public readonly Scope? Scope;
 
-        // If this declaration corresponds to an argument or local variable, what it was named. Not guaranteed unique
+        /// <summary>
+        /// If this declaration corresponds to an argument or local variable,
+        /// what it was named. Not guaranteed unique
+        /// </summary>
         public readonly SimpleName Name;
         public readonly bool IsParameter;
         public readonly bool MutableBinding;
         public readonly DataType Type;
         public bool TypeIsNotEmpty => !Type.IsEmpty;
-        private readonly VariableReferenceKind referenceKind;
+
+        // TODO does this make sense? shouldn't the default reference kind always be Share?
+        private readonly VariableReferenceKind defaultReferenceKind;
 
         public LocalVariableDeclaration(
             bool isParameter,
@@ -32,14 +45,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             MutableBinding = mutableBinding;
             Type = type;
             if (type is ObjectType objectType && objectType.Mutability == Mutability.Immutable)
-                referenceKind = VariableReferenceKind.Share;
+                defaultReferenceKind = VariableReferenceKind.Share;
             else
-                referenceKind = VariableReferenceKind.Borrow;
+                defaultReferenceKind = VariableReferenceKind.Borrow;
         }
 
         public VariableReference Reference(TextSpan span)
         {
-            return new VariableReference(Variable, referenceKind, span);
+            return new VariableReference(Variable, defaultReferenceKind, span);
         }
 
         public VariableReference AssignReference(TextSpan span)
