@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public ImplicitImmutabilityConversionExpression(
             ExpressionSyntax expression,
-            ObjectType convertToType)
+            UserObjectType convertToType)
             : base(expression.Span, convertToType)
         {
             Expression = expression;

@@ -100,13 +100,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             switch (function)
             {
                 case ConstructorDeclarationSyntax constructor:
-                    return constructor.SelfParameterType = ((ObjectType)declaringType).ForConstructorSelf();
+                    return constructor.SelfParameterType = ((UserObjectType)declaringType).ForConstructorSelf();
                 case NamedFunctionDeclarationSyntax namedFunction:
                     var selfParameter = namedFunction.Parameters.OfType<SelfParameterSyntax>().SingleOrDefault();
                     if (selfParameter == null) return null; // Static function
                     selfParameter.Type.BeginFulfilling();
                     // TODO deal with structs and ref self
-                    var selfType = (ObjectType)declaringType;
+                    var selfType = (UserObjectType)declaringType;
                     if (selfParameter.MutableSelf) selfType = selfType.AsMutable();
                     return namedFunction.SelfParameterType = selfParameter.Type.Fulfill(selfType);
                 case InitializerDeclarationSyntax _:
@@ -188,7 +188,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 : DataType.Void;
 
             // If we are returning ownership, then they can make it mutable
-            if (returnType is ObjectType objectType && objectType.IsOwned)
+            if (returnType is UserObjectType objectType && objectType.IsOwned)
                 returnType = objectType.AsImplicitlyUpgradable();
             return function.ReturnType.Fulfill(returnType);
         }
@@ -225,32 +225,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             switch (declaration)
             {
                 case ClassDeclarationSyntax classDeclaration:
-                    var classType = ObjectType.Declaration(declaration,
+                    var classType = UserObjectType.Declaration(declaration,
                         classDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
                         genericParameterTypes);
                     declaration.Type.Fulfill(new Metatype(classType));
                     classDeclaration.CreateDefaultConstructor();
                     break;
                 case StructDeclarationSyntax structDeclaration:
-                    var structType = ObjectType.Declaration(declaration,
+                    var structType = UserObjectType.Declaration(declaration,
                         structDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
                         genericParameterTypes);
                     declaration.Type.Fulfill(new Metatype(structType));
                     break;
                 case EnumStructDeclarationSyntax enumStructDeclaration:
-                    var enumStructType = ObjectType.Declaration(declaration,
+                    var enumStructType = UserObjectType.Declaration(declaration,
                         enumStructDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
                         genericParameterTypes);
                     declaration.Type.Fulfill(new Metatype(enumStructType));
                     break;
                 case EnumClassDeclarationSyntax enumStructDeclaration:
-                    var enumClassType = ObjectType.Declaration(declaration,
+                    var enumClassType = UserObjectType.Declaration(declaration,
                         enumStructDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
                         genericParameterTypes);
                     declaration.Type.Fulfill(new Metatype(enumClassType));
                     break;
                 case TraitDeclarationSyntax declarationSyntax:
-                    var type = ObjectType.Declaration(declaration,
+                    var type = UserObjectType.Declaration(declaration,
                         declarationSyntax.Modifiers.Any(m => m is IMutableKeywordToken),
                         genericParameterTypes);
                     declaration.Type.Fulfill(new Metatype(type));

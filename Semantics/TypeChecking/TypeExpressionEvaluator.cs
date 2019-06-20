@@ -46,7 +46,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 case RefTypeSyntax refType:
                 {
                     var referent = EvaluateExpression(refType.ReferencedType);
-                    if (referent is ObjectType objectType)
+                    if (referent is UserObjectType objectType)
                         return new RefType(objectType);
                     return DataType.Unknown;
                 }
@@ -79,7 +79,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     var type = EvaluateExpression(mutableType.Expression);
                     switch (type)
                     {
-                        case ObjectType objectType when objectType.DeclaredMutable:
+                        case UserObjectType objectType when objectType.DeclaredMutable:
                             return objectType.AsMutable();
                         default:
                             return DataType.Unknown;

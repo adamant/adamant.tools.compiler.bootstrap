@@ -90,7 +90,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             return builder.ToString();
         }
 
-        public string Mangle(ObjectType type)
+        public string Mangle(UserObjectType type)
         {
             // builder with room for the characters we are likely to add
             var extraSize = 0; // Room for

@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
         public DataType Type { get; }
         public SymbolSet ChildSymbols => SymbolSet.Empty;
 
-        public DefaultConstructor(ObjectType type)
+        public DefaultConstructor(UserObjectType type)
         {
             FullName = type.Name.Qualify(SpecialName.New);
             Type = new FunctionType(Enumerable.Empty<DataType>(), type);

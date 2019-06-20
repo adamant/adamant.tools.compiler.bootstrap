@@ -288,7 +288,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             if (assignToPlace == null) return;
 
             var variableDeclaration = VariableDeclaration(assignToPlace, variables);
-            if (variableDeclaration.Type is ObjectType objectType
+            if (variableDeclaration.Type is UserObjectType objectType
                 && objectType.Mutability == Mutability.Mutable)
                 AcquireBorrow(assignToPlace.CoreVariable(), callLifetime, claimsAfterStatement);
             else

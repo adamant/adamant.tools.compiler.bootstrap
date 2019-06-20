@@ -49,7 +49,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Deletes
                     foreach (var variableNumber in dead.TrueIndexes())
                     {
                         var variable = graph.VariableDeclarations[variableNumber];
-                        if (variable.Type is ObjectType type
+                        if (variable.Type is UserObjectType type
                             && type.IsOwned)
                         {
                             // The delete happens after the last statement

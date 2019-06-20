@@ -6,11 +6,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class ConstructorCall : Value
     {
-        public readonly ObjectType Type;
+        public readonly UserObjectType Type;
         public FixedList<Operand> Arguments { get; }
         public int Arity => Arguments.Count + 1;
 
-        public ConstructorCall(ObjectType type, FixedList<Operand> arguments, TextSpan span)
+        public ConstructorCall(UserObjectType type, FixedList<Operand> arguments, TextSpan span)
             : base(span)
         {
             Type = type;

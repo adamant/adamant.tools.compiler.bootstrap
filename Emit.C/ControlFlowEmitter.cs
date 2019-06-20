@@ -195,7 +195,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             switch (type)
             {
-                case ObjectType objectType:
+                case UserObjectType objectType:
                     return nameMangler.Mangle(objectType);
                 case SimpleType simpleType:
                     return nameMangler.Mangle(simpleType.Name);

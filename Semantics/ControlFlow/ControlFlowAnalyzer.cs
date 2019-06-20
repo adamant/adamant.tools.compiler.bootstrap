@@ -175,7 +175,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case ReturnExpressionSyntax returnExpression:
                     if (returnExpression.ReturnValue != null)
                     {
-                        var isMove = returnType is ObjectType objectType
+                        var isMove = returnType is UserObjectType objectType
                                      && objectType.IsOwned;
                         var value = isMove
                             ? ConvertToMove(returnExpression.ReturnValue, returnExpression.Span)
@@ -309,7 +309,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             {
                 case NewObjectExpressionSyntax newObjectExpression:
                     var args = newObjectExpression.Arguments.Select(a => ConvertToOperand(a.Value)).ToFixedList();
-                    return new ConstructorCall((ObjectType)newObjectExpression.Type, args, newObjectExpression.Span);
+                    return new ConstructorCall((UserObjectType)newObjectExpression.Type, args, newObjectExpression.Span);
                 case IdentifierNameSyntax identifier:
                 {
                     var symbol = identifier.ReferencedSymbol;
@@ -385,7 +385,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         case Dereference _:
                             throw new NotImplementedException();
                         case VariableReference varReference:
-                            if (implicitImmutabilityConversion.Type is ObjectType objectType
+                            if (implicitImmutabilityConversion.Type is UserObjectType objectType
                                 && objectType.IsOwned)
                                 return varReference.AsMove(implicitImmutabilityConversion.Span);
                             else

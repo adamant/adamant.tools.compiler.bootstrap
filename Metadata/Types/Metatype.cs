@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         {
             switch (Instance)
             {
-                case ObjectType _:
+                case UserObjectType _:
                 case SimpleType _:
                 case AnyType _:
                 case TypeType _:

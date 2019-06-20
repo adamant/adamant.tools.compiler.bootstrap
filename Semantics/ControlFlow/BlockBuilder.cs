@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             statements.Add(new ActionStatement(value, span, scope));
         }
 
-        public void AddDelete(Place place, ObjectType type, TextSpan span, Scope scope)
+        public void AddDelete(Place place, UserObjectType type, TextSpan span, Scope scope)
         {
             statements.Add(new DeleteStatement(place, type, span, scope));
         }

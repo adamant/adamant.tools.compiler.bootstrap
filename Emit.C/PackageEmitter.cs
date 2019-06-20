@@ -57,7 +57,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.Definitions.AppendLine("int32_t main(const int argc, char const * const * const argv)");
             code.Definitions.BeginBlock();
             var arguments = new List<string>();
-            foreach (var parameterTypeName in entryPoint.Parameters.Select(p => p.Type).Cast<ObjectType>().Select(t => t.Name))
+            foreach (var parameterTypeName in entryPoint.Parameters.Select(p => p.Type).Cast<UserObjectType>().Select(t => t.Name))
             {
                 if (parameterTypeName.Equals(Name.From("system", "console", "Console")))
                 {

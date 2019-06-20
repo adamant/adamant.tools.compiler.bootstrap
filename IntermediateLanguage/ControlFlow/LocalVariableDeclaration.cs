@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         /// </summary>
         public readonly SimpleName Name;
         public readonly bool IsParameter;
-        public readonly bool MutableBinding;
+        public readonly bool IsMutableBinding;
         public readonly DataType Type;
         public bool TypeIsNotEmpty => !Type.IsEmpty;
 
@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 
         public LocalVariableDeclaration(
             bool isParameter,
-            bool mutableBinding,
+            bool isMutableBinding,
             DataType type,
             Variable variable,
             Scope? scope,
@@ -42,9 +42,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             Variable = variable;
             Scope = scope;
             Name = name;
-            MutableBinding = mutableBinding;
+            IsMutableBinding = isMutableBinding;
             Type = type;
-            if (type is ObjectType objectType && objectType.Mutability == Mutability.Immutable)
+            if (type is UserObjectType objectType && objectType.Mutability == Mutability.Immutable)
                 defaultReferenceKind = VariableReferenceKind.Share;
             else
                 defaultReferenceKind = VariableReferenceKind.Borrow;
@@ -63,7 +63,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         // Useful for debugging
         public override string ToString()
         {
-            var binding = MutableBinding ? "var" : "let";
+            var binding = IsMutableBinding ? "var" : "let";
             var result = $"{binding} {Variable}: {Type};";
             if (Scope != null || Name != null)
                 result += " //";

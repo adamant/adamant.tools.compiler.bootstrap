@@ -6,9 +6,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     public class DeleteStatement : ExpressionStatement
     {
         public Place Place { get; }
-        public ObjectType Type { get; }
+        public UserObjectType Type { get; }
 
-        public DeleteStatement(Place place, ObjectType type, TextSpan span, Scope scope)
+        public DeleteStatement(Place place, UserObjectType type, TextSpan span, Scope scope)
             : base(span, scope)
         {
             Place = place;

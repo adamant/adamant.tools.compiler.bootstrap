@@ -83,7 +83,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 InsertImplicitConversionIfNeeded(ref variableDeclaration.Initializer, type);
                 var initializerType = variableDeclaration.Initializer.Type;
                 // If the source is an owned reference, then the declaration is implicitly owned
-                if (type is ObjectType targetType && initializerType is ObjectType sourceType
+                if (type is UserObjectType targetType && initializerType is UserObjectType sourceType
                       && sourceType.Lifetime == Lifetime.Owned
                       && targetType.Lifetime == Lifetime.None
                       && IsAssignableFrom(targetType.AsOwned(), sourceType))
@@ -148,7 +148,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     break;
                 case StringConstantType _:
                 {
-                    if (targetType is ObjectType objectType)
+                    if (targetType is UserObjectType objectType)
                     {
                         var conversionOperators = objectType.Symbol.Lookup(SpecialName.OperatorStringLiteral);
                         if (conversionOperators.Count == 1) // TODO actually check we can call it
@@ -159,8 +159,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     }
                 }
                 break;
-                case ObjectType objectType:
-                    if (targetType is ObjectType targetObjectType
+                case UserObjectType objectType:
+                    if (targetType is UserObjectType targetObjectType
                         && targetObjectType.Mutability == Mutability.Immutable
                         && targetObjectType.EqualExceptLifetimeAndMutability(objectType)
                         && objectType.Mutability != Mutability.Immutable)
@@ -199,7 +199,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                             throw new NotImplementedException("Null return type. Report an error?");
 
                         // If we return ownership, there is an implicit move
-                        if (returnType is ObjectType objectType && objectType.IsOwned)
+                        if (returnType is UserObjectType objectType && objectType.IsOwned)
                             InferMoveExpressionType(returnExpression.ReturnValue);
                         else
                             InferExpressionType(returnExpression.ReturnValue);
@@ -302,7 +302,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                         case Metatype metatype:
                         {
                             type = DataType.Type; // It names/describes a type
-                            if (!(metatype.Instance is ObjectType objectType && objectType.DeclaredMutable))
+                            if (!(metatype.Instance is UserObjectType objectType && objectType.DeclaredMutable))
                                 diagnostics.Add(TypeError.TypeDeclaredImmutable(file, mutableExpression.Expression));
                             break;
                         }
@@ -314,7 +314,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                             switch (expressionType)
                             {
                                 // If it is already mutable we can't redeclare it mutable (i.e. `mut mut x` is error)
-                                case ObjectType objectType
+                                case UserObjectType objectType
                                     when objectType.Mutability.IsUpgradable:
                                     type = objectType.AsMutable();
                                     break;
@@ -361,7 +361,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                         diagnostics.Add(TypeError.CannotMoveBorrowedValue(file, moveExpression));
                         type = referenceType.WithLifetime(Lifetime.Owned);
                     }
-                    if (type is ObjectType objectType) type = objectType.AsOwnedUpgradable();
+                    if (type is UserObjectType objectType) type = objectType.AsOwnedUpgradable();
                     return moveExpression.Type = type;
                 }
                 default:
@@ -383,7 +383,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 case 1:
                     identifierName.ReferencedSymbol = symbols.Single();
                     type = symbols.Single().Type;
-                    if (type is ObjectType objectType)
+                    if (type is UserObjectType objectType)
                     {
                         // A bare variable reference doesn't default to mutable
                         if (objectType.Mutability == Mutability.Mutable)
@@ -407,7 +407,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
         {
             var argumentTypes = expression.Arguments.Select(InferArgumentType).ToFixedList();
             // TODO handle named constructors here
-            var constructedType = (ObjectType)CheckAndEvaluateTypeExpression(expression.Constructor);
+            var constructedType = (UserObjectType)CheckAndEvaluateTypeExpression(expression.Constructor);
             var typeSymbol = GetSymbolForType(constructedType);
             var constructors = typeSymbol.ChildSymbols[SpecialName.New];
             constructors = ResolveOverload(constructors, null, argumentTypes);
@@ -507,7 +507,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
         private static bool IsAssignableFrom(DataType target, DataType source)
         {
             if (target.Equals(source)) return true;
-            if (target is ObjectType targetReference && source is ObjectType sourceReference)
+            if (target is UserObjectType targetReference && source is UserObjectType sourceReference)
             {
                 if (targetReference.IsOwned && !sourceReference.IsOwned) return false;
 
@@ -543,7 +543,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             {
                 case UnknownType _:
                     return UnknownSymbol.Instance;
-                case ObjectType objectType:
+                case UserObjectType objectType:
                     return objectType.Symbol;
                 case SizedIntegerType integerType:
                     // TODO this seems a very strange way to handle this. Shouldn't the symbol be on the type?
@@ -660,7 +660,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     // TODO this isn't right we might need to convert either of them
                     InsertImplicitConversionIfNeeded(ref rightOperand, integerType);
                     return rightOperand.Type is SizedIntegerType;
-                case ObjectType _:
+                case UserObjectType _:
                 case BoolType _:
                 case VoidType _: // This might need a special error message
                 case StringConstantType _: // String concatenation will be handled outside this function

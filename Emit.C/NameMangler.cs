@@ -75,7 +75,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             return Mangle(type.Name);
         }
 
-        public string Mangle(ObjectType type)
+        public string Mangle(UserObjectType type)
         {
             // builder with room for the characters we are likely to add
             var builder = new StringBuilder(EstimateSize(type.Name) + 5);

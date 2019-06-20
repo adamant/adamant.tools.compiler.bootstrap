@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     // is an *unbound type*. One with generic arguments supplied for all
     // parameters is *a constructed type*. One with some but not all arguments
     // supplied is *partially constructed type*.
-    public class ObjectType : ReferenceType, IEquatable<ObjectType>
+    public class UserObjectType : ReferenceType, IEquatable<UserObjectType>
     {
         public ISymbol Symbol { get; }
         public Name Name { get; }
@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         // TODO deal with the generic parameters and arguments
         public override bool IsKnown => true;
 
-        private ObjectType(
+        private UserObjectType(
             ISymbol symbol,
             bool declaredMutable,
             IEnumerable<DataType> genericParameterTypes,
@@ -52,12 +52,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             GenericArguments = genericArgumentsList;
         }
 
-        public static ObjectType Declaration(
+        public static UserObjectType Declaration(
             ISymbol symbol,
             bool mutable,
             IEnumerable<DataType> genericParameterTypes = null)
         {
-            return new ObjectType(
+            return new UserObjectType(
                 symbol,
                 mutable,
                 genericParameterTypes,
@@ -69,78 +69,78 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// <summary>
         /// Use this type as a mutable type. Only allowed if the type is declared mutable
         /// </summary>
-        public ObjectType AsMutable()
+        public UserObjectType AsMutable()
         {
             Requires.That("DeclaredMutable", DeclaredMutable, "must be declared as a mutable type to use mutably");
-            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability.Mutable, Lifetime);
+            return new UserObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability.Mutable, Lifetime);
         }
 
         /// <summary>
         /// Use this type as an immutable type. 
         /// </summary>
-        public ObjectType AsImmutable()
+        public UserObjectType AsImmutable()
         {
-            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability.Immutable, Lifetime);
+            return new UserObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability.Immutable, Lifetime);
         }
 
         /// <summary>
         /// Use this type with indeterminate mutability. Note that if it is declared immutable, then
         /// there can be no indeterminate mutability and this function returns an immutable type.
         /// </summary>
-        public ObjectType AsExplicitlyUpgradable()
+        public UserObjectType AsExplicitlyUpgradable()
         {
             if (!DeclaredMutable && Mutability == Mutability.Immutable) return this; // no change
             var mutability = DeclaredMutable ? Mutability.ExplicitlyUpgradable : Mutability.Immutable;
-            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, mutability, Lifetime);
+            return new UserObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, mutability, Lifetime);
         }
 
         /// <summary>
         /// Use this type with indeterminate mutability. Note that if it is declared immutable, then
         /// there can be no indeterminate mutability and this function returns an immutable type.
         /// </summary>
-        public ObjectType AsImplicitlyUpgradable()
+        public UserObjectType AsImplicitlyUpgradable()
         {
             if (!DeclaredMutable && Mutability == Mutability.Immutable) return this; // no change
             var mutability = DeclaredMutable ? Mutability.ImplicitlyUpgradable : Mutability.Immutable;
-            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, mutability, Lifetime);
+            return new UserObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, mutability, Lifetime);
         }
 
         /// <summary>
         /// Changes the lifetime to owned and if possible changes the mutability to implicitly upgradable
         /// </summary>
-        public ObjectType AsOwnedUpgradable()
+        public UserObjectType AsOwnedUpgradable()
         {
             var expectedMutability = DeclaredMutable ? Mutability.ImplicitlyUpgradable : Mutability.Immutable;
             if (Lifetime == Lifetime.Owned && Mutability == expectedMutability) return this;
-            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, expectedMutability, Lifetime.Owned);
+            return new UserObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, expectedMutability, Lifetime.Owned);
         }
 
         /// <summary>
         /// Changes the lifetime to owned
         /// </summary>
-        public ObjectType AsOwned()
+        public UserObjectType AsOwned()
         {
             if (Lifetime == Lifetime.Owned) return this;
-            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability, Lifetime.Owned);
+            return new UserObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability, Lifetime.Owned);
         }
 
         /// <summary>
         /// Make a mutable version of this type regardless of whether it was declared
         /// mutable for use as the constructor parameter.
         /// </summary>
-        public ObjectType ForConstructorSelf()
+        public UserObjectType ForConstructorSelf()
         {
-            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability.Mutable, AnonymousLifetime.Instance);
+            return new UserObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability.Mutable, AnonymousLifetime.Instance);
         }
 
-        public ObjectType WithGenericArguments(IEnumerable<DataType> genericArguments)
+        public UserObjectType WithGenericArguments(IEnumerable<DataType> genericArguments)
         {
-            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, genericArguments, Mutability, Lifetime);
+            return new UserObjectType(Symbol, DeclaredMutable, GenericParameterTypes, genericArguments, Mutability, Lifetime);
         }
 
         public override ReferenceType WithLifetime(Lifetime lifetime)
         {
-            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability, lifetime);
+            return new UserObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability, lifetime);
         }
 
         public override string ToString()
@@ -153,10 +153,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         #region Equality
         public override bool Equals(object obj)
         {
-            return Equals(obj as ObjectType);
+            return Equals(obj as UserObjectType);
         }
 
-        public bool Equals(ObjectType other)
+        public bool Equals(UserObjectType other)
         {
             return other != null &&
                    EqualityComparer<ISymbol>.Default.Equals(Symbol, other.Symbol) &&
@@ -173,18 +173,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             return HashCode.Combine(Symbol, Name, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability, Lifetime);
         }
 
-        public static bool operator ==(ObjectType type1, ObjectType type2)
+        public static bool operator ==(UserObjectType type1, UserObjectType type2)
         {
-            return EqualityComparer<ObjectType>.Default.Equals(type1, type2);
+            return EqualityComparer<UserObjectType>.Default.Equals(type1, type2);
         }
 
-        public static bool operator !=(ObjectType type1, ObjectType type2)
+        public static bool operator !=(UserObjectType type1, UserObjectType type2)
         {
             return !(type1 == type2);
         }
         #endregion
 
-        public bool EqualExceptLifetimeAndMutability(ObjectType other)
+        public bool EqualExceptLifetimeAndMutability(UserObjectType other)
         {
             return EqualityComparer<ISymbol>.Default.Equals(Symbol, other.Symbol)
                    && EqualityComparer<Name>.Default.Equals(Name, other.Name)
