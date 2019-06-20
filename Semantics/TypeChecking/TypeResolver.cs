@@ -187,6 +187,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 ? expressionResolver.CheckAndEvaluateTypeExpression(returnTypeExpression)
                 : DataType.Void;
 
+            // If we are returning ownership, then they can make it mutable
+            if (returnType is ObjectType objectType && objectType.IsOwned)
+                returnType = objectType.AsImplicitlyUpgradable();
             return function.ReturnType.Fulfill(returnType);
         }
 

@@ -46,6 +46,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private Scope nextScope;
         private readonly Stack<Scope> scopes = new Stack<Scope>();
         private Scope CurrentScope => scopes.Peek();
+        private DataType returnType;
 
         private ControlFlowAnalyzer()
         {
@@ -57,6 +58,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
         private void BuildGraph(FunctionDeclarationSyntax function)
         {
+            returnType = function.ReturnType.Resolved();
+
             // Temp Variable for return
             if (function is ConstructorDeclarationSyntax constructor)
                 graph.AddSelfParameter(constructor.SelfParameterType);
@@ -172,7 +175,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case ReturnExpressionSyntax returnExpression:
                     if (returnExpression.ReturnValue != null)
                     {
-                        var isMove = returnExpression.ReturnValue.Type is ObjectType objectType
+                        var isMove = returnType is ObjectType objectType
                                      && objectType.IsOwned;
                         var value = isMove
                             ? ConvertToMove(returnExpression.ReturnValue, returnExpression.Span)

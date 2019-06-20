@@ -85,12 +85,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         /// <summary>
         /// Use this type with indeterminate mutability. Note that if it is declared immutable, then
-        /// there can be no indeterminate mutability and this function returns and immutable type.
+        /// there can be no indeterminate mutability and this function returns an immutable type.
         /// </summary>
-        public ObjectType AsUpgradable()
+        public ObjectType AsExplicitlyUpgradable()
         {
             if (!DeclaredMutable && Mutability == Mutability.Immutable) return this; // no change
             var mutability = DeclaredMutable ? Mutability.ExplicitlyUpgradable : Mutability.Immutable;
+            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, mutability, Lifetime);
+        }
+
+        /// <summary>
+        /// Use this type with indeterminate mutability. Note that if it is declared immutable, then
+        /// there can be no indeterminate mutability and this function returns an immutable type.
+        /// </summary>
+        public ObjectType AsImplicitlyUpgradable()
+        {
+            if (!DeclaredMutable && Mutability == Mutability.Immutable) return this; // no change
+            var mutability = DeclaredMutable ? Mutability.ImplicitlyUpgradable : Mutability.Immutable;
             return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, mutability, Lifetime);
         }
 

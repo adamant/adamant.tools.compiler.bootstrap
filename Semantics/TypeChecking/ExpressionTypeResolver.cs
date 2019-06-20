@@ -387,7 +387,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     {
                         // A bare variable reference doesn't default to mutable
                         if (objectType.Mutability == Mutability.Mutable)
-                            type = objectType = objectType.AsUpgradable();
+                            type = objectType = objectType.AsExplicitlyUpgradable();
                         // A bare variable reference doesn't default to owned
                         if (!isMove && objectType.IsOwned) type = objectType.WithLifetime(Lifetime.None);
                     }
