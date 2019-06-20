@@ -1,5 +1,8 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
+    /// <summary>
+    /// The type of string literals
+    /// </summary>
     public class StringConstantType : SimpleType
     {
         #region Singleton
@@ -11,6 +14,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         }
         #endregion
 
-        public override bool IsResolved => true;
+        public override bool IsKnown => true;
     }
 }

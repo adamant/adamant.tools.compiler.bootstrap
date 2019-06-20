@@ -99,7 +99,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             foreach (var declaration in controlFlow.VariableDeclarations)
                 Disassemble(declaration, builder);
 
-            if (controlFlow.VariableDeclarations.Any(v => v.Exists))
+            if (controlFlow.VariableDeclarations.Any(v => v.TypeIsNotEmpty))
                 builder.BlankLine();
 
             if (Disassemble(controlFlow.BorrowClaims?.ParameterClaims, builder))
@@ -111,7 +111,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
 
         private void Disassemble(LocalVariableDeclaration declaration, AssemblyBuilder builder)
         {
-            if (declaration.Exists)
+            if (declaration.TypeIsNotEmpty)
                 builder.AppendLine(declaration.ToString());
         }
 

@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public FixedList<DataType> ParameterTypes { get; }
         public int Arity => ParameterTypes.Count;
         public DataType ResultType { get; }
-        public override bool IsResolved { get; }
+        public override bool IsKnown { get; }
 
         public MetaFunctionType(
             IEnumerable<DataType> parameterTypes,
@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         {
             ParameterTypes = parameterTypes.ToFixedList();
             ResultType = resultType;
-            IsResolved = ParameterTypes.All(pt => pt.IsResolved) && ResultType.IsResolved;
+            IsKnown = ParameterTypes.All(pt => pt.IsKnown) && ResultType.IsKnown;
         }
 
         public override ReferenceType WithLifetime(Lifetime lifetime)

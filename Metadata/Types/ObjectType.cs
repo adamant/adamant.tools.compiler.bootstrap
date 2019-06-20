@@ -30,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         public Mutability Mutability { get; }
         // TODO deal with the generic parameters and arguments
-        public override bool IsResolved => true;
+        public override bool IsKnown => true;
 
         private ObjectType(
             ISymbol symbol,

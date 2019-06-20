@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     public class IntegerConstantType : IntegerType
     {
         public readonly BigInteger Value;
-        public override bool IsResolved => true;
+        public override bool IsKnown => true;
 
         public IntegerConstantType(BigInteger value)
             : base(value.ToString())

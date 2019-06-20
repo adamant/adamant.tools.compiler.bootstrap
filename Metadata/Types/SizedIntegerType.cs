@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         public readonly bool IsSigned;
         public readonly int Bits;
-        public override bool IsResolved => true;
+        public override bool IsKnown => true;
 
         private SizedIntegerType(string name, int bits)
             : base(name)

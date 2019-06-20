@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public readonly FixedList<DataType> ParameterTypes;
         public int Arity => ParameterTypes.Count;
         public readonly DataType ReturnType;
-        public override bool IsResolved { get; }
+        public override bool IsKnown { get; }
 
         public FunctionType(
             IEnumerable<DataType> parameterTypes,
@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         {
             ParameterTypes = parameterTypes.ToFixedList();
             ReturnType = returnType;
-            IsResolved = ParameterTypes.All(pt => pt.IsResolved) && ReturnType.IsResolved;
+            IsKnown = ParameterTypes.All(pt => pt.IsKnown) && ReturnType.IsKnown;
         }
 
         public override ReferenceType WithLifetime(Lifetime lifetime)

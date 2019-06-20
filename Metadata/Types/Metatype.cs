@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         // The type this is a metatype for. Named instance because it represents
         // the single object instance that is of this metatype.
         public DataType Instance { get; }
-        public override bool IsResolved => Instance.IsResolved;
+        public override bool IsKnown => Instance.IsKnown;
 
         public Metatype(DataType instanceType)
             : base(Lifetime.Forever)

@@ -22,10 +22,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             var definitions = code.Definitions;
 
-            foreach (var declaration in cfg.VariableDeclarations.Where(v => v.Exists))
+            foreach (var declaration in cfg.VariableDeclarations.Where(v => v.TypeIsNotEmpty))
                 EmitVariable(declaration, definitions);
 
-            if (cfg.VariableDeclarations.Any(v => v.Exists))
+            if (cfg.VariableDeclarations.Any(v => v.TypeIsNotEmpty))
                 definitions.BlankLine();
 
             var voidReturn = cfg.ReturnType == DataType.Void;
@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
         private void EmitVariable(LocalVariableDeclaration declaration, CCodeBuilder code)
         {
-            Requires.That(nameof(declaration), declaration.Exists, "tried to look up variable that does not exist");
+            Requires.That(nameof(declaration), declaration.TypeIsNotEmpty, "tried to look up variable that does not exist");
             var initializer = declaration.IsParameter ? $" = {nameMangler.Mangle(declaration.Name)}" : "";
             code.AppendLine($"{typeConverter.Convert(declaration.Type)} _{declaration.Variable.Name}{initializer}; // {declaration}");
         }

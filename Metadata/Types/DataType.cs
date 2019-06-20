@@ -31,18 +31,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         public static readonly PointerType BytePointer = new PointerType(Byte);
 
-        public virtual bool Exists => true;
+        /// <summary>
+        /// The `never` and `void` types are the only empty types. This means
+        /// there are no values of either type. The `never` type is defined
+        /// as the type without values. The `void` type behaves more like a unit
+        /// type. However, its implementation is that it doesn't have a value
+        /// and represents the lack of that value. For example, that a function
+        /// doesn't return a value or that an argument is to be dropped.
+        /// </summary>
+        public virtual bool IsEmpty => false;
 
         /// <summary>
-        /// A resolved type is one that has no unknown or unresolved parts
+        /// A known type is one that has no unknown parts
         /// </summary>
-        public abstract bool IsResolved { get; }
+        public abstract bool IsKnown { get; }
 
         [DebuggerHidden]
         public DataType AssertResolved()
         {
-            if (!IsResolved)
-                throw new InvalidOperationException($"Type {this} not resolved");
+            if (!IsKnown)
+                throw new InvalidOperationException($"Type {this} not known");
 
             return this;
         }

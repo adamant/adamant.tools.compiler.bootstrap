@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         private UnknownType() { }
         #endregion
 
-        public override bool IsResolved => false;
+        public override bool IsKnown => false;
 
         public override string ToString()
         {
