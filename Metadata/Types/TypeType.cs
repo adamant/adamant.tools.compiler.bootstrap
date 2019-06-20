@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
-    public class TypeType : ReferenceType
+    public class TypeType : ObjectType
     {
         #region Singleton
         internal static readonly TypeType Instance = new TypeType();

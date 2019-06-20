@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     // is an *unbound type*. One with generic arguments supplied for all
     // parameters is *a constructed type*. One with some but not all arguments
     // supplied is *partially constructed type*.
-    public class UserObjectType : ReferenceType, IEquatable<UserObjectType>
+    public class UserObjectType : ObjectType, IEquatable<UserObjectType>
     {
         public ISymbol Symbol { get; }
         public Name Name { get; }
