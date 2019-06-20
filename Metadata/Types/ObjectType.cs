@@ -97,11 +97,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// <summary>
         /// Changes the lifetime to owned and if possible changes the mutability to implicitly upgradable
         /// </summary>
-        public ObjectType AsOwned()
+        public ObjectType AsOwnedUpgradable()
         {
             var expectedMutability = DeclaredMutable ? Mutability.ImplicitlyUpgradable : Mutability.Immutable;
             if (Lifetime == Lifetime.Owned && Mutability == expectedMutability) return this;
             return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, expectedMutability, Lifetime.Owned);
+        }
+
+        /// <summary>
+        /// Changes the lifetime to owned
+        /// </summary>
+        public ObjectType AsOwned()
+        {
+            if (Lifetime == Lifetime.Owned) return this;
+            return new ObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability, Lifetime.Owned);
         }
 
         /// <summary>

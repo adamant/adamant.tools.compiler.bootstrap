@@ -361,7 +361,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                         diagnostics.Add(TypeError.CannotMoveBorrowedValue(file, moveExpression));
                         type = referenceType.WithLifetime(Lifetime.Owned);
                     }
-                    if (type is ObjectType objectType) type = objectType.AsOwned();
+                    if (type is ObjectType objectType) type = objectType.AsOwnedUpgradable();
                     return moveExpression.Type = type;
                 }
                 default:
@@ -437,7 +437,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     break;
             }
 
-            return expression.Type = constructedType.AsOwned();
+            return expression.Type = constructedType.AsOwnedUpgradable();
         }
 
         private DataType InferMoveExpressionType(ExpressionSyntax expression)

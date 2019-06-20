@@ -171,11 +171,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     return;
                 case ReturnExpressionSyntax returnExpression:
                     if (returnExpression.ReturnValue != null)
+                    {
+                        var isMove = returnExpression.ReturnValue.Type is ObjectType objectType
+                                     && objectType.IsOwned;
+                        var value = isMove
+                            ? ConvertToMove(returnExpression.ReturnValue, returnExpression.Span)
+                            : ConvertToValue(returnExpression.ReturnValue);
                         currentBlock.AddAssignment(
                             graph.ReturnVariable.AssignReference(returnExpression.ReturnValue.Span),
-                            ConvertToValue(returnExpression.ReturnValue),
-                            returnExpression.ReturnValue.Span,
-                            CurrentScope);
+                            value,
+                            returnExpression.ReturnValue.Span, CurrentScope);
+                    }
 
                     ExitScope(returnExpression.Span.AtEnd());
                     currentBlock.AddReturn(returnExpression.Span, CurrentScope);
@@ -363,17 +369,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     // need to be able to check mutability on borrows?
                     return ConvertToValue(mutable.Expression);
                 case MoveExpressionSyntax move:
-                {
-                    // TODO should this be explicit in IR?
-                    var operand = ConvertToOperand(move.Expression);
-                    switch (operand)
-                    {
-                        case VariableReference variableReference:
-                            return variableReference.AsMove(move.Span);
-                        default:
-                            throw new NotImplementedException();
-                    }
-                }
+                    return ConvertToMove(move.Expression, move.Span);
                 case ImplicitImmutabilityConversionExpression implicitImmutabilityConversion:
                 {
                     var operand = ConvertToOperand(implicitImmutabilityConversion.Expression);
@@ -386,13 +382,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         case Dereference _:
                             throw new NotImplementedException();
                         case VariableReference varReference:
-                            return varReference.AsShared();
+                            if (implicitImmutabilityConversion.Type is ObjectType objectType
+                                && objectType.IsOwned)
+                                return varReference.AsMove(implicitImmutabilityConversion.Span);
+                            else
+                                return varReference.AsShared();
                         default:
                             throw NonExhaustiveMatchException.For(expression);
                     }
                 }
                 default:
                     throw NonExhaustiveMatchException.For(expression);
+            }
+        }
+
+        private Value ConvertToMove(ExpressionSyntax moveExpression, TextSpan moveSpan)
+        {
+            var operand = ConvertToOperand(moveExpression);
+            switch (operand)
+            {
+                case VariableReference variableReference:
+
+                    return variableReference.AsMove(moveSpan);
+                default:
+                    throw new NotImplementedException();
             }
         }
 
