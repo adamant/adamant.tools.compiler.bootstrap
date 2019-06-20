@@ -97,5 +97,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
             return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3011,
                 $"Expression can't be made mutable `{file.Code[expression.Span]}`");
         }
+
+        public static Diagnostic ReturnExpressionMustHaveValue(CodeFile file, in TextSpan span, DataType returnType)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3012,
+                $"The return expression must return a value of type `{returnType}`");
+        }
+
+        public static Diagnostic CantReturnFromNeverFunction(CodeFile file, in TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3013,
+                $"Functions that never return can't contain return statements");
+        }
     }
 }

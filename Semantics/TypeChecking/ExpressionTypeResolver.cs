@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -197,7 +196,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     if (returnExpression.ReturnValue != null)
                     {
                         InferExpressionType(returnExpression.ReturnValue);
-                        if (returnType != null) // TODO report an error
+                        if (returnType != null)
                         {
                             InsertImplicitConversionIfNeeded(ref returnExpression.ReturnValue, returnType);
                             var type = returnExpression.ReturnValue.Type;
@@ -205,11 +204,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                                 diagnostics.Add(TypeError.CannotConvert(file,
                                     returnExpression.ReturnValue, type, returnType));
                         }
+                        else throw new NotImplementedException("Null return type. Report an error?");
                     }
-                    else
-                    {
-                        // TODO a void or never function shouldn't have this
-                    }
+                    else if (returnType == DataType.Never)
+                        diagnostics.Add(TypeError.CantReturnFromNeverFunction(file, returnExpression.Span));
+                    else if (returnType != DataType.Void)
+                        diagnostics.Add(TypeError.ReturnExpressionMustHaveValue(file, returnExpression.Span, returnType));
+
                     return expression.Type = DataType.Never;
                 case IntegerLiteralExpressionSyntax integerLiteral:
                     return expression.Type = new IntegerConstantType(integerLiteral.Value);
@@ -220,31 +221,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 case BinaryExpressionSyntax binaryOperatorExpression:
                     return InferBinaryExpressionType(binaryOperatorExpression);
                 case IdentifierNameSyntax identifierName:
-                {
-                    var symbols = identifierName.LookupInContainingScope();
-                    DataType type;
-                    switch (symbols.Count)
-                    {
-                        case 0:
-                            diagnostics.Add(NameBindingError.CouldNotBindName(file, identifierName.Span));
-                            identifierName.ReferencedSymbol = UnknownSymbol.Instance;
-                            type = DataType.Unknown;
-                            break;
-                        case 1:
-                            identifierName.ReferencedSymbol = symbols.Single();
-                            type = symbols.Single().Type;
-                            if (type is ObjectType objectType && objectType.Mutability == Mutability.Mutable)
-                                type = objectType.AsUpgradable();
-                            break;
-                        default:
-                            diagnostics.Add(NameBindingError.AmbiguousName(file, identifierName.Span));
-                            identifierName.ReferencedSymbol = UnknownSymbol.Instance;
-                            type = DataType.Unknown;
-                            break;
-                    }
-
-                    return identifierName.Type = type;
-                }
+                    return InferIdentifierNameType(identifierName, false);
                 case UnaryExpressionSyntax unaryOperatorExpression:
                     return InferUnaryExpressionType(unaryOperatorExpression);
                 case ReferenceLifetimeSyntax lifetimeType:
@@ -375,7 +352,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                     return selfType ?? DataType.Unknown;
                 case MoveExpressionSyntax moveExpression:
                 {
-                    var type = InferExpressionType(moveExpression.Expression);
+                    var type = InferMoveExpressionType(moveExpression.Expression);
                     if (type is ReferenceType referenceType && !referenceType.IsOwned)
                     {
                         diagnostics.Add(TypeError.CannotMoveBorrowedValue(file, moveExpression));
@@ -387,6 +364,40 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
+        }
+
+        private DataType InferIdentifierNameType(IdentifierNameSyntax identifierName, bool isMove)
+        {
+            var symbols = identifierName.LookupInContainingScope();
+            DataType type;
+            switch (symbols.Count)
+            {
+                case 0:
+                    diagnostics.Add(NameBindingError.CouldNotBindName(file, identifierName.Span));
+                    identifierName.ReferencedSymbol = UnknownSymbol.Instance;
+                    type = DataType.Unknown;
+                    break;
+                case 1:
+                    identifierName.ReferencedSymbol = symbols.Single();
+                    type = symbols.Single().Type;
+                    if (type is ObjectType objectType)
+                    {
+                        // A bare variable reference doesn't default to mutable
+                        if (objectType.Mutability == Mutability.Mutable)
+                            type = objectType = objectType.AsUpgradable();
+                        // A bare variable reference doesn't default to owned
+                        if (!isMove && objectType.IsOwned) type = objectType.WithLifetime(Lifetime.None);
+                    }
+
+                    break;
+                default:
+                    diagnostics.Add(NameBindingError.AmbiguousName(file, identifierName.Span));
+                    identifierName.ReferencedSymbol = UnknownSymbol.Instance;
+                    type = DataType.Unknown;
+                    break;
+            }
+
+            return identifierName.Type = type;
         }
 
         private DataType InferConstructorCallType(NewObjectExpressionSyntax expression)
@@ -424,6 +435,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             }
 
             return expression.Type = constructedType.AsOwned();
+        }
+
+        private DataType InferMoveExpressionType(ExpressionSyntax expression)
+        {
+            if (expression == null) return DataType.Unknown;
+
+            switch (expression)
+            {
+                case IdentifierNameSyntax identifierName:
+                    return InferIdentifierNameType(identifierName, true);
+                default:
+                    throw NonExhaustiveMatchException.For(expression);
+            }
         }
 
         private static bool IsType(DataType dataType)
@@ -637,7 +661,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 case BoolType _:
                 case VoidType _: // This might need a special error message
                 case StringConstantType _: // String concatenation will be handled outside this function
-                    // Other object types can't be used in numeric expressions
+                                           // Other object types can't be used in numeric expressions
                     return false;
                 default:
                     // In theory we could just return false here, but this way we are forced to note

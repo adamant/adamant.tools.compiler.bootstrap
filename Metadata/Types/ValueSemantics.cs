@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// </summary>
         Copy,
         /// <summary>
-        /// Expression of type `never`, don't return
+        /// Expressions of type `never`, don't return
         /// </summary>
         Never,
     }

@@ -87,9 +87,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         }
 
         /// <summary>
-        /// Changes the lifetime to owned and if possible changes the mutability to downgradable
+        /// Changes the lifetime to owned and if possible changes the mutability to implicitly upgradable
         /// </summary>
-        /// <returns></returns>
         public ObjectType AsOwned()
         {
             var expectedMutability = DeclaredMutable ? Mutability.ImplicitlyUpgradable : Mutability.Immutable;
@@ -122,8 +121,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             if (!(Lifetime is NoLifetime)) value += "$" + Lifetime;
             return value;
         }
-
-
 
         #region Equality
         public override bool Equals(object obj)

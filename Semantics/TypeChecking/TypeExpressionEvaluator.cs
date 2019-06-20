@@ -8,6 +8,9 @@ using ReferenceType = Adamant.Tools.Compiler.Bootstrap.Metadata.Types.ReferenceT
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
 {
+    /// <summary>
+    /// Evaluates type expressions into DataType values.
+    /// </summary>
     public class TypeExpressionEvaluator
     {
         public static DataType EvaluateExpression(ExpressionSyntax typeExpression)
