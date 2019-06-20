@@ -12,16 +12,15 @@ The current plan is to slowly build up functionality by getting a series of kata
 
 * Make the Adamant source code as correct as possible given all current ideas on the design of the language with the exception of specific features listed below.
 * Ensure any language features used are in the language reference.
-* If needed, parts of what will be the standard library can be created as compiler intrinsics at first, but they could be replaced with correct standard library code as quickly as possible.
+* If needed, parts of what will be the standard library can be created as compiler intrinsics at first, but they should be replaced with correct standard library code as quickly as possible.
 
 ### Excluded Language Features
 
 The following features will not be implemented by this compiler even though they are described in the [language reference](https://github.com/adamant/adamant.language.reference/blob/master/src/book.md).
 
-* Meta Functions: Functions which have generic parameters but not regular parameters and are evaluated only at compile time.
 * [Loop Labels](https://github.com/adamant/adamant.language.reference/blob/master/src/loop-expressions.md#loop-labels)
 * [Document Comment Validation](https://github.com/adamant/adamant.language.reference/blob/master/src/documentation-comments.md#supported-markdown)
-* Full Type Inference: Variable types can be inferred from the type of their initalizer only.
+* Full Type Inference: Variable types can be inferred from the type of their initializer only.
 
 ### Features Planned for After v1.0
 
