@@ -138,5 +138,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moving
             foreach (var (type, argument) in parameterTypes.Zip(arguments))
                 CheckAssignment(type, argument.Value);
         }
+
+        public override void VisitImplicitImmutabilityConversionExpression(
+            ImplicitImmutabilityConversionExpression conversionExpression,
+            Void args)
+        {
+            base.VisitImplicitImmutabilityConversionExpression(conversionExpression, args);
+            conversionExpression.ValueSemantics = conversionExpression.Expression.ValueSemantics;
+        }
     }
 }
