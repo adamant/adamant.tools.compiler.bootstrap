@@ -26,8 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private static bool ShouldBuildGraph(FunctionDeclarationSyntax function)
         {
             return function.Body != null // It is not abstract
-                   && function.GenericParameters == null // It is not generic, generic functions need monomorphized
-                   && !function.HasErrors; // There were errors, we may not be able to make a control flow graph, so don't try
+                   && function.GenericParameters == null; // It is not generic, generic functions need monomorphized
         }
 
         private readonly ControlFlowGraphBuilder graph = new ControlFlowGraphBuilder();
@@ -130,6 +129,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 }
                 case ExpressionSyntax expression:
                 {
+                    // Skip expressions with unknown type
+                    if (!expression.Type.IsKnown)
+                        return;
+
                     if (expression.Type is VoidType || expression.Type is NeverType)
                         ConvertExpressionToStatement(expression);
                     else
@@ -175,8 +178,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case ReturnExpressionSyntax returnExpression:
                     if (returnExpression.ReturnValue != null)
                     {
-                        var isMove = returnType is UserObjectType objectType
-                                     && objectType.IsOwned;
+                        var isMove = IsOwned(returnType);
                         var value = isMove
                             ? ConvertToMove(returnExpression.ReturnValue, returnExpression.Span)
                             : ConvertToValue(returnExpression.ReturnValue);
@@ -385,8 +387,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         case Dereference _:
                             throw new NotImplementedException();
                         case VariableReference varReference:
-                            if (implicitImmutabilityConversion.Type is UserObjectType objectType
-                                && objectType.IsOwned)
+                            if (IsOwned(implicitImmutabilityConversion.Type))
                                 return varReference.AsMove(implicitImmutabilityConversion.Span);
                             else
                                 return varReference.AsShared();

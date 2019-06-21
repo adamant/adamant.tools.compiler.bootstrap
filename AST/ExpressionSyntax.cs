@@ -9,9 +9,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public TextSpan Span { get; }
         public ValueSemantics? ValueSemantics { get; set; } = null;
 
+        /// <summary>
+        /// If an expression has been poisoned, then it is errored in some way
+        /// and we won't report errors against it in the future. We may also
+        /// skip it for some processing.
+        /// </summary>
+        public bool Poisoned { get; private set; }
+
         protected ExpressionSyntax(TextSpan span)
         {
             Span = span;
+        }
+
+        public void Poison()
+        {
+            Poisoned = true;
         }
 
         // Useful for debugging

@@ -50,7 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             TypeResolver.Check(memberDeclarations, diagnostics);
 
 #if DEBUG
-            TypeResolutionValidator.Validate(memberDeclarations);
+            TypeFulfillmentValidator.Validate(memberDeclarations);
             // TODO validate that all `ReferencedSymbol` properties have been set
 #endif
             // TODO the move checker should be handled by the data flow analysis and type checking
