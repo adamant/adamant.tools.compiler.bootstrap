@@ -94,7 +94,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                 SaveBorrowClaims = SaveBorrowClaims,
             };
 
-            return analyzer.Analyze(packageSyntax, references);
+            return analyzer.Check(packageSyntax, references);
         }
     }
 }

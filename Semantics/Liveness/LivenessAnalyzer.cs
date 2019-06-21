@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
     /// </summary>
     public class LivenessAnalyzer
     {
-        public static FixedDictionary<FunctionDeclarationSyntax, LiveVariables> Analyze(
+        public static FixedDictionary<FunctionDeclarationSyntax, LiveVariables> Check(
             FixedList<MemberDeclarationSyntax> memberDeclarations,
             bool saveLivenessAnalysis)
         {
@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
             var livenessAnalyzer = new LivenessAnalyzer();
             foreach (var function in memberDeclarations.OfType<FunctionDeclarationSyntax>())
             {
-                var liveness = livenessAnalyzer.AnalyzeFunction(function);
+                var liveness = livenessAnalyzer.CheckFunction(function);
                 if (liveness != null)
                 {
                     analyses.Add(function, liveness);
@@ -33,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
             return analyses.ToFixedDictionary();
         }
 
-        private LiveVariables AnalyzeFunction(FunctionDeclarationSyntax function)
+        private LiveVariables CheckFunction(FunctionDeclarationSyntax function)
         {
             // Compute aliveness at point after each statement
             return ComputeLiveness(function.ControlFlow);

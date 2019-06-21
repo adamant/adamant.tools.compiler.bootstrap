@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         /// </summary>
         public bool SaveBorrowClaims = false;
 
-        public Package Analyze(
+        public Package Check(
             PackageSyntax packageSyntax,
             FixedDictionary<string, Package> references)
         {
@@ -46,7 +46,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             var memberDeclarations = packageSyntax.CompilationUnits
                 .SelectMany(cu => cu.AllMemberDeclarations).ToFixedList();
 
-            // Do type checking and symbol lookup (set ReferencedSymbol properties)
+            // Basic Analysis includes: Name Binding, Type Checking, Constant Folding
             BasicAnalyzer.Check(memberDeclarations, diagnostics);
 
 #if DEBUG
@@ -67,7 +67,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             ControlFlowAnalyzer.BuildGraphs(memberDeclarations);
             // --------------------------------------------------
 
-            var liveness = LivenessAnalyzer.Analyze(memberDeclarations, SaveLivenessAnalysis);
+            var liveness = LivenessAnalyzer.Check(memberDeclarations, SaveLivenessAnalysis);
 
             // TODO inserting deletes based only on liveness led to issues.
             // There are cases when a variable is no longer directly used, but another variable has borrowed the value.

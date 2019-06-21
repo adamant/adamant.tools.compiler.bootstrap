@@ -11,11 +11,19 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 {
     /// <summary>
+    /// The basic analyzer does name binding, type checking and constant folding.
+    /// This class handles declarations and delegates expressions, types etc. to
+    /// other classes.
+    ///
+    /// All basic analysis uses specific terminology to distinguish different
+    /// aspects of type checking. (The entry method `Check` is an exception. It
+    /// is named to match other analyzers but performs a resolve.)
+    /// 
     /// Terminology:
     ///
-    /// * Resolve: includes type inference, checking and evaluation, whichever is appropriate
-    /// * Check: there is a type something is expected to be compatible with, check that it is
-    /// * Infer: infer what type something has
+    /// * Resolve - includes type inference and checking
+    /// * Check - check something has an expected type
+    /// * Infer - infer what type something has
     /// </summary>
     public class BasicAnalyzer
     {
@@ -28,8 +36,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         public static void Check(FixedList<MemberDeclarationSyntax> memberDeclarations, Diagnostics diagnostics)
         {
-            var typeChecker = new BasicAnalyzer(diagnostics);
-            typeChecker.ResolveTypesInDeclarations(memberDeclarations);
+            var analyzer = new BasicAnalyzer(diagnostics);
+            analyzer.ResolveTypesInDeclarations(memberDeclarations);
         }
 
         private void ResolveTypesInDeclarations(FixedList<MemberDeclarationSyntax> declarations)
@@ -75,14 +83,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 ResolveSignatureTypesInTypeDeclaration(function.DeclaringType);
 
             var selfType = ResolveSelfType(function);
-            var resolver = new BasicExpressionAnalyzer(function.File, diagnostics, selfType);
+            var analyzer = new BasicExpressionAnalyzer(function.File, diagnostics, selfType);
 
             if (function.GenericParameters != null)
-                ResolveTypesInGenericParameters(function.GenericParameters, resolver);
+                ResolveTypesInGenericParameters(function.GenericParameters, analyzer);
 
-            var parameterTypes = ResolveTypesInParameters(function, resolver);
+            var parameterTypes = ResolveTypesInParameters(function, analyzer);
 
-            var returnType = ResolveReturnType(function, resolver);
+            var returnType = ResolveReturnType(function, analyzer);
             DataType functionType = new FunctionType(parameterTypes, returnType);
 
             if (function.GenericParameters?.Any() ?? false)
@@ -118,21 +126,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private static void ResolveTypesInGenericParameters(
             FixedList<GenericParameterSyntax> genericParameters,
-             BasicExpressionAnalyzer expressionResolver)
+            BasicExpressionAnalyzer analyzer)
         {
             foreach (var parameter in genericParameters)
             {
                 parameter.Type.BeginFulfilling();
                 var type = parameter.TypeExpression == null ?
                     DataType.Type
-                    : expressionResolver.CheckAndEvaluateTypeExpression(parameter.TypeExpression);
+                    : analyzer.CheckAndEvaluateTypeExpression(parameter.TypeExpression);
                 parameter.Type.Fulfill(type);
             }
         }
 
         private FixedList<DataType> ResolveTypesInParameters(
              FunctionDeclarationSyntax function,
-             BasicExpressionAnalyzer expressionResolver)
+             BasicExpressionAnalyzer analyzer)
         {
             var types = new List<DataType>();
             foreach (var parameter in function.Parameters)
@@ -142,7 +150,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     {
                         parameter.Type.BeginFulfilling();
                         var type =
-                            expressionResolver.CheckAndEvaluateTypeExpression(namedParameter
+                            analyzer.CheckAndEvaluateTypeExpression(namedParameter
                                 .TypeExpression);
                         types.Add(parameter.Type.Fulfill(type));
                     }
@@ -161,15 +169,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private static DataType ResolveReturnType(
             FunctionDeclarationSyntax function,
-            BasicExpressionAnalyzer expressionResolver)
+            BasicExpressionAnalyzer analyzer)
         {
             function.ReturnType.BeginFulfilling();
             switch (function)
             {
                 case NamedFunctionDeclarationSyntax namedFunction:
-                    return ResolveReturnType(function, namedFunction.ReturnTypeExpression, expressionResolver);
+                    return ResolveReturnType(function, namedFunction.ReturnTypeExpression, analyzer);
                 case OperatorDeclarationSyntax @operator:
-                    return ResolveReturnType(function, @operator.ReturnTypeExpression, expressionResolver);
+                    return ResolveReturnType(function, @operator.ReturnTypeExpression, analyzer);
                 case ConstructorDeclarationSyntax _:
                 case InitializerDeclarationSyntax _:
                     return function.ReturnType.Fulfill(function.DeclaringType.Metatype.Instance);
@@ -181,10 +189,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         private static DataType ResolveReturnType(
             FunctionDeclarationSyntax function,
             ExpressionSyntax returnTypeExpression,
-            BasicExpressionAnalyzer expressionResolver)
+            BasicExpressionAnalyzer analyzer)
         {
             var returnType = returnTypeExpression != null
-                ? expressionResolver.CheckAndEvaluateTypeExpression(returnTypeExpression)
+                ? analyzer.CheckAndEvaluateTypeExpression(returnTypeExpression)
                 : DataType.Void;
 
             // If we are returning ownership, then they can make it mutable
@@ -306,7 +314,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             if (diagnosticCount != diagnostics.Count) function.MarkErrored();
         }
 
-        private void ResolveBodyTypesInTypeDeclaration(TypeDeclarationSyntax typeDeclaration)
+        private void ResolveBodyTypesInTypeDeclaration(TypeDeclarationSyntax _)
         {
             // No body types, members are already processed
         }
