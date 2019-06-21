@@ -13,7 +13,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
     /// </summary>
     internal static class LexError
     {
-
         public static Diagnostic UnclosedBlockComment(CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1001, "End-of-file found, expected `*/`");

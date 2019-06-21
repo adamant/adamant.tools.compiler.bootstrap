@@ -10,7 +10,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             switch (Tokens.Current)
             {
-                // TODO handle cases like if, loop, foreach etc.
                 case IOpenBraceToken _:
                     return ParseBlock();
                 case ILetKeywordToken _:
@@ -53,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (Tokens.Accept<IColonToken>())
                 // Need to not consume the assignment that separates the type from the initializer,
                 // hence the min operator precedence.
-                type = ParseExpression(OperatorPrecedence.LogicalOr);
+                type = ParseExpression(OperatorPrecedence.AboveAssignment);
 
             ExpressionSyntax initializer = null;
             if (Tokens.Accept<IEqualsToken>()) initializer = ParseExpression();

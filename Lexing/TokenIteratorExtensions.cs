@@ -6,7 +6,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
 {
     public static class TokenIteratorExtensions
     {
-
         public static ITokenIterator WhereNotTrivia(this ITokenIterator tokens)
         {
             return new WhereNotTriviaIterator(tokens);

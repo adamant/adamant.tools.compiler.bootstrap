@@ -16,7 +16,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     /// </summary>
     internal static class ParseError
     {
-
         public static Diagnostic IncompleteDeclaration(CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3001, "Incomplete declaration");

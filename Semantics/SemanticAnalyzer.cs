@@ -46,7 +46,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             var memberDeclarations = packageSyntax.CompilationUnits
                 .SelectMany(cu => cu.AllMemberDeclarations).ToFixedList();
 
-            // Do type checking
+            // Do type checking and symbol lookup (set ReferencedSymbol properties)
             TypeResolver.Check(memberDeclarations, diagnostics);
 
 #if DEBUG

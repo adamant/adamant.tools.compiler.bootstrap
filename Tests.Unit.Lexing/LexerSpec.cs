@@ -19,7 +19,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
     [Category("Lex")]
     public class LexerSpec
     {
-
         private LexResult Lex(string text)
         {
             var lexer = new Lexer();
