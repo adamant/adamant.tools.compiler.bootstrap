@@ -13,8 +13,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         Range, // `..` `..<`
         Additive, // `+` `-`
         Multiplicative, // `*` `/`
-        Lifetime, // `$<` `$<≠` `$>` `$>≠`
-        Unary, // `+` `-` `not`
-        Primary // f() . []
+        Lifetime, // `$`
+        Unary, // `+` `-` `not` `?`
+        Primary // `f()` `.` `[]`
     }
 }

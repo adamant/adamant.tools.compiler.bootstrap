@@ -12,16 +12,16 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Primitives;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 {
-    public class ExpressionTypeResolver
+    public class BasicExpressionAnalyzer
     {
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
         private readonly DataType selfType;
         private readonly DataType returnType;
 
-        public ExpressionTypeResolver(
+        public BasicExpressionAnalyzer(
             CodeFile file,
             Diagnostics diagnostics,
             DataType selfType = null,

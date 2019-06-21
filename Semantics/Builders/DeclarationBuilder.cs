@@ -8,7 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
 {
     public class DeclarationBuilder
     {

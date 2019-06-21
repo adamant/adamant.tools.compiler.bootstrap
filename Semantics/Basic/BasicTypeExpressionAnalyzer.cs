@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using ReferenceType = Adamant.Tools.Compiler.Bootstrap.Metadata.Types.ReferenceType;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 {
     /// <summary>
     /// Evaluates type expressions into DataType values.

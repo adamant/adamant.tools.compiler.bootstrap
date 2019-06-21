@@ -3,9 +3,10 @@ using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Builders;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment;
@@ -13,7 +14,6 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Moving;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Validation;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics
@@ -47,7 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                 .SelectMany(cu => cu.AllMemberDeclarations).ToFixedList();
 
             // Do type checking and symbol lookup (set ReferencedSymbol properties)
-            TypeResolver.Check(memberDeclarations, diagnostics);
+            BasicAnalyzer.Check(memberDeclarations, diagnostics);
 
 #if DEBUG
             TypeFulfillmentValidator.Validate(memberDeclarations);
