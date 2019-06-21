@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             var name = function.Name.Text;
             var parameters = Convert(function.Parameters);
-            var returnType = typeConverter.Convert(function.ReturnType.AssertResolved());
+            var returnType = typeConverter.Convert(function.ReturnType.AssertKnown());
             code.FunctionDeclarations.AppendLine($"{returnType} {name}({parameters});");
         }
 
@@ -63,7 +63,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
             var name = nameMangler.MangleName(function);
             var parameters = Convert(function.Parameters);
-            var returnType = typeConverter.Convert(function.ReturnType.AssertResolved());
+            var returnType = typeConverter.Convert(function.ReturnType.AssertKnown());
 
             // Write out the function declaration for C so we can call functions defined after others
             code.FunctionDeclarations.AppendLine($"{returnType} {name}({parameters});");
@@ -83,7 +83,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
             var name = nameMangler.MangleName(constructor);
             var parameters = Convert(constructor.Parameters);
-            var returnType = typeConverter.Convert(constructor.ReturnType.AssertResolved());
+            var returnType = typeConverter.Convert(constructor.ReturnType.AssertKnown());
 
             // Write out the function declaration for C so we can call functions defined after others
             code.FunctionDeclarations.AppendLine($"{returnType} {name}({parameters});");
@@ -122,7 +122,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             {
                 var name = nameMangler.MangleUnqualifiedName(function);
                 var parameters = Convert(function.Parameters);
-                var returnType = typeConverter.Convert(function.ReturnType.AssertResolved());
+                var returnType = typeConverter.Convert(function.ReturnType.AssertKnown());
                 structs.AppendLine($"{returnType} (*{name})({parameters});");
             }
             structs.EndBlockWithSemicolon();

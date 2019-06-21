@@ -13,8 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// * In Progress
     /// * Fulfilled
     ///
-    /// Once a <see cref="TypePromise"/> has been fulfilled it can't be changed
-    /// except to resolve an unresolved type.
+    /// Once a <see cref="TypePromise"/> has been fulfilled it can't be changed.
     /// </summary>
     [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
     public class TypePromise
@@ -47,13 +46,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             return DataType;
         }
 
+
+        /// <summary>
+        /// Asserts that the type has been fulfilled and is known.
+        /// </summary>
         [DebuggerHidden]
-        public DataType Resolved()
+        public DataType Known()
         {
             if (State != PromiseState.Fulfilled)
                 throw new InvalidOperationException("Promise not fulfilled");
 
-            return DataType.AssertResolved();
+            return DataType.AssertKnown();
         }
 
         // Useful for debugging

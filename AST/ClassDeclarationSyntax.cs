@@ -42,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public void CreateDefaultConstructor()
         {
             if (Members.Any(m => m is ConstructorDeclarationSyntax)) return;
-            var metatype = (Metatype)Type.Resolved();
+            var metatype = (Metatype)Type.Known();
             var constructor = new DefaultConstructor((UserObjectType)metatype.Instance);
             ChildSymbols = new SymbolSet(ChildSymbols.Values.SelectMany(s => s).Append(constructor));
         }

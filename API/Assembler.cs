@@ -96,6 +96,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
 
         private void Disassemble(ControlFlowGraph controlFlow, AssemblyBuilder builder)
         {
+            if (controlFlow == null)
+            {
+                builder.AppendLine("// Control Flow Graph not available");
+                return;
+            }
+
             foreach (var declaration in controlFlow.VariableDeclarations)
                 Disassemble(declaration, builder);
 

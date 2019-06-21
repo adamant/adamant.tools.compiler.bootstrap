@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         public FixedList<Declaration> Build(IEnumerable<DeclarationSyntax> declarationSyntaxes)
         {
             var declarations = new List<Declaration>();
-            foreach (var namespacedDeclaration in declarationSyntaxes.Where(d => !d.HasErrors))
+            foreach (var namespacedDeclaration in declarationSyntaxes)
                 switch (namespacedDeclaration)
                 {
                     case NamedFunctionDeclarationSyntax namedFunction:
@@ -23,27 +23,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
                             namedFunction.IsExternalFunction,
                             namedFunction.DeclaringType != null,
                             namedFunction.FullName,
-                            namedFunction.Type.Resolved(),
+                            namedFunction.Type.Known(),
                             BuildParameters(namedFunction.Parameters),
-                            namedFunction.ReturnType.Resolved(),
+                            namedFunction.ReturnType.Known(),
                             namedFunction.ControlFlow));
                         break;
                     case ClassDeclarationSyntax classDeclaration:
                         declarations.Add(new TypeDeclaration(
                             classDeclaration.FullName,
-                            classDeclaration.Type.Resolved(),
+                            classDeclaration.Type.Known(),
                             BuildGenericParameters(classDeclaration.GenericParameters),
                             BuildClassMembers(classDeclaration, declarations)));
                         break;
                     case ConstructorDeclarationSyntax constructorDeclaration:
                     {
-                        var constructorType = (FunctionType)constructorDeclaration.Type.Resolved();
+                        var constructorType = (FunctionType)constructorDeclaration.Type.Known();
                         var parameters = BuildConstructorParameters(constructorDeclaration);
                         constructorType = new FunctionType(parameters.Select(p => p.Type), constructorType.ReturnType);
                         declarations.Add(new ConstructorDeclaration(constructorDeclaration.FullName,
                             constructorType,
                             parameters,
-                            constructorDeclaration.ReturnType.Resolved(),
+                            constructorDeclaration.ReturnType.Known(),
                             constructorDeclaration.ControlFlow));
                     }
                     break;
@@ -73,7 +73,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         {
             var className = classDeclaration.FullName;
             var constructorName = className.Qualify(SpecialName.New);
-            var selfType = ((Metatype)classDeclaration.Type.Resolved()).Instance;
+            var selfType = ((Metatype)classDeclaration.Type.Known()).Instance;
             var selfName = className.Qualify(SpecialName.Self);
             var selfParameter = new Parameter(false, selfName, selfType);
             var parameters = selfParameter.Yield().ToFixedList();
@@ -114,9 +114,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
             switch (parameter)
             {
                 case NamedParameterSyntax namedParameter:
-                    return new Parameter(namedParameter.MutableBinding, namedParameter.Name, namedParameter.Type.Resolved());
+                    return new Parameter(namedParameter.MutableBinding, namedParameter.Name, namedParameter.Type.Known());
                 case SelfParameterSyntax selfParameter:
-                    return new Parameter(selfParameter.MutableBinding, selfParameter.Name, selfParameter.Type.Resolved());
+                    return new Parameter(selfParameter.MutableBinding, selfParameter.Name, selfParameter.Type.Known());
                 default:
                     throw NonExhaustiveMatchException.For(parameter);
             }

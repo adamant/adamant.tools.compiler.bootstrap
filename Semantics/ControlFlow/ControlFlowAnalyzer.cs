@@ -58,17 +58,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
         private void BuildGraph(FunctionDeclarationSyntax function)
         {
-            returnType = function.ReturnType.Resolved();
+            returnType = function.ReturnType.Known();
 
             // Temp Variable for return
             if (function is ConstructorDeclarationSyntax constructor)
                 graph.AddSelfParameter(constructor.SelfParameterType);
             else
-                graph.AddReturnVariable(function.ReturnType.Resolved());
+                graph.AddReturnVariable(function.ReturnType.Known());
 
             // TODO don't emit temp variables for unused parameters
             foreach (var parameter in function.Parameters.Where(p => !p.Unused))
-                graph.AddParameter(parameter.MutableBinding, parameter.Type.Resolved(), CurrentScope, parameter.Name.UnqualifiedName);
+                graph.AddParameter(parameter.MutableBinding, parameter.Type.Known(), CurrentScope, parameter.Name.UnqualifiedName);
 
             currentBlock = graph.NewBlock();
             breakToBlock = null;
@@ -134,7 +134,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         ConvertExpressionToStatement(expression);
                     else
                     {
-                        var tempVariable = graph.Let(expression.Type.AssertResolved(), CurrentScope);
+                        var tempVariable = graph.Let(expression.Type.AssertKnown(), CurrentScope);
                         var value = ConvertToValue(expression);
                         currentBlock.AddAssignment(
                             tempVariable.AssignReference(expression.Span),
@@ -333,8 +333,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case BoolLiteralExpressionSyntax boolLiteral:
                     return new BooleanConstant(boolLiteral.Value, boolLiteral.Span);
                 case ImplicitNumericConversionExpression implicitNumericConversion:
-                    if (implicitNumericConversion.Expression.Type.AssertResolved() is IntegerConstantType constantType)
-                        return new IntegerConstant(constantType.Value, implicitNumericConversion.Type.AssertResolved(), implicitNumericConversion.Span);
+                    if (implicitNumericConversion.Expression.Type.AssertKnown() is IntegerConstantType constantType)
+                        return new IntegerConstant(constantType.Value, implicitNumericConversion.Type.AssertKnown(), implicitNumericConversion.Span);
                     else
                         throw new NotImplementedException();
                 case IfExpressionSyntax ifExpression:
@@ -421,7 +421,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private Operand ConvertToOperand(Value value, DataType type)
         {
             if (value is Operand operand) return operand;
-            var tempVariable = graph.Let(type.AssertResolved(), CurrentScope);
+            var tempVariable = graph.Let(type.AssertKnown(), CurrentScope);
             currentBlock.AddAssignment(tempVariable.AssignReference(value.Span), value, value.Span, CurrentScope);
             return tempVariable.Reference(value.Span);
         }

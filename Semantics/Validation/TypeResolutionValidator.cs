@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
         public override void VisitTypeDeclaration(TypeDeclarationSyntax typeDeclaration, Void args)
         {
             base.VisitTypeDeclaration(typeDeclaration, args);
-            typeDeclaration?.Type.Resolved();
+            typeDeclaration?.Type.Known();
         }
 
         public override void VisitClassDeclaration(ClassDeclarationSyntax classDeclaration, Void args)
@@ -36,15 +36,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
         public override void VisitFunctionDeclaration(FunctionDeclarationSyntax functionDeclaration, Void args)
         {
             base.VisitFunctionDeclaration(functionDeclaration, args);
-            functionDeclaration?.ReturnType.Resolved();
-            functionDeclaration?.Type.Resolved();
+            functionDeclaration?.ReturnType.Known();
+            functionDeclaration?.Type.Known();
         }
 
         public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax constructorDeclaration, Void args)
         {
             base.VisitConstructorDeclaration(constructorDeclaration, args);
-            constructorDeclaration?.ReturnType.Resolved();
-            constructorDeclaration?.Type.Resolved();
+            constructorDeclaration?.ReturnType.Known();
+            constructorDeclaration?.Type.Known();
         }
 
         public override void VisitVariableDeclarationStatement(
@@ -52,13 +52,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
             Void args)
         {
             base.VisitVariableDeclarationStatement(variableDeclaration, args);
-            variableDeclaration.Type.AssertResolved();
+            variableDeclaration.Type.AssertKnown();
         }
 
         public override void VisitExpression(ExpressionSyntax expression, Void args)
         {
             base.VisitExpression(expression, args);
-            expression?.Type.AssertResolved();
+            expression?.Type.AssertKnown();
         }
     }
 }

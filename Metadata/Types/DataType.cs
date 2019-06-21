@@ -47,7 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public abstract bool IsKnown { get; }
 
         [DebuggerHidden]
-        public DataType AssertResolved()
+        public DataType AssertKnown()
         {
             if (!IsKnown)
                 throw new InvalidOperationException($"Type {this} not known");
