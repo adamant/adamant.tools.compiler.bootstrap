@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
         public override void VisitDeclaration(DeclarationSyntax declaration, Void args)
         {
             // Skip poisoned declarations
-            if (declaration?.Poisoned ?? true) return;
+            if (declaration?.HasErrors ?? true) return;
 
             base.VisitDeclaration(declaration, args);
         }

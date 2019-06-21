@@ -58,12 +58,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
                 if (binding.MutableBinding)
                 {
                     diagnostics.Add(SemanticError.CantRebindMutableBinding(function.File, variableDeclaration.NameSpan));
-                    function.Poison();
+                    function.MarkErrored();
                 }
                 else if (variableDeclaration.MutableBinding)
                 {
                     diagnostics.Add(SemanticError.CantRebindAsMutableBinding(function.File, variableDeclaration.NameSpan));
-                    function.Poison();
+                    function.MarkErrored();
                 }
             }
         }
@@ -74,7 +74,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
             var shadowedBy = binding.WasShadowedBy.LastOrDefault();
             if (shadowedBy == null) return;
             diagnostics.Add(SemanticError.CantShadow(function.File, shadowedBy.NameSpan, identifierName.Span));
-            function.Poison();
+            function.MarkErrored();
         }
     }
 }

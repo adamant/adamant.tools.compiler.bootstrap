@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
         private LiveVariables AnalyzeFunction(FunctionDeclarationSyntax function)
         {
             // We can't check because of errors or no body
-            if (function.Poisoned || function.ControlFlow == null)
+            if (function.HasErrors || function.ControlFlow == null)
                 return null;
 
             // Compute aliveness at point after each statement

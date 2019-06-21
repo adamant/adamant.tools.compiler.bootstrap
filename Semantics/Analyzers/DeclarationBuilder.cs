@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Analyzers
         public FixedList<Declaration> Build(IEnumerable<DeclarationSyntax> declarationSyntaxes)
         {
             var declarations = new List<Declaration>();
-            foreach (var namespacedDeclaration in declarationSyntaxes.Where(d => !d.Poisoned))
+            foreach (var namespacedDeclaration in declarationSyntaxes.Where(d => !d.HasErrors))
                 switch (namespacedDeclaration)
                 {
                     case NamedFunctionDeclarationSyntax namedFunction:

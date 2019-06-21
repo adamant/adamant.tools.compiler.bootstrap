@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public abstract class DeclarationSyntax : Syntax
     {
         public CodeFile File { get; }
-        public bool Poisoned { get; private set; }
+        public bool HasErrors { get; private set; }
 
         /// <summary>
         /// The span of whatever would count as the "name" of this declaration
@@ -23,9 +23,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             File = file;
         }
 
-        public void Poison()
+        public void MarkErrored()
         {
-            Poisoned = true;
+            HasErrors = true;
         }
     }
 }

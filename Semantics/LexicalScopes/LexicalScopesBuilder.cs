@@ -130,7 +130,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     throw NonExhaustiveMatchException.For(declaration);
             }
             if (diagnosticCount != diagnostics.Count)
-                declaration.Poison();
+                declaration.MarkErrored();
         }
 
         private static void BuildScopesInFunctionParameters(

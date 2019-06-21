@@ -89,7 +89,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
                 functionType = new MetaFunctionType(function.GenericParameters.Select(p => p.Type.Fulfilled()), functionType);
 
             function.Type.Fulfill(functionType);
-            if (diagnosticCount != diagnostics.Count) function.Poison();
+            if (diagnosticCount != diagnostics.Count) function.MarkErrored();
         }
 
         private DataType ResolveSelfType(FunctionDeclarationSyntax function)
@@ -303,7 +303,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.TypeChecking
             // The body of a function shouldn't itself evaluate to anything.
             // There should be no `=> value` for the block, so the type is `void`.
             resolver.CheckExpressionType(function.Body, DataType.Void);
-            if (diagnosticCount != diagnostics.Count) function.Poison();
+            if (diagnosticCount != diagnostics.Count) function.MarkErrored();
         }
 
         private void ResolveBodyTypesInTypeDeclaration(TypeDeclarationSyntax typeDeclaration)

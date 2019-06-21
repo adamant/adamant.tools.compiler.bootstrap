@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         {
             return function.Body != null // It is not abstract
                    && function.GenericParameters == null // It is not generic, generic functions need monomorphized
-                   && !function.Poisoned; // There were errors, we may not be able to make a control flow graph, so don't try
+                   && !function.HasErrors; // There were errors, we may not be able to make a control flow graph, so don't try
         }
 
         private readonly ControlFlowGraphBuilder graph = new ControlFlowGraphBuilder();

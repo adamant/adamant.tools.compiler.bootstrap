@@ -106,7 +106,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moving
                 if (value.ValueSemantics != ValueSemantics.Move)
                 {
                     diagnostics.Add(SemanticError.CantMove(function.File, value));
-                    function.Poison();
+                    function.MarkErrored();
                 }
             }
         }
