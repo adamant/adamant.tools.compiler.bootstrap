@@ -15,7 +15,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             var builder = new AssemblyBuilder();
             foreach (var declaration in package.Declarations)
             {
-                Disassemble(declaration, builder);
+                switch (declaration)
+                {
+                    case FunctionDeclaration _:
+                    case TypeDeclaration _:
+                        Disassemble(declaration, builder);
+                        break;
+                    case ConstructorDeclaration _:
+                        // Constructors are emitted as part of the type declaration
+                        break;
+                    default:
+                        throw NonExhaustiveMatchException.For(declaration);
+                }
+
                 builder.BlankLine();
             }
 
@@ -30,6 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                     Disassemble(function, builder);
                     break;
                 case ConstructorDeclaration constructor:
+
                     Disassemble(constructor, builder);
                     break;
                 case TypeDeclaration type:
