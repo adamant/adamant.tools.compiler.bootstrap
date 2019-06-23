@@ -6,6 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -310,8 +311,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             switch (expression)
             {
                 case NewObjectExpressionSyntax newObjectExpression:
-                    var args = newObjectExpression.Arguments.Select(a => ConvertToOperand(a.Value)).ToFixedList();
-                    return new ConstructorCall((UserObjectType)newObjectExpression.Type, args, newObjectExpression.Span);
+                {
+                    var args = newObjectExpression.Arguments
+                                    .Select(a => ConvertToOperand(a.Value))
+                                    .ToFixedList();
+                    var type = (UserObjectType)newObjectExpression.Type;
+                    // lifetime is implicitly owned since we are making a new one
+                    type = (UserObjectType)type.WithLifetime(Lifetime.None);
+                    return new ConstructorCall(type, args, newObjectExpression.Span);
+                }
                 case IdentifierNameSyntax identifier:
                 {
                     var symbol = identifier.ReferencedSymbol;

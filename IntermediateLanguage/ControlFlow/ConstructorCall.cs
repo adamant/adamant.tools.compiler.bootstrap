@@ -1,5 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
@@ -13,6 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public ConstructorCall(UserObjectType type, FixedList<Operand> arguments, TextSpan span)
             : base(span)
         {
+            Requires.That(nameof(type), type.Lifetime == Lifetime.None, "type must not have a lifetime");
             Type = type;
             Arguments = arguments;
         }
