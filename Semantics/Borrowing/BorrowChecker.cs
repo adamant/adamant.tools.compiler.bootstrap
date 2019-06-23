@@ -123,8 +123,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                                 .Select(d => d.Variable)
                                 .ToList();
                             var lifetimesOwnedByVariablesInScope = variablesInScope
-                                .Select(v => claimsAfterStatement.OwnedBy(v)).Where(o => o != null)
-                                .Select(o => o.Lifetime)
+                                .Select(v => claimsAfterStatement.OwnedBy(v))
+                                .Where(o => o != null).Select(o => o.Lifetime)
                                 .ToList();
                             claimsAfterStatement.Release(variablesInScope);
                             var erroredLifetimes = lifetimesOwnedByVariablesInScope
@@ -136,7 +136,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             {
                                 var declaration = function.ControlFlow.VariableDeclarations
                                                             .Single(d => d.Variable == variable);
-                                ReportDiagnostic(BorrowError.BorrowedValueDoesNotLiveLongEnough(file, exitScopeStatement.Span, declaration.Name));
+                                ReportDiagnostic(BorrowError.SharedValueDoesNotLiveLongEnough(file, exitScopeStatement.Span, declaration.Name));
                             }
                             break;
                         default:
@@ -282,12 +282,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         {
             if (assignToPlace == null) return;
 
-            var variableDeclaration = VariableDeclaration(assignToPlace, variables);
-            if (variableDeclaration.Type is UserObjectType objectType
+            var assignToVariable = VariableDeclaration(assignToPlace, variables);
+            if (assignToVariable.Type is UserObjectType objectType
                 && objectType.Mutability == Mutability.Mutable)
-                AcquireBorrow(assignToPlace.CoreVariable(), callLifetime, claimsAfterStatement);
+                AcquireBorrow(assignToVariable.Variable, callLifetime, claimsAfterStatement);
             else
-                AcquireAlias(assignToPlace.CoreVariable(), callLifetime, claimsAfterStatement);
+                AcquireAlias(assignToVariable.Variable, callLifetime, claimsAfterStatement);
 
             // TODO For now, we just add all the call claims, this should be based on the function type instead
             claimsAfterStatement.AddRange(outstandingClaims);
@@ -324,47 +324,48 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             switch (operand)
             {
                 case VariableReference varRef:
+                    var lifetimeReferenced = outstandingClaims.LifetimeOf(varRef.Variable);
+                    if (lifetimeReferenced == null)
+                        break; // TODO this actually happens with things that should be copy etc. Handle correctly
+                    var lifetime = lifetimeReferenced.Value;
                     switch (varRef.ValueSemantics)
                     {
                         case ValueSemantics.Borrow:
                         {
-                            // TODO check if we can borrow from this variable
-                            var borrowingLifetime = outstandingClaims.LifetimeOf(varRef.Variable);
-                            if (borrowingLifetime == null) break;
-                            var lifetime = borrowingLifetime.Value;
-
                             if (outstandingClaims.IsAliased(lifetime))
-                                ReportDiagnostic(BorrowError.CantBorrowMutablyWhileBorrowedImmutably(file, operand.Span));
+                                ReportDiagnostic(BorrowError.CantBorrowWhileAliased(file, operand.Span));
                             else if (!outstandingClaims.CurrentBorrower(lifetime).Equals(varRef.Variable))
-                                ReportDiagnostic(BorrowError.CantBorrowMutablyWhileBorrowedMutably(file, operand.Span));
+                                ReportDiagnostic(BorrowError.CantBorrowWhileBorrowed(file, operand.Span));
                             else
                                 outstandingClaims.Add(new Borrows(claimHolder, lifetime));
                         }
                         break;
                         case ValueSemantics.Alias:
                         {
-                            // TODO check if we can alias from this variable
-                            var sharingLifetime = outstandingClaims.LifetimeOf(varRef.Variable);
-                            if (sharingLifetime == null)
-                                break;
-                            var lifetime = sharingLifetime.Value;
                             if (!outstandingClaims.IsAliased(lifetime) &&
                                 !outstandingClaims.CurrentBorrower(lifetime).Equals(varRef.Variable))
-                                ReportDiagnostic(BorrowError.CantBorrowImmutablyWhileBorrowedMutably(file, operand.Span));
+                                ReportDiagnostic(BorrowError.CantAliasWhileBorrowed(file, operand.Span));
                             else
                                 outstandingClaims.Add(new Aliases(claimHolder, lifetime));
                         }
                         break;
                         case ValueSemantics.Move:
                         {
-                            var lifetime = outstandingClaims.LifetimeOf(varRef.Variable);
-                            if (lifetime == null) throw new NotImplementedException();
-                            var currentOwner = outstandingClaims.OwnerOf(lifetime.Value);
+                            var currentOwner = outstandingClaims.OwnerOf(lifetime);
                             outstandingClaims.Remove(currentOwner);
-                            if (claimHolder is Variable newHolder)
-                                outstandingClaims.Add(new Owns(newHolder, lifetime.Value));
-                            else
-                                throw new NotImplementedException();
+                            switch (claimHolder)
+                            {
+                                case Variable variable:
+                                    outstandingClaims.Add(new Owns(variable, lifetime));
+                                    break;
+                                case Lifetime _:
+                                    // This occurs when we pass ownership as a function argument
+                                    if (outstandingClaims.IsShared(lifetime))
+                                        ReportDiagnostic(BorrowError.CantMoveIntoArgumentWhileShared(file, operand.Span));
+                                    break;
+                                default:
+                                    throw NonExhaustiveMatchException.For(claimHolder);
+                            }
                         }
                         break;
                         default:

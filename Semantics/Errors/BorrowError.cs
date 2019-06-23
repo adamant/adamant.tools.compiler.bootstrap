@@ -14,32 +14,38 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
     /// </summary>
     public static class BorrowError
     {
-        public static Diagnostic BorrowedValueDoesNotLiveLongEnough(
+        public static Diagnostic SharedValueDoesNotLiveLongEnough(
             CodeFile file,
             TextSpan span,
             SimpleName variable)
         {
-            var msg = variable == null ? "Borrowed value does not live long enough"
-                : $"Value borrowed by `{variable}` does not live long enough";
+            var msg = variable == null ? "Shared value does not live long enough"
+                : $"Value shared by `{variable}` does not live long enough";
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 4001, msg);
         }
 
-        public static Diagnostic CantBorrowMutablyWhileBorrowedImmutably(CodeFile file, TextSpan span)
+        public static Diagnostic CantBorrowWhileAliased(CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 4002,
-                $"Can't borrow reference mutably while it is immutably borrowed.");
+                $"Can't borrow from reference while it is aliased.");
         }
 
-        public static Diagnostic CantBorrowMutablyWhileBorrowedMutably(CodeFile file, TextSpan span)
+        public static Diagnostic CantBorrowWhileBorrowed(CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 4003,
-                $"Can't borrow reference mutably while it is mutably borrowed by something else.");
+                $"Can't borrow from reference while it is borrowed.");
         }
 
-        public static Diagnostic CantBorrowImmutablyWhileBorrowedMutably(CodeFile file, TextSpan span)
+        public static Diagnostic CantAliasWhileBorrowed(CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 4004,
-                $"Can't borrow reference immutably while it is mutably borrowed by something else.");
+                $"Can't alias reference while it is borrowed.");
+        }
+
+        public static Diagnostic CantMoveIntoArgumentWhileShared(CodeFile file, TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 4004,
+                $"Can't move ownership into argument while it is shared.");
         }
     }
 }
