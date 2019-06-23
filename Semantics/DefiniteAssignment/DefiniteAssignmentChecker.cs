@@ -24,20 +24,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
 
         public VariableFlags StartState()
         {
-            var state = new VariableFlags(function, false);
+            var definitelyAssigned = new VariableFlags(function, false);
             // All parameters are assigned
-            state = state.Set(function.Parameters, true);
-            return state;
+            definitelyAssigned = definitelyAssigned.Set(function.Parameters, true);
+            return definitelyAssigned;
         }
 
         public VariableFlags Assignment(
             AssignmentExpressionSyntax assignmentExpression,
-            VariableFlags state)
+            VariableFlags definitelyAssigned)
         {
             switch (assignmentExpression.LeftOperand)
             {
                 case IdentifierNameSyntax identifier:
-                    return state.Set(identifier.ReferencedSymbol, true);
+                    return definitelyAssigned.Set(identifier.ReferencedSymbol, true);
                 default:
                     throw new NotImplementedException("Complex assignments not yet implemented");
             }
@@ -45,23 +45,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
 
         public VariableFlags IdentifierName(
             IdentifierNameSyntax identifierName,
-            VariableFlags state)
+            VariableFlags definitelyAssigned)
         {
-            if (state.SymbolMap.TryGetValue(identifierName.ReferencedSymbol, out var i)
-                && !state[i])
-            {
-                diagnostics.Add(SemanticError.VariableMayNotHaveBeenAssigned(file, identifierName.Span, identifierName.Name));
-            }
+            if (definitelyAssigned[identifierName.ReferencedSymbol] == false)
+                diagnostics.Add(SemanticError.VariableMayNotHaveBeenAssigned(file,
+                    identifierName.Span, identifierName.Name));
 
-            return state;
+            return definitelyAssigned;
         }
 
         public VariableFlags VariableDeclaration(
             VariableDeclarationStatementSyntax variableDeclaration,
-            VariableFlags state)
+            VariableFlags definitelyAssigned)
         {
-            if (variableDeclaration.Initializer == null) return state;
-            return state.Set(variableDeclaration, true);
+            if (variableDeclaration.Initializer == null) return definitelyAssigned;
+            return definitelyAssigned.Set(variableDeclaration, true);
         }
     }
 }

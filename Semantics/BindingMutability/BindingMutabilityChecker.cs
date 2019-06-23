@@ -19,50 +19,48 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
         public BindingMutabilityChecker(FunctionDeclarationSyntax function, Diagnostics diagnostics)
         {
             this.function = function;
-            this.file = function.File;
+            file = function.File;
             this.diagnostics = diagnostics;
         }
 
         public VariableFlags StartState()
         {
             // All variables start definitely unassigned
-            var state = new VariableFlags(function, true);
+            var definitelyUnassigned = new VariableFlags(function, true);
             // All parameters are assigned
-            state = state.Set(function.Parameters, false);
-            return state;
+            definitelyUnassigned = definitelyUnassigned.Set(function.Parameters, false);
+            return definitelyUnassigned;
         }
 
         public VariableFlags Assignment(
             AssignmentExpressionSyntax assignmentExpression,
-            VariableFlags state)
+            VariableFlags definitelyUnassigned)
         {
             switch (assignmentExpression.LeftOperand)
             {
                 case IdentifierNameSyntax identifier:
                     var symbol = identifier.ReferencedSymbol;
-                    if (state.SymbolMap.TryGetValue(symbol, out var i)
-                        && !state[i]
-                        && !symbol.MutableBinding)
+                    if (!symbol.MutableBinding && definitelyUnassigned[symbol] == false)
                     {
                         diagnostics.Add(SemanticError.VariableMayAlreadyBeAssigned(file, identifier.Span, identifier.Name));
                     }
-                    return state.Set(symbol, false);
+                    return definitelyUnassigned.Set(symbol, false);
                 default:
                     throw new NotImplementedException("Complex assignments not yet implemented");
             }
         }
 
-        public VariableFlags IdentifierName(IdentifierNameSyntax identifierName, VariableFlags state)
+        public VariableFlags IdentifierName(IdentifierNameSyntax identifierName, VariableFlags definitelyUnassigned)
         {
-            return state;
+            return definitelyUnassigned;
         }
 
         public VariableFlags VariableDeclaration(
             VariableDeclarationStatementSyntax variableDeclaration,
-            VariableFlags state)
+            VariableFlags definitelyUnassigned)
         {
-            if (variableDeclaration.Initializer == null) return state;
-            return state.Set(variableDeclaration, false);
+            if (variableDeclaration.Initializer == null) return definitelyUnassigned;
+            return definitelyUnassigned.Set(variableDeclaration, false);
         }
     }
 }

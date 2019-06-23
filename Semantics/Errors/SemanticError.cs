@@ -45,5 +45,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6005,
                 $"Variable `{name}` may not have been assigned before use");
         }
+
+        public static Diagnostic UseOfPossiblyMovedValue(CodeFile file, TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6006,
+                $"Use of possibly moved value.");
+        }
     }
 }

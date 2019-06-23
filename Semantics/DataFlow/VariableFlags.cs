@@ -9,30 +9,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
 {
     public class VariableFlags
     {
-        public readonly FixedDictionary<ISymbol, int> SymbolMap;
+        private readonly FixedDictionary<ISymbol, int> symbolMap;
         private readonly BitArray flags;
 
         public VariableFlags(FunctionDeclarationSyntax function, bool defaultValue)
         {
-            SymbolMap = function.ChildSymbols.Values.SelectMany(l => l).Enumerate()
+            symbolMap = function.ChildSymbols.Values.SelectMany(l => l).Enumerate()
                 .ToFixedDictionary(t => t.Item1, t => t.Item2);
-            flags = new BitArray(SymbolMap.Count, defaultValue);
+            flags = new BitArray(symbolMap.Count, defaultValue);
         }
 
         public VariableFlags(
             FixedDictionary<ISymbol, int> symbolMap,
             BitArray flags)
         {
-            SymbolMap = symbolMap;
+            this.symbolMap = symbolMap;
             this.flags = flags;
         }
 
-        public bool this[int i] => flags[i];
+        /// <summary>
+        /// Returns the state for the variable or null if the symbol isn't a
+        /// variable.
+        /// </summary>
+        public bool? this[ISymbol symbol] => symbolMap.TryGetValue(symbol, out var i) ? (bool?)flags[i] : null;
 
         public VariableFlags Set(ISymbol symbol, bool value)
         {
             var newFlags = Clone();
-            newFlags.flags[SymbolMap[symbol]] = value;
+            newFlags.flags[symbolMap[symbol]] = value;
             return newFlags;
         }
 
@@ -40,14 +44,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
         {
             var newFlags = Clone();
             foreach (var symbol in symbols)
-                newFlags.flags[SymbolMap[symbol]] = value;
+                newFlags.flags[symbolMap[symbol]] = value;
 
             return newFlags;
         }
 
         private VariableFlags Clone()
         {
-            return new VariableFlags(SymbolMap, (BitArray)flags.Clone());
+            return new VariableFlags(symbolMap, (BitArray)flags.Clone());
         }
     }
 }

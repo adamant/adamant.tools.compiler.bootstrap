@@ -12,6 +12,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Moves;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Validation;
 
@@ -54,13 +55,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 #endif
             ShadowChecker.Check(memberDeclarations, diagnostics);
 
+            // TODO use DataFlowAnalysis to check for unused variables and report use of variables starting with `_`
+
             DataFlowAnalysis.Check(DefiniteAssignmentStrategy.Instance, memberDeclarations, diagnostics);
 
             DataFlowAnalysis.Check(BindingMutabilityStrategy.Instance, memberDeclarations, diagnostics);
 
-            // TODO use DataFlowAnalysis to check for use of moved value
-
-            // TODO use DataFlowAnalysis to check for unused variables and report use of variables starting with `_`
+            DataFlowAnalysis.Check(UseOfMovedValueStrategy.Instance, memberDeclarations, diagnostics);
 
             // --------------------------------------------------
             // This is where the representation transitions to IR
