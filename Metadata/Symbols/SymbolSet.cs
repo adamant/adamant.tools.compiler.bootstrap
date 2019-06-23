@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
     // A set of symbols that are indexed by name
     public class SymbolSet : FixedDictionary<SimpleName, FixedList<ISymbol>>
     {
-        public static new readonly SymbolSet Empty = new SymbolSet(Enumerable.Empty<ISymbol>());
+        public new static readonly SymbolSet Empty = new SymbolSet(Enumerable.Empty<ISymbol>());
 
         public SymbolSet(IEnumerable<ISymbol> symbols)
             : base(GroupSymbols(symbols))

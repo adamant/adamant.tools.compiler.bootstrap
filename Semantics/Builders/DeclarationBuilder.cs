@@ -4,6 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
@@ -12,67 +13,73 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
 {
     public class DeclarationBuilder
     {
-        public FixedList<Declaration> Build(IEnumerable<DeclarationSyntax> declarationSyntaxes)
-        {
-            var declarations = new List<Declaration>();
-            foreach (var namespacedDeclaration in declarationSyntaxes)
-                switch (namespacedDeclaration)
-                {
-                    case NamedFunctionDeclarationSyntax namedFunction:
-                        declarations.Add(new FunctionDeclaration(
-                            namedFunction.IsExternalFunction,
-                            namedFunction.DeclaringType != null,
-                            namedFunction.FullName,
-                            namedFunction.Type.Known(),
-                            BuildParameters(namedFunction.Parameters),
-                            namedFunction.ReturnType.Known(),
-                            namedFunction.ControlFlow));
-                        break;
-                    case ClassDeclarationSyntax classDeclaration:
-                        declarations.Add(new TypeDeclaration(
-                            classDeclaration.FullName,
-                            classDeclaration.Type.Known(),
-                            BuildGenericParameters(classDeclaration.GenericParameters),
-                            BuildClassMembers(classDeclaration, declarations)));
-                        break;
-                    case ConstructorDeclarationSyntax constructorDeclaration:
-                    {
-                        var constructorType = (FunctionType)constructorDeclaration.Type.Known();
-                        var parameters = BuildConstructorParameters(constructorDeclaration);
-                        constructorType = new FunctionType(parameters.Select(p => p.Type), constructorType.ReturnType);
-                        declarations.Add(new ConstructorDeclaration(constructorDeclaration.FullName,
-                            constructorType,
-                            parameters,
-                            constructorDeclaration.ReturnType.Known(),
-                            constructorDeclaration.ControlFlow));
-                    }
-                    break;
-                    default:
-                        throw NonExhaustiveMatchException.For(namespacedDeclaration);
-                }
+        private readonly Dictionary<ISymbol, Declaration> declarations = new Dictionary<ISymbol, Declaration>();
 
-            return declarations.ToFixedList();
+        public IEnumerable<Declaration> AllDeclarations => declarations.Values;
+
+        public void Build(IEnumerable<MemberDeclarationSyntax> memberDeclarations)
+        {
+            foreach (var memberDeclaration in memberDeclarations)
+                Build(memberDeclaration);
         }
 
-        private FixedList<Declaration> BuildClassMembers(
-            ClassDeclarationSyntax classDeclaration,
-            List<Declaration> declarations)
+        private FixedList<Declaration> BuildList(IEnumerable<MemberDeclarationSyntax> memberDeclarations)
         {
-            var members = Build(classDeclaration.Members);
+            return memberDeclarations.Select(Build).ToFixedList();
+        }
+
+        private Declaration Build(MemberDeclarationSyntax memberDeclarations)
+        {
+            if (declarations.TryGetValue(memberDeclarations, out var declaration)) return declaration;
+
+            switch (memberDeclarations)
+            {
+                case NamedFunctionDeclarationSyntax namedFunction:
+                    declaration = new FunctionDeclaration(namedFunction.IsExternalFunction,
+                        namedFunction.DeclaringType != null, namedFunction.FullName,
+                        namedFunction.Type.Known(), BuildParameters(namedFunction.Parameters),
+                        namedFunction.ReturnType.Known(), namedFunction.ControlFlow);
+                    break;
+                case ClassDeclarationSyntax classDeclaration:
+                    declaration = new TypeDeclaration(classDeclaration.FullName,
+                        classDeclaration.Type.Known(),
+                        BuildGenericParameters(classDeclaration.GenericParameters),
+                        BuildClassMembers(classDeclaration));
+                    break;
+                case ConstructorDeclarationSyntax constructorDeclaration:
+                    var constructorType = (FunctionType)constructorDeclaration.Type.Known();
+                    var parameters = BuildConstructorParameters(constructorDeclaration);
+                    constructorType = new FunctionType(parameters.Select(p => p.Type),
+                        constructorType.ReturnType);
+                    declaration = new ConstructorDeclaration(constructorDeclaration.FullName,
+                        constructorType, parameters, constructorDeclaration.ReturnType.Known(),
+                        constructorDeclaration.ControlFlow);
+
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.For(memberDeclarations);
+            }
+            declarations.Add(memberDeclarations, declaration);
+            return declaration;
+        }
+
+        private FixedList<Declaration> BuildClassMembers(ClassDeclarationSyntax classDeclaration)
+        {
+            var members = BuildList(classDeclaration.Members);
             if (members.Any(m => m is ConstructorDeclaration)) return members;
 
             var defaultConstructor = BuildDefaultConstructor(classDeclaration);
-            members = members.Append(defaultConstructor).ToFixedList();
-            // We have to add it to the list of all declarations too, or it won't be found by the emitter
-            declarations.Add(defaultConstructor);
-            return members;
+            return members.Append(defaultConstructor).ToFixedList();
         }
 
-        private static ConstructorDeclaration BuildDefaultConstructor(
+        private Declaration BuildDefaultConstructor(
             ClassDeclarationSyntax classDeclaration)
         {
+            var symbol = classDeclaration.ChildSymbols.Values.SelectMany(l => l)
+                            .OfType<DefaultConstructor>().Single();
+            if (declarations.TryGetValue(symbol, out var declaration)) return declaration;
+
             var className = classDeclaration.FullName;
-            var constructorName = className.Qualify(SpecialName.New);
             var selfType = ((Metatype)classDeclaration.Type.Known()).Instance;
             var selfName = className.Qualify(SpecialName.Self);
             var selfParameter = new Parameter(false, selfName, selfType);
@@ -84,8 +91,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
             var block = graph.NewBlock();
             block.AddReturn(classDeclaration.NameSpan, Scope.Outer);
 
-            var defaultConstructor = new ConstructorDeclaration(constructorName, constructorType,
-                parameters, selfType, graph.Build());
+            var defaultConstructor = new ConstructorDeclaration(
+                                            symbol.FullName,
+                                            constructorType,
+                                            parameters,
+                                            selfType,
+                                            graph.Build());
+
+            declarations.Add(symbol, defaultConstructor);
             return defaultConstructor;
         }
 

@@ -13,21 +13,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         public string Disassemble(Package package)
         {
             var builder = new AssemblyBuilder();
-            foreach (var declaration in package.Declarations)
+            var typeMembers = package.Declarations.OfType<TypeDeclaration>()
+                                .SelectMany(t => t.Members).ToList();
+            foreach (var declaration in package.Declarations.Except(typeMembers))
             {
-                switch (declaration)
-                {
-                    case FunctionDeclaration _:
-                    case TypeDeclaration _:
-                        Disassemble(declaration, builder);
-                        break;
-                    case ConstructorDeclaration _:
-                        // Constructors are emitted as part of the type declaration
-                        break;
-                    default:
-                        throw NonExhaustiveMatchException.For(declaration);
-                }
-
+                Disassemble(declaration, builder);
                 builder.BlankLine();
             }
 
@@ -125,7 +115,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             foreach (var declaration in controlFlow.LocalVariables)
                 Disassemble(declaration, builder);
 
-            if (controlFlow.VariableDeclarations.Any(v => v.TypeIsNotEmpty))
+            if (controlFlow.LocalVariables.Any(v => v.TypeIsNotEmpty))
                 builder.BlankLine();
 
             if (Disassemble(controlFlow.BorrowClaims?.ParameterClaims, builder))
