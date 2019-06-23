@@ -9,11 +9,17 @@ using ReferenceType = Adamant.Tools.Compiler.Bootstrap.Metadata.Types.ReferenceT
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 {
     /// <summary>
-    /// Evaluates type expressions into DataType values.
+    /// Type expressions are importantly different from regular expressions. In
+    /// a standard expression, the type of the expression is what is being inferred.
+    /// For type expressions, what is being done is figuring out what type the
+    /// expression is naming. This is because the type of a type expression is
+    /// always `Type` or some subtype of that. It is because of this last point
+    /// that the methods in this class use the term "Check" because they are
+    /// checking that the expression is of type `Type`.
     /// </summary>
     public class TypeExpressionEvaluator
     {
-        public static DataType EvaluateExpression(ExpressionSyntax typeExpression)
+        public static DataType CheckExpression(ExpressionSyntax typeExpression)
         {
             switch (typeExpression)
             {
@@ -36,16 +42,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
                 case ReferenceLifetimeSyntax referenceLifetime:
                 {
-                    var type = EvaluateExpression(referenceLifetime.ReferentTypeExpression);
+                    var type = CheckExpression(referenceLifetime.ReferentTypeExpression);
                     if (type == DataType.Unknown) return DataType.Unknown;
-                    var lifetime = EvaluateLifetime(referenceLifetime.Lifetime);
+                    var lifetime = ResolveLifetime(referenceLifetime.Lifetime);
                     if (type is ReferenceType referenceType)
                         return referenceType.WithLifetime(lifetime);
                     return DataType.Unknown;
                 }
                 case RefTypeSyntax refType:
                 {
-                    var referent = EvaluateExpression(refType.ReferencedType);
+                    var referent = CheckExpression(refType.ReferencedType);
                     if (referent is UserObjectType objectType)
                         return new RefType(objectType);
                     return DataType.Unknown;
@@ -76,7 +82,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return DataType.Unknown;
                 case MutableExpressionSyntax mutableType:
                 {
-                    var type = EvaluateExpression(mutableType.Expression);
+                    var type = CheckExpression(mutableType.Expression);
                     switch (type)
                     {
                         case UserObjectType objectType when objectType.DeclaredMutable:
@@ -90,7 +96,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
         }
 
-        public static Lifetime EvaluateLifetime(SimpleName lifetimeName)
+        /// <summary>
+        /// Since we aren't checking the type of lifetimes, we term this "Resolve"
+        /// </summary>
+        public static Lifetime ResolveLifetime(SimpleName lifetimeName)
         {
             if (lifetimeName.IsSpecial)
             {

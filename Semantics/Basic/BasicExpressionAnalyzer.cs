@@ -754,7 +754,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 return DataType.Unknown;
             }
 
-            return TypeExpressionEvaluator.EvaluateExpression(typeExpression);
+            return TypeExpressionEvaluator.CheckExpression(typeExpression);
         }
 
         private void InferExpressionTypeInInvocation(ExpressionSyntax callee, FixedList<DataType> argumentTypes)
