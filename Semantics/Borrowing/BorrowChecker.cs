@@ -352,6 +352,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                         case ValueSemantics.Move:
                         {
                             var currentOwner = outstandingClaims.OwnerOf(lifetime);
+                            // Trying to move out of something that doesn't have ownership. We
+                            // don't report an error, because that should already be reported by
+                            // the type checker. We don't change claims, because ownership hasn't been
+                            // changed.
+                            if (currentOwner?.Holder != varRef.Variable)
+                                break;
                             outstandingClaims.Remove(currentOwner);
                             switch (claimHolder)
                             {
