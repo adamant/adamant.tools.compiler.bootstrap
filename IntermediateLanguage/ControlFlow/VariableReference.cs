@@ -33,6 +33,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
                 case ValueSemantics.Copy:
                     mutability = "copy ";
                     break;
+                case ValueSemantics.Own:
+                    mutability = "own ";
+                    break;
                 case ValueSemantics.Borrow:
                     mutability = "borrow ";
                     break;
@@ -50,9 +53,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             return Variable;
         }
 
-        public Value AsMove(TextSpan span)
+        public Value AsOwn(TextSpan span)
         {
-            return new VariableReference(Variable, ValueSemantics.Move, span);
+            return new VariableReference(Variable, ValueSemantics.Own, span);
         }
 
         public Value AsBorrow()

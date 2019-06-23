@@ -22,8 +22,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             DeclaredMutable = declaredMutable;
             Mutability = mutability;
             ValueSemantics = IsOwned
-                ? ValueSemantics.Move
-                : (Mutability == Mutability.Mutable ? ValueSemantics.Alias : ValueSemantics.Borrow);
+                ? ValueSemantics.Own
+                : (Mutability == Mutability.Mutable ? ValueSemantics.Borrow : ValueSemantics.Alias);
         }
 
         public abstract ReferenceType WithLifetime(Lifetime lifetime);

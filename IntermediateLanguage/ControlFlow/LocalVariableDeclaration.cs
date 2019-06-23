@@ -44,10 +44,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             Name = name;
             IsMutableBinding = isMutableBinding;
             Type = type;
-            if (type is UserObjectType objectType && objectType.Mutability == Mutability.Immutable)
-                defaultSemantics = ValueSemantics.Alias;
+            if (type.ValueSemantics == ValueSemantics.Own)
+                if (type is ReferenceType referenceType && referenceType.Mutability == Mutability.Immutable)
+                    defaultSemantics = ValueSemantics.Alias;
+                else
+                    defaultSemantics = ValueSemantics.Borrow;
             else
-                defaultSemantics = ValueSemantics.Borrow;
+                defaultSemantics = type.ValueSemantics;
         }
 
         public VariableReference Reference(TextSpan span)

@@ -349,7 +349,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                                 outstandingClaims.Add(new Aliases(claimHolder, lifetime));
                         }
                         break;
-                        case ValueSemantics.Move:
+                        case ValueSemantics.Own:
                         {
                             var currentOwner = outstandingClaims.OwnerOf(lifetime);
                             // Trying to move out of something that doesn't have ownership. We

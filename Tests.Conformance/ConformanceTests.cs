@@ -72,6 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
                     testOutput.WriteLine($"{testCase.RelativeCodePath}:{diagnostic.StartPosition.Line}:{diagnostic.StartPosition.Column} {diagnostic.Level} {diagnostic.ErrorCode}");
                     testOutput.WriteLine(diagnostic.Message);
                 }
+                testOutput.WriteLine("");
             }
 
             var errorDiagnostics = diagnostics

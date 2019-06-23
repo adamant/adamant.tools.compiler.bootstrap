@@ -114,7 +114,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private void AssignToPlace(Place place, Value value, TextSpan span)
         {
             if (value is VariableReference assignFrom
-                && assignFrom.ValueSemantics == ValueSemantics.Move
+                && assignFrom.ValueSemantics == ValueSemantics.Own
                 && place is VariableReference assignTo)
             {
                 // There is a chance we are assigning into something that doesn't
@@ -122,8 +122,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 var variableSemantics = graph[assignTo.Variable].Type.ValueSemantics;
                 switch (variableSemantics)
                 {
-                    case ValueSemantics.Move:
-                        // They are both move, no problems
+                    case ValueSemantics.Own:
+                        // They are both own, no problems
                         break;
                     case ValueSemantics.Alias:
                         value = assignFrom.AsAlias();
@@ -210,9 +210,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case ReturnExpressionSyntax returnExpression:
                     if (returnExpression.ReturnValue != null)
                     {
-                        var isMove = returnType.ValueSemantics == ValueSemantics.Move;
-                        var value = isMove
-                            ? ConvertToMove(returnExpression.ReturnValue, returnExpression.Span)
+                        var isOwn = returnType.ValueSemantics == ValueSemantics.Own;
+                        var value = isOwn
+                            ? ConvertToOwn(returnExpression.ReturnValue, returnExpression.Span)
                             // TODO avoid getting a move from this just because it is a new object expression
                             : ConvertToValue(returnExpression.ReturnValue);
                         AssignToPlace(
@@ -414,7 +414,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     // need to be able to check mutability on borrows?
                     return ConvertToValue(mutable.Expression);
                 case MoveExpressionSyntax move:
-                    return ConvertToMove(move.Expression, move.Span);
+                    return ConvertToOwn(move.Expression, move.Span);
                 case ImplicitImmutabilityConversionExpression implicitImmutabilityConversion:
                 {
                     var operand = ConvertToOperand(implicitImmutabilityConversion.Expression);
@@ -427,8 +427,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         case Dereference _:
                             throw new NotImplementedException();
                         case VariableReference varReference:
-                            if (implicitImmutabilityConversion.Type.ValueSemantics == ValueSemantics.Move)
-                                return varReference.AsMove(implicitImmutabilityConversion.Span);
+                            if (implicitImmutabilityConversion.Type.ValueSemantics == ValueSemantics.Own)
+                                return varReference.AsOwn(implicitImmutabilityConversion.Span);
                             else
                                 return varReference.AsAlias();
                         default:
@@ -440,13 +440,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
         }
 
-        private Value ConvertToMove(ExpressionSyntax expression, TextSpan moveSpan)
+        private Value ConvertToOwn(ExpressionSyntax expression, TextSpan moveSpan)
         {
             var operand = ConvertToOperand(expression);
             switch (operand)
             {
                 case VariableReference variableReference:
-                    return variableReference.AsMove(moveSpan);
+                    return variableReference.AsOwn(moveSpan);
                 default:
                     throw new NotImplementedException();
             }
