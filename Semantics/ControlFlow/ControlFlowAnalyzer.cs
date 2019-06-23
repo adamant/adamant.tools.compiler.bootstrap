@@ -9,7 +9,6 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 {
@@ -108,6 +107,48 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             scopes.Pop();
         }
 
+        /// <summary>
+        /// Assign a value into a place while making sure to correctly handle
+        /// value semantics.
+        /// </summary>
+        private void AssignToPlace(Place place, Value value, TextSpan span)
+        {
+            if (value is VariableReference assignFrom
+                && assignFrom.ValueSemantics == ValueSemantics.Move
+                && place is VariableReference assignTo)
+            {
+                // There is a chance we are assigning into something that doesn't
+                // accept ownership. In that case, we demote to a borrow or alias
+                var variableSemantics = graph[assignTo.Variable].Type.ValueSemantics;
+                switch (variableSemantics)
+                {
+                    case ValueSemantics.Move:
+                        // They are both move, no problems
+                        break;
+                    case ValueSemantics.Alias:
+                        value = assignFrom.AsAlias();
+                        break;
+                    case ValueSemantics.Borrow:
+                        value = assignFrom.AsBorrow();
+                        break;
+                    default:
+                        throw NonExhaustiveMatchException.ForEnum(variableSemantics);
+                }
+            }
+
+            currentBlock.AddAssignment(place, value, span, CurrentScope);
+        }
+
+        private VariableReference AssignToTemp(DataType type, Value value)
+        {
+            var tempVariable = graph.Let(type.AssertKnown(), CurrentScope);
+            currentBlock.AddAssignment(
+                tempVariable.LValueReference(value.Span),
+                value, value.Span,
+                CurrentScope);
+            return tempVariable.Reference(value.Span);
+        }
+
         private void ConvertToStatement(StatementSyntax statement)
         {
             switch (statement)
@@ -120,11 +161,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     if (variableDeclaration.Initializer != null)
                     {
                         var value = ConvertToValue(variableDeclaration.Initializer);
-                        currentBlock.AddAssignment(
-                            variable.AssignReference(variableDeclaration.Initializer.Span),
+                        AssignToPlace(
+                            variable.LValueReference(variableDeclaration.Initializer.Span),
                             value,
-                            variableDeclaration.Initializer.Span,
-                            CurrentScope);
+                            variableDeclaration.Initializer.Span);
                     }
                     return;
                 }
@@ -138,13 +178,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         ConvertExpressionToStatement(expression);
                     else
                     {
-                        var tempVariable = graph.Let(expression.Type.AssertKnown(), CurrentScope);
+                        //var tempVariable = graph.Let(expression.Type.AssertKnown(), CurrentScope);
                         var value = ConvertToValue(expression);
-                        currentBlock.AddAssignment(
-                            tempVariable.AssignReference(expression.Span),
-                            value,
-                            expression.Span,
-                            CurrentScope);
+                        //currentBlock.AddAssignment(
+                        //    tempVariable.LValueReference(expression.Span),
+                        //    value, expression.Span,
+                        //    CurrentScope);
+                        AssignToTemp(expression.Type, value);
                     }
 
                     return;
@@ -154,20 +194,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
         }
 
-        private static bool IsOwned(DataType type)
-        {
-            if (type is ReferenceType referenceType)
-                return referenceType.IsOwned;
-
-            return false;
-        }
-
         /// <summary>
         /// Converts an expression of type `void` or `never` to a statement
         /// </summary>
         private void ConvertExpressionToStatement(ExpressionSyntax expression)
         {
-            // expression m
             switch (expression)
             {
                 case UnaryExpressionSyntax _:
@@ -179,14 +210,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case ReturnExpressionSyntax returnExpression:
                     if (returnExpression.ReturnValue != null)
                     {
-                        var isMove = IsOwned(returnType);
+                        var isMove = returnType.ValueSemantics == ValueSemantics.Move;
                         var value = isMove
                             ? ConvertToMove(returnExpression.ReturnValue, returnExpression.Span)
+                            // TODO avoid getting a move from this just because it is a new object expression
                             : ConvertToValue(returnExpression.ReturnValue);
-                        currentBlock.AddAssignment(
-                            graph.ReturnVariable.AssignReference(returnExpression.ReturnValue.Span),
+                        AssignToPlace(
+                            graph.ReturnVariable.LValueReference(returnExpression.ReturnValue.Span),
                             value,
-                            returnExpression.ReturnValue.Span, CurrentScope);
+                            returnExpression.ReturnValue.Span);
                     }
 
                     ExitScope(returnExpression.Span.AtEnd());
@@ -293,7 +325,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         }
                         value = new BinaryOperation(place, binaryOperator, rightOperand, type);
                     }
-                    currentBlock.AddAssignment(place, value, assignmentExpression.Span, CurrentScope);
+                    AssignToPlace(place, value, assignmentExpression.Span);
                     return;
                 }
                 case ResultExpressionSyntax resultExpression:
@@ -388,17 +420,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     var operand = ConvertToOperand(implicitImmutabilityConversion.Expression);
                     switch (operand)
                     {
-                        case BooleanConstant _:
-                        case Utf8BytesConstant _:
-                        case IntegerConstant _:
-                            return operand;
+                        //case BooleanConstant _:
+                        //case Utf8BytesConstant _:
+                        //case IntegerConstant _:
+                        //    return operand;
                         case Dereference _:
                             throw new NotImplementedException();
                         case VariableReference varReference:
-                            if (IsOwned(implicitImmutabilityConversion.Type))
+                            if (implicitImmutabilityConversion.Type.ValueSemantics == ValueSemantics.Move)
                                 return varReference.AsMove(implicitImmutabilityConversion.Span);
                             else
-                                return varReference.AsShared();
+                                return varReference.AsAlias();
                         default:
                             throw NonExhaustiveMatchException.For(expression);
                     }
@@ -408,13 +440,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
         }
 
-        private Value ConvertToMove(ExpressionSyntax moveExpression, TextSpan moveSpan)
+        private Value ConvertToMove(ExpressionSyntax expression, TextSpan moveSpan)
         {
-            var operand = ConvertToOperand(moveExpression);
+            var operand = ConvertToOperand(expression);
             switch (operand)
             {
                 case VariableReference variableReference:
-
                     return variableReference.AsMove(moveSpan);
                 default:
                     throw new NotImplementedException();
@@ -430,9 +461,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private Operand ConvertToOperand(Value value, DataType type)
         {
             if (value is Operand operand) return operand;
-            var tempVariable = graph.Let(type.AssertKnown(), CurrentScope);
-            currentBlock.AddAssignment(tempVariable.AssignReference(value.Span), value, value.Span, CurrentScope);
-            return tempVariable.Reference(value.Span);
+            return AssignToTemp(type, value);
+            //var tempVariable = graph.Let(type.AssertKnown(), CurrentScope);
+            //currentBlock.AddAssignment(tempVariable.LValueReference(value.Span), value, value.Span, CurrentScope);
+            //return tempVariable.Reference(value.Span);
         }
 
         private Value ConvertBinaryExpressionToValue(BinaryExpressionSyntax expression)
@@ -530,7 +562,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             {
                 case IdentifierNameSyntax identifier:
                     // TODO what if this isn't just a variable?
-                    return graph.VariableFor(identifier.ReferencedSymbol.FullName.UnqualifiedName).AssignReference(value.Span);
+                    return graph.VariableFor(identifier.ReferencedSymbol.FullName.UnqualifiedName).LValueReference(value.Span);
                 default:
                     throw NonExhaustiveMatchException.For(value);
             }

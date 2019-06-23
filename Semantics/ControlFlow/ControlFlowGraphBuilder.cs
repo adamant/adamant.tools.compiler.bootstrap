@@ -99,5 +99,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
             return new ControlFlowGraph(variables, blocks);
         }
+
+        public LocalVariableDeclaration this[Variable variable]
+        {
+            get
+            {
+                var declaration = variables[variable.Number];
+                Debug.Assert(declaration.Variable == variable);
+                return declaration;
+            }
+        }
     }
 }

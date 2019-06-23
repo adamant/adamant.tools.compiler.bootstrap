@@ -7,7 +7,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public abstract class ExpressionSyntax : StatementSyntax
     {
         public TextSpan Span { get; }
-        public ValueSemantics? ValueSemantics { get; set; } = null;
 
         /// <summary>
         /// If an expression has been poisoned, then it is errored in some way

@@ -17,19 +17,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     public class UserObjectType : ObjectType, IEquatable<UserObjectType>
     {
         public ISymbol Symbol { get; }
-        public Name Name { get; }
-        /// <summary>
-        /// Whether this type was declared `mut class` or just `class`
-        /// </summary>
-        public bool DeclaredMutable { get; }
 
         public FixedList<DataType> GenericParameterTypes { get; }
         public bool IsGeneric => GenericParameterTypes != null;
         public int? GenericArity => GenericParameterTypes?.Count;
         public FixedList<DataType> GenericArguments { get; }
 
-        public Mutability Mutability { get; }
-        // TODO deal with the generic parameters and arguments
+        // TODO for IsKnown, deal with the generic parameters and arguments
         public override bool IsKnown => true;
 
         private UserObjectType(
@@ -39,11 +33,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             IEnumerable<DataType> genericArguments,
             Mutability mutability,
             Lifetime lifetime)
-            : base(lifetime)
+            : base(symbol.FullName, declaredMutable, mutability, lifetime)
         {
-            Name = symbol.FullName;
-            DeclaredMutable = declaredMutable;
-            Mutability = mutability;
             Symbol = symbol;
             var genericParameterTypesList = genericParameterTypes?.ToFixedList();
             GenericParameterTypes = genericParameterTypesList;
@@ -76,7 +67,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         }
 
         /// <summary>
-        /// Use this type as an immutable type. 
+        /// Use this type as an immutable type.
         /// </summary>
         public UserObjectType AsImmutable()
         {

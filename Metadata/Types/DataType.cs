@@ -9,11 +9,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// </summary>
     public abstract class DataType
     {
+        #region Standard Types
         public static readonly UnknownType Unknown = UnknownType.Instance;
         public static readonly VoidType Void = VoidType.Instance;
         public static readonly NeverType Never = NeverType.Instance;
         public static readonly BoolType Bool = BoolType.Instance;
-        public static readonly AnyType Any = AnyType.Instance;
+        public static readonly AnyType Any = AnyType.ImmutableInstance;
+        public static readonly AnyType MutableAny = AnyType.MutableInstance;
         public static readonly TypeType Type = TypeType.Instance;
         public static readonly SizedIntegerType Int8 = SizedIntegerType.Int8;
         public static readonly SizedIntegerType Byte = SizedIntegerType.Byte;
@@ -30,6 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public static readonly StringConstantType StringConstant = StringConstantType.Instance;
 
         public static readonly PointerType BytePointer = new PointerType(Byte);
+        #endregion
 
         /// <summary>
         /// The `never` and `void` types are the only empty types. This means
@@ -45,6 +48,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// A known type is one that has no unknown parts
         /// </summary>
         public abstract bool IsKnown { get; }
+
+        /// <summary>
+        /// The value semantics of expressions producing this type
+        /// </summary>
+        public abstract ValueSemantics ValueSemantics { get; }
 
         [DebuggerHidden]
         public DataType AssertKnown()

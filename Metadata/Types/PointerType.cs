@@ -4,7 +4,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     {
         public readonly DataType Referent;
         public override bool IsKnown { get; }
-        public override ValueSemantics Semantics => ValueSemantics.Copy;
+        public override ValueSemantics ValueSemantics => ValueSemantics.Copy;
 
         public PointerType(DataType referent)
         {

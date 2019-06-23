@@ -2,12 +2,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     /// <summary>
     /// The value semantics is how an expression produces its value. That is
-    /// whether a move or a copy. For reference types the value mode applies to the
-    /// reference itself, not to the referent.
+    /// whether a move or a copy. For reference types, there are two different
+    /// kinds of copy
     ///
     /// Reference Types:
-    /// Move - an owned reference is being moved
-    /// Copy - a reference is copied, i.e. borrowed
+    /// Move - move an owned reference
+    /// Borrow - copy the reference, borrow the object
+    /// Alias - copy the reference, alias the object
     ///
     /// Value Types:
     /// Move - the value is moved
@@ -16,17 +17,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     public enum ValueSemantics
     {
         /// <summary>
-        /// This value type is a move type
+        /// Expression is acting as an lvalue not an rvalue
+        /// </summary>
+        LValue = -1,
+        /// <summary>
+        /// Expressions of type `never` and `void`, don't produce a value
+        /// </summary>
+        Empty = 0,
+        /// <summary>
+        /// The value or reference is moved
         /// </summary>
         Move = 1,
         /// <summary>
-        /// This value type is a copy type. Does not indicate whether it is safe
-        /// to bit copy the type or a copy function is needed
+        /// This value type is a copy type. For expression, does not indicate
+        /// whether it is safe to bit copy the type or a copy function is needed
         /// </summary>
         Copy,
         /// <summary>
-        /// Expressions of type `never`, don't return
+        /// Copy a reference, borrow the referent
         /// </summary>
-        Never,
+        Borrow,
+        /// <summary>
+        /// Copy a reference, alias the referent
+        /// </summary>
+        Alias,
     }
 }

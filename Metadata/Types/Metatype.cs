@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
@@ -21,8 +22,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public DataType Instance { get; }
         public override bool IsKnown => Instance.IsKnown;
 
-        public Metatype(DataType instanceType)
-            : base(Lifetime.Forever)
+        public Metatype(ObjectType instanceType)
+            : base(new QualifiedName(instanceType.Name, SpecialName.Type),
+                false, Mutability.Immutable,
+                Lifetime.Forever)
+        {
+            Instance = instanceType;
+        }
+
+        public Metatype(SimpleType instanceType)
+            : base(new QualifiedName(instanceType.Name, SpecialName.Type),
+                false, Mutability.Immutable,
+                Lifetime.Forever)
         {
             Instance = instanceType;
         }
@@ -34,18 +45,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         public override string ToString()
         {
-            switch (Instance)
-            {
-                case UserObjectType _:
-                case SimpleType _:
-                case AnyType _:
-                case TypeType _:
-                case Metatype _:
-                    // For these types we don't need parens, for others we might
-                    return $"{Instance}.Type";
-                default:
-                    return $"({Instance}).Type";
-            }
+            // For these types we don't need parens, for others we might
+            return $"{Instance}.Type";
         }
     }
 }

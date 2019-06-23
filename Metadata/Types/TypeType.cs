@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
@@ -8,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         internal static readonly TypeType Instance = new TypeType();
 
         private TypeType()
-            : base(Lifetime.None)
+            : base(SpecialName.Type, false, Mutability.Immutable, Lifetime.None)
         { }
         #endregion
 

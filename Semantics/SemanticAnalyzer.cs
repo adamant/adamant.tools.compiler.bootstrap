@@ -12,7 +12,6 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Moving;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Validation;
 
@@ -53,9 +52,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             TypeFulfillmentValidator.Validate(memberDeclarations);
             ReferencedSymbolValidator.Validate(memberDeclarations);
 #endif
-            // TODO the move checker should be handled by the data flow analysis and type checking
-            MoveChecker.Check(memberDeclarations, diagnostics);
-
             ShadowChecker.Check(memberDeclarations, diagnostics);
 
             DataFlowAnalysis.Check(DefiniteAssignmentStrategy.Instance, memberDeclarations, diagnostics);

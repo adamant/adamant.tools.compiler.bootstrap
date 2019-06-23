@@ -324,9 +324,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             switch (operand)
             {
                 case VariableReference varRef:
-                    switch (varRef.Kind)
+                    switch (varRef.ValueSemantics)
                     {
-                        case VariableReferenceKind.Borrow:
+                        case ValueSemantics.Borrow:
                         {
                             // TODO check if we can borrow from this variable
                             var borrowingLifetime = outstandingClaims.LifetimeOf(varRef.Variable);
@@ -341,7 +341,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                                 outstandingClaims.Add(new Borrows(claimHolder, lifetime));
                         }
                         break;
-                        case VariableReferenceKind.Alias:
+                        case ValueSemantics.Alias:
                         {
                             // TODO check if we can alias from this variable
                             var sharingLifetime = outstandingClaims.LifetimeOf(varRef.Variable);
@@ -355,7 +355,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                                 outstandingClaims.Add(new Aliases(claimHolder, lifetime));
                         }
                         break;
-                        case VariableReferenceKind.Move:
+                        case ValueSemantics.Move:
                         {
                             var lifetime = outstandingClaims.LifetimeOf(varRef.Variable);
                             if (lifetime == null) throw new NotImplementedException();
@@ -368,7 +368,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                         }
                         break;
                         default:
-                            throw NonExhaustiveMatchException.ForEnum(varRef.Kind);
+                            throw NonExhaustiveMatchException.ForEnum(varRef.ValueSemantics);
                     }
                     break;
                 case Place _:

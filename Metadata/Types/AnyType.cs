@@ -5,10 +5,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     public class AnyType : ReferenceType
     {
         #region Singleton
-        internal static readonly AnyType Instance = new AnyType();
+        internal static readonly AnyType ImmutableInstance = new AnyType(false);
+        internal static readonly AnyType MutableInstance = new AnyType(false);
 
-        private AnyType()
-            : base(Lifetime.Forever)
+        private AnyType(bool mutable)
+            : base(mutable, mutable ? Mutability.Mutable : Mutability.Immutable, Lifetime.Forever)
         { }
         #endregion
 
@@ -19,6 +20,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             throw new System.NotImplementedException();
         }
 
-        public override string ToString() => "Any";
+        public override string ToString() => Mutability == Mutability.Mutable ? "mut Any" : "Any";
     }
 }

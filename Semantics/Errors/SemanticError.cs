@@ -34,21 +34,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
                 $"Variable binding can't shadow. Shadowed binding used at {useSpan}");
         }
 
-        public static Diagnostic CantMove(CodeFile file, ExpressionSyntax expression)
-        {
-            return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6004,
-                $"Can't move out of expression");
-        }
-
         public static Diagnostic VariableMayAlreadyBeAssigned(CodeFile file, TextSpan span, SimpleName name)
         {
-            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6005,
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6004,
                 $"Variable `{name}` declared with `let` may already be assigned");
         }
 
         public static Diagnostic VariableMayNotHaveBeenAssigned(CodeFile file, TextSpan span, SimpleName name)
         {
-            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6006,
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6005,
                 $"Variable `{name}` may not have been assigned before use");
         }
     }
