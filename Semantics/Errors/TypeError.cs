@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
             DataType rightOperandType)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3001,
-                $"Operator `{@operator}` cannot be applied to operands of type `{leftOperandType}` and `{rightOperandType}`.");
+                $"Operator `{@operator.ToSymbolString()}` cannot be applied to operands of type `{leftOperandType}` and `{rightOperandType}`.");
         }
 
         public static Diagnostic OperatorCannotBeAppliedToOperandOfType(
