@@ -1,6 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
@@ -9,8 +8,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         public FixedList<ArgumentSyntax> Arguments { get; }
         public int Arity => Arguments.Count;
-
-        public TypePromise NameType { get; } = new TypePromise();
 
         public GenericNameSyntax(
             TextSpan span,

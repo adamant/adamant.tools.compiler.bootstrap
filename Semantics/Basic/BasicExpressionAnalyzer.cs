@@ -271,21 +271,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     foreach (var argument in genericName.Arguments)
                         InferExpressionType(argument.Value);
 
-                    genericName.NameType.BeginFulfilling();
-                    var nameType = InferNameType(genericName);
+                    // TODO lookup the symbol and construct a type
+                    throw new NotImplementedException();
+                    //genericName.NameType.BeginFulfilling();
+                    //var nameType = InferNameType(genericName);
 
-                    // TODO check that argument types match function type
-                    genericName.NameType.Fulfill(nameType);
+                    //// TODO check that argument types match function type
+                    //genericName.NameType.Fulfill(nameType);
 
-                    switch (nameType)
-                    {
-                        case MetaFunctionType metaFunctionType:
-                            return genericName.Type = metaFunctionType.ResultType;
-                        case UnknownType _:
-                            return genericName.Type = DataType.Unknown;
-                        default:
-                            throw NonExhaustiveMatchException.For(genericName.NameType);
-                    }
+                    //switch (nameType)
+                    //{
+                    //    case MetaFunctionType metaFunctionType:
+                    //        return genericName.Type = metaFunctionType.ResultType;
+                    //    case UnknownType _:
+                    //        return genericName.Type = DataType.Unknown;
+                    //    default:
+                    //        throw NonExhaustiveMatchException.For(genericName.NameType);
+                    //}
                 }
                 case RefTypeSyntax refType:
                     CheckAndEvaluateTypeExpression(refType.ReferencedType);
@@ -572,11 +574,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     identifier.ReferencedSymbol = UnknownSymbol.Instance;
                     return identifier.Type = DataType.Unknown;
             }
-        }
-
-        private DataType InferNameType(GenericNameSyntax genericName)
-        {
-            throw new NotImplementedException();
         }
 
         private DataType InferArgumentType(ArgumentSyntax argument)

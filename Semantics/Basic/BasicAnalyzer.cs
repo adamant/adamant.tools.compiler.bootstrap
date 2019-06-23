@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
     /// All basic analysis uses specific terminology to distinguish different
     /// aspects of type checking. (The entry method `Check` is an exception. It
     /// is named to match other analyzers but performs a resolve.)
-    /// 
+    ///
     /// Terminology:
     ///
     /// * Resolve - includes type inference and checking
@@ -93,8 +93,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             var returnType = ResolveReturnType(function, analyzer);
             DataType functionType = new FunctionType(parameterTypes, returnType);
 
-            if (function.GenericParameters?.Any() ?? false)
-                functionType = new MetaFunctionType(function.GenericParameters.Select(p => p.Type.Fulfilled()), functionType);
+            // TODO handle generic parameters. The function type will just have type parameters in it
+            //if (function.GenericParameters?.Any() ?? false)
+            //    functionType = new MetaFunctionType(function.GenericParameters.Select(p => p.Type.Fulfilled()), functionType);
 
             function.Type.Fulfill(functionType);
             if (diagnosticCount != diagnostics.Count) function.MarkErrored();
