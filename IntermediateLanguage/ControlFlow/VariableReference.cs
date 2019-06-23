@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
                 case VariableReferenceKind.Borrow:
                     mutability = "mut ";
                     break;
-                case VariableReferenceKind.Share:
+                case VariableReferenceKind.Alias:
                     mutability = "imm ";
                     break;
                 case VariableReferenceKind.Move:
@@ -45,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 
         public Value AsShared()
         {
-            return Kind == VariableReferenceKind.Share ? this : new VariableReference(Variable, VariableReferenceKind.Share, Span);
+            return Kind == VariableReferenceKind.Alias ? this : new VariableReference(Variable, VariableReferenceKind.Alias, Span);
         }
 
         public Value AsMove(TextSpan span)

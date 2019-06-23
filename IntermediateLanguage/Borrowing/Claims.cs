@@ -55,9 +55,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
             return claimsList.OfType<Owns>().SingleOrDefault(o => o.Lifetime == lifetime);
         }
 
-        public bool IsBorrowedOrShared(Lifetime lifetime)
+        /// <summary>
+        /// An object lifetime is shared if it is borrowed or aliased
+        /// </summary>
+        public bool IsShared(Lifetime lifetime)
         {
-            return claimsList.OfType<ILoan>().Any(c => c.Lifetime == lifetime);
+            return claimsList.OfType<IShares>().Any(c => c.Lifetime == lifetime);
         }
 
         public bool SequenceEqual(Claims other)
@@ -127,17 +130,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
             return claimsList.Any();
         }
 
-        public bool IsShared(Lifetime lifetime)
+        public bool IsAliased(Lifetime lifetime)
         {
-            return claimsList.OfType<Shares>().Any(s => s.Lifetime == lifetime);
+            return claimsList.OfType<Aliases>().Any(s => s.Lifetime == lifetime);
         }
 
         public IClaimHolder CurrentBorrower(Lifetime lifetime)
         {
-            return claimsList.OfType<IExclusive>().Last(c => c.Lifetime == lifetime).Holder;
+            return claimsList.OfType<IExclusiveClaim>().Last(c => c.Lifetime == lifetime).Holder;
         }
 
-        public IEnumerable<Claim> ClaimsOn(Lifetime lifetime)
+        public IEnumerable<Claim> ClaimsTo(Lifetime lifetime)
         {
             return claimsList.Where(c => c.Lifetime == lifetime);
         }

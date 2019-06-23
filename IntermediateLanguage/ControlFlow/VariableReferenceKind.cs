@@ -4,7 +4,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     {
         Assign = 0, // used for assigning to the variable
         Borrow, // exclusive access
-        Share, // shared access
+        Alias, // shared access
         Move, // move out of the variable
     }
 }

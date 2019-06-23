@@ -1,16 +1,13 @@
 using System;
 using System.Collections.Generic;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
 {
     /// <summary>
-    /// A claim that a variable has borrowed an object reference. For implementation
-    /// purposes, a borrow is a mutable borrow while an immutable borrow is termed
-    /// a share. When there are multiple borrow claims, the most recent one takes
-    /// precedence.
+    /// A claim that a given variable has borrowed an object. That is, that it
+    /// has temporarily claimed exclusive access to the object.
     /// </summary>
-    public class Borrows : Claim, IEquatable<Borrows>, ILoan, IExclusive
+    public class Borrows : Claim, IEquatable<Borrows>, IShares, IExclusiveClaim
     {
         public Borrows(IClaimHolder claimHolder, Lifetime lifetime)
             : base(claimHolder, lifetime)
@@ -44,14 +41,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
             return hash.ToHashCode();
         }
 
-        public static bool operator ==(Borrows loan1, Borrows loan2)
+        public static bool operator ==(Borrows borrow1, Borrows borrow2)
         {
-            return EqualityComparer<Borrows>.Default.Equals(loan1, loan2);
+            return EqualityComparer<Borrows>.Default.Equals(borrow1, borrow2);
         }
 
-        public static bool operator !=(Borrows loan1, Borrows loan2)
+        public static bool operator !=(Borrows borrow1, Borrows borrow2)
         {
-            return !(loan1 == loan2);
+            return !(borrow1 == borrow2);
         }
     }
 }

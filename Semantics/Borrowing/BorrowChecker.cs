@@ -84,7 +84,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             blocks.Enqueue(function.ControlFlow.EntryBlock);
             // Compute parameter claims once in case for some reason we process the entry block repeatedly
             var parameterClaims = AcquireParameterClaims(function);
-            var claims = new ControlFlowGraphClaims(parameterClaims);
+            var claims = new StatementClaims(parameterClaims);
 
             while (blocks.TryDequeue(out var block))
             {
@@ -128,9 +128,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                                 .ToList();
                             claimsAfterStatement.Release(variablesInScope);
                             var erroredLifetimes = lifetimesOwnedByVariablesInScope
-                                .Where(l => claimsAfterStatement.IsBorrowedOrShared(l));
+                                .Where(l => claimsAfterStatement.IsShared(l));
                             var erroredVariables = erroredLifetimes.SelectMany(l =>
-                                claimsAfterStatement.ClaimsOn(l).Select(c => c.Holder)
+                                claimsAfterStatement.ClaimsTo(l).Select(c => c.Holder)
                                     .OfType<Variable>()).Distinct();
                             foreach (var variable in erroredVariables)
                             {
@@ -146,7 +146,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     var liveAfter = liveVariables.After(statement);
                     var droppedVariables = liveAfter.FalseIndexes()
                         .Select(i => new Variable(i))
-                        .Where(v => !VariableOwnsBorrowedValue(v, claimsAfterStatement));
+                        .Where(v => !VariableOwnsSharedValue(v, claimsAfterStatement));
                     claimsAfterStatement.Release(droppedVariables);
 
                     // Get Ready for next statement
@@ -166,7 +166,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                         case GotoStatement gotoStatement:
                             blocks.Enqueue(function.ControlFlow[gotoStatement.GotoBlock]);
                             break;
-                        case ReturnStatement _: // Add only applies to copy types so no loans
+                        case ReturnStatement _:
                             break;
                         default:
                             throw NonExhaustiveMatchException.For(block.Terminator);
@@ -177,18 +177,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             if (saveBorrowClaims) function.ControlFlow.BorrowClaims = claims;
         }
 
-        private static bool VariableOwnsBorrowedValue(Variable variable, Claims outstandingClaims)
+        private static bool VariableOwnsSharedValue(Variable variable, Claims outstandingClaims)
         {
             var ownerShip = outstandingClaims.OwnedBy(variable);
-            // If it doesn't have ownership, then it doesn't own a borrowed value
+            // If it doesn't have ownership, then it doesn't own a shared value
             if (ownerShip == null) return false;
-            return outstandingClaims.IsBorrowedOrShared(ownerShip.Lifetime);
+            return outstandingClaims.IsShared(ownerShip.Lifetime);
         }
 
         private Claims ClaimsBeforeBlock(
             FunctionDeclarationSyntax function,
             BasicBlock block,
-            ControlFlowGraphClaims claims)
+            StatementClaims claims)
         {
             var claimsBeforeStatement = new Claims();
 
@@ -237,7 +237,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     AcquireClaim(assignToPlace?.CoreVariable(), binaryOperation.RightOperand, claimsAfterStatement);
                     break;
                 case IntegerConstant _:
-                    // no loans to acquire
+                    // no claims to acquire
                     break;
                 case Operand operand:
                     AcquireClaim(assignToPlace?.CoreVariable(), operand, claimsAfterStatement);
@@ -287,7 +287,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                 && objectType.Mutability == Mutability.Mutable)
                 AcquireBorrow(assignToPlace.CoreVariable(), callLifetime, claimsAfterStatement);
             else
-                AcquireShare(assignToPlace.CoreVariable(), callLifetime, claimsAfterStatement);
+                AcquireAlias(assignToPlace.CoreVariable(), callLifetime, claimsAfterStatement);
 
             // TODO For now, we just add all the call claims, this should be based on the function type instead
             claimsAfterStatement.AddRange(outstandingClaims);
@@ -333,7 +333,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             if (borrowingLifetime == null) break;
                             var lifetime = borrowingLifetime.Value;
 
-                            if (outstandingClaims.IsShared(lifetime))
+                            if (outstandingClaims.IsAliased(lifetime))
                                 ReportDiagnostic(BorrowError.CantBorrowMutablyWhileBorrowedImmutably(file, operand.Span));
                             else if (!outstandingClaims.CurrentBorrower(lifetime).Equals(varRef.Variable))
                                 ReportDiagnostic(BorrowError.CantBorrowMutablyWhileBorrowedMutably(file, operand.Span));
@@ -341,18 +341,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                                 outstandingClaims.Add(new Borrows(claimHolder, lifetime));
                         }
                         break;
-                        case VariableReferenceKind.Share:
+                        case VariableReferenceKind.Alias:
                         {
-                            // TODO check if we can share from this variable
+                            // TODO check if we can alias from this variable
                             var sharingLifetime = outstandingClaims.LifetimeOf(varRef.Variable);
                             if (sharingLifetime == null)
                                 break;
                             var lifetime = sharingLifetime.Value;
-                            if (!outstandingClaims.IsShared(lifetime) &&
+                            if (!outstandingClaims.IsAliased(lifetime) &&
                                 !outstandingClaims.CurrentBorrower(lifetime).Equals(varRef.Variable))
                                 ReportDiagnostic(BorrowError.CantBorrowImmutablyWhileBorrowedMutably(file, operand.Span));
                             else
-                                outstandingClaims.Add(new Shares(claimHolder, lifetime));
+                                outstandingClaims.Add(new Aliases(claimHolder, lifetime));
                         }
                         break;
                         case VariableReferenceKind.Move:
@@ -374,7 +374,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                 case Place _:
                     throw new NotImplementedException();
                 case Constant _:
-                    // no loans to acquire
+                    // no claims to acquire
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(operand);
@@ -389,12 +389,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             outstandingClaims.Add(new Borrows(claimHolder, lifetime));
         }
 
-        private static void AcquireShare(
+        private static void AcquireAlias(
             IClaimHolder claimHolder,
             Lifetime lifetime,
             Claims outstandingClaims)
         {
-            outstandingClaims.Add(new Shares(claimHolder, lifetime));
+            outstandingClaims.Add(new Aliases(claimHolder, lifetime));
         }
 
         private void ReportDiagnostic(Diagnostic diagnostic)

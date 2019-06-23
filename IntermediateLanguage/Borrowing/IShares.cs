@@ -1,11 +1,10 @@
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
 {
     /// <summary>
-    /// A claim with exclusive access either owns or borrows the lifetime
+    /// A claim that a variable shares the lifetime
     /// </summary>
-    public interface IExclusive
+    public interface IShares
     {
-        IClaimHolder Holder { get; }
         Lifetime Lifetime { get; }
     }
 }

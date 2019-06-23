@@ -45,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             IsMutableBinding = isMutableBinding;
             Type = type;
             if (type is UserObjectType objectType && objectType.Mutability == Mutability.Immutable)
-                defaultReferenceKind = VariableReferenceKind.Share;
+                defaultReferenceKind = VariableReferenceKind.Alias;
             else
                 defaultReferenceKind = VariableReferenceKind.Borrow;
         }

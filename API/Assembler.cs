@@ -123,7 +123,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
 
         private void Disassemble(
             BasicBlock block,
-            ControlFlowGraphClaims borrowClaims,
+            StatementClaims borrowClaims,
             AssemblyBuilder builder)
         {
 

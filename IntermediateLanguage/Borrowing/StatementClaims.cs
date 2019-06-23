@@ -6,12 +6,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
     /// <summary>
     /// The claims for each statement in a control flow graph
     /// </summary>
-    public class ControlFlowGraphClaims
+    public class StatementClaims
     {
         public readonly Claims ParameterClaims;
         private readonly Dictionary<Statement, Claims> claimsAfter = new Dictionary<Statement, Claims>();
 
-        public ControlFlowGraphClaims(Claims parameterClaims)
+        public StatementClaims(Claims parameterClaims)
         {
             ParameterClaims = parameterClaims;
         }

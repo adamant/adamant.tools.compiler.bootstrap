@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         /// <summary>
         /// If requested, the semantic analyzer will store the borrow claims here
         /// </summary>
-        public ControlFlowGraphClaims BorrowClaims { get; set; }
+        public StatementClaims BorrowClaims { get; set; }
 
         public ControlFlowGraph(
             IEnumerable<LocalVariableDeclaration> variableDeclarations,

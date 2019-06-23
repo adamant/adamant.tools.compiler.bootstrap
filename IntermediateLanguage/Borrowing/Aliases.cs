@@ -1,36 +1,35 @@
 using System;
 using System.Collections.Generic;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
 {
     /// <summary>
-    /// A claim that a given variable shares an object. That is an immutable
-    /// borrow.
+    /// A claim that a given variable aliases an object. That is that it is one
+    /// of possibly many references to the same object.
     /// </summary>
-    public class Shares : Claim, IEquatable<Shares>, ILoan
+    public class Aliases : Claim, IEquatable<Aliases>, IShares
     {
-        public Shares(IClaimHolder holder, Lifetime lifetime)
+        public Aliases(IClaimHolder holder, Lifetime lifetime)
             : base(holder, lifetime)
         {
         }
 
         public override string ToString()
         {
-            return $"{Holder} shares {Lifetime}";
+            return $"{Holder} aliases {Lifetime}";
         }
 
         public override bool Equals(object obj)
         {
-            return Equals(obj as Shares);
+            return Equals(obj as Aliases);
         }
 
         public override bool Equals(Claim other)
         {
-            return Equals(other as Shares);
+            return Equals(other as Aliases);
         }
 
-        public bool Equals(Shares other)
+        public bool Equals(Aliases other)
         {
             return other != null && base.Equals(other);
         }
@@ -42,14 +41,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
             return hash.ToHashCode();
         }
 
-        public static bool operator ==(Shares loan1, Shares loan2)
+        public static bool operator ==(Aliases alias1, Aliases alias2)
         {
-            return EqualityComparer<Shares>.Default.Equals(loan1, loan2);
+            return EqualityComparer<Aliases>.Default.Equals(alias1, alias2);
         }
 
-        public static bool operator !=(Shares loan1, Shares loan2)
+        public static bool operator !=(Aliases alias1, Aliases alias2)
         {
-            return !(loan1 == loan2);
+            return !(alias1 == alias2);
         }
     }
 }
