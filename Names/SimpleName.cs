@@ -66,8 +66,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
             var escapedName = Text.Escape();
             if (NeedsQuoted.IsMatch(escapedName))
                 escapedName += $@"""{escapedName}""";
-            if (Number != null) escapedName += "#" + Number;
-            //if (IsSpecial) escapedName = "ₛ" + escapedName;
+            if (Number != null && Number != 0) escapedName += "#" + Number;
             return escapedName;
         }
 

@@ -11,58 +11,58 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 {
     public class ControlFlowGraphBuilder
     {
-        private readonly List<LocalVariableDeclaration> variables = new List<LocalVariableDeclaration>();
-        public LocalVariableDeclaration ReturnVariable => variables.First();
+        private readonly List<VariableDeclaration> variables = new List<VariableDeclaration>();
+        public VariableDeclaration ReturnVariable => variables.First();
         private readonly List<BlockBuilder> blockBuilders = new List<BlockBuilder>();
 
         public ControlFlowGraphBuilder() { }
 
-        public ControlFlowGraphBuilder(FixedList<LocalVariableDeclaration> variables)
+        public ControlFlowGraphBuilder(FixedList<VariableDeclaration> variables)
         {
             this.variables = variables.ToList();
         }
 
-        public LocalVariableDeclaration AddVariable(bool mutableBinding, DataType type, Scope scope, SimpleName name = null)
+        public VariableDeclaration AddVariable(bool mutableBinding, DataType type, Scope scope, SimpleName name = null)
         {
-            var variable = new LocalVariableDeclaration(false, mutableBinding, type, new Variable(variables.Count), scope, name);
+            var variable = new VariableDeclaration(false, mutableBinding, type, new Variable(variables.Count), scope, name);
             variables.Add(variable);
             return variable;
         }
 
-        public LocalVariableDeclaration AddParameter(bool mutableBinding, DataType type, Scope scope, SimpleName name)
+        public VariableDeclaration AddParameter(bool mutableBinding, DataType type, Scope scope, SimpleName name)
         {
-            var variable = new LocalVariableDeclaration(true, mutableBinding, type, new Variable(variables.Count), scope, name);
+            var variable = new VariableDeclaration(true, mutableBinding, type, new Variable(variables.Count), scope, name);
             variables.Add(variable);
             return variable;
         }
 
-        public LocalVariableDeclaration AddSelfParameter(DataType type)
+        public VariableDeclaration AddSelfParameter(DataType type)
         {
             Requires.That("variableNumber", variables.Count == 0, "Self parameter must have variable number 0");
-            var variable = new LocalVariableDeclaration(true, false, type, new Variable(variables.Count), null, SpecialName.Self);
+            var variable = new VariableDeclaration(true, false, type, new Variable(variables.Count), null, SpecialName.Self);
             variables.Add(variable);
             return variable;
         }
 
-        public LocalVariableDeclaration AddReturnVariable(DataType type)
+        public VariableDeclaration AddReturnVariable(DataType type)
         {
             Requires.That("variableNumber", variables.Count == 0, "Return variable must have variable number 0");
-            var variable = new LocalVariableDeclaration(false, false, type, new Variable(variables.Count), null);
+            var variable = new VariableDeclaration(false, false, type, new Variable(variables.Count), null);
             variables.Add(variable);
             return variable;
         }
 
-        public LocalVariableDeclaration Let(DataType type, Scope scope)
+        public VariableDeclaration Let(DataType type, Scope scope)
         {
             return AddVariable(false, type, scope);
         }
 
-        public LocalVariableDeclaration Var(DataType type, Scope scope)
+        public VariableDeclaration Var(DataType type, Scope scope)
         {
             return AddVariable(true, type, scope);
         }
 
-        public LocalVariableDeclaration VariableFor(SimpleName name)
+        public VariableDeclaration VariableFor(SimpleName name)
         {
             return variables.Single(v => v.Name == name);
         }
@@ -100,7 +100,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             return new ControlFlowGraph(variables, blocks);
         }
 
-        public LocalVariableDeclaration this[Variable variable]
+        public VariableDeclaration this[Variable variable]
         {
             get
             {

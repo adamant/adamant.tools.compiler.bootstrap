@@ -55,7 +55,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
 
         public void Disassemble(FunctionDeclaration function, AssemblyBuilder builder)
         {
-            var parameters = string.Join(", ", function.Parameters.Select(FormatParameter));
+            var functionControlFlow = function.ControlFlow;
+            var parameters = FormatParameters(functionControlFlow);
             builder.BeginLine("fn ");
             builder.Append(function.FullName.ToString());
             builder.Append("(");
@@ -70,15 +71,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.EndBlock();
         }
 
-        private static string FormatParameter(Parameter parameter)
+        private static string FormatParameters(ControlFlowGraph controlFlow)
         {
-            var format = parameter.MutableBinding ? "mut {0}: {1}" : "{0}: {1}";
-            return string.Format(format, parameter.Name, parameter.Type);
+            var parameters = string.Join(", ", controlFlow.Parameters.Select(FormatParameter));
+            return parameters;
+        }
+
+        private static string FormatParameter(VariableDeclaration parameter)
+        {
+            var format = parameter.IsMutableBinding ? "var {0}({1}): {2}" : "{0}({1}): {2}";
+            return string.Format(format, parameter.Variable, parameter.Name, parameter.Type);
         }
 
         public void Disassemble(ConstructorDeclaration constructor, AssemblyBuilder builder)
         {
-            var parameters = string.Join(", ", constructor.Parameters.Select(FormatParameter));
+            var parameters = string.Join(", ", constructor.ControlFlow.Parameters.Select(FormatParameter));
             builder.BeginLine("fn ");
             builder.Append(constructor.FullName.ToString());
             builder.Append("(");
@@ -115,7 +122,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                 return;
             }
 
-            foreach (var declaration in controlFlow.VariableDeclarations)
+            foreach (var declaration in controlFlow.LocalVariables)
                 Disassemble(declaration, builder);
 
             if (controlFlow.VariableDeclarations.Any(v => v.TypeIsNotEmpty))
@@ -128,7 +135,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                 Disassemble(block, controlFlow.BorrowClaims, builder);
         }
 
-        private void Disassemble(LocalVariableDeclaration declaration, AssemblyBuilder builder)
+        private void Disassemble(VariableDeclaration declaration, AssemblyBuilder builder)
         {
             if (declaration.TypeIsNotEmpty)
                 builder.AppendLine(declaration.ToString());

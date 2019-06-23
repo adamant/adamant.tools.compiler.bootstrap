@@ -33,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 EmitBlock(block, voidReturn, definitions);
         }
 
-        private void EmitVariable(LocalVariableDeclaration declaration, CCodeBuilder code)
+        private void EmitVariable(VariableDeclaration declaration, CCodeBuilder code)
         {
             Requires.That(nameof(declaration), declaration.TypeIsNotEmpty, "tried to look up variable that does not exist");
             var initializer = declaration.IsParameter ? $" = {nameMangler.Mangle(declaration.Name)}" : "";

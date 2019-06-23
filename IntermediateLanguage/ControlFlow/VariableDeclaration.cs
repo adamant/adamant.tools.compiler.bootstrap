@@ -4,7 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
-    public class LocalVariableDeclaration
+    public class VariableDeclaration
     {
         /// <summary>
         /// Which IL variable is being declared
@@ -30,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         // TODO does this make sense? shouldn't the default reference kind always be Share?
         private readonly ValueSemantics defaultSemantics;
 
-        public LocalVariableDeclaration(
+        public VariableDeclaration(
             bool isParameter,
             bool isMutableBinding,
             DataType type,
@@ -67,14 +67,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public override string ToString()
         {
             var binding = IsMutableBinding ? "var" : "let";
-            var result = $"{binding} {Variable}: {Type};";
-            if (Scope != null || Name != null)
-                result += " //";
-            if (Scope != null)
-                result += $" in {Scope}";
-            if (Name != null)
-                result += $" for {Name}";
-            return result;
+            var name = Name != null ? $"({Name})" : "";
+            var scope = Scope != null ? $" // in {Scope}" : "";
+            return $"{binding} {Variable}{name}: {Type};{scope}";
         }
     }
 }

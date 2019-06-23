@@ -216,7 +216,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             Value value,
             Claims claimsBeforeStatement,
             Claims claimsAfterStatement,
-            FixedList<LocalVariableDeclaration> variables)
+            FixedList<VariableDeclaration> variables)
         {
             switch (value)
             {
@@ -278,7 +278,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             Lifetime callLifetime,
             Claims outstandingClaims,
             Claims claimsAfterStatement,
-            FixedList<LocalVariableDeclaration> variables)
+            FixedList<VariableDeclaration> variables)
         {
             if (assignToPlace == null) return;
 
@@ -295,7 +295,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 
         private void AcquireOwnershipIfMoved(
             Place assignToPlace,
-            FixedList<LocalVariableDeclaration> variables,
+            FixedList<VariableDeclaration> variables,
             Claims claimsAfterStatement)
         {
             if (assignToPlace == null) return;
@@ -311,7 +311,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             }
         }
 
-        private static LocalVariableDeclaration VariableDeclaration(Place assignToPlace, FixedList<LocalVariableDeclaration> variables)
+        private static VariableDeclaration VariableDeclaration(Place assignToPlace, FixedList<VariableDeclaration> variables)
         {
             return variables.Single(v => v.Variable == assignToPlace.CoreVariable());
         }

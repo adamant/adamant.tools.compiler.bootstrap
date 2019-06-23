@@ -8,10 +8,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class ControlFlowGraph
     {
-        public FixedList<LocalVariableDeclaration> VariableDeclarations { get; }
-        public IEnumerable<LocalVariableDeclaration> Parameters =>
+        public FixedList<VariableDeclaration> VariableDeclarations { get; }
+        public IEnumerable<VariableDeclaration> Parameters =>
             VariableDeclarations.Where(v => v.IsParameter);
-        public LocalVariableDeclaration ReturnVariable => VariableDeclarations[0];
+        public IEnumerable<VariableDeclaration> LocalVariables =>
+            VariableDeclarations.Where(v => !v.IsParameter);
+        public VariableDeclaration ReturnVariable => VariableDeclarations[0];
         public DataType ReturnType => ReturnVariable.Type;
         public FixedList<BasicBlock> BasicBlocks { get; }
         public BasicBlock EntryBlock => BasicBlocks.First();
@@ -29,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public StatementClaims BorrowClaims { get; set; }
 
         public ControlFlowGraph(
-            IEnumerable<LocalVariableDeclaration> variableDeclarations,
+            IEnumerable<VariableDeclaration> variableDeclarations,
             IEnumerable<BasicBlock> basicBlocks)
         {
             VariableDeclarations = variableDeclarations.ToFixedList();
