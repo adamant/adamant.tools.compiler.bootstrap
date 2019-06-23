@@ -20,6 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         private readonly Diagnostics diagnostics;
         private readonly DataType selfType;
         private readonly DataType returnType;
+        private readonly BasicTypeExpressionAnalyzer typeAnalyzer;
 
         public BasicExpressionAnalyzer(
             CodeFile file,
@@ -31,6 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             this.diagnostics = diagnostics;
             this.returnType = returnType;
             this.selfType = selfType;
+            typeAnalyzer = new BasicTypeExpressionAnalyzer(file, diagnostics, this);
         }
 
         public void ResolveTypesInStatement(StatementSyntax statement)
@@ -55,7 +57,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             DataType type;
             if (variableDeclaration.TypeExpression != null)
-                type = CheckAndEvaluateTypeExpression(variableDeclaration.TypeExpression);
+                type = typeAnalyzer.Check(variableDeclaration.TypeExpression);
             else if (variableDeclaration.Initializer != null)
             {
                 type = variableDeclaration.Initializer.Type;
@@ -227,11 +229,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return InferIdentifierNameType(identifierName, false);
                 case UnaryExpressionSyntax unaryOperatorExpression:
                     return InferUnaryExpressionType(unaryOperatorExpression);
-                case ReferenceLifetimeSyntax lifetimeType:
-                    InferExpressionType(lifetimeType.ReferentTypeExpression);
-                    if (!IsType(lifetimeType.ReferentTypeExpression.Type))
-                        diagnostics.Add(TypeError.MustBeATypeExpression(file, lifetimeType.ReferentTypeExpression.Span));
-                    return expression.Type = DataType.Type;
                 case BlockSyntax blockExpression:
                     foreach (var statement in blockExpression.Statements)
                         ResolveTypesInStatement(statement);
@@ -245,10 +242,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
                     // TODO verify argument types against called function
 
-                    return placementInitExpression.Type = CheckAndEvaluateTypeExpression(placementInitExpression.Initializer);
+                    return placementInitExpression.Type = typeAnalyzer.Check(placementInitExpression.Initializer);
                 case ForeachExpressionSyntax foreachExpression:
                     foreachExpression.Type =
-                        CheckAndEvaluateTypeExpression(foreachExpression.TypeExpression);
+                        typeAnalyzer.Check(foreachExpression.TypeExpression);
                     InferExpressionType(foreachExpression.InExpression);
 
                     // TODO check the break types
@@ -289,9 +286,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     //        throw NonExhaustiveMatchException.For(genericName.NameType);
                     //}
                 }
-                case RefTypeSyntax refType:
-                    CheckAndEvaluateTypeExpression(refType.ReferencedType);
-                    return refType.Type = DataType.Type;
                 case UnsafeExpressionSyntax unsafeExpression:
                     InferExpressionType(unsafeExpression.Expression);
                     return unsafeExpression.Type = unsafeExpression.Expression.Type;
@@ -371,7 +365,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
         }
 
-        private DataType InferIdentifierNameType(IdentifierNameSyntax identifierName, bool isMove)
+        public DataType InferIdentifierNameType(IdentifierNameSyntax identifierName, bool isMove)
         {
             var symbols = identifierName.LookupInContainingScope();
             DataType type;
@@ -409,7 +403,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         {
             var argumentTypes = expression.Arguments.Select(InferArgumentType).ToFixedList();
             // TODO handle named constructors here
-            var constructedType = (UserObjectType)CheckAndEvaluateTypeExpression(expression.Constructor);
+            var constructedType = (UserObjectType)typeAnalyzer.Check(expression.Constructor);
             var typeSymbol = GetSymbolForType(constructedType);
             var constructors = typeSymbol.ChildSymbols[SpecialName.New];
             constructors = ResolveOverload(constructors, null, argumentTypes);
@@ -452,18 +446,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return InferIdentifierNameType(identifierName, true);
                 default:
                     throw NonExhaustiveMatchException.For(expression);
-            }
-        }
-
-        private static bool IsType(DataType dataType)
-        {
-            switch (dataType)
-            {
-                case Metatype _:
-                case DataType t when t == DataType.Type:
-                    return true;
-                default:
-                    return false;
             }
         }
 
@@ -739,22 +721,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             return unaryExpression.Type;
         }
 
-        /// <summary>
-        /// Evaluates a type expression to the type it identifies
-        /// </summary>
-        public DataType CheckAndEvaluateTypeExpression(ExpressionSyntax typeExpression)
+        // Re-expose type analyzer to BasicAnalyzer
+        public DataType CheckTypeExpression(ExpressionSyntax typeExpression)
         {
-            if (typeExpression == null) return DataType.Unknown;
-
-            var type = InferExpressionType(typeExpression);
-            if (type is UnknownType) return DataType.Unknown;
-            if (!IsType(type))
-            {
-                diagnostics.Add(TypeError.MustBeATypeExpression(file, typeExpression.Span));
-                return DataType.Unknown;
-            }
-
-            return TypeExpressionEvaluator.CheckExpression(typeExpression);
+            return typeAnalyzer.Check(typeExpression);
         }
 
         private void InferExpressionTypeInInvocation(ExpressionSyntax callee, FixedList<DataType> argumentTypes)

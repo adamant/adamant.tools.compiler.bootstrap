@@ -1,10 +1,10 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using ReferenceType = Adamant.Tools.Compiler.Bootstrap.Metadata.Types.ReferenceType;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 {
@@ -17,14 +17,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
     /// that the methods in this class use the term "Check" because they are
     /// checking that the expression is of type `Type`.
     /// </summary>
-    public class TypeExpressionEvaluator
+    public class BasicTypeExpressionAnalyzer
     {
-        public static DataType CheckExpression(ExpressionSyntax typeExpression)
+        private readonly CodeFile file;
+        private readonly Diagnostics diagnostics;
+        private readonly BasicExpressionAnalyzer expressionAnalyzer;
+
+        public BasicTypeExpressionAnalyzer(
+            CodeFile file,
+            Diagnostics diagnostics,
+            BasicExpressionAnalyzer expressionAnalyzer)
+        {
+            this.file = file;
+            this.diagnostics = diagnostics;
+            this.expressionAnalyzer = expressionAnalyzer;
+        }
+
+        public DataType Check(ExpressionSyntax typeExpression)
         {
             switch (typeExpression)
             {
                 case IdentifierNameSyntax identifier:
                 {
+                    expressionAnalyzer.InferIdentifierNameType(identifier, false);
                     var identifierType = identifier.Type;
                     switch (identifierType)
                     {
@@ -42,16 +57,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
                 case ReferenceLifetimeSyntax referenceLifetime:
                 {
-                    var type = CheckExpression(referenceLifetime.ReferentTypeExpression);
+                    var type = Check(referenceLifetime.ReferentTypeExpression);
                     if (type == DataType.Unknown) return DataType.Unknown;
                     var lifetime = ResolveLifetime(referenceLifetime.Lifetime);
+                    referenceLifetime.Type = DataType.Type;
                     if (type is ReferenceType referenceType)
                         return referenceType.WithLifetime(lifetime);
                     return DataType.Unknown;
                 }
                 case RefTypeSyntax refType:
                 {
-                    var referent = CheckExpression(refType.ReferencedType);
+                    var referent = Check(refType.ReferencedType);
                     if (referent is UserObjectType objectType)
                         return new RefType(objectType);
                     return DataType.Unknown;
@@ -77,12 +93,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     // TODO evaluate to type
                     return DataType.Unknown;
                 }
-                case BinaryExpressionSyntax _:
-                    // TODO evaluate to type
-                    return DataType.Unknown;
                 case MutableExpressionSyntax mutableType:
                 {
-                    var type = CheckExpression(mutableType.Expression);
+                    var type = Check(mutableType.Expression);
+                    mutableType.Type = DataType.Type;
                     switch (type)
                     {
                         case UserObjectType objectType when objectType.DeclaredMutable:
@@ -91,6 +105,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             return DataType.Unknown;
                     }
                 }
+                // TODO report errors of expressions that aren't supposed 
+                //if (!IsType(lifetimeType.ReferentTypeExpression.Type))
+                //    diagnostics.Add(TypeError.MustBeATypeExpression(file, lifetimeType.ReferentTypeExpression.Span));
                 default:
                     throw NonExhaustiveMatchException.For(typeExpression);
             }
@@ -110,6 +127,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
 
             return new NamedLifetime(lifetimeName.Text);
+        }
+
+        private static bool IsType(DataType dataType)
+        {
+            switch (dataType)
+            {
+                case Metatype _:
+                case DataType t when t == DataType.Type:
+                    return true;
+                default:
+                    return false;
+            }
         }
     }
 }

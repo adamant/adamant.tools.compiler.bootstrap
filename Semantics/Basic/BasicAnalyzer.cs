@@ -134,7 +134,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 parameter.Type.BeginFulfilling();
                 var type = parameter.TypeExpression == null ?
                     DataType.Type
-                    : analyzer.CheckAndEvaluateTypeExpression(parameter.TypeExpression);
+                    : analyzer.CheckTypeExpression(parameter.TypeExpression);
                 parameter.Type.Fulfill(type);
             }
         }
@@ -151,7 +151,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     {
                         parameter.Type.BeginFulfilling();
                         var type =
-                            analyzer.CheckAndEvaluateTypeExpression(namedParameter
+                            analyzer.CheckTypeExpression(namedParameter
                                 .TypeExpression);
                         types.Add(parameter.Type.Fulfill(type));
                     }
@@ -193,7 +193,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             BasicExpressionAnalyzer analyzer)
         {
             var returnType = returnTypeExpression != null
-                ? analyzer.CheckAndEvaluateTypeExpression(returnTypeExpression)
+                ? analyzer.CheckTypeExpression(returnTypeExpression)
                 : DataType.Void;
 
             // If we are returning ownership, then they can make it mutable
@@ -273,7 +273,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         {
             var resolver = new BasicExpressionAnalyzer(field.File, diagnostics);
             field.Type.BeginFulfilling();
-            var type = resolver.CheckAndEvaluateTypeExpression(field.TypeExpression);
+            var type = resolver.CheckTypeExpression(field.TypeExpression);
             field.Type.Fulfill(type);
         }
 
@@ -324,8 +324,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         {
             if (fieldDeclaration.Initializer == null) return;
 
+            var diagnosticCount = diagnostics.Count;
             var resolver = new BasicExpressionAnalyzer(fieldDeclaration.File, diagnostics);
             resolver.CheckExpressionType(fieldDeclaration.Initializer, fieldDeclaration.Type.Fulfilled());
+            if (diagnosticCount != diagnostics.Count) fieldDeclaration.MarkErrored();
         }
     }
 }
