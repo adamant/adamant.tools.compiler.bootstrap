@@ -62,6 +62,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             DataFlowAnalysis.Check(BindingMutabilityStrategy.Instance, memberDeclarations, diagnostics);
 
+            // TODO use DataFlowAnalysis to check for use of moved value
+
+            // TODO use DataFlowAnalysis to check for unused variables and report use of variables starting with `_`
+
             // --------------------------------------------------
             // This is where the representation transitions to IR
             ControlFlowAnalyzer.BuildGraphs(memberDeclarations);

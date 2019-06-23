@@ -6,6 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
 {
+    // TODO check definite assignment of fields in constructors
     public class DefiniteAssignmentChecker : IDataFlowAnalysisChecker<VariableFlags>
     {
         private readonly FunctionDeclarationSyntax function;
