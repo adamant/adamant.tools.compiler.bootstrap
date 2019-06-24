@@ -24,6 +24,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public abstract Statement Clone();
 
         // Useful for debugging
-        public abstract override string ToString();
+        public sealed override string ToString()
+        {
+            return ToStatementString() + ContextCommentString();
+        }
+
+        public abstract string ToStatementString();
+
+        public virtual string ContextCommentString()
+        {
+            return $" // at {Span} in {Scope}";
+        }
     }
 }

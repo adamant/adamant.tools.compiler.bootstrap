@@ -29,9 +29,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         }
 
         // Useful for debugging
-        public override string ToString()
+        public override string ToStatementString()
         {
-            return $"if {Condition} -> {ThenBlock} else -> {ElseBlock} // at {Span} in {Scope}";
+            return $"if {Condition} -> {ThenBlock} else -> {ElseBlock};";
         }
     }
 }

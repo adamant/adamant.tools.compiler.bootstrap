@@ -64,12 +64,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         }
 
         // Useful for debugging
-        public override string ToString()
+        public sealed override string ToString()
+        {
+            return ToStatementString() + ContextCommentString();
+        }
+
+        public string ToStatementString()
         {
             var binding = IsMutableBinding ? "var" : "let";
             var name = Name != null ? $"({Name})" : "";
-            var scope = Scope != null ? $" // in {Scope}" : "";
-            return $"{binding} {Variable}{name}: {Type};{scope}";
+            return $"{binding} {Variable}{name}: {Type};";
+        }
+
+        public string ContextCommentString()
+        {
+            return Scope != null ? $" // in {Scope}" : "";
         }
     }
 }

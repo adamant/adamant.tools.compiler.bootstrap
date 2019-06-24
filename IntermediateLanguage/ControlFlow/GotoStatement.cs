@@ -23,9 +23,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             return new GotoStatement(GotoBlock, Span, Scope);
         }
 
-        public override string ToString()
+        public override string ToStatementString()
         {
-            return $"goto {GotoBlock} // at {Span} in {Scope}";
+            return $"goto {GotoBlock};";
         }
     }
 }

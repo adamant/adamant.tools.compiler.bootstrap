@@ -10,6 +10,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
 {
     public class Assembler
     {
+        protected const int StandardStatementWidth = 50;
+
         public string Disassemble(Package package)
         {
             var builder = new AssemblyBuilder();
@@ -128,7 +130,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         private void Disassemble(VariableDeclaration declaration, AssemblyBuilder builder)
         {
             if (declaration.TypeIsNotEmpty)
-                builder.AppendLine(declaration.ToString());
+                builder.AppendLine(declaration.ToStatementString().PadRight(StandardStatementWidth) + declaration.ContextCommentString());
         }
 
         private void Disassemble(
@@ -143,7 +145,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.EndLine(":");
             foreach (var statement in block.Statements)
             {
-                builder.AppendLine(statement.ToString());
+                builder.AppendLine(statement.ToStatementString().PadRight(StandardStatementWidth) + statement.ContextCommentString());
                 Disassemble(borrowClaims?.After(statement), builder);
             }
         }

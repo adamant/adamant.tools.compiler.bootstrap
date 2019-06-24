@@ -21,9 +21,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             return new ReturnStatement(Span, Scope);
         }
 
-        public override string ToString()
+        public override string ToStatementString()
         {
-            return $"return // at {Span} in {Scope}";
+            return "return;";
         }
     }
 }

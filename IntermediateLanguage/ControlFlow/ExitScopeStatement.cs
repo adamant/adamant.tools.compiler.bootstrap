@@ -19,9 +19,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         }
 
         // Useful for debugging
-        public override string ToString()
+        public override string ToStatementString()
         {
-            return $"exit {Scope} // at {Span}";
+            return $"exit {Scope};";
+        }
+
+        /// <summary>
+        /// Since the statement itself contains the relevant scope, we drop the
+        /// scope from the comment.
+        /// </summary>
+        public override string ContextCommentString()
+        {
+            return $" // at {Span}";
         }
     }
 }
