@@ -69,15 +69,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             ControlFlowAnalyzer.BuildGraphs(memberDeclarations);
             // --------------------------------------------------
 
-            var liveness = LivenessAnalyzer.Check(memberDeclarations, false);
+            var liveness = LivenessAnalyzer.Check(memberDeclarations, SaveLivenessAnalysis);
 
             BorrowChecker.Check(memberDeclarations, liveness, diagnostics, SaveBorrowClaims);
 
-            DeleteInserter.Transform(memberDeclarations, liveness);
+            //DeleteInserter.Transform(memberDeclarations, liveness);
 
-            // We have rebuilt the control flow graphs, if we need liveness then we have to redo it
-            if (SaveLivenessAnalysis)
-                LivenessAnalyzer.Check(memberDeclarations, SaveLivenessAnalysis);
+            //// We have rebuilt the control flow graphs, if we need liveness then we have to redo it
+            //if (SaveLivenessAnalysis)
+            //    LivenessAnalyzer.Check(memberDeclarations, SaveLivenessAnalysis);
 
             // Build final declaration objects and find the entry point
             var declarationBuilder = new DeclarationBuilder();

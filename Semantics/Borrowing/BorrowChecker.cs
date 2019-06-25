@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
@@ -143,11 +144,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             throw NonExhaustiveMatchException.For(statement);
                     }
 
-                    var liveAfter = liveVariables.After(statement);
-                    var droppedVariables = liveAfter.FalseIndexes()
-                        .Select(i => new Variable(i))
-                        .Where(v => !VariableOwnsSharedValue(v, claimsAfterStatement));
-                    claimsAfterStatement.Release(droppedVariables);
+                    ReleaseDeadClaims(claimsAfterStatement, liveVariables.After(statement));
 
                     // Get Ready for next statement
                     claimsBeforeStatement = claimsAfterStatement;
@@ -175,6 +172,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             }
 
             if (saveBorrowClaims) function.ControlFlow.BorrowClaims = claims;
+        }
+
+        private static void ReleaseDeadClaims(Claims claimsAfterStatement, BitArray liveAfter)
+        {
+            var deadVariables = liveAfter.FalseIndexes().Select(i => new Variable(i));
+            var deadVariablesOwnership = deadVariables.ToDictionary(v => v, claimsAfterStatement.OwnedBy);
+
+            // First release dead variables that don't own their value
+            var deadVariableShares = deadVariablesOwnership.Where(e => e.Value == null)
+                .Select(e => e.Key);
+            claimsAfterStatement.Release(deadVariableShares);
+
+            // Now that any shares have been released, release ownership claims. This must be done
+            // second because it depends on what shares are outstanding.
+            var deadVariableOwns = deadVariablesOwnership
+                .Where(e => e.Value != null && !claimsAfterStatement.IsShared(e.Value.Lifetime))
+                .Select(e => e.Key);
+            claimsAfterStatement.Release(deadVariableOwns);
         }
 
         private static bool VariableOwnsSharedValue(Variable variable, Claims outstandingClaims)
