@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
@@ -106,25 +107,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.EndBlock();
         }
 
-        private void Disassemble(ControlFlowGraph controlFlow, AssemblyBuilder builder)
+        private void Disassemble(ControlFlowGraph graph, AssemblyBuilder builder)
         {
-            if (controlFlow == null)
+            if (graph == null)
             {
                 builder.AppendLine("// Control Flow Graph not available");
                 return;
             }
 
-            foreach (var declaration in controlFlow.LocalVariables)
+            foreach (var declaration in graph.LocalVariables)
                 Disassemble(declaration, builder);
 
-            if (controlFlow.LocalVariables.Any(v => v.TypeIsNotEmpty))
+            if (graph.LocalVariables.Any(v => v.TypeIsNotEmpty))
                 builder.BlankLine();
 
-            if (Disassemble(controlFlow.BorrowClaims?.ParameterClaims, builder))
+            if (Disassemble(graph.BorrowClaims?.ParameterClaims, builder))
                 builder.BlankLine();
 
-            foreach (var block in controlFlow.BasicBlocks)
-                Disassemble(block, controlFlow.BorrowClaims, builder);
+            foreach (var block in graph.BasicBlocks)
+                Disassemble(graph, block, builder);
         }
 
         private void Disassemble(VariableDeclaration declaration, AssemblyBuilder builder)
@@ -133,21 +134,38 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                 builder.AppendLine(declaration.ToStatementString().PadRight(StandardStatementWidth) + declaration.ContextCommentString());
         }
 
-        private void Disassemble(
-            BasicBlock block,
-            StatementClaims borrowClaims,
-            AssemblyBuilder builder)
+        private void Disassemble(ControlFlowGraph graph, BasicBlock block, AssemblyBuilder builder)
         {
-
             var labelIndent = Math.Max(builder.CurrentIndentDepth - 1, 0);
             builder.Append(string.Concat(Enumerable.Repeat(builder.IndentCharacters, labelIndent)));
             builder.Append(block.Name.ToString());
             builder.EndLine(":");
             foreach (var statement in block.Statements)
             {
+                Disassemble(graph, graph.LiveVariables?.Before(statement), builder);
                 builder.AppendLine(statement.ToStatementString().PadRight(StandardStatementWidth) + statement.ContextCommentString());
-                Disassemble(borrowClaims?.After(statement), builder);
+                Disassemble(graph.BorrowClaims?.After(statement), builder);
             }
+        }
+
+        private void Disassemble(
+            ControlFlowGraph graph,
+            BitArray liveVariables,
+            AssemblyBuilder builder)
+        {
+            if (liveVariables == null || liveVariables.Cast<bool>().All(x => x == false)) return;
+
+            var variables = string.Join(", ", liveVariables.TrueIndexes()
+                                .Select(i => FormatVariableName(graph.VariableDeclarations[i])));
+            builder.BeginLine("// live: ");
+            builder.EndLine(variables);
+        }
+
+        private string FormatVariableName(VariableDeclaration declaration)
+        {
+            return declaration.Name != null
+                ? $"{declaration.Variable}({declaration.Name})"
+                : declaration.Variable.ToString();
         }
 
         private bool Disassemble(Claims claims, AssemblyBuilder builder)

@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         // Useful for debugging
         public override string ToString()
         {
-            return $"new {Type}({string.Join(", ", Arguments)});";
+            return $"new {Type}({string.Join(", ", Arguments)})";
         }
     }
 }

@@ -10,6 +10,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Builders;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Deletes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Moves;
@@ -68,27 +69,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             ControlFlowAnalyzer.BuildGraphs(memberDeclarations);
             // --------------------------------------------------
 
-            var liveness = LivenessAnalyzer.Check(memberDeclarations, SaveLivenessAnalysis);
+            var liveness = LivenessAnalyzer.Check(memberDeclarations, false);
 
-            // TODO inserting deletes based only on liveness led to issues.
-            // There are cases when a variable is no longer directly used, but another variable has borrowed the value.
-            // The owner then shows as dead, so we inserted the delete. But really, we needed to wait until the
-            // borrow is gone to delete it. However, we can't just wait for all borrows to be dead to insert a delete
-            // because things are guaranteed to be deleted when the owner goes out of scope. A borrow that extends
-            // beyond the scope should be an error. We had been detecting this by noticing the borrow claim extended
-            // past the delete statement. That worked, because the owning variable must always be dead after the scope
-            // because there are no references to it outside the scope.
-            //DeleteInserter.Transform(memberDeclarations, liveness);
-
-            // Plan for inserting deletes:
-            // ---------------------------
-            // When generating the CFG, output statements for when variables go out of scope. Then track another level
-            // of liveness between alive and dead. This would be a new state, perhaps called "liminal" or "pending", which
-            // indicated that the variable would not be used again, but may need to exist as the owner of something borrowed
-            // until all outstanding borrows are resolved. Delete statements could then be inserted after borrow checking
-            // at the point where values are no longer used. The variable leaving scope statements could then be ignored
-            // or removed.
             BorrowChecker.Check(memberDeclarations, liveness, diagnostics, SaveBorrowClaims);
+
+            DeleteInserter.Transform(memberDeclarations, liveness);
+
+            // We have rebuilt the control flow graphs, if we need liveness then we have to redo it
+            if (SaveLivenessAnalysis)
+                LivenessAnalyzer.Check(memberDeclarations, SaveLivenessAnalysis);
 
             // Build final declaration objects and find the entry point
             var declarationBuilder = new DeclarationBuilder();

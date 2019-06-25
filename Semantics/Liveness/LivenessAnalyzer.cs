@@ -75,10 +75,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
                         case ActionStatement action:
                             EnlivenVariables(liveSet, action.Value);
                             break;
-                        case DeleteStatement _:
-                            throw new InvalidOperationException("Delete statements are supposed to be added after liveness analysis");
-                        //liveSet[deleteStatement.Place.CoreVariable()] = true;
-                        //break;
+                        case DeleteStatement delete:
+                            liveSet[delete.Place.CoreVariable().Number] = true;
+                            break;
                         case IfStatement _:
                         case GotoStatement _:
                             // We already or'ed together the live variables from successor blocks

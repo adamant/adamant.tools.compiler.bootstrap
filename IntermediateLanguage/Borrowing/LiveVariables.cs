@@ -7,7 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
 {
-    [DebuggerDisplay("Entries = {values.Count}, Variables = {VariableCount}")]
+    [DebuggerDisplay("Blocks = {values.Count}, Variables = {VariableCount}")]
     public class LiveVariables
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -20,8 +20,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
         {
             VariableCount = graph.VariableDeclarations.Count;
             values = graph.BasicBlocks.Select(block =>
-                block.ExpressionStatements.Append<object>(block.Terminator)
-                    .Select(s => new BitArray(VariableCount)).ToList()).ToFixedList();
+                            block.Statements.Select(s => new BitArray(VariableCount)).ToList())
+                        .ToFixedList();
         }
 
         /// <summary>

@@ -48,6 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             var code = codeFile.Code.Text;
             var compiler = new AdamantCompiler()
             {
+                SaveLivenessAnalysis = true,
                 SaveBorrowClaims = true,
             };
             var references = new Dictionary<string, Package>();
