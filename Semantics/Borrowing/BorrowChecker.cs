@@ -89,7 +89,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 
             while (blocks.TryDequeue(out var block))
             {
-                var claimsBeforeStatement = ClaimsBeforeBlock(function, block, claims);
+                var claimsBeforeStatement = GetClaimsBeforeBlock(function, block, claims);
 
                 foreach (var statement in block.ExpressionStatements)
                 {
@@ -192,15 +192,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             claimsAfterStatement.Release(deadVariableOwns);
         }
 
-        private static bool VariableOwnsSharedValue(Variable variable, Claims outstandingClaims)
-        {
-            var ownerShip = outstandingClaims.OwnedBy(variable);
-            // If it doesn't have ownership, then it doesn't own a shared value
-            if (ownerShip == null) return false;
-            return outstandingClaims.IsShared(ownerShip.Lifetime);
-        }
-
-        private Claims ClaimsBeforeBlock(
+        private Claims GetClaimsBeforeBlock(
             FunctionDeclarationSyntax function,
             BasicBlock block,
             StatementClaims claims)
@@ -216,14 +208,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             return claimsBeforeStatement;
         }
 
-        private Claims AcquireParameterClaims(FunctionDeclarationSyntax function)
+        private static VariableDeclaration GetVariableDeclaration(Place assignToPlace, FixedList<VariableDeclaration> variables)
         {
-            var claimsBeforeStatement = new Claims();
-            foreach (var parameter in function.ControlFlow.Parameters
-                .Where(v => v.Type is ReferenceType))
-                claimsBeforeStatement.Add(new Borrows(parameter.Variable, NewLifetime()));
-
-            return claimsBeforeStatement;
+            return variables.Single(v => v.Variable == assignToPlace.CoreVariable());
         }
 
         private void CheckStatement(
@@ -241,8 +228,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     // We have made a new object, assign it a new id
                     var objectId = NewLifetime();
                     // Variable acquires title on any new objects
-                    var title = new Owns(assignToPlace.CoreVariable(), objectId);
-                    claimsAfterStatement.Add(title);
+                    AcquireOwnership(assignToPlace.CoreVariable(), objectId, claimsAfterStatement);
                     break;
                 case UnaryOperation unaryOperation:
                     AcquireClaim(assignToPlace?.CoreVariable(), unaryOperation.Operand, claimsAfterStatement);
@@ -288,6 +274,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             }
         }
 
+        private Claims AcquireParameterClaims(FunctionDeclarationSyntax function)
+        {
+            var claimsBeforeStatement = new Claims();
+            foreach (var parameter in function.ControlFlow.Parameters
+                .Where(v => v.Type is ReferenceType))
+                claimsBeforeStatement.Add(new Borrows(parameter.Variable, NewLifetime()));
+
+            return claimsBeforeStatement;
+        }
+
         private static void AcquireReturnClaim(
             Place assignToPlace,
             Lifetime callLifetime,
@@ -297,38 +293,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         {
             if (assignToPlace == null) return;
 
-            var assignToVariable = VariableDeclaration(assignToPlace, variables);
-            if (assignToVariable.Type is UserObjectType objectType
-                && objectType.Mutability == Mutability.Mutable)
-                AcquireBorrow(assignToVariable.Variable, callLifetime, claimsAfterStatement);
+            var variableDeclaration = GetVariableDeclaration(assignToPlace, variables);
+            var assignToVariable = variableDeclaration.Variable;
+            if (variableDeclaration.Type is ReferenceType objectType)
+            {
+                if (objectType.IsOwned)
+                    AcquireOwnership(assignToVariable, callLifetime, claimsAfterStatement);
+                else if (objectType.Mutability == Mutability.Mutable)
+                    AcquireBorrow(assignToVariable, callLifetime, claimsAfterStatement);
+                else
+                    AcquireAlias(assignToVariable, callLifetime, claimsAfterStatement);
+            }
             else
-                AcquireAlias(assignToVariable.Variable, callLifetime, claimsAfterStatement);
+                AcquireAlias(assignToVariable, callLifetime, claimsAfterStatement);
 
             // TODO For now, we just add all the call claims, this should be based on the function type instead
             claimsAfterStatement.AddRange(outstandingClaims);
-        }
-
-        private void AcquireOwnershipIfMoved(
-            Place assignToPlace,
-            FixedList<VariableDeclaration> variables,
-            Claims claimsAfterStatement)
-        {
-            if (assignToPlace == null) return;
-            var assignToVariable = VariableDeclaration(assignToPlace, variables);
-            if (assignToVariable.Type is ReferenceType referenceType
-                && referenceType.IsOwned)
-            {
-                // We have taken ownership of a new object, assign it a new id
-                var objectId = NewLifetime();
-                // Variable acquires title on any new objects
-                var title = new Owns(assignToPlace.CoreVariable(), objectId);
-                claimsAfterStatement.Add(title);
-            }
-        }
-
-        private static VariableDeclaration VariableDeclaration(Place assignToPlace, FixedList<VariableDeclaration> variables)
-        {
-            return variables.Single(v => v.Variable == assignToPlace.CoreVariable());
         }
 
         private void AcquireClaim(
@@ -377,7 +357,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             switch (claimHolder)
                             {
                                 case Variable variable:
-                                    outstandingClaims.Add(new Owns(variable, lifetime));
+                                    AcquireOwnership(variable, lifetime, outstandingClaims);
                                     break;
                                 case Lifetime _:
                                     // This occurs when we pass ownership as a function argument
@@ -401,6 +381,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                 default:
                     throw NonExhaustiveMatchException.For(operand);
             }
+        }
+
+        private static void AcquireOwnership(
+            Variable claimHolder,
+            Lifetime lifetime,
+            Claims outstandingClaims)
+        {
+            outstandingClaims.Add(new Owns(claimHolder, lifetime));
         }
 
         private static void AcquireBorrow(
