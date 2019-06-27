@@ -10,7 +10,6 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Builders;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Deletes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Moves;
@@ -72,12 +71,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             var liveness = LivenessAnalyzer.Check(memberDeclarations, SaveLivenessAnalysis);
 
             BorrowChecker.Check(memberDeclarations, liveness, diagnostics, SaveBorrowClaims);
-
-            //DeleteInserter.Transform(memberDeclarations, liveness);
-
-            //// We have rebuilt the control flow graphs, if we need liveness then we have to redo it
-            //if (SaveLivenessAnalysis)
-            //    LivenessAnalyzer.Check(memberDeclarations, SaveLivenessAnalysis);
 
             // Build final declaration objects and find the entry point
             var declarationBuilder = new DeclarationBuilder();

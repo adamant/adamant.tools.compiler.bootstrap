@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -15,6 +16,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
     /// <summary>
     /// Check for borrow errors
     /// </summary>
+    ///
+    // Plan for inserting deletes:
+    // ---------------------------
+    // When generating the CFG, output statements for when variables go out of scope. Then track another level
+    // of liveness between alive and dead. This would be a new state, perhaps called "liminal" or "pending", which
+    // indicated that the variable would not be used again, but may need to exist as the owner of something borrowed
+    // until all outstanding borrows are resolved. Delete statements could then be inserted after borrow checking
+    // at the point where values are no longer used. The variable leaving scope statements could then be ignored
+    // or removed.
+    // TODO inserting deletes based only on liveness led to issues.
+    // There are cases when a variable is no longer directly used, but another variable has borrowed the value.
+    // The owner then shows as dead, so we inserted the delete. But really, we needed to wait until the
+    // borrow is gone to delete it. However, we can't just wait for all borrows to be dead to insert a delete
+    // because things are guaranteed to be deleted when the owner goes out of scope. A borrow that extends
+    // beyond the scope should be an error. We had been detecting this by noticing the borrow claim extended
+    // past the delete statement. That worked, because the owning variable must always be dead after the scope
+    // because there are no references to it outside the scope.
     public class BorrowChecker
     {
         private readonly CodeFile file;
@@ -86,6 +104,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             // Compute parameter claims once in case for some reason we process the entry block repeatedly
             var parameterClaims = AcquireParameterClaims(function);
             var claims = new StatementClaims(parameterClaims);
+            var insertedDeletes = new InsertedDeletes();
 
             while (blocks.TryDequeue(out var block))
             {
@@ -144,7 +163,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             throw NonExhaustiveMatchException.For(statement);
                     }
 
-                    ReleaseDeadClaims(claimsAfterStatement, liveVariables.After(statement));
+                    var deletedVariables = ReleaseDeadClaims(claimsAfterStatement, liveVariables.After(statement));
+                    InsertDeletes(statement, variables, deletedVariables, insertedDeletes);
 
                     // Get Ready for next statement
                     claimsBeforeStatement = claimsAfterStatement;
@@ -171,25 +191,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                 }
             }
 
+            function.ControlFlow.InsertedDeletes = insertedDeletes;
             if (saveBorrowClaims) function.ControlFlow.BorrowClaims = claims;
-        }
-
-        private static void ReleaseDeadClaims(Claims claimsAfterStatement, BitArray liveAfter)
-        {
-            var deadVariables = liveAfter.FalseIndexes().Select(i => new Variable(i));
-            var deadVariablesOwnership = deadVariables.ToDictionary(v => v, claimsAfterStatement.OwnedBy);
-
-            // First release dead variables that don't own their value
-            var deadVariableShares = deadVariablesOwnership.Where(e => e.Value == null)
-                .Select(e => e.Key);
-            claimsAfterStatement.Release(deadVariableShares);
-
-            // Now that any shares have been released, release ownership claims. This must be done
-            // second because it depends on what shares are outstanding.
-            var deadVariableOwns = deadVariablesOwnership
-                .Where(e => e.Value != null && !claimsAfterStatement.IsShared(e.Value.Lifetime))
-                .Select(e => e.Key);
-            claimsAfterStatement.Release(deadVariableOwns);
         }
 
         private Claims GetClaimsBeforeBlock(
@@ -206,6 +209,48 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                 claimsBeforeStatement.AddRange(claims.After(predecessor));
 
             return claimsBeforeStatement;
+        }
+
+        private static List<Variable> ReleaseDeadClaims(
+            Claims claimsAfterStatement,
+            BitArray liveAfter)
+        {
+            var deadVariables = liveAfter.FalseIndexes().Select(i => new Variable(i));
+            var deadVariablesOwnership = deadVariables.ToDictionary(v => v, claimsAfterStatement.OwnedBy);
+
+            // First release dead variables that don't own their value
+            var deadVariableShares = deadVariablesOwnership.Where(e => e.Value == null)
+                .Select(e => e.Key);
+            claimsAfterStatement.Release(deadVariableShares);
+
+            // Now that any shares have been released, release ownership claims. This must be done
+            // second because it depends on what shares are outstanding.
+            var deadVariableOwns = deadVariablesOwnership
+                .Where(e => e.Value != null && !claimsAfterStatement.IsShared(e.Value.Lifetime))
+                .Select(e => e.Key).ToList();
+            claimsAfterStatement.Release(deadVariableOwns);
+            return deadVariableOwns;
+        }
+
+        private void InsertDeletes(
+            ExpressionStatement statement,
+            FixedList<VariableDeclaration> variables,
+            List<Variable> deletedVariables,
+            InsertedDeletes insertedDeletes)
+        {
+            foreach (var variable in deletedVariables)
+            {
+                var declaration = variables.Single(v => v.Variable == variable);
+                var span = statement.Span.AtEnd();
+                // We may be in a different scope than the variable declaration.
+                // For example, the last use may be in a nested scope
+                insertedDeletes.AddDeleteAfter(
+                    statement,
+                    declaration.Reference(span).AsOwn(span),
+                    (UserObjectType)declaration.Type,
+                    span,
+                    statement.Scope);
+            }
         }
 
         private static VariableDeclaration GetVariableDeclaration(Place assignToPlace, FixedList<VariableDeclaration> variables)

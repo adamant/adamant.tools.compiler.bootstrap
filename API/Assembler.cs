@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
@@ -17,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         {
             var builder = new AssemblyBuilder();
             var typeMembers = package.Declarations.OfType<TypeDeclaration>()
-                                .SelectMany(t => t.Members).ToList();
+                .SelectMany(t => t.Members).ToList();
             foreach (var declaration in package.Declarations.Except(typeMembers))
             {
                 Disassemble(declaration, builder);
@@ -131,7 +132,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         private void Disassemble(VariableDeclaration declaration, AssemblyBuilder builder)
         {
             if (declaration.TypeIsNotEmpty)
-                builder.AppendLine(declaration.ToStatementString().PadRight(StandardStatementWidth) + declaration.ContextCommentString());
+                builder.AppendLine(declaration.ToStatementString().PadRight(StandardStatementWidth)
+                                   + declaration.ContextCommentString());
         }
 
         private void Disassemble(ControlFlowGraph graph, BasicBlock block, AssemblyBuilder builder)
@@ -143,7 +145,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             foreach (var statement in block.Statements)
             {
                 Disassemble(graph, graph.LiveVariables?.Before(statement), builder);
-                builder.AppendLine(statement.ToStatementString().PadRight(StandardStatementWidth) + statement.ContextCommentString());
+                builder.AppendLine(statement.ToStatementString().PadRight(StandardStatementWidth)
+                                   + statement.ContextCommentString());
+                Disassemble(graph.InsertedDeletes.After(statement), builder);
                 Disassemble(graph.BorrowClaims?.After(statement), builder);
             }
         }
@@ -156,7 +160,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             if (liveVariables == null || liveVariables.Cast<bool>().All(x => x == false)) return;
 
             var variables = string.Join(", ", liveVariables.TrueIndexes()
-                                .Select(i => FormatVariableName(graph.VariableDeclarations[i])));
+                    .Select(i => FormatVariableName(graph.VariableDeclarations[i])));
             builder.BeginLine("// live: ");
             builder.EndLine(variables);
         }
@@ -166,6 +170,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             return declaration.Name != null
                 ? $"{declaration.Variable}({declaration.Name})"
                 : declaration.Variable.ToString();
+        }
+
+        private void Disassemble(
+            IReadOnlyList<DeleteStatement> deletes,
+            AssemblyBuilder builder)
+        {
+            foreach (var delete in deletes)
+                builder.AppendLine(delete.ToStatementString().PadRight(StandardStatementWidth)
+                                   + delete.ContextCommentString());
         }
 
         private bool Disassemble(Claims claims, AssemblyBuilder builder)

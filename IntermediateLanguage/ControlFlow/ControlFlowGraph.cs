@@ -30,6 +30,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         /// </summary>
         public StatementClaims BorrowClaims { get; set; }
 
+        public InsertedDeletes InsertedDeletes { get; set; }
+
         public ControlFlowGraph(
             IEnumerable<VariableDeclaration> variableDeclarations,
             IEnumerable<BasicBlock> basicBlocks)

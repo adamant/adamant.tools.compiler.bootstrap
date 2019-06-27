@@ -53,17 +53,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             return Variable;
         }
 
-        public Value AsOwn(TextSpan span)
+        public VariableReference AsOwn(TextSpan span)
         {
             return new VariableReference(Variable, ValueSemantics.Own, span);
         }
 
-        public Value AsBorrow()
+        public VariableReference AsBorrow()
         {
             return ValueSemantics == ValueSemantics.Borrow ? this : new VariableReference(Variable, ValueSemantics.Borrow, Span);
         }
 
-        public Value AsAlias()
+        public VariableReference AsAlias()
         {
             return ValueSemantics == ValueSemantics.Alias ? this : new VariableReference(Variable, ValueSemantics.Alias, Span);
         }
