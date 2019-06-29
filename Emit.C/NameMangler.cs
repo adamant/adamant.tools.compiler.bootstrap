@@ -17,6 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
     /// * replace " " with "_"
     /// * use "__" to separate segments
     /// * use "__" and a number for arity
+    /// * special names are prefixed with "_" because names don't normally start with underscore
     /// * encode with punycode
     ///
     /// </summary>

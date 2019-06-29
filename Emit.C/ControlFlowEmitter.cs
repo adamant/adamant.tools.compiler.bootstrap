@@ -30,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
             var voidReturn = cfg.ReturnType == DataType.Void;
             foreach (var block in cfg.BasicBlocks)
-                EmitBlock(block, voidReturn, definitions);
+                EmitBlock(block, voidReturn, cfg.InsertedDeletes, definitions);
         }
 
         private void EmitVariable(VariableDeclaration declaration, CCodeBuilder code)
@@ -40,11 +40,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.AppendLine($"{typeConverter.Convert(declaration.Type)} _{declaration.Variable.Name}{initializer}; // {declaration}");
         }
 
-        private void EmitBlock(BasicBlock block, bool voidReturn, CCodeBuilder code)
+        private void EmitBlock(
+            BasicBlock block,
+            bool voidReturn,
+            InsertedDeletes insertedDeletes,
+            CCodeBuilder code)
         {
             code.AppendLine($"{block.Name}:");
             code.BeginBlock();
-            foreach (var statement in block.Statements) EmitStatement(statement, voidReturn, code);
+            foreach (var statement in block.Statements)
+            {
+                EmitStatement(statement, voidReturn, code);
+                foreach (var deleteStatement in insertedDeletes.After(statement))
+                    EmitStatement(deleteStatement, voidReturn, code);
+            }
             code.EndBlock();
         }
 
