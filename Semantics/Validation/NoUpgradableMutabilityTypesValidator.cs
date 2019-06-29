@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
         {
             base.VisitFunctionDeclaration(functionDeclaration, args);
             Validate(functionDeclaration.SelfParameterType);
-            Validate(functionDeclaration.ReturnType.Fulfilled());
+            ValidateReturn(functionDeclaration.ReturnType.Fulfilled());
         }
 
         public override void VisitParameter(ParameterSyntax parameter, Void args)
