@@ -50,7 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         public void Disassemble(FunctionDeclaration function, AssemblyBuilder builder)
         {
             var functionControlFlow = function.ControlFlow;
-            var parameters = FormatParameters(functionControlFlow);
+            var parameters = FormatParameters(function.Parameters);
             builder.BeginLine("fn ");
             builder.Append(function.FullName.ToString());
             builder.Append("(");
@@ -65,21 +65,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.EndBlock();
         }
 
-        private static string FormatParameters(ControlFlowGraph controlFlow)
+        private static string FormatParameters(IEnumerable<Parameter> parameters)
         {
-            var parameters = string.Join(", ", controlFlow.Parameters.Select(FormatParameter));
-            return parameters;
+            var formatted = string.Join(", ", parameters.Select(FormatParameter));
+            return formatted;
         }
 
-        private static string FormatParameter(VariableDeclaration parameter)
+        private static string FormatParameter(Parameter parameter)
         {
-            var format = parameter.IsMutableBinding ? "var {0}({1}): {2}" : "{0}({1}): {2}";
-            return string.Format(format, parameter.Variable, parameter.Name, parameter.Type);
+            var format = parameter.IsMutableBinding ? "var {0}: {1}" : "{0}: {1}";
+            return string.Format(format, parameter.Name, parameter.Type);
         }
 
         public void Disassemble(ConstructorDeclaration constructor, AssemblyBuilder builder)
         {
-            var parameters = string.Join(", ", constructor.ControlFlow.Parameters.Select(FormatParameter));
+            var parameters = FormatParameters(constructor.Parameters);
             builder.BeginLine("fn ");
             builder.Append(constructor.FullName.ToString());
             builder.Append("(");

@@ -5,16 +5,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class Parameter
     {
-        public bool MutableBinding { get; }
+        public bool IsMutableBinding { get; }
         public Name Name { get; }
         public DataType Type { get; internal set; }
 
         public Parameter(
-            bool mutableBinding,
+            bool isMutableBinding,
             Name name,
             DataType type)
         {
-            MutableBinding = mutableBinding;
+            IsMutableBinding = isMutableBinding;
             Name = name;
             Type = type;
         }
