@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
@@ -63,6 +64,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             return this;
         }
 
+        /// <summary>
+        /// Returns a version of this type that could be used as a declared type.
+        /// This means that upgradable mutability is converted to non-upgradable.
+        /// </summary>
+        protected internal virtual Self AsDeclaredReturnsSelf()
+        {
+            return this;
+        }
+
         public abstract override string ToString();
+
+        public static implicit operator Self(DataType type)
+        {
+            return new Self(type);
+        }
+    }
+
+    public static class DataTypeExtensions
+    {
+        public static T AsDeclared<T>(this T type)
+            where T : DataType
+        {
+            return type.AsDeclaredReturnsSelf().Cast<T>();
+        }
     }
 }

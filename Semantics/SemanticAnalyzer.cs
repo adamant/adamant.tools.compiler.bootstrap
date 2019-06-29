@@ -51,8 +51,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
 #if DEBUG
             TypeFulfillmentValidator.Validate(memberDeclarations);
+            NoUpgradableMutabilityTypesValidator.Validate(memberDeclarations);
             ReferencedSymbolValidator.Validate(memberDeclarations);
 #endif
+
             ShadowChecker.Check(memberDeclarations, diagnostics);
 
             // TODO use DataFlowAnalysis to check for unused variables and report use of variables starting with `_`

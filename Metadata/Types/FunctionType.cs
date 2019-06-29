@@ -27,7 +27,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             IsKnown = ParameterTypes.All(pt => pt.IsKnown) && ReturnType.IsKnown;
         }
 
-        public override ReferenceType WithLifetime(Lifetime lifetime)
+        protected internal override Self AsImmutableReturnsSelf()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        protected internal override Self WithLifetimeReturnsSelf(Lifetime lifetime)
         {
             throw new System.NotImplementedException();
         }

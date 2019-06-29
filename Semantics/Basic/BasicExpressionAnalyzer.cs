@@ -89,17 +89,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                       && sourceType.Lifetime == Lifetime.Owned
                       && targetType.Lifetime == Lifetime.None
                       && IsAssignableFrom(targetType.AsOwned(), sourceType))
-                    variableDeclaration.Type = targetType.AsOwned();
+                    variableDeclaration.Type = targetType.AsOwned().AsDeclared();
                 else
                 {
                     if (!IsAssignableFrom(type, initializerType))
                         diagnostics.Add(TypeError.CannotConvert(file, variableDeclaration.Initializer, initializerType, type));
 
-                    variableDeclaration.Type = type;
+                    variableDeclaration.Type = type.AsDeclared();
                 }
             }
             else
-                variableDeclaration.Type = type;
+                variableDeclaration.Type = type.AsDeclared();
         }
 
         /// <summary>

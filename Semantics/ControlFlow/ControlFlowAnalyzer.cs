@@ -349,7 +349,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                                     .ToFixedList();
                     var type = (UserObjectType)newObjectExpression.Type;
                     // lifetime is implicitly owned since we are making a new one
-                    type = (UserObjectType)type.WithLifetime(Lifetime.None);
+                    type = type.WithLifetime(Lifetime.None);
                     return new ConstructorCall(type, args, newObjectExpression.Span);
                 }
                 case IdentifierNameSyntax identifier:

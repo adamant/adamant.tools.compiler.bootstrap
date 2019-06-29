@@ -69,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// <summary>
         /// Use this type as an immutable type.
         /// </summary>
-        public UserObjectType AsImmutable()
+        protected internal override Self AsImmutableReturnsSelf()
         {
             return new UserObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability.Immutable, Lifetime);
         }
@@ -129,7 +129,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             return new UserObjectType(Symbol, DeclaredMutable, GenericParameterTypes, genericArguments, Mutability, Lifetime);
         }
 
-        public override ReferenceType WithLifetime(Lifetime lifetime)
+        protected internal override Self WithLifetimeReturnsSelf(Lifetime lifetime)
         {
             return new UserObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability, lifetime);
         }

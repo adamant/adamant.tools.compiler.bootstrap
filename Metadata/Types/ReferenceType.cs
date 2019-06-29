@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
@@ -26,6 +27,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                 : (Mutability == Mutability.Mutable ? ValueSemantics.Borrow : ValueSemantics.Alias);
         }
 
-        public abstract ReferenceType WithLifetime(Lifetime lifetime);
+        protected internal override Self AsDeclaredReturnsSelf()
+        {
+            if (!Mutability.IsUpgradable) return this;
+            return this.AsImmutable();
+        }
+
+        /// <summary>
+        /// Use this type as an immutable type.
+        /// </summary>
+        protected internal abstract Self AsImmutableReturnsSelf();
+
+        protected internal abstract Self WithLifetimeReturnsSelf(Lifetime lifetime);
+    }
+
+    public static class ReferenceTypeExtensions
+    {
+        public static T AsImmutable<T>(this T type)
+            where T : ReferenceType
+        {
+            return type.AsImmutableReturnsSelf().Cast<T>();
+        }
+
+        public static T WithLifetime<T>(this T type, Lifetime lifetime)
+            where T : ReferenceType
+        {
+            return type.WithLifetimeReturnsSelf(lifetime).Cast<T>();
+        }
     }
 }
