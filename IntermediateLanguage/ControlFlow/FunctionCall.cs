@@ -45,7 +45,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         // Useful for debugging
         public override string ToString()
         {
-            return $"call {FunctionName}({string.Join(", ", Arguments)})";
+            var arguments = string.Join(", ", Arguments);
+            return Self != null
+                // For method invocation, we need to know what self
+                ? $"call method {FunctionName}({string.Join(", ", Self, arguments)})"
+                : $"call fn {FunctionName}({arguments})";
         }
     }
 }
