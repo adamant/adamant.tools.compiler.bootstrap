@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -36,6 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
         }
 
         private static readonly Regex ExitCodePattern = new Regex(@"//[ \t]*exit code: (?<exitCode>\d+)", RegexOptions.Compiled);
+        private const string ExpectedOutputFileFormat = @"//[ \t]*{0} file: (?<file>[a-zA-Z0-9.]+)";
         private const string ExpectedOutputFormat = @"\/\*[ \t]*{0}:\r?\n(?<output>(\*+[^/]|[^*])*)\*\/";
         private static readonly Regex ErrorPattern = new Regex(@"//[ \t]*ERROR([ \t].*)?", RegexOptions.Compiled | RegexOptions.Multiline);
 
@@ -119,11 +121,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             var stdout = process.StandardOutput.ReadToEnd();
             testOutput.WriteLine("stdout:");
             testOutput.WriteLine(stdout);
-            Assert.Equal(ExpectedOutput(code, "stdout"), stdout);
+            Assert.Equal(ExpectedOutput(code, "stdout", testCase.FullCodePath), stdout);
             var stderr = process.StandardError.ReadToEnd();
             testOutput.WriteLine("stderr:");
             testOutput.WriteLine(stderr);
-            Assert.Equal(ExpectedOutput(code, "stderr"), stderr);
+            Assert.Equal(ExpectedOutput(code, "stderr", testCase.FullCodePath), stderr);
             Assert.Equal(ExpectedExitCode(code), process.ExitCode);
         }
 
@@ -194,10 +196,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             return int.Parse(exitCode);
         }
 
-        private static string ExpectedOutput(string code, string channel)
+        private static string ExpectedOutput(
+            string code,
+            string channel,
+            string testCasePath)
         {
-            var regex = new Regex(string.Format(ExpectedOutputFormat, channel));
-            return regex.Match(code).Groups["output"]?.Captures.SingleOrDefault()?.Value ?? "";
+            // First check if there is a file for the expected output
+            var match = Regex.Match(code, string.Format(ExpectedOutputFileFormat, channel));
+            var path = match.Groups["file"]?.Captures.SingleOrDefault()?.Value;
+            if (path != null)
+            {
+                path = Path.Combine(Path.GetDirectoryName(testCasePath), path);
+                return File.ReadAllText(path);
+            }
+
+            // Then look for inline expected output
+            match = Regex.Match(code, string.Format(ExpectedOutputFormat, channel));
+            return match.Groups["output"]?.Captures.SingleOrDefault()?.Value ?? "";
         }
 
         public static TheoryData<TestCase> GetConformanceTestCases()
