@@ -8,18 +8,42 @@ The compiler is under active development. It is in a very early stage, and there
 
 ## Current Plan
 
-The current plan is to slowly build up functionality by getting a series of katas and small programs working. These will likely be included in the conformance tests. After some very basic programs, various versions of the Fizz Buzz kata will be worked on. As this process is carried out, the plan will be to:
+The current plan is to get a basic object-oriented subset of the language working. The inspiration for this is the feature set of Java 1.0. While Java 1.0 was very limiting, it demonstrates a viable language for general purpose development. This subset of the language should provide experience with the viability of developing with compile-time memory management. It will also provide a platform for experimenting with how to best support language features like asynchronous programming, class extension, closures, exceptions, and effect types.
 
-* Make the Adamant source code as correct as possible given all current ideas on the design of the language with the exception of specific features listed below.
+The basic object-oriented subset is planned to include a minimal set of features to support programming. The list below should be taken as a general guideline. Some very basic language features have been omitted. For features that are listed, often only a very basic version of them will be supported. At the end of the list are some features that may be necessary to include, but will be omitted if possible.
+
+* [x] Stand-alone Functions - no generics
+* [ ] Simple Types - `int`, `uint`, `size`, `offset`
+* [ ] Simple Class Declarations - no base class, generics (see below for supported members)
+* [ ] Fields - no initializers
+* [ ] Constructors
+* [ ] Basic Methods - no generics
+* [ ] Optional Types
+* [ ] Basic Control Flow - `if`, `while`, `loop` `break`, `next`
+* [ ] Conversions and Casts - `as`, `as!`, `as?` (not including unboxing)
+* [ ] Namespaces
+* [ ] Strings
+* [ ] `foreach n in 1..100` - basic loop iteration may need to be hard-coded because the final version will depend on features not yet available.
+* [ ] Basic Arrays of `Any` - may need to be implemented as intrinsics
+* [ ] Wrapper Types - `Int`, `UInt`, `Size`, `Offset` to enable simple types in arrays
+* [ ] Basic Traits? - no generics, classes directly implement like interfaces
+* [ ] `foreach` in Iterator?
+* [ ] Destructors?
+
+These features should allow a number of basic programs and katas to be implemented. Note that the lack of generics will mean that future versions won't be backwards compatible with the standard library of this version.
+
+As this subset is developed, the plan will be to:
+
+* Make the Adamant source code as correct as possible given all current ideas on the design of the language with the exception of what isn't possible due to missing features (for example, generics).
 * Ensure any language features used are in the language reference.
-* If needed, parts of what will be the standard library can be created as compiler intrinsics at first, but they should be replaced with correct standard library code as quickly as possible.
+* If needed, parts of what will be the standard library can be created as compiler intrinsics at first, but they should be replaced with correct standard library code when possible.
 
 ### Excluded Language Features
 
 The following features will not be implemented by this compiler even though they are described in the [language reference](https://github.com/adamant/adamant.language.reference/blob/master/src/book.md).
 
 * [Loop Labels](https://github.com/adamant/adamant.language.reference/blob/master/src/loop-expressions.md#loop-labels)
-* [Document Comment Validation](https://github.com/adamant/adamant.language.reference/blob/master/src/documentation-comments.md#supported-markdown)
+* [Document Comment Validation](https://github.com/adamant/adamant.language.reference/blob/master/src/documentation-comments.md#documentation-comments)
 * Full Type Inference: Variable types can be inferred from the type of their initializer only.
 
 ### Features Planned for After v1.0
@@ -53,4 +77,4 @@ None Currently
 
 ## Line Count
 
-A line count can be obtained from Visual Studio by running "Find All" with regular expressions across all `*.cs` files using the regex `^.*[^\s{}].*.$`. This matches all lines that aren't blank or only curly braces. Note that this does match lines that are only comments and includes a few generated code files.
+A line count can be obtained from Visual Studio 2019 using the "Code Metrics" feature. An alternate approximation can be found in other versions of Visual Studio by running "Find All" with regular expressions across all `*.cs` files using the regex `^.*[^\s{}].*.$`. This matches all lines that aren't blank or only curly braces. Note that this does match lines that are only comments and includes a few generated code files.
