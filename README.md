@@ -26,18 +26,21 @@ The following features will not be implemented by this compiler even though they
 
 A number of language features are planned for the future but not yet included in the language. For quick reference, SOME of those features are:
 
-* Types
-  * [128-bit Integer Types](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-features.md#128-bit-integer-types)
-  * [128-bit Floating Point Type](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-features.md#128-bit-floating-point-type)
-  * [Fixed Point Types](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-features.md#fixed-point-types)
-  * [Decimal Types](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-features.md#decimal-types)
-  * [Real Types](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-features.md#real-types)
-* Using Directives
-  * [Global and Package Qualified Using Directives](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-features.md#global-and-package-qualified-using-directives)
-  * [Using Type Members](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-features.md#using-type-members)
-* [Aliases](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-features.md#aliases)
-* Expressions
-  * [Multiline String Literals](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-features.md#multiline-string-literals)
+* [Global and Package Qualifiers](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-qualifier.md)
+* [Additional Types](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-types.md)
+  * [128-bit Integer Types](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-types.md#128-bit-integer-types)
+  * [128-bit Floating Point Type](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-types.md#128-bit-floating-point-type)
+  * [Fixed Point Types](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-types.md#fixed-point-types)
+  * [Decimal Types](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-types.md#decimal-types)
+  * [Real Types](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-types.md#real-types)
+* [Aliases](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-aliases.md)
+* [Additional Expressions](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-expressions.md)
+  * [Multiline String Literals](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-expressions.md#multiline-string-literals)
+* [Operator Features](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-operators.md)
+* [Compile-time Function Execution](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-ctfe.md)
+* [Language-Oriented Programming](https://github.com/adamant/adamant.language.reference/blob/master/src/planned-lop.md)
+
+The full list can be found in the [language reference](https://github.com/adamant/adamant.language.reference/blob/master/src/book.md) planned features section.
 
 ## Cleanup Tasks
 
