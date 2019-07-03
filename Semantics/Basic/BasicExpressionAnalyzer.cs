@@ -244,14 +244,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
                     return placementInitExpression.Type = typeAnalyzer.Check(placementInitExpression.Initializer);
                 case ForeachExpressionSyntax foreachExpression:
-                    foreachExpression.Type =
-                        typeAnalyzer.Check(foreachExpression.TypeExpression);
+                {
+                    foreachExpression.Type = typeAnalyzer.Check(foreachExpression.TypeExpression);
                     InferExpressionType(foreachExpression.InExpression);
 
                     // TODO check the break types
                     InferExpressionType(foreachExpression.Block);
                     // TODO assign correct type to the expression
                     return expression.Type = DataType.Void;
+                }
                 case WhileExpressionSyntax whileExpression:
                     CheckExpressionType(whileExpression.Condition, DataType.Bool);
                     InferExpressionType(whileExpression.Block);
@@ -263,29 +264,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return expression.Type = DataType.Void;
                 case InvocationSyntax invocation:
                     return InferInvocationType(invocation);
-                case GenericNameSyntax genericName:
-                {
-                    foreach (var argument in genericName.Arguments)
-                        InferExpressionType(argument.Value);
-
-                    // TODO lookup the symbol and construct a type
-                    throw new NotImplementedException();
-                    //genericName.NameType.BeginFulfilling();
-                    //var nameType = InferNameType(genericName);
-
-                    //// TODO check that argument types match function type
-                    //genericName.NameType.Fulfill(nameType);
-
-                    //switch (nameType)
-                    //{
-                    //    case MetaFunctionType metaFunctionType:
-                    //        return genericName.Type = metaFunctionType.ResultType;
-                    //    case UnknownType _:
-                    //        return genericName.Type = DataType.Unknown;
-                    //    default:
-                    //        throw NonExhaustiveMatchException.For(genericName.NameType);
-                    //}
-                }
                 case UnsafeExpressionSyntax unsafeExpression:
                     InferExpressionType(unsafeExpression.Expression);
                     return unsafeExpression.Type = unsafeExpression.Expression.Type;

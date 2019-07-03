@@ -84,15 +84,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             // TODO evaluate to type
                             return DataType.Unknown;
                     }
-                case GenericNameSyntax _:
-                {
-                    var type = typeExpression.Type;
-                    if (type is Metatype metatype)
-                        return metatype.Instance;
-
-                    // TODO evaluate to type
-                    return DataType.Unknown;
-                }
                 case MutableExpressionSyntax mutableType:
                 {
                     var type = Check(mutableType.Expression);
