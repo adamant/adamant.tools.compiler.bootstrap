@@ -135,13 +135,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
                 break;
                 case IntegerConstantType expressionType:
+                    var requireSigned = expressionType.Value < 0;
                     switch (targetType)
                     {
                         case SizedIntegerType expectedType:
                             var bits = expressionType.Value.GetByteCount() * 8;
-                            var requireSigned = expressionType.Value < 0;
                             if (expectedType.Bits >= bits
                                && (!requireSigned || expectedType.IsSigned))
+                                expression = new ImplicitNumericConversionExpression(expression, expectedType);
+                            break;
+                        case UnsizedIntegerType expectedType:
+                            if (!requireSigned || expectedType.IsSigned)
                                 expression = new ImplicitNumericConversionExpression(expression, expectedType);
                             break;
                         case FloatingPointType expectedType:
@@ -532,7 +536,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case UserObjectType objectType:
                     return objectType.Symbol;
                 case SizedIntegerType integerType:
-                    // TODO this seems a very strange way to handle this. Shouldn't the symbol be on the type?
+                    return PrimitiveSymbols.Instance.Single(p => p.FullName == integerType.Name);
+                case UnsizedIntegerType integerType:
                     return PrimitiveSymbols.Instance.Single(p => p.FullName == integerType.Name);
                 default:
                     throw NonExhaustiveMatchException.For(type);

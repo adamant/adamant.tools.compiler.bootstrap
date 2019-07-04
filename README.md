@@ -13,8 +13,8 @@ The current plan is to get a basic object-oriented subset of the language workin
 The basic object-oriented subset is planned to include a minimal set of features to support programming. The list below should be taken as a general guideline. Some very basic language features have been omitted. For features that are listed, often only a very basic version of them will be supported. At the end of the list are some features that may be necessary to include, but will be omitted if possible.
 
 * [x] Stand-alone Functions - no generics
-* [ ] Simple Types - `int`, `uint`, `size`, `offset`
-* [ ] Simple Class Declarations - no base class, generics (see below for supported members)
+* [x] Simple Types - `int`, `uint`, `size`, `offset`
+* [ ] Simple Class Declarations - no base class, no generics (see below for supported members)
 * [ ] Fields - no initializers
 * [ ] Constructors
 * [ ] Basic Methods - no generics
