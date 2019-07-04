@@ -14,7 +14,7 @@ The basic object-oriented subset is planned to include a minimal set of features
 
 * [x] Stand-alone Functions - no generics
 * [x] Simple Types - `int`, `uint`, `size`, `offset`
-* [ ] Simple Class Declarations - no base class, no generics (see below for supported members)
+* [x] Simple Class Declarations - no base class, no generics (see below for supported members)
 * [ ] Fields - no initializers
 * [ ] Constructors
 * [ ] Basic Methods - no generics
