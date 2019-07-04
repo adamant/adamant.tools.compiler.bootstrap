@@ -5,10 +5,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class DeleteStatement : ExpressionStatement
     {
-        public Place Place { get; }
+        public IPlace Place { get; }
         public UserObjectType Type { get; }
 
-        public DeleteStatement(Place place, UserObjectType type, TextSpan span, Scope scope)
+        public DeleteStatement(IPlace place, UserObjectType type, TextSpan span, Scope scope)
             : base(span, scope)
         {
             Place = place;

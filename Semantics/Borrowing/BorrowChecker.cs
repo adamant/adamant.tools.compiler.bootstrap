@@ -81,15 +81,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                 case TypeDeclarationSyntax typeDeclaration:
                     Check(typeDeclaration);
                     break;
+                case FieldDeclarationSyntax field:
+                    Check(field);
+                    break;
                 case FunctionDeclarationSyntax function:
                     Check(function);
                     break;
+
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
             }
         }
 
         private static void Check(TypeDeclarationSyntax _type)
+        {
+            // Currently nothing to check
+        }
+
+        private static void Check(FieldDeclarationSyntax _field)
         {
             // Currently nothing to check
         }
@@ -253,14 +262,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             }
         }
 
-        private static VariableDeclaration GetVariableDeclaration(Place assignToPlace, FixedList<VariableDeclaration> variables)
+        private static VariableDeclaration GetVariableDeclaration(IPlace assignToPlace, FixedList<VariableDeclaration> variables)
         {
             return variables.Single(v => v.Variable == assignToPlace.CoreVariable());
         }
 
         private void CheckStatement(
-            Place assignToPlace,
-            Value value,
+            IPlace assignToPlace,
+            IValue value,
             Claims claimsBeforeStatement,
             Claims claimsAfterStatement,
             FixedList<VariableDeclaration> variables)
@@ -285,7 +294,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                 case IntegerConstant _:
                     // no claims to acquire
                     break;
-                case Operand operand:
+                case IOperand operand:
                     AcquireClaim(assignToPlace?.CoreVariable(), operand, claimsAfterStatement);
                     break;
                 case FunctionCall functionCall:
@@ -314,6 +323,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     AcquireReturnClaim(assignToPlace, callLifetime, outstandingClaims, claimsAfterStatement, variables);
                 }
                 break;
+                case FieldAccess fieldAccess:
+                    AcquireClaim(assignToPlace?.CoreVariable(), fieldAccess.Expression, claimsAfterStatement);
+                    break;
                 default:
                     throw NonExhaustiveMatchException.For(value);
             }
@@ -330,7 +342,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         }
 
         private static void AcquireReturnClaim(
-            Place assignToPlace,
+            IPlace assignToPlace,
             Lifetime callLifetime,
             Claims outstandingClaims,
             Claims claimsAfterStatement,
@@ -358,7 +370,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 
         private void AcquireClaim(
             IClaimHolder claimHolder,
-            Operand operand,
+            IOperand operand,
             Claims outstandingClaims)
         {
             switch (operand)
@@ -418,7 +430,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             throw NonExhaustiveMatchException.ForEnum(varRef.ValueSemantics);
                     }
                     break;
-                case Place _:
+                case IPlace _:
                     throw new NotImplementedException();
                 case Constant _:
                     // no claims to acquire

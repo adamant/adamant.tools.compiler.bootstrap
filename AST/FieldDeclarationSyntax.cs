@@ -33,7 +33,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public override string ToString()
         {
-            throw new System.NotImplementedException();
+            var result = $"{Name}: {TypeExpression}";
+            if (Initializer != null) result += Initializer.ToString();
+            result += ";";
+            return result;
         }
     }
 }

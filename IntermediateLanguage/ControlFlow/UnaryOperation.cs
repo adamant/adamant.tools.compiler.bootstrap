@@ -5,9 +5,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     public class UnaryOperation : Value
     {
         public UnaryOperator Operator { get; }
-        public Operand Operand { get; }
+        public IOperand Operand { get; }
 
-        public UnaryOperation(UnaryOperator @operator, Operand operand, TextSpan span)
+        public UnaryOperation(UnaryOperator @operator, IOperand operand, TextSpan span)
             : base(span)
         {
             Operator = @operator;

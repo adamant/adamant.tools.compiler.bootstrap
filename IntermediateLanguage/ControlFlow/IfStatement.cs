@@ -5,11 +5,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class IfStatement : BlockTerminatorStatement
     {
-        public Operand Condition { get; }
+        public IOperand Condition { get; }
         public BasicBlockName ThenBlock { get; }
         public BasicBlockName ElseBlock { get; }
 
-        public IfStatement(Operand condition, BasicBlockName thenBlock, BasicBlockName elseBlock, TextSpan span, Scope scope)
+        public IfStatement(IOperand condition, BasicBlockName thenBlock, BasicBlockName elseBlock, TextSpan span, Scope scope)
             : base(span, scope)
         {
             Condition = condition;

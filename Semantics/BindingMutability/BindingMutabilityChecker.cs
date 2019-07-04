@@ -45,6 +45,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
                         diagnostics.Add(SemanticError.VariableMayAlreadyBeAssigned(file, identifier.Span, identifier.Name));
                     }
                     return definitelyUnassigned.Set(symbol, false);
+                case MemberAccessExpressionSyntax memberAccessExpression:
+                    return definitelyUnassigned;
                 default:
                     throw new NotImplementedException("Complex assignments not yet implemented");
             }

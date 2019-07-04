@@ -95,7 +95,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             }
         }
 
-        private string ConvertPlace(Place place)
+        private string ConvertPlace(IPlace place)
         {
             switch (place)
             {
@@ -106,7 +106,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             }
         }
 
-        private string ConvertValue(Value value)
+        private string ConvertValue(IValue value)
         {
             switch (value)
             {
@@ -132,9 +132,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 }
                 case DeclaredValue declaredValue:
                     return nameMangler.Mangle(declaredValue.Name);
-                case FieldAccessValue fieldAccess:
+                case FieldAccess fieldAccess:
                     return $"{ConvertValue(fieldAccess.Expression)}.{nameMangler.Mangle(fieldAccess.Field.UnqualifiedName)}";
-                case Place place:
+                case IPlace place:
                     return ConvertPlace(place);
                 case VirtualFunctionCall virtualCall:
                 {

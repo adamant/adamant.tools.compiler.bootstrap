@@ -43,6 +43,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
                     // We are assigning into this variable so it definitely has a value now
                     var symbol = identifierName.ReferencedSymbol;
                     return possiblyMoved.Set(symbol, false);
+                case MemberAccessExpressionSyntax memberAccessExpression:
+                    return possiblyMoved;
                 default:
                     throw new NotImplementedException("Complex assignments not yet implemented");
             }

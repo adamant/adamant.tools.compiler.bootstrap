@@ -53,12 +53,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case TypeDeclarationSyntax typeDeclaration:
                     VisitTypeDeclaration(typeDeclaration, args);
                     break;
+                case FieldDeclarationSyntax fieldDeclaration:
+                    VisitFieldDeclaration(fieldDeclaration, args);
+                    break;
                 case null:
                     // Ignore
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(memberDeclaration);
             }
+        }
+
+        public virtual void VisitFieldDeclaration(FieldDeclarationSyntax fieldDeclaration, A args)
+        {
+            VisitExpression(fieldDeclaration.TypeExpression, args);
+            VisitExpression(fieldDeclaration.Initializer, args);
         }
 
         public virtual void VisitTypeDeclaration(TypeDeclarationSyntax typeDeclaration, A args)

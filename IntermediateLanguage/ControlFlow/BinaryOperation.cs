@@ -5,15 +5,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class BinaryOperation : Value
     {
-        public Operand LeftOperand { get; }
+        public IOperand LeftOperand { get; }
         public BinaryOperator Operator { get; }
-        public Operand RightOperand { get; }
+        public IOperand RightOperand { get; }
         public SimpleType Type { get; }
 
         public BinaryOperation(
-            Operand leftOperand,
+            IOperand leftOperand,
             BinaryOperator @operator,
-            Operand rightOperand,
+            IOperand rightOperand,
             SimpleType type)
             : base(TextSpan.Covering(leftOperand.Span, rightOperand.Span))
         {

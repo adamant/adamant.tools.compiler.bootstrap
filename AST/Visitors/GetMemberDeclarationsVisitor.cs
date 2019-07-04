@@ -24,6 +24,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             // No need to visit the children, no members there
         }
 
+        public override void VisitFieldDeclaration(FieldDeclarationSyntax fieldDeclaration, Void args)
+        {
+            // No need to visit the children, no members there
+        }
+
         public override void VisitExpression(ExpressionSyntax expression, Void args)
         {
             // We aren't supposed to be trying to go into expressions

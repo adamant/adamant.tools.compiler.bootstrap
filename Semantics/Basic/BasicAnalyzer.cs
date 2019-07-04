@@ -308,7 +308,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             var diagnosticCount = diagnostics.Count;
             // TODO the return types of constructors and init functions should probably be void for purposes of expressions
-            var resolver = new BasicExpressionAnalyzer(function.File, diagnostics, (Metatype)function.DeclaringType?.Type.Fulfilled(), function.ReturnType.Fulfilled());
+            var resolver = new BasicExpressionAnalyzer(function.File, diagnostics, function.SelfParameterType, function.ReturnType.Fulfilled());
             // The body of a function shouldn't itself evaluate to anything.
             // There should be no `=> value` for the block, so the type is `void`.
             resolver.CheckExpressionType(function.Body, DataType.Void);

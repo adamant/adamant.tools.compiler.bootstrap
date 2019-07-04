@@ -8,10 +8,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     public class ConstructorCall : Value
     {
         public readonly UserObjectType Type;
-        public FixedList<Operand> Arguments { get; }
+        public FixedList<IOperand> Arguments { get; }
         public int Arity => Arguments.Count + 1;
 
-        public ConstructorCall(UserObjectType type, FixedList<Operand> arguments, TextSpan span)
+        public ConstructorCall(UserObjectType type, FixedList<IOperand> arguments, TextSpan span)
             : base(span)
         {
             Requires.That(nameof(type), type.Lifetime == Lifetime.None, "type must not have a lifetime");

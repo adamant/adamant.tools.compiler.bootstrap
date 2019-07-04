@@ -4,10 +4,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class AssignmentStatement : ExpressionStatement
     {
-        public Place Place { get; }
-        public Value Value { get; }
+        public IPlace Place { get; }
+        public IValue Value { get; }
 
-        public AssignmentStatement(Place place, Value value, TextSpan span, Scope scope)
+        public AssignmentStatement(IPlace place, IValue value, TextSpan span, Scope scope)
             : base(span, scope)
         {
             Place = place;

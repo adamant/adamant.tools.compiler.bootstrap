@@ -47,13 +47,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
             currentState = checker.Assignment(assignmentExpression, currentState);
         }
 
-        private static void VisitLValueExpression(ExpressionSyntax expression, Void args)
+        private void VisitLValueExpression(ExpressionSyntax expression, Void args)
         {
             switch (expression)
             {
                 case IdentifierNameSyntax identifierName:
                 case null:
                     // Ignore
+                    break;
+                case MemberAccessExpressionSyntax memberAccessExpression:
+                    // The expression we are accessing the member off of is an rvalue
+                    VisitExpression(memberAccessExpression.Expression, args);
                     break;
                 // TODO we will need to visit other expression types that also contain rvalues
                 default:

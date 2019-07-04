@@ -8,14 +8,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     public class VirtualFunctionCall : Value
     {
         public readonly SimpleName FunctionName;
-        public readonly Operand Self;
-        public readonly FixedList<Operand> Arguments;
+        public readonly IOperand Self;
+        public readonly FixedList<IOperand> Arguments;
 
         public VirtualFunctionCall(
             TextSpan span,
             SimpleName functionName,
-            Operand self,
-            IEnumerable<Operand> arguments)
+            IOperand self,
+            IEnumerable<IOperand> arguments)
             : base(span)
         {
             FunctionName = functionName;
@@ -26,9 +26,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public VirtualFunctionCall(
             TextSpan span,
             SimpleName functionName,
-            Operand self,
-            params Operand[] arguments)
-            : this(span, functionName, self, arguments as IEnumerable<Operand>)
+            IOperand self,
+            params IOperand[] arguments)
+            : this(span, functionName, self, arguments as IEnumerable<IOperand>)
         {
         }
 

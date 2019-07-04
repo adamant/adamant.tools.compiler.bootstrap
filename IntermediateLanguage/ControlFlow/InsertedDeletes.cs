@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 
         public void AddDeleteAfter(
             Statement statement,
-            Place place,
+            IPlace place,
             UserObjectType type,
             TextSpan span,
             Scope scope)

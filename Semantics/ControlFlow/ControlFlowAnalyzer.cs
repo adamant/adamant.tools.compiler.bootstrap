@@ -9,6 +9,7 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 {
@@ -111,7 +112,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         /// Assign a value into a place while making sure to correctly handle
         /// value semantics.
         /// </summary>
-        private void AssignToPlace(Place place, Value value, TextSpan span)
+        private void AssignToPlace(IPlace place, Value value, TextSpan span)
         {
             if (value is VariableReference assignFrom
                 && assignFrom.ValueSemantics == ValueSemantics.Own
@@ -139,7 +140,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             currentBlock.AddAssignment(place, value, span, CurrentScope);
         }
 
-        private VariableReference AssignToTemp(DataType type, Value value)
+        private VariableReference AssignToTemp(DataType type, IValue value)
         {
             var tempVariable = graph.Let(type.AssertKnown(), CurrentScope);
             currentBlock.AddAssignment(
@@ -342,8 +343,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     return;
                 case AssignmentExpressionSyntax assignmentExpression:
                 {
-                    var place = ConvertToPlace(assignmentExpression.LeftOperand);
                     var value = ConvertToValue(assignmentExpression.RightOperand);
+                    var place = ConvertToPlace(assignmentExpression.LeftOperand);
+
                     if (assignmentExpression.Operator != AssignmentOperator.Direct)
                     {
                         var type = (SimpleType)assignmentExpression.RightOperand.Type;
@@ -366,8 +368,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                             default:
                                 throw NonExhaustiveMatchException.ForEnum(assignmentExpression.Operator);
                         }
-                        value = new BinaryOperation(place, binaryOperator, rightOperand, type);
+                        value = new BinaryOperation(ConvertToOperand(place, assignmentExpression.LeftOperand.Type), binaryOperator, rightOperand, type);
                     }
+
                     AssignToPlace(place, value, assignmentExpression.Span);
                     return;
                 }
@@ -450,7 +453,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     if (symbol is IAccessorSymbol accessor)
                         return new VirtualFunctionCall(memberAccess.Span, accessor.PropertyName.UnqualifiedName, value);
 
-                    return new FieldAccessValue(value,
+                    return new FieldAccess(value,
                         memberAccess.ReferencedSymbol.FullName, memberAccess.Span);
                 }
                 case MutableExpressionSyntax mutable:
@@ -479,6 +482,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                             throw NonExhaustiveMatchException.For(expression);
                     }
                 }
+                case SelfExpressionSyntax selfExpression:
+                    return graph.VariableFor(SpecialName.Self).Reference(selfExpression.Span);
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
@@ -496,15 +501,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
         }
 
-        private Operand ConvertToOperand(ExpressionSyntax expression)
+        private IOperand ConvertToOperand(ExpressionSyntax expression)
         {
             var value = ConvertToValue(expression);
             return ConvertToOperand(value, expression.Type);
         }
 
-        private Operand ConvertToOperand(Value value, DataType type)
+        private IOperand ConvertToOperand(IValue value, DataType type)
         {
-            if (value is Operand operand) return operand;
+            if (value is IOperand operand) return operand;
             return AssignToTemp(type, value);
             //var tempVariable = graph.Let(type.AssertKnown(), CurrentScope);
             //currentBlock.AddAssignment(tempVariable.LValueReference(value.Span), value, value.Span, CurrentScope);
@@ -600,13 +605,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
         }
 
-        private Place ConvertToPlace(ExpressionSyntax value)
+        private IPlace ConvertToPlace(ExpressionSyntax value)
         {
             switch (value)
             {
                 case IdentifierNameSyntax identifier:
                     // TODO what if this isn't just a variable?
                     return graph.VariableFor(identifier.ReferencedSymbol.FullName.UnqualifiedName).LValueReference(value.Span);
+                case MemberAccessExpressionSyntax memberAccessExpression:
+                    var expressionValue = ConvertToOperand(memberAccessExpression.Expression);
+                    return new FieldAccess(expressionValue, memberAccessExpression.Member.Name, memberAccessExpression.Span);
                 default:
                     throw NonExhaustiveMatchException.For(value);
             }

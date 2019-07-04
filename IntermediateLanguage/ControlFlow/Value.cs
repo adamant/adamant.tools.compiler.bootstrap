@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     /// of an assignment.
     /// </summary>
     [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
-    public abstract class Value
+    public abstract class Value : IValue
     {
         public TextSpan Span { get; }
 

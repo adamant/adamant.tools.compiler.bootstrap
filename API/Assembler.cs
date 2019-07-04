@@ -36,11 +36,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                     Disassemble(function, builder);
                     break;
                 case ConstructorDeclaration constructor:
-
                     Disassemble(constructor, builder);
                     break;
                 case TypeDeclaration type:
                     Disassemble(type, builder);
+                    break;
+                case FieldDeclaration field:
+                    Disassemble(field, builder);
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
@@ -81,7 +83,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         {
             var parameters = FormatParameters(constructor.Parameters);
             builder.BeginLine("fn ");
-            builder.Append(constructor.FullName.ToString());
+            builder.Append(constructor.Name.ToString());
             builder.Append("(");
             builder.Append(parameters);
             builder.Append(")");
@@ -192,6 +194,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             }
 
             return claims.Any();
+        }
+
+        public void Disassemble(FieldDeclaration field, AssemblyBuilder builder)
+        {
+            var binding = field.MutableBinding ? "var" : "let";
+            builder.AppendLine($"{binding} {field.Name}: {field.Type};");
         }
     }
 }

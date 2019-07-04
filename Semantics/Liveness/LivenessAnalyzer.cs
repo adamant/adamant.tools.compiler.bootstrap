@@ -105,7 +105,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
             return liveVariables;
         }
 
-        private static void KillVariables(BitArray variables, Place lvalue)
+        private static void KillVariables(BitArray variables, IPlace lvalue)
         {
             switch (lvalue)
             {
@@ -115,11 +115,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
                 case VariableReference variableReference:
                     variables[variableReference.Variable.Number] = false;
                     break;
+                case FieldAccess fieldAccess:
+                    EnlivenVariables(variables, fieldAccess.Expression);
+                    break;
                 default:
                     throw NonExhaustiveMatchException.For(lvalue);
             }
         }
-        private static void EnlivenVariables(BitArray variables, Value value)
+        private static void EnlivenVariables(BitArray variables, IValue value)
         {
             switch (value)
             {
@@ -134,7 +137,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
                     EnlivenVariables(variables, binaryOperation.LeftOperand);
                     EnlivenVariables(variables, binaryOperation.RightOperand);
                     break;
-                case Place place:
+                case IPlace place:
                     variables[place.CoreVariable().Number] = true;
                     break;
                 case FunctionCall functionCall:

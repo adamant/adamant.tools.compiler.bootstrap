@@ -10,15 +10,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     {
         public readonly Name FunctionName;
         public readonly FunctionType Type;
-        public readonly Operand Self;
-        public FixedList<Operand> Arguments { get; }
+        public readonly IOperand Self;
+        public FixedList<IOperand> Arguments { get; }
         public int Arity => Arguments.Count;
 
         public FunctionCall(
             Name functionName,
             FunctionType type,
-            Operand self,
-            IEnumerable<Operand> arguments,
+            IOperand self,
+            IEnumerable<IOperand> arguments,
             TextSpan span)
             : base(span)
         {
@@ -28,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             Arguments = arguments.ToFixedList();
         }
 
-        public FunctionCall(Name functionName, FunctionType type, IEnumerable<Operand> arguments, TextSpan span)
+        public FunctionCall(Name functionName, FunctionType type, IEnumerable<IOperand> arguments, TextSpan span)
             : this(functionName, type, null, arguments, span)
         {
         }
@@ -37,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             TextSpan span,
             Name functionName,
             FunctionType type,
-            params Operand[] arguments)
+            params IOperand[] arguments)
             : this(functionName, type, null, arguments, span)
         {
         }

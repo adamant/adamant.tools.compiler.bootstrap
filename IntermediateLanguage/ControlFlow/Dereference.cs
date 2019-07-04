@@ -2,17 +2,17 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
-    public class Dereference : Place
+    public class Dereference : Value, IPlace, IOperand
     {
-        public readonly Place DereferencedValue;
+        public readonly IPlace DereferencedValue;
 
-        public Dereference(Place dereferencedValue, TextSpan span)
+        public Dereference(IPlace dereferencedValue, TextSpan span)
             : base(span)
         {
             DereferencedValue = dereferencedValue;
         }
 
-        public override Variable CoreVariable()
+        public Variable CoreVariable()
         {
             return DereferencedValue.CoreVariable();
         }

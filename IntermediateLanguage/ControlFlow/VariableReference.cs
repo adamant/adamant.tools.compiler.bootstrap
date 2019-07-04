@@ -4,7 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
-    public class VariableReference : Place
+    public class VariableReference : Value, IPlace, IOperand
     {
         public readonly Variable Variable;
         public readonly ValueSemantics ValueSemantics;
@@ -48,7 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             return mutability + Variable;
         }
 
-        public override Variable CoreVariable()
+        public Variable CoreVariable()
         {
             return Variable;
         }

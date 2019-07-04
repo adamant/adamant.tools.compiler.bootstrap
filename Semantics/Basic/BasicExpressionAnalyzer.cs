@@ -329,8 +329,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     if (!IsAssignableFrom(left, right))
                         diagnostics.Add(TypeError.CannotConvert(file, assignmentExpression.RightOperand, right, left));
                     return assignmentExpression.Type = DataType.Void;
-                case SelfExpressionSyntax _:
-                    return selfType ?? DataType.Unknown;
+                case SelfExpressionSyntax selfExpression:
+                    return selfExpression.Type = selfType ?? DataType.Unknown;
                 case MoveExpressionSyntax moveExpression:
                 {
                     var type = InferMoveExpressionType(moveExpression.Expression);

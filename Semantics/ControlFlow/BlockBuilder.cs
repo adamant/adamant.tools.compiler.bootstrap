@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             statements.Add(statement.Clone());
         }
 
-        public void AddAssignment(Place place, Value value, TextSpan span, Scope scope)
+        public void AddAssignment(IPlace place, IValue value, TextSpan span, Scope scope)
         {
             statements.Add(new AssignmentStatement(place, value, span, scope));
         }
@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             statements.Add(new ActionStatement(value, span, scope));
         }
 
-        public void AddDelete(Place place, UserObjectType type, TextSpan span, Scope scope)
+        public void AddDelete(IPlace place, UserObjectType type, TextSpan span, Scope scope)
         {
             statements.Add(new DeleteStatement(place, type, span, scope));
         }
@@ -46,7 +46,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             statements.Add(new GotoStatement(exit.BlockName, span, scope));
         }
 
-        public void AddIf(Operand condition, BlockBuilder thenBlock, BlockBuilder elseBlock, TextSpan span, Scope scope)
+        public void AddIf(IOperand condition, BlockBuilder thenBlock, BlockBuilder elseBlock, TextSpan span, Scope scope)
         {
             statements.Add(new IfStatement(condition, thenBlock.BlockName, elseBlock.BlockName, span, scope));
         }
