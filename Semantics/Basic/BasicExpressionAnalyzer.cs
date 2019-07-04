@@ -456,6 +456,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             return invocation.Type = DataType.Unknown;
         }
 
+        /// <summary>
+        /// Eventually, a for each in expression will just be a regular expression. However, at the
+        /// moment, there isn't enough of the language to implement range expressions. So this
+        /// check handles range expressions in the specific case of `foreach` only. It marks them
+        /// as having the same type as the range endpoints.
+        /// </summary>
         private DataType CheckForeachInType(DataType declaredType, ExpressionSyntax inExpression)
         {
             switch (inExpression)

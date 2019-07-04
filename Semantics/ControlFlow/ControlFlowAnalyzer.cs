@@ -227,8 +227,49 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     // There is no exit from a return block, hence null for exit block
                     currentBlock = null;
                     return;
-                case ForeachExpressionSyntax _:
-                    throw new NotImplementedException("Control flow for `foreach` not implemented.");
+                case ForeachExpressionSyntax foreachExpression:
+                {
+                    // For now, we support only range syntax `foreach x: T in z..y` ranges
+                    // aren't yet supported by the rest of the language, so they must be directly
+                    // translated here. The for each loop is basically desugared into:
+                    // var x: T = z;
+                    // let temp = y;
+                    // loop
+                    // {
+                    //     <loop body>
+                    //     x += 1;
+                    //     if x > temp => break;
+                    // }
+                    if (!(foreachExpression.InExpression is BinaryExpressionSyntax inExpression)
+                        || inExpression.Operator != BinaryOperator.DotDot)
+                        throw new NotImplementedException("`foreach` in non-range expression not implemented");
+                    var startExpression = inExpression.LeftOperand;
+                    var endExpression = inExpression.RightOperand;
+
+                    var variableType = (SimpleType)foreachExpression.VariableType;
+                    var loopVariable = graph.AddVariable(foreachExpression.MutableBinding,
+                                                         variableType, CurrentScope,
+                                                         foreachExpression.VariableName);
+                    var loopVariableLValue = loopVariable.LValueReference(foreachExpression.Span);
+                    var loopVariableReference = loopVariable.Reference(foreachExpression.Span);
+
+                    var startValue = ConvertToValue(startExpression);
+                    AssignToPlace(loopVariableLValue, startValue, startExpression.Span);
+                    var endValue = ConvertToOperand(endExpression);
+                    var loopEntry = graph.NewEntryBlock(currentBlock,
+                                                        foreachExpression.Block.Span.AtStart(),
+                                                        CurrentScope);
+                    currentBlock = loopEntry;
+                    var loopExit = breakToBlock = graph.NewBlock();
+                    ConvertExpressionToStatement(foreachExpression.Block);
+                    var one = new IntegerConstant(1, variableType, foreachExpression.Span);
+                    var addOneValue = new BinaryOperation(loopVariableReference, BinaryOperator.Plus, one, variableType);
+                    AssignToPlace(loopVariableLValue, addOneValue, startExpression.Span);
+                    var breakCondition = new BinaryOperation(loopVariableReference, BinaryOperator.GreaterThan, endValue, variableType);
+                    currentBlock.AddIf(ConvertToOperand(breakCondition, DataType.Bool), breakToBlock, loopEntry, foreachExpression.Span, CurrentScope);
+                    currentBlock = loopExit;
+                    return;
+                }
                 case WhileExpressionSyntax _:
                     throw new NotImplementedException("Control flow for `while` not implemented.");
                 case LoopExpressionSyntax loopExpression:
@@ -239,9 +280,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     currentBlock = loopEntry;
                     breakToBlock = graph.NewBlock();
                     ConvertExpressionToStatement(loopExpression.Block);
+                    // If it always breaks, there isn't a current block
                     currentBlock?.AddGoto(loopEntry,
-                        loopExpression.Block.Span.AtEnd(),
-                        CurrentScope);
+                                        loopExpression.Block.Span.AtEnd(),
+                                        CurrentScope);
                     currentBlock = breakToBlock;
                     return;
                 }
@@ -360,6 +402,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     {
                         case VariableDeclarationStatementSyntax _:
                         case ParameterSyntax _:
+                        case ForeachExpressionSyntax _:
                             return graph.VariableFor(symbol.FullName.UnqualifiedName).Reference(identifier.Span);
                         default:
                             return new DeclaredValue(symbol.FullName, identifier.Span);
