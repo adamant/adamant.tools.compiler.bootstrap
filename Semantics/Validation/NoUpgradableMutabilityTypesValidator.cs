@@ -54,6 +54,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                 case SimpleType _:
                     // No problems
                     break;
+                case UnknownType _:
+                    // Can't validate since we don't know the type
+                    break;
                 default:
                     throw NonExhaustiveMatchException.For(type);
             }

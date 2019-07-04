@@ -228,8 +228,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     currentBlock = null;
                     return;
                 case ForeachExpressionSyntax _:
+                    throw new NotImplementedException("Control flow for `foreach` not implemented.");
                 case WhileExpressionSyntax _:
-                    throw new NotImplementedException();
+                    throw new NotImplementedException("Control flow for `while` not implemented.");
                 case LoopExpressionSyntax loopExpression:
                 {
                     var loopEntry = graph.NewEntryBlock(currentBlock,

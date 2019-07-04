@@ -30,5 +30,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         {
             identifierName.ContainingScope = containingScope;
         }
+
+        public override void VisitForeachExpression(ForeachExpressionSyntax foreachExpression, LexicalScope containingScope)
+        {
+            VisitExpression(foreachExpression.TypeExpression, containingScope);
+            VisitExpression(foreachExpression.InExpression, containingScope);
+            containingScope = new NestedScope(containingScope, foreachExpression.Yield(), Enumerable.Empty<ISymbol>());
+            VisitExpression(foreachExpression.Block, containingScope);
+        }
     }
 }

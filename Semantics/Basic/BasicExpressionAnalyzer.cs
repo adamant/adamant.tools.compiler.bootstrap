@@ -245,9 +245,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return placementInitExpression.Type = typeAnalyzer.Check(placementInitExpression.Initializer);
                 case ForeachExpressionSyntax foreachExpression:
                 {
-                    foreachExpression.Type = typeAnalyzer.Check(foreachExpression.TypeExpression);
-                    InferExpressionType(foreachExpression.InExpression);
-
+                    var declaredType = typeAnalyzer.Check(foreachExpression.TypeExpression);
+                    CheckForeachInType(declaredType, foreachExpression.InExpression);
+                    foreachExpression.VariableType = declaredType ?? foreachExpression.InExpression.Type;
                     // TODO check the break types
                     InferExpressionType(foreachExpression.Block);
                     // TODO assign correct type to the expression
@@ -454,6 +454,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             diagnostics.Add(TypeError.MustBeCallable(file, invocation.Callee));
             return invocation.Type = DataType.Unknown;
+        }
+
+        private DataType CheckForeachInType(DataType declaredType, ExpressionSyntax inExpression)
+        {
+            switch (inExpression)
+            {
+                case BinaryExpressionSyntax binaryExpression when binaryExpression.Operator == BinaryOperator.DotDot:
+                    InferExpressionType(binaryExpression.LeftOperand);
+                    InferExpressionType(binaryExpression.RightOperand);
+                    if (declaredType != null)
+                    {
+                        InsertImplicitConversionIfNeeded(ref binaryExpression.LeftOperand, declaredType);
+                        InsertImplicitConversionIfNeeded(ref binaryExpression.RightOperand, declaredType);
+                    }
+                    return inExpression.Type = binaryExpression.LeftOperand.Type;
+                default:
+                    return InferExpressionType(inExpression);
+            }
         }
 
         private void CheckArgumentTypeCompatibility(DataType type, ArgumentSyntax arg)

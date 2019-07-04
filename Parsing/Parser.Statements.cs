@@ -47,7 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private StatementSyntax ParseRestOfVariableDeclaration(bool mutableBinding)
         {
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
-            var name = this.nameContext.Qualify(variableNumbers.VariableName(identifier.Value));
+            var name = nameContext.Qualify(variableNumbers.VariableName(identifier.Value));
             ExpressionSyntax type = null;
             if (Tokens.Accept<IColonToken>())
                 // Need to not consume the assignment that separates the type from the initializer,
