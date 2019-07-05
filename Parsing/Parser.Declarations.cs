@@ -115,9 +115,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     return ParseGetter(attributes, modifiers);
                 case ISetKeywordToken _:
                     return ParseSetter(attributes, modifiers);
-                case IVarKeywordToken _:
                 case ILetKeywordToken _:
-                    return ParseField(attributes, modifiers);
+                    return ParseField(false, attributes, modifiers);
+                case IVarKeywordToken _:
+                    return ParseField(true, attributes, modifiers);
                 case IConstKeywordToken _:
                     return ParseConst(attributes, modifiers);
                 default:
@@ -350,11 +351,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         #region Parse Type Member Declarations
         private FieldDeclarationSyntax ParseField(
+            bool mutableBinding,
             FixedList<AttributeSyntax> attributes,
             FixedList<IModiferToken> modifiers)
         {
-            // TODO include these in the syntax tree
-            var binding = Tokens.Expect<IBindingToken>();
+            // We should only be called when there is a binding keyword
+            Tokens.Expect<IBindingToken>();
             var getterAccess = AcceptFieldGetter();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(identifier.Value);
@@ -370,7 +372,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 initializer = ParseExpression();
 
             Tokens.Expect<ISemicolonToken>();
-            return new FieldDeclarationSyntax(File, attributes, modifiers, getterAccess, name,
+            return new FieldDeclarationSyntax(File, attributes, modifiers, mutableBinding, getterAccess, name,
                 identifier.Span, typeExpression, initializer);
         }
 

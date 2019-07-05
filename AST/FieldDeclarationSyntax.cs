@@ -9,6 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         public FixedList<AttributeSyntax> Attributes { get; }
         public FixedList<IModiferToken> Modifiers { get; }
+        public bool IsMutableBinding { get; }
         public AccessModifier? GetterAccess { get; }
         public ExpressionSyntax TypeExpression { get; }
         public ExpressionSyntax Initializer { get; }
@@ -17,6 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             CodeFile file,
             FixedList<AttributeSyntax> attributes,
             FixedList<IModiferToken> modifiers,
+            bool mutableBinding,
             AccessModifier? getterAccess,
             Name fullName,
             TextSpan nameSpan,
@@ -26,6 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         {
             Attributes = attributes;
             Modifiers = modifiers;
+            IsMutableBinding = mutableBinding;
             GetterAccess = getterAccess;
             TypeExpression = typeExpression;
             Initializer = initializer;

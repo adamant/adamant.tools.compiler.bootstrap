@@ -56,8 +56,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                         constructorDeclaration.ControlFlow);
                     break;
                 case FieldDeclarationSyntax fieldDeclaration:
-                    // TODO determine proper value of mutable binding
-                    declaration = new FieldDeclaration(false, fieldDeclaration.FullName, fieldDeclaration.Type.Known());
+                    declaration = new FieldDeclaration(fieldDeclaration.IsMutableBinding, fieldDeclaration.FullName, fieldDeclaration.Type.Known());
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(memberDeclarations);
