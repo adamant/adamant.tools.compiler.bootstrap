@@ -42,6 +42,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 case TypeDeclaration type:
                     EmitType(type, code);
                     break;
+                case FieldDeclaration _:
+                    // fields are emitted as part of the type
+                    break;
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
             }
@@ -115,6 +118,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             var structs = code.StructDeclarations;
             structs.AppendLine($"struct {selfType}");
             structs.BeginBlock();
+            foreach (var field in type.Members.OfType<FieldDeclaration>())
+            {
+                var fieldType = typeConverter.Convert(field.Type.AssertKnown());
+                var fieldName = nameMangler.Mangle(field.Name);
+                structs.AppendLine($"{fieldType} {fieldName};");
+            }
             structs.EndBlockWithSemicolon();
             structs.AppendLine($"struct {vtableType}");
             structs.BeginBlock();

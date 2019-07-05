@@ -45,6 +45,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
             return removed;
         }
 
+        public Claim ClaimBy(Variable variable)
+        {
+            return claimsList.SingleOrDefault(c => c.Holder.Equals(variable));
+        }
+
         public Owns OwnedBy(Variable variable)
         {
             return claimsList.OfType<Owns>().SingleOrDefault(o => o.Holder == variable);

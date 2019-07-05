@@ -1,7 +1,8 @@
 #include <stdint.h>
 
-// Rather than including all of stdlib.h we only declare the one thing we need.
+// Rather than including all of stdlib.h we only declare the things we need.
 void* malloc(size_t size);
+void free(void* ptr);
 
 #define _UNUSED(x) (void)(x)
 

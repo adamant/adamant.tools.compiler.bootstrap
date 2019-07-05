@@ -324,8 +324,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                 }
                 break;
                 case FieldAccess fieldAccess:
-                    AcquireClaim(assignToPlace?.CoreVariable(), fieldAccess.Expression, claimsAfterStatement);
-                    break;
+                {
+                    var instanceVariable = fieldAccess.CoreVariable();
+                    var instanceLifetime = claimsBeforeStatement.ClaimBy(instanceVariable).Lifetime;
+                    var fieldLifetime = NewLifetime();
+                    var outstandingClaims = new Claims();
+                    outstandingClaims.AddRange(claimsBeforeStatement);
+                    // TODO this should be based on the field type
+                    AcquireAlias(instanceLifetime, fieldLifetime, outstandingClaims);
+                    // TODO this should be based on the access mode
+                    AcquireAlias(assignToPlace?.CoreVariable(), fieldLifetime, outstandingClaims);
+                    claimsAfterStatement.AddRange(outstandingClaims);
+                }
+                break;
                 default:
                     throw NonExhaustiveMatchException.For(value);
             }
@@ -376,6 +387,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             switch (operand)
             {
                 case VariableReference varRef:
+                {
                     var lifetimeReferenced = outstandingClaims.LifetimeOf(varRef.Variable);
                     if (lifetimeReferenced == null)
                         break; // TODO this actually happens with things that should be copy etc. Handle correctly
@@ -394,8 +406,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                         break;
                         case ValueSemantics.Alias:
                         {
-                            if (!outstandingClaims.IsAliased(lifetime) &&
-                                !outstandingClaims.CurrentBorrower(lifetime).Equals(varRef.Variable))
+                            if (!outstandingClaims.IsAliased(lifetime)
+                                && !outstandingClaims.CurrentBorrower(lifetime).Equals(varRef.Variable))
                                 ReportDiagnostic(BorrowError.CantAliasWhileBorrowed(file, operand.Span));
                             else
                                 outstandingClaims.Add(new Aliases(claimHolder, lifetime));
@@ -429,7 +441,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                         default:
                             throw NonExhaustiveMatchException.ForEnum(varRef.ValueSemantics);
                     }
-                    break;
+                }
+                break;
                 case IPlace _:
                     throw new NotImplementedException();
                 case Constant _:

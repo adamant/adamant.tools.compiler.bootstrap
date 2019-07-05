@@ -101,6 +101,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             {
                 case VariableReference reference:
                     return "_" + reference.Variable.Name;
+                case FieldAccess fieldAccess:
+                    var fieldName = nameMangler.Mangle(fieldAccess.Field.UnqualifiedName);
+                    return $"{ConvertValue(fieldAccess.Expression)}._self->{fieldName}";
                 default:
                     throw NonExhaustiveMatchException.For(place);
             }
@@ -133,7 +136,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 case DeclaredValue declaredValue:
                     return nameMangler.Mangle(declaredValue.Name);
                 case FieldAccess fieldAccess:
-                    return $"{ConvertValue(fieldAccess.Expression)}.{nameMangler.Mangle(fieldAccess.Field.UnqualifiedName)}";
+                    var fieldName = nameMangler.Mangle(fieldAccess.Field.UnqualifiedName);
+                    return $"{ConvertValue(fieldAccess.Expression)}._self->{fieldName}";
                 case IPlace place:
                     return ConvertPlace(place);
                 case VirtualFunctionCall virtualCall:
