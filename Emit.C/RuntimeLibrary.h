@@ -1,4 +1,4 @@
-#include <stdint.h>
+﻿#include <stdint.h>
 
 // Rather than including all of stdlib.h we only declare the things we need.
 void* malloc(size_t size);
