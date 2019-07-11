@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
@@ -15,6 +16,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
             name = name.Substring(0, index);
             var genericArguments = string.Join(',', type.GetGenericArguments().Select(GetFriendlyName));
             return $"{name}<{genericArguments}>";
+        }
+
+        public static IEnumerable<Type> GetAllSubtypes(this Type type)
+        {
+            return AppDomain.CurrentDomain.GetAssemblies()
+                    .SelectMany(a => a.GetTypes())
+                    .Where(t => type.IsAssignableFrom(t) && t != type)
+                    .ToArray();
+        }
+
+        public static bool HasAttribute<TAttribute>(this Type type)
+        {
+            return type.GetCustomAttributes(true).OfType<TAttribute>().Any();
         }
     }
 }
