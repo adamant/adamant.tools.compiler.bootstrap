@@ -101,7 +101,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     case IColonToken _: // type kind
                         if (minPrecedence <= OperatorPrecedence.Relational)
                         {
-                            var colon = Tokens.Expect<IColonToken>();
+                            var colon = Tokens.RequiredToken<IColonToken>();
                             TypeKind typeKind;
                             switch (Tokens.Current)
                             {
@@ -117,7 +117,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                                     continue;
                             }
                             var typeKindSpan = Tokens.Expect<ITypeKindKeywordToken>();
-                            var span = TextSpan.Covering(colon, typeKindSpan);
+                            var span = TextSpan.Covering(colon.Span, typeKindSpan);
                             expression = new TypeKindExpressionSyntax(span, typeKind);
                             continue;
                         }
@@ -151,7 +151,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     case IDollarToken _:
                         if (minPrecedence <= OperatorPrecedence.Lifetime)
                         {
-                            Tokens.Expect<IDollarToken>();
+                            Tokens.RequiredToken<IDollarToken>();
                             var (nameSpan, lifetime) = ParseLifetimeName();
                             expression = new ReferenceLifetimeSyntax(expression, nameSpan, lifetime);
                             continue;
@@ -170,7 +170,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         if (minPrecedence <= OperatorPrecedence.Primary)
                         {
                             var callee = expression;
-                            Tokens.Expect<IOpenParenToken>();
+                            Tokens.RequiredToken<IOpenParenToken>();
                             var arguments = ParseArguments();
                             var closeParenSpan = Tokens.Expect<ICloseParenToken>();
                             var span = TextSpan.Covering(callee.Span, closeParenSpan);
@@ -377,7 +377,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 }
                 case INoneKeywordToken _:
                 {
-                    var literal = Tokens.Required<IUninitializedKeywordToken>();
+                    var literal = Tokens.Required<INoneKeywordToken>();
                     return new NoneLiteralExpressionSyntax(literal);
                 }
                 case IPrimitiveTypeToken _:
