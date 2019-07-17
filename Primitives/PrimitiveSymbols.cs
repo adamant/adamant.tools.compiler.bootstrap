@@ -71,9 +71,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 
         private static ISymbol BuildBoolSymbol()
         {
-            var typeName = DataType.Bool.Name;
-            var symbols = new List<ISymbol> { };
-            return Symbol.NewSimpleType(DataType.Bool, symbols);
+            return Symbol.NewSimpleType(DataType.Bool);
         }
 
         private static ISymbol BuildIntegerTypeSymbol(

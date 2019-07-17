@@ -9,7 +9,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 {
     /// <summary>
-    /// Type expressions are importantly different from regular expressions. In
+    /// Type expressions are importantly different from standard expressions. In
     /// a standard expression, the type of the expression is what is being inferred.
     /// For type expressions, what is being done is figuring out what type the
     /// expression is naming. This is because the type of a type expression is

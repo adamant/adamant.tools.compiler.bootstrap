@@ -7,11 +7,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
     internal class DispatchTable
     {
-        private readonly Dictionary<Type, MethodInfo> methods;
+        private readonly MethodInfo operation;
+        private readonly Dictionary<Type, VisitMethod> methods;
+        private readonly MethodInfo nullMethod;
 
-        private DispatchTable(Dictionary<Type, MethodInfo> methods)
+        private DispatchTable(
+            MethodInfo operation,
+            Dictionary<Type, VisitMethod> methods,
+            MethodInfo nullMethod)
         {
+            this.operation = operation;
             this.methods = methods;
+            this.nullMethod = nullMethod;
         }
 
         public static DispatchTable Build(MethodInfo operation)
@@ -20,68 +27,58 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
             var visitMethodName = operation.Name + "For";
             var parameters = operation.GetParameters();
             var dispatchOnType = parameters[0].ParameterType;
-
-            var allConcreteSubclasses = dispatchOnType.GetAllSubtypes()
-                                        .Where(t => !t.IsAbstract)
-                                        .Where(t => !t.HasAttribute<VisitorNotSupportedAttribute>()).ToList();
-
             const BindingFlags bindingFlags = BindingFlags.DeclaredOnly
                                               | BindingFlags.NonPublic | BindingFlags.Public
                                               | BindingFlags.Instance | BindingFlags.Static;
+
+            // Visit Null Method
+            var visitNullMethodName = visitMethodName + "Null";
+            var visitNullMethodInfo = visitorType.GetMethod(visitNullMethodName, bindingFlags);
+
+
+            var allConcreteSubclasses = dispatchOnType.GetAllSubtypes()
+                                        .Where(t => !t.IsAbstract)
+                                        .Where(t => !t.HasCustomAttribute<VisitorNotSupportedAttribute>()).ToList();
+
             var allVisitMethods = visitorType
                 .GetMethods(bindingFlags)
-                .Where(m => m.Name == visitMethodName).ToHashSet();
+                .Where(m => m.Name == visitMethodName)
+                .Select(m => new VisitMethod(m)).ToHashSet();
 
             // TODO check all visit methods take and return compatible types (same?)
 
-            var methods = new Dictionary<Type, MethodInfo>();
+            var methods = new Dictionary<Type, VisitMethod>();
             foreach (var subclass in allConcreteSubclasses)
             {
-                var matchingMethods = allVisitMethods.Where(m =>
-                    m.GetParameters()[0].ParameterType.IsAssignableFrom(subclass))
-                    .ToList();
+                var matchingMethods = allVisitMethods.Where(m => m.Visits(subclass)).ToList();
                 if (!matchingMethods.Any())
                     throw new Exception($"No `{visitorType.Name}.{visitMethodName}` method can handle instances of type `{subclass.Name}` (dispatching on subtype of `{dispatchOnType.Name}`");
 
-                var bestMethod = matchingMethods.Aggregate(MoreSpecificMethod);
+                var bestMethod = matchingMethods.Aggregate((m1, m2) => m1.MostSpecific(m2));
                 methods.Add(subclass, bestMethod);
             }
 
-            var usedMethods = new HashSet<MethodInfo>(methods.Values);
+            var usedMethods = new HashSet<VisitMethod>(methods.Values);
             if (allVisitMethods.IsProperSupersetOf(usedMethods))
                 throw new Exception("Some visit methods will never be called");
 
-            return new DispatchTable(methods);
-        }
-
-        public static MethodInfo MoreSpecificMethod(MethodInfo m1, MethodInfo m2)
-        {
-            var p1 = m1.GetParameters()[0].ParameterType;
-            var p2 = m2.GetParameters()[0].ParameterType;
-
-
-            var m1MoreSpecific = p2.IsAssignableFrom(p1);
-            var m2MoreSpecific = p1.IsAssignableFrom(p2);
-
-            if (m1MoreSpecific && m2MoreSpecific)
-                throw new Exception("Neither method is more specific than the other");
-
-            return m1MoreSpecific ? m1 : m2;
+            return new DispatchTable(operation, methods, visitNullMethodInfo);
         }
 
         public object Dispatch(object target, object[] arguments)
         {
             if (arguments[0] == null)
             {
-                if (methods.TryGetValue(null, out var nullMethod))
-                {
-                    return nullMethod.Invoke(target, arguments);
-                }
-                // TODO throw exception about not having a null or default case
+                if (nullMethod != null) return nullMethod.Invoke(target, arguments.Skip(1).ToArray());
+
+                var visitorType = operation.DeclaringType;
+                var methodName = operation.Name + "ForNull";
+                throw new Exception(
+                    $"Can't visit `null` because there is no `{visitorType.Name}.{methodName}` method.");
             }
 
             if (methods.TryGetValue(arguments[0].GetType(), out var method))
-                return method.Invoke(target, arguments);
+                return method.Info.Invoke(target, arguments);
 
             throw new NotImplementedException();
         }

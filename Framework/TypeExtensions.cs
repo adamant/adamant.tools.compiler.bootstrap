@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
                     .ToArray();
         }
 
-        public static bool HasAttribute<TAttribute>(this Type type)
+        public static bool HasCustomAttribute<TAttribute>(this Type type)
         {
             return type.GetCustomAttributes(true).OfType<TAttribute>().Any();
         }

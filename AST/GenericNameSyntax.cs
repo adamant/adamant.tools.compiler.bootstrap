@@ -4,6 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
+    [VisitorNotSupported("Only implemented in parser")]
     public class GenericNameSyntax : NameSyntax
     {
         public FixedList<ArgumentSyntax> Arguments { get; }

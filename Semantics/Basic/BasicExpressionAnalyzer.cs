@@ -194,154 +194,247 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private DataType InferExpressionType(ExpressionSyntax expression)
         {
+            return expression.Accept(InferExpressionType);
+        }
+
+        private DataType InferExpressionTypeForNull()
+        {
+            return DataType.Unknown;
+        }
+
+        private DataType InferExpressionTypeFor(ReturnExpressionSyntax returnExpression)
+        {
+            if (returnExpression.ReturnValue != null)
+            {
+                if (returnType == null)
+                    throw new NotImplementedException("Null return type. Report an error?");
+
+                // If we return ownership, there is an implicit move
+                if (returnType is UserObjectType objectType && objectType.IsOwned)
+                    InferMoveExpressionType(returnExpression.ReturnValue);
+                else
+                    InferExpressionType(returnExpression.ReturnValue);
+                InsertImplicitConversionIfNeeded(ref returnExpression.ReturnValue, returnType);
+                var type = returnExpression.ReturnValue.Type;
+                if (!IsAssignableFrom(returnType, type))
+                    diagnostics.Add(TypeError.CannotConvert(file,
+                        returnExpression.ReturnValue, type, returnType));
+            }
+            else if (returnType == DataType.Never)
+                diagnostics.Add(TypeError.CantReturnFromNeverFunction(file, returnExpression.Span));
+            else if (returnType != DataType.Void)
+                diagnostics.Add(TypeError.ReturnExpressionMustHaveValue(file, returnExpression.Span, returnType));
+
+            return returnExpression.Type = DataType.Never;
+        }
+
+        private DataType InferExpressionTypeFor(IntegerLiteralExpressionSyntax integerLiteral)
+        {
+            return integerLiteral.Type = new IntegerConstantType(integerLiteral.Value);
+        }
+
+        private DataType InferExpressionTypeFor(StringLiteralExpressionSyntax stringLiteral)
+        {
+            return stringLiteral.Type = DataType.StringConstant;
+        }
+
+        private DataType InferExpressionTypeFor(BoolLiteralExpressionSyntax boolLiteral)
+        {
+            return boolLiteral.Type = DataType.Bool;
+        }
+
+        private DataType InferExpressionTypeFor(BinaryExpressionSyntax binaryOperatorExpression)
+        {
+            return InferBinaryExpressionType(binaryOperatorExpression);
+        }
+
+        private DataType InferExpressionTypeFor(IdentifierNameSyntax identifierName)
+        {
+            return InferIdentifierNameType(identifierName, false);
+        }
+
+        private DataType InferExpressionTypeFor(UnaryExpressionSyntax unaryOperatorExpression)
+        {
+            return InferUnaryExpressionType(unaryOperatorExpression); ;
+        }
+
+        private DataType InferExpressionTypeFor(BlockSyntax blockExpression)
+        {
+            foreach (var statement in blockExpression.Statements)
+                ResolveTypesInStatement(statement);
+
+            return blockExpression.Type = DataType.Void;// TODO assign the correct type to the block
+        }
+
+        private DataType InferExpressionTypeFor(NewObjectExpressionSyntax newObjectExpression)
+        {
+            return InferConstructorCallType(newObjectExpression);
+        }
+
+        private DataType InferExpressionTypeFor(PlacementInitExpressionSyntax placementInitExpression)
+        {
+            foreach (var argument in placementInitExpression.Arguments)
+                InferArgumentType(argument);
+
+            // TODO verify argument types against called function
+
+            return placementInitExpression.Type = typeAnalyzer.Check(placementInitExpression.Initializer);
+        }
+
+        private DataType InferExpressionTypeFor(ForeachExpressionSyntax foreachExpression)
+        {
+            var declaredType = typeAnalyzer.Check(foreachExpression.TypeExpression);
+            CheckForeachInType(declaredType, foreachExpression.InExpression);
+            foreachExpression.VariableType = declaredType ?? foreachExpression.InExpression.Type;
+            // TODO check the break types
+            InferExpressionType(foreachExpression.Block);
+            // TODO assign correct type to the expression
+            return foreachExpression.Type = DataType.Void;
+        }
+
+        private DataType InferExpressionTypeFor(WhileExpressionSyntax whileExpression)
+        {
+            CheckExpressionType(whileExpression.Condition, DataType.Bool);
+            InferExpressionType(whileExpression.Block);
+            // TODO assign correct type to the expression
+            return whileExpression.Type = DataType.Void;
+        }
+
+        private DataType InferExpressionTypeFor(LoopExpressionSyntax loopExpression)
+        {
+            InferExpressionType(loopExpression.Block);
+            // TODO assign correct type to the expression
+            return loopExpression.Type = DataType.Void;
+        }
+
+        private DataType InferExpressionTypeFor(InvocationSyntax invocation)
+        {
+            return InferInvocationType(invocation);
+        }
+
+        private DataType InferExpressionTypeFor(UnsafeExpressionSyntax unsafeExpression)
+        {
+            InferExpressionType(unsafeExpression.Expression);
+            return unsafeExpression.Type = unsafeExpression.Expression.Type;
+        }
+
+        private DataType InferExpressionTypeFor(MutableExpressionSyntax mutableExpression)
+        {
+            var expressionType = InferExpressionType(mutableExpression.Expression);
+            DataType type;
+            switch (expressionType)
+            {
+                case Metatype metatype:
+                {
+                    type = DataType.Type; // It names/describes a type
+                    if (!(metatype.Instance is UserObjectType objectType && objectType.DeclaredMutable))
+                        diagnostics.Add(TypeError.TypeDeclaredImmutable(file, mutableExpression.Expression));
+                    break;
+                }
+                case TypeType _:
+                    // TODO we need to check whether it is valid to use `mut` on this
+                    type = DataType.Type; // It names/describes a type
+                    break;
+                default:
+                    switch (expressionType)
+                    {
+                        // If it is already mutable we can't redeclare it mutable (i.e. `mut mut x` is error)
+                        case UserObjectType objectType
+                            when objectType.Mutability.IsUpgradable:
+                            type = objectType.AsMutable();
+                            break;
+                        default:
+                            diagnostics.Add(TypeError.ExpressionCantBeMutable(file,
+                                mutableExpression.Expression));
+                            type = expressionType;
+                            break;
+                    }
+                    break;
+            }
+
+            return mutableExpression.Type = type;
+        }
+
+        private DataType InferExpressionTypeFor(IfExpressionSyntax ifExpression)
+        {
+            CheckExpressionType(ifExpression.Condition, DataType.Bool);
+            InferExpressionType(ifExpression.ThenBlock);
+            InferExpressionType(ifExpression.ElseClause);
+            // TODO assign a type to the expression
+            return ifExpression.Type = DataType.Void;
+        }
+
+        private DataType InferExpressionTypeFor(ResultExpressionSyntax resultExpression)
+        {
+            InferExpressionType(resultExpression.Expression);
+            return resultExpression.Type = DataType.Never;
+        }
+
+        private DataType InferExpressionTypeFor(MemberAccessExpressionSyntax memberAccess)
+        {
+            return InferMemberAccessType(memberAccess);
+        }
+
+        private DataType InferExpressionTypeFor(BreakExpressionSyntax breakExpression)
+        {
+            InferExpressionType(breakExpression.Value);
+            return breakExpression.Type = DataType.Never;
+        }
+
+        private DataType InferExpressionTypeFor(AssignmentExpressionSyntax assignmentExpression)
+        {
+            var left = InferExpressionType(assignmentExpression.LeftOperand);
+            InferExpressionType(assignmentExpression.RightOperand);
+            InsertImplicitConversionIfNeeded(ref assignmentExpression.RightOperand, left);
+            var right = assignmentExpression.RightOperand.Type;
+            if (!IsAssignableFrom(left, right))
+                diagnostics.Add(TypeError.CannotConvert(file, assignmentExpression.RightOperand, right, left));
+            return assignmentExpression.Type = DataType.Void;
+        }
+
+        private DataType InferExpressionTypeFor(SelfExpressionSyntax selfExpression)
+        {
+            return selfExpression.Type = selfType ?? DataType.Unknown;
+        }
+
+        private DataType InferExpressionTypeFor(MoveExpressionSyntax moveExpression)
+        {
+            var type = InferMoveExpressionType(moveExpression.Expression);
+            if (type is ReferenceType referenceType && !referenceType.IsOwned)
+            {
+                diagnostics.Add(TypeError.CannotMoveBorrowedValue(file, moveExpression));
+                type = referenceType.WithLifetime(Lifetime.Owned);
+            }
+            if (type is UserObjectType objectType) type = objectType.AsOwnedUpgradable();
+            return moveExpression.Type = type;
+        }
+
+        private DataType InferExpressionTypeFor(NoneLiteralExpressionSyntax noneLiteralExpression)
+        {
+            throw new NotImplementedException();
+            //return noneLiteralExpression.Type = DataType.None;
+        }
+
+        private DataType InferExpressionTypeFor(ImplicitConversionExpression _)
+        {
+            throw new Exception("ImplicitConversionExpressions are inserted by BasicExpressionAnalyzer. They should not be present in the AST yet.");
+        }
+
+        [Visit(typeof(LifetimeExpressionSyntax))]
+        [Visit(typeof(ReferenceLifetimeSyntax))]
+        [Visit(typeof(RefTypeSyntax))]
+        [Visit(typeof(SelfTypeExpressionSyntax))]
+        private DataType InferExpressionTypeFor(ExpressionSyntax _)
+        {
+            throw new Exception("Should be inferring type of type expression");
+        }
+
+        private DataType InferExpressionTypeOld(ExpressionSyntax expression)
+        {
             if (expression == null) return DataType.Unknown;
 
             switch (expression)
             {
-                case ReturnExpressionSyntax returnExpression:
-                    if (returnExpression.ReturnValue != null)
-                    {
-                        if (returnType == null)
-                            throw new NotImplementedException("Null return type. Report an error?");
-
-                        // If we return ownership, there is an implicit move
-                        if (returnType is UserObjectType objectType && objectType.IsOwned)
-                            InferMoveExpressionType(returnExpression.ReturnValue);
-                        else
-                            InferExpressionType(returnExpression.ReturnValue);
-                        InsertImplicitConversionIfNeeded(ref returnExpression.ReturnValue, returnType);
-                        var type = returnExpression.ReturnValue.Type;
-                        if (!IsAssignableFrom(returnType, type))
-                            diagnostics.Add(TypeError.CannotConvert(file,
-                                returnExpression.ReturnValue, type, returnType));
-                    }
-                    else if (returnType == DataType.Never)
-                        diagnostics.Add(TypeError.CantReturnFromNeverFunction(file, returnExpression.Span));
-                    else if (returnType != DataType.Void)
-                        diagnostics.Add(TypeError.ReturnExpressionMustHaveValue(file, returnExpression.Span, returnType));
-
-                    return expression.Type = DataType.Never;
-                case IntegerLiteralExpressionSyntax integerLiteral:
-                    return expression.Type = new IntegerConstantType(integerLiteral.Value);
-                case StringLiteralExpressionSyntax _:
-                    return expression.Type = DataType.StringConstant;
-                case BoolLiteralExpressionSyntax _:
-                    return expression.Type = DataType.Bool;
-                case BinaryExpressionSyntax binaryOperatorExpression:
-                    return InferBinaryExpressionType(binaryOperatorExpression);
-                case IdentifierNameSyntax identifierName:
-                    return InferIdentifierNameType(identifierName, false);
-                case UnaryExpressionSyntax unaryOperatorExpression:
-                    return InferUnaryExpressionType(unaryOperatorExpression);
-                case BlockSyntax blockExpression:
-                    foreach (var statement in blockExpression.Statements)
-                        ResolveTypesInStatement(statement);
-
-                    return expression.Type = DataType.Void;// TODO assign the correct type to the block
-                case NewObjectExpressionSyntax newObjectExpression:
-                    return InferConstructorCallType(newObjectExpression);
-                case PlacementInitExpressionSyntax placementInitExpression:
-                    foreach (var argument in placementInitExpression.Arguments)
-                        InferArgumentType(argument);
-
-                    // TODO verify argument types against called function
-
-                    return placementInitExpression.Type = typeAnalyzer.Check(placementInitExpression.Initializer);
-                case ForeachExpressionSyntax foreachExpression:
-                {
-                    var declaredType = typeAnalyzer.Check(foreachExpression.TypeExpression);
-                    CheckForeachInType(declaredType, foreachExpression.InExpression);
-                    foreachExpression.VariableType = declaredType ?? foreachExpression.InExpression.Type;
-                    // TODO check the break types
-                    InferExpressionType(foreachExpression.Block);
-                    // TODO assign correct type to the expression
-                    return expression.Type = DataType.Void;
-                }
-                case WhileExpressionSyntax whileExpression:
-                    CheckExpressionType(whileExpression.Condition, DataType.Bool);
-                    InferExpressionType(whileExpression.Block);
-                    // TODO assign correct type to the expression
-                    return expression.Type = DataType.Void;
-                case LoopExpressionSyntax loopExpression:
-                    InferExpressionType(loopExpression.Block);
-                    // TODO assign correct type to the expression
-                    return expression.Type = DataType.Void;
-                case InvocationSyntax invocation:
-                    return InferInvocationType(invocation);
-                case UnsafeExpressionSyntax unsafeExpression:
-                    InferExpressionType(unsafeExpression.Expression);
-                    return unsafeExpression.Type = unsafeExpression.Expression.Type;
-                case MutableExpressionSyntax mutableExpression:
-                {
-                    var expressionType = InferExpressionType(mutableExpression.Expression);
-                    DataType type;
-                    switch (expressionType)
-                    {
-                        case Metatype metatype:
-                        {
-                            type = DataType.Type; // It names/describes a type
-                            if (!(metatype.Instance is UserObjectType objectType && objectType.DeclaredMutable))
-                                diagnostics.Add(TypeError.TypeDeclaredImmutable(file, mutableExpression.Expression));
-                            break;
-                        }
-                        case TypeType _:
-                            // TODO we need to check whether it is valid to use `mut` on this
-                            type = DataType.Type; // It names/describes a type
-                            break;
-                        default:
-                            switch (expressionType)
-                            {
-                                // If it is already mutable we can't redeclare it mutable (i.e. `mut mut x` is error)
-                                case UserObjectType objectType
-                                    when objectType.Mutability.IsUpgradable:
-                                    type = objectType.AsMutable();
-                                    break;
-                                default:
-                                    diagnostics.Add(TypeError.ExpressionCantBeMutable(file,
-                                        mutableExpression.Expression));
-                                    type = expressionType;
-                                    break;
-                            }
-                            break;
-                    }
-
-                    return mutableExpression.Type = type;
-                }
-                case IfExpressionSyntax ifExpression:
-                    CheckExpressionType(ifExpression.Condition, DataType.Bool);
-                    InferExpressionType(ifExpression.ThenBlock);
-                    InferExpressionType(ifExpression.ElseClause);
-                    // TODO assign a type to the expression
-                    return ifExpression.Type = DataType.Void;
-                case ResultExpressionSyntax resultExpression:
-                    InferExpressionType(resultExpression.Expression);
-                    return resultExpression.Type = DataType.Never;
-                case MemberAccessExpressionSyntax memberAccess:
-                    return InferMemberAccessType(memberAccess);
-                case BreakExpressionSyntax breakExpression:
-                    InferExpressionType(breakExpression.Value);
-                    return breakExpression.Type = DataType.Never;
-                case AssignmentExpressionSyntax assignmentExpression:
-                    var left = InferExpressionType(assignmentExpression.LeftOperand);
-                    InferExpressionType(assignmentExpression.RightOperand);
-                    InsertImplicitConversionIfNeeded(ref assignmentExpression.RightOperand, left);
-                    var right = assignmentExpression.RightOperand.Type;
-                    if (!IsAssignableFrom(left, right))
-                        diagnostics.Add(TypeError.CannotConvert(file, assignmentExpression.RightOperand, right, left));
-                    return assignmentExpression.Type = DataType.Void;
-                case SelfExpressionSyntax selfExpression:
-                    return selfExpression.Type = selfType ?? DataType.Unknown;
-                case MoveExpressionSyntax moveExpression:
-                {
-                    var type = InferMoveExpressionType(moveExpression.Expression);
-                    if (type is ReferenceType referenceType && !referenceType.IsOwned)
-                    {
-                        diagnostics.Add(TypeError.CannotMoveBorrowedValue(file, moveExpression));
-                        type = referenceType.WithLifetime(Lifetime.Owned);
-                    }
-                    if (type is UserObjectType objectType) type = objectType.AsOwnedUpgradable();
-                    return moveExpression.Type = type;
-                }
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
