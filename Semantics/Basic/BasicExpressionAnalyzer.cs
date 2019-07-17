@@ -245,7 +245,52 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private DataType InferExpressionTypeFor(BinaryExpressionSyntax binaryOperatorExpression)
         {
-            return InferBinaryExpressionType(binaryOperatorExpression);
+            InferExpressionType(binaryOperatorExpression.LeftOperand);
+            var leftType = binaryOperatorExpression.LeftOperand.Type;
+            var @operator = binaryOperatorExpression.Operator;
+            InferExpressionType(binaryOperatorExpression.RightOperand);
+            var rightType = binaryOperatorExpression.RightOperand.Type;
+
+            // If either is unknown, then we can't know whether there is a a problem.
+            // Note that the operator could be overloaded
+            if (leftType == DataType.Unknown || rightType == DataType.Unknown)
+                return binaryOperatorExpression.Type = DataType.Unknown;
+
+            bool compatible;
+            switch (@operator)
+            {
+                case BinaryOperator.Plus:
+                case BinaryOperator.Minus:
+                case BinaryOperator.Asterisk:
+                case BinaryOperator.Slash:
+                    compatible = NumericOperatorTypesAreCompatible(ref binaryOperatorExpression.LeftOperand, ref binaryOperatorExpression.RightOperand, null);
+                    binaryOperatorExpression.Type = compatible ? leftType : DataType.Unknown;
+                    break;
+                case BinaryOperator.EqualsEquals:
+                case BinaryOperator.NotEqual:
+                case BinaryOperator.LessThan:
+                case BinaryOperator.LessThanOrEqual:
+                case BinaryOperator.GreaterThan:
+                case BinaryOperator.GreaterThanOrEqual:
+                    compatible = (leftType == DataType.Bool && rightType == DataType.Bool)
+                                 || NumericOperatorTypesAreCompatible(ref binaryOperatorExpression.LeftOperand, ref binaryOperatorExpression.RightOperand, null);
+                    binaryOperatorExpression.Type = DataType.Bool;
+                    break;
+                case BinaryOperator.And:
+                case BinaryOperator.Or:
+                    compatible = leftType == DataType.Bool && rightType == DataType.Bool;
+                    binaryOperatorExpression.Type = DataType.Bool;
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.ForEnum(@operator);
+            }
+            if (!compatible)
+                diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandsOfType(file,
+                    binaryOperatorExpression.Span, @operator,
+                    binaryOperatorExpression.LeftOperand.Type,
+                    binaryOperatorExpression.RightOperand.Type));
+
+            return binaryOperatorExpression.Type;
         }
 
         private DataType InferExpressionTypeFor(IdentifierNameSyntax identifierName)
@@ -255,7 +300,72 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private DataType InferExpressionTypeFor(UnaryExpressionSyntax unaryOperatorExpression)
         {
-            return InferUnaryExpressionType(unaryOperatorExpression); ;
+            var operandType = InferExpressionType(unaryOperatorExpression.Operand);
+            var @operator = unaryOperatorExpression.Operator;
+
+            // If either is unknown, then we can't know whether there is a a problem
+            // (technically not true, for example, we could know that one arg should
+            // be a bool and isn't)
+            if (operandType == DataType.Unknown)
+                return unaryOperatorExpression.Type = DataType.Unknown;
+
+            bool typeError;
+            switch (@operator)
+            {
+                case UnaryOperator.Not:
+                    typeError = operandType != DataType.Bool;
+                    unaryOperatorExpression.Type = DataType.Bool;
+                    break;
+                case UnaryOperator.At:
+                    typeError = false; // TODO check that the expression can have a pointer taken
+                    if (operandType is Metatype)
+                        unaryOperatorExpression.Type = DataType.Type; // constructing a type
+                    else
+                        unaryOperatorExpression.Type = new PointerType(operandType); // taking the address of something
+                    break;
+                case UnaryOperator.Question:
+                    typeError = false; // TODO check that the expression can have a pointer taken
+                    unaryOperatorExpression.Type = new PointerType(operandType);
+                    break;
+                case UnaryOperator.Caret:
+                    switch (operandType)
+                    {
+                        case PointerType pointerType:
+                            unaryOperatorExpression.Type = pointerType.Referent;
+                            typeError = false;
+                            break;
+                        default:
+                            unaryOperatorExpression.Type = DataType.Unknown;
+                            typeError = true;
+                            break;
+                    }
+                    break;
+                case UnaryOperator.Minus:
+                    switch (operandType)
+                    {
+                        case IntegerConstantType integerType:
+                            typeError = false;
+                            unaryOperatorExpression.Type = integerType;
+                            break;
+                        case SizedIntegerType sizedIntegerType:
+                            typeError = false;
+                            unaryOperatorExpression.Type = sizedIntegerType;
+                            break;
+                        default:
+                            unaryOperatorExpression.Type = DataType.Unknown;
+                            typeError = true;
+                            break;
+                    }
+                    break;
+                default:
+                    throw NonExhaustiveMatchException.ForEnum(@operator);
+            }
+            if (typeError)
+                diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandOfType(file,
+                    unaryOperatorExpression.Span, @operator, operandType));
+
+            return unaryOperatorExpression.Type;
+            ;
         }
 
         private DataType InferExpressionTypeFor(BlockSyntax blockExpression)
@@ -268,7 +378,39 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private DataType InferExpressionTypeFor(NewObjectExpressionSyntax newObjectExpression)
         {
-            return InferConstructorCallType(newObjectExpression);
+            var argumentTypes = newObjectExpression.Arguments.Select(InferArgumentType).ToFixedList();
+            // TODO handle named constructors here
+            var constructedType = (UserObjectType)typeAnalyzer.Check(newObjectExpression.Constructor);
+            var typeSymbol = GetSymbolForType(constructedType);
+            var constructors = typeSymbol.ChildSymbols[SpecialName.New];
+            constructors = ResolveOverload(constructors, null, argumentTypes);
+            switch (constructors.Count)
+            {
+                case 0:
+                    diagnostics.Add(NameBindingError.CouldNotBindConstructor(file, newObjectExpression.Span));
+                    newObjectExpression.ConstructorSymbol = UnknownSymbol.Instance;
+                    newObjectExpression.ConstructorType = DataType.Unknown;
+                    break;
+                case 1:
+                    var constructorSymbol = constructors.Single();
+                    newObjectExpression.ConstructorSymbol = constructorSymbol;
+                    var constructorType = constructorSymbol.Type;
+                    newObjectExpression.ConstructorType = constructorType;
+                    if (constructorType is FunctionType functionType)
+                        foreach (var (arg, type) in newObjectExpression.Arguments.Zip(functionType.ParameterTypes))
+                        {
+                            InsertImplicitConversionIfNeeded(ref arg.Value, type);
+                            CheckArgumentTypeCompatibility(type, arg);
+                        }
+                    break;
+                default:
+                    diagnostics.Add(NameBindingError.AmbiguousConstructor(file, newObjectExpression.Span));
+                    newObjectExpression.ConstructorSymbol = UnknownSymbol.Instance;
+                    newObjectExpression.ConstructorType = DataType.Unknown;
+                    break;
+            }
+
+            return newObjectExpression.Type = constructedType.AsOwnedUpgradable();
         }
 
         private DataType InferExpressionTypeFor(PlacementInitExpressionSyntax placementInitExpression)
@@ -309,7 +451,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private DataType InferExpressionTypeFor(InvocationSyntax invocation)
         {
-            return InferInvocationType(invocation);
+            // This could:
+            // * Invoke a stand alone function
+            // * Invoke a static function
+            // * Invoke a method
+            // * Invoke a function pointer
+            var argumentTypes = invocation.Arguments.Select(InferArgumentType).ToFixedList();
+            InferExpressionTypeInInvocation(invocation.Callee, argumentTypes);
+            var callee = invocation.Callee.Type;
+
+            if (callee is FunctionType functionType)
+            {
+                foreach (var (arg, type) in invocation.Arguments.Zip(functionType.ParameterTypes))
+                {
+                    InsertImplicitConversionIfNeeded(ref arg.Value, type);
+                    CheckArgumentTypeCompatibility(type, arg);
+                }
+
+                return invocation.Type = functionType.ReturnType;
+            }
+
+            // If it is unknown, we already reported an error
+            if (callee == DataType.Unknown) return invocation.Type = DataType.Unknown;
+
+            diagnostics.Add(TypeError.MustBeCallable(file, invocation.Callee));
+            return invocation.Type = DataType.Unknown;
         }
 
         private DataType InferExpressionTypeFor(UnsafeExpressionSyntax unsafeExpression)
@@ -372,7 +538,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private DataType InferExpressionTypeFor(MemberAccessExpressionSyntax memberAccess)
         {
-            return InferMemberAccessType(memberAccess);
+            var left = InferExpressionType(memberAccess.Expression);
+            var symbol = GetSymbolForType(left);
+
+            switch (memberAccess.Member)
+            {
+                case IdentifierNameSyntax identifier:
+                    var memberSymbols = symbol.Lookup(identifier.Name);
+                    var type = AssignReferencedSymbolAndType(identifier, memberSymbols);
+                    return memberAccess.Type = type;
+                default:
+                    throw NonExhaustiveMatchException.For(memberAccess.Member);
+            }
         }
 
         private DataType InferExpressionTypeFor(BreakExpressionSyntax breakExpression)
@@ -429,17 +606,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             throw new Exception("Should be inferring type of type expression");
         }
 
-        private DataType InferExpressionTypeOld(ExpressionSyntax expression)
-        {
-            if (expression == null) return DataType.Unknown;
-
-            switch (expression)
-            {
-                default:
-                    throw NonExhaustiveMatchException.For(expression);
-            }
-        }
-
         public DataType InferIdentifierNameType(IdentifierNameSyntax identifierName, bool isMove)
         {
             var symbols = identifierName.LookupInContainingScope();
@@ -474,43 +640,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             return identifierName.Type = type;
         }
 
-        private DataType InferConstructorCallType(NewObjectExpressionSyntax expression)
-        {
-            var argumentTypes = expression.Arguments.Select(InferArgumentType).ToFixedList();
-            // TODO handle named constructors here
-            var constructedType = (UserObjectType)typeAnalyzer.Check(expression.Constructor);
-            var typeSymbol = GetSymbolForType(constructedType);
-            var constructors = typeSymbol.ChildSymbols[SpecialName.New];
-            constructors = ResolveOverload(constructors, null, argumentTypes);
-            switch (constructors.Count)
-            {
-                case 0:
-                    diagnostics.Add(NameBindingError.CouldNotBindConstructor(file, expression.Span));
-                    expression.ConstructorSymbol = UnknownSymbol.Instance;
-                    expression.ConstructorType = DataType.Unknown;
-                    break;
-                case 1:
-                    var constructorSymbol = constructors.Single();
-                    expression.ConstructorSymbol = constructorSymbol;
-                    var constructorType = constructorSymbol.Type;
-                    expression.ConstructorType = constructorType;
-                    if (constructorType is FunctionType functionType)
-                        foreach (var (arg, type) in expression.Arguments.Zip(functionType.ParameterTypes))
-                        {
-                            InsertImplicitConversionIfNeeded(ref arg.Value, type);
-                            CheckArgumentTypeCompatibility(type, arg);
-                        }
-                    break;
-                default:
-                    diagnostics.Add(NameBindingError.AmbiguousConstructor(file, expression.Span));
-                    expression.ConstructorSymbol = UnknownSymbol.Instance;
-                    expression.ConstructorType = DataType.Unknown;
-                    break;
-            }
-
-            return expression.Type = constructedType.AsOwnedUpgradable();
-        }
-
         private DataType InferMoveExpressionType(ExpressionSyntax expression)
         {
             if (expression == null) return DataType.Unknown;
@@ -522,35 +651,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
-        }
-
-        private DataType InferInvocationType(InvocationSyntax invocation)
-        {
-            // This could:
-            // * Invoke a stand alone function
-            // * Invoke a static function
-            // * Invoke a method
-            // * Invoke a function pointer
-            var argumentTypes = invocation.Arguments.Select(InferArgumentType).ToFixedList();
-            InferExpressionTypeInInvocation(invocation.Callee, argumentTypes);
-            var callee = invocation.Callee.Type;
-
-            if (callee is FunctionType functionType)
-            {
-                foreach (var (arg, type) in invocation.Arguments.Zip(functionType.ParameterTypes))
-                {
-                    InsertImplicitConversionIfNeeded(ref arg.Value, type);
-                    CheckArgumentTypeCompatibility(type, arg);
-                }
-
-                return invocation.Type = functionType.ReturnType;
-            }
-
-            // If it is unknown, we already reported an error
-            if (callee == DataType.Unknown) return invocation.Type = DataType.Unknown;
-
-            diagnostics.Add(TypeError.MustBeCallable(file, invocation.Callee));
-            return invocation.Type = DataType.Unknown;
         }
 
         /// <summary>
@@ -604,22 +704,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             return false;
         }
 
-        private DataType InferMemberAccessType(MemberAccessExpressionSyntax memberAccess)
-        {
-            var left = InferExpressionType(memberAccess.Expression);
-            var symbol = GetSymbolForType(left);
-
-            switch (memberAccess.Member)
-            {
-                case IdentifierNameSyntax identifier:
-                    var memberSymbols = symbol.Lookup(identifier.Name);
-                    var type = AssignReferencedSymbolAndType(identifier, memberSymbols);
-                    return memberAccess.Type = type;
-                default:
-                    throw NonExhaustiveMatchException.For(memberAccess.Member);
-            }
-        }
-
         private static ISymbol GetSymbolForType(DataType type)
         {
             switch (type)
@@ -663,57 +747,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             return InferExpressionType(argument.Value);
         }
 
-        private DataType InferBinaryExpressionType(
-            BinaryExpressionSyntax binaryExpression)
-        {
-            InferExpressionType(binaryExpression.LeftOperand);
-            var leftType = binaryExpression.LeftOperand.Type;
-            var @operator = binaryExpression.Operator;
-            InferExpressionType(binaryExpression.RightOperand);
-            var rightType = binaryExpression.RightOperand.Type;
-
-            // If either is unknown, then we can't know whether there is a a problem.
-            // Note that the operator could be overloaded
-            if (leftType == DataType.Unknown || rightType == DataType.Unknown)
-                return binaryExpression.Type = DataType.Unknown;
-
-            bool compatible;
-            switch (@operator)
-            {
-                case BinaryOperator.Plus:
-                case BinaryOperator.Minus:
-                case BinaryOperator.Asterisk:
-                case BinaryOperator.Slash:
-                    compatible = NumericOperatorTypesAreCompatible(ref binaryExpression.LeftOperand, ref binaryExpression.RightOperand, null);
-                    binaryExpression.Type = compatible ? leftType : DataType.Unknown;
-                    break;
-                case BinaryOperator.EqualsEquals:
-                case BinaryOperator.NotEqual:
-                case BinaryOperator.LessThan:
-                case BinaryOperator.LessThanOrEqual:
-                case BinaryOperator.GreaterThan:
-                case BinaryOperator.GreaterThanOrEqual:
-                    compatible = (leftType == DataType.Bool && rightType == DataType.Bool)
-                        || NumericOperatorTypesAreCompatible(ref binaryExpression.LeftOperand, ref binaryExpression.RightOperand, null);
-                    binaryExpression.Type = DataType.Bool;
-                    break;
-                case BinaryOperator.And:
-                case BinaryOperator.Or:
-                    compatible = leftType == DataType.Bool && rightType == DataType.Bool;
-                    binaryExpression.Type = DataType.Bool;
-                    break;
-                default:
-                    throw NonExhaustiveMatchException.ForEnum(@operator);
-            }
-            if (!compatible)
-                diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandsOfType(file,
-                    binaryExpression.Span, @operator,
-                    binaryExpression.LeftOperand.Type,
-                    binaryExpression.RightOperand.Type));
-
-            return binaryExpression.Type;
-        }
-
         private bool NumericOperatorTypesAreCompatible(
             ref ExpressionSyntax leftOperand,
             ref ExpressionSyntax rightOperand,
@@ -750,75 +783,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     // exactly which types this doesn't work on.
                     throw NonExhaustiveMatchException.For(leftType);
             }
-        }
-
-        private DataType InferUnaryExpressionType(UnaryExpressionSyntax unaryExpression)
-        {
-            var operandType = InferExpressionType(unaryExpression.Operand);
-            var @operator = unaryExpression.Operator;
-
-            // If either is unknown, then we can't know whether there is a a problem
-            // (technically not true, for example, we could know that one arg should
-            // be a bool and isn't)
-            if (operandType == DataType.Unknown)
-                return unaryExpression.Type = DataType.Unknown;
-
-            bool typeError;
-            switch (@operator)
-            {
-                case UnaryOperator.Not:
-                    typeError = operandType != DataType.Bool;
-                    unaryExpression.Type = DataType.Bool;
-                    break;
-                case UnaryOperator.At:
-                    typeError = false; // TODO check that the expression can have a pointer taken
-                    if (operandType is Metatype)
-                        unaryExpression.Type = DataType.Type; // constructing a type
-                    else
-                        unaryExpression.Type = new PointerType(operandType); // taking the address of something
-                    break;
-                case UnaryOperator.Question:
-                    typeError = false; // TODO check that the expression can have a pointer taken
-                    unaryExpression.Type = new PointerType(operandType);
-                    break;
-                case UnaryOperator.Caret:
-                    switch (operandType)
-                    {
-                        case PointerType pointerType:
-                            unaryExpression.Type = pointerType.Referent;
-                            typeError = false;
-                            break;
-                        default:
-                            unaryExpression.Type = DataType.Unknown;
-                            typeError = true;
-                            break;
-                    }
-                    break;
-                case UnaryOperator.Minus:
-                    switch (operandType)
-                    {
-                        case IntegerConstantType integerType:
-                            typeError = false;
-                            unaryExpression.Type = integerType;
-                            break;
-                        case SizedIntegerType sizedIntegerType:
-                            typeError = false;
-                            unaryExpression.Type = sizedIntegerType;
-                            break;
-                        default:
-                            unaryExpression.Type = DataType.Unknown;
-                            typeError = true;
-                            break;
-                    }
-                    break;
-                default:
-                    throw NonExhaustiveMatchException.ForEnum(@operator);
-            }
-            if (typeError)
-                diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandOfType(file,
-                    unaryExpression.Span, @operator, operandType));
-
-            return unaryExpression.Type;
         }
 
         // Re-expose type analyzer to BasicAnalyzer
