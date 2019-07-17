@@ -43,43 +43,74 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
 
         private static void Validate(DataType type)
         {
-            if (type == null) return;
-            switch (type)
-            {
-                case ReferenceType referenceType:
-                    if (referenceType.Mutability.IsUpgradable)
-                        throw new Exception($"Type has is upgradable `{type}` and shouldn't be");
-                    break;
-                case EmptyType _:
-                case SimpleType _:
-                    // No problems
-                    break;
-                case UnknownType _:
-                    // Can't validate since we don't know the type
-                    break;
-                default:
-                    throw NonExhaustiveMatchException.For(type);
-            }
+            type.Accept(Validate);
+        }
+
+        private static void ValidateForNull()
+        {
+            // Nothing to check
+        }
+
+        private static void ValidateFor(ReferenceType referenceType)
+        {
+            if (referenceType.Mutability.IsUpgradable)
+                throw new Exception($"Type is upgradable `{referenceType}` and shouldn't be");
+        }
+
+        private static void ValidateFor(OptionalType optionalType)
+        {
+            Validate(optionalType.Referent);
+        }
+
+        private static void ValidateFor(RefType refType)
+        {
+            Validate(refType.Referent);
+        }
+
+        [Visit(typeof(EmptyType))]
+        [Visit(typeof(SimpleType))]
+        [Visit(typeof(UnknownType))]
+        [Visit(typeof(PointerType))]
+        private static void ValidateFor(DataType type)
+        {
+            // can't contain a reference type
         }
 
         private static void ValidateReturn(DataType type)
         {
-            if (type == null) return;
-            switch (type)
-            {
-                case ReferenceType referenceType:
-                    // Owned returns are supposed to be upgradable so that the caller
-                    // can receive ownership.
-                    if (referenceType.Mutability.IsUpgradable && !referenceType.IsOwned)
-                        throw new Exception($"Type has is upgradable `{type}` and shouldn't be");
-                    break;
-                case EmptyType _:
-                case SimpleType _:
-                    // No problems
-                    break;
-                default:
-                    throw NonExhaustiveMatchException.For(type);
-            }
+            type.Accept(ValidateReturn);
+        }
+
+        private static void ValidateReturnForNull()
+        {
+            // Nothing to check
+        }
+
+        private static void ValidateReturnFor(ReferenceType referenceType)
+        {
+            // Owned returns are supposed to be upgradable so that the caller
+            // can receive ownership.
+            if (referenceType.Mutability.IsUpgradable && !referenceType.IsOwned)
+                throw new Exception($"Type is upgradable `{referenceType}` and shouldn't be");
+        }
+
+        private static void ValidateReturnFor(OptionalType optionalType)
+        {
+            Validate(optionalType.Referent);
+        }
+
+        private static void ValidateReturnFor(RefType refType)
+        {
+            Validate(refType.Referent);
+        }
+
+        [Visit(typeof(EmptyType))]
+        [Visit(typeof(SimpleType))]
+        [Visit(typeof(UnknownType))]
+        [Visit(typeof(PointerType))]
+        private static void ValidateReturnFor(DataType type)
+        {
+            // can't contain a reference type
         }
     }
 }

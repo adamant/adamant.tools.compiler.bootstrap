@@ -325,7 +325,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     break;
                 case UnaryOperator.Question:
                     typeError = false; // TODO check that the expression can have a pointer taken
-                    unaryOperatorExpression.Type = new PointerType(operandType);
+                    unaryOperatorExpression.Type = new OptionalType(operandType);
                     break;
                 case UnaryOperator.Caret:
                     switch (operandType)
@@ -588,8 +588,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private DataType InferExpressionTypeFor(NoneLiteralExpressionSyntax noneLiteralExpression)
         {
-            throw new NotImplementedException();
-            //return noneLiteralExpression.Type = DataType.None;
+            return noneLiteralExpression.Type = DataType.None;
         }
 
         private DataType InferExpressionTypeFor(ImplicitConversionExpression _)

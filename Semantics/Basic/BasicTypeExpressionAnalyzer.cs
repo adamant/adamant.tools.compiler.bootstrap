@@ -80,6 +80,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                 return new PointerType(metatype.Instance);
                             // TODO evaluate to type
                             return DataType.Unknown;
+                        case UnaryOperator.Question:
+                            unaryOperatorExpression.Type = DataType.Type;
+                            var referent = Check(unaryOperatorExpression.Operand);
+                            return new OptionalType(referent);
                         default:
                             // TODO evaluate to type
                             return DataType.Unknown;

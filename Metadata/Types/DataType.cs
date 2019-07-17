@@ -33,6 +33,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public static readonly StringConstantType StringConstant = StringConstantType.Instance;
 
         public static readonly PointerType BytePointer = new PointerType(Byte);
+        /// <summary>
+        /// The value `none` has this type, which is `never?`
+        /// </summary>
+        public static readonly OptionalType None = new OptionalType(Never);
         #endregion
 
         /// <summary>
