@@ -278,24 +278,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             {
                 case ConstructorCall constructorCall:
                     foreach (var argument in constructorCall.Arguments)
-                        AcquireClaim(assignToPlace?.CoreVariable(), argument, claimsAfterStatement);
+                        AcquireClaim(assignToPlace?.CoreVariable(), argument, claimsAfterStatement, claimsAfterStatement);
                     // We have made a new object, assign it a new id
                     var objectId = NewLifetime();
                     // Variable acquires title on any new objects
                     AcquireOwnership(assignToPlace.CoreVariable(), objectId, claimsAfterStatement);
                     break;
                 case UnaryOperation unaryOperation:
-                    AcquireClaim(assignToPlace?.CoreVariable(), unaryOperation.Operand, claimsAfterStatement);
+                    AcquireClaim(assignToPlace?.CoreVariable(), unaryOperation.Operand, claimsAfterStatement, claimsAfterStatement);
                     break;
                 case BinaryOperation binaryOperation:
-                    AcquireClaim(assignToPlace?.CoreVariable(), binaryOperation.LeftOperand, claimsAfterStatement);
-                    AcquireClaim(assignToPlace?.CoreVariable(), binaryOperation.RightOperand, claimsAfterStatement);
+                    AcquireClaim(assignToPlace?.CoreVariable(), binaryOperation.LeftOperand, claimsAfterStatement, claimsAfterStatement);
+                    AcquireClaim(assignToPlace?.CoreVariable(), binaryOperation.RightOperand, claimsAfterStatement, claimsAfterStatement);
                     break;
                 case IntegerConstant _:
                     // no claims to acquire
                     break;
                 case IOperand operand:
-                    AcquireClaim(assignToPlace?.CoreVariable(), operand, claimsAfterStatement);
+                    AcquireClaim(assignToPlace?.CoreVariable(), operand, claimsAfterStatement, claimsAfterStatement);
                     break;
                 case FunctionCall functionCall:
                 {
@@ -303,9 +303,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     var outstandingClaims = new Claims();
                     outstandingClaims.AddRange(claimsBeforeStatement);
                     if (functionCall.Self != null)
-                        AcquireClaim(callLifetime, functionCall.Self, outstandingClaims);
+                        AcquireClaim(callLifetime, functionCall.Self, outstandingClaims, claimsAfterStatement);
                     foreach (var argument in functionCall.Arguments)
-                        AcquireClaim(callLifetime, argument, outstandingClaims);
+                        AcquireClaim(callLifetime, argument, outstandingClaims, claimsAfterStatement);
 
                     AcquireReturnClaim(assignToPlace, callLifetime, outstandingClaims, claimsAfterStatement, variables);
                 }
@@ -316,9 +316,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     var outstandingClaims = new Claims();
                     outstandingClaims.AddRange(claimsBeforeStatement);
                     if (virtualFunctionCall.Self != null)
-                        AcquireClaim(callLifetime, virtualFunctionCall.Self, outstandingClaims);
+                        AcquireClaim(callLifetime, virtualFunctionCall.Self, outstandingClaims, claimsAfterStatement);
                     foreach (var argument in virtualFunctionCall.Arguments)
-                        AcquireClaim(callLifetime, argument, outstandingClaims);
+                        AcquireClaim(callLifetime, argument, outstandingClaims, claimsAfterStatement);
 
                     AcquireReturnClaim(assignToPlace, callLifetime, outstandingClaims, claimsAfterStatement, variables);
                 }
@@ -382,7 +382,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         private void AcquireClaim(
             IClaimHolder claimHolder,
             IOperand operand,
-            Claims outstandingClaims)
+            Claims outstandingClaims,
+            Claims claimsAfterStatement)
         {
             switch (operand)
             {
@@ -423,6 +424,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             if (currentOwner?.Holder != varRef.Variable)
                                 break;
                             outstandingClaims.Remove(currentOwner);
+                            // Because claims are melded from multiple passes, the claims after statement
+                            // would still contain this claim even though we removed it from outstanding
+                            // claims. Thus we must remove it from claimsAfterStatement because this
+                            // statement always takes ownership of the value.
+                            claimsAfterStatement.Remove(currentOwner);
                             switch (claimHolder)
                             {
                                 case Variable variable:
