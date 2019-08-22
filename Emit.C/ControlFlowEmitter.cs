@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
@@ -198,6 +199,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                             throw NonExhaustiveMatchException.ForEnum(binaryOperation.Operator);
                     }
                     return $"{operationType}__{@operator}({left}, {right})";
+                }
+                case NoneConstant noneConstant:
+                    switch (noneConstant.Type.Referent)
+                    {
+                        case UserObjectType userObjectType:
+                        {
+                            var typeName = nameMangler.Mangle(userObjectType);
+                            return $"({noneConstant.Type}){{&{typeName}___vtable, NULL}}";
+                        }
+
+                        case SimpleType simpleType:
+                        {
+                            var typeName = nameMangler.Mangle(simpleType);
+                            return $"_opt__{typeName}__none";
+                        }
+
+                        default:
+                            throw NonExhaustiveMatchException.For(noneConstant.Type);
+                    }
+
+                case ConstructSome constructSome:
+                {
+                    var someValue = ConvertValue(constructSome.Value);
+                    if (constructSome.Type.Referent is ReferenceType) return someValue;
+                    else
+                    {
+                        var typeName = nameMangler.Mangle(constructSome.Type.Referent);
+                        return $"_opt_{typeName}__Some({someValue})";
+                    }
+                    throw new NotImplementedException();
                 }
                 default:
                     throw NonExhaustiveMatchException.For(value);

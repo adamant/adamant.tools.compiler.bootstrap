@@ -71,6 +71,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             return mapping.GetAscii(builder.ToString());
         }
 
+        public object Mangle(DataType type)
+        {
+            switch (type)
+            {
+                case SimpleType simpleType:
+                    return Mangle(simpleType);
+                case UserObjectType userObjectType:
+                    return Mangle(userObjectType);
+                default:
+                    throw NonExhaustiveMatchException.For(type);
+            }
+        }
+
         public string Mangle(SimpleType type)
         {
             return Mangle(type.Name);

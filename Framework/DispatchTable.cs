@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -65,6 +66,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
             return new DispatchTable(operation, methods, visitNullMethodInfo);
         }
 
+        [DebuggerStepThrough]
         public object Dispatch(object target, object[] arguments)
         {
             if (arguments[0] == null)

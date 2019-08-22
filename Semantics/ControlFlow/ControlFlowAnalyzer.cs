@@ -421,11 +421,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     throw new InvalidOperationException("String literals should have an implicit conversion around them");
                 case BoolLiteralExpressionSyntax boolLiteral:
                     return new BooleanConstant(boolLiteral.Value, boolLiteral.Span);
+                case NoneLiteralExpressionSyntax _:
+                    throw new InvalidOperationException("None literals should have an implicit conversion around them");
                 case ImplicitNumericConversionExpression implicitNumericConversion:
                     if (implicitNumericConversion.Expression.Type.AssertKnown() is IntegerConstantType constantType)
                         return new IntegerConstant(constantType.Value, implicitNumericConversion.Type.AssertKnown(), implicitNumericConversion.Span);
                     else
                         throw new NotImplementedException();
+                case ImplicitOptionalConversionExpression implicitOptionalConversionExpression:
+                {
+                    var value = ConvertToOperand(implicitOptionalConversionExpression.Expression);
+                    return new ConstructSome(implicitOptionalConversionExpression.ConvertToType, value, implicitOptionalConversionExpression.Span);
+                }
                 case IfExpressionSyntax ifExpression:
                     // TODO deal with the value of the if expression
                     throw new NotImplementedException();
@@ -444,6 +451,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         sizeArgument,
                         bytesArgument);
                 }
+                case ImplicitNoneConversionExpression implicitNoneConversion:
+                    return new NoneConstant(implicitNoneConversion.ConvertToType, implicitNoneConversion.Span);
                 case InvocationSyntax invocation:
                     return ConvertInvocationToValue(invocation);
                 case MemberAccessExpressionSyntax memberAccess:

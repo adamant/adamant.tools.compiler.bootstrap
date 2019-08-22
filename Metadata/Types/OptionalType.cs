@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// type or a reference type. Optional types themselves are always immutable.
     /// However the referent type may be mutable or immutable. Effectively, optional
     /// types are like an immutable struct type `Optional[T]`. However, the value
-    /// semantics are strange. They depend on the referent type
+    /// semantics are strange. They depend on the referent type.
     /// </summary>
     public class OptionalType : ValueType
     {
@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         public override bool IsKnown { get; }
 
-        public override ValueSemantics ValueSemantics => throw new NotImplementedException();
+        public override ValueSemantics ValueSemantics => Referent.ValueSemantics;
 
         public OptionalType(DataType referent)
         {

@@ -3,6 +3,10 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
+    /// <summary>
+    /// This kind of conversion is inserted when there is an implicit conversion
+    /// from a literal to some data type.
+    /// </summary>
     public class ImplicitLiteralConversionExpression : ImplicitConversionExpression
     {
         public ExpressionSyntax Expression { get; }

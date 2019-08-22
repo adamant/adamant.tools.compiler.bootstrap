@@ -109,6 +109,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             ref ExpressionSyntax expression,
             DataType targetType)
         {
+            if (targetType is OptionalType optionalType)
+            {
+                // We may need to do a conversion to optional or from none
+                if (expression.Type is OptionalType noneType)
+                {
+                    if (noneType.Referent is NeverType)
+                        expression = new ImplicitNoneConversionExpression(expression, optionalType);
+                    // TODO may need to lift an implicit numeric conversion
+                }
+                else
+                {
+                    // If needed, convert the type to the referent type of the optional type
+                    InsertImplicitConversionIfNeeded(ref expression, optionalType.Referent);
+                    if (IsAssignableFrom(optionalType.Referent, expression.Type))
+                        expression = new ImplicitOptionalConversionExpression(expression, optionalType);
+                }
+
+                return;
+            }
+
             switch (expression.Type)
             {
                 case SizedIntegerType expressionType:
@@ -653,7 +673,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         }
 
         /// <summary>
-        /// Eventually, a for each in expression will just be a regular expression. However, at the
+        /// Eventually, a `foreach` `in` expression will just be a regular expression. However, at the
         /// moment, there isn't enough of the language to implement range expressions. So this
         /// check handles range expressions in the specific case of `foreach` only. It marks them
         /// as having the same type as the range endpoints.
@@ -699,6 +719,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 // If they are equal except for lifetimes and mutability compatible, it is fine
                 return targetReference.EqualExceptLifetimeAndMutability(sourceReference);
             }
+
+            if (target is OptionalType targetOptional && source is OptionalType sourceOptional)
+                return IsAssignableFrom(targetOptional.Referent, sourceOptional.Referent);
 
             return false;
         }

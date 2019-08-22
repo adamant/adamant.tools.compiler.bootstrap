@@ -136,12 +136,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case ImplicitImmutabilityConversionExpression implicitImmutabilityConversionExpression:
                     VisitImplicitImmutabilityConversionExpression(implicitImmutabilityConversionExpression, args);
                     break;
+                case ImplicitNoneConversionExpression implicitNoneConversionExpression:
+                    VisitImplicitNoneConversionExpression(implicitNoneConversionExpression, args);
+                    break;
+                case ImplicitOptionalConversionExpression implicitOptionalConversionExpression:
+                    VisitImplicitOptionalConversionExpression(implicitOptionalConversionExpression, args);
+                    break;
                 case null:
                     // Ignore
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(implicitConversionExpression);
             }
+        }
+
+        public virtual void VisitImplicitOptionalConversionExpression(ImplicitOptionalConversionExpression implicitOptionalConversionExpression, A args)
+        {
+            VisitExpression(implicitOptionalConversionExpression.Expression, args);
+        }
+
+        public virtual void VisitImplicitNoneConversionExpression(ImplicitNoneConversionExpression implicitNoneConversionExpression, A args)
+        {
+            VisitExpression(implicitNoneConversionExpression.Expression, args);
         }
 
         public virtual void VisitImplicitImmutabilityConversionExpression(ImplicitImmutabilityConversionExpression implicitImmutabilityConversionExpression, A args)

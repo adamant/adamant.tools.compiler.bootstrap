@@ -337,6 +337,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     claimsAfterStatement.AddRange(outstandingClaims);
                 }
                 break;
+                case ConstructSome constructSome:
+                {
+                    AcquireClaim(assignToPlace?.CoreVariable(), constructSome.Value, claimsAfterStatement, claimsAfterStatement);
+                }
+                break;
                 default:
                     throw NonExhaustiveMatchException.For(value);
             }

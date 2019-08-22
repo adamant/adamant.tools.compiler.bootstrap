@@ -150,6 +150,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
                     foreach (var argument in virtualFunctionCall.Arguments)
                         EnlivenVariables(variables, argument);
                     break;
+                case ConstructSome constructSome:
+                    EnlivenVariables(variables, constructSome.Value);
+                    break;
                 case Constant _:
                     // No variables
                     break;

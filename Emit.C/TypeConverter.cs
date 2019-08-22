@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Runtime.InteropServices;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
@@ -30,6 +31,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     return Convert(referenced) + "*";
                 case FunctionType functionType:
                     return $"{Convert(functionType.ReturnType)}(*)({string.Join(", ", functionType.ParameterTypes.Select(Convert))})";
+                case OptionalType optionalType:
+                {
+                    if (optionalType.Referent is ReferenceType referenceType)
+                        return Convert(referenceType);
+
+                    return "_opt__" + Convert(optionalType.Referent);
+                }
                 default:
                     throw NonExhaustiveMatchException.For(type);
             }
