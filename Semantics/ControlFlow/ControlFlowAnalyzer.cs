@@ -39,9 +39,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private BlockBuilder currentBlock;
 
         /// <summary>
-        /// The block that a break statement should go to
+        /// The block that a `break` statement should go to
         /// </summary>
         private BlockBuilder breakToBlock;
+
+        /// <summary>
+        /// The block that a `next` statement should go to
+        /// </summary>
+        private BlockBuilder continueToBlock;
 
         private Scope nextScope;
         private readonly Stack<Scope> scopes = new Stack<Scope>();
@@ -209,6 +214,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     currentBlock.AddAction(ConvertInvocationToValue(invocation), invocation.Span, CurrentScope);
                     return;
                 case ReturnExpressionSyntax returnExpression:
+                {
                     if (returnExpression.ReturnValue != null)
                     {
                         var isOwn = returnType.ValueSemantics == ValueSemantics.Own;
@@ -228,6 +234,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     // There is no exit from a return block, hence null for exit block
                     currentBlock = null;
                     return;
+                }
                 case ForeachExpressionSyntax foreachExpression:
                 {
                     // For now, we support only range syntax `foreach x: T in z..y` ranges
@@ -261,8 +268,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                                                         foreachExpression.Block.Span.AtStart(),
                                                         CurrentScope);
                     currentBlock = loopEntry;
+                    var conditionBlock = continueToBlock = graph.NewBlock();
                     var loopExit = breakToBlock = graph.NewBlock();
                     ConvertExpressionToStatement(foreachExpression.Block);
+                    // If it always breaks, there isn't a current block
+                    currentBlock?.AddGoto(conditionBlock,
+                        foreachExpression.Block.Span.AtEnd(),
+                        CurrentScope);
+                    currentBlock = conditionBlock;
                     var one = new IntegerConstant(1, variableType, foreachExpression.Span);
                     var addOneValue = new BinaryOperation(loopVariableReference, BinaryOperator.Plus, one, variableType);
                     AssignToPlace(loopVariableLValue, addOneValue, startExpression.Span);
@@ -281,6 +294,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     currentBlock = conditionBlock;
                     var condition = ConvertToOperand(whileExpression.Condition);
                     var loopEntry = graph.NewBlock();
+                    continueToBlock = conditionBlock;
                     breakToBlock = graph.NewBlock();
                     conditionBlock.AddIf(condition, loopEntry, breakToBlock, whileExpression.Condition.Span, CurrentScope);
                     currentBlock = loopEntry;
@@ -298,6 +312,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                                             loopExpression.Block.Span.AtStart(),
                                             CurrentScope);
                     currentBlock = loopEntry;
+                    continueToBlock = loopEntry;
                     breakToBlock = graph.NewBlock();
                     ConvertExpressionToStatement(loopExpression.Block);
                     // If it always breaks, there isn't a current block
@@ -313,6 +328,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     currentBlock.AddGoto(
                         breakToBlock ?? throw new InvalidOperationException(),
                         breakExpression.Span,
+                        CurrentScope);
+                    currentBlock = null;
+                    return;
+                }
+                case NextExpressionSyntax nextExpression:
+                {
+                    ExitScope(nextExpression.Span.AtEnd());
+                    currentBlock.AddGoto(
+                        continueToBlock ?? throw new InvalidOperationException(),
+                        nextExpression.Span,
                         CurrentScope);
                     currentBlock = null;
                     return;
