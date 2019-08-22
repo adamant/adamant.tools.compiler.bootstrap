@@ -38,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             projects.Add(projectDir, null);
             var dependencies = config.Dependencies.Select(d =>
             {
-                var dependencyConfig = configs.AtPath(d.Value.Path);
+                var dependencyConfig = configs[d.Key];
                 var dependencyProject = GetOrAdd(dependencyConfig, configs);
                 return new ProjectReference(d.Key, dependencyProject, d.Value.Trusted);
             }).ToList();

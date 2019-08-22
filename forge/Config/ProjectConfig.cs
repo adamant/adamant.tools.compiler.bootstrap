@@ -31,14 +31,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Config
         {
             var extension = Path.GetExtension(path);
             string projectFilePath;
-            if (extension == "vson")
+            if (Directory.Exists(path))
+            {
+                projectFilePath = Path.Combine(path, FileName);
+            }
+            else if (extension == "vson")
             {
                 projectFilePath = path;
-            }
-            else if (string.IsNullOrEmpty(extension))
-            {
-                // Assume it is a directory
-                projectFilePath = Path.Combine(path, FileName);
             }
             else
             {
