@@ -1,5 +1,6 @@
 ﻿#include "RuntimeLibrary.h"
 #include <stdio.h>
+#include <string.h>
 
 // Reminder: `extern` function declarations are so the compiler knows what
 // object file to put the non-inline copies of inlined functions in.
@@ -51,6 +52,13 @@ extern String String___op_string_literal__2(_size count, _byte* bytes);
 void print_string__1(String text)
 {
     printf("%.*s", (int)text.byte_count._value, (char*)text.bytes);
+}
+
+String read_string__0()
+{
+    char *str = malloc(1024);
+    gets_s(str, 1024);
+    return (String) { (_size) { strnlen_s(str,1024) }, (_byte *)str };
 }
 
 String _uint__to_display_string__0(_uint value)

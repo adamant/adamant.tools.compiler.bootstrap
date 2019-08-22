@@ -23,6 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             {
                 stringSymbol,
                 BuildPrintStringSymbol(stringType),
+                BuildReadStringSymbol(stringType),
 
                 BuildBoolSymbol(),
 
@@ -66,6 +67,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         {
             var name = new SimpleName("print_string");
             var type = new FunctionType(new[] { stringType }, DataType.Void);
+            return Symbol.NewFunction(name, type);
+        }
+
+        private static ISymbol BuildReadStringSymbol(DataType stringType)
+        {
+            var name = new SimpleName("read_string");
+            var type = new FunctionType(Enumerable.Empty<DataType>(), stringType);
             return Symbol.NewFunction(name, type);
         }
 

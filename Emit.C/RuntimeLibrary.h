@@ -61,7 +61,7 @@ typedef struct { intptr_t _value; } _offset;
 INTEGER_OPERATIONS(_offset)
 
 // `String` type
-// Note: For now, we have moved strings
+// Note: For now, strings are intrinsic
 typedef struct
 {
     _size byte_count;
@@ -75,4 +75,5 @@ inline String String___op_string_literal__2(_size byte_count, _byte* bytes)
 
 // Direct support through the runtime for now
 void print_string__1(String text);
+String read_string__0();
 String _uint__to_display_string__0(_uint value);
