@@ -398,6 +398,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var span = TextSpan.Covering(breakKeyword, expression?.Span);
                     return new BreakExpressionSyntax(span, expression);
                 }
+                case INextKeywordToken _:
+                {
+                    var span = Tokens.Required<INextKeywordToken>();
+                    return new NextExpressionSyntax(span);
+                }
                 case IUnsafeKeywordToken _:
                     return ParseUnsafeExpression();
                 case IRefKeywordToken _:

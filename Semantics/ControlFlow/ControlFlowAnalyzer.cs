@@ -271,8 +271,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     currentBlock = loopExit;
                     return;
                 }
-                case WhileExpressionSyntax _:
-                    throw new NotImplementedException("Control flow for `while` not implemented.");
+                case WhileExpressionSyntax whileExpression:
+                {
+                    // There is a block for the condition, it then goes either to
+                    // the body or the after block.
+                    var conditionBlock = graph.NewEntryBlock(currentBlock,
+                                            whileExpression.Condition.Span.AtStart(),
+                                            CurrentScope);
+                    currentBlock = conditionBlock;
+                    var condition = ConvertToOperand(whileExpression.Condition);
+                    var loopEntry = graph.NewBlock();
+                    breakToBlock = graph.NewBlock();
+                    conditionBlock.AddIf(condition, loopEntry, breakToBlock, whileExpression.Condition.Span, CurrentScope);
+                    currentBlock = loopEntry;
+                    ConvertExpressionToStatement(whileExpression.Block);
+                    // If it always breaks, there isn't a current block
+                    currentBlock?.AddGoto(conditionBlock,
+                                        whileExpression.Block.Span.AtEnd(),
+                                        CurrentScope);
+                    currentBlock = breakToBlock;
+                    return;
+                }
                 case LoopExpressionSyntax loopExpression:
                 {
                     var loopEntry = graph.NewEntryBlock(currentBlock,
@@ -289,6 +308,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     return;
                 }
                 case BreakExpressionSyntax breakExpression:
+                {
                     ExitScope(breakExpression.Span.AtEnd());
                     currentBlock.AddGoto(
                         breakToBlock ?? throw new InvalidOperationException(),
@@ -296,7 +316,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         CurrentScope);
                     currentBlock = null;
                     return;
+                }
                 case IfExpressionSyntax ifExpression:
+                {
                     var containingBlock = currentBlock;
                     var condition = ConvertToOperand(ifExpression.Condition);
                     var thenEntry = graph.NewBlock();
@@ -326,6 +348,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     containingBlock.AddIf(condition, thenEntry, elseEntry, ifExpression.Condition.Span, CurrentScope);
                     currentBlock = exit;
                     return;
+                }
                 case BlockSyntax block:
                 {
                     // Starting a new nested scope

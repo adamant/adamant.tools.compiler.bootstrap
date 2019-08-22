@@ -578,6 +578,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             return breakExpression.Type = DataType.Never;
         }
 
+        private DataType InferExpressionTypeFor(NextExpressionSyntax nextExpression)
+        {
+            return nextExpression.Type = DataType.Never;
+        }
+
         private DataType InferExpressionTypeFor(AssignmentExpressionSyntax assignmentExpression)
         {
             var left = InferExpressionType(assignmentExpression.LeftOperand);

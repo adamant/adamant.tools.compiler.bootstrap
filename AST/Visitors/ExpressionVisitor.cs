@@ -98,12 +98,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case ForeachExpressionSyntax foreachExpression:
                     VisitForeachExpression(foreachExpression, args);
                     break;
+                case NextExpressionSyntax nextExpression:
+                    VisitNextExpression(nextExpression, args);
+                    break;
+                case WhileExpressionSyntax whileExpression:
+                    VisitWhileExpression(whileExpression, args);
+                    break;
                 case null:
                     // Ignore
                     break;
                 default:
                     throw NonExhaustiveMatchException.For(expression);
             }
+        }
+
+        public virtual void VisitWhileExpression(WhileExpressionSyntax whileExpression, A args)
+        {
+            VisitExpression(whileExpression.Condition, args);
+            VisitExpression(whileExpression.Block, args);
+        }
+
+        public virtual void VisitNextExpression(NextExpressionSyntax nextExpression, A args)
+        {
         }
 
         public virtual void VisitForeachExpression(ForeachExpressionSyntax foreachExpression, A args)
