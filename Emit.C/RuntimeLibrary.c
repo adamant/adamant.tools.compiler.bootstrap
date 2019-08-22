@@ -4,9 +4,15 @@
 // Reminder: `extern` function declarations are so the compiler knows what
 // object file to put the non-inline copies of inlined functions in.
 
+#define EXTERN_OPTIONAL_TYPE(type) \
+extern inline _opt__##type _opt__##type##__Some(type x); \
+const _opt__##type _opt__##type##__none = (_opt__##type) {0};
+
 // `bool` type
 extern inline _bool _bool__and(_bool x, _bool y);
 extern inline _bool _bool__or(_bool x, _bool y);
+
+EXTERN_OPTIONAL_TYPE(_bool)
 
 // Extern Integer Type Operations Macro
 #define EXTERN_INTEGER_OPERATIONS(type) \
@@ -24,6 +30,7 @@ extern inline _bool type##__gte(type x, type y);
 
 // `int` type
 EXTERN_INTEGER_OPERATIONS(_int)
+EXTERN_OPTIONAL_TYPE(_int)
 
 // `uint` type
 EXTERN_INTEGER_OPERATIONS(_uint)

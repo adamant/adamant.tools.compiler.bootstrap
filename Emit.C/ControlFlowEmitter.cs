@@ -226,7 +226,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     else
                     {
                         var typeName = nameMangler.Mangle(constructSome.Type.Referent);
-                        return $"_opt_{typeName}__Some({someValue})";
+                        return $"_opt__{typeName}__Some({someValue})";
                     }
                     throw new NotImplementedException();
                 }
