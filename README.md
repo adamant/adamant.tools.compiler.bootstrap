@@ -19,7 +19,7 @@ The basic object-oriented subset is planned to include a minimal set of features
 * [x] Constructors
 * [x] Basic Methods - no generics
 * [ ] Optional Types
-* [ ] Basic Control Flow - `if`, `while`, `loop` `break`, `next`
+* [x] Basic Control Flow - `if`, `while`, `loop` `break`, `next`
 * [ ] Conversions and Casts - `as`, `as!`, `as?` (not including unboxing)
 * [ ] Namespaces
 * [ ] Strings
