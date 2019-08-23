@@ -174,14 +174,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     break;
                 case StringConstantType _:
                 {
-                    if (targetType is UserObjectType objectType)
+                    ISymbol symbol;
+                    switch (targetType)
                     {
-                        var conversionOperators = objectType.Symbol.Lookup(SpecialName.OperatorStringLiteral);
-                        if (conversionOperators.Count == 1) // TODO actually check we can call it
-                        {
-                            expression = new ImplicitLiteralConversionExpression(expression, objectType, conversionOperators.Single());
-                        }
+                        case UserObjectType objectType:
+                            symbol = objectType.Symbol;
+                            break;
+                        default:
+                            throw new NotImplementedException();
+                    }
+                    var conversionOperators = symbol.Lookup(SpecialName.OperatorStringLiteral);
+                    // TODO actually check we can call it
+                    if (conversionOperators.Count == 1)
+                    {
+                        expression = new ImplicitLiteralConversionExpression(expression, targetType, conversionOperators.Single());
+                    }
+                    else
+                    {
                         // TODO if there is more than one
+                        throw new NotImplementedException();
                     }
                 }
                 break;
@@ -293,7 +304,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case BinaryOperator.GreaterThan:
                 case BinaryOperator.GreaterThanOrEqual:
                     compatible = (leftType == DataType.Bool && rightType == DataType.Bool)
-                                 || NumericOperatorTypesAreCompatible(ref binaryOperatorExpression.LeftOperand, ref binaryOperatorExpression.RightOperand, null);
+                                 || NumericOperatorTypesAreCompatible(ref binaryOperatorExpression.LeftOperand, ref binaryOperatorExpression.RightOperand, null)
+                                 || OperatorOverloadDefined(@operator, binaryOperatorExpression.LeftOperand, ref binaryOperatorExpression.RightOperand);
                     binaryOperatorExpression.Type = DataType.Bool;
                     break;
                 case BinaryOperator.And:
@@ -810,6 +822,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     // exactly which types this doesn't work on.
                     throw NonExhaustiveMatchException.For(leftType);
             }
+        }
+
+        private bool OperatorOverloadDefined(BinaryOperator @operator, ExpressionSyntax leftOperand, ref ExpressionSyntax rightOperand)
+        {
+            // all other operators are not yet implemented
+            if (@operator != BinaryOperator.EqualsEquals) return false;
+
+            if (!(leftOperand.Type is UserObjectType userObjectType)) return false;
+            var equalityOperators = userObjectType.Symbol.Lookup(SpecialName.OperatorEquals);
+            if (equalityOperators.Count != 1) return false;
+            var equalityOperator = equalityOperators.Single();
+            if (!(equalityOperator.Type is FunctionType functionType) || functionType.Arity != 2)
+                return false;
+            InsertImplicitConversionIfNeeded(ref rightOperand, functionType.ParameterTypes[1]);
+            return IsAssignableFrom(functionType.ParameterTypes[1], rightOperand.Type);
+
         }
 
         // Re-expose type analyzer to BasicAnalyzer

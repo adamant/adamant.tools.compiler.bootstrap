@@ -47,6 +47,14 @@ EXTERN_INTEGER_OPERATIONS(_offset)
 
 // `String` type
 extern String String___op_string_literal__2(_size count, _byte* bytes);
+_bool String___op_equals__2(String left, String right)
+{
+    if(left.byte_count._value != right.byte_count._value)
+        return (_bool) { 0 };
+
+    int cmp = strncmp((char*)left.bytes, (char*)right.bytes, left.byte_count._value);
+    return (_bool) { cmp==0 };
+}
 
 // Direct support for console IO through the runtime for now
 void print_string__1(String text)

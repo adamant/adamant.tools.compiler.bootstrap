@@ -591,9 +591,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     // TODO handle calls to overloaded operators
                     var leftOperand = ConvertToOperand(expression.LeftOperand);
                     var rightOperand = ConvertToOperand(expression.RightOperand);
-                    // What matters is the type we are operating on, for comparisons, that is different than the result type which is bool
-                    var operandType = (SimpleType)expression.LeftOperand.Type;
-                    return new BinaryOperation(leftOperand, expression.Operator, rightOperand, operandType);
+                    switch (expression.LeftOperand.Type)
+                    {
+                        case SimpleType operandType:
+                        {
+                            // What matters is the type we are operating on, for comparisons, that is different than the result type which is bool
+                            return new BinaryOperation(leftOperand, expression.Operator, rightOperand, operandType);
+                        }
+                        case UserObjectType operandType:
+                        {
+                            if (expression.Operator != BinaryOperator.EqualsEquals) throw new NotImplementedException();
+                            var equalityOperators = operandType.Symbol.Lookup(SpecialName.OperatorEquals);
+                            if (equalityOperators.Count == 1)
+                            {
+                                var equalityOperator = equalityOperators.Single();
+                                return new FunctionCall(equalityOperator.FullName,
+                                            (FunctionType)equalityOperator.Type,
+                                            new[] { leftOperand, rightOperand },
+                                            expression.Span);
+                            }
+                            else throw new NotImplementedException();
+                        }
+                        break;
+                        default:
+                            throw NonExhaustiveMatchException.For(expression.LeftOperand.Type);
+                    }
                 }
                 case BinaryOperator.And:
                 case BinaryOperator.Or:

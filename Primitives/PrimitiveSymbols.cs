@@ -48,18 +48,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         {
             var typeName = new SimpleName("String");
             var stringLiteralOperator = Symbol.New(typeName.Qualify(SpecialName.OperatorStringLiteral));
+            var equalsOperator = Symbol.New(typeName.Qualify(SpecialName.OperatorEquals));
             var symbols = new List<ISymbol>()
             {
                 // Making these fields for now
                 Symbol.New(typeName.Qualify("bytes"), DataType.BytePointer),
                 Symbol.New(typeName.Qualify("byte_count"), DataType.Size),
-                stringLiteralOperator
+                stringLiteralOperator,
+                equalsOperator,
             };
 
             var stringSymbol = Symbol.NewType(typeName, symbols);
             var stringType = UserObjectType.Declaration(stringSymbol, false);
             stringSymbol.Type = new Metatype(stringType);
             stringLiteralOperator.Type = new FunctionType(new DataType[] { DataType.Size, DataType.BytePointer }, stringType);
+            equalsOperator.Type = new FunctionType(new[] { stringType, stringType }, DataType.Bool);
             return stringSymbol;
         }
 

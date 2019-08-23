@@ -72,6 +72,7 @@ inline String String___op_string_literal__2(_size byte_count, _byte* bytes)
 {
     return (String) { byte_count, bytes };
 }
+_bool String___op_equals__2(String left, String right);
 
 // Direct support through the runtime for now
 void print_string__1(String text);

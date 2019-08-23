@@ -33,6 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         public static readonly SimpleName Float = SimpleName.Special("float");
 
         public static readonly SimpleName OperatorStringLiteral = SimpleName.Special("op_string_literal");
+        public static readonly SimpleName OperatorEquals = SimpleName.Special("op_equals");
 
         public static SimpleName Constructor(string name = null)
         {
