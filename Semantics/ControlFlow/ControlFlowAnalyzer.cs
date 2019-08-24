@@ -138,7 +138,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         value = assignFrom.AsBorrow();
                         break;
                     default:
-                        throw NonExhaustiveMatchException.ForEnum(variableSemantics);
+                        throw NonExhaustiveMatchException.For(variableSemantics);
                 }
             }
 
@@ -414,7 +414,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                                 binaryOperator = BinaryOperator.Slash;
                                 break;
                             default:
-                                throw NonExhaustiveMatchException.ForEnum(assignmentExpression.Operator);
+                                throw NonExhaustiveMatchException.For(assignmentExpression.Operator);
                         }
                         value = new BinaryOperation(ConvertToOperand(place, assignmentExpression.LeftOperand.Type), binaryOperator, rightOperand, type);
                     }
@@ -627,7 +627,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     return new BinaryOperation(leftOperand, expression.Operator, rightOperand, (SimpleType)expression.Type);
                 }
                 default:
-                    throw NonExhaustiveMatchException.ForEnum(expression.Operator);
+                    throw NonExhaustiveMatchException.For(expression.Operator);
             }
         }
 
@@ -642,7 +642,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     // This is a no-op
                     return ConvertToValue(expression.Operand);
                 default:
-                    throw NonExhaustiveMatchException.ForEnum(expression.Operator);
+                    throw NonExhaustiveMatchException.For(expression.Operator);
             }
         }
 

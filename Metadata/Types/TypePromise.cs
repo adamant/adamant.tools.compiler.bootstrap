@@ -71,7 +71,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                 case PromiseState.Fulfilled:
                     return DataType.ToString();
                 default:
-                    throw NonExhaustiveMatchException.ForEnum(State);
+                    throw NonExhaustiveMatchException.For(State);
             }
         }
     }

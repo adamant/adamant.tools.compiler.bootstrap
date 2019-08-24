@@ -213,7 +213,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
                 }
                 break;
                 default:
-                    throw NonExhaustiveMatchException.ForEnum(project.Template);
+                    throw NonExhaustiveMatchException.For(project.Template);
             }
 
             File.WriteAllText(outputPath, codeEmitter.GetEmittedCode(), Encoding.UTF8);
@@ -241,16 +241,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             {
                 case ProjectTemplate.App:
                 {
-                    outputPath = System.IO.Path.ChangeExtension(codePath, "exe");
+                    outputPath = Path.ChangeExtension(codePath, "exe");
                 }
                 break;
                 case ProjectTemplate.Lib:
                 {
-                    outputPath = System.IO.Path.ChangeExtension(codePath, "dll");
+                    outputPath = Path.ChangeExtension(codePath, "dll");
                 }
                 break;
                 default:
-                    throw NonExhaustiveMatchException.ForEnum(project.Template);
+                    throw NonExhaustiveMatchException.For(project.Template);
             }
 
             lock (consoleLock)

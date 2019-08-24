@@ -8,7 +8,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public partial class Parser
     {
-
         public FixedList<T> AcceptMany<T>(Func<T> acceptItem)
             where T : class
         {

@@ -314,7 +314,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     binaryOperatorExpression.Type = DataType.Bool;
                     break;
                 default:
-                    throw NonExhaustiveMatchException.ForEnum(@operator);
+                    throw NonExhaustiveMatchException.For(@operator);
             }
             if (!compatible)
                 diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandsOfType(file,
@@ -390,7 +390,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     }
                     break;
                 default:
-                    throw NonExhaustiveMatchException.ForEnum(@operator);
+                    throw NonExhaustiveMatchException.For(@operator);
             }
             if (typeError)
                 diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandOfType(file,

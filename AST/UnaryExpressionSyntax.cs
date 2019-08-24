@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
                 case UnaryOperatorFixity.Postfix:
                     return $"{Operand}{Operator.ToSymbolString()}";
                 default:
-                    throw NonExhaustiveMatchException.ForEnum(Fixty);
+                    throw NonExhaustiveMatchException.For(Fixty);
             }
         }
     }

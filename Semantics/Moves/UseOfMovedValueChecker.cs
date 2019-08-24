@@ -67,7 +67,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
                     // Not moving value
                     return possiblyMoved;
                 default:
-                    throw NonExhaustiveMatchException.ForEnum(identifierName.Type.ValueSemantics);
+                    throw NonExhaustiveMatchException.For(identifierName.Type.ValueSemantics);
             }
         }
 

@@ -43,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
                     mutability = "alias ";
                     break;
                 default:
-                    throw NonExhaustiveMatchException.ForEnum(ValueSemantics);
+                    throw NonExhaustiveMatchException.For(ValueSemantics);
             }
             return mutability + Variable;
         }

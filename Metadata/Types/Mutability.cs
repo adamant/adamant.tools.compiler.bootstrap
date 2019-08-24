@@ -69,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                 case Upgradable.Explicitly:
                     return "(mut) ";
                 default:
-                    throw NonExhaustiveMatchException.ForEnum(upgradable);
+                    throw NonExhaustiveMatchException.For(upgradable);
             }
         }
 
@@ -110,7 +110,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                     case Upgradable.Explicitly:
                         return "Immutable (Explicitly Upgrade) ";
                     default:
-                        throw NonExhaustiveMatchException.ForEnum(upgradable);
+                        throw NonExhaustiveMatchException.For(upgradable);
                 }
             }
         }

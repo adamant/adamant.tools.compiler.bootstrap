@@ -450,7 +450,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                         }
                         break;
                         default:
-                            throw NonExhaustiveMatchException.ForEnum(varRef.ValueSemantics);
+                            throw NonExhaustiveMatchException.For(varRef.ValueSemantics);
                     }
                 }
                 break;

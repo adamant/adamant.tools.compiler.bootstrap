@@ -196,7 +196,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                             @operator = "gte";
                             break;
                         default:
-                            throw NonExhaustiveMatchException.ForEnum(binaryOperation.Operator);
+                            throw NonExhaustiveMatchException.For(binaryOperation.Operator);
                     }
                     return $"{operationType}__{@operator}({left}, {right})";
                 }
