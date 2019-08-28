@@ -48,5 +48,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
             if (endPositionComparison != 0) return endPositionComparison;
             return ErrorCode.CompareTo(other.ErrorCode);
         }
+
+        public override string ToString()
+        {
+            return $"{Level} {ErrorCode}: {Message} @{File.Reference}@{Span}";
+        }
     }
 }

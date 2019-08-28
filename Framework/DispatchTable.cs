@@ -79,10 +79,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
                     $"Can't visit `null` because there is no `{visitorType.Name}.{methodName}` method.");
             }
 
-            if (methods.TryGetValue(arguments[0].GetType(), out var method))
-                return method.Info.Invoke(target, arguments);
+            var dispatchType = arguments[0].GetType();
+            if (!methods.TryGetValue(dispatchType, out var method))
+            {
+                // It wasn't directly found, that means it is a subtype
+                method = methods.Single(pair => pair.Key.IsAssignableFrom(dispatchType)).Value;
+                // Add so future dispatches are efficient
+                methods.Add(dispatchType, method);
+            }
 
-            throw new NotImplementedException();
+            return method.Info.Invoke(target, arguments);
         }
     }
 }
