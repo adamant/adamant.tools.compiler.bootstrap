@@ -5,20 +5,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class FieldParameterSyntax : ParameterSyntax
     {
+        public SimpleName FieldName { get; }
+
         public ExpressionSyntax DefaultValue { get; }
 
         public FieldParameterSyntax(
             TextSpan span,
             Name fullName,
+            SimpleName fieldName,
             ExpressionSyntax defaultValue)
             : base(span, false, fullName)
         {
+            FieldName = fieldName;
             DefaultValue = defaultValue;
         }
 
         public override string ToString()
         {
-            throw new System.NotImplementedException();
+            var defaultValue = DefaultValue != null ? " = " + DefaultValue : "";
+            return $".{Name}{defaultValue}";
         }
     }
 }

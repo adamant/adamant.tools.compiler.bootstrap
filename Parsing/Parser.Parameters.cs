@@ -33,8 +33,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     if (equals != null)
                         defaultValue = ParseExpression();
                     var span = TextSpan.Covering(dot, identifier.Span, defaultValue?.Span);
-                    var name = nameContext.Qualify(SimpleName.Special("field_" + identifier.Value));
-                    return new FieldParameterSyntax(span, name, defaultValue);
+                    var fullName = nameContext.Qualify(SimpleName.Special("field_" + identifier.Value));
+                    var fieldName = new SimpleName(identifier.Value);
+                    return new FieldParameterSyntax(span, fullName, fieldName, defaultValue);
                 }
                 default:
                 {

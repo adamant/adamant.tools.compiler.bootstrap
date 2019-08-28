@@ -160,7 +160,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         // Skip, we have already handled the self parameter
                         break;
                     case FieldParameterSyntax fieldParameter:
-                        throw new NotImplementedException();
+                        parameter.Type.BeginFulfilling();
+                        var field = function.DeclaringType.Members
+                            .OfType<FieldDeclarationSyntax>()
+                            .SingleOrDefault(f => f.Name == fieldParameter.FieldName);
+                        if (field == null)
+                        {
+                            parameter.Type.Fulfill(DataType.Unknown);
+                            // TODO report an error
+                            throw new NotImplementedException();
+                        }
+                        else
+                        {
+                            ResolveSignatureTypesInField(field);
+                            parameter.Type.Fulfill(field.Type.Fulfilled());
+                        }
+                        break;
                     default:
                         throw NonExhaustiveMatchException.For(parameter);
                 }
@@ -271,6 +286,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private void ResolveSignatureTypesInField(FieldDeclarationSyntax field)
         {
+            switch (field.Type.State)
+            {
+                case PromiseState.InProgress:
+                    diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan, field.Name));
+                    return;
+                case PromiseState.Fulfilled:
+                    return;   // We have already resolved it
+                case PromiseState.Pending:
+                    // we need to compute it
+                    break;
+            }
             var resolver = new BasicExpressionAnalyzer(field.File, diagnostics);
             field.Type.BeginFulfilling();
             var type = resolver.CheckTypeExpression(field.TypeExpression);
