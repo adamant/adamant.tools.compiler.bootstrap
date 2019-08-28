@@ -610,9 +610,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                                             new[] { leftOperand, rightOperand },
                                             expression.Span);
                             }
-                            else throw new NotImplementedException();
+                            throw new NotImplementedException();
                         }
-                        break;
                         default:
                             throw NonExhaustiveMatchException.For(expression.LeftOperand.Type);
                     }

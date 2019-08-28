@@ -23,6 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
     /// </summary>
     public class NameMangler
     {
+        // try https://github.com/atifaziz/Nunycode
         readonly IdnMapping mapping = new IdnMapping();
 
         // Note, we don't have to worry about whether the identifier starts with
