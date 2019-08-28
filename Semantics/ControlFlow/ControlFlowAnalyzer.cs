@@ -13,6 +13,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 {
+    // TODO seems like this should be name builder not analyzer, but we already have another class named builder
     public class ControlFlowAnalyzer
     {
         public static void BuildGraphs(IEnumerable<MemberDeclarationSyntax> declarations)
@@ -73,7 +74,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
             // TODO don't emit temp variables for unused parameters
             foreach (var parameter in function.Parameters.Where(p => !p.Unused))
-                graph.AddParameter(parameter.MutableBinding, parameter.Type.Known(), CurrentScope, parameter.Name.UnqualifiedName);
+                graph.AddParameter(parameter.MutableBinding, parameter.Type.Fulfilled(), CurrentScope, parameter.Name.UnqualifiedName);
 
             currentBlock = graph.NewBlock();
             breakToBlock = null;

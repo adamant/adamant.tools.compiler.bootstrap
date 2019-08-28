@@ -412,7 +412,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         {
             var argumentTypes = newObjectExpression.Arguments.Select(InferArgumentType).ToFixedList();
             // TODO handle named constructors here
-            var constructedType = (UserObjectType)typeAnalyzer.Check(newObjectExpression.Constructor);
+            var constructingType = typeAnalyzer.Check(newObjectExpression.Constructor);
+            if (!constructingType.IsKnown)
+            {
+                diagnostics.Add(NameBindingError.CouldNotBindConstructor(file, newObjectExpression.Span));
+                newObjectExpression.ConstructorSymbol = UnknownSymbol.Instance;
+                return newObjectExpression.Type = newObjectExpression.ConstructorType = DataType.Unknown;
+            }
+            var constructedType = (UserObjectType)constructingType;
             var typeSymbol = GetSymbolForType(constructedType);
             var constructors = typeSymbol.ChildSymbols[SpecialName.New];
             constructors = ResolveOverload(constructors, null, argumentTypes);
