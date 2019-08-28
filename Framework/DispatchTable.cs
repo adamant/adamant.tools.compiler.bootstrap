@@ -82,10 +82,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
             var dispatchType = arguments[0].GetType();
             if (!methods.TryGetValue(dispatchType, out var method))
             {
-                // It wasn't directly found, that means it is a subtype
-                method = methods.Single(pair => pair.Key.IsAssignableFrom(dispatchType)).Value;
-                // Add so future dispatches are efficient
-                methods.Add(dispatchType, method);
+                if (dispatchType.HasCustomAttribute<VisitorNotSupportedAttribute>())
+                    throw new Exception($"Can't dispatch type `{dispatchType}` marked with `VisitorNotSupported` attribute. In dispatch of `{operation.DeclaringType.Name}.{operation.Name}`.");
+
+                throw new NotImplementedException($"Couldn't dispatch `{dispatchType}` to `{operation.DeclaringType.Name}.{operation.Name}`.");
             }
 
             return method.Info.Invoke(target, arguments);
