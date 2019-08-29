@@ -567,7 +567,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
         private IOperand ConvertToOperand(IValue value, DataType type)
         {
-            if (value is IOperand operand) return operand;
+            if (value is IOperand operand)
+                return operand;
             return AssignToTemp(type, value);
             //var tempVariable = graph.Let(type.AssertKnown(), CurrentScope);
             //currentBlock.AddAssignment(tempVariable.LValueReference(value.Span), value, value.Span, CurrentScope);
@@ -601,7 +602,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         }
                         case UserObjectType operandType:
                         {
-                            if (expression.Operator != BinaryOperator.EqualsEquals) throw new NotImplementedException();
+                            if (expression.Operator != BinaryOperator.EqualsEquals)
+                                throw new NotImplementedException();
                             var equalityOperators = operandType.Symbol.Lookup(SpecialName.OperatorEquals);
                             if (equalityOperators.Count == 1)
                             {
@@ -636,6 +638,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             switch (expression.Operator)
             {
                 case UnaryOperator.Not:
+                case UnaryOperator.Minus:
                     var operand = ConvertToOperand(expression.Operand);
                     return new UnaryOperation(expression.Operator, operand, expression.Span);
                 case UnaryOperator.Plus:
