@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
         public override void VisitTypeDeclaration(TypeDeclarationSyntax typeDeclaration, Void args)
         {
             base.VisitTypeDeclaration(typeDeclaration, args);
-            typeDeclaration?.Type.Known();
+            typeDeclaration?.Type.Fulfilled();
         }
 
         public override void VisitClassDeclaration(ClassDeclarationSyntax classDeclaration, Void args)
@@ -33,15 +33,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
         public override void VisitFunctionDeclaration(FunctionDeclarationSyntax functionDeclaration, Void args)
         {
             base.VisitFunctionDeclaration(functionDeclaration, args);
-            functionDeclaration?.ReturnType.Known();
-            functionDeclaration?.Type.Known();
+            functionDeclaration?.ReturnType.Fulfilled();
+            functionDeclaration?.Type.Fulfilled();
         }
 
         public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax constructorDeclaration, Void args)
         {
             base.VisitConstructorDeclaration(constructorDeclaration, args);
-            constructorDeclaration?.ReturnType.Known();
-            constructorDeclaration?.Type.Known();
+            constructorDeclaration?.ReturnType.Fulfilled();
+            constructorDeclaration?.Type.Fulfilled();
         }
 
         public override void VisitVariableDeclarationStatement(
