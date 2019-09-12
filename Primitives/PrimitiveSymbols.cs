@@ -49,6 +49,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             var typeName = new SimpleName("String");
             var stringLiteralOperator = Symbol.New(typeName.Qualify(SpecialName.OperatorStringLiteral));
             var equalsOperator = Symbol.New(typeName.Qualify(SpecialName.OperatorEquals));
+            var concatFunc = Symbol.New(typeName.Qualify(Name.From("concat")));
             var symbols = new List<ISymbol>()
             {
                 // Making these fields for now
@@ -56,6 +57,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
                 Symbol.New(typeName.Qualify("byte_count"), DataType.Size),
                 stringLiteralOperator,
                 equalsOperator,
+                concatFunc,
             };
 
             var stringSymbol = Symbol.NewType(typeName, symbols);
@@ -63,6 +65,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             stringSymbol.Type = new Metatype(stringType);
             stringLiteralOperator.Type = new FunctionType(new DataType[] { DataType.Size, DataType.BytePointer }, stringType);
             equalsOperator.Type = new FunctionType(new[] { stringType, stringType }, DataType.Bool);
+            concatFunc.Type = new FunctionType(new[] { stringType, stringType }, stringType);
             return stringSymbol;
         }
 
