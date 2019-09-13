@@ -3,9 +3,13 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
+    [Closed(
+        typeof(IdentifierNameSyntax),
+        typeof(GenericNameSyntax))]
     public abstract class NameSyntax : TypeSyntax
     {
         public SimpleName Name { get; }
@@ -16,7 +20,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             get => referencedSymbol;
             set
             {
-                if (referencedSymbol != null) throw new InvalidOperationException("Can't set referenced symbol repeatedly");
+                if (referencedSymbol != null)
+                    throw new InvalidOperationException("Can't set referenced symbol repeatedly");
                 referencedSymbol = value ?? throw new ArgumentException();
             }
         }
@@ -27,7 +32,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             get => containingScope;
             set
             {
-                if (containingScope != null) throw new InvalidOperationException("Can't set containing scope repeatedly");
+                if (containingScope != null)
+                    throw new InvalidOperationException("Can't set containing scope repeatedly");
                 containingScope = value ?? throw new ArgumentException();
             }
         }

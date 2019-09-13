@@ -1,9 +1,35 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     // An expression is also a statement
+    [Closed(
+        typeof(UnaryExpressionSyntax),
+        typeof(UnsafeExpressionSyntax),
+        typeof(NewObjectExpressionSyntax),
+        typeof(LiteralExpressionSyntax),
+        typeof(NextExpressionSyntax),
+        typeof(PlacementInitExpressionSyntax),
+        typeof(ReturnExpressionSyntax),
+        typeof(TypeKindExpressionSyntax),
+        typeof(WhileExpressionSyntax),
+        typeof(MemberAccessExpressionSyntax),
+        typeof(MatchExpressionSyntax),
+        typeof(MoveExpressionSyntax),
+        typeof(LoopExpressionSyntax),
+        typeof(LifetimeExpressionSyntax),
+        typeof(ExpressionBlockSyntax),
+        typeof(InvocationSyntax),
+        typeof(ImplicitConversionExpression),
+        typeof(ForeachExpressionSyntax),
+        typeof(IfExpressionSyntax),
+        typeof(AssignmentExpressionSyntax),
+        typeof(BreakExpressionSyntax),
+        typeof(BinaryExpressionSyntax),
+        typeof(DeleteExpressionSyntax),
+        typeof(InstanceExpressionSyntax),
+        typeof(TypeSyntax))]
     public abstract class ExpressionSyntax : StatementSyntax
     {
         public TextSpan Span { get; }

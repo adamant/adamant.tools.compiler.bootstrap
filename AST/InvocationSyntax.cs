@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class InvocationSyntax : ExpressionSyntax
+    public sealed class InvocationSyntax : ExpressionSyntax
     {
         public ExpressionSyntax Callee { get; set; }
         public FixedList<ArgumentSyntax> Arguments { get; }

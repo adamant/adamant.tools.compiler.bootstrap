@@ -13,6 +13,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ExhaustiveMatching.Analyzer" Version="0.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Framework\Framework.csproj" />
     <ProjectReference Include="..\IntermediateLanguage\IntermediateLanguage.csproj" />

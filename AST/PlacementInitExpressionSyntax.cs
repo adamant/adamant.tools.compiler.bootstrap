@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class PlacementInitExpressionSyntax : ExpressionSyntax
+    public sealed class PlacementInitExpressionSyntax : ExpressionSyntax
     {
         public ExpressionSyntax PlaceExpression { get; }
         public ExpressionSyntax Initializer { get; }

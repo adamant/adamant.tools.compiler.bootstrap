@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class StructDeclarationSyntax : TypeDeclarationSyntax
+    public sealed class StructDeclarationSyntax : TypeDeclarationSyntax
     {
         public FixedList<AttributeSyntax> Attributes { get; }
         public FixedList<IModiferToken> Modifiers { get; }

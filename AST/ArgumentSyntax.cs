@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class ArgumentSyntax : Syntax
+    public sealed class ArgumentSyntax : Syntax
     {
         public bool IsParams { get; }
         public ExpressionSyntax Value;
@@ -15,7 +15,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public override string ToString()
         {
-            if (IsParams) return $"params {Value}";
+            if (IsParams)
+                return $"params {Value}";
             return Value?.ToString() ?? "";
         }
     }

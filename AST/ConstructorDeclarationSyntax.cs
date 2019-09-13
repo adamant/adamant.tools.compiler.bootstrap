@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class ConstructorDeclarationSyntax : FunctionDeclarationSyntax
+    public sealed class ConstructorDeclarationSyntax : FunctionDeclarationSyntax
     {
         public ConstructorDeclarationSyntax(
             CodeFile file,

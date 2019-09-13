@@ -1,6 +1,6 @@
 using System;
 using System.Diagnostics;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
@@ -51,15 +51,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         public bool IsAssignableFrom(Mutability other)
         {
-            if (!mutable) return true;
-            if (other.mutable) return true;
-            if (other.upgradable == Upgradable.Implicitly) return true;
+            if (!mutable)
+                return true;
+            if (other.mutable)
+                return true;
+            if (other.upgradable == Upgradable.Implicitly)
+                return true;
             return false;
         }
 
         public override string ToString()
         {
-            if (mutable) return "mut ";
+            if (mutable)
+                return "mut ";
 
             switch (upgradable)
             {
@@ -69,7 +73,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                 case Upgradable.Explicitly:
                     return "(mut) ";
                 default:
-                    throw NonExhaustiveMatchException.For(upgradable);
+                    throw ExhaustiveMatch.Failed(upgradable);
             }
         }
 
@@ -99,7 +103,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         {
             get
             {
-                if (mutable) return "Mutable";
+                if (mutable)
+                    return "Mutable";
 
                 switch (upgradable)
                 {
@@ -110,7 +115,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                     case Upgradable.Explicitly:
                         return "Immutable (Explicitly Upgrade) ";
                     default:
-                        throw NonExhaustiveMatchException.For(upgradable);
+                        throw ExhaustiveMatch.Failed(upgradable);
                 }
             }
         }

@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
@@ -28,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
                 case AssignmentOperator.Slash:
                     return "/=";
                 default:
-                    throw NonExhaustiveMatchException.For(@operator);
+                    throw ExhaustiveMatch.Failed(@operator);
             }
         }
     }

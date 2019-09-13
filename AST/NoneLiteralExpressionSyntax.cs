@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class NoneLiteralExpressionSyntax : LiteralExpressionSyntax
+    public sealed class NoneLiteralExpressionSyntax : LiteralExpressionSyntax
     {
         public NoneLiteralExpressionSyntax(TextSpan span)
             : base(span)

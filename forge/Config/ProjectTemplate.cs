@@ -4,6 +4,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Config
     {
         App,
         Lib,
-        Web,
+        //Web, // TODO add web template
     }
 }

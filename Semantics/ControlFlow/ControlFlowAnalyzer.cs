@@ -10,6 +10,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 {
@@ -138,8 +139,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     case ValueSemantics.Borrow:
                         value = assignFrom.AsBorrow();
                         break;
+                    case ValueSemantics.LValue:
+                    case ValueSemantics.Move:
+                    case ValueSemantics.Empty:
+                    case ValueSemantics.Copy:
+                        throw new NotImplementedException();
                     default:
-                        throw NonExhaustiveMatchException.For(variableSemantics);
+                        throw ExhaustiveMatch.Failed(variableSemantics);
                 }
             }
 
@@ -402,6 +408,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         BinaryOperator binaryOperator;
                         switch (assignmentExpression.Operator)
                         {
+                            case AssignmentOperator.Direct:
+                                throw new UnreachableCodeException("Case excluded by if statement");
                             case AssignmentOperator.Plus:
                                 binaryOperator = BinaryOperator.Plus;
                                 break;
@@ -415,7 +423,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                                 binaryOperator = BinaryOperator.Slash;
                                 break;
                             default:
-                                throw NonExhaustiveMatchException.For(assignmentExpression.Operator);
+                                throw ExhaustiveMatch.Failed(assignmentExpression.Operator);
                         }
                         value = new BinaryOperation(ConvertToOperand(place, assignmentExpression.LeftOperand.Type), binaryOperator, rightOperand, type);
                     }
@@ -628,8 +636,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     var rightOperand = ConvertToOperand(expression.RightOperand);
                     return new BinaryOperation(leftOperand, expression.Operator, rightOperand, (SimpleType)expression.Type);
                 }
+                case BinaryOperator.DotDot:
+                    throw new NotImplementedException("Conversion of `..` for binary operators");
                 default:
-                    throw NonExhaustiveMatchException.For(expression.Operator);
+                    throw ExhaustiveMatch.Failed(expression.Operator);
             }
         }
 
@@ -644,8 +654,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case UnaryOperator.Plus:
                     // This is a no-op
                     return ConvertToValue(expression.Operand);
+                case UnaryOperator.Question:
+                case UnaryOperator.At:
+                case UnaryOperator.Caret:
+                    throw new NotImplementedException("Unary expression conversion not implemented");
                 default:
-                    throw NonExhaustiveMatchException.For(expression.Operator);
+                    throw ExhaustiveMatch.Failed(expression.Operator);
             }
         }
 

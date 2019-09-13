@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class UnsafeExpressionSyntax : ExpressionSyntax
+    public sealed class UnsafeExpressionSyntax : ExpressionSyntax
     {
         public ExpressionSyntax Expression { get; }
 

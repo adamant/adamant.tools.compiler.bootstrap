@@ -16,11 +16,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         {
         }
 
-        public static NonExhaustiveMatchException For(Enum value)
-        {
-            return new NonExhaustiveMatchException($"Matching value {value.GetType().Name}.{value}");
-        }
-
         public static NonExhaustiveMatchException For<T>(T value)
             where T : class
         {

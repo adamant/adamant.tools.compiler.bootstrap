@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class NewObjectExpressionSyntax : ExpressionSyntax
+    public sealed class NewObjectExpressionSyntax : ExpressionSyntax
     {
         /// <summary>
         /// Note that this could represent a named or unnamed constructor. So
@@ -22,7 +22,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             get => constructorSymbol;
             set
             {
-                if (constructorSymbol != null) throw new InvalidOperationException("Can't set constructor symbol repeatedly");
+                if (constructorSymbol != null)
+                    throw new InvalidOperationException("Can't set constructor symbol repeatedly");
                 constructorSymbol = value ?? throw new ArgumentException();
             }
         }
@@ -32,7 +33,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             get => constructorType;
             set
             {
-                if (constructorType != null) throw new InvalidOperationException("Can't set constructor type repeatedly");
+                if (constructorType != null)
+                    throw new InvalidOperationException("Can't set constructor type repeatedly");
                 constructorType = value ?? throw new ArgumentException();
             }
         }

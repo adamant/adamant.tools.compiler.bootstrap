@@ -7,7 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     [VisitorNotSupported("Only implemented in parser")]
-    public class SetterDeclarationSyntax : FunctionDeclarationSyntax, IAccessorSymbol
+    public sealed class SetterDeclarationSyntax : FunctionDeclarationSyntax, IAccessorSymbol
     {
         public FixedList<AttributeSyntax> Attributes { get; }
         public Name PropertyName { get; }

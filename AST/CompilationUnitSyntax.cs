@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class CompilationUnitSyntax : Syntax
+    public sealed class CompilationUnitSyntax : Syntax
     {
         public CodeFile CodeFile { get; }
         public RootName ImplicitNamespaceName { get; }

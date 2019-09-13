@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
@@ -71,7 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                 case PromiseState.Fulfilled:
                     return DataType.ToString();
                 default:
-                    throw NonExhaustiveMatchException.For(State);
+                    throw ExhaustiveMatch.Failed(State);
             }
         }
     }

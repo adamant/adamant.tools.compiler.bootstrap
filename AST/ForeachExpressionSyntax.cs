@@ -7,7 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class ForeachExpressionSyntax : ExpressionSyntax, ISymbol
+    public sealed class ForeachExpressionSyntax : ExpressionSyntax, ISymbol
     {
         public bool MutableBinding { get; }
         Name ISymbol.FullName => FullVariableName;
@@ -26,7 +26,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             get => variableType;
             set
             {
-                if (variableType != null) throw new InvalidOperationException("Can't set type repeatedly");
+                if (variableType != null)
+                    throw new InvalidOperationException("Can't set type repeatedly");
                 variableType = value ?? throw new ArgumentNullException(nameof(Type), "Can't set type to null");
             }
         }

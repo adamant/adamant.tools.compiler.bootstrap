@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class WhileExpressionSyntax : ExpressionSyntax
+    public sealed class WhileExpressionSyntax : ExpressionSyntax
     {
         public ExpressionSyntax Condition { get; }
         public BlockSyntax Block { get; }

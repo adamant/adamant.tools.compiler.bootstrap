@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class IntegerLiteralExpressionSyntax : LiteralExpressionSyntax
+    public sealed class IntegerLiteralExpressionSyntax : LiteralExpressionSyntax
     {
         public BigInteger Value { get; }
 

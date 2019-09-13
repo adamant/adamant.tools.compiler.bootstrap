@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -10,6 +9,7 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 {
@@ -201,7 +201,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             }
 
             function.ControlFlow.InsertedDeletes = insertedDeletes;
-            if (saveBorrowClaims) function.ControlFlow.BorrowClaims = claims;
+            if (saveBorrowClaims)
+                function.ControlFlow.BorrowClaims = claims;
         }
 
         private Claims GetClaimsBeforeBlock(
@@ -364,7 +365,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             Claims claimsAfterStatement,
             FixedList<VariableDeclaration> variables)
         {
-            if (assignToPlace == null) return;
+            if (assignToPlace == null)
+                return;
 
             var variableDeclaration = GetVariableDeclaration(assignToPlace, variables);
             var assignToVariable = variableDeclaration.Variable;
@@ -445,12 +447,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                                         ReportDiagnostic(BorrowError.CantMoveIntoArgumentWhileShared(file, operand.Span));
                                     break;
                                 default:
-                                    throw NonExhaustiveMatchException.For(claimHolder);
+                                    throw ExhaustiveMatch.Failed(claimHolder);
                             }
                         }
                         break;
+                        case ValueSemantics.LValue:
+                        case ValueSemantics.Empty:
+                        case ValueSemantics.Move:
+                        case ValueSemantics.Copy:
+                            throw new NotImplementedException();
                         default:
-                            throw NonExhaustiveMatchException.For(varRef.ValueSemantics);
+                            throw ExhaustiveMatch.Failed(varRef.ValueSemantics);
                     }
                 }
                 break;
@@ -491,7 +498,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         private void ReportDiagnostic(Diagnostic diagnostic)
         {
             // Presumably, if we have the exact same span, that means we reported this error before
-            if (reportedDiagnosticSpans.Contains(diagnostic.Span)) return;
+            if (reportedDiagnosticSpans.Contains(diagnostic.Span))
+                return;
 
             reportedDiagnosticSpans.Add(diagnostic.Span);
             diagnostics.Add(diagnostic);

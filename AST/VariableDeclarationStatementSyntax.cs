@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class VariableDeclarationStatementSyntax : StatementSyntax, ISymbol
+    public sealed class VariableDeclarationStatementSyntax : StatementSyntax, ISymbol
     {
         public bool MutableBinding { get; }
         public Name FullName { get; }

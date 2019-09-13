@@ -6,7 +6,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
     public static class StringExtensions
     {
-
         private static readonly Regex LineEndings = new Regex(@"\r\n|\n\r|\n|\r", RegexOptions.Compiled);
 
         public static string Repeat(this string input, int count)
@@ -31,17 +30,39 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
             {
                 switch (c)
                 {
-                    case '\'': escaped.Append(@"\'"); break;
-                    case '\"': escaped.Append("\\\""); break;
-                    case '\\': escaped.Append(@"\\"); break;
-                    case '\0': escaped.Append(@"\0"); break;
-                    case '\a': escaped.Append(@"\a"); break;
-                    case '\b': escaped.Append(@"\b"); break;
-                    case '\f': escaped.Append(@"\f"); break;
-                    case '\n': escaped.Append(@"\n"); break;
-                    case '\r': escaped.Append(@"\r"); break;
-                    case '\t': escaped.Append(@"\t"); break;
-                    case '\v': escaped.Append(@"\v"); break;
+                    case '\'':
+                        escaped.Append(@"\'");
+                        break;
+                    case '\"':
+                        escaped.Append("\\\"");
+                        break;
+                    case '\\':
+                        escaped.Append(@"\\");
+                        break;
+                    case '\0':
+                        escaped.Append(@"\0");
+                        break;
+                    case '\a':
+                        escaped.Append(@"\a");
+                        break;
+                    case '\b':
+                        escaped.Append(@"\b");
+                        break;
+                    case '\f':
+                        escaped.Append(@"\f");
+                        break;
+                    case '\n':
+                        escaped.Append(@"\n");
+                        break;
+                    case '\r':
+                        escaped.Append(@"\r");
+                        break;
+                    case '\t':
+                        escaped.Append(@"\t");
+                        break;
+                    case '\v':
+                        escaped.Append(@"\v");
+                        break;
                     default:
                         if (char.GetUnicodeCategory(c) != UnicodeCategory.Control)
                             escaped.Append(c);
@@ -60,7 +81,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
 
         public static FixedList<string> SplitOrEmpty(this string value, params char[] separators)
         {
-            if (string.IsNullOrEmpty(value)) return FixedList<string>.Empty;
+            if (string.IsNullOrEmpty(value))
+                return FixedList<string>.Empty;
             return value.Split(separators).ToFixedList();
         }
     }

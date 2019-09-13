@@ -4,7 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     [VisitorNotSupported("Only implemented in parser")]
-    public class DeleteExpressionSyntax : ExpressionSyntax
+    public sealed class DeleteExpressionSyntax : ExpressionSyntax
     {
         public ExpressionSyntax Expression { get; }
 

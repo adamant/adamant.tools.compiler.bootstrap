@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.AST.Visitors;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+using ExhaustiveMatching;
 using Void = Adamant.Tools.Compiler.Bootstrap.Framework.Void;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
@@ -43,74 +43,60 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
 
         private static void Validate(DataType type)
         {
-            type.Accept(Validate);
-        }
-
-        private static void ValidateForNull()
-        {
-            // Nothing to check
-        }
-
-        private static void ValidateFor(ReferenceType referenceType)
-        {
-            if (referenceType.Mutability.IsUpgradable)
-                throw new Exception($"Type is upgradable `{referenceType}` and shouldn't be");
-        }
-
-        private static void ValidateFor(OptionalType optionalType)
-        {
-            Validate(optionalType.Referent);
-        }
-
-        private static void ValidateFor(RefType refType)
-        {
-            Validate(refType.Referent);
-        }
-
-        [Visit(typeof(EmptyType))]
-        [Visit(typeof(SimpleType))]
-        [Visit(typeof(UnknownType))]
-        [Visit(typeof(PointerType))]
-        private static void ValidateFor(DataType type)
-        {
-            // can't contain a reference type
+            switch (type)
+            {
+                case ReferenceType referenceType:
+                    if (referenceType.Mutability.IsUpgradable)
+                        throw new Exception($"Type is upgradable `{referenceType}` and shouldn't be");
+                    break;
+                case OptionalType optionalType:
+                    Validate(optionalType.Referent);
+                    break;
+                case RefType refType:
+                    Validate(refType.Referent);
+                    break;
+                case EmptyType _:
+                case SimpleType _:
+                case UnknownType _:
+                case PointerType _:
+                    // can't contain a reference type
+                    break;
+                case null:
+                    // Nothing to check
+                    break;
+                default:
+                    throw ExhaustiveMatch.Failed(type);
+            }
         }
 
         private static void ValidateReturn(DataType type)
         {
-            type.Accept(ValidateReturn);
-        }
-
-        private static void ValidateReturnForNull()
-        {
-            // Nothing to check
-        }
-
-        private static void ValidateReturnFor(ReferenceType referenceType)
-        {
-            // Owned returns are supposed to be upgradable so that the caller
-            // can receive ownership.
-            if (referenceType.Mutability.IsUpgradable && !referenceType.IsOwned)
-                throw new Exception($"Type is upgradable `{referenceType}` and shouldn't be");
-        }
-
-        private static void ValidateReturnFor(OptionalType optionalType)
-        {
-            Validate(optionalType.Referent);
-        }
-
-        private static void ValidateReturnFor(RefType refType)
-        {
-            Validate(refType.Referent);
-        }
-
-        [Visit(typeof(EmptyType))]
-        [Visit(typeof(SimpleType))]
-        [Visit(typeof(UnknownType))]
-        [Visit(typeof(PointerType))]
-        private static void ValidateReturnFor(DataType type)
-        {
-            // can't contain a reference type
+            switch (type)
+            {
+                case ReferenceType referenceType:
+                    // Owned returns are supposed to be upgradable so that the caller
+                    // can receive ownership.
+                    if (referenceType.Mutability.IsUpgradable && !referenceType.IsOwned)
+                        throw new Exception($"Type is upgradable `{referenceType}` and shouldn't be");
+                    break;
+                case OptionalType optionalType:
+                    Validate(optionalType.Referent);
+                    break;
+                case RefType refType:
+                    Validate(refType.Referent);
+                    break;
+                case EmptyType _:
+                case SimpleType _:
+                case UnknownType _:
+                case PointerType _:
+                    // can't contain a reference type
+                    break;
+                case null:
+                    // Nothing to check
+                    break;
+                default:
+                    throw ExhaustiveMatch.Failed(type);
+            }
         }
     }
 }

@@ -9,9 +9,18 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
+    [Closed(
+        typeof(OperatorDeclarationSyntax),
+        typeof(SetterDeclarationSyntax),
+        typeof(NamedFunctionDeclarationSyntax),
+        typeof(InitializerDeclarationSyntax),
+        typeof(GetterDeclarationSyntax),
+        typeof(DestructorDeclarationSyntax),
+        typeof(ConstructorDeclarationSyntax))]
     public abstract class FunctionDeclarationSyntax : MemberDeclarationSyntax
     {
         private DataType selfParameterType;
@@ -20,7 +29,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             get => selfParameterType;
             set
             {
-                if (selfParameterType != null) throw new InvalidOperationException("Can't set type repeatedly");
+                if (selfParameterType != null)
+                    throw new InvalidOperationException("Can't set type repeatedly");
                 selfParameterType = value ?? throw new ArgumentException();
             }
         }

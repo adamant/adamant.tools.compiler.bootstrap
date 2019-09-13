@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class InitializerDeclarationSyntax : FunctionDeclarationSyntax
+    public sealed class InitializerDeclarationSyntax : FunctionDeclarationSyntax
     {
         public InitializerDeclarationSyntax(
             CodeFile file,

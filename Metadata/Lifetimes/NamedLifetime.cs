@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes
 {
-    public class NamedLifetime : Lifetime
+    public sealed class NamedLifetime : Lifetime
     {
         public readonly string Name;
 

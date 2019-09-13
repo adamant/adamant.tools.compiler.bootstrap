@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class PackageSyntax : Syntax
+    public sealed class PackageSyntax : Syntax
     {
         public string Name { get; }
 

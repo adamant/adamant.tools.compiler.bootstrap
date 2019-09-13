@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
                 case UnaryOperator.Question:
                     return "?";
                 default:
-                    throw NonExhaustiveMatchException.For(@operator);
+                    throw ExhaustiveMatch.Failed(@operator);
             }
         }
     }

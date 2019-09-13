@@ -3,9 +3,11 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
+    [Closed()]
     public class FunctionDeclaration : Declaration
     {
         public bool IsExternal { get; }

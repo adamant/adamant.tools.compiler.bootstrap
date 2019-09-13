@@ -2,9 +2,15 @@ using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
+    [Closed(
+        typeof(TypeDeclaration),
+        typeof(FunctionDeclaration),
+        typeof(FieldDeclaration),
+        typeof(ConstructorDeclaration))]
     public abstract class Declaration : ISymbol
     {
         // Declarations are not mutable bindings

@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
-    public class TypeDeclaration : Declaration
+    public sealed class TypeDeclaration : Declaration
     {
         public FixedList<GenericParameter> GenericParameters { get; }
         public bool IsGeneric => GenericParameters != null;

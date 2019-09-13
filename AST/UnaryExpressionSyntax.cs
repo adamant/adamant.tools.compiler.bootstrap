@@ -1,10 +1,10 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class UnaryExpressionSyntax : ExpressionSyntax
+    public sealed class UnaryExpressionSyntax : ExpressionSyntax
     {
         public UnaryOperatorFixity Fixity { get; }
         public UnaryOperator Operator { get; }
@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
                 case UnaryOperatorFixity.Postfix:
                     return $"{Operand}{Operator.ToSymbolString()}";
                 default:
-                    throw NonExhaustiveMatchException.For(Fixity);
+                    throw ExhaustiveMatch.Failed(Fixity);
             }
         }
     }

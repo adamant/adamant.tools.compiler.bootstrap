@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         GreaterThanOrEqual,
         And,
         Or,
-        DotDot
+        DotDot,
     }
 
     public static class BinaryOperatorExtensions
@@ -52,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
                 case BinaryOperator.DotDot:
                     return "..";
                 default:
-                    throw NonExhaustiveMatchException.For(@operator);
+                    throw ExhaustiveMatch.Failed(@operator);
             }
         }
     }

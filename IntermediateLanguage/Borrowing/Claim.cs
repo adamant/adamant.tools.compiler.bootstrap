@@ -1,8 +1,13 @@
 using System;
 using System.Collections.Generic;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
 {
+    [Closed(
+        typeof(Aliases),
+        typeof(Borrows),
+        typeof(Owns))]
     public abstract class Claim : IEquatable<Claim>
     {
         public IClaimHolder Holder { get; }

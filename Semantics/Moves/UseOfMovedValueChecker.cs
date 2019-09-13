@@ -1,10 +1,10 @@
 using System;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
 {
@@ -66,8 +66,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
                 case ValueSemantics.Empty:
                     // Not moving value
                     return possiblyMoved;
+                case ValueSemantics.LValue:
+                    throw new NotImplementedException();
                 default:
-                    throw NonExhaustiveMatchException.For(identifierName.Type.ValueSemantics);
+                    throw ExhaustiveMatch.Failed(identifierName.Type.ValueSemantics);
             }
         }
 

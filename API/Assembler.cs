@@ -7,6 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.API
 {
@@ -45,7 +46,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                     Disassemble(field, builder);
                     break;
                 default:
-                    throw NonExhaustiveMatchException.For(declaration);
+                    throw ExhaustiveMatch.Failed(declaration);
             }
         }
 

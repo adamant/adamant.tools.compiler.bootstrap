@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class BreakExpressionSyntax : ExpressionSyntax
+    public sealed class BreakExpressionSyntax : ExpressionSyntax
     {
         public ExpressionSyntax Value { get; }
 
@@ -16,7 +16,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public override string ToString()
         {
-            if (Value != null) return $"break {Value}";
+            if (Value != null)
+                return $"break {Value}";
             return "break";
         }
     }

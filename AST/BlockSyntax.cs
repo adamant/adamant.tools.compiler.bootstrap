@@ -4,7 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class BlockSyntax : ExpressionBlockSyntax
+    public sealed class BlockSyntax : ExpressionBlockSyntax
     {
         public FixedList<StatementSyntax> Statements { get; }
 

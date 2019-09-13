@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class ReturnExpressionSyntax : ExpressionSyntax
+    public sealed class ReturnExpressionSyntax : ExpressionSyntax
     {
         public ExpressionSyntax ReturnValue;
 
@@ -16,7 +16,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public override string ToString()
         {
-            if (ReturnValue != null) return $"return {ReturnValue}";
+            if (ReturnValue != null)
+                return $"return {ReturnValue}";
             return "return";
         }
     }

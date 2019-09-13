@@ -12,6 +12,7 @@ using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using Adamant.Tools.Compiler.Bootstrap.Forge.Config;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
 {
@@ -142,8 +143,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
 
             // Clear the cache directory?
             var dir = new DirectoryInfo(cacheDir);
-            foreach (var file in dir.EnumerateFiles()) file.Delete();
-            foreach (var subDirectory in dir.EnumerateDirectories()) subDirectory.Delete(true);
+            foreach (var file in dir.EnumerateFiles())
+                file.Delete();
+            foreach (var subDirectory in dir.EnumerateDirectories())
+                subDirectory.Delete(true);
 
             return cacheDir;
         }
@@ -154,7 +157,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             object consoleLock)
         {
             var diagnostics = package.Diagnostics;
-            if (!diagnostics.Any()) return false;
+            if (!diagnostics.Any())
+                return false;
             lock (consoleLock)
             {
                 Console.WriteLine($@"Build FAILED {project.Name} ({project.Path})");
@@ -204,16 +208,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             {
                 case ProjectTemplate.App:
                 {
-                    outputPath = System.IO.Path.Combine(cacheDir, "program.c");
+                    outputPath = Path.Combine(cacheDir, "program.c");
                 }
                 break;
                 case ProjectTemplate.Lib:
                 {
-                    outputPath = System.IO.Path.Combine(cacheDir, "lib.c");
+                    outputPath = Path.Combine(cacheDir, "lib.c");
                 }
                 break;
                 default:
-                    throw NonExhaustiveMatchException.For(project.Template);
+                    throw ExhaustiveMatch.Failed(project.Template);
             }
 
             File.WriteAllText(outputPath, codeEmitter.GetEmittedCode(), Encoding.UTF8);
@@ -240,17 +244,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             switch (project.Template)
             {
                 case ProjectTemplate.App:
-                {
                     outputPath = Path.ChangeExtension(codePath, "exe");
-                }
-                break;
+                    break;
                 case ProjectTemplate.Lib:
-                {
                     outputPath = Path.ChangeExtension(codePath, "dll");
-                }
-                break;
+                    break;
                 default:
-                    throw NonExhaustiveMatchException.For(project.Template);
+                    throw ExhaustiveMatch.Failed(project.Template);
             }
 
             lock (consoleLock)

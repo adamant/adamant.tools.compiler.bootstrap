@@ -1,6 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
@@ -43,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
                     mutability = "alias ";
                     break;
                 default:
-                    throw NonExhaustiveMatchException.For(ValueSemantics);
+                    throw ExhaustiveMatch.Failed(ValueSemantics);
             }
             return mutability + Variable;
         }

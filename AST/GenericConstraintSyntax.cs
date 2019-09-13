@@ -2,7 +2,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     // NOTE: keeping this class around for now on the assumption there might be
     // other kinds of generic constraints that aren't just expressions
-    public class GenericConstraintSyntax : Syntax
+    public sealed class GenericConstraintSyntax : Syntax
     {
         public ExpressionSyntax Expression { get; }
 

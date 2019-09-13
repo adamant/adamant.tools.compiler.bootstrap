@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class FieldDeclarationSyntax : MemberDeclarationSyntax
+    public sealed class FieldDeclarationSyntax : MemberDeclarationSyntax
     {
         public FixedList<AttributeSyntax> Attributes { get; }
         public FixedList<IModiferToken> Modifiers { get; }
@@ -37,7 +37,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public override string ToString()
         {
             var result = $"{Name}: {TypeExpression}";
-            if (Initializer != null) result += Initializer.ToString();
+            if (Initializer != null)
+                result += Initializer.ToString();
             result += ";";
             return result;
         }

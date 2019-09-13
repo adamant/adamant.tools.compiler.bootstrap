@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Names
 {
@@ -6,6 +6,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
     /// A name of a declaration. Note that names could even refer to local
     /// variables etc.
     /// </summary>
+    [Closed(
+        typeof(SimpleName),
+        typeof(QualifiedName))]
     public abstract class Name : RootName
     {
         /// <summary>
@@ -37,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
                 case QualifiedName qualifiedName:
                     return new QualifiedName(Qualify(qualifiedName.Qualifier), qualifiedName.UnqualifiedName);
                 default:
-                    throw NonExhaustiveMatchException.For(name);
+                    throw ExhaustiveMatch.Failed(name);
             }
         }
 

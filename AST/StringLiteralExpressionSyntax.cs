@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class StringLiteralExpressionSyntax : LiteralExpressionSyntax
+    public sealed class StringLiteralExpressionSyntax : LiteralExpressionSyntax
     {
         public string Value { get; }
 

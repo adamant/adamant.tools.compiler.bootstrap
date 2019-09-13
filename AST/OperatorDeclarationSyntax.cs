@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class OperatorDeclarationSyntax : FunctionDeclarationSyntax
+    public sealed class OperatorDeclarationSyntax : FunctionDeclarationSyntax
     {
         public ExpressionSyntax LifetimeBounds { get; }
         public ExpressionSyntax ReturnTypeExpression { get; }

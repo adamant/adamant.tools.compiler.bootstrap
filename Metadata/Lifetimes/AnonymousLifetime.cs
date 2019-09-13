@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes
 {
-    public class AnonymousLifetime : Lifetime
+    public sealed class AnonymousLifetime : Lifetime
     {
         #region Singleton
         public static readonly AnonymousLifetime Instance = new AnonymousLifetime();

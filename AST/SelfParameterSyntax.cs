@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class SelfParameterSyntax : ParameterSyntax
+    public sealed class SelfParameterSyntax : ParameterSyntax
     {
         public bool RefSelf { get; }
         public bool MutableSelf { get; }
@@ -18,8 +18,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public override string ToString()
         {
             var value = "self";
-            if (MutableSelf) value = "mut " + value;
-            if (RefSelf) value = "ref " + value;
+            if (MutableSelf)
+                value = "mut " + value;
+            if (RefSelf)
+                value = "ref " + value;
             return value;
         }
     }

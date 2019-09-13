@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class MatchArmSyntax : Syntax
+    public sealed class MatchArmSyntax : Syntax
     {
         public PatternSyntax Pattern { get; }
         public ExpressionBlockSyntax Expression { get; }

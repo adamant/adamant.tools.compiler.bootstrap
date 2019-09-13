@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
@@ -10,6 +10,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ExhaustiveMatching.Analyzer" Version="0.1.2" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AST\AST.csproj" />

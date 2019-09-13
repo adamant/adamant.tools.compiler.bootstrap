@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class BoolLiteralExpressionSyntax : LiteralExpressionSyntax
+    public sealed class BoolLiteralExpressionSyntax : LiteralExpressionSyntax
     {
         public bool Value { get; }
 

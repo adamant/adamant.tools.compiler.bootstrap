@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class MemberAccessExpressionSyntax : ExpressionSyntax
+    public sealed class MemberAccessExpressionSyntax : ExpressionSyntax
     {
         /// <summary>
         /// This expression is null for implicit member access i.e. self and enums

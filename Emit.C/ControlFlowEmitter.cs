@@ -3,6 +3,7 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
@@ -195,8 +196,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                         case BinaryOperator.GreaterThanOrEqual:
                             @operator = "gte";
                             break;
+                        case BinaryOperator.DotDot:
+                            @operator = "dotdot";
+                            break;
                         default:
-                            throw NonExhaustiveMatchException.For(binaryOperation.Operator);
+                            throw ExhaustiveMatch.Failed(binaryOperation.Operator);
                     }
                     return $"{operationType}__{@operator}({left}, {right})";
                 }
@@ -222,7 +226,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 case ConstructSome constructSome:
                 {
                     var someValue = ConvertValue(constructSome.Value);
-                    if (constructSome.Type.Referent is ReferenceType) return someValue;
+                    if (constructSome.Type.Referent is ReferenceType)
+                        return someValue;
                     else
                     {
                         var typeName = nameMangler.Mangle(constructSome.Type.Referent);

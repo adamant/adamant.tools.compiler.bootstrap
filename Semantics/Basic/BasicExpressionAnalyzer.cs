@@ -11,6 +11,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Primitives;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 {
@@ -225,428 +226,386 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private DataType InferExpressionType(ExpressionSyntax expression)
         {
-            return expression.Accept(InferExpressionType);
-        }
-
-        private DataType InferExpressionTypeForNull()
-        {
-            return DataType.Unknown;
-        }
-
-        private DataType InferExpressionTypeFor(ReturnExpressionSyntax returnExpression)
-        {
-            if (returnExpression.ReturnValue != null)
+            switch (expression)
             {
-                if (returnType == null)
-                    throw new NotImplementedException("Null return type. Report an error?");
-
-                // If we return ownership, there is an implicit move
-                if (returnType is UserObjectType objectType && objectType.IsOwned)
-                    InferMoveExpressionType(returnExpression.ReturnValue);
-                else
-                    InferExpressionType(returnExpression.ReturnValue);
-                InsertImplicitConversionIfNeeded(ref returnExpression.ReturnValue, returnType);
-                var type = returnExpression.ReturnValue.Type;
-                if (!IsAssignableFrom(returnType, type))
-                    diagnostics.Add(TypeError.CannotConvert(file,
-                        returnExpression.ReturnValue, type, returnType));
-            }
-            else if (returnType == DataType.Never)
-                diagnostics.Add(TypeError.CantReturnFromNeverFunction(file, returnExpression.Span));
-            else if (returnType != DataType.Void)
-                diagnostics.Add(TypeError.ReturnExpressionMustHaveValue(file, returnExpression.Span, returnType));
-
-            return returnExpression.Type = DataType.Never;
-        }
-
-        private DataType InferExpressionTypeFor(IntegerLiteralExpressionSyntax integerLiteral)
-        {
-            return integerLiteral.Type = new IntegerConstantType(integerLiteral.Value);
-        }
-
-        private DataType InferExpressionTypeFor(StringLiteralExpressionSyntax stringLiteral)
-        {
-            return stringLiteral.Type = DataType.StringConstant;
-        }
-
-        private DataType InferExpressionTypeFor(BoolLiteralExpressionSyntax boolLiteral)
-        {
-            return boolLiteral.Type = DataType.Bool;
-        }
-
-        private DataType InferExpressionTypeFor(BinaryExpressionSyntax binaryOperatorExpression)
-        {
-            InferExpressionType(binaryOperatorExpression.LeftOperand);
-            var leftType = binaryOperatorExpression.LeftOperand.Type;
-            var @operator = binaryOperatorExpression.Operator;
-            InferExpressionType(binaryOperatorExpression.RightOperand);
-            var rightType = binaryOperatorExpression.RightOperand.Type;
-
-            // If either is unknown, then we can't know whether there is a a problem.
-            // Note that the operator could be overloaded
-            if (leftType == DataType.Unknown || rightType == DataType.Unknown)
-                return binaryOperatorExpression.Type = DataType.Unknown;
-
-            bool compatible;
-            switch (@operator)
-            {
-                case BinaryOperator.Plus:
-                case BinaryOperator.Minus:
-                case BinaryOperator.Asterisk:
-                case BinaryOperator.Slash:
-                    compatible = NumericOperatorTypesAreCompatible(ref binaryOperatorExpression.LeftOperand, ref binaryOperatorExpression.RightOperand, null);
-                    binaryOperatorExpression.Type = compatible ? leftType : DataType.Unknown;
-                    break;
-                case BinaryOperator.EqualsEquals:
-                case BinaryOperator.NotEqual:
-                case BinaryOperator.LessThan:
-                case BinaryOperator.LessThanOrEqual:
-                case BinaryOperator.GreaterThan:
-                case BinaryOperator.GreaterThanOrEqual:
-                    compatible = (leftType == DataType.Bool && rightType == DataType.Bool)
-                                 || NumericOperatorTypesAreCompatible(ref binaryOperatorExpression.LeftOperand, ref binaryOperatorExpression.RightOperand, null)
-                                 || OperatorOverloadDefined(@operator, binaryOperatorExpression.LeftOperand, ref binaryOperatorExpression.RightOperand);
-                    binaryOperatorExpression.Type = DataType.Bool;
-                    break;
-                case BinaryOperator.And:
-                case BinaryOperator.Or:
-                    compatible = leftType == DataType.Bool && rightType == DataType.Bool;
-                    binaryOperatorExpression.Type = DataType.Bool;
-                    break;
-                default:
-                    throw NonExhaustiveMatchException.For(@operator);
-            }
-            if (!compatible)
-                diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandsOfType(file,
-                    binaryOperatorExpression.Span, @operator,
-                    binaryOperatorExpression.LeftOperand.Type,
-                    binaryOperatorExpression.RightOperand.Type));
-
-            return binaryOperatorExpression.Type;
-        }
-
-        private DataType InferExpressionTypeFor(IdentifierNameSyntax identifierName)
-        {
-            return InferIdentifierNameType(identifierName, false);
-        }
-
-        private DataType InferExpressionTypeFor(UnaryExpressionSyntax unaryOperatorExpression)
-        {
-            var operandType = InferExpressionType(unaryOperatorExpression.Operand);
-            var @operator = unaryOperatorExpression.Operator;
-
-            // If either is unknown, then we can't know whether there is a a problem
-            // (technically not true, for example, we could know that one arg should
-            // be a bool and isn't)
-            if (operandType == DataType.Unknown)
-                return unaryOperatorExpression.Type = DataType.Unknown;
-
-            bool typeError;
-            switch (@operator)
-            {
-                case UnaryOperator.Not:
-                    typeError = operandType != DataType.Bool;
-                    unaryOperatorExpression.Type = DataType.Bool;
-                    break;
-                case UnaryOperator.At:
-                    typeError = false; // TODO check that the expression can have a pointer taken
-                    if (operandType is Metatype)
-                        unaryOperatorExpression.Type = DataType.Type; // constructing a type
-                    else
-                        unaryOperatorExpression.Type = new PointerType(operandType); // taking the address of something
-                    break;
-                case UnaryOperator.Question:
-                    typeError = false; // TODO check that the expression can have a pointer taken
-                    unaryOperatorExpression.Type = new OptionalType(operandType);
-                    break;
-                case UnaryOperator.Caret:
-                    switch (operandType)
+                case ReturnExpressionSyntax returnExpression:
+                {
+                    if (returnExpression.ReturnValue != null)
                     {
-                        case PointerType pointerType:
-                            unaryOperatorExpression.Type = pointerType.Referent;
-                            typeError = false;
+                        if (returnType == null)
+                            throw new NotImplementedException("Null return type. Report an error?");
+
+                        // If we return ownership, there is an implicit move
+                        if (returnType is UserObjectType objectType && objectType.IsOwned)
+                            InferMoveExpressionType(returnExpression.ReturnValue);
+                        else
+                            InferExpressionType(returnExpression.ReturnValue);
+                        InsertImplicitConversionIfNeeded(ref returnExpression.ReturnValue,
+                            returnType);
+                        var type = returnExpression.ReturnValue.Type;
+                        if (!IsAssignableFrom(returnType, type))
+                            diagnostics.Add(TypeError.CannotConvert(file,
+                                returnExpression.ReturnValue, type, returnType));
+                    }
+                    else if (returnType == DataType.Never)
+                        diagnostics.Add(
+                            TypeError.CantReturnFromNeverFunction(file, returnExpression.Span));
+                    else if (returnType != DataType.Void)
+                        diagnostics.Add(TypeError.ReturnExpressionMustHaveValue(file,
+                            returnExpression.Span, returnType));
+
+                    return returnExpression.Type = DataType.Never;
+                }
+                case IntegerLiteralExpressionSyntax integerLiteral:
+                    return integerLiteral.Type = new IntegerConstantType(integerLiteral.Value);
+                case StringLiteralExpressionSyntax stringLiteral:
+                    return stringLiteral.Type = DataType.StringConstant;
+                case BoolLiteralExpressionSyntax boolLiteral:
+                    return boolLiteral.Type = DataType.Bool;
+                case BinaryExpressionSyntax binaryOperatorExpression:
+                {
+                    InferExpressionType(binaryOperatorExpression.LeftOperand);
+                    var leftType = binaryOperatorExpression.LeftOperand.Type;
+                    var @operator = binaryOperatorExpression.Operator;
+                    InferExpressionType(binaryOperatorExpression.RightOperand);
+                    var rightType = binaryOperatorExpression.RightOperand.Type;
+
+                    // If either is unknown, then we can't know whether there is a a problem.
+                    // Note that the operator could be overloaded
+                    if (leftType == DataType.Unknown || rightType == DataType.Unknown)
+                        return binaryOperatorExpression.Type = DataType.Unknown;
+
+                    bool compatible;
+                    switch (@operator)
+                    {
+                        case BinaryOperator.Plus:
+                        case BinaryOperator.Minus:
+                        case BinaryOperator.Asterisk:
+                        case BinaryOperator.Slash:
+                            compatible = NumericOperatorTypesAreCompatible(ref binaryOperatorExpression.LeftOperand, ref binaryOperatorExpression.RightOperand, null);
+                            binaryOperatorExpression.Type = compatible ? leftType : DataType.Unknown;
+                            break;
+                        case BinaryOperator.EqualsEquals:
+                        case BinaryOperator.NotEqual:
+                        case BinaryOperator.LessThan:
+                        case BinaryOperator.LessThanOrEqual:
+                        case BinaryOperator.GreaterThan:
+                        case BinaryOperator.GreaterThanOrEqual:
+                            compatible = (leftType == DataType.Bool && rightType == DataType.Bool)
+                                         || NumericOperatorTypesAreCompatible(ref binaryOperatorExpression.LeftOperand, ref binaryOperatorExpression.RightOperand, null)
+                                         || OperatorOverloadDefined(@operator, binaryOperatorExpression.LeftOperand, ref binaryOperatorExpression.RightOperand);
+                            binaryOperatorExpression.Type = DataType.Bool;
+                            break;
+                        case BinaryOperator.And:
+                        case BinaryOperator.Or:
+                            compatible = leftType == DataType.Bool && rightType == DataType.Bool;
+                            binaryOperatorExpression.Type = DataType.Bool;
+                            break;
+                        case BinaryOperator.DotDot:
+                            throw new NotImplementedException("Type of `..` operator");
+                        default:
+                            throw ExhaustiveMatch.Failed(@operator);
+                    }
+                    if (!compatible)
+                        diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandsOfType(file,
+                            binaryOperatorExpression.Span, @operator,
+                            binaryOperatorExpression.LeftOperand.Type,
+                            binaryOperatorExpression.RightOperand.Type));
+
+                    return binaryOperatorExpression.Type;
+                }
+                case IdentifierNameSyntax identifierName:
+                    return InferIdentifierNameType(identifierName, false);
+                case UnaryExpressionSyntax unaryOperatorExpression:
+                {
+                    var operandType = InferExpressionType(unaryOperatorExpression.Operand);
+                    var @operator = unaryOperatorExpression.Operator;
+
+                    // If either is unknown, then we can't know whether there is a a problem
+                    // (technically not true, for example, we could know that one arg should
+                    // be a bool and isn't)
+                    if (operandType == DataType.Unknown)
+                        return unaryOperatorExpression.Type = DataType.Unknown;
+
+                    bool typeError;
+                    switch (@operator)
+                    {
+                        case UnaryOperator.Not:
+                            typeError = operandType != DataType.Bool;
+                            unaryOperatorExpression.Type = DataType.Bool;
+                            break;
+                        case UnaryOperator.At:
+                            typeError = false; // TODO check that the expression can have a pointer taken
+                            if (operandType is Metatype)
+                                unaryOperatorExpression.Type = DataType.Type; // constructing a type
+                            else
+                                unaryOperatorExpression.Type = new PointerType(operandType); // taking the address of something
+                            break;
+                        case UnaryOperator.Question:
+                            typeError = false; // TODO check that the expression can have a pointer taken
+                            unaryOperatorExpression.Type = new OptionalType(operandType);
+                            break;
+                        case UnaryOperator.Caret:
+                            switch (operandType)
+                            {
+                                case PointerType pointerType:
+                                    unaryOperatorExpression.Type = pointerType.Referent;
+                                    typeError = false;
+                                    break;
+                                default:
+                                    unaryOperatorExpression.Type = DataType.Unknown;
+                                    typeError = true;
+                                    break;
+                            }
+                            break;
+                        case UnaryOperator.Minus:
+                        case UnaryOperator.Plus:
+                            switch (operandType)
+                            {
+                                case IntegerConstantType integerType:
+                                    typeError = false;
+                                    unaryOperatorExpression.Type = integerType;
+                                    break;
+                                case SizedIntegerType sizedIntegerType:
+                                    typeError = false;
+                                    unaryOperatorExpression.Type = sizedIntegerType;
+                                    break;
+                                default:
+                                    unaryOperatorExpression.Type = DataType.Unknown;
+                                    typeError = true;
+                                    break;
+                            }
                             break;
                         default:
-                            unaryOperatorExpression.Type = DataType.Unknown;
-                            typeError = true;
-                            break;
+                            throw ExhaustiveMatch.Failed(@operator);
                     }
-                    break;
-                case UnaryOperator.Minus:
-                    switch (operandType)
+                    if (typeError)
+                        diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandOfType(file,
+                            unaryOperatorExpression.Span, @operator, operandType));
+
+                    return unaryOperatorExpression.Type;
+                }
+                case BlockSyntax blockExpression:
+                    foreach (var statement in blockExpression.Statements)
+                        ResolveTypesInStatement(statement);
+
+                    return blockExpression.Type = DataType.Void; // TODO assign the correct type to the block
+                case NewObjectExpressionSyntax newObjectExpression:
+                {
+                    var argumentTypes = newObjectExpression.Arguments.Select(InferArgumentType).ToFixedList();
+                    // TODO handle named constructors here
+                    var constructingType = typeAnalyzer.Check(newObjectExpression.Constructor);
+                    if (!constructingType.IsKnown)
                     {
-                        case IntegerConstantType integerType:
-                            typeError = false;
-                            unaryOperatorExpression.Type = integerType;
+                        diagnostics.Add(NameBindingError.CouldNotBindConstructor(file, newObjectExpression.Span));
+                        newObjectExpression.ConstructorSymbol = UnknownSymbol.Instance;
+                        return newObjectExpression.Type = newObjectExpression.ConstructorType = DataType.Unknown;
+                    }
+                    var constructedType = (UserObjectType)constructingType;
+                    var typeSymbol = GetSymbolForType(constructedType);
+                    var constructors = typeSymbol.ChildSymbols[SpecialName.New];
+                    constructors = ResolveOverload(constructors, null, argumentTypes);
+                    switch (constructors.Count)
+                    {
+                        case 0:
+                            diagnostics.Add(NameBindingError.CouldNotBindConstructor(file, newObjectExpression.Span));
+                            newObjectExpression.ConstructorSymbol = UnknownSymbol.Instance;
+                            newObjectExpression.ConstructorType = DataType.Unknown;
                             break;
-                        case SizedIntegerType sizedIntegerType:
-                            typeError = false;
-                            unaryOperatorExpression.Type = sizedIntegerType;
+                        case 1:
+                            var constructorSymbol = constructors.Single();
+                            newObjectExpression.ConstructorSymbol = constructorSymbol;
+                            var constructorType = constructorSymbol.Type;
+                            newObjectExpression.ConstructorType = constructorType;
+                            if (constructorType is FunctionType functionType)
+                                foreach (var (arg, type) in newObjectExpression.Arguments.Zip(functionType.ParameterTypes))
+                                {
+                                    InsertImplicitConversionIfNeeded(ref arg.Value, type);
+                                    CheckArgumentTypeCompatibility(type, arg);
+                                }
                             break;
                         default:
-                            unaryOperatorExpression.Type = DataType.Unknown;
-                            typeError = true;
+                            diagnostics.Add(NameBindingError.AmbiguousConstructor(file, newObjectExpression.Span));
+                            newObjectExpression.ConstructorSymbol = UnknownSymbol.Instance;
+                            newObjectExpression.ConstructorType = DataType.Unknown;
                             break;
                     }
-                    break;
-                default:
-                    throw NonExhaustiveMatchException.For(@operator);
-            }
-            if (typeError)
-                diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandOfType(file,
-                    unaryOperatorExpression.Span, @operator, operandType));
 
-            return unaryOperatorExpression.Type;
-            ;
-        }
+                    return newObjectExpression.Type = constructedType.AsOwnedUpgradable();
+                }
+                case PlacementInitExpressionSyntax placementInitExpression:
+                {
+                    foreach (var argument in placementInitExpression.Arguments)
+                        InferArgumentType(argument);
 
-        private DataType InferExpressionTypeFor(BlockSyntax blockExpression)
-        {
-            foreach (var statement in blockExpression.Statements)
-                ResolveTypesInStatement(statement);
+                    // TODO verify argument types against called function
 
-            return blockExpression.Type = DataType.Void;// TODO assign the correct type to the block
-        }
+                    return placementInitExpression.Type =
+                        typeAnalyzer.Check(placementInitExpression.Initializer);
+                }
+                case ForeachExpressionSyntax foreachExpression:
+                {
+                    var declaredType = typeAnalyzer.Check(foreachExpression.TypeExpression);
+                    CheckForeachInType(declaredType, foreachExpression.InExpression);
+                    foreachExpression.VariableType =
+                        declaredType ?? foreachExpression.InExpression.Type;
+                    // TODO check the break types
+                    InferExpressionType(foreachExpression.Block);
+                    // TODO assign correct type to the expression
+                    return foreachExpression.Type = DataType.Void;
+                }
+                case WhileExpressionSyntax whileExpression:
+                {
+                    CheckExpressionType(whileExpression.Condition, DataType.Bool);
+                    InferExpressionType(whileExpression.Block);
+                    // TODO assign correct type to the expression
+                    return whileExpression.Type = DataType.Void;
+                }
+                case LoopExpressionSyntax loopExpression:
+                    InferExpressionType(loopExpression.Block);
+                    // TODO assign correct type to the expression
+                    return loopExpression.Type = DataType.Void;
+                case InvocationSyntax invocation:
+                {
+                    // This could:
+                    // * Invoke a stand alone function
+                    // * Invoke a static function
+                    // * Invoke a method
+                    // * Invoke a function pointer
+                    var argumentTypes =
+                        invocation.Arguments.Select(InferArgumentType).ToFixedList();
+                    InferExpressionTypeInInvocation(invocation.Callee, argumentTypes);
+                    var callee = invocation.Callee.Type;
 
-        private DataType InferExpressionTypeFor(NewObjectExpressionSyntax newObjectExpression)
-        {
-            var argumentTypes = newObjectExpression.Arguments.Select(InferArgumentType).ToFixedList();
-            // TODO handle named constructors here
-            var constructingType = typeAnalyzer.Check(newObjectExpression.Constructor);
-            if (!constructingType.IsKnown)
-            {
-                diagnostics.Add(NameBindingError.CouldNotBindConstructor(file, newObjectExpression.Span));
-                newObjectExpression.ConstructorSymbol = UnknownSymbol.Instance;
-                return newObjectExpression.Type = newObjectExpression.ConstructorType = DataType.Unknown;
-            }
-            var constructedType = (UserObjectType)constructingType;
-            var typeSymbol = GetSymbolForType(constructedType);
-            var constructors = typeSymbol.ChildSymbols[SpecialName.New];
-            constructors = ResolveOverload(constructors, null, argumentTypes);
-            switch (constructors.Count)
-            {
-                case 0:
-                    diagnostics.Add(NameBindingError.CouldNotBindConstructor(file, newObjectExpression.Span));
-                    newObjectExpression.ConstructorSymbol = UnknownSymbol.Instance;
-                    newObjectExpression.ConstructorType = DataType.Unknown;
-                    break;
-                case 1:
-                    var constructorSymbol = constructors.Single();
-                    newObjectExpression.ConstructorSymbol = constructorSymbol;
-                    var constructorType = constructorSymbol.Type;
-                    newObjectExpression.ConstructorType = constructorType;
-                    if (constructorType is FunctionType functionType)
-                        foreach (var (arg, type) in newObjectExpression.Arguments.Zip(functionType.ParameterTypes))
+                    if (callee is FunctionType functionType)
+                    {
+                        foreach (var (arg, type) in invocation.Arguments.Zip(functionType
+                            .ParameterTypes))
                         {
                             InsertImplicitConversionIfNeeded(ref arg.Value, type);
                             CheckArgumentTypeCompatibility(type, arg);
                         }
-                    break;
-                default:
-                    diagnostics.Add(NameBindingError.AmbiguousConstructor(file, newObjectExpression.Span));
-                    newObjectExpression.ConstructorSymbol = UnknownSymbol.Instance;
-                    newObjectExpression.ConstructorType = DataType.Unknown;
-                    break;
-            }
 
-            return newObjectExpression.Type = constructedType.AsOwnedUpgradable();
-        }
+                        return invocation.Type = functionType.ReturnType;
+                    }
 
-        private DataType InferExpressionTypeFor(PlacementInitExpressionSyntax placementInitExpression)
-        {
-            foreach (var argument in placementInitExpression.Arguments)
-                InferArgumentType(argument);
+                    // If it is unknown, we already reported an error
+                    if (callee == DataType.Unknown)
+                        return invocation.Type = DataType.Unknown;
 
-            // TODO verify argument types against called function
-
-            return placementInitExpression.Type = typeAnalyzer.Check(placementInitExpression.Initializer);
-        }
-
-        private DataType InferExpressionTypeFor(ForeachExpressionSyntax foreachExpression)
-        {
-            var declaredType = typeAnalyzer.Check(foreachExpression.TypeExpression);
-            CheckForeachInType(declaredType, foreachExpression.InExpression);
-            foreachExpression.VariableType = declaredType ?? foreachExpression.InExpression.Type;
-            // TODO check the break types
-            InferExpressionType(foreachExpression.Block);
-            // TODO assign correct type to the expression
-            return foreachExpression.Type = DataType.Void;
-        }
-
-        private DataType InferExpressionTypeFor(WhileExpressionSyntax whileExpression)
-        {
-            CheckExpressionType(whileExpression.Condition, DataType.Bool);
-            InferExpressionType(whileExpression.Block);
-            // TODO assign correct type to the expression
-            return whileExpression.Type = DataType.Void;
-        }
-
-        private DataType InferExpressionTypeFor(LoopExpressionSyntax loopExpression)
-        {
-            InferExpressionType(loopExpression.Block);
-            // TODO assign correct type to the expression
-            return loopExpression.Type = DataType.Void;
-        }
-
-        private DataType InferExpressionTypeFor(InvocationSyntax invocation)
-        {
-            // This could:
-            // * Invoke a stand alone function
-            // * Invoke a static function
-            // * Invoke a method
-            // * Invoke a function pointer
-            var argumentTypes = invocation.Arguments.Select(InferArgumentType).ToFixedList();
-            InferExpressionTypeInInvocation(invocation.Callee, argumentTypes);
-            var callee = invocation.Callee.Type;
-
-            if (callee is FunctionType functionType)
-            {
-                foreach (var (arg, type) in invocation.Arguments.Zip(functionType.ParameterTypes))
-                {
-                    InsertImplicitConversionIfNeeded(ref arg.Value, type);
-                    CheckArgumentTypeCompatibility(type, arg);
+                    diagnostics.Add(TypeError.MustBeCallable(file, invocation.Callee));
+                    return invocation.Type = DataType.Unknown;
                 }
-
-                return invocation.Type = functionType.ReturnType;
-            }
-
-            // If it is unknown, we already reported an error
-            if (callee == DataType.Unknown) return invocation.Type = DataType.Unknown;
-
-            diagnostics.Add(TypeError.MustBeCallable(file, invocation.Callee));
-            return invocation.Type = DataType.Unknown;
-        }
-
-        private DataType InferExpressionTypeFor(UnsafeExpressionSyntax unsafeExpression)
-        {
-            InferExpressionType(unsafeExpression.Expression);
-            return unsafeExpression.Type = unsafeExpression.Expression.Type;
-        }
-
-        private DataType InferExpressionTypeFor(MutableExpressionSyntax mutableExpression)
-        {
-            var expressionType = InferExpressionType(mutableExpression.Expression);
-            DataType type;
-            switch (expressionType)
-            {
-                case Metatype metatype:
+                case UnsafeExpressionSyntax unsafeExpression:
+                    InferExpressionType(unsafeExpression.Expression);
+                    return unsafeExpression.Type = unsafeExpression.Expression.Type;
+                case MutableExpressionSyntax mutableExpression:
                 {
-                    type = DataType.Type; // It names/describes a type
-                    if (!(metatype.Instance is UserObjectType objectType && objectType.DeclaredMutable))
-                        diagnostics.Add(TypeError.TypeDeclaredImmutable(file, mutableExpression.Expression));
-                    break;
-                }
-                case TypeType _:
-                    // TODO we need to check whether it is valid to use `mut` on this
-                    type = DataType.Type; // It names/describes a type
-                    break;
-                default:
+                    var expressionType = InferExpressionType(mutableExpression.Expression);
+                    DataType type;
                     switch (expressionType)
                     {
-                        // If it is already mutable we can't redeclare it mutable (i.e. `mut mut x` is error)
-                        case UserObjectType objectType
-                            when objectType.Mutability.IsUpgradable:
-                            type = objectType.AsMutable();
+                        case Metatype metatype:
+                        {
+                            type = DataType.Type; // It names/describes a type
+                            if (!(metatype.Instance is UserObjectType objectType
+                                  && objectType.DeclaredMutable))
+                                diagnostics.Add(TypeError.TypeDeclaredImmutable(file,
+                                    mutableExpression.Expression));
+                            break;
+                        }
+                        case TypeType _:
+                            // TODO we need to check whether it is valid to use `mut` on this
+                            type = DataType.Type; // It names/describes a type
                             break;
                         default:
-                            diagnostics.Add(TypeError.ExpressionCantBeMutable(file,
-                                mutableExpression.Expression));
-                            type = expressionType;
+                            switch (expressionType)
+                            {
+                                // If it is already mutable we can't redeclare it mutable (i.e. `mut mut x` is error)
+                                case UserObjectType objectType
+                                    when objectType.Mutability.IsUpgradable:
+                                    type = objectType.AsMutable();
+                                    break;
+                                default:
+                                    diagnostics.Add(TypeError.ExpressionCantBeMutable(file,
+                                        mutableExpression.Expression));
+                                    type = expressionType;
+                                    break;
+                            }
                             break;
                     }
-                    break;
-            }
 
-            return mutableExpression.Type = type;
-        }
+                    return mutableExpression.Type = type;
+                }
+                case IfExpressionSyntax ifExpression:
+                    CheckExpressionType(ifExpression.Condition, DataType.Bool);
+                    InferExpressionType(ifExpression.ThenBlock);
+                    InferExpressionType(ifExpression.ElseClause);
+                    // TODO assign a type to the expression
+                    return ifExpression.Type = DataType.Void;
+                case ResultExpressionSyntax resultExpression:
+                    InferExpressionType(resultExpression.Expression);
+                    return resultExpression.Type = DataType.Never;
+                case MemberAccessExpressionSyntax memberAccess:
+                {
+                    var left = InferExpressionType(memberAccess.Expression);
+                    var symbol = GetSymbolForType(left);
 
-        private DataType InferExpressionTypeFor(IfExpressionSyntax ifExpression)
-        {
-            CheckExpressionType(ifExpression.Condition, DataType.Bool);
-            InferExpressionType(ifExpression.ThenBlock);
-            InferExpressionType(ifExpression.ElseClause);
-            // TODO assign a type to the expression
-            return ifExpression.Type = DataType.Void;
-        }
+                    switch (memberAccess.Member)
+                    {
+                        case IdentifierNameSyntax identifier:
+                            var memberSymbols = symbol.Lookup(identifier.Name);
+                            var type = AssignReferencedSymbolAndType(identifier, memberSymbols);
+                            return memberAccess.Type = type;
+                        default:
+                            throw NonExhaustiveMatchException.For(memberAccess.Member);
+                    }
+                }
+                case BreakExpressionSyntax breakExpression:
+                    InferExpressionType(breakExpression.Value);
+                    return breakExpression.Type = DataType.Never;
+                case NextExpressionSyntax nextExpression:
+                    return nextExpression.Type = DataType.Never;
+                case AssignmentExpressionSyntax assignmentExpression:
+                {
+                    var left = InferExpressionType(assignmentExpression.LeftOperand);
+                    InferExpressionType(assignmentExpression.RightOperand);
+                    InsertImplicitConversionIfNeeded(ref assignmentExpression.RightOperand, left);
+                    var right = assignmentExpression.RightOperand.Type;
+                    if (!IsAssignableFrom(left, right))
+                        diagnostics.Add(TypeError.CannotConvert(file,
+                            assignmentExpression.RightOperand, right, left));
+                    return assignmentExpression.Type = DataType.Void;
+                }
+                case SelfExpressionSyntax selfExpression:
+                    return selfExpression.Type = selfType ?? DataType.Unknown;
+                case MoveExpressionSyntax moveExpression:
+                {
+                    var type = InferMoveExpressionType(moveExpression.Expression);
+                    if (type is ReferenceType referenceType && !referenceType.IsOwned)
+                    {
+                        diagnostics.Add(TypeError.CannotMoveBorrowedValue(file, moveExpression));
+                        type = referenceType.WithLifetime(Lifetime.Owned);
+                    }
 
-        private DataType InferExpressionTypeFor(ResultExpressionSyntax resultExpression)
-        {
-            InferExpressionType(resultExpression.Expression);
-            return resultExpression.Type = DataType.Never;
-        }
-
-        private DataType InferExpressionTypeFor(MemberAccessExpressionSyntax memberAccess)
-        {
-            var left = InferExpressionType(memberAccess.Expression);
-            var symbol = GetSymbolForType(left);
-
-            switch (memberAccess.Member)
-            {
-                case IdentifierNameSyntax identifier:
-                    var memberSymbols = symbol.Lookup(identifier.Name);
-                    var type = AssignReferencedSymbolAndType(identifier, memberSymbols);
-                    return memberAccess.Type = type;
+                    if (type is UserObjectType objectType)
+                        type = objectType.AsOwnedUpgradable();
+                    return moveExpression.Type = type;
+                }
+                case NoneLiteralExpressionSyntax noneLiteralExpression:
+                    return noneLiteralExpression.Type = DataType.None;
+                case ImplicitConversionExpression _:
+                    throw new Exception("ImplicitConversionExpressions are inserted by BasicExpressionAnalyzer. They should not be present in the AST yet.");
+                case LifetimeExpressionSyntax _:
+                case ReferenceLifetimeSyntax _:
+                case RefTypeSyntax _:
+                case SelfTypeExpressionSyntax _:
+                    throw new Exception("Should be inferring type of type expression");
+                case null:
+                    return DataType.Unknown;
                 default:
-                    throw NonExhaustiveMatchException.For(memberAccess.Member);
+                    throw NonExhaustiveMatchException.For(expression);
             }
-        }
-
-        private DataType InferExpressionTypeFor(BreakExpressionSyntax breakExpression)
-        {
-            InferExpressionType(breakExpression.Value);
-            return breakExpression.Type = DataType.Never;
-        }
-
-        private DataType InferExpressionTypeFor(NextExpressionSyntax nextExpression)
-        {
-            return nextExpression.Type = DataType.Never;
-        }
-
-        private DataType InferExpressionTypeFor(AssignmentExpressionSyntax assignmentExpression)
-        {
-            var left = InferExpressionType(assignmentExpression.LeftOperand);
-            InferExpressionType(assignmentExpression.RightOperand);
-            InsertImplicitConversionIfNeeded(ref assignmentExpression.RightOperand, left);
-            var right = assignmentExpression.RightOperand.Type;
-            if (!IsAssignableFrom(left, right))
-                diagnostics.Add(TypeError.CannotConvert(file, assignmentExpression.RightOperand, right, left));
-            return assignmentExpression.Type = DataType.Void;
-        }
-
-        private DataType InferExpressionTypeFor(SelfExpressionSyntax selfExpression)
-        {
-            return selfExpression.Type = selfType ?? DataType.Unknown;
-        }
-
-        private DataType InferExpressionTypeFor(MoveExpressionSyntax moveExpression)
-        {
-            var type = InferMoveExpressionType(moveExpression.Expression);
-            if (type is ReferenceType referenceType && !referenceType.IsOwned)
-            {
-                diagnostics.Add(TypeError.CannotMoveBorrowedValue(file, moveExpression));
-                type = referenceType.WithLifetime(Lifetime.Owned);
-            }
-            if (type is UserObjectType objectType) type = objectType.AsOwnedUpgradable();
-            return moveExpression.Type = type;
-        }
-
-        private DataType InferExpressionTypeFor(NoneLiteralExpressionSyntax noneLiteralExpression)
-        {
-            return noneLiteralExpression.Type = DataType.None;
-        }
-
-        private DataType InferExpressionTypeFor(ImplicitConversionExpression _)
-        {
-            throw new Exception("ImplicitConversionExpressions are inserted by BasicExpressionAnalyzer. They should not be present in the AST yet.");
-        }
-
-        [Visit(typeof(LifetimeExpressionSyntax))]
-        [Visit(typeof(ReferenceLifetimeSyntax))]
-        [Visit(typeof(RefTypeSyntax))]
-        [Visit(typeof(SelfTypeExpressionSyntax))]
-        private DataType InferExpressionTypeFor(ExpressionSyntax _)
-        {
-            throw new Exception("Should be inferring type of type expression");
         }
 
         public DataType InferIdentifierNameType(IdentifierNameSyntax identifierName, bool isMove)
@@ -669,7 +628,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         if (objectType.Mutability == Mutability.Mutable)
                             type = objectType = objectType.AsExplicitlyUpgradable();
                         // A bare variable reference doesn't default to owned
-                        if (!isMove && objectType.IsOwned) type = objectType.WithLifetime(Lifetime.None);
+                        if (!isMove && objectType.IsOwned)
+                            type = objectType.WithLifetime(Lifetime.None);
                     }
 
                     break;
@@ -685,7 +645,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private DataType InferMoveExpressionType(ExpressionSyntax expression)
         {
-            if (expression == null) return DataType.Unknown;
+            if (expression == null)
+                return DataType.Unknown;
 
             switch (expression)
             {
@@ -732,10 +693,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         /// </summary>
         private static bool IsAssignableFrom(DataType target, DataType source)
         {
-            if (target.Equals(source)) return true;
+            if (target.Equals(source))
+                return true;
             if (target is UserObjectType targetReference && source is UserObjectType sourceReference)
             {
-                if (targetReference.IsOwned && !sourceReference.IsOwned) return false;
+                if (targetReference.IsOwned && !sourceReference.IsOwned)
+                    return false;
 
                 if (!targetReference.Mutability.IsAssignableFrom(sourceReference.Mutability))
                     return false;
@@ -834,11 +797,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         private bool OperatorOverloadDefined(BinaryOperator @operator, ExpressionSyntax leftOperand, ref ExpressionSyntax rightOperand)
         {
             // all other operators are not yet implemented
-            if (@operator != BinaryOperator.EqualsEquals) return false;
+            if (@operator != BinaryOperator.EqualsEquals)
+                return false;
 
-            if (!(leftOperand.Type is UserObjectType userObjectType)) return false;
+            if (!(leftOperand.Type is UserObjectType userObjectType))
+                return false;
             var equalityOperators = userObjectType.Symbol.Lookup(SpecialName.OperatorEquals);
-            if (equalityOperators.Count != 1) return false;
+            if (equalityOperators.Count != 1)
+                return false;
             var equalityOperator = equalityOperators.Single();
             if (!(equalityOperator.Type is FunctionType functionType) || functionType.Arity != 2)
                 return false;
@@ -885,7 +851,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             {
                 if (s.Type is FunctionType functionType)
                 {
-                    if (functionType.Arity != argumentTypes.Count) return false;
+                    if (functionType.Arity != argumentTypes.Count)
+                        return false;
                     // TODO check compatibility of self type
                     // TODO check compatibility over argument types
                 }

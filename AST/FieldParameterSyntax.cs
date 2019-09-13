@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class FieldParameterSyntax : ParameterSyntax
+    public sealed class FieldParameterSyntax : ParameterSyntax
     {
         public SimpleName FieldName { get; }
 

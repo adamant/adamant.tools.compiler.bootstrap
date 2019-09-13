@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class GenericParameterSyntax : Syntax, ISymbol
+    public sealed class GenericParameterSyntax : Syntax, ISymbol
     {
         // Generic parameters are not mutable bindings
         bool ISymbol.MutableBinding => false;
@@ -39,9 +39,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public override string ToString()
         {
-            if (IsLifetime) return "$" + Name;
+            if (IsLifetime)
+                return "$" + Name;
             var paramsKeyword = IsParams ? "params " : "";
-            if (TypeExpression != null) return $"{paramsKeyword}{Name} : {TypeExpression}";
+            if (TypeExpression != null)
+                return $"{paramsKeyword}{Name} : {TypeExpression}";
             return $"{paramsKeyword}{Name}";
         }
     }

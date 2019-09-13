@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class BinaryExpressionSyntax : ExpressionSyntax
+    public sealed class BinaryExpressionSyntax : ExpressionSyntax
     {
         public ExpressionSyntax LeftOperand;
         public BinaryOperator Operator { get; }

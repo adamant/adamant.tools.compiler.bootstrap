@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     [VisitorNotSupported("Only implemented in parser")]
-    public class DestructorDeclarationSyntax : FunctionDeclarationSyntax
+    public sealed class DestructorDeclarationSyntax : FunctionDeclarationSyntax
     {
         public DestructorDeclarationSyntax(
             CodeFile file,

@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
     /// A qualified name doesn't include the package. This is because the
     /// package name could be aliased.
     /// </summary>
-    public class QualifiedName : Name, IEquatable<QualifiedName>
+    public sealed class QualifiedName : Name, IEquatable<QualifiedName>
     {
         public Name Qualifier { get; }
         public override SimpleName UnqualifiedName { get; }

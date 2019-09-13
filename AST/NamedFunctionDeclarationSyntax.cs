@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class NamedFunctionDeclarationSyntax : FunctionDeclarationSyntax, IFunctionSymbol
+    public sealed class NamedFunctionDeclarationSyntax : FunctionDeclarationSyntax, IFunctionSymbol
     {
         public bool IsExternalFunction { get; set; }
         public ExpressionSyntax LifetimeBounds { get; }

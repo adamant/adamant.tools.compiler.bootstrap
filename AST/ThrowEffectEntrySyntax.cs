@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class ThrowEffectEntrySyntax : Syntax
+    public sealed class ThrowEffectEntrySyntax : Syntax
     {
         public bool IsParams { get; }
         public ExpressionSyntax ExceptionType { get; }

@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class LoopExpressionSyntax : ExpressionSyntax
+    public sealed class LoopExpressionSyntax : ExpressionSyntax
     {
         public BlockSyntax Block { get; }
 

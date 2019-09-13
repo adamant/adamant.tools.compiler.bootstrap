@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Names
 {
-    public class SimpleName : Name, IEquatable<SimpleName>
+    public sealed class SimpleName : Name, IEquatable<SimpleName>
     {
         private static readonly Regex NeedsQuoted = new Regex(@"[\\ #ₛ]", RegexOptions.Compiled);
 
@@ -57,7 +57,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
 
         public SimpleName WithoutNumber()
         {
-            if (Number == null) return this;
+            if (Number == null)
+                return this;
             return new SimpleName(Text, IsSpecial, null);
         }
 
@@ -66,7 +67,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
             var escapedName = Text.Escape();
             if (NeedsQuoted.IsMatch(escapedName))
                 escapedName += $@"""{escapedName}""";
-            if (Number != null && Number != 0) escapedName += "#" + Number;
+            if (Number != null && Number != 0)
+                escapedName += "#" + Number;
             return escapedName;
         }
 
