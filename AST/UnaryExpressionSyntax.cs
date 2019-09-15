@@ -4,7 +4,7 @@ using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public sealed class UnaryExpressionSyntax : ExpressionSyntax
+    public class UnaryExpressionSyntax : ExpressionSyntax
     {
         public UnaryOperatorFixity Fixity { get; }
         public UnaryOperator Operator { get; }

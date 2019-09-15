@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public sealed class MoveExpressionSyntax : ExpressionSyntax
+    public class MoveExpressionSyntax : ExpressionSyntax
     {
         public ExpressionSyntax Expression { get; }
 

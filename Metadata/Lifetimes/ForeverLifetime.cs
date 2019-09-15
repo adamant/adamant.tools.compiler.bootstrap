@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes
 {
-    public sealed class ForeverLifetime : Lifetime
+    public class ForeverLifetime : Lifetime
     {
         #region Singleton
         internal static readonly ForeverLifetime Instance = new ForeverLifetime();

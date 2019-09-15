@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public sealed class IfExpressionSyntax : ExpressionSyntax
+    public class IfExpressionSyntax : ExpressionSyntax
     {
         public ExpressionSyntax Condition { get; }
         public ExpressionBlockSyntax ThenBlock { get; }

@@ -4,7 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
-    public sealed class FieldDeclaration : Declaration
+    public class FieldDeclaration : Declaration
     {
         public bool MutableBinding { get; }
 

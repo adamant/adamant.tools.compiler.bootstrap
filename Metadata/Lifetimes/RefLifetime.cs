@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes
 {
-    public sealed class RefLifetime : Lifetime
+    public class RefLifetime : Lifetime
     {
         #region Singleton
         public static readonly RefLifetime Instance = new RefLifetime();

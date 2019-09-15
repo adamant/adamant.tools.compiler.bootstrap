@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
     /// A claim that a given variable has borrowed an object. That is, that it
     /// has temporarily claimed exclusive access to the object.
     /// </summary>
-    public sealed class Borrows : Claim, IEquatable<Borrows>, IShares, IExclusiveClaim
+    public class Borrows : Claim, IEquatable<Borrows>, IShares, IExclusiveClaim
     {
         public Borrows(IClaimHolder claimHolder, Lifetime lifetime)
             : base(claimHolder, lifetime)

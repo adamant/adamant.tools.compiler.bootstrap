@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public sealed class OrPatternSyntax : PatternSyntax
+    public class OrPatternSyntax : PatternSyntax
     {
         public PatternSyntax LeftAlternative { get; }
         public PatternSyntax RightAlternative { get; }

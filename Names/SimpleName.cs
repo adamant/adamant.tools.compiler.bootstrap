@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Names
 {
-    public sealed class SimpleName : Name, IEquatable<SimpleName>
+    public class SimpleName : Name, IEquatable<SimpleName>
     {
         private static readonly Regex NeedsQuoted = new Regex(@"[\\ #ₛ]", RegexOptions.Compiled);
 

@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public sealed class BreakExpressionSyntax : ExpressionSyntax
+    public class BreakExpressionSyntax : ExpressionSyntax
     {
         public ExpressionSyntax Value { get; }
 

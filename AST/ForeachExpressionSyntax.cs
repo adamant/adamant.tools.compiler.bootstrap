@@ -7,7 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public sealed class ForeachExpressionSyntax : ExpressionSyntax, ISymbol
+    public class ForeachExpressionSyntax : ExpressionSyntax, ISymbol
     {
         public bool MutableBinding { get; }
         Name ISymbol.FullName => FullVariableName;

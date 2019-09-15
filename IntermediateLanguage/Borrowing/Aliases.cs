@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
     /// A claim that a given variable aliases an object. That is that it is one
     /// of possibly many references to the same object.
     /// </summary>
-    public sealed class Aliases : Claim, IEquatable<Aliases>, IShares
+    public class Aliases : Claim, IEquatable<Aliases>, IShares
     {
         public Aliases(IClaimHolder holder, Lifetime lifetime)
             : base(holder, lifetime)

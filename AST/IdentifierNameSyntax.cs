@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public sealed class IdentifierNameSyntax : NameSyntax
+    public class IdentifierNameSyntax : NameSyntax
     {
         public IdentifierNameSyntax(TextSpan span, SimpleName name)
             : base(name, span)

@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public sealed class NewObjectExpressionSyntax : ExpressionSyntax
+    public class NewObjectExpressionSyntax : ExpressionSyntax
     {
         /// <summary>
         /// Note that this could represent a named or unnamed constructor. So

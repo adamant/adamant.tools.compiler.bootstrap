@@ -8,7 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public sealed class ClassDeclarationSyntax : TypeDeclarationSyntax
+    public class ClassDeclarationSyntax : TypeDeclarationSyntax
     {
         public FixedList<AttributeSyntax> Attributes { get; }
         public FixedList<IModiferToken> Modifiers { get; }

@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public sealed class AssignmentExpressionSyntax : ExpressionSyntax
+    public class AssignmentExpressionSyntax : ExpressionSyntax
     {
         public ExpressionSyntax LeftOperand;
         public AssignmentOperator Operator { get; }

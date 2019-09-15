@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public sealed class SimpleEffectSyntax : EffectSyntax
+    public class SimpleEffectSyntax : EffectSyntax
     {
         public SimpleName Name { get; }
 

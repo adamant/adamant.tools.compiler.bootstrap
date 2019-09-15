@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public sealed class ThrowEffectSyntax : EffectSyntax
+    public class ThrowEffectSyntax : EffectSyntax
     {
         public FixedList<ThrowEffectEntrySyntax> Exceptions { get; }
 

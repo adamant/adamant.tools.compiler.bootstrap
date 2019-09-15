@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public sealed class AnyPatternSyntax : PatternSyntax
+    public class AnyPatternSyntax : PatternSyntax
     {
         public SimpleName Name { get; }
 

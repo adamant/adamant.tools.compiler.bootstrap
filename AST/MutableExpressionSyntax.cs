@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     // TODO should this really be a TypeSyntax? Maybe it should be just ExpressionSyntax
-    public sealed class MutableExpressionSyntax : TypeSyntax
+    public class MutableExpressionSyntax : TypeSyntax
     {
         public ExpressionSyntax Expression { get; }
 

@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     /// <summary>
     /// An implicit conversion from `T` to `T?`
     /// </summary>
-    public sealed class ImplicitOptionalConversionExpression : ImplicitConversionExpression
+    public class ImplicitOptionalConversionExpression : ImplicitConversionExpression
     {
         public ExpressionSyntax Expression { get; }
         public OptionalType ConvertToType { get; }

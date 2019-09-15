@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public sealed class GenericParameterSyntax : Syntax, ISymbol
+    public class GenericParameterSyntax : Syntax, ISymbol
     {
         // Generic parameters are not mutable bindings
         bool ISymbol.MutableBinding => false;

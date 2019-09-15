@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public sealed class SelfParameterSyntax : ParameterSyntax
+    public class SelfParameterSyntax : ParameterSyntax
     {
         public bool RefSelf { get; }
         public bool MutableSelf { get; }

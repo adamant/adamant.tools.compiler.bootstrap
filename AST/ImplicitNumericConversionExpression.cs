@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public sealed class ImplicitNumericConversionExpression : ImplicitConversionExpression
+    public class ImplicitNumericConversionExpression : ImplicitConversionExpression
     {
         public ExpressionSyntax Expression { get; }
         public NumericType ConvertToType { get; }

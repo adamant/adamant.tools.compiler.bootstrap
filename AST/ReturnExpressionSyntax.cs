@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public sealed class ReturnExpressionSyntax : ExpressionSyntax
+    public class ReturnExpressionSyntax : ExpressionSyntax
     {
         public ExpressionSyntax ReturnValue;
 

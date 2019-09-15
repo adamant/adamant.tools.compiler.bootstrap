@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public sealed class ImplicitImmutabilityConversionExpression : ImplicitConversionExpression
+    public class ImplicitImmutabilityConversionExpression : ImplicitConversionExpression
     {
         public ExpressionSyntax Expression { get; }
 

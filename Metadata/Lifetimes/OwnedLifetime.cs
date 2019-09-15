@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes
 {
-    public sealed class OwnedLifetime : Lifetime
+    public class OwnedLifetime : Lifetime
     {
         #region Singleton
         internal static readonly OwnedLifetime Instance = new OwnedLifetime();

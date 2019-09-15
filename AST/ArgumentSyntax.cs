@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public sealed class ArgumentSyntax : Syntax
+    public class ArgumentSyntax : Syntax
     {
         public bool IsParams { get; }
         public ExpressionSyntax Value;

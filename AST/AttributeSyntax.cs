@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public sealed class AttributeSyntax : Syntax
+    public class AttributeSyntax : Syntax
     {
         public ExpressionSyntax Name { get; }
         public FixedList<ArgumentSyntax> Arguments { get; }

@@ -4,7 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     [VisitorNotSupported("Only implemented in parser")]
-    public sealed class BaseExpressionSyntax : InstanceExpressionSyntax
+    public class BaseExpressionSyntax : InstanceExpressionSyntax
     {
         public BaseExpressionSyntax(TextSpan span)
             : base(span)

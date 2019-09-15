@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public sealed class RefTypeSyntax : TypeSyntax
+    public class RefTypeSyntax : TypeSyntax
     {
         public ExpressionSyntax ReferencedType { get; }
 

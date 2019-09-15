@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     [VisitorNotSupported("Only implemented in parser")]
-    public sealed class ConstDeclarationSyntax : MemberDeclarationSyntax
+    public class ConstDeclarationSyntax : MemberDeclarationSyntax
     {
         public FixedList<AttributeSyntax> Attributes { get; }
         public FixedList<IModiferToken> Modifiers { get; }
