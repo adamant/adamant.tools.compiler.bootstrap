@@ -12,6 +12,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ExhaustiveMatching.Analyzer" Version="0.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Tokens\Tokens.csproj" />
   </ItemGroup>
 
