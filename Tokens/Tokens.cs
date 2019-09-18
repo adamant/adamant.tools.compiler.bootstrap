@@ -45,16 +45,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             return new CloseParenToken(span);
         }
 
-        public static IOpenBracketToken OpenBracket(TextSpan span)
-        {
-            return new OpenBracketToken(span);
-        }
-
-        public static ICloseBracketToken CloseBracket(TextSpan span)
-        {
-            return new CloseBracketToken(span);
-        }
-
         public static ISemicolonToken Semicolon(TextSpan span)
         {
             return new SemicolonToken(span);
@@ -65,11 +55,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             return new CommaToken(span);
         }
 
-        public static IPipeToken Pipe(TextSpan span)
-        {
-            return new PipeToken(span);
-        }
-
         public static IColonToken Colon(TextSpan span)
         {
             return new ColonToken(span);
@@ -78,16 +63,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         public static IRightArrowToken RightArrow(TextSpan span)
         {
             return new RightArrowToken(span);
-        }
-
-        public static IHashToken Hash(TextSpan span)
-        {
-            return new HashToken(span);
-        }
-
-        public static IHashHashToken HashHash(TextSpan span)
-        {
-            return new HashHashToken(span);
         }
 
         public static IDotToken Dot(TextSpan span)
@@ -118,21 +93,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         public static ILessThanDotDotLessThanToken LessThanDotDotLessThan(TextSpan span)
         {
             return new LessThanDotDotLessThanToken(span);
-        }
-
-        public static IAtSignToken AtSign(TextSpan span)
-        {
-            return new AtSignToken(span);
-        }
-
-        public static ICaretToken Caret(TextSpan span)
-        {
-            return new CaretToken(span);
-        }
-
-        public static ICaretDotToken CaretDot(TextSpan span)
-        {
-            return new CaretDotToken(span);
         }
 
         public static IPlusToken Plus(TextSpan span)
@@ -251,24 +211,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         typeof(ICloseBraceToken),
         typeof(IOpenParenToken),
         typeof(ICloseParenToken),
-        typeof(IOpenBracketToken),
-        typeof(ICloseBracketToken),
         typeof(ISemicolonToken),
         typeof(ICommaToken),
-        typeof(IPipeToken),
         typeof(IColonToken),
         typeof(IRightArrowToken),
-        typeof(IHashToken),
-        typeof(IHashHashToken),
         typeof(IDotToken),
         typeof(IColonColonToken),
         typeof(IDotDotToken),
         typeof(ILessThanDotDotToken),
         typeof(IDotDotLessThanToken),
         typeof(ILessThanDotDotLessThanToken),
-        typeof(IAtSignToken),
-        typeof(ICaretToken),
-        typeof(ICaretDotToken),
         typeof(IPlusToken),
         typeof(IMinusToken),
         typeof(IAsteriskToken),
@@ -365,24 +317,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IOpenBracketToken : IToken { }
-    internal partial class OpenBracketToken : Token, IOpenBracketToken
-    {
-        public OpenBracketToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
-    public partial interface ICloseBracketToken : IToken { }
-    internal partial class CloseBracketToken : Token, ICloseBracketToken
-    {
-        public CloseBracketToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
     public partial interface ISemicolonToken : IToken { }
     internal partial class SemicolonToken : Token, ISemicolonToken
     {
@@ -401,15 +335,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IPipeToken : IToken { }
-    internal partial class PipeToken : Token, IPipeToken
-    {
-        public PipeToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
     public partial interface IColonToken : IToken { }
     internal partial class ColonToken : Token, IColonToken
     {
@@ -423,24 +348,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     internal partial class RightArrowToken : Token, IRightArrowToken
     {
         public RightArrowToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
-    public partial interface IHashToken : IToken { }
-    internal partial class HashToken : Token, IHashToken
-    {
-        public HashToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
-    public partial interface IHashHashToken : IToken { }
-    internal partial class HashHashToken : Token, IHashHashToken
-    {
-        public HashHashToken(TextSpan span)
             : base(span)
         {
         }
@@ -495,33 +402,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     internal partial class LessThanDotDotLessThanToken : Token, ILessThanDotDotLessThanToken
     {
         public LessThanDotDotLessThanToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
-    public partial interface IAtSignToken : IToken { }
-    internal partial class AtSignToken : Token, IAtSignToken
-    {
-        public AtSignToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
-    public partial interface ICaretToken : IToken { }
-    internal partial class CaretToken : Token, ICaretToken
-    {
-        public CaretToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
-    public partial interface ICaretDotToken : IToken { }
-    internal partial class CaretDotToken : Token, ICaretDotToken
-    {
-        public CaretDotToken(TextSpan span)
             : base(span)
         {
         }

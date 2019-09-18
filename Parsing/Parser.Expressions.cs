@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             switch (Tokens.Current)
             {
                 case ICloseParenToken _:
-                case ICloseBracketToken _:
+                //case ICloseBracketToken _:
                 case ICloseBraceToken _:
                 case ISemicolonToken _:
                 case ICommaToken _:
@@ -350,10 +350,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     return ParsePrefixUnaryOperator(UnaryOperator.Minus);
                 case IPlusToken _:
                     return ParsePrefixUnaryOperator(UnaryOperator.Plus);
-                case IAtSignToken _:
-                    return ParsePrefixUnaryOperator(UnaryOperator.At);
-                case ICaretToken _:
-                    return ParsePrefixUnaryOperator(UnaryOperator.Caret);
+                //case IAtSignToken _:
+                //    return ParsePrefixUnaryOperator(UnaryOperator.At);
+                //case ICaretToken _:
+                //    return ParsePrefixUnaryOperator(UnaryOperator.Caret);
                 case INotKeywordToken _:
                     return ParsePrefixUnaryOperator(UnaryOperator.Not);
                 case IBooleanLiteralToken _:

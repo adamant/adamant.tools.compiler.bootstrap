@@ -45,15 +45,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         public IEnumerable<DeclarationSyntax> ParseDeclaration()
         {
-            var attributes = ParseAttributes();
+            //var attributes = ParseAttributes();
             var modifiers = AcceptMany(Tokens.AcceptToken<IModiferToken>);
 
             switch (Tokens.Current)
             {
                 case INamespaceKeywordToken _:
-                    return ParseNamespaceDeclaration(attributes, modifiers).Yield();
+                    return ParseNamespaceDeclaration(/*attributes,*/ modifiers).Yield();
                 case IClassKeywordToken _:
-                    return ParseClass(attributes, modifiers).Yield();
+                    return ParseClass(/*attributes,*/ modifiers).Yield();
                 //case ITraitKeywordToken _:
                 //    return ParseTrait(attributes, modifiers).Yield();
                 //case IStructKeywordToken _:
@@ -61,7 +61,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 //case IEnumKeywordToken _:
                 //    return ParseEnum(attributes, modifiers).Yield();
                 case IFunctionKeywordToken _:
-                    return ParseNamedFunction(attributes, modifiers).Yield();
+                    return ParseNamedFunction(/*attributes,*/ modifiers).Yield();
                 //case IConstKeywordToken _:
                 //    return ParseConst(attributes, modifiers).Yield();
                 //case IExternalKeywordToken _:
@@ -87,13 +87,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         public MemberDeclarationSyntax ParseMemberDeclaration()
         {
-            var attributes = ParseAttributes();
+            //var attributes = ParseAttributes();
             var modifiers = AcceptMany(Tokens.AcceptToken<IModiferToken>);
 
             switch (Tokens.Current)
             {
                 case IClassKeywordToken _:
-                    return ParseClass(attributes, modifiers);
+                    return ParseClass(/*attributes,*/ modifiers);
                 //case ITraitKeywordToken _:
                 //    return ParseTrait(attributes, modifiers);
                 //case IStructKeywordToken _:
@@ -101,11 +101,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 //case IEnumKeywordToken _:
                 //    return ParseEnum(attributes, modifiers);
                 case IFunctionKeywordToken _:
-                    return ParseNamedFunction(attributes, modifiers);
+                    return ParseNamedFunction(/*attributes,*/ modifiers);
                 //case IOperatorKeywordToken _:
                 //    return ParseOperator(attributes, modifiers);
                 case INewKeywordToken _:
-                    return ParseConstructor(attributes, modifiers);
+                    return ParseConstructor(/*attributes,*/ modifiers);
                 //case IInitKeywordToken _:
                 //    return ParseInitializer(attributes, modifiers);
                 //case IDeleteKeywordToken _:
@@ -115,9 +115,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 //case ISetKeywordToken _:
                 //    return ParseSetter(attributes, modifiers);
                 case ILetKeywordToken _:
-                    return ParseField(false, attributes, modifiers);
+                    return ParseField(false,/* attributes,*/ modifiers);
                 case IVarKeywordToken _:
-                    return ParseField(true, attributes, modifiers);
+                    return ParseField(true, /*attributes,*/ modifiers);
                 //case IConstKeywordToken _:
                 //    return ParseConst(attributes, modifiers);
                 default:
@@ -128,7 +128,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         #region Parse Namespaces
         public NamespaceDeclarationSyntax ParseNamespaceDeclaration(
-             FixedList<AttributeSyntax> attributes,
+             //FixedList<AttributeSyntax> attributes,
              FixedList<IModiferToken> modifiers)
         {
             // TODO generate errors for attributes or modifiers
@@ -167,28 +167,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         #endregion
 
         #region Parse Type Parts
-        private FixedList<AttributeSyntax> ParseAttributes()
-        {
-            var attributes = new List<AttributeSyntax>();
-            // Take modifiers until null
-            while (AcceptAttribute() is AttributeSyntax attribute)
-                attributes.Add(attribute);
-            return attributes.ToFixedList();
-        }
+        //private FixedList<AttributeSyntax> ParseAttributes()
+        //{
+        //    var attributes = new List<AttributeSyntax>();
+        //    // Take modifiers until null
+        //    while (AcceptAttribute() is AttributeSyntax attribute)
+        //        attributes.Add(attribute);
+        //    return attributes.ToFixedList();
+        //}
 
-        private AttributeSyntax AcceptAttribute()
-        {
-            if (!Tokens.Accept<IHashHashToken>())
-                return null;
-            var name = ParseName();
-            FixedList<ArgumentSyntax> arguments = null;
-            if (Tokens.Accept<IOpenParenToken>())
-            {
-                arguments = ParseArguments();
-                Tokens.Expect<ICloseParenToken>();
-            }
-            return new AttributeSyntax(name, arguments);
-        }
+        //private AttributeSyntax AcceptAttribute()
+        //{
+        //    if (!Tokens.Accept<IHashHashToken>())
+        //        return null;
+        //    var name = ParseName();
+        //    FixedList<ArgumentSyntax> arguments = null;
+        //    if (Tokens.Accept<IOpenParenToken>())
+        //    {
+        //        arguments = ParseArguments();
+        //        Tokens.Expect<ICloseParenToken>();
+        //    }
+        //    return new AttributeSyntax(name, arguments);
+        //}
 
         //private ExpressionSyntax AcceptBaseClass()
         //{
@@ -232,7 +232,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         #region Parse Type Declarations
         private ClassDeclarationSyntax ParseClass(
-             FixedList<AttributeSyntax> attributes,
+             //FixedList<AttributeSyntax> attributes,
              FixedList<IModiferToken> modifiers)
         {
             Tokens.Expect<IClassKeywordToken>();
@@ -245,7 +245,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             //var genericConstraints = ParseGenericConstraints();
             //var invariants = ParseInvariants();
             var members = bodyParser.ParseTypeBody();
-            return new ClassDeclarationSyntax(File, attributes, modifiers, name, identifier.Span,
+            return new ClassDeclarationSyntax(File,/* attributes,*/ modifiers, name, identifier.Span,
                 /*genericParameters, baseClass, baseTypes, genericConstraints, invariants,*/ members);
         }
 
@@ -357,7 +357,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         #region Parse Type Member Declarations
         private FieldDeclarationSyntax ParseField(
             bool mutableBinding,
-            FixedList<AttributeSyntax> attributes,
+            //FixedList<AttributeSyntax> attributes,
             FixedList<IModiferToken> modifiers)
         {
             // We should only be called when there is a binding keyword
@@ -377,7 +377,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 initializer = ParseExpression();
 
             Tokens.Expect<ISemicolonToken>();
-            return new FieldDeclarationSyntax(File, attributes, modifiers, mutableBinding, /*getterAccess,*/ name,
+            return new FieldDeclarationSyntax(File, /*attributes,*/ modifiers, mutableBinding, /*getterAccess,*/ name,
                 identifier.Span, typeExpression, initializer);
         }
 
@@ -394,7 +394,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         #region Parse Functions
         public NamedFunctionDeclarationSyntax ParseNamedFunction(
-            FixedList<AttributeSyntax> attributes,
+            //FixedList<AttributeSyntax> attributes,
             FixedList<IModiferToken> modifiers)
         {
             Tokens.Expect<IFunctionKeywordToken>();
@@ -481,7 +481,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         //}
 
         public ConstructorDeclarationSyntax ParseConstructor(
-            FixedList<AttributeSyntax> attributes,
+            //FixedList<AttributeSyntax> attributes,
             FixedList<IModiferToken> modifiers)
         {
             var newKeywordSpan = Tokens.Expect<INewKeywordToken>();

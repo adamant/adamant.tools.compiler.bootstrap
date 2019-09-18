@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class FieldDeclarationSyntax : MemberDeclarationSyntax
     {
-        public FixedList<AttributeSyntax> Attributes { get; }
+        //public FixedList<AttributeSyntax> Attributes { get; }
         public FixedList<IModiferToken> Modifiers { get; }
         public bool IsMutableBinding { get; }
         //public AccessModifier? GetterAccess { get; }
@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public FieldDeclarationSyntax(
             CodeFile file,
-            FixedList<AttributeSyntax> attributes,
+            //FixedList<AttributeSyntax> attributes,
             FixedList<IModiferToken> modifiers,
             bool mutableBinding,
             //AccessModifier? getterAccess,
@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             ExpressionSyntax initializer)
             : base(file, fullName, nameSpan)
         {
-            Attributes = attributes;
+            //Attributes = attributes;
             Modifiers = modifiers;
             IsMutableBinding = mutableBinding;
             //GetterAccess = getterAccess;

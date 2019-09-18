@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         //typeof(MatchArmSyntax),
         //typeof(GenericParameterSyntax),
         //typeof(GenericConstraintSyntax),
-        typeof(AttributeSyntax),
+        //typeof(AttributeSyntax),
         //typeof(EnumVariantSyntax),
         typeof(CompilationUnitSyntax),
         typeof(ArgumentSyntax))]

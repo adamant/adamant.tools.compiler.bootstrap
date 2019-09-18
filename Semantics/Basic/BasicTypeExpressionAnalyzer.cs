@@ -76,11 +76,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case UnaryExpressionSyntax unaryOperatorExpression:
                     switch (unaryOperatorExpression.Operator)
                     {
-                        case UnaryOperator.At:
-                            //if (unaryOperatorExpression.Operand.Type is Metatype metatype)
-                            //    return new PointerType(metatype.Instance);
-                            // TODO evaluate to type
-                            return DataType.Unknown;
+                        //case UnaryOperator.At:
+                        //    //if (unaryOperatorExpression.Operand.Type is Metatype metatype)
+                        //    //    return new PointerType(metatype.Instance);
+                        //    // TODO evaluate to type
+                        //    return DataType.Unknown;
                         case UnaryOperator.Question:
                             //unaryOperatorExpression.Type = DataType.Type;
                             var referent = Check(unaryOperatorExpression.Operand);

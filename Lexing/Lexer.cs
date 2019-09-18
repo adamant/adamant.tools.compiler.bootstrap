@@ -38,26 +38,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                     case ')':
                         yield return TokenFactory.CloseParen(SymbolSpan());
                         break;
-                    case '[':
-                        yield return TokenFactory.OpenBracket(SymbolSpan());
-                        break;
-                    case ']':
-                        yield return TokenFactory.CloseBracket(SymbolSpan());
-                        break;
+                    //case '[':
+                    //    yield return TokenFactory.OpenBracket(SymbolSpan());
+                    //    break;
+                    //case ']':
+                    //    yield return TokenFactory.CloseBracket(SymbolSpan());
+                    //    break;
                     case ';':
                         yield return TokenFactory.Semicolon(SymbolSpan());
                         break;
                     case ',':
                         yield return TokenFactory.Comma(SymbolSpan());
                         break;
-                    case '#':
-                        if (NextCharIs('#'))
-                            // it is `##`
-                            yield return TokenFactory.HashHash(SymbolSpan(2));
-                        else
-                            // it is `#`
-                            yield return TokenFactory.Hash(SymbolSpan(1));
-                        break;
+                    //case '#':
+                    //    if (NextCharIs('#'))
+                    //        // it is `##`
+                    //        yield return TokenFactory.HashHash(SymbolSpan(2));
+                    //    else
+                    //        // it is `#`
+                    //        yield return TokenFactory.Hash(SymbolSpan(1));
+                    //    break;
                     case '.':
                         if (NextCharIs('.'))
                         {
@@ -96,26 +96,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                                 break;
                         }
                         break;
-                    case '|':
-                        yield return TokenFactory.Pipe(SymbolSpan());
-                        break;
+                    //case '|':
+                    //    yield return TokenFactory.Pipe(SymbolSpan());
+                    //    break;
                     case '$':
                         yield return TokenFactory.Dollar(SymbolSpan());
                         break;
                     case '→':
                         yield return TokenFactory.RightArrow(SymbolSpan());
                         break;
-                    case '@':
-                        yield return TokenFactory.AtSign(SymbolSpan());
-                        break;
-                    case '^':
-                        if (NextCharIs('.'))
-                            // it is `^.`
-                            yield return TokenFactory.CaretDot(SymbolSpan(2));
-                        else
-                            // it is `^`
-                            yield return TokenFactory.Caret(SymbolSpan());
-                        break;
+                    //case '@':
+                    //    yield return TokenFactory.AtSign(SymbolSpan());
+                    //    break;
+                    //case '^':
+                    //    if (NextCharIs('.'))
+                    //        // it is `^.`
+                    //        yield return TokenFactory.CaretDot(SymbolSpan(2));
+                    //    else
+                    //        // it is `^`
+                    //        yield return TokenFactory.Caret(SymbolSpan());
+                    //    break;
                     case '+':
                         if (NextCharIs('='))
                             // it is `+=`
@@ -214,7 +214,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                                 if (CharAtIs(2, '='))
                                     // it is `=/=`
                                     yield return TokenFactory.NotEqual(SymbolSpan(3));
-                                else goto default;
+                                else
+                                    goto default;
                                 break;
                             default:
                                 // it is `=`
@@ -502,7 +503,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                 if (tokenEnd < text.Length)
                 {
                     // To include the close quote
-                    if (text[tokenEnd] == '"') tokenEnd += 1;
+                    if (text[tokenEnd] == '"')
+                        tokenEnd += 1;
                 }
                 else
                     diagnostics.Add(LexError.UnclosedStringLiteral(file,

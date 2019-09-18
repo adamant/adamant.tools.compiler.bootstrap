@@ -335,30 +335,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             typeError = operandType != DataType.Bool;
                             unaryOperatorExpression.Type = DataType.Bool;
                             break;
-                        case UnaryOperator.At:
-                            typeError = false; // TODO check that the expression can have a pointer taken
-                                               //if (operandType is Metatype)
-                                               //    unaryOperatorExpression.Type = DataType.Type; // constructing a type
-                                               //else
-                            unaryOperatorExpression.Type = new PointerType(operandType); // taking the address of something
-                            break;
+                        //case UnaryOperator.At:
+                        //    typeError = false; // TODO check that the expression can have a pointer taken
+                        //                       //if (operandType is Metatype)
+                        //                       //    unaryOperatorExpression.Type = DataType.Type; // constructing a type
+                        //                       //else
+                        //    unaryOperatorExpression.Type = new PointerType(operandType); // taking the address of something
+                        //    break;
                         case UnaryOperator.Question:
                             typeError = false; // TODO check that the expression can have a pointer taken
                             unaryOperatorExpression.Type = new OptionalType(operandType);
                             break;
-                        case UnaryOperator.Caret:
-                            switch (operandType)
-                            {
-                                case PointerType pointerType:
-                                    unaryOperatorExpression.Type = pointerType.Referent;
-                                    typeError = false;
-                                    break;
-                                default:
-                                    unaryOperatorExpression.Type = DataType.Unknown;
-                                    typeError = true;
-                                    break;
-                            }
-                            break;
+                        //case UnaryOperator.Caret:
+                        //    switch (operandType)
+                        //    {
+                        //        case PointerType pointerType:
+                        //            unaryOperatorExpression.Type = pointerType.Referent;
+                        //            typeError = false;
+                        //            break;
+                        //        default:
+                        //            unaryOperatorExpression.Type = DataType.Unknown;
+                        //            typeError = true;
+                        //            break;
+                        //    }
+                        //    break;
                         case UnaryOperator.Minus:
                         case UnaryOperator.Plus:
                             switch (operandType)
@@ -765,11 +765,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             var leftType = leftOperand.Type;
             switch (leftType)
             {
-                case PointerType _:
-                {
-                    // TODO it may need to be size
-                    throw new NotImplementedException();
-                }
+                //case PointerType _:
+                //{
+                //    // TODO it may need to be size
+                //    throw new NotImplementedException();
+                //}
                 case IntegerConstantType _:
                     // TODO may need to promote based on size
                     throw new NotImplementedException();

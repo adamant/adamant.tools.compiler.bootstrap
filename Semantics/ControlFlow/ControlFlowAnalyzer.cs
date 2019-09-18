@@ -499,14 +499,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 {
                     var conversionFunction = implicitLiteralConversion.ConversionFunction;
                     var literal = (StringLiteralExpressionSyntax)implicitLiteralConversion.Expression;
-                    var constantLength = Utf8BytesConstant.Encoding.GetByteCount(literal.Value);
-                    var sizeArgument = new IntegerConstant(constantLength, DataType.Size, literal.Span);
-                    var bytesArgument = new Utf8BytesConstant(literal.Value, literal.Span);
-                    return new FunctionCall(implicitLiteralConversion.Span,
-                        conversionFunction.FullName,
-                        //(FunctionType)conversionFunction.Type,
-                        sizeArgument,
-                        bytesArgument);
+                    //var constantLength = Utf8BytesConstant.Encoding.GetByteCount(literal.Value);
+                    //var sizeArgument = new IntegerConstant(constantLength, DataType.Size, literal.Span);
+                    //var bytesArgument = new Utf8BytesConstant(literal.Value, literal.Span);
+                    //return new FunctionCall(implicitLiteralConversion.Span,
+                    //    conversionFunction.FullName,
+                    //    //(FunctionType)conversionFunction.Type,
+                    //    sizeArgument,
+                    //    bytesArgument);
+                    throw new NotImplementedException();
                 }
                 case ImplicitNoneConversionExpression implicitNoneConversion:
                     return new NoneConstant(implicitNoneConversion.ConvertToType, implicitNoneConversion.Span);
@@ -655,8 +656,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     // This is a no-op
                     return ConvertToValue(expression.Operand);
                 case UnaryOperator.Question:
-                case UnaryOperator.At:
-                case UnaryOperator.Caret:
+                    //case UnaryOperator.At:
+                    //case UnaryOperator.Caret:
                     throw new NotImplementedException("Unary expression conversion not implemented");
                 default:
                     throw ExhaustiveMatch.Failed(expression.Operator);

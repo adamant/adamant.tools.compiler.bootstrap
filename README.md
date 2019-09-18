@@ -12,6 +12,8 @@ The current plan is to get a basic object-oriented subset of the language workin
 
 The basic object-oriented subset is planned to include a minimal set of features to support programming. The list below should be taken as a general guideline. Some very basic language features have been omitted. For features that are listed, often only a very basic version of them will be supported. At the end of the list are some features that may be necessary to include, but will be omitted if possible.
 
+The compiler will be simplified to include code only for these features. Not attempt will be made to structure code for features that aren't currently present. For example, function types will not be used internally because function types aren't supported in this version of the language. Additionally, the compiler will be multi-phase with errors in any phase preventing subsequent phases from running. It is expected the phases will be lexing and parsing; name binding and type checking; and borrow checking.
+
 * [x] Stand-alone Functions - no generics
 * [x] Simple Types - `int`, `uint`, `size`, `offset`
 * [x] Simple Class Declarations - no base class, no generics (see below for supported members)
@@ -28,7 +30,7 @@ The basic object-oriented subset is planned to include a minimal set of features
 * [ ] Wrapper Types - `Int`, `UInt`, `Size`, `Offset` to enable simple types in arrays
 * [ ] Basic Traits? - no generics, classes directly implement like interfaces
 * [ ] `foreach` in Iterator?
-* [ ] Destructors?
+* [ ] `string` as primitive type
 
 These features should allow a number of basic programs and katas to be implemented. Note that the lack of generics will mean that future versions won't be backwards compatible with the standard library of this version.
 

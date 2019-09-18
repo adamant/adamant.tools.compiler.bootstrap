@@ -52,8 +52,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             var symbols = new List<ISymbol>()
             {
                 // Making these fields for now
-                PrimitiveSymbol.New(typeName.Qualify("bytes"), DataType.BytePointer),
-                PrimitiveSymbol.New(typeName.Qualify("byte_count"), DataType.Size),
+                //PrimitiveSymbol.New(typeName.Qualify("bytes"), DataType.BytePointer),
+                //PrimitiveSymbol.New(typeName.Qualify("byte_count"), DataType.Size),
                 stringLiteralOperator,
                 equalsOperator,
                 concatFunc,

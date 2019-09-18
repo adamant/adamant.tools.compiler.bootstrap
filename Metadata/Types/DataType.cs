@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         //public static readonly FloatingPointType Float = FloatingPointType.Float;
         public static readonly StringConstantType StringConstant = StringConstantType.Instance;
 
-        public static readonly PointerType BytePointer = new PointerType(Byte);
+        //public static readonly PointerType BytePointer = new PointerType(Byte);
         /// <summary>
         /// The value `none` has this type, which is `never?`
         /// </summary>

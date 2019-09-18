@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class ClassDeclarationSyntax : TypeDeclarationSyntax
     {
-        public FixedList<AttributeSyntax> Attributes { get; }
+        //public FixedList<AttributeSyntax> Attributes { get; }
         public FixedList<IModiferToken> Modifiers { get; }
         //public ExpressionSyntax BaseClass { get; }
         //public FixedList<ExpressionSyntax> BaseTypes { get; }
@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public ClassDeclarationSyntax(
             CodeFile file,
-            FixedList<AttributeSyntax> attributes,
+            //FixedList<AttributeSyntax> attributes,
             FixedList<IModiferToken> modifiers,
             Name fullName,
             TextSpan nameSpan,
@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             FixedList<MemberDeclarationSyntax> members)
             : base(file, nameSpan, fullName, /*genericParameters,*/ members)
         {
-            Attributes = attributes;
+            //Attributes = attributes;
             Modifiers = modifiers;
             //BaseClass = baseClass;
             //BaseTypes = baseTypes;

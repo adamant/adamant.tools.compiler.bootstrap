@@ -117,8 +117,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             {
                 case IntegerConstant integer:
                     return $"({ConvertType(integer.Type)}){{{integer.Value}}}";
-                case Utf8BytesConstant utf8BytesConstant:
-                    return $"((_byte*)u8\"{utf8BytesConstant.Value.Escape()}\")";
+                //case Utf8BytesConstant utf8BytesConstant:
+                //    return $"((_byte*)u8\"{utf8BytesConstant.Value.Escape()}\")";
                 case BooleanConstant boolean:
                     var booleanValue = boolean.Value ? 1 : 0;
                     return $"({ConvertType(boolean.Type)}){{{booleanValue}}}";
