@@ -6,7 +6,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
     public static class DictionaryExtensions
     {
-
         public static FixedDictionary<TKey, TValue> ToFixedDictionary<TKey, TValue>(
             this IDictionary<TKey, TValue> dictionary)
         {
