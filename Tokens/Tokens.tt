@@ -57,6 +57,7 @@
     }.AsReadOnly();
 #>
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
@@ -70,6 +71,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 
 <#}#>
     }
+
+    [Closed(
+<# for (int i = 0; i < tokens.Count; i++) {#>
+        typeof(I<#=tokens[i]#>Token)<# if(i == tokens.Count-1) {#>)]<#} else {#>,<#}#>
+
+<#}#>    public partial interface IToken { }
+
 <# foreach(var token in tokens) {#>
 
     public partial interface I<#=token#>Token : IToken { }

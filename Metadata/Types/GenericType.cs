@@ -1,7 +1,9 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
+    [Closed()]
     public abstract class GenericType : DataType
     {
         public abstract FixedList<DataType> GenericParameterTypes { get; }

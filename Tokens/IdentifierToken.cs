@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
-    internal abstract class IdentifierToken : Token, IIdentifierToken
+    internal abstract class IdentifierToken : Token
     {
         public string Value { get; }
 

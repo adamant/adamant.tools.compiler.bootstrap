@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
@@ -409,6 +410,89 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             return new ExternalKeywordToken(span);
         }
     }
+
+    [Closed(
+        typeof(IPublishedKeywordToken),
+        typeof(IPublicKeywordToken),
+        typeof(IProtectedKeywordToken),
+        typeof(ILetKeywordToken),
+        typeof(IVarKeywordToken),
+        typeof(IVoidKeywordToken),
+        typeof(IIntKeywordToken),
+        typeof(IInt8KeywordToken),
+        typeof(IInt16KeywordToken),
+        typeof(IInt64KeywordToken),
+        typeof(IUIntKeywordToken),
+        typeof(IUInt16KeywordToken),
+        typeof(IUInt64KeywordToken),
+        typeof(IByteKeywordToken),
+        typeof(ISizeKeywordToken),
+        typeof(IOffsetKeywordToken),
+        typeof(IBoolKeywordToken),
+        typeof(INeverKeywordToken),
+        typeof(IReturnKeywordToken),
+        typeof(IClassKeywordToken),
+        typeof(IFunctionKeywordToken),
+        typeof(INewKeywordToken),
+        typeof(IInitKeywordToken),
+        typeof(IDeleteKeywordToken),
+        typeof(IOwnedKeywordToken),
+        typeof(IForeverKeywordToken),
+        typeof(INamespaceKeywordToken),
+        typeof(IUsingKeywordToken),
+        typeof(IForeachKeywordToken),
+        typeof(IInKeywordToken),
+        typeof(IIfKeywordToken),
+        typeof(IElseKeywordToken),
+        typeof(IStructKeywordToken),
+        typeof(IEnumKeywordToken),
+        typeof(IUnsafeKeywordToken),
+        typeof(ISafeKeywordToken),
+        typeof(ISelfKeywordToken),
+        typeof(ISelfTypeKeywordToken),
+        typeof(IBaseKeywordToken),
+        typeof(ITypeKeywordToken),
+        typeof(IMutableKeywordToken),
+        typeof(IParamsKeywordToken),
+        typeof(IMayKeywordToken),
+        typeof(INoKeywordToken),
+        typeof(IThrowKeywordToken),
+        typeof(IRefKeywordToken),
+        typeof(IAbstractKeywordToken),
+        typeof(IGetKeywordToken),
+        typeof(ISetKeywordToken),
+        typeof(IRequiresKeywordToken),
+        typeof(IEnsuresKeywordToken),
+        typeof(IInvariantKeywordToken),
+        typeof(IWhereKeywordToken),
+        typeof(IConstKeywordToken),
+        typeof(IUninitializedKeywordToken),
+        typeof(INoneKeywordToken),
+        typeof(IOperatorKeywordToken),
+        typeof(IImplicitKeywordToken),
+        typeof(IExplicitKeywordToken),
+        typeof(IMoveKeywordToken),
+        typeof(ICopyKeywordToken),
+        typeof(IMatchKeywordToken),
+        typeof(ILoopKeywordToken),
+        typeof(IWhileKeywordToken),
+        typeof(IBreakKeywordToken),
+        typeof(INextKeywordToken),
+        typeof(IOverrideKeywordToken),
+        typeof(IAnyKeywordToken),
+        typeof(ITrueKeywordToken),
+        typeof(IFalseKeywordToken),
+        typeof(IAsKeywordToken),
+        typeof(IAndKeywordToken),
+        typeof(IOrKeywordToken),
+        typeof(INotKeywordToken),
+        typeof(ITraitKeywordToken),
+        typeof(IFloatKeywordToken),
+        typeof(IFloat32KeywordToken),
+        typeof(IUnderscoreKeywordToken),
+        typeof(IExternalKeywordToken))]
+    public partial interface IKeywordToken : IToken { }
+
 
     public partial interface IPublishedKeywordToken : IKeywordToken { }
     internal partial class PublishedKeywordToken : Token, IPublishedKeywordToken

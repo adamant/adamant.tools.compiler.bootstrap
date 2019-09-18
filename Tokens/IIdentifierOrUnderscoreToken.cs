@@ -1,5 +1,10 @@
+using ExhaustiveMatching;
+
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
+    [Closed(
+        typeof(IIdentifierToken),
+        typeof(IUnderscoreKeywordToken))]
     public partial interface IIdentifierOrUnderscoreToken : IToken
     {
         string Value { get; }

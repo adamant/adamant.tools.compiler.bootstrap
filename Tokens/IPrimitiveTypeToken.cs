@@ -1,5 +1,26 @@
+using ExhaustiveMatching;
+
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
+    [Closed(
+        typeof(IVoidKeywordToken),
+        typeof(INeverKeywordToken),
+        typeof(IBoolKeywordToken),
+        typeof(IAnyKeywordToken),
+        typeof(ITypeKeywordToken),
+        typeof(IInt8KeywordToken),
+        typeof(IByteKeywordToken),
+        typeof(IInt16KeywordToken),
+        typeof(IUInt16KeywordToken),
+        typeof(IIntKeywordToken),
+        typeof(IUIntKeywordToken),
+        typeof(IInt64KeywordToken),
+        typeof(IInt64KeywordToken),
+        typeof(IUInt64KeywordToken),
+        typeof(ISizeKeywordToken),
+        typeof(IOffsetKeywordToken),
+        typeof(IFloat32KeywordToken),
+        typeof(IFloatKeywordToken))]
     public interface IPrimitiveTypeToken : IToken { }
 
     public partial interface IVoidKeywordToken : IPrimitiveTypeToken { }

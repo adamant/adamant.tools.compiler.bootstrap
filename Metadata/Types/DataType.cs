@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
@@ -8,6 +9,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// The data type of a value in an Adamant program. This includes potentially
     /// unresolved types like `UnknownType` or types containing unknown parts.
     /// </summary>
+    [Closed(
+        typeof(ReferenceType),
+        typeof(ValueType),
+        typeof(RefType),
+        typeof(EmptyType),
+        typeof(UnknownType),
+        typeof(GenericType))]
     public abstract class DataType
     {
         #region Standard Types

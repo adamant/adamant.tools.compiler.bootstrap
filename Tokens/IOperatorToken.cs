@@ -1,5 +1,46 @@
+using ExhaustiveMatching;
+
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
+    [Closed(
+        typeof(ILifetimeOperatorToken),
+        typeof(IAccessOperatorToken),
+        typeof(IDotToken),
+        typeof(IDotDotToken),
+        typeof(ILessThanDotDotToken),
+        typeof(IDotDotLessThanToken),
+        typeof(ILessThanDotDotLessThanToken),
+        typeof(IAtSignToken),
+        typeof(ICaretToken),
+        typeof(ICaretDotToken),
+        typeof(IPlusToken),
+        typeof(IMinusToken),
+        typeof(IAsteriskToken),
+        typeof(ISlashToken),
+        typeof(IEqualsToken),
+        typeof(IEqualsEqualsToken),
+        typeof(INotEqualToken),
+        typeof(IGreaterThanToken),
+        typeof(IGreaterThanOrEqualToken),
+        typeof(ILessThanToken),
+        typeof(ILessThanOrEqualToken),
+        typeof(IPlusEqualsToken),
+        typeof(IMinusEqualsToken),
+        typeof(IAsteriskEqualsToken),
+        typeof(ISlashEqualsToken),
+        typeof(IDollarToken),
+        typeof(IDollarLessThanToken),
+        typeof(IDollarLessThanNotEqualToken),
+        typeof(IDollarGreaterThanToken),
+        typeof(IDollarGreaterThanNotEqualToken),
+        typeof(IQuestionToken),
+        typeof(IQuestionQuestionToken),
+        typeof(IQuestionDotToken),
+        typeof(ILessThanColonToken),
+        typeof(IEqualsGreaterThanToken),
+        typeof(IAndKeywordToken),
+        typeof(IOrKeywordToken),
+        typeof(INotKeywordToken))]
     public interface IOperatorToken : IToken { }
 
     public partial interface IDotToken : IOperatorToken { }

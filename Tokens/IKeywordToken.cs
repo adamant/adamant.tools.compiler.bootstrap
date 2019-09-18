@@ -1,4 +1,13 @@
+using ExhaustiveMatching;
+
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
-    public interface IKeywordToken : IToken { }
+    [Closed(
+        typeof(IMemberNameToken),
+        typeof(IBindingToken),
+        typeof(IModiferToken),
+        typeof(IAccessModifierToken),
+        typeof(ITypeKindKeywordToken),
+        typeof(IBooleanLiteralToken))]
+    public partial interface IKeywordToken : IToken { }
 }

@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
-    internal abstract partial class Token : IToken
+    internal abstract class Token
     {
         public TextSpan Span { get; }
 

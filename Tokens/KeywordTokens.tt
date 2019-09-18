@@ -91,6 +91,7 @@
 using System;
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
@@ -113,6 +114,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
 <#}#>
     }
+
+    [Closed(
+<# for (int i = 0; i < keywords.Count; i++) {#>
+        typeof(I<#=keywords[i]#>KeywordToken)<# if(i == keywords.Count-1) {#>)]<#} else {#>,<#}#>
+
+<#}#>    public partial interface IKeywordToken : IToken { }
+
 <# foreach(var keyword in keywords) {#>
 
     public partial interface I<#=keyword#>KeywordToken : IKeywordToken { }

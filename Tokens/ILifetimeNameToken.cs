@@ -1,5 +1,12 @@
+using ExhaustiveMatching;
+
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
+    [Closed(
+        typeof(IOwnedKeywordToken),
+        typeof(IRefKeywordToken),
+        typeof(IForeverKeywordToken),
+        typeof(IIdentifierToken))]
     public interface ILifetimeNameToken : IToken { }
 
     public partial interface IOwnedKeywordToken : ILifetimeNameToken { }

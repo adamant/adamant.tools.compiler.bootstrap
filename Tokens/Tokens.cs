@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
@@ -240,6 +241,57 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
 
     }
+
+    [Closed(
+        typeof(IWhitespaceToken),
+        typeof(ICommentToken),
+        typeof(IUnexpectedToken),
+        typeof(IEndOfFileToken),
+        typeof(IOpenBraceToken),
+        typeof(ICloseBraceToken),
+        typeof(IOpenParenToken),
+        typeof(ICloseParenToken),
+        typeof(IOpenBracketToken),
+        typeof(ICloseBracketToken),
+        typeof(ISemicolonToken),
+        typeof(ICommaToken),
+        typeof(IPipeToken),
+        typeof(IColonToken),
+        typeof(IRightArrowToken),
+        typeof(IHashToken),
+        typeof(IHashHashToken),
+        typeof(IDotToken),
+        typeof(IColonColonToken),
+        typeof(IDotDotToken),
+        typeof(ILessThanDotDotToken),
+        typeof(IDotDotLessThanToken),
+        typeof(ILessThanDotDotLessThanToken),
+        typeof(IAtSignToken),
+        typeof(ICaretToken),
+        typeof(ICaretDotToken),
+        typeof(IPlusToken),
+        typeof(IMinusToken),
+        typeof(IAsteriskToken),
+        typeof(ISlashToken),
+        typeof(IEqualsToken),
+        typeof(IEqualsEqualsToken),
+        typeof(INotEqualToken),
+        typeof(IGreaterThanToken),
+        typeof(IGreaterThanOrEqualToken),
+        typeof(ILessThanToken),
+        typeof(ILessThanOrEqualToken),
+        typeof(IPlusEqualsToken),
+        typeof(IMinusEqualsToken),
+        typeof(IAsteriskEqualsToken),
+        typeof(ISlashEqualsToken),
+        typeof(IDollarToken),
+        typeof(IQuestionToken),
+        typeof(IQuestionQuestionToken),
+        typeof(IQuestionDotToken),
+        typeof(ILessThanColonToken),
+        typeof(IEqualsGreaterThanToken))]
+    public partial interface IToken { }
+
 
     public partial interface IWhitespaceToken : IToken { }
     internal partial class WhitespaceToken : Token, IWhitespaceToken

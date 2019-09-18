@@ -1,5 +1,18 @@
+using ExhaustiveMatching;
+
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
+    [Closed(
+        typeof(IAccessModifierToken),
+        typeof(IAbstractKeywordToken),
+        typeof(IImplicitKeywordToken),
+        typeof(IExplicitKeywordToken),
+        typeof(IMutableKeywordToken),
+        typeof(IOverrideKeywordToken),
+        typeof(IMoveKeywordToken),
+        typeof(IRefKeywordToken),
+        typeof(ISafeKeywordToken),
+        typeof(IUnsafeKeywordToken))]
     public partial interface IModiferToken : IKeywordToken { }
 
     public partial interface IAccessModifierToken : IModiferToken { }
