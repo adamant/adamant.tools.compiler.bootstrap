@@ -15,11 +15,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 
         public ConstructorDeclaration(
             Name fullName,
-            DataType type,
+            //DataType type,
             FixedList<Parameter> parameters,
             DataType returnType,
             ControlFlowGraph controlFlow)
-            : base(true, fullName, type, SymbolSet.Empty)
+            : base(true, fullName, /*type,*/null, SymbolSet.Empty)
         {
             ReturnType = returnType;
             ControlFlow = controlFlow;

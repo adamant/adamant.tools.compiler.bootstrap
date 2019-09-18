@@ -68,7 +68,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     case IntegerConstantType integerConstant:
                         var value = integerConstant.Value;
                         var byteCount = value.GetByteCount();
-                        type = byteCount <= 4 ? DataType.Int : DataType.Int64;
+                        //type = byteCount <= 4 ? DataType.Int : DataType.Int64;
+                        type = DataType.Int;
                         break;
                     case StringConstantType stringConstant:
                         throw new NotImplementedException();
@@ -141,20 +142,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                 && (!expressionType.IsSigned || expectedType.IsSigned))
                                 expression = new ImplicitNumericConversionExpression(expression, expectedType);
                             break;
-                        case FloatingPointType expectedType:
-                            if (expressionType.Bits < expectedType.Bits)
-                                expression = new ImplicitNumericConversionExpression(expression, expectedType);
-                            break;
+                            //case FloatingPointType expectedType:
+                            //    if (expressionType.Bits < expectedType.Bits)
+                            //        expression = new ImplicitNumericConversionExpression(expression, expectedType);
+                            //    break;
                     }
                 }
                 break;
-                case FloatingPointType expressionType:
-                {
-                    if (targetType is FloatingPointType expectedType
-                        && expressionType.Bits < expectedType.Bits)
-                        expression = new ImplicitNumericConversionExpression(expression, expectedType);
-                }
-                break;
+                //case FloatingPointType expressionType:
+                //{
+                //    if (targetType is FloatingPointType expectedType
+                //        && expressionType.Bits < expectedType.Bits)
+                //        expression = new ImplicitNumericConversionExpression(expression, expectedType);
+                //}
+                //break;
                 case IntegerConstantType expressionType:
                     var requireSigned = expressionType.Value < 0;
                     switch (targetType)
@@ -169,8 +170,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             if (!requireSigned || expectedType.IsSigned)
                                 expression = new ImplicitNumericConversionExpression(expression, expectedType);
                             break;
-                        case FloatingPointType expectedType:
-                            throw new NotImplementedException();
+                            //case FloatingPointType expectedType:
+                            //    throw new NotImplementedException();
                     }
                     break;
                 case StringConstantType _:
@@ -293,7 +294,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         case BinaryOperator.GreaterThanOrEqual:
                             compatible = (leftType == DataType.Bool && rightType == DataType.Bool)
                                          || NumericOperatorTypesAreCompatible(ref binaryOperatorExpression.LeftOperand, ref binaryOperatorExpression.RightOperand, null)
-                                         || OperatorOverloadDefined(@operator, binaryOperatorExpression.LeftOperand, ref binaryOperatorExpression.RightOperand);
+                                         /*|| OperatorOverloadDefined(@operator, binaryOperatorExpression.LeftOperand, ref binaryOperatorExpression.RightOperand)*/;
                             binaryOperatorExpression.Type = DataType.Bool;
                             break;
                         case BinaryOperator.And:
@@ -417,12 +418,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             newObjectExpression.ConstructorSymbol = constructorSymbol;
                             var constructorType = constructorSymbol.Type;
                             newObjectExpression.ConstructorType = constructorType;
-                            if (constructorType is FunctionType functionType)
-                                foreach (var (arg, type) in newObjectExpression.Arguments.Zip(functionType.ParameterTypes))
-                                {
-                                    InsertImplicitConversionIfNeeded(ref arg.Value, type);
-                                    CheckArgumentTypeCompatibility(type, arg);
-                                }
+                            //if (constructorType is FunctionType functionType)
+                            //    foreach (var (arg, type) in newObjectExpression.Arguments.Zip(functionType.ParameterTypes))
+                            //    {
+                            //        InsertImplicitConversionIfNeeded(ref arg.Value, type);
+                            //        CheckArgumentTypeCompatibility(type, arg);
+                            //    }
                             break;
                         default:
                             diagnostics.Add(NameBindingError.AmbiguousConstructor(file, newObjectExpression.Span));
@@ -477,17 +478,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     InferExpressionTypeInInvocation(invocation.Callee, argumentTypes);
                     var callee = invocation.Callee.Type;
 
-                    if (callee is FunctionType functionType)
-                    {
-                        foreach (var (arg, type) in invocation.Arguments.Zip(functionType
-                            .ParameterTypes))
-                        {
-                            InsertImplicitConversionIfNeeded(ref arg.Value, type);
-                            CheckArgumentTypeCompatibility(type, arg);
-                        }
+                    //if (callee is FunctionType functionType)
+                    //{
+                    //    foreach (var (arg, type) in invocation.Arguments.Zip(functionType
+                    //        .ParameterTypes))
+                    //    {
+                    //        InsertImplicitConversionIfNeeded(ref arg.Value, type);
+                    //        CheckArgumentTypeCompatibility(type, arg);
+                    //    }
 
-                        return invocation.Type = functionType.ReturnType;
-                    }
+                    //    return invocation.Type = functionType.ReturnType;
+                    //}
 
                     // If it is unknown, we already reported an error
                     if (callee == DataType.Unknown)
@@ -794,24 +795,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
         }
 
-        private bool OperatorOverloadDefined(BinaryOperator @operator, ExpressionSyntax leftOperand, ref ExpressionSyntax rightOperand)
-        {
-            // all other operators are not yet implemented
-            if (@operator != BinaryOperator.EqualsEquals)
-                return false;
+        //private bool OperatorOverloadDefined(BinaryOperator @operator, ExpressionSyntax leftOperand, ref ExpressionSyntax rightOperand)
+        //{
+        //    // all other operators are not yet implemented
+        //    if (@operator != BinaryOperator.EqualsEquals)
+        //        return false;
 
-            if (!(leftOperand.Type is UserObjectType userObjectType))
-                return false;
-            var equalityOperators = userObjectType.Symbol.Lookup(SpecialName.OperatorEquals);
-            if (equalityOperators.Count != 1)
-                return false;
-            var equalityOperator = equalityOperators.Single();
-            if (!(equalityOperator.Type is FunctionType functionType) || functionType.Arity != 2)
-                return false;
-            InsertImplicitConversionIfNeeded(ref rightOperand, functionType.ParameterTypes[1]);
-            return IsAssignableFrom(functionType.ParameterTypes[1], rightOperand.Type);
+        //    if (!(leftOperand.Type is UserObjectType userObjectType))
+        //        return false;
+        //    var equalityOperators = userObjectType.Symbol.Lookup(SpecialName.OperatorEquals);
+        //    if (equalityOperators.Count != 1)
+        //        return false;
+        //    var equalityOperator = equalityOperators.Single();
+        //    if (!(equalityOperator.Type is FunctionType functionType) || functionType.Arity != 2)
+        //        return false;
+        //    InsertImplicitConversionIfNeeded(ref rightOperand, functionType.ParameterTypes[1]);
+        //    return IsAssignableFrom(functionType.ParameterTypes[1], rightOperand.Type);
 
-        }
+        //}
 
         // Re-expose type analyzer to BasicAnalyzer
         public DataType CheckTypeExpression(ExpressionSyntax typeExpression)
@@ -849,13 +850,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             // Filter down to symbols that could possible match
             symbols = symbols.Where(s =>
             {
-                if (s.Type is FunctionType functionType)
-                {
-                    if (functionType.Arity != argumentTypes.Count)
-                        return false;
-                    // TODO check compatibility of self type
-                    // TODO check compatibility over argument types
-                }
+                //if (s.Type is FunctionType functionType)
+                //{
+                //    if (functionType.Arity != argumentTypes.Count)
+                //        return false;
+                //    // TODO check compatibility of self type
+                //    // TODO check compatibility over argument types
+                //}
 
                 return true;
             }).ToFixedList();

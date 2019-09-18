@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
@@ -27,14 +26,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 
                 BuildBoolSymbol(),
 
-                BuildIntegerTypeSymbol(DataType.Int8, stringType),
+                //BuildIntegerTypeSymbol(DataType.Int8, stringType),
                 BuildIntegerTypeSymbol(DataType.Byte, stringType),
-                BuildIntegerTypeSymbol(DataType.Int16, stringType),
-                BuildIntegerTypeSymbol(DataType.UInt16, stringType),
+                //BuildIntegerTypeSymbol(DataType.Int16, stringType),
+                //BuildIntegerTypeSymbol(DataType.UInt16, stringType),
                 BuildIntegerTypeSymbol(DataType.Int, stringType),
                 BuildIntegerTypeSymbol(DataType.UInt, stringType),
-                BuildIntegerTypeSymbol(DataType.Int64, stringType),
-                BuildIntegerTypeSymbol(DataType.UInt64, stringType),
+                //BuildIntegerTypeSymbol(DataType.Int64, stringType),
+                //BuildIntegerTypeSymbol(DataType.UInt64, stringType),
 
                 BuildIntegerTypeSymbol(DataType.Size, stringType),
                 BuildIntegerTypeSymbol(DataType.Offset, stringType),
@@ -63,24 +62,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             var stringSymbol = PrimitiveSymbol.NewType(typeName, symbols);
             var stringType = UserObjectType.Declaration(stringSymbol, false);
             stringSymbol.DeclaresType = stringType;
-            stringLiteralOperator.Type = new FunctionType(new DataType[] { DataType.Size, DataType.BytePointer }, stringType);
-            equalsOperator.Type = new FunctionType(new[] { stringType, stringType }, DataType.Bool);
-            concatFunc.Type = new FunctionType(new[] { stringType, stringType }, stringType);
+            //stringLiteralOperator.Type = new FunctionType(new DataType[] { DataType.Size, DataType.BytePointer }, stringType);
+            //equalsOperator.Type = new FunctionType(new[] { stringType, stringType }, DataType.Bool);
+            //concatFunc.Type = new FunctionType(new[] { stringType, stringType }, stringType);
             return stringSymbol;
         }
 
         private static ISymbol BuildPrintStringSymbol(DataType stringType)
         {
             var name = new SimpleName("print_string");
-            var type = new FunctionType(new[] { stringType }, DataType.Void);
-            return PrimitiveSymbol.NewFunction(name, type);
+            //var type = new FunctionType(new[] { stringType }, DataType.Void);
+            return PrimitiveSymbol.NewFunction(name/*, type*/);
         }
 
         private static ISymbol BuildReadStringSymbol(DataType stringType)
         {
             var name = new SimpleName("read_string");
-            var type = new FunctionType(Enumerable.Empty<DataType>(), stringType);
-            return PrimitiveSymbol.NewFunction(name, type);
+            //var type = new FunctionType(Enumerable.Empty<DataType>(), stringType);
+            return PrimitiveSymbol.NewFunction(name/*, type*/);
         }
 
         private static ISymbol BuildBoolSymbol()
@@ -95,8 +94,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             var typeName = integerType.Name;
             var symbols = new List<ISymbol>
             {
-                PrimitiveSymbol.NewFunction(typeName.Qualify("remainder"), new FunctionType(new[] {integerType}, integerType)),
-                PrimitiveSymbol.NewFunction(typeName.Qualify("to_display_string"), new FunctionType(Enumerable.Empty<DataType>(), stringType))
+                PrimitiveSymbol.NewFunction(typeName.Qualify("remainder")/*, new FunctionType(new[] {integerType}, integerType)*/),
+                PrimitiveSymbol.NewFunction(typeName.Qualify("to_display_string")/*, new FunctionType(Enumerable.Empty<DataType>(), stringType)*/)
             };
             return PrimitiveSymbol.NewSimpleType(integerType, symbols);
         }

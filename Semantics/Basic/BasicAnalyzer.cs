@@ -100,13 +100,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             var parameterTypes = ResolveTypesInParameters(function, analyzer);
 
             var returnType = ResolveReturnType(function, analyzer);
-            DataType functionType = new FunctionType(parameterTypes, returnType);
+            //DataType functionType = new FunctionType(parameterTypes, returnType);
 
             // TODO handle generic parameters. The function type will just have type parameters in it
             //if (function.GenericParameters?.Any() ?? false)
             //    functionType = new MetaFunctionType(function.GenericParameters.Select(p => p.Type.Fulfilled()), functionType);
 
-            function.Type.Fulfill(functionType);
+            //function.Type.Fulfill(functionType);
             if (diagnosticCount != diagnostics.Count)
                 function.MarkErrored();
         }

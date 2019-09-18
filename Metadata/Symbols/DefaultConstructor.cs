@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
         public DefaultConstructor(UserObjectType type)
         {
             FullName = type.Name.Qualify(SpecialName.New);
-            Type = new FunctionType(Enumerable.Empty<DataType>(), type);
+            //Type = new FunctionType(Enumerable.Empty<DataType>(), type);
         }
     }
 }

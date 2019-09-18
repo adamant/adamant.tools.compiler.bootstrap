@@ -1,5 +1,3 @@
-using System.Linq;
-using System.Runtime.InteropServices;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
@@ -29,8 +27,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     if (referenced == DataType.Any)
                         return "void*";
                     return Convert(referenced) + "*";
-                case FunctionType functionType:
-                    return $"{Convert(functionType.ReturnType)}(*)({string.Join(", ", functionType.ParameterTypes.Select(Convert))})";
+                //case FunctionType functionType:
+                //    return $"{Convert(functionType.ReturnType)}(*)({string.Join(", ", functionType.ParameterTypes.Select(Convert))})";
                 case OptionalType optionalType:
                 {
                     if (optionalType.Referent is ReferenceType referenceType)

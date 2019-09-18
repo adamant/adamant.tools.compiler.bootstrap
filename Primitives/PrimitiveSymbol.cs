@@ -50,9 +50,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         //    return new AccessorSymbol(getterName, propertyName, type);
         //}
 
-        public static PrimitiveFunctionSymbol NewFunction(Name fullName, FunctionType type = null)
+        public static PrimitiveFunctionSymbol NewFunction(Name fullName/*, FunctionType type = null*/)
         {
-            return new PrimitiveFunctionSymbol(fullName, type);
+            return new PrimitiveFunctionSymbol(fullName/*, type*/);
         }
     }
 }

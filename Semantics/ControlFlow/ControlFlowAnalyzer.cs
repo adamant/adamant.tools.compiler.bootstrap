@@ -504,7 +504,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     var bytesArgument = new Utf8BytesConstant(literal.Value, literal.Span);
                     return new FunctionCall(implicitLiteralConversion.Span,
                         conversionFunction.FullName,
-                        (FunctionType)conversionFunction.Type,
+                        //(FunctionType)conversionFunction.Type,
                         sizeArgument,
                         bytesArgument);
                 }
@@ -617,7 +617,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                             {
                                 var equalityOperator = equalityOperators.Single();
                                 return new FunctionCall(equalityOperator.FullName,
-                                            (FunctionType)equalityOperator.Type,
+                                            //(FunctionType)equalityOperator.Type,
                                             new[] { leftOperand, rightOperand },
                                             expression.Span);
                             }
@@ -672,7 +672,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     var symbol = identifier.ReferencedSymbol;
                     var arguments = invocation.Arguments
                         .Select(a => ConvertToOperand(a.Value)).ToList();
-                    return new FunctionCall(symbol.FullName, (FunctionType)symbol.Type, arguments, invocation.Span);
+                    return new FunctionCall(symbol.FullName, /*(FunctionType)symbol.Type,*/ arguments, invocation.Span);
                 }
                 case MemberAccessExpressionSyntax memberAccess:
                 {
@@ -688,7 +688,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                                 case SimpleType _:
                                     // case StructType _:
                                     // Full name because this isn't a member
-                                    return new FunctionCall(function.FullName, (FunctionType)function.Type, self, arguments, invocation.Span);
+                                    return new FunctionCall(function.FullName, /*(FunctionType)function.Type,*/ self, arguments, invocation.Span);
                                 default:
                                     return new VirtualFunctionCall(invocation.Span, function.FullName.UnqualifiedName, self, arguments);
                             }

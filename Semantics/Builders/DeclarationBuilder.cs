@@ -5,7 +5,6 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 
@@ -48,12 +47,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                         BuildClassMembers(classDeclaration));
                     break;
                 case ConstructorDeclarationSyntax constructorDeclaration:
-                    var constructorType = (FunctionType)constructorDeclaration.Type.Known();
+                    //var constructorType = (FunctionType)constructorDeclaration.Type.Known();
                     var parameters = BuildConstructorParameters(constructorDeclaration);
-                    constructorType = new FunctionType(parameters.Select(p => p.Type),
-                        constructorType.ReturnType);
+                    //constructorType = new FunctionType(parameters.Select(p => p.Type),
+                    //    constructorType.ReturnType);
                     declaration = new ConstructorDeclaration(constructorDeclaration.FullName,
-                        constructorType, parameters, constructorDeclaration.ReturnType.Known(),
+                        /*constructorType,*/ parameters, constructorDeclaration.ReturnType.Known(),
                         constructorDeclaration.ControlFlow);
                     break;
                 case FieldDeclarationSyntax fieldDeclaration:
@@ -89,7 +88,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
             var selfName = className.Qualify(SpecialName.Self);
             var selfParameter = new Parameter(false, selfName, selfType);
             var parameters = selfParameter.Yield().ToFixedList();
-            var constructorType = new FunctionType(selfType.Yield(), selfType);
+            //var constructorType = new FunctionType(selfType.Yield(), selfType);
 
             var graph = new ControlFlowGraphBuilder();
             graph.AddSelfParameter(selfType);
@@ -98,7 +97,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
 
             var defaultConstructor = new ConstructorDeclaration(
                                             symbol.FullName,
-                                            constructorType,
+                                            //constructorType,
                                             parameters,
                                             selfType,
                                             graph.Build());
