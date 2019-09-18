@@ -180,7 +180,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         }
                         break;
                     case IDotToken _:
-                    case ICaretDotToken _:
+                    //case ICaretDotToken _:
                     case IQuestionDotToken _:
                         if (minPrecedence <= OperatorPrecedence.Primary)
                         {
@@ -221,8 +221,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     return AccessOperator.Standard;
                 case IQuestionDotToken _:
                     return AccessOperator.Conditional;
-                case ICaretDotToken _:
-                    return AccessOperator.Dereference;
+                //case ICaretDotToken _:
+                //    return AccessOperator.Dereference;
                 default:
                     throw NonExhaustiveMatchException.For(accessOperatorToken);
             }
