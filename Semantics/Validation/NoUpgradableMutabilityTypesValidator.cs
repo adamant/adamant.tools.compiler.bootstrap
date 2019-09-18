@@ -52,9 +52,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                 case OptionalType optionalType:
                     Validate(optionalType.Referent);
                     break;
-                case RefType refType:
-                    Validate(refType.Referent);
-                    break;
+                //case RefType refType:
+                //    Validate(refType.Referent);
+                //    break;
                 case EmptyType _:
                 case SimpleType _:
                 case UnknownType _:
@@ -82,9 +82,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                 case OptionalType optionalType:
                     Validate(optionalType.Referent);
                     break;
-                case RefType refType:
-                    Validate(refType.Referent);
-                    break;
+                //case RefType refType:
+                //    Validate(refType.Referent);
+                //    break;
                 case EmptyType _:
                 case SimpleType _:
                 case UnknownType _:

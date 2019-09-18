@@ -8,27 +8,28 @@ using ExhaustiveMatching;
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     [Closed(
-        typeof(TraitDeclarationSyntax),
-        typeof(StructDeclarationSyntax),
-        typeof(EnumClassDeclarationSyntax),
-        typeof(EnumStructDeclarationSyntax),
+        //typeof(TraitDeclarationSyntax),
+        //typeof(StructDeclarationSyntax),
+        //typeof(EnumClassDeclarationSyntax),
+        //typeof(EnumStructDeclarationSyntax),
         typeof(ClassDeclarationSyntax))]
     public abstract class TypeDeclarationSyntax : MemberDeclarationSyntax
     {
-        public FixedList<GenericParameterSyntax> GenericParameters { get; }
+        //public FixedList<GenericParameterSyntax> GenericParameters { get; }
         public FixedList<MemberDeclarationSyntax> Members { get; }
-        public Metatype Metatype => (Metatype)Type.Fulfilled();
+        //public Metatype Metatype => (Metatype)Type.Fulfilled();
+        public DataType DeclaresType { get; }
 
         protected TypeDeclarationSyntax(
             CodeFile file,
             TextSpan nameSpan,
             Name fullName,
-            FixedList<GenericParameterSyntax> genericParameters,
+            //FixedList<GenericParameterSyntax> genericParameters,
             FixedList<MemberDeclarationSyntax> members)
             : base(file, fullName, nameSpan, new SymbolSet(members))
         {
             Members = members;
-            GenericParameters = genericParameters;
+            //GenericParameters = genericParameters;
             foreach (var member in Members)
                 member.DeclaringType = this;
         }

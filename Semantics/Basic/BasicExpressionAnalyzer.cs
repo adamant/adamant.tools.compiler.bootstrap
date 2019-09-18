@@ -336,10 +336,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             break;
                         case UnaryOperator.At:
                             typeError = false; // TODO check that the expression can have a pointer taken
-                            if (operandType is Metatype)
-                                unaryOperatorExpression.Type = DataType.Type; // constructing a type
-                            else
-                                unaryOperatorExpression.Type = new PointerType(operandType); // taking the address of something
+                                               //if (operandType is Metatype)
+                                               //    unaryOperatorExpression.Type = DataType.Type; // constructing a type
+                                               //else
+                            unaryOperatorExpression.Type = new PointerType(operandType); // taking the address of something
                             break;
                         case UnaryOperator.Question:
                             typeError = false; // TODO check that the expression can have a pointer taken
@@ -433,16 +433,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
                     return newObjectExpression.Type = constructedType.AsOwnedUpgradable();
                 }
-                case PlacementInitExpressionSyntax placementInitExpression:
-                {
-                    foreach (var argument in placementInitExpression.Arguments)
-                        InferArgumentType(argument);
+                //case PlacementInitExpressionSyntax placementInitExpression:
+                //{
+                //    foreach (var argument in placementInitExpression.Arguments)
+                //        InferArgumentType(argument);
 
-                    // TODO verify argument types against called function
+                //    // TODO verify argument types against called function
 
-                    return placementInitExpression.Type =
-                        typeAnalyzer.Check(placementInitExpression.Initializer);
-                }
+                //    return placementInitExpression.Type =
+                //        typeAnalyzer.Check(placementInitExpression.Initializer);
+                //}
                 case ForeachExpressionSyntax foreachExpression:
                 {
                     var declaredType = typeAnalyzer.Check(foreachExpression.TypeExpression);
@@ -505,19 +505,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     DataType type;
                     switch (expressionType)
                     {
-                        case Metatype metatype:
-                        {
-                            type = DataType.Type; // It names/describes a type
-                            if (!(metatype.Instance is UserObjectType objectType
-                                  && objectType.DeclaredMutable))
-                                diagnostics.Add(TypeError.TypeDeclaredImmutable(file,
-                                    mutableExpression.Expression));
-                            break;
-                        }
-                        case TypeType _:
-                            // TODO we need to check whether it is valid to use `mut` on this
-                            type = DataType.Type; // It names/describes a type
-                            break;
+                        //case Metatype metatype:
+                        //{
+                        //    type = DataType.Type; // It names/describes a type
+                        //    if (!(metatype.Instance is UserObjectType objectType
+                        //          && objectType.DeclaredMutable))
+                        //        diagnostics.Add(TypeError.TypeDeclaredImmutable(file,
+                        //            mutableExpression.Expression));
+                        //    break;
+                        //}
+                        //case TypeType _:
+                        //    // TODO we need to check whether it is valid to use `mut` on this
+                        //    type = DataType.Type; // It names/describes a type
+                        //    break;
                         default:
                             switch (expressionType)
                             {
@@ -598,7 +598,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     throw new Exception("ImplicitConversionExpressions are inserted by BasicExpressionAnalyzer. They should not be present in the AST yet.");
                 case LifetimeExpressionSyntax _:
                 case ReferenceLifetimeSyntax _:
-                case RefTypeSyntax _:
+                //case RefTypeSyntax _:
                 case SelfTypeExpressionSyntax _:
                     throw new Exception("Should be inferring type of type expression");
                 case null:

@@ -71,9 +71,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case SelfExpressionSyntax selfExpression:
                     VisitSelfExpression(selfExpression, args);
                     break;
-                case BaseExpressionSyntax baseExpression:
-                    VisitBaseExpression(baseExpression, args);
-                    break;
+                //case BaseExpressionSyntax baseExpression:
+                //    VisitBaseExpression(baseExpression, args);
+                //    break;
                 case LoopExpressionSyntax loopExpression:
                     VisitLoopExpression(loopExpression, args);
                     break;
@@ -212,9 +212,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             VisitExpression(loopExpression.Block, args);
         }
 
-        public virtual void VisitBaseExpression(BaseExpressionSyntax baseExpression, A args)
-        {
-        }
+        //public virtual void VisitBaseExpression(BaseExpressionSyntax baseExpression, A args)
+        //{
+        //}
 
         public virtual void VisitSelfExpression(SelfExpressionSyntax selfExpression, A args)
         {
@@ -233,7 +233,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         public virtual void VisitNewObjectExpression(NewObjectExpressionSyntax newObjectExpression, A args)
         {
             VisitExpression(newObjectExpression.Constructor, args);
-            foreach (var argument in newObjectExpression.Arguments) VisitArgument(argument, args);
+            foreach (var argument in newObjectExpression.Arguments)
+                VisitArgument(argument, args);
         }
 
         public virtual void VisitArgument(ArgumentSyntax argument, A args)
@@ -248,7 +249,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 
         public virtual void VisitBlock(BlockSyntax block, A args)
         {
-            foreach (var statement in block.Statements) VisitStatement(statement, args);
+            foreach (var statement in block.Statements)
+                VisitStatement(statement, args);
         }
 
         public virtual void VisitAssignmentExpression(AssignmentExpressionSyntax assignmentExpression, A args)
@@ -273,7 +275,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         public virtual void VisitInvocation(InvocationSyntax invocation, A args)
         {
             VisitExpression(invocation.Callee, args);
-            foreach (var argument in invocation.Arguments) VisitArgument(argument, args);
+            foreach (var argument in invocation.Arguments)
+                VisitArgument(argument, args);
         }
 
         public virtual void VisitReturnExpression(ReturnExpressionSyntax returnExpression, A args)

@@ -22,6 +22,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         public SimpleName Name => FullName.UnqualifiedName;
 
         public DataType Type { get; }
+
+        public DataType DeclaresType { get; }
+
         public SymbolSet ChildSymbols { get; }
 
         protected Declaration(

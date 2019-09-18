@@ -1,18 +1,18 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes
 {
-    public class RefLifetime : Lifetime
-    {
-        #region Singleton
-        public static readonly RefLifetime Instance = new RefLifetime();
+    //public class RefLifetime : Lifetime
+    //{
+    //    #region Singleton
+    //    public static readonly RefLifetime Instance = new RefLifetime();
 
-        private RefLifetime() { }
-        #endregion
+    //    private RefLifetime() { }
+    //    #endregion
 
-        public override bool IsOwned => true;
+    //    public override bool IsOwned => true;
 
-        public override string ToString()
-        {
-            return "ref";
-        }
-    }
+    //    public override string ToString()
+    //    {
+    //        return "ref";
+    //    }
+    //}
 }

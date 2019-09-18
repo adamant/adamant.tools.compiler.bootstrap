@@ -8,8 +8,9 @@ using ExhaustiveMatching;
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     [Closed(
-        typeof(IdentifierNameSyntax),
-        typeof(GenericNameSyntax))]
+        typeof(IdentifierNameSyntax)//,
+                                    //typeof(GenericNameSyntax)
+        )]
     public abstract class NameSyntax : TypeSyntax
     {
         public SimpleName Name { get; }

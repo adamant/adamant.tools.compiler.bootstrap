@@ -4,8 +4,9 @@ using ExhaustiveMatching;
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     [Closed(
-        typeof(SelfExpressionSyntax),
-        typeof(BaseExpressionSyntax))]
+        typeof(SelfExpressionSyntax)//,
+                                    //typeof(BaseExpressionSyntax)
+        )]
     public abstract class InstanceExpressionSyntax : ExpressionSyntax
     {
         protected InstanceExpressionSyntax(TextSpan span)

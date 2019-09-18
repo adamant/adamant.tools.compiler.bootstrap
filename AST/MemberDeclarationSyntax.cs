@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     [Closed(
         typeof(FunctionDeclarationSyntax),
         typeof(FieldDeclarationSyntax),
-        typeof(ConstDeclarationSyntax),
+        //typeof(ConstDeclarationSyntax),
         typeof(TypeDeclarationSyntax))]
     public abstract class MemberDeclarationSyntax : DeclarationSyntax, ISymbol
     {
@@ -26,6 +26,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public SimpleName Name => FullName.UnqualifiedName;
 
         public TypePromise Type { get; } = new TypePromise();
+
+        DataType ISymbol.DeclaresType => null;
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

@@ -7,8 +7,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes
         typeof(ForeverLifetime),
         typeof(NamedLifetime),
         typeof(NoLifetime),
-        typeof(OwnedLifetime),
-        typeof(RefLifetime))]
+        typeof(OwnedLifetime)//,
+                             //typeof(RefLifetime)
+        )]
     public abstract class Lifetime
     {
         public static Lifetime Owned = OwnedLifetime.Instance;

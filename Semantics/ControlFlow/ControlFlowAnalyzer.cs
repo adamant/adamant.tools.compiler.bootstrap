@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private static bool ShouldBuildGraph(FunctionDeclarationSyntax function)
         {
             return function.Body != null // It is not abstract
-                   && function.GenericParameters == null; // It is not generic, generic functions need monomorphized
+                                         /* && function.GenericParameters == null*/; // It is not generic, generic functions need monomorphized
         }
 
         private readonly ControlFlowGraphBuilder graph = new ControlFlowGraphBuilder();

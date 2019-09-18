@@ -20,6 +20,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public BlockSyntax Block { get; }
 
         DataType ISymbol.Type => VariableType;
+
+        DataType ISymbol.DeclaresType => null;
+
         private DataType variableType;
         public DataType VariableType
         {

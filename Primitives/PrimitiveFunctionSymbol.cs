@@ -5,13 +5,13 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 {
-    internal class FunctionSymbol : Symbol, IFunctionSymbol
+    internal class PrimitiveFunctionSymbol : PrimitiveSymbol, IFunctionSymbol
     {
-        public FunctionSymbol(
+        public PrimitiveFunctionSymbol(
             Name fullName,
             FunctionType type,
             IEnumerable<ISymbol> childSymbols = null)
-            : base(fullName, type, childSymbols)
+            : base(fullName, type, null, childSymbols)
         {
         }
     }

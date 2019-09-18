@@ -30,7 +30,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
 
         private Declaration Build(MemberDeclarationSyntax memberDeclarations)
         {
-            if (declarations.TryGetValue(memberDeclarations, out var declaration)) return declaration;
+            if (declarations.TryGetValue(memberDeclarations, out var declaration))
+                return declaration;
 
             switch (memberDeclarations)
             {
@@ -43,7 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                 case ClassDeclarationSyntax classDeclaration:
                     declaration = new TypeDeclaration(classDeclaration.FullName,
                         classDeclaration.Type.Known(),
-                        BuildGenericParameters(classDeclaration.GenericParameters),
+                        //BuildGenericParameters(classDeclaration.GenericParameters),
                         BuildClassMembers(classDeclaration));
                     break;
                 case ConstructorDeclarationSyntax constructorDeclaration:
@@ -68,7 +69,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
         private FixedList<Declaration> BuildClassMembers(ClassDeclarationSyntax classDeclaration)
         {
             var members = BuildList(classDeclaration.Members);
-            if (members.Any(m => m is ConstructorDeclaration)) return members;
+            if (members.Any(m => m is ConstructorDeclaration))
+                return members;
 
             var defaultConstructor = BuildDefaultConstructor(classDeclaration);
             return members.Append(defaultConstructor).ToFixedList();
@@ -79,10 +81,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
         {
             var symbol = classDeclaration.ChildSymbols.Values.SelectMany(l => l)
                             .OfType<DefaultConstructor>().Single();
-            if (declarations.TryGetValue(symbol, out var declaration)) return declaration;
+            if (declarations.TryGetValue(symbol, out var declaration))
+                return declaration;
 
             var className = classDeclaration.FullName;
-            var selfType = ((Metatype)classDeclaration.Type.Known()).Instance;
+            var selfType = classDeclaration.DeclaresType;
             var selfName = className.Qualify(SpecialName.Self);
             var selfParameter = new Parameter(false, selfName, selfType);
             var parameters = selfParameter.Yield().ToFixedList();
@@ -105,11 +108,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
             return defaultConstructor;
         }
 
-        private static FixedList<GenericParameter> BuildGenericParameters(FixedList<GenericParameterSyntax> parameters)
-        {
-            if (parameters == null) return null;
-            throw new System.NotImplementedException();
-        }
+        //private static FixedList<GenericParameter> BuildGenericParameters(FixedList<GenericParameterSyntax> parameters)
+        //{
+        //    if (parameters == null) return null;
+        //    throw new System.NotImplementedException();
+        //}
 
         private static FixedList<Parameter> BuildParameters(FixedList<ParameterSyntax> parameters)
         {

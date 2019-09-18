@@ -113,19 +113,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     binder.VisitExpression(function.ReturnTypeExpression, containingScope);
                     BuildScopesInFunctionBody(function, containingScope, binder);
                     break;
-                case OperatorDeclarationSyntax operatorDeclaration:
-                    BuildScopesInFunctionParameters(operatorDeclaration, containingScope, binder);
-                    binder.VisitExpression(operatorDeclaration.ReturnTypeExpression, containingScope);
-                    BuildScopesInFunctionBody(operatorDeclaration, containingScope, binder);
-                    break;
+                //case OperatorDeclarationSyntax operatorDeclaration:
+                //    BuildScopesInFunctionParameters(operatorDeclaration, containingScope, binder);
+                //    binder.VisitExpression(operatorDeclaration.ReturnTypeExpression, containingScope);
+                //    BuildScopesInFunctionBody(operatorDeclaration, containingScope, binder);
+                //    break;
                 case ConstructorDeclarationSyntax constructor:
                     BuildScopesInFunctionParameters(constructor, containingScope, binder);
                     BuildScopesInFunctionBody(constructor, containingScope, binder);
                     break;
-                case InitializerDeclarationSyntax initializer:
-                    BuildScopesInFunctionParameters(initializer, containingScope, binder);
-                    BuildScopesInFunctionBody(initializer, containingScope, binder);
-                    break;
+                //case InitializerDeclarationSyntax initializer:
+                //    BuildScopesInFunctionParameters(initializer, containingScope, binder);
+                //    BuildScopesInFunctionBody(initializer, containingScope, binder);
+                //    break;
                 case TypeDeclarationSyntax typeDeclaration:
                     // TODO name scope for type declaration
                     foreach (var nestedDeclaration in typeDeclaration.Members)
@@ -145,9 +145,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             LexicalScope containingScope,
             ExpressionLexicalScopesBuilder binder)
         {
-            if (function.GenericParameters != null)
-                foreach (var parameter in function.GenericParameters)
-                    binder.VisitExpression(parameter.TypeExpression, containingScope);
+            //if (function.GenericParameters != null)
+            //    foreach (var parameter in function.GenericParameters)
+            //        binder.VisitExpression(parameter.TypeExpression, containingScope);
 
             foreach (var parameter in function.Parameters)
                 switch (parameter)

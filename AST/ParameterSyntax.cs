@@ -22,6 +22,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public bool Unused { get; }
         public TypePromise Type { get; } = new TypePromise();
 
+        DataType ISymbol.DeclaresType => null;
+
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         DataType ISymbol.Type => Type.Fulfilled();

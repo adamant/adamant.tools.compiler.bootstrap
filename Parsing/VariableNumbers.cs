@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         public SimpleName VariableName(string text)
         {
-            if (text == "_") return SpecialName.Underscore;
+            //if (text == "_") return SpecialName.Underscore;
             // Just try putting in first index, if it isn't already there, no problem
             nextNumber.TryAdd(text, 0);
             var number = nextNumber[text];

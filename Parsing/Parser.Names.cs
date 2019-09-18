@@ -24,14 +24,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = new SimpleName(identifier.Value);
             NameSyntax syntax;
-            if (Tokens.Accept<IOpenBracketToken>())
-            {
-                var arguments = ParseArguments();
-                var closeBracket = Tokens.Expect<ICloseBracketToken>();
-                var span = TextSpan.Covering(identifier.Span, closeBracket);
-                syntax = new GenericNameSyntax(span, identifier.Value, arguments);
-            }
-            else
+            //if (Tokens.Accept<IOpenBracketToken>())
+            //{
+            //    var arguments = ParseArguments();
+            //    var closeBracket = Tokens.Expect<ICloseBracketToken>();
+            //    var span = TextSpan.Covering(identifier.Span, closeBracket);
+            //    syntax = new GenericNameSyntax(span, identifier.Value, arguments);
+            //}
+            //else
                 syntax = new IdentifierNameSyntax(identifier.Span, name);
             return syntax;
         }

@@ -12,10 +12,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         public FixedList<AttributeSyntax> Attributes { get; }
         public FixedList<IModiferToken> Modifiers { get; }
-        public ExpressionSyntax BaseClass { get; }
-        public FixedList<ExpressionSyntax> BaseTypes { get; }
-        public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
-        public FixedList<ExpressionSyntax> Invariants { get; }
+        //public ExpressionSyntax BaseClass { get; }
+        //public FixedList<ExpressionSyntax> BaseTypes { get; }
+        //public FixedList<GenericConstraintSyntax> GenericConstraints { get; }
+        //public FixedList<ExpressionSyntax> Invariants { get; }
 
         public ClassDeclarationSyntax(
             CodeFile file,
@@ -23,37 +23,37 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             FixedList<IModiferToken> modifiers,
             Name fullName,
             TextSpan nameSpan,
-            FixedList<GenericParameterSyntax> genericParameters,
-            ExpressionSyntax baseClass,
-            FixedList<ExpressionSyntax> baseTypes,
-            FixedList<GenericConstraintSyntax> genericConstraints,
-            FixedList<ExpressionSyntax> invariants,
+            //FixedList<GenericParameterSyntax> genericParameters,
+            //ExpressionSyntax baseClass,
+            //FixedList<ExpressionSyntax> baseTypes,
+            //FixedList<GenericConstraintSyntax> genericConstraints,
+            //FixedList<ExpressionSyntax> invariants,
             FixedList<MemberDeclarationSyntax> members)
-            : base(file, nameSpan, fullName, genericParameters, members)
+            : base(file, nameSpan, fullName, /*genericParameters,*/ members)
         {
             Attributes = attributes;
             Modifiers = modifiers;
-            BaseClass = baseClass;
-            BaseTypes = baseTypes;
-            GenericConstraints = genericConstraints;
-            Invariants = invariants;
+            //BaseClass = baseClass;
+            //BaseTypes = baseTypes;
+            //GenericConstraints = genericConstraints;
+            //Invariants = invariants;
         }
 
         public void CreateDefaultConstructor()
         {
             if (Members.Any(m => m is ConstructorDeclarationSyntax))
                 return;
-            var metatype = (Metatype)Type.Known();
-            var constructor = new DefaultConstructor((UserObjectType)metatype.Instance);
+            //var metatype = (Metatype)Type.Known();
+            var constructor = new DefaultConstructor((UserObjectType)DeclaresType);
             ChildSymbols = new SymbolSet(ChildSymbols.Values.SelectMany(s => s).Append(constructor));
         }
 
         public override string ToString()
         {
-            var generics = GenericParameters != null
-                ? $"[{string.Join(", ", GenericParameters)}]"
-                : "";
-            return $"class {FullName}{generics} {{ … }}";
+            //var generics = GenericParameters != null
+            //    ? $"[{string.Join(", ", GenericParameters)}]"
+            //    : "";
+            return $"class {FullName}{/*generics*/""} {{ … }}";
         }
     }
 }

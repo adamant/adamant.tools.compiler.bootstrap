@@ -15,6 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
         public bool MutableBinding => true;
         public Name FullName => SpecialName.Unknown;
         public DataType Type => DataType.Unknown;
+        DataType ISymbol.DeclaresType => null;
         public SymbolSet ChildSymbols => SymbolSet.Empty;
     }
 }

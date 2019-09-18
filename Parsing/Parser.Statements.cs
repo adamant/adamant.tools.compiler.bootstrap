@@ -30,8 +30,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     return ParseLoop();
                 case IIfKeywordToken _:
                     return ParseIf(ParseAs.Statement);
-                case IMatchKeywordToken _:
-                    return ParseMatch();
+                //case IMatchKeywordToken _:
+                //    return ParseMatch();
                 case IUnsafeKeywordToken _:
                     return ParseUnsafeExpression(ParseAs.Statement);
                 default:
@@ -55,7 +55,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 type = ParseExpression(OperatorPrecedence.AboveAssignment);
 
             ExpressionSyntax initializer = null;
-            if (Tokens.Accept<IEqualsToken>()) initializer = ParseExpression();
+            if (Tokens.Accept<IEqualsToken>())
+                initializer = ParseExpression();
 
             Tokens.Expect<ISemicolonToken>();
             return new VariableDeclarationStatementSyntax(mutableBinding, name, identifier.Span, type,
@@ -65,7 +66,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public BlockSyntax AcceptBlock()
         {
             var openBrace = Tokens.Current.Span;
-            if (!Tokens.Accept<IOpenBraceToken>()) return null;
+            if (!Tokens.Accept<IOpenBraceToken>())
+                return null;
             return ParseRestOfBlock(openBrace);
         }
 

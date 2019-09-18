@@ -8,6 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
         bool MutableBinding { get; }
         Name FullName { get; }
         DataType Type { get; }
+        DataType DeclaresType { get; }
         SymbolSet ChildSymbols { get; }
     }
 }

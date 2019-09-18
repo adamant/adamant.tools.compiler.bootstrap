@@ -11,17 +11,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             switch (Tokens.Current)
             {
-                case IRefKeywordToken _:
+                //case IRefKeywordToken _:
                 case IMutableKeywordToken _:
                 case ISelfKeywordToken _:
                 {
                     var span = Tokens.Current.Span;
-                    var refSelf = Tokens.Accept<IRefKeywordToken>();
+                    //var refSelf = Tokens.Accept<IRefKeywordToken>();
                     var mutableSelf = Tokens.Accept<IMutableKeywordToken>();
                     var selfSpan = Tokens.Expect<ISelfKeywordToken>();
                     span = TextSpan.Covering(span, selfSpan);
                     var name = nameContext.Qualify(SpecialName.Self);
-                    return new SelfParameterSyntax(span, name, refSelf, mutableSelf);
+                    return new SelfParameterSyntax(span, name, /*refSelf,*/ mutableSelf);
                 }
                 case IDotToken _:
                 {
@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 default:
                 {
                     var span = Tokens.Current.Span;
-                    var isParams = Tokens.Accept<IParamsKeywordToken>();
+                    //var isParams = Tokens.Accept<IParamsKeywordToken>();
                     var mutableBinding = Tokens.Accept<IVarKeywordToken>();
                     var identifier = Tokens.RequiredToken<IIdentifierOrUnderscoreToken>();
                     var name = nameContext.Qualify(variableNumbers.VariableName(identifier.Value));
@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     if (Tokens.Accept<IEqualsToken>())
                         defaultValue = ParseExpression();
                     span = TextSpan.Covering(span, type.Span, defaultValue?.Span);
-                    return new NamedParameterSyntax(span, isParams, mutableBinding, name, type, defaultValue);
+                    return new NamedParameterSyntax(span, /*isParams,*/ mutableBinding, name, type, defaultValue);
                 }
             }
         }

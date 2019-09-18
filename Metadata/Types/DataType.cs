@@ -12,10 +12,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     [Closed(
         typeof(ReferenceType),
         typeof(ValueType),
-        typeof(RefType),
+        //typeof(RefType),
         typeof(EmptyType),
-        typeof(UnknownType),
-        typeof(GenericType))]
+        typeof(UnknownType)
+        //typeof(GenericType)
+        )]
     public abstract class DataType
     {
         #region Standard Types
@@ -25,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public static readonly BoolType Bool = BoolType.Instance;
         public static readonly AnyType Any = AnyType.ImmutableInstance;
         public static readonly AnyType MutableAny = AnyType.MutableInstance;
-        public static readonly TypeType Type = TypeType.Instance;
+        //public static readonly TypeType Type = TypeType.Instance;
         public static readonly SizedIntegerType Int8 = SizedIntegerType.Int8;
         public static readonly SizedIntegerType Byte = SizedIntegerType.Byte;
         public static readonly SizedIntegerType Int16 = SizedIntegerType.Int16;

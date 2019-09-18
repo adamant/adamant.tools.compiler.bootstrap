@@ -9,6 +9,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
         bool ISymbol.MutableBinding => false;
         public Name FullName { get; }
         public DataType Type { get; }
+
+        DataType ISymbol.DeclaresType => null;
+
         public SymbolSet ChildSymbols => SymbolSet.Empty;
 
         public DefaultConstructor(UserObjectType type)

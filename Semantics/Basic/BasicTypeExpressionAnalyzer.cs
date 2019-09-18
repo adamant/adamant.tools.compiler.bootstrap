@@ -43,12 +43,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var identifierType = identifier.Type;
                     switch (identifierType)
                     {
-                        case Metatype metatype:
-                            return metatype.Instance;
-                        case TypeType _:
-                            // It is a variable holding a type?
-                            // for now, return a placeholder type
-                            return DataType.Any;
+                        //case Metatype metatype:
+                        //    return metatype.Instance;
+                        //case TypeType _:
+                        //    // It is a variable holding a type?
+                        //    // for now, return a placeholder type
+                        //    return DataType.Any;
                         case UnknownType _:
                             return DataType.Unknown;
                         default:
@@ -58,30 +58,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case ReferenceLifetimeSyntax referenceLifetime:
                 {
                     var type = Check(referenceLifetime.ReferentTypeExpression);
-                    if (type == DataType.Unknown) return DataType.Unknown;
+                    if (type == DataType.Unknown)
+                        return DataType.Unknown;
                     var lifetime = ResolveLifetime(referenceLifetime.Lifetime);
-                    referenceLifetime.Type = DataType.Type;
+                    //referenceLifetime.Type = DataType.Type;
                     if (type is ReferenceType referenceType)
                         return referenceType.WithLifetime(lifetime);
                     return DataType.Unknown;
                 }
-                case RefTypeSyntax refType:
-                {
-                    var referent = Check(refType.ReferencedType);
-                    if (referent is UserObjectType objectType)
-                        return new RefType(objectType);
-                    return DataType.Unknown;
-                }
+                //case RefTypeSyntax refType:
+                //{
+                //    var referent = Check(refType.ReferencedType);
+                //    if (referent is UserObjectType objectType)
+                //        return new RefType(objectType);
+                //    return DataType.Unknown;
+                //}
                 case UnaryExpressionSyntax unaryOperatorExpression:
                     switch (unaryOperatorExpression.Operator)
                     {
                         case UnaryOperator.At:
-                            if (unaryOperatorExpression.Operand.Type is Metatype metatype)
-                                return new PointerType(metatype.Instance);
+                            //if (unaryOperatorExpression.Operand.Type is Metatype metatype)
+                            //    return new PointerType(metatype.Instance);
                             // TODO evaluate to type
                             return DataType.Unknown;
                         case UnaryOperator.Question:
-                            unaryOperatorExpression.Type = DataType.Type;
+                            //unaryOperatorExpression.Type = DataType.Type;
                             var referent = Check(unaryOperatorExpression.Operand);
                             return new OptionalType(referent);
                         default:
@@ -91,7 +92,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case MutableExpressionSyntax mutableType:
                 {
                     var type = Check(mutableType.Expression);
-                    mutableType.Type = DataType.Type;
+                    //mutableType.Type = DataType.Type;
                     switch (type)
                     {
                         case UserObjectType objectType when objectType.DeclaredMutable:
@@ -115,25 +116,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         {
             if (lifetimeName.IsSpecial)
             {
-                if (lifetimeName == SpecialName.Owned) return Lifetime.Owned;
-                if (lifetimeName == SpecialName.Ref) return RefLifetime.Instance;
-                if (lifetimeName == SpecialName.Forever) return Lifetime.Forever;
+                if (lifetimeName == SpecialName.Owned)
+                    return Lifetime.Owned;
+                //if (lifetimeName == SpecialName.Ref) return RefLifetime.Instance;
+                if (lifetimeName == SpecialName.Forever)
+                    return Lifetime.Forever;
                 throw NonExhaustiveMatchException.For(lifetimeName.Text);
             }
 
             return new NamedLifetime(lifetimeName.Text);
         }
 
-        private static bool IsType(DataType dataType)
-        {
-            switch (dataType)
-            {
-                case Metatype _:
-                case DataType t when t == DataType.Type:
-                    return true;
-                default:
-                    return false;
-            }
-        }
+        //private static bool IsType(DataType dataType)
+        //{
+        //    switch (dataType)
+        //    {
+        //        case Metatype _:
+        //        case DataType t when t == DataType.Type:
+        //            return true;
+        //        default:
+        //            return false;
+        //    }
+        //}
     }
 }

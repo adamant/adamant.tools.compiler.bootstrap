@@ -9,7 +9,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
              IEnumerable<DeclarationSyntax> declarations,
             A args)
         {
-            foreach (var declaration in declarations) VisitDeclaration(declaration, args);
+            foreach (var declaration in declarations)
+                VisitDeclaration(declaration, args);
         }
 
         public virtual void VisitDeclaration(DeclarationSyntax declaration, A args)
@@ -111,9 +112,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 
         public virtual void VisitConstructorDeclaration(ConstructorDeclarationSyntax constructorDeclaration, A args)
         {
-            if (constructorDeclaration.GenericParameters != null)
-                foreach (var genericParameter in constructorDeclaration.GenericParameters)
-                    VisitGenericParameter(genericParameter, args);
+            //if (constructorDeclaration.GenericParameters != null)
+            //    foreach (var genericParameter in constructorDeclaration.GenericParameters)
+            //        VisitGenericParameter(genericParameter, args);
 
             foreach (var parameter in constructorDeclaration.Parameters)
                 VisitParameter(parameter, args);
@@ -123,9 +124,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 
         public virtual void VisitNamedFunctionDeclaration(NamedFunctionDeclarationSyntax namedFunctionDeclaration, A args)
         {
-            if (namedFunctionDeclaration.GenericParameters != null)
-                foreach (var genericParameter in namedFunctionDeclaration.GenericParameters)
-                    VisitGenericParameter(genericParameter, args);
+            //if (namedFunctionDeclaration.GenericParameters != null)
+            //    foreach (var genericParameter in namedFunctionDeclaration.GenericParameters)
+            //        VisitGenericParameter(genericParameter, args);
 
             foreach (var parameter in namedFunctionDeclaration.Parameters)
                 VisitParameter(parameter, args);
@@ -167,9 +168,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             VisitExpression(namedParameter.DefaultValue, args);
         }
 
-        public virtual void VisitGenericParameter(GenericParameterSyntax genericParameter, A args)
-        {
-            VisitExpression(genericParameter.TypeExpression, args);
-        }
+        //public virtual void VisitGenericParameter(GenericParameterSyntax genericParameter, A args)
+        //{
+        //    VisitExpression(genericParameter.TypeExpression, args);
+        //}
     }
 }

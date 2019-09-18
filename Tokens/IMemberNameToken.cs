@@ -4,9 +4,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
     [Closed(
         typeof(IIdentifierToken),
-        typeof(INewKeywordToken),
-        typeof(IInitKeywordToken),
-        typeof(IDeleteKeywordToken))]
+        typeof(INewKeywordToken)
+        //typeof(IInitKeywordToken)
+        //typeof(IDeleteKeywordToken)
+        )]
     public interface IMemberNameToken : IKeywordToken { }
 
     [Closed(
@@ -14,6 +15,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         typeof(IEscapedIdentifierToken))]
     public partial interface IIdentifierToken : IMemberNameToken { }
     public partial interface INewKeywordToken : IMemberNameToken { }
-    public partial interface IInitKeywordToken : IMemberNameToken { }
-    public partial interface IDeleteKeywordToken : IMemberNameToken { }
+    //public partial interface IInitKeywordToken : IMemberNameToken { }
+    //public partial interface IDeleteKeywordToken : IMemberNameToken { }
 }
