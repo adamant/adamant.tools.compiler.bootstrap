@@ -517,8 +517,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 {
                     var value = ConvertToOperand(memberAccess.Expression);
                     var symbol = memberAccess.ReferencedSymbol;
-                    if (symbol is IAccessorSymbol accessor)
-                        return new VirtualFunctionCall(memberAccess.Span, accessor.PropertyName.UnqualifiedName, value);
+                    //if (symbol is IAccessorSymbol accessor)
+                    //    return new VirtualFunctionCall(memberAccess.Span, accessor.PropertyName.UnqualifiedName, value);
 
                     return new FieldAccess(value,
                         memberAccess.ReferencedSymbol.FullName, memberAccess.Span);
@@ -613,15 +613,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         {
                             if (expression.Operator != BinaryOperator.EqualsEquals)
                                 throw new NotImplementedException();
-                            var equalityOperators = operandType.Symbol.Lookup(SpecialName.OperatorEquals);
-                            if (equalityOperators.Count == 1)
-                            {
-                                var equalityOperator = equalityOperators.Single();
-                                return new FunctionCall(equalityOperator.FullName,
-                                            //(FunctionType)equalityOperator.Type,
-                                            new[] { leftOperand, rightOperand },
-                                            expression.Span);
-                            }
+                            //var equalityOperators = operandType.Symbol.Lookup(SpecialName.OperatorEquals);
+                            //if (equalityOperators.Count == 1)
+                            //{
+                            //    var equalityOperator = equalityOperators.Single();
+                            //    return new FunctionCall(equalityOperator.FullName,
+                            //                //(FunctionType)equalityOperator.Type,
+                            //                new[] { leftOperand, rightOperand },
+                            //                expression.Span);
+                            //}
                             throw new NotImplementedException();
                         }
                         default:

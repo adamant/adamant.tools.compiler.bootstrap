@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         //public static readonly SimpleName Ref = SimpleName.Special("ref");
         public static readonly SimpleName Owned = SimpleName.Special("owned");
         public static readonly SimpleName Forever = SimpleName.Special("forever");
-        public static readonly SimpleName Delete = SimpleName.Special("delete");
+        //public static readonly SimpleName Delete = SimpleName.Special("delete");
         //public static readonly SimpleName Underscore = SimpleName.Special("_");
 
         public static readonly SimpleName Void = SimpleName.Special("void");
@@ -32,8 +32,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         //public static readonly SimpleName Float32 = SimpleName.Special("float32");
         //public static readonly SimpleName Float = SimpleName.Special("float");
 
-        public static readonly SimpleName OperatorStringLiteral = SimpleName.Special("op_string_literal");
-        public static readonly SimpleName OperatorEquals = SimpleName.Special("op_equals");
+        //public static readonly SimpleName OperatorStringLiteral = SimpleName.Special("op_string_literal");
+        //public static readonly SimpleName OperatorEquals = SimpleName.Special("op_equals");
 
         public static SimpleName Constructor(string name = null)
         {

@@ -185,17 +185,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         default:
                             throw new NotImplementedException();
                     }
-                    var conversionOperators = symbol.Lookup(SpecialName.OperatorStringLiteral);
+                    //var conversionOperators = symbol.Lookup(SpecialName.OperatorStringLiteral);
                     // TODO actually check we can call it
-                    if (conversionOperators.Count == 1)
-                    {
-                        expression = new ImplicitLiteralConversionExpression(expression, targetType, conversionOperators.Single());
-                    }
-                    else
-                    {
+                    //if (conversionOperators.Count == 1)
+                    //{
+                    //    expression = new ImplicitLiteralConversionExpression(expression, targetType, conversionOperators.Single());
+                    //}
+                    //else
+                    //{
                         // TODO if there is more than one
                         throw new NotImplementedException();
-                    }
+                    //}
                 }
                 break;
                 case UserObjectType objectType:

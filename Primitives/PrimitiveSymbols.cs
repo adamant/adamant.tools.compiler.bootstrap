@@ -46,16 +46,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         private static ISymbol BuildStringSymbol()
         {
             var typeName = new SimpleName("String");
-            var stringLiteralOperator = PrimitiveSymbol.New(typeName.Qualify(SpecialName.OperatorStringLiteral));
-            var equalsOperator = PrimitiveSymbol.New(typeName.Qualify(SpecialName.OperatorEquals));
+            //var stringLiteralOperator = PrimitiveSymbol.New(typeName.Qualify(SpecialName.OperatorStringLiteral));
+            //var equalsOperator = PrimitiveSymbol.New(typeName.Qualify(SpecialName.OperatorEquals));
             var concatFunc = PrimitiveSymbol.New(typeName.Qualify(Name.From("concat")));
             var symbols = new List<ISymbol>()
             {
                 // Making these fields for now
                 //PrimitiveSymbol.New(typeName.Qualify("bytes"), DataType.BytePointer),
                 //PrimitiveSymbol.New(typeName.Qualify("byte_count"), DataType.Size),
-                stringLiteralOperator,
-                equalsOperator,
+                //stringLiteralOperator,
+                //equalsOperator,
                 concatFunc,
             };
 
