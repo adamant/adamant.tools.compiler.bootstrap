@@ -7,7 +7,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public partial class Parser
     {
-
         public ParameterSyntax ParseParameter()
         {
             switch (Tokens.Current)

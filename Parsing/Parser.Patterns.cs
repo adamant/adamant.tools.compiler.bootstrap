@@ -6,7 +6,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public partial class Parser
     {
-
         private PatternSyntax ParsePattern()
         {
             var pattern = ParsePatternAtom();

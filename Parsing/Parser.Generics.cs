@@ -10,7 +10,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     {
         public FixedList<GenericParameterSyntax> AcceptGenericParameters()
         {
-            if (!Tokens.Accept<IOpenBracketToken>()) return null;
+            if (!Tokens.Accept<IOpenBracketToken>())
+                return null;
             var parameters = ParseMany<GenericParameterSyntax, ICommaToken, ICloseBracketToken>(ParseGenericParameter);
             Tokens.Expect<ICloseBracketToken>();
             return parameters;
@@ -61,7 +62,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         public GenericConstraintSyntax AcceptGenericConstraint()
         {
-            if (!Tokens.Accept<IWhereKeywordToken>()) return null;
+            if (!Tokens.Accept<IWhereKeywordToken>())
+                return null;
             var expression = ParseExpression();
             return new GenericConstraintSyntax(expression);
         }

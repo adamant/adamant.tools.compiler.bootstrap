@@ -19,7 +19,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
 
         public bool Next()
         {
-            if (tokens == null) return false;
+            if (tokens == null)
+                return false;
             if (!tokens.MoveNext())
                 tokens = null;
             return tokens != null;
