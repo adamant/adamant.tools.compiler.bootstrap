@@ -39,11 +39,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         /// </summary>
         private static ITypeSymbol BuildStringSymbol()
         {
-            var typeName = SpecialName.String;
+            var typeName = Name.From("String");
             var concatName = typeName.Qualify("concat");
             var concatFunc = Function.New(concatName);
+            var literalConstructor = Function.New(typeName.Qualify(SpecialName.New),
+                ("value", DataType.StringConstant));
             var symbols = new List<ISymbol>()
             {
+                literalConstructor,
                 concatFunc,
             };
 
@@ -52,6 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             stringSymbol.DeclaresType = stringType;
             concatFunc.SetParameters(("other", stringType));
             concatFunc.ReturnType = stringType;
+            literalConstructor.ReturnType = stringType;
             return stringSymbol;
         }
 

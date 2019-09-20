@@ -47,7 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     InferExpressionType(expression);
                     break;
                 default:
-                    throw NonExhaustiveMatchException.For(statement);
+                    throw ExhaustiveMatch.Failed(statement);
             }
         }
 
@@ -70,6 +70,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         var byteCount = value.GetByteCount();
                         //type = byteCount <= 4 ? DataType.Int : DataType.Int64;
                         type = DataType.Int;
+                        throw new NotImplementedException("account for small integer constants");
                         break;
                     case StringConstantType stringConstant:
                         throw new NotImplementedException();
@@ -107,7 +108,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         /// <summary>
         /// Create an implicit conversion if allowed and needed
         /// </summary>
-        private void InsertImplicitConversionIfNeeded(
+        private static void InsertImplicitConversionIfNeeded(
             ref ExpressionSyntax expression,
             DataType targetType)
         {
@@ -142,20 +143,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                 && (!expressionType.IsSigned || expectedType.IsSigned))
                                 expression = new ImplicitNumericConversionExpression(expression, expectedType);
                             break;
-                            //case FloatingPointType expectedType:
-                            //    if (expressionType.Bits < expectedType.Bits)
-                            //        expression = new ImplicitNumericConversionExpression(expression, expectedType);
-                            //    break;
                     }
                 }
                 break;
-                //case FloatingPointType expressionType:
-                //{
-                //    if (targetType is FloatingPointType expectedType
-                //        && expressionType.Bits < expectedType.Bits)
-                //        expression = new ImplicitNumericConversionExpression(expression, expectedType);
-                //}
-                //break;
                 case IntegerConstantType expressionType:
                     var requireSigned = expressionType.Value < 0;
                     switch (targetType)
@@ -170,8 +160,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             if (!requireSigned || expectedType.IsSigned)
                                 expression = new ImplicitNumericConversionExpression(expression, expectedType);
                             break;
-                            //case FloatingPointType expectedType:
-                            //    throw new NotImplementedException();
                     }
                     break;
                 case StringConstantType _:
@@ -185,17 +173,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         default:
                             throw new NotImplementedException();
                     }
-                    //var conversionOperators = symbol.Lookup(SpecialName.OperatorStringLiteral);
-                    // TODO actually check we can call it
-                    //if (conversionOperators.Count == 1)
-                    //{
-                    //    expression = new ImplicitLiteralConversionExpression(expression, targetType, conversionOperators.Single());
-                    //}
-                    //else
-                    //{
-                    // TODO if there is more than one
-                    throw new NotImplementedException();
-                    //}
+
+                    if (symbol.FullName.Equals(Name.From("String")))
+                    {
+                        var stringConstructor = symbol.ChildSymbols[SpecialName.New]
+                            .Cast<IFunctionSymbol>().Single(c => c.Parameters.Count() == 1);
+                        expression = new ImplicitLiteralConversionExpression(expression, targetType,
+                            stringConstructor);
+                    }
+                    else
+                        throw new NotImplementedException("Trying to use string literal as non-string type");
                 }
                 break;
                 case UserObjectType objectType:
@@ -605,7 +592,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case null:
                     return DataType.Unknown;
                 default:
-                    throw NonExhaustiveMatchException.For(expression);
+                    throw ExhaustiveMatch.Failed(expression);
             }
         }
 
@@ -654,7 +641,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IdentifierNameSyntax identifierName:
                     return InferIdentifierNameType(identifierName, true);
                 default:
-                    throw NonExhaustiveMatchException.For(expression);
+                    throw new NotImplementedException("Tried to move out of expression type that isn't implemented");
             }
         }
 
@@ -727,7 +714,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case UnsizedIntegerType integerType:
                     return PrimitiveSymbols.Instance.Single(p => p.FullName == integerType.Name);
                 default:
-                    throw NonExhaustiveMatchException.For(type);
+                    throw new NotImplementedException();
             }
         }
 
@@ -766,11 +753,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             var leftType = leftOperand.Type;
             switch (leftType)
             {
-                //case PointerType _:
-                //{
-                //    // TODO it may need to be size
-                //    throw new NotImplementedException();
-                //}
                 case IntegerConstantType _:
                     // TODO may need to promote based on size
                     throw new NotImplementedException();
@@ -783,7 +765,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     // TODO this isn't right we might need to convert either of them
                     InsertImplicitConversionIfNeeded(ref rightOperand, integerType);
                     return rightOperand.Type is SizedIntegerType;
-                case UserObjectType _:
+                case OptionalType _:
+                    throw new NotImplementedException("Trying to do math on optional type");
+                case NeverType _:
+                case UnknownType _:
+                    return true;
+                case ReferenceType _:
                 case BoolType _:
                 case VoidType _: // This might need a special error message
                 case StringConstantType _: // String concatenation will be handled outside this function
@@ -792,7 +779,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 default:
                     // In theory we could just return false here, but this way we are forced to note
                     // exactly which types this doesn't work on.
-                    throw NonExhaustiveMatchException.For(leftType);
+                    throw ExhaustiveMatch.Failed(leftType);
             }
         }
 
@@ -842,7 +829,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
                 break;
                 default:
-                    throw NonExhaustiveMatchException.For(callee);
+                    throw new NotImplementedException();
             }
         }
 

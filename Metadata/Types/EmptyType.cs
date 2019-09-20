@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
@@ -6,6 +7,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// The two empty types are `never` and `void`. They are the only types with
     /// no values.
     /// </summary>
+    [Closed(
+        typeof(VoidType),
+        typeof(NeverType))]
     public abstract class EmptyType : DataType
     {
         public Name Name { get; }

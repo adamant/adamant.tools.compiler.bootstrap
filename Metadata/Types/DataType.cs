@@ -12,10 +12,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     [Closed(
         typeof(ReferenceType),
         typeof(ValueType),
-        //typeof(RefType),
         typeof(EmptyType),
         typeof(UnknownType)
-        //typeof(GenericType)
         )]
     public abstract class DataType
     {

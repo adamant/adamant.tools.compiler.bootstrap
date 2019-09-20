@@ -19,7 +19,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         public static readonly SimpleName UInt = SimpleName.Special("uint");
         public static readonly SimpleName Size = SimpleName.Special("size");
         public static readonly SimpleName Offset = SimpleName.Special("offset");
-        public static readonly SimpleName String = SimpleName.Special("string");
 
         public static SimpleName Constructor(string name = null)
         {

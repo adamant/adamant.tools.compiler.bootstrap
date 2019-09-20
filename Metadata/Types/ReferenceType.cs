@@ -1,8 +1,12 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
+    [Closed(
+        typeof(ObjectType),
+        typeof(AnyType))]
     public abstract class ReferenceType : DataType
     {
         public Lifetime Lifetime { get; }
@@ -29,7 +33,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         protected internal override Self AsDeclaredReturnsSelf()
         {
-            if (!Mutability.IsUpgradable) return this;
+            if (!Mutability.IsUpgradable)
+                return this;
             return this.AsImmutable();
         }
 
