@@ -7,6 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 {
@@ -58,13 +59,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         }
 
         private void ResolveSignatureTypesInDeclarations(
-             IEnumerable<DeclarationSyntax> declarations)
+             IEnumerable<MemberDeclarationSyntax> declarations)
         {
             foreach (var declaration in declarations)
                 ResolveSignatureTypesInDeclaration(declaration);
         }
 
-        private void ResolveSignatureTypesInDeclaration(DeclarationSyntax declaration)
+        private void ResolveSignatureTypesInDeclaration(MemberDeclarationSyntax declaration)
         {
             switch (declaration)
             {
@@ -78,13 +79,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     ResolveSignatureTypesInField(f);
                     break;
                 default:
-                    throw NonExhaustiveMatchException.For(declaration);
+                    throw ExhaustiveMatch.Failed(declaration);
             }
         }
 
         private void ResolveSignatureTypesInFunction(FunctionDeclarationSyntax function)
         {
-            function.Type.BeginFulfilling();
             var diagnosticCount = diagnostics.Count;
 
             // Resolve the declaring type because we need its type for things like `self`
@@ -94,26 +94,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             var selfType = ResolveSelfType(function);
             var analyzer = new BasicExpressionAnalyzer(function.File, diagnostics, selfType);
 
-            //if (function.GenericParameters != null)
-            //    ResolveTypesInGenericParameters(function.GenericParameters, analyzer);
+            ResolveTypesInParameters(function, analyzer);
 
-            var parameterTypes = ResolveTypesInParameters(function, analyzer);
+            ResolveReturnType(function, analyzer);
 
-            var returnType = ResolveReturnType(function, analyzer);
-            //DataType functionType = new FunctionType(parameterTypes, returnType);
-
-            // TODO handle generic parameters. The function type will just have type parameters in it
-            //if (function.GenericParameters?.Any() ?? false)
-            //    functionType = new MetaFunctionType(function.GenericParameters.Select(p => p.Type.Fulfilled()), functionType);
-
-            //function.Type.Fulfill(functionType);
             if (diagnosticCount != diagnostics.Count)
                 function.MarkErrored();
         }
 
-        private DataType ResolveSelfType(FunctionDeclarationSyntax function)
+        private static DataType ResolveSelfType(FunctionDeclarationSyntax function)
         {
-            var declaringType = function.DeclaringType.DeclaresType;
+            var declaringType = function.DeclaringType?.DeclaresType.Fulfilled();
             if (declaringType == null)
                 return null;
 
@@ -126,35 +117,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     if (selfParameter == null)
                         return null; // Static function
                     selfParameter.Type.BeginFulfilling();
-                    // TODO deal with structs and ref self
                     var selfType = (UserObjectType)declaringType;
                     if (selfParameter.MutableSelf)
                         selfType = selfType.AsMutable();
                     return namedFunction.SelfParameterType = selfParameter.Type.Fulfill(selfType);
-                //case InitializerDeclarationSyntax _:
-                //    throw new NotImplementedException();
                 default:
                     throw NonExhaustiveMatchException.For(function);
             }
         }
 
-        //private static void ResolveTypesInGenericParameters(
-        //    FixedList<GenericParameterSyntax> genericParameters,
-        //    BasicExpressionAnalyzer analyzer)
-        //{
-        //    foreach (var parameter in genericParameters)
-        //    {
-        //        parameter.Type.BeginFulfilling();
-        //        var type = parameter.TypeExpression == null ?
-        //            DataType.Type
-        //            : analyzer.CheckTypeExpression(parameter.TypeExpression);
-        //        parameter.Type.Fulfill(type);
-        //    }
-        //}
-
-        private FixedList<DataType> ResolveTypesInParameters(
-             FunctionDeclarationSyntax function,
-             BasicExpressionAnalyzer analyzer)
+        private void ResolveTypesInParameters(
+            FunctionDeclarationSyntax function,
+            BasicExpressionAnalyzer analyzer)
         {
             var types = new List<DataType>();
             foreach (var parameter in function.Parameters)
@@ -163,9 +137,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     case NamedParameterSyntax namedParameter:
                     {
                         parameter.Type.BeginFulfilling();
-                        var type =
-                            analyzer.CheckTypeExpression(namedParameter
-                                .TypeExpression);
+                        var type = analyzer
+                            .CheckTypeExpression(namedParameter.TypeExpression);
                         types.Add(parameter.Type.Fulfill(type));
                     }
                     break;
@@ -190,13 +163,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         }
                         break;
                     default:
-                        throw NonExhaustiveMatchException.For(parameter);
+                        throw ExhaustiveMatch.Failed(parameter);
                 }
 
-            return types.ToFixedList();
+            types.ToFixedList();
         }
 
-        private static DataType ResolveReturnType(
+        private static void ResolveReturnType(
             FunctionDeclarationSyntax function,
             BasicExpressionAnalyzer analyzer)
         {
@@ -204,18 +177,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             switch (function)
             {
                 case NamedFunctionDeclarationSyntax namedFunction:
-                    return ResolveReturnType(function, namedFunction.ReturnTypeExpression, analyzer);
-                //case OperatorDeclarationSyntax @operator:
-                //    return ResolveReturnType(function, @operator.ReturnTypeExpression, analyzer);
+                    ResolveReturnType(function, namedFunction.ReturnTypeExpression, analyzer);
+                    return;
                 case ConstructorDeclarationSyntax _:
-                    //case InitializerDeclarationSyntax _:
-                    return function.ReturnType.Fulfill(function.DeclaringType.DeclaresType);
+                    function.ReturnType.Fulfill(function.DeclaringType.DeclaresType.Fulfilled());
+                    return;
                 default:
-                    throw NonExhaustiveMatchException.For(function);
+                    throw ExhaustiveMatch.Failed(function);
             }
         }
 
-        private static DataType ResolveReturnType(
+        private static void ResolveReturnType(
             FunctionDeclarationSyntax function,
             ExpressionSyntax returnTypeExpression,
             BasicExpressionAnalyzer analyzer)
@@ -227,7 +199,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             // If we are returning ownership, then they can make it mutable
             if (returnType is UserObjectType objectType && objectType.IsOwned)
                 returnType = objectType.AsImplicitlyUpgradable();
-            return function.ReturnType.Fulfill(returnType);
+            function.ReturnType.Fulfill(returnType);
         }
 
         /// <summary>
@@ -236,7 +208,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         /// </summary>
         private void ResolveSignatureTypesInTypeDeclaration(TypeDeclarationSyntax declaration)
         {
-            switch (declaration.Type.State)
+            switch (declaration.DeclaresType.State)
             {
                 case PromiseState.InProgress:
                     diagnostics.Add(TypeError.CircularDefinition(declaration.File, declaration.NameSpan, declaration.Name));
@@ -246,54 +218,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case PromiseState.Pending:
                     // we need to compute it
                     break;
+                default:
+                    throw ExhaustiveMatch.Failed(declaration.DeclaresType.State);
             }
 
-            declaration.Type.BeginFulfilling();
+            declaration.DeclaresType.BeginFulfilling();
 
-            var expressionChecker = new BasicExpressionAnalyzer(declaration.File, diagnostics);
-
-            FixedList<DataType> genericParameterTypes = null;
-            //if (declaration.GenericParameters != null)
-            //{
-            //    var genericParameters = declaration.GenericParameters;
-            //    ResolveTypesInGenericParameters(genericParameters, expressionChecker);
-            //    genericParameterTypes = genericParameters.Select(p => p.Type.Fulfilled()).ToFixedList();
-            //}
             switch (declaration)
             {
                 case ClassDeclarationSyntax classDeclaration:
                     var classType = UserObjectType.Declaration(declaration,
-                        classDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
-                        genericParameterTypes);
-                    //declaration.Type.Fulfill(new Metatype(classType));
+                        classDeclaration.Modifiers.Any(m => m is IMutableKeywordToken));
+                    declaration.DeclaresType.Fulfill(classType);
                     classDeclaration.CreateDefaultConstructor();
                     break;
-                //case StructDeclarationSyntax structDeclaration:
-                //    var structType = UserObjectType.Declaration(declaration,
-                //        structDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
-                //        genericParameterTypes);
-                //    declaration.Type.Fulfill(new Metatype(structType));
-                //    break;
-                //case EnumStructDeclarationSyntax enumStructDeclaration:
-                //    var enumStructType = UserObjectType.Declaration(declaration,
-                //        enumStructDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
-                //        genericParameterTypes);
-                //    declaration.Type.Fulfill(new Metatype(enumStructType));
-                //    break;
-                //case EnumClassDeclarationSyntax enumStructDeclaration:
-                //    var enumClassType = UserObjectType.Declaration(declaration,
-                //        enumStructDeclaration.Modifiers.Any(m => m is IMutableKeywordToken),
-                //        genericParameterTypes);
-                //    declaration.Type.Fulfill(new Metatype(enumClassType));
-                //    break;
-                //case TraitDeclarationSyntax declarationSyntax:
-                //    var type = UserObjectType.Declaration(declaration,
-                //        declarationSyntax.Modifiers.Any(m => m is IMutableKeywordToken),
-                //        genericParameterTypes);
-                //    declaration.Type.Fulfill(new Metatype(type));
-                //    break;
                 default:
-                    throw NonExhaustiveMatchException.For(declaration);
+                    throw ExhaustiveMatch.Failed(declaration);
             }
         }
 
@@ -309,6 +249,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case PromiseState.Pending:
                     // we need to compute it
                     break;
+                default:
+                    throw ExhaustiveMatch.Failed(field.Type.State);
             }
             var resolver = new BasicExpressionAnalyzer(field.File, diagnostics);
             field.Type.BeginFulfilling();
@@ -317,13 +259,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         }
 
         private void ResolveBodyTypesInDeclarations(
-             IEnumerable<DeclarationSyntax> declarations)
+             IEnumerable<MemberDeclarationSyntax> declarations)
         {
             foreach (var declaration in declarations)
                 ResolveBodyTypesInDeclaration(declaration);
         }
 
-        private void ResolveBodyTypesInDeclaration(DeclarationSyntax declaration)
+        private void ResolveBodyTypesInDeclaration(MemberDeclarationSyntax declaration)
         {
             switch (declaration)
             {
@@ -337,7 +279,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     ResolveBodyTypesInField(f);
                     break;
                 default:
-                    throw NonExhaustiveMatchException.For(declaration);
+                    throw ExhaustiveMatch.Failed(declaration);
             }
         }
 
@@ -356,7 +298,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 function.MarkErrored();
         }
 
-        private void ResolveBodyTypesInTypeDeclaration(TypeDeclarationSyntax _)
+        private static void ResolveBodyTypesInTypeDeclaration(TypeDeclarationSyntax _)
         {
             // No body types, members are already processed
         }

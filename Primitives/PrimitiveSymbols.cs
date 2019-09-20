@@ -15,7 +15,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 
         private static FixedList<ISymbol> BuildPrimitives()
         {
-            // TODO make a symbol for `Type`
             var stringSymbol = BuildStringSymbol();
             var stringType = stringSymbol.DeclaresType;
             return new List<ISymbol>
@@ -26,14 +25,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 
                 BuildBoolSymbol(),
 
-                //BuildIntegerTypeSymbol(DataType.Int8, stringType),
                 BuildIntegerTypeSymbol(DataType.Byte, stringType),
-                //BuildIntegerTypeSymbol(DataType.Int16, stringType),
-                //BuildIntegerTypeSymbol(DataType.UInt16, stringType),
                 BuildIntegerTypeSymbol(DataType.Int, stringType),
                 BuildIntegerTypeSymbol(DataType.UInt, stringType),
-                //BuildIntegerTypeSymbol(DataType.Int64, stringType),
-                //BuildIntegerTypeSymbol(DataType.UInt64, stringType),
 
                 BuildIntegerTypeSymbol(DataType.Size, stringType),
                 BuildIntegerTypeSymbol(DataType.Offset, stringType),
@@ -43,48 +37,39 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         /// <summary>
         /// For now, we are putting string in the runtime library
         /// </summary>
-        private static ISymbol BuildStringSymbol()
+        private static ITypeSymbol BuildStringSymbol()
         {
-            var typeName = new SimpleName("String");
-            //var stringLiteralOperator = PrimitiveSymbol.New(typeName.Qualify(SpecialName.OperatorStringLiteral));
-            //var equalsOperator = PrimitiveSymbol.New(typeName.Qualify(SpecialName.OperatorEquals));
-            var concatFunc = PrimitiveSymbol.New(typeName.Qualify(Name.From("concat")));
+            var typeName = SpecialName.String;
+            var concatName = typeName.Qualify("concat");
+            var concatFunc = Function.New(concatName);
             var symbols = new List<ISymbol>()
             {
-                // Making these fields for now
-                //PrimitiveSymbol.New(typeName.Qualify("bytes"), DataType.BytePointer),
-                //PrimitiveSymbol.New(typeName.Qualify("byte_count"), DataType.Size),
-                //stringLiteralOperator,
-                //equalsOperator,
                 concatFunc,
             };
 
-            var stringSymbol = PrimitiveSymbol.NewType(typeName, symbols);
+            var stringSymbol = Type.NewType(typeName, symbols);
             var stringType = UserObjectType.Declaration(stringSymbol, false);
             stringSymbol.DeclaresType = stringType;
-            //stringLiteralOperator.Type = new FunctionType(new DataType[] { DataType.Size, DataType.BytePointer }, stringType);
-            //equalsOperator.Type = new FunctionType(new[] { stringType, stringType }, DataType.Bool);
-            //concatFunc.Type = new FunctionType(new[] { stringType, stringType }, stringType);
+            concatFunc.SetParameters(("other", stringType));
+            concatFunc.ReturnType = stringType;
             return stringSymbol;
         }
 
         private static ISymbol BuildPrintStringSymbol(DataType stringType)
         {
             var name = new SimpleName("print_string");
-            //var type = new FunctionType(new[] { stringType }, DataType.Void);
-            return PrimitiveSymbol.NewFunction(name/*, type*/);
+            return Function.New(name, ("s", stringType));
         }
 
         private static ISymbol BuildReadStringSymbol(DataType stringType)
         {
             var name = new SimpleName("read_string");
-            //var type = new FunctionType(Enumerable.Empty<DataType>(), stringType);
-            return PrimitiveSymbol.NewFunction(name/*, type*/);
+            return Function.New(name, stringType);
         }
 
         private static ISymbol BuildBoolSymbol()
         {
-            return PrimitiveSymbol.NewSimpleType(DataType.Bool);
+            return Type.NewSimpleType(DataType.Bool);
         }
 
         private static ISymbol BuildIntegerTypeSymbol(
@@ -94,10 +79,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             var typeName = integerType.Name;
             var symbols = new List<ISymbol>
             {
-                PrimitiveSymbol.NewFunction(typeName.Qualify("remainder")/*, new FunctionType(new[] {integerType}, integerType)*/),
-                PrimitiveSymbol.NewFunction(typeName.Qualify("to_display_string")/*, new FunctionType(Enumerable.Empty<DataType>(), stringType)*/)
+                Function.New(typeName.Qualify("remainder"), integerType, ("divisor", integerType)),
+                Function.New(typeName.Qualify("to_display_string"), stringType)
             };
-            return PrimitiveSymbol.NewSimpleType(integerType, symbols);
+            return Type.NewSimpleType(integerType, symbols);
         }
     }
 }

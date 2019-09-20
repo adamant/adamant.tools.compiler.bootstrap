@@ -5,21 +5,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class NamedParameterSyntax : ParameterSyntax
     {
-        //public bool IsParams { get; }
-
         public ExpressionSyntax TypeExpression { get; }
         public ExpressionSyntax DefaultValue { get; }
 
         public NamedParameterSyntax(
             TextSpan span,
             //bool isParams,
-            bool mutableBinding,
+            bool isMutableBinding,
             Name fullName,
             ExpressionSyntax typeExpression,
             ExpressionSyntax defaultValue)
-            : base(span, mutableBinding, fullName)
+            : base(span, isMutableBinding, fullName)
         {
-            //IsParams = isParams;
             TypeExpression = typeExpression;
             DefaultValue = defaultValue;
         }

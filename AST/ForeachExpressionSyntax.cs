@@ -7,9 +7,9 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class ForeachExpressionSyntax : ExpressionSyntax, ISymbol
+    public class ForeachExpressionSyntax : ExpressionSyntax, IBindingSymbol
     {
-        public bool MutableBinding { get; }
+        public bool IsMutableBinding { get; }
         Name ISymbol.FullName => FullVariableName;
         private Name FullVariableName { get; }
         [DebuggerHidden]
@@ -19,9 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public ExpressionSyntax InExpression { get; }
         public BlockSyntax Block { get; }
 
-        DataType ISymbol.Type => VariableType;
-
-        DataType ISymbol.DeclaresType => null;
+        DataType IBindingSymbol.Type => VariableType;
 
         private DataType variableType;
         public DataType VariableType
@@ -41,14 +39,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public ForeachExpressionSyntax(
             TextSpan span,
-            bool mutableBinding,
+            bool isMutableBinding,
             Name fullVariableName,
             ExpressionSyntax typeExpression,
             ExpressionSyntax inExpression,
             BlockSyntax block)
             : base(span)
         {
-            MutableBinding = mutableBinding;
+            IsMutableBinding = isMutableBinding;
             FullVariableName = fullVariableName;
             InExpression = inExpression;
             Block = block;
@@ -57,7 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public override string ToString()
         {
-            var binding = MutableBinding ? "var " : "";
+            var binding = IsMutableBinding ? "var " : "";
             return $"foreach {binding}{VariableName}: {TypeExpression} in {InExpression} {Block}";
         }
     }

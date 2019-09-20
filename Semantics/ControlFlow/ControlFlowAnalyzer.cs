@@ -75,7 +75,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
             // TODO don't emit temp variables for unused parameters
             foreach (var parameter in function.Parameters.Where(p => !p.Unused))
-                graph.AddParameter(parameter.MutableBinding, parameter.Type.Fulfilled(), CurrentScope, parameter.Name.UnqualifiedName);
+                graph.AddParameter(parameter.IsMutableBinding, parameter.Type.Fulfilled(), CurrentScope, parameter.Name.UnqualifiedName);
 
             currentBlock = graph.NewBlock();
             breakToBlock = null;
@@ -168,7 +168,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             {
                 case VariableDeclarationStatementSyntax variableDeclaration:
                 {
-                    var variable = graph.AddVariable(variableDeclaration.MutableBinding,
+                    var variable = graph.AddVariable(variableDeclaration.IsMutableBinding,
                                         variableDeclaration.Type, CurrentScope,
                                         variableDeclaration.Name.UnqualifiedName);
                     if (variableDeclaration.Initializer != null)
@@ -262,7 +262,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     var endExpression = inExpression.RightOperand;
 
                     var variableType = (SimpleType)foreachExpression.VariableType;
-                    var loopVariable = graph.AddVariable(foreachExpression.MutableBinding,
+                    var loopVariable = graph.AddVariable(foreachExpression.IsMutableBinding,
                                                          variableType, CurrentScope,
                                                          foreachExpression.VariableName);
                     var loopVariableLValue = loopVariable.LValueReference(foreachExpression.Span);

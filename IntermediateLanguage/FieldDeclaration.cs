@@ -4,14 +4,16 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
-    public class FieldDeclaration : Declaration
+    public class FieldDeclaration : Declaration, IBindingSymbol
     {
-        public bool MutableBinding { get; }
+        public bool IsMutableBinding { get; }
+        public DataType Type { get; }
 
-        public FieldDeclaration(bool mutableBinding, Name fullName, DataType type)
-            : base(true, fullName, type, SymbolSet.Empty)
+        public FieldDeclaration(bool isMutableBinding, Name fullName, DataType type)
+            : base(true, fullName, SymbolSet.Empty)
         {
-            MutableBinding = mutableBinding;
+            IsMutableBinding = isMutableBinding;
+            Type = type;
         }
     }
 }

@@ -60,7 +60,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
                     diagnostics.Add(SemanticError.CantRebindMutableBinding(function.File, variableDeclaration.NameSpan));
                     function.MarkErrored();
                 }
-                else if (variableDeclaration.MutableBinding)
+                else if (variableDeclaration.IsMutableBinding)
                 {
                     diagnostics.Add(SemanticError.CantRebindAsMutableBinding(function.File, variableDeclaration.NameSpan));
                     function.MarkErrored();

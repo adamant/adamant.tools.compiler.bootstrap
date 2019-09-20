@@ -94,16 +94,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             // builder with room for the characters we are likely to add
             var extraSize = 0; // Room for
-            var arity = type.GenericArity?.ToString();
-            if (arity != null)
-                extraSize = arity.Length + 1; // for '´'+arity on end
             var builder = new StringBuilder(EstimateSize(type.Name) + extraSize);
             Mangle(type.Name, builder);
-            if (type.IsGeneric)
-            {
-                builder.Append('´');
-                builder.Append(arity);
-            }
             return builder.ToString();
         }
 

@@ -1,23 +1,23 @@
+using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
 {
-    public class DefaultConstructor : ISymbol
+    public class DefaultConstructor : IFunctionSymbol
     {
-        bool ISymbol.MutableBinding => false;
         public Name FullName { get; }
-        public DataType Type { get; }
+        public DataType ConstructedType { get; }
 
-        DataType ISymbol.DeclaresType => null;
+        SymbolSet ISymbol.ChildSymbols => SymbolSet.Empty;
+        IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Enumerable.Empty<IBindingSymbol>();
+        DataType IFunctionSymbol.ReturnType => ConstructedType;
 
-        public SymbolSet ChildSymbols => SymbolSet.Empty;
-
-        public DefaultConstructor(UserObjectType type)
+        public DefaultConstructor(UserObjectType constructedType)
         {
-            FullName = type.Name.Qualify(SpecialName.New);
-            //Type = new FunctionType(Enumerable.Empty<DataType>(), type);
+            ConstructedType = constructedType;
+            FullName = constructedType.Name.Qualify(SpecialName.New);
         }
     }
 }

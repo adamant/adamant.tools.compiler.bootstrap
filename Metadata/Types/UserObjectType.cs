@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
@@ -18,41 +17,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     {
         public ISymbol Symbol { get; }
 
-        public FixedList<DataType> GenericParameterTypes { get; }
-        public bool IsGeneric => GenericParameterTypes != null;
-        public int? GenericArity => GenericParameterTypes?.Count;
-        public FixedList<DataType> GenericArguments { get; }
-
         // TODO for IsKnown, deal with the generic parameters and arguments
         public override bool IsKnown => true;
 
         private UserObjectType(
             ISymbol symbol,
             bool declaredMutable,
-            IEnumerable<DataType> genericParameterTypes,
-            IEnumerable<DataType> genericArguments,
             Mutability mutability,
             Lifetime lifetime)
             : base(symbol.FullName, declaredMutable, mutability, lifetime)
         {
             Symbol = symbol;
-            var genericParameterTypesList = genericParameterTypes?.ToFixedList();
-            GenericParameterTypes = genericParameterTypesList;
-            var genericArgumentsList = (genericArguments ?? genericParameterTypesList?.Select(t => default(DataType)))?.ToFixedList();
-            Requires.That(nameof(genericArguments), genericArgumentsList?.Count == genericParameterTypesList?.Count, "number of arguments must match number of parameters");
-            GenericArguments = genericArgumentsList;
         }
 
         public static UserObjectType Declaration(
             ISymbol symbol,
-            bool mutable,
-            IEnumerable<DataType> genericParameterTypes = null)
+            bool mutable)
         {
             return new UserObjectType(
                 symbol,
                 mutable,
-                genericParameterTypes,
-                null, // generic arguments
                 Mutability.Immutable,
                 Lifetime.None);
         }
@@ -63,7 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public UserObjectType AsMutable()
         {
             Requires.That("DeclaredMutable", DeclaredMutable, "must be declared as a mutable type to use mutably");
-            return new UserObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability.Mutable, Lifetime);
+            return new UserObjectType(Symbol, DeclaredMutable, Mutability.Mutable, Lifetime);
         }
 
         /// <summary>
@@ -71,7 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// </summary>
         protected internal override Self AsImmutableReturnsSelf()
         {
-            return new UserObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability.Immutable, Lifetime);
+            return new UserObjectType(Symbol, DeclaredMutable, Mutability.Immutable, Lifetime);
         }
 
         /// <summary>
@@ -80,9 +64,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// </summary>
         public UserObjectType AsExplicitlyUpgradable()
         {
-            if (!DeclaredMutable && Mutability == Mutability.Immutable) return this; // no change
+            if (!DeclaredMutable && Mutability == Mutability.Immutable)
+                return this; // no change
             var mutability = DeclaredMutable ? Mutability.ExplicitlyUpgradable : Mutability.Immutable;
-            return new UserObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, mutability, Lifetime);
+            return new UserObjectType(Symbol, DeclaredMutable, mutability, Lifetime);
         }
 
         /// <summary>
@@ -91,9 +76,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// </summary>
         public UserObjectType AsImplicitlyUpgradable()
         {
-            if (!DeclaredMutable && Mutability == Mutability.Immutable) return this; // no change
+            if (!DeclaredMutable && Mutability == Mutability.Immutable)
+                return this; // no change
             var mutability = DeclaredMutable ? Mutability.ImplicitlyUpgradable : Mutability.Immutable;
-            return new UserObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, mutability, Lifetime);
+            return new UserObjectType(Symbol, DeclaredMutable, mutability, Lifetime);
         }
 
         /// <summary>
@@ -102,8 +88,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public UserObjectType AsOwnedUpgradable()
         {
             var expectedMutability = DeclaredMutable ? Mutability.ImplicitlyUpgradable : Mutability.Immutable;
-            if (Lifetime == Lifetime.Owned && Mutability == expectedMutability) return this;
-            return new UserObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, expectedMutability, Lifetime.Owned);
+            if (Lifetime == Lifetime.Owned && Mutability == expectedMutability)
+                return this;
+            return new UserObjectType(Symbol, DeclaredMutable, expectedMutability, Lifetime.Owned);
         }
 
         /// <summary>
@@ -111,8 +98,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// </summary>
         public UserObjectType AsOwned()
         {
-            if (Lifetime == Lifetime.Owned) return this;
-            return new UserObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability, Lifetime.Owned);
+            if (Lifetime == Lifetime.Owned)
+                return this;
+            return new UserObjectType(Symbol, DeclaredMutable, Mutability, Lifetime.Owned);
         }
 
         /// <summary>
@@ -121,23 +109,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// </summary>
         public UserObjectType ForConstructorSelf()
         {
-            return new UserObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability.Mutable, AnonymousLifetime.Instance);
-        }
-
-        public UserObjectType WithGenericArguments(IEnumerable<DataType> genericArguments)
-        {
-            return new UserObjectType(Symbol, DeclaredMutable, GenericParameterTypes, genericArguments, Mutability, Lifetime);
+            return new UserObjectType(Symbol, DeclaredMutable, Mutability.Mutable, AnonymousLifetime.Instance);
         }
 
         protected internal override Self WithLifetimeReturnsSelf(Lifetime lifetime)
         {
-            return new UserObjectType(Symbol, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability, lifetime);
+            return new UserObjectType(Symbol, DeclaredMutable, Mutability, lifetime);
         }
 
         public override string ToString()
         {
             var value = $"{Mutability}{Name}";
-            if (!(Lifetime is NoLifetime)) value += "$" + Lifetime;
+            if (!(Lifetime is NoLifetime))
+                value += "$" + Lifetime;
             return value;
         }
 
@@ -153,15 +137,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                    EqualityComparer<ISymbol>.Default.Equals(Symbol, other.Symbol) &&
                    EqualityComparer<Name>.Default.Equals(Name, other.Name) &&
                    DeclaredMutable == other.DeclaredMutable &&
-                   EqualityComparer<FixedList<DataType>>.Default.Equals(GenericParameterTypes, other.GenericParameterTypes) &&
-                   EqualityComparer<FixedList<DataType>>.Default.Equals(GenericArguments, other.GenericArguments) &&
                    Mutability == other.Mutability &&
                    EqualityComparer<Lifetime>.Default.Equals(Lifetime, other.Lifetime);
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Symbol, Name, DeclaredMutable, GenericParameterTypes, GenericArguments, Mutability, Lifetime);
+            return HashCode.Combine(Symbol, Name, DeclaredMutable, Mutability, Lifetime);
         }
 
         public static bool operator ==(UserObjectType type1, UserObjectType type2)
@@ -179,11 +161,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         {
             return EqualityComparer<ISymbol>.Default.Equals(Symbol, other.Symbol)
                    && EqualityComparer<Name>.Default.Equals(Name, other.Name)
-                   && DeclaredMutable == other.DeclaredMutable
-                   && EqualityComparer<FixedList<DataType>>.Default.Equals(
-                       GenericParameterTypes, other.GenericParameterTypes)
-                   && EqualityComparer<FixedList<DataType>>.Default.Equals(GenericArguments,
-                       other.GenericArguments);
+                   && DeclaredMutable == other.DeclaredMutable;
         }
     }
 }

@@ -1,13 +1,18 @@
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
-    public class Parameter
+    public class Parameter : IBindingSymbol
     {
         public bool IsMutableBinding { get; }
         public Name Name { get; }
         public DataType Type { get; internal set; }
+
+        Name ISymbol.FullName => throw new System.NotImplementedException();
+
+        SymbolSet ISymbol.ChildSymbols => SymbolSet.Empty;
 
         public Parameter(
             bool isMutableBinding,

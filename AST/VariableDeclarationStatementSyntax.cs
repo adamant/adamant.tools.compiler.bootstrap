@@ -1,14 +1,13 @@
 using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class VariableDeclarationStatementSyntax : StatementSyntax, ISymbol
+    public class VariableDeclarationStatementSyntax : StatementSyntax, IBindingSymbol
     {
-        public bool MutableBinding { get; }
+        public bool IsMutableBinding { get; }
         public Name FullName { get; }
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -18,20 +17,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public ExpressionSyntax TypeExpression { get; }
         public ExpressionSyntax Initializer;
 
-        DataType ISymbol.DeclaresType => null;
-
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         SymbolSet ISymbol.ChildSymbols => SymbolSet.Empty;
 
         public VariableDeclarationStatementSyntax(
-            bool mutableBinding,
+            bool isMutableBinding,
             Name fullName,
             TextSpan nameSpan,
             ExpressionSyntax typeExpression,
             ExpressionSyntax initializer)
         {
-            MutableBinding = mutableBinding;
+            IsMutableBinding = isMutableBinding;
             FullName = fullName;
             NameSpan = nameSpan;
             TypeExpression = typeExpression;
@@ -40,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public override string ToString()
         {
-            var binding = MutableBinding ? "var" : "let";
+            var binding = IsMutableBinding ? "var" : "let";
             var type = TypeExpression != null ? ": " + TypeExpression : "";
             var initializer = Initializer != null ? " = " + Initializer : "";
             return $"{binding} {Name}{type}{initializer};";

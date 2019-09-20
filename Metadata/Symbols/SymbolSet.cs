@@ -24,7 +24,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
 
         private static SimpleName LookupByName(ISymbol symbol)
         {
-            //if (symbol is IAccessorSymbol accessor) return accessor.PropertyName.UnqualifiedName.WithoutNumber();
             return symbol.FullName.UnqualifiedName.WithoutNumber();
         }
     }

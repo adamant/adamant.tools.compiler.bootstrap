@@ -2,7 +2,6 @@ using System;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
 {
@@ -40,10 +39,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
             {
                 case IdentifierNameSyntax identifier:
                     var symbol = identifier.ReferencedSymbol;
-                    if (!symbol.MutableBinding && definitelyUnassigned[symbol] == false)
-                    {
-                        diagnostics.Add(SemanticError.VariableMayAlreadyBeAssigned(file, identifier.Span, identifier.Name));
-                    }
+                    //if (!symbol.IsMutableBinding && definitelyUnassigned[symbol] == false)
+                    //{
+                    //    diagnostics.Add(SemanticError.VariableMayAlreadyBeAssigned(file, identifier.Span, identifier.Name));
+                    //}
+                    throw new NotImplementedException();
                     return definitelyUnassigned.Set(symbol, false);
                 case MemberAccessExpressionSyntax memberAccessExpression:
                     return definitelyUnassigned;
@@ -61,7 +61,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
             VariableDeclarationStatementSyntax variableDeclaration,
             VariableFlags definitelyUnassigned)
         {
-            if (variableDeclaration.Initializer == null) return definitelyUnassigned;
+            if (variableDeclaration.Initializer == null)
+                return definitelyUnassigned;
             return definitelyUnassigned.Set(variableDeclaration, false);
         }
     }

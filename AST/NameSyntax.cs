@@ -7,10 +7,7 @@ using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    [Closed(
-        typeof(IdentifierNameSyntax)//,
-                                    //typeof(GenericNameSyntax)
-        )]
+    [Closed(typeof(IdentifierNameSyntax))]
     public abstract class NameSyntax : TypeSyntax
     {
         public SimpleName Name { get; }

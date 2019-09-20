@@ -5,22 +5,19 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
-    public class TypeDeclaration : Declaration
+    public class TypeDeclaration : Declaration, ITypeSymbol
     {
-        //public FixedList<GenericParameter> GenericParameters { get; }
-        //public bool IsGeneric => GenericParameters != null;
-        //public int? GenericArity => GenericParameters?.Count;
         public FixedList<Declaration> Members { get; }
+        public DataType DeclaresType { get; }
 
         public TypeDeclaration(
             Name name,
-            DataType type,
-            //IEnumerable<GenericParameter> genericParameters,
+            DataType declaresType,
             FixedList<Declaration> members)
-            : base(false, name, type, new SymbolSet(members))
+            : base(false, name, new SymbolSet(members))
         {
+            DeclaresType = declaresType;
             Members = members;
-            //GenericParameters = genericParameters?.ToFixedList();
         }
     }
 }

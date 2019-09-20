@@ -199,7 +199,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
 
         public void Disassemble(FieldDeclaration field, AssemblyBuilder builder)
         {
-            var binding = field.MutableBinding ? "var" : "let";
+            var binding = field.IsMutableBinding ? "var" : "let";
             builder.AppendLine($"{binding} {field.Name}: {field.Type};");
         }
     }

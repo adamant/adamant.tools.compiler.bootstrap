@@ -11,10 +11,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(SelfParameterSyntax),
         typeof(NamedParameterSyntax),
         typeof(FieldParameterSyntax))]
-    public abstract class ParameterSyntax : Syntax, ISymbol
+    public abstract class ParameterSyntax : Syntax, IBindingSymbol
     {
         public TextSpan Span { get; }
-        public bool MutableBinding { get; }
+        public bool IsMutableBinding { get; }
         public Name FullName { get; }
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -22,19 +22,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public bool Unused { get; }
         public TypePromise Type { get; } = new TypePromise();
 
-        DataType ISymbol.DeclaresType => null;
-
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        DataType ISymbol.Type => Type.Fulfilled();
+        DataType IBindingSymbol.Type => Type.Fulfilled();
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         SymbolSet ISymbol.ChildSymbols => SymbolSet.Empty;
 
-        protected ParameterSyntax(TextSpan span, bool mutableBinding, Name fullName)
+        protected ParameterSyntax(TextSpan span, bool isMutableBinding, Name fullName)
         {
             Span = span;
-            MutableBinding = mutableBinding;
+            IsMutableBinding = isMutableBinding;
             FullName = fullName;
             Unused = fullName.UnqualifiedName.Text.StartsWith("_");
         }

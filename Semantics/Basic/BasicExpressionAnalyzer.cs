@@ -193,8 +193,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     //}
                     //else
                     //{
-                        // TODO if there is more than one
-                        throw new NotImplementedException();
+                    // TODO if there is more than one
+                    throw new NotImplementedException();
                     //}
                 }
                 break;
@@ -416,8 +416,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         case 1:
                             var constructorSymbol = constructors.Single();
                             newObjectExpression.ConstructorSymbol = constructorSymbol;
-                            var constructorType = constructorSymbol.Type;
-                            newObjectExpression.ConstructorType = constructorType;
+                            //var constructorType = constructorSymbol.Type;
+                            //newObjectExpression.ConstructorType = constructorType;
                             //if (constructorType is FunctionType functionType)
                             //    foreach (var (arg, type) in newObjectExpression.Arguments.Zip(functionType.ParameterTypes))
                             //    {
@@ -622,17 +622,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     break;
                 case 1:
                     identifierName.ReferencedSymbol = symbols.Single();
-                    type = symbols.Single().Type;
-                    if (type is UserObjectType objectType)
-                    {
-                        // A bare variable reference doesn't default to mutable
-                        if (objectType.Mutability == Mutability.Mutable)
-                            type = objectType = objectType.AsExplicitlyUpgradable();
-                        // A bare variable reference doesn't default to owned
-                        if (!isMove && objectType.IsOwned)
-                            type = objectType.WithLifetime(Lifetime.None);
-                    }
-
+                    //type = symbols.Single().Type;
+                    //if (type is UserObjectType objectType)
+                    //{
+                    //    // A bare variable reference doesn't default to mutable
+                    //    if (objectType.Mutability == Mutability.Mutable)
+                    //        type = objectType = objectType.AsExplicitlyUpgradable();
+                    //    // A bare variable reference doesn't default to owned
+                    //    if (!isMove && objectType.IsOwned)
+                    //        type = objectType.WithLifetime(Lifetime.None);
+                    //}
+                    throw new NotImplementedException();
                     break;
                 default:
                     diagnostics.Add(NameBindingError.AmbiguousName(file, identifierName.Span));
@@ -742,9 +742,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     identifier.ReferencedSymbol = UnknownSymbol.Instance;
                     return identifier.Type = DataType.Unknown;
                 case 1:
-                    var memberSymbol = memberSymbols.Single();
-                    identifier.ReferencedSymbol = memberSymbol;
-                    return identifier.Type = memberSymbol.Type;
+                    //var memberSymbol = memberSymbols.Single();
+                    //identifier.ReferencedSymbol = memberSymbol;
+                    //return identifier.Type = memberSymbol.Type;
+                    throw new NotImplementedException();
                 default:
                     diagnostics.Add(NameBindingError.AmbiguousName(file, identifier.Span));
                     identifier.ReferencedSymbol = UnknownSymbol.Instance;

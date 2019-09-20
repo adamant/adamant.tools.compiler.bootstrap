@@ -95,11 +95,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             // builder with room for the characters we are likely to add
             var builder = new StringBuilder(EstimateSize(type.Name) + 5);
             Mangle(type.Name, builder);
-            if (type.IsGeneric)
-            {
-                builder.Append("__");
-                builder.Append(type.GenericArity);
-            }
             return mapping.GetAscii(builder.ToString());
         }
 

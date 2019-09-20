@@ -36,13 +36,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
             {
                 case NamedFunctionDeclarationSyntax namedFunction:
                     declaration = new FunctionDeclaration(namedFunction.IsExternalFunction,
-                        namedFunction.DeclaringType != null, namedFunction.FullName,
-                        namedFunction.Type.Known(), BuildParameters(namedFunction.Parameters),
+                        namedFunction.DeclaringType != null, namedFunction.FullName, BuildParameters(namedFunction.Parameters),
                         namedFunction.ReturnType.Known(), namedFunction.ControlFlow);
                     break;
                 case ClassDeclarationSyntax classDeclaration:
                     declaration = new TypeDeclaration(classDeclaration.FullName,
-                        classDeclaration.Type.Known(),
+                        classDeclaration.DeclaresType.Known(),
                         //BuildGenericParameters(classDeclaration.GenericParameters),
                         BuildClassMembers(classDeclaration));
                     break;
@@ -84,7 +83,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                 return declaration;
 
             var className = classDeclaration.FullName;
-            var selfType = classDeclaration.DeclaresType;
+            var selfType = classDeclaration.DeclaresType.Fulfilled();
             var selfName = className.Qualify(SpecialName.Self);
             var selfParameter = new Parameter(false, selfName, selfType);
             var parameters = selfParameter.Yield().ToFixedList();
@@ -132,9 +131,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
             switch (parameter)
             {
                 case NamedParameterSyntax namedParameter:
-                    return new Parameter(namedParameter.MutableBinding, namedParameter.Name, namedParameter.Type.Known());
+                    return new Parameter(namedParameter.IsMutableBinding, namedParameter.Name, namedParameter.Type.Known());
                 case SelfParameterSyntax selfParameter:
-                    return new Parameter(selfParameter.MutableBinding, selfParameter.Name, selfParameter.Type.Known());
+                    return new Parameter(selfParameter.IsMutableBinding, selfParameter.Name, selfParameter.Type.Known());
                 default:
                     throw NonExhaustiveMatchException.For(parameter);
             }

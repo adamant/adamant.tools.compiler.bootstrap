@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
 
         public VariableBinding(ParameterSyntax parameter)
         {
-            MutableBinding = parameter.MutableBinding;
+            MutableBinding = parameter.IsMutableBinding;
             BindingName = parameter.Name;
             Name = BindingName.WithoutNumber();
             NameSpan = parameter.Span;
@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
 
         public VariableBinding(VariableDeclarationStatementSyntax variableDeclaration)
         {
-            MutableBinding = variableDeclaration.MutableBinding;
+            MutableBinding = variableDeclaration.IsMutableBinding;
             BindingName = variableDeclaration.Name;
             Name = BindingName.WithoutNumber();
             NameSpan = variableDeclaration.NameSpan;

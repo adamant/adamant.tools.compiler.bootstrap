@@ -1,9 +1,11 @@
+using System.Collections.Generic;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
 {
-    public class UnknownSymbol : ISymbol
+    public class UnknownSymbol : ITypeSymbol, IFunctionSymbol, IBindingSymbol
     {
         #region Singleton
         public static readonly UnknownSymbol Instance = new UnknownSymbol();
@@ -12,10 +14,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
         #endregion
 
         // We don't know what this is, so it might be mutable (fewer errors this way)
-        public bool MutableBinding => true;
+        public bool IsMutableBinding => true;
         public Name FullName => SpecialName.Unknown;
         public DataType Type => DataType.Unknown;
-        DataType ISymbol.DeclaresType => null;
+        public DataType DeclaresType => DataType.Unknown;
         public SymbolSet ChildSymbols => SymbolSet.Empty;
+
+        public IEnumerable<IBindingSymbol> Parameters => Enumerable.Empty<IBindingSymbol>();
+
+        public DataType ReturnType => DataType.Unknown;
     }
 }
