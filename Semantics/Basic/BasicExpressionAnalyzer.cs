@@ -491,38 +491,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 {
                     var expressionType = InferExpressionType(mutableExpression.Expression);
                     DataType type;
+
                     switch (expressionType)
                     {
-                        //case Metatype metatype:
-                        //{
-                        //    type = DataType.Type; // It names/describes a type
-                        //    if (!(metatype.Instance is UserObjectType objectType
-                        //          && objectType.DeclaredMutable))
-                        //        diagnostics.Add(TypeError.TypeDeclaredImmutable(file,
-                        //            mutableExpression.Expression));
-                        //    break;
-                        //}
-                        //case TypeType _:
-                        //    // TODO we need to check whether it is valid to use `mut` on this
-                        //    type = DataType.Type; // It names/describes a type
-                        //    break;
+                        // If it is already mutable we can't redeclare it mutable (i.e. `mut mut x` is error)
+                        case UserObjectType objectType
+                            when objectType.Mutability.IsUpgradable:
+                            type = objectType.AsMutable();
+                            break;
                         default:
-                            switch (expressionType)
-                            {
-                                // If it is already mutable we can't redeclare it mutable (i.e. `mut mut x` is error)
-                                case UserObjectType objectType
-                                    when objectType.Mutability.IsUpgradable:
-                                    type = objectType.AsMutable();
-                                    break;
-                                default:
-                                    diagnostics.Add(TypeError.ExpressionCantBeMutable(file,
-                                        mutableExpression.Expression));
-                                    type = expressionType;
-                                    break;
-                            }
+                            diagnostics.Add(TypeError.ExpressionCantBeMutable(file,
+                                mutableExpression.Expression));
+                            type = expressionType;
                             break;
                     }
-
+                   
                     return mutableExpression.Type = type;
                 }
                 case IfExpressionSyntax ifExpression:
@@ -586,7 +569,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     throw new Exception("ImplicitConversionExpressions are inserted by BasicExpressionAnalyzer. They should not be present in the AST yet.");
                 case LifetimeExpressionSyntax _:
                 case ReferenceLifetimeSyntax _:
-                //case RefTypeSyntax _:
                 case SelfTypeExpressionSyntax _:
                     throw new Exception("Should be inferring type of type expression");
                 case null:
@@ -608,19 +590,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     type = DataType.Unknown;
                     break;
                 case 1:
-                    identifierName.ReferencedSymbol = symbols.Single();
-                    //type = symbols.Single().Type;
-                    //if (type is UserObjectType objectType)
-                    //{
-                    //    // A bare variable reference doesn't default to mutable
-                    //    if (objectType.Mutability == Mutability.Mutable)
-                    //        type = objectType = objectType.AsExplicitlyUpgradable();
-                    //    // A bare variable reference doesn't default to owned
-                    //    if (!isMove && objectType.IsOwned)
-                    //        type = objectType.WithLifetime(Lifetime.None);
-                    //}
-                    throw new NotImplementedException();
+                {
+                    var symbol = symbols.Single();
+                    identifierName.ReferencedSymbol = symbol;
+                    switch (symbol)
+                    {
+                        case IBindingSymbol binding:
+                        {
+                            type = binding.Type;
+                            if (type is UserObjectType objectType)
+                            {
+                                // A bare variable reference doesn't default to mutable
+                                if (objectType.Mutability == Mutability.Mutable)
+                                    type = objectType = objectType.AsExplicitlyUpgradable();
+                                // A bare variable reference doesn't default to owned
+                                if (!isMove && objectType.IsOwned)
+                                    type = objectType.WithLifetime(Lifetime.None);
+                                //}
+                                throw new NotImplementedException();
+                            }
+                        }
+                        break;
+                        default:
+                            throw new NotImplementedException();
+                    }
                     break;
+                }
                 default:
                     diagnostics.Add(NameBindingError.AmbiguousName(file, identifierName.Span));
                     identifierName.ReferencedSymbol = UnknownSymbol.Instance;

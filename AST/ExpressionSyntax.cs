@@ -10,12 +10,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(NewObjectExpressionSyntax),
         typeof(LiteralExpressionSyntax),
         typeof(NextExpressionSyntax),
-        //typeof(PlacementInitExpressionSyntax),
         typeof(ReturnExpressionSyntax),
-        //typeof(TypeKindExpressionSyntax),
         typeof(WhileExpressionSyntax),
         typeof(MemberAccessExpressionSyntax),
-        //typeof(MatchExpressionSyntax),
         typeof(MoveExpressionSyntax),
         typeof(LoopExpressionSyntax),
         typeof(LifetimeExpressionSyntax),
@@ -27,7 +24,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(AssignmentExpressionSyntax),
         typeof(BreakExpressionSyntax),
         typeof(BinaryExpressionSyntax),
-        //typeof(DeleteExpressionSyntax),
         typeof(InstanceExpressionSyntax),
         typeof(TypeSyntax))]
     public abstract class ExpressionSyntax : StatementSyntax

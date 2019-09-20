@@ -5,7 +5,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     [Closed(
         typeof(NoneLiteralExpressionSyntax),
-        //typeof(UninitializedLiteralExpressionSyntax),
         typeof(StringLiteralExpressionSyntax),
         typeof(IntegerLiteralExpressionSyntax),
         typeof(BoolLiteralExpressionSyntax))]

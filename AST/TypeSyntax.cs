@@ -4,7 +4,6 @@ using ExhaustiveMatching;
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     [Closed(
-        //typeof(RefTypeSyntax),
         typeof(ReferenceLifetimeSyntax),
         typeof(SelfTypeExpressionSyntax),
         typeof(NameSyntax),

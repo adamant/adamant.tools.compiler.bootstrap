@@ -5,13 +5,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class SelfParameterSyntax : ParameterSyntax
     {
-        //public bool RefSelf { get; }
         public bool MutableSelf { get; }
 
-        public SelfParameterSyntax(TextSpan span, Name fullName, /*bool refSelf,*/ bool mutableSelf)
+        public SelfParameterSyntax(TextSpan span, Name fullName, bool mutableSelf)
             : base(span, false, fullName)
         {
-            //RefSelf = refSelf;
             MutableSelf = mutableSelf;
         }
 
@@ -20,8 +18,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             var value = "self";
             if (MutableSelf)
                 value = "mut " + value;
-            //if (RefSelf)
-            //    value = "ref " + value;
             return value;
         }
     }

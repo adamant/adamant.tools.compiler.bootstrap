@@ -4,6 +4,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         Standard,
         Conditional,
-        //Dereference,
     }
 }
