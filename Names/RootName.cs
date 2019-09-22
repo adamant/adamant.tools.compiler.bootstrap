@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Names
 {
@@ -8,6 +9,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
     /// the global namespace.
     /// </summary>
     [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
+    [Closed(
+        typeof(GlobalNamespaceName),
+        typeof(Name))]
     public abstract class RootName
     {
         public abstract IEnumerable<SimpleName> Segments { get; }

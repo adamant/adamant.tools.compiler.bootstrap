@@ -523,10 +523,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     return new FieldAccess(value,
                         memberAccess.ReferencedSymbol.FullName, memberAccess.Span);
                 }
-                case MutableExpressionSyntax mutable:
-                    // TODO shouldn't borrowing be explicit in the IR and don't we
-                    // need to be able to check mutability on borrows?
-                    return ConvertToValue(mutable.Expression);
+                //case MutableTypeSyntax mutable:
+                //    // TODO shouldn't borrowing be explicit in the IR and don't we
+                //    // need to be able to check mutability on borrows?
+                //    return ConvertToValue(mutable.Referent);
                 case MoveExpressionSyntax move:
                     return ConvertToOwn(move.Expression, move.Span);
                 case ImplicitImmutabilityConversionExpression implicitImmutabilityConversion:

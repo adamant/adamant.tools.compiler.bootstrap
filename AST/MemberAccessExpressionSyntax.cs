@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         /// </summary>
         public ExpressionSyntax Expression { get; }
         public AccessOperator AccessOperator { get; }
-        public NameSyntax Member { get; }
+        public IdentifierNameSyntax Member { get; }
 
         public ISymbol ReferencedSymbol
         {
@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             TextSpan span,
             ExpressionSyntax expression,
             AccessOperator accessOperator,
-            NameSyntax member)
+            IdentifierNameSyntax member)
             : base(span)
         {
             Expression = expression;

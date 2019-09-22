@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(BreakExpressionSyntax),
         typeof(BinaryExpressionSyntax),
         typeof(InstanceExpressionSyntax),
-        typeof(TypeSyntax))]
+        typeof(IdentifierNameSyntax))]
     public abstract class ExpressionSyntax : StatementSyntax
     {
         public TextSpan Span { get; }

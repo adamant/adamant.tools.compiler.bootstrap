@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         public FixedList<IModiferToken> Modifiers { get; }
         public bool IsMutableBinding { get; }
-        public ExpressionSyntax TypeExpression { get; }
+        public TypeSyntax TypeSyntax { get; }
         public ExpressionSyntax Initializer { get; }
         public TypePromise Type { get; } = new TypePromise();
 
@@ -26,19 +26,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             bool mutableBinding,
             Name fullName,
             TextSpan nameSpan,
-            ExpressionSyntax typeExpression,
+            TypeSyntax typeSyntax,
             ExpressionSyntax initializer)
             : base(file, fullName, nameSpan)
         {
             Modifiers = modifiers;
             IsMutableBinding = mutableBinding;
-            TypeExpression = typeExpression;
+            TypeSyntax = typeSyntax;
             Initializer = initializer;
         }
 
         public override string ToString()
         {
-            var result = $"{Name}: {TypeExpression}";
+            var result = $"{Name}: {TypeSyntax}";
             if (Initializer != null)
                 result += Initializer.ToString();
             result += ";";

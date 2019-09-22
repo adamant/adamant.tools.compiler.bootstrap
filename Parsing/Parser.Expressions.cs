@@ -16,7 +16,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             switch (Tokens.Current)
             {
                 case ICloseParenToken _:
-                //case ICloseBracketToken _:
                 case ICloseBraceToken _:
                 case ISemicolonToken _:
                 case ICommaToken _:
@@ -149,15 +148,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                             @operator = Tokens.RequiredToken<IOperatorToken>();
                         }
                         break;
-                    case IDollarToken _:
-                        if (minPrecedence <= OperatorPrecedence.Lifetime)
-                        {
-                            Tokens.RequiredToken<IDollarToken>();
-                            var (nameSpan, lifetime) = ParseLifetimeName();
-                            expression = new ReferenceLifetimeSyntax(expression, nameSpan, lifetime);
-                            continue;
-                        }
-                        break;
+                    //case IDollarToken _:
+                    //    if (minPrecedence <= OperatorPrecedence.Lifetime)
+                    //    {
+                    //        Tokens.RequiredToken<IDollarToken>();
+                    //        var (nameSpan, lifetime) = ParseLifetimeName();
+                    //        expression = new ReferenceLifetimeSyntax(expression, nameSpan, lifetime);
+                    //        continue;
+                    //    }
+                    //    break;
                     case IQuestionToken _:
                         if (minPrecedence <= OperatorPrecedence.Unary)
                         {
@@ -180,7 +179,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         }
                         break;
                     case IDotToken _:
-                    //case ICaretDotToken _:
                     case IQuestionDotToken _:
                         if (minPrecedence <= OperatorPrecedence.Primary)
                         {
@@ -221,8 +219,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     return AccessOperator.Standard;
                 case IQuestionDotToken _:
                     return AccessOperator.Conditional;
-                //case ICaretDotToken _:
-                //    return AccessOperator.Dereference;
                 default:
                     throw NonExhaustiveMatchException.For(accessOperatorToken);
             }
@@ -296,45 +292,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             switch (Tokens.Current)
             {
-                case ISelfTypeKeywordToken _:
-                    var selfTypeKeyword = Tokens.Expect<ISelfTypeKeywordToken>();
-                    return new SelfTypeExpressionSyntax(selfTypeKeyword);
                 case ISelfKeywordToken _:
                     var selfKeyword = Tokens.Expect<ISelfKeywordToken>();
                     return new SelfExpressionSyntax(selfKeyword);
-                //case IBaseKeywordToken _:
-                //    var baseKeyword = Tokens.Expect<IBaseKeywordToken>();
-                //    return new BaseExpressionSyntax(baseKeyword);
                 case INewKeywordToken _:
                 {
                     var newKeyword = Tokens.Expect<INewKeywordToken>();
-                    var type = ParseName();
+                    var type = ParseTypeName();
                     Tokens.Expect<IOpenParenToken>();
                     var arguments = ParseArguments();
                     var closeParen = Tokens.Expect<ICloseParenToken>();
                     var span = TextSpan.Covering(newKeyword, closeParen);
                     return new NewObjectExpressionSyntax(span, type, arguments);
                 }
-                //case IInitKeywordToken _:
-                //{
-                //    var initKeyword = Tokens.Expect<IInitKeywordToken>();
-                //    Tokens.Expect<IOpenParenToken>();
-                //    var placeExpression = ParseExpression();
-                //    Tokens.Expect<ICloseParenToken>();
-                //    var initializer = ParseName();
-                //    Tokens.Expect<IOpenParenToken>();
-                //    var arguments = ParseArguments();
-                //    var argumentsCloseParen = Tokens.Expect<ICloseParenToken>();
-                //    var span = TextSpan.Covering(initKeyword, argumentsCloseParen);
-                //    return new PlacementInitExpressionSyntax(span, placeExpression, initializer, arguments);
-                //}
-                //case IDeleteKeywordToken _:
-                //{
-                //    var deleteKeyword = Tokens.Expect<IDeleteKeywordToken>();
-                //    var expression = ParseExpression();
-                //    var span = TextSpan.Covering(deleteKeyword, expression.Span);
-                //    return new DeleteExpressionSyntax(span, expression);
-                //}
                 case IReturnKeywordToken _:
                 {
                     var returnKeyword = Tokens.Expect<IReturnKeywordToken>();
@@ -350,10 +320,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     return ParsePrefixUnaryOperator(UnaryOperator.Minus);
                 case IPlusToken _:
                     return ParsePrefixUnaryOperator(UnaryOperator.Plus);
-                //case IAtSignToken _:
-                //    return ParsePrefixUnaryOperator(UnaryOperator.At);
-                //case ICaretToken _:
-                //    return ParsePrefixUnaryOperator(UnaryOperator.Caret);
                 case INotKeywordToken _:
                     return ParsePrefixUnaryOperator(UnaryOperator.Not);
                 case IBooleanLiteralToken _:
@@ -366,11 +332,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var literal = Tokens.RequiredToken<IIntegerLiteralToken>();
                     return new IntegerLiteralExpressionSyntax(literal.Span, literal.Value);
                 }
-                //case IUninitializedKeywordToken _:
-                //{
-                //    var literal = Tokens.Required<IUninitializedKeywordToken>();
-                //    return new UninitializedLiteralExpressionSyntax(literal);
-                //}
                 case IStringLiteralToken _:
                 {
                     var literal = Tokens.RequiredToken<IStringLiteralToken>();
@@ -381,8 +342,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var literal = Tokens.Required<INoneKeywordToken>();
                     return new NoneLiteralExpressionSyntax(literal);
                 }
-                case IPrimitiveTypeToken _:
-                    return ParsePrimitiveType();
                 case IIdentifierToken _:
                     return ParseSimpleName();
                 case IForeachKeywordToken _:
@@ -406,20 +365,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 }
                 case IUnsafeKeywordToken _:
                     return ParseUnsafeExpression();
-                //case IRefKeywordToken _:
+                //case IMutableKeywordToken _:
                 //{
-                //    var refKeyword = Tokens.Expect<IRefKeywordToken>();
-                //    var referencedType = ParseExpression();
-                //    var span = TextSpan.Covering(refKeyword, referencedType.Span);
-                //    return new RefTypeSyntax(span, referencedType);
+                //    var mutableKeyword = Tokens.Expect<IMutableKeywordToken>();
+                //    var expression = ParseExpression(OperatorPrecedence.AboveAssignment);
+                //    var span = TextSpan.Covering(mutableKeyword, expression.Span);
+                //    return new MutableTypeSyntax(span, expression);
                 //}
-                case IMutableKeywordToken _:
-                {
-                    var mutableKeyword = Tokens.Expect<IMutableKeywordToken>();
-                    var expression = ParseExpression(OperatorPrecedence.AboveAssignment);
-                    var span = TextSpan.Covering(mutableKeyword, expression.Span);
-                    return new MutableExpressionSyntax(span, expression);
-                }
                 case IMoveKeywordToken _:
                 {
                     var moveKeyword = Tokens.Expect<IMoveKeywordToken>();
@@ -429,8 +381,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 }
                 case IIfKeywordToken _:
                     return ParseIf();
-                //case IMatchKeywordToken _:
-                //    return ParseMatch();
                 case IDotToken _:
                 {
                     // implicit self etc.
@@ -478,69 +428,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new UnsafeExpressionSyntax(span, expression);
         }
 
-        private ExpressionSyntax ParsePrimitiveType()
-        {
-            var keyword = Tokens.RequiredToken<IPrimitiveTypeToken>();
-            SimpleName name;
-            switch (keyword)
-            {
-                case IVoidKeywordToken _:
-                    name = SpecialName.Void;
-                    break;
-                case INeverKeywordToken _:
-                    name = SpecialName.Never;
-                    break;
-                case IBoolKeywordToken _:
-                    name = SpecialName.Bool;
-                    break;
-                case IAnyKeywordToken _:
-                    name = SpecialName.Any;
-                    break;
-                //case ITypeKeywordToken _:
-                //    name = SpecialName.Type;
-                //    break;
-                //case IInt8KeywordToken _:
-                //    name = SpecialName.Int8;
-                //    break;
-                case IByteKeywordToken _:
-                    name = SpecialName.Byte;
-                    break;
-                //case IInt16KeywordToken _:
-                //    name = SpecialName.Int16;
-                //    break;
-                //case IUInt16KeywordToken _:
-                //    name = SpecialName.UInt16;
-                //    break;
-                case IIntKeywordToken _:
-                    name = SpecialName.Int;
-                    break;
-                case IUIntKeywordToken _:
-                    name = SpecialName.UInt;
-                    break;
-                //case IInt64KeywordToken _:
-                //    name = SpecialName.Int64;
-                //    break;
-                //case IUInt64KeywordToken _:
-                //    name = SpecialName.UInt64;
-                //    break;
-                case ISizeKeywordToken _:
-                    name = SpecialName.Size;
-                    break;
-                case IOffsetKeywordToken _:
-                    name = SpecialName.Offset;
-                    break;
-                //case IFloat32KeywordToken _:
-                //    name = SpecialName.Float32;
-                //    break;
-                //case IFloatKeywordToken _:
-                //    name = SpecialName.Float;
-                //    break;
-                default:
-                    throw NonExhaustiveMatchException.For(keyword);
-            }
-            return new IdentifierNameSyntax(keyword.Span, name);
-        }
-
         private ExpressionSyntax ParsePrefixUnaryOperator(UnaryOperator @operator)
         {
             var operatorSpan = Tokens.Required<IOperatorToken>();
@@ -559,9 +446,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IOwnedKeywordToken _:
                     var ownedKeyword = Tokens.RequiredToken<IOwnedKeywordToken>();
                     return (ownedKeyword.Span, SpecialName.Owned);
-                //case IRefKeywordToken _:
-                //    var refKeyword = Tokens.RequiredToken<IRefKeywordToken>();
-                //    return (refKeyword.Span, SpecialName.Ref);
                 case IForeverKeywordToken _:
                     var foreverKeyword = Tokens.RequiredToken<IForeverKeywordToken>();
                     return (foreverKeyword.Span, SpecialName.Forever);
@@ -577,9 +461,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var mutableBinding = Tokens.Accept<IVarKeywordToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var variableName = nameContext.Qualify(variableNumbers.VariableName(identifier.Value));
-            ExpressionSyntax type = null;
+            TypeSyntax type = null;
             if (Tokens.Accept<IColonToken>())
-                type = ParseExpression();
+                type = ParseType();
             Tokens.Expect<IInKeywordToken>();
             var expression = ParseExpression();
             var block = ParseBlock();
@@ -633,26 +517,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 Tokens.Expect<ISemicolonToken>();
             return expression;
         }
-
-        //private ExpressionSyntax ParseMatch()
-        //{
-        //    var matchKeyword = Tokens.Expect<IMatchKeywordToken>();
-        //    var value = ParseExpression();
-        //    Tokens.Expect<IOpenBraceToken>();
-        //    var arms = ParseMany<MatchArmSyntax, ICommaToken, ICloseBraceToken>(ParseMatchArm);
-        //    var closeBrace = Tokens.Expect<ICloseBraceToken>();
-        //    var span = TextSpan.Covering(matchKeyword, closeBrace);
-        //    return new MatchExpressionSyntax(span, value, arms);
-        //}
-
-        //private MatchArmSyntax ParseMatchArm()
-        //{
-        //    var pattern = ParsePattern();
-        //    var expression = ParseExpressionBlock();
-        //    // TODO the comma is only optional on the last one
-        //    Tokens.Accept<ICommaToken>();
-        //    return new MatchArmSyntax(pattern, expression);
-        //}
 
         private ExpressionSyntax ParseParenthesizedExpression()
         {

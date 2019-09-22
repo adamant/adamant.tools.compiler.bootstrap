@@ -5,22 +5,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class ReferenceLifetimeSyntax : TypeSyntax
     {
-        public ExpressionSyntax ReferentTypeExpression { get; }
+        public TypeSyntax ReferentType { get; }
         public SimpleName Lifetime { get; }
 
         public ReferenceLifetimeSyntax(
-            ExpressionSyntax referentTypeExpression,
+            TypeSyntax referentType,
             TextSpan nameSpan,
             SimpleName lifetime)
-            : base(TextSpan.Covering(referentTypeExpression.Span, nameSpan))
+            : base(TextSpan.Covering(referentType.Span, nameSpan))
         {
-            ReferentTypeExpression = referentTypeExpression;
+            ReferentType = referentType;
             Lifetime = lifetime;
         }
 
         public override string ToString()
         {
-            return $"{ReferentTypeExpression}${Lifetime}";
+            return $"{ReferentType}${Lifetime}";
         }
     }
 }

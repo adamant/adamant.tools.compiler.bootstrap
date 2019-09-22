@@ -11,7 +11,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(PackageSyntax),
         typeof(ModifierSyntax),
         typeof(CompilationUnitSyntax),
-        typeof(ArgumentSyntax))]
+        typeof(ArgumentSyntax),
+        typeof(TypeSyntax))]
     [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
     public abstract class Syntax
     {

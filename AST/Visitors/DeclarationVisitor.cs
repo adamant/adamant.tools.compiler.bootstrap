@@ -67,7 +67,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 
         public virtual void VisitFieldDeclaration(FieldDeclarationSyntax fieldDeclaration, A args)
         {
-            VisitExpression(fieldDeclaration.TypeExpression, args);
+            VisitType(fieldDeclaration.TypeSyntax, args);
             VisitExpression(fieldDeclaration.Initializer, args);
         }
 
@@ -131,7 +131,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             foreach (var parameter in namedFunctionDeclaration.Parameters)
                 VisitParameter(parameter, args);
 
-            VisitExpression(namedFunctionDeclaration.ReturnTypeExpression, args);
+            VisitType(namedFunctionDeclaration.ReturnTypeSyntax, args);
             VisitExpression(namedFunctionDeclaration.Body, args);
         }
 
@@ -164,13 +164,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 
         public virtual void VisitNamedParameter(NamedParameterSyntax namedParameter, A args)
         {
-            VisitExpression(namedParameter.TypeExpression, args);
+            VisitType(namedParameter.TypeSyntax, args);
             VisitExpression(namedParameter.DefaultValue, args);
         }
-
-        //public virtual void VisitGenericParameter(GenericParameterSyntax genericParameter, A args)
-        //{
-        //    VisitExpression(genericParameter.TypeExpression, args);
-        //}
     }
 }

@@ -1,16 +1,18 @@
 using System;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
-using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    [Closed(typeof(IdentifierNameSyntax))]
-    public abstract class NameSyntax : TypeSyntax
+    /// <summary>
+    /// The potentially qualified name of a type (i.e. `foo.bar.Baz`)
+    /// </summary>
+    public class TypeNameSyntax : TypeSyntax
     {
-        public SimpleName Name { get; }
+        public Name Name { get; }
 
         private ISymbol referencedSymbol;
         public ISymbol ReferencedSymbol
@@ -36,10 +38,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             }
         }
 
-        protected NameSyntax(SimpleName name, TextSpan span)
+        public TypeNameSyntax(TextSpan span, Name name)
             : base(span)
         {
             Name = name;
+        }
+
+        public FixedList<ISymbol> LookupInContainingScope()
+        {
+            return ContainingScope.LookupQualified(Name);
+        }
+
+        public override string ToString()
+        {
+            return Name.ToString();
         }
     }
 }

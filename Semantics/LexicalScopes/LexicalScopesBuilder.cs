@@ -1,15 +1,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
+using Adamant.Tools.Compiler.Bootstrap.AST.Walkers;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Primitives;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 {
+    /// <summary>
+    /// Builds up a hierarchy of lexical scope objects that are later used to look
+    /// up names for name binding
+    /// </summary>
     public class LexicalScopesBuilder
     {
         // TODO do we need a list of all the namespaces for validating using statements?
@@ -84,7 +90,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             DeclarationSyntax declaration,
             LexicalScope containingScope)
         {
-            var binder = new ExpressionLexicalScopesBuilder();
+            var binder = new ExpressionScopesBuilder();
             var diagnosticCount = diagnostics.Count;
             BuildScopesInDeclaration(declaration, containingScope, binder);
             if (diagnosticCount != diagnostics.Count)
@@ -94,10 +100,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         private void BuildScopesInDeclaration(
             DeclarationSyntax declaration,
             LexicalScope containingScope,
-            ExpressionLexicalScopesBuilder binder)
+            ExpressionScopesBuilder binder)
         {
             switch (declaration)
             {
+                default:
+                    throw ExhaustiveMatch.Failed(declaration);
                 case NamespaceDeclarationSyntax ns:
                     if (ns.InGlobalNamespace)
                         containingScope = globalScope;
@@ -110,64 +118,50 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     break;
                 case NamedFunctionDeclarationSyntax function:
                     BuildScopesInFunctionParameters(function, containingScope, binder);
-                    binder.VisitExpression(function.ReturnTypeExpression, containingScope);
+                    if (function.ReturnTypeSyntax != null)
+                        new TypeScopesBuilder(containingScope).Walk(function.ReturnTypeSyntax);
                     BuildScopesInFunctionBody(function, containingScope, binder);
                     break;
-                //case OperatorDeclarationSyntax operatorDeclaration:
-                //    BuildScopesInFunctionParameters(operatorDeclaration, containingScope, binder);
-                //    binder.VisitExpression(operatorDeclaration.ReturnTypeExpression, containingScope);
-                //    BuildScopesInFunctionBody(operatorDeclaration, containingScope, binder);
-                //    break;
                 case ConstructorDeclarationSyntax constructor:
                     BuildScopesInFunctionParameters(constructor, containingScope, binder);
                     BuildScopesInFunctionBody(constructor, containingScope, binder);
                     break;
-                //case InitializerDeclarationSyntax initializer:
-                //    BuildScopesInFunctionParameters(initializer, containingScope, binder);
-                //    BuildScopesInFunctionBody(initializer, containingScope, binder);
-                //    break;
                 case TypeDeclarationSyntax typeDeclaration:
                     // TODO name scope for type declaration
                     foreach (var nestedDeclaration in typeDeclaration.Members)
                         BuildScopesInDeclaration(nestedDeclaration, containingScope);
                     break;
                 case FieldDeclarationSyntax fieldDeclaration:
-                    binder.VisitExpression(fieldDeclaration.TypeExpression, containingScope);
+                    new TypeScopesBuilder(containingScope).Walk(fieldDeclaration.TypeSyntax);
                     binder.VisitExpression(fieldDeclaration.Initializer, containingScope);
                     break;
-                default:
-                    throw NonExhaustiveMatchException.For(declaration);
             }
         }
 
         private static void BuildScopesInFunctionParameters(
             FunctionDeclarationSyntax function,
             LexicalScope containingScope,
-            ExpressionLexicalScopesBuilder binder)
+            ExpressionScopesBuilder binder)
         {
-            //if (function.GenericParameters != null)
-            //    foreach (var parameter in function.GenericParameters)
-            //        binder.VisitExpression(parameter.TypeExpression, containingScope);
-
             foreach (var parameter in function.Parameters)
                 switch (parameter)
                 {
+                    default:
+                        throw ExhaustiveMatch.Failed(parameter);
                     case NamedParameterSyntax namedParameter:
-                        binder.VisitExpression(namedParameter.TypeExpression, containingScope);
+                        new TypeScopesBuilder(containingScope).Walk(namedParameter.TypeSyntax);
                         break;
                     case SelfParameterSyntax _:
                     case FieldParameterSyntax _:
                         // Nothing to bind
                         break;
-                    default:
-                        throw NonExhaustiveMatchException.For(parameter);
                 }
         }
 
         private static void BuildScopesInFunctionBody(
             FunctionDeclarationSyntax function,
             LexicalScope containingScope,
-            ExpressionLexicalScopesBuilder binder)
+            ExpressionScopesBuilder binder)
         {
             var symbols = new List<ISymbol>();
             foreach (var parameter in function.Parameters)
@@ -184,6 +178,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             Name name;
             switch (ns)
             {
+                default:
+                    throw ExhaustiveMatch.Failed(ns);
                 case GlobalNamespaceName _:
                     return containingScope;
                 case QualifiedName qualifiedName:
@@ -193,8 +189,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                 case SimpleName simpleName:
                     name = simpleName;
                     break;
-                default:
-                    throw NonExhaustiveMatchException.For(ns);
             }
 
             var symbolsInNamespace = allSymbols.Where(s => s.FullName.HasQualifier(name));

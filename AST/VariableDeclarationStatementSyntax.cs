@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public SimpleName Name => FullName.UnqualifiedName;
 
         public TextSpan NameSpan { get; }
-        public ExpressionSyntax TypeExpression { get; }
+        public TypeSyntax TypeSyntax { get; }
         public ExpressionSyntax Initializer;
 
         [DebuggerHidden]
@@ -25,20 +25,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             bool isMutableBinding,
             Name fullName,
             TextSpan nameSpan,
-            ExpressionSyntax typeExpression,
+            TypeSyntax typeSyntax,
             ExpressionSyntax initializer)
         {
             IsMutableBinding = isMutableBinding;
             FullName = fullName;
             NameSpan = nameSpan;
-            TypeExpression = typeExpression;
+            TypeSyntax = typeSyntax;
             Initializer = initializer;
         }
 
         public override string ToString()
         {
             var binding = IsMutableBinding ? "var" : "let";
-            var type = TypeExpression != null ? ": " + TypeExpression : "";
+            var type = TypeSyntax != null ? ": " + TypeSyntax : "";
             var initializer = Initializer != null ? " = " + Initializer : "";
             return $"{binding} {Name}{type}{initializer};";
         }

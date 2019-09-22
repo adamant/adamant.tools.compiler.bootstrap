@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SimpleName VariableName => FullVariableName.UnqualifiedName;
-        public ExpressionSyntax TypeExpression { get; }
+        public TypeSyntax TypeSyntax { get; }
         public ExpressionSyntax InExpression { get; }
         public BlockSyntax Block { get; }
 
@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             TextSpan span,
             bool isMutableBinding,
             Name fullVariableName,
-            ExpressionSyntax typeExpression,
+            TypeSyntax typeSyntax,
             ExpressionSyntax inExpression,
             BlockSyntax block)
             : base(span)
@@ -50,13 +50,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             FullVariableName = fullVariableName;
             InExpression = inExpression;
             Block = block;
-            TypeExpression = typeExpression;
+            TypeSyntax = typeSyntax;
         }
 
         public override string ToString()
         {
             var binding = IsMutableBinding ? "var " : "";
-            return $"foreach {binding}{VariableName}: {TypeExpression} in {InExpression} {Block}";
+            return $"foreach {binding}{VariableName}: {TypeSyntax} in {InExpression} {Block}";
         }
     }
 }

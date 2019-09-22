@@ -1,4 +1,6 @@
+using System;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 {
@@ -24,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 
         public virtual void VisitVariableDeclarationStatement(VariableDeclarationStatementSyntax variableDeclaration, A args)
         {
-            VisitExpression(variableDeclaration.TypeExpression, args);
+            VisitType(variableDeclaration.TypeSyntax, args);
             VisitExpression(variableDeclaration.Initializer, args);
         }
 
@@ -56,9 +58,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case BlockSyntax block:
                     VisitBlock(block, args);
                     break;
-                case ReferenceLifetimeSyntax lifetimeName:
-                    VisitLifetimeName(lifetimeName, args);
-                    break;
                 case NewObjectExpressionSyntax newObjectExpression:
                     VisitNewObjectExpression(newObjectExpression, args);
                     break;
@@ -71,9 +70,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case SelfExpressionSyntax selfExpression:
                     VisitSelfExpression(selfExpression, args);
                     break;
-                //case BaseExpressionSyntax baseExpression:
-                //    VisitBaseExpression(baseExpression, args);
-                //    break;
                 case LoopExpressionSyntax loopExpression:
                     VisitLoopExpression(loopExpression, args);
                     break;
@@ -88,9 +84,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                     break;
                 case ImplicitConversionExpression implicitConversion:
                     VisitImplicitConversionExpression(implicitConversion, args);
-                    break;
-                case MutableExpressionSyntax mutableExpression:
-                    VisitMutableExpression(mutableExpression, args);
                     break;
                 case MoveExpressionSyntax moveExpression:
                     VisitMoveExpression(moveExpression, args);
@@ -112,6 +105,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             }
         }
 
+        public virtual void VisitType(TypeSyntax type, A args)
+        {
+            switch (type)
+            {
+                case TypeNameSyntax typeName:
+                    VisitTypeName(typeName, args);
+                    break;
+                case MutableTypeSyntax mutableType:
+                    VisitMutableType(mutableType, args);
+                    break;
+                case ReferenceLifetimeSyntax referenceLifetime:
+                    VisitReferenceLifetime(referenceLifetime, args);
+                    break;
+                case SelfTypeSyntax selfType:
+                    VisitSelfType(selfType, args);
+                    break;
+                default:
+                    throw ExhaustiveMatch.Failed(type);
+            }
+        }
+
+        public virtual void VisitSelfType(SelfTypeSyntax selfType, A args)
+        {
+
+        }
+
+        public virtual void VisitTypeName(TypeNameSyntax typeName, A args)
+        {
+        }
+
         public virtual void VisitWhileExpression(WhileExpressionSyntax whileExpression, A args)
         {
             VisitExpression(whileExpression.Condition, args);
@@ -124,7 +147,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 
         public virtual void VisitForeachExpression(ForeachExpressionSyntax foreachExpression, A args)
         {
-            VisitExpression(foreachExpression.TypeExpression, args);
+            VisitType(foreachExpression.TypeSyntax, args);
             VisitExpression(foreachExpression.InExpression, args);
             VisitExpression(foreachExpression.Block, args);
         }
@@ -134,9 +157,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             VisitExpression(moveExpression.Expression, args);
         }
 
-        public virtual void VisitMutableExpression(MutableExpressionSyntax mutableExpression, A args)
+        public virtual void VisitMutableType(MutableTypeSyntax mutableType, A args)
         {
-            VisitExpression(mutableExpression.Expression, args);
+            throw new NotImplementedException();
         }
 
         public virtual void VisitImplicitConversionExpression(ImplicitConversionExpression implicitConversionExpression, A args)
@@ -212,10 +235,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             VisitExpression(loopExpression.Block, args);
         }
 
-        //public virtual void VisitBaseExpression(BaseExpressionSyntax baseExpression, A args)
-        //{
-        //}
-
         public virtual void VisitSelfExpression(SelfExpressionSyntax selfExpression, A args)
         {
         }
@@ -232,7 +251,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 
         public virtual void VisitNewObjectExpression(NewObjectExpressionSyntax newObjectExpression, A args)
         {
-            VisitExpression(newObjectExpression.Constructor, args);
+            VisitType(newObjectExpression.Constructor, args);
             foreach (var argument in newObjectExpression.Arguments)
                 VisitArgument(argument, args);
         }
@@ -242,9 +261,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             VisitExpression(argument.Value, args);
         }
 
-        public virtual void VisitLifetimeName(ReferenceLifetimeSyntax referenceLifetime, A args)
+        public virtual void VisitReferenceLifetime(ReferenceLifetimeSyntax referenceLifetime, A args)
         {
-            VisitExpression(referenceLifetime.ReferentTypeExpression, args);
+            VisitType(referenceLifetime.ReferentType, args);
         }
 
         public virtual void VisitBlock(BlockSyntax block, A args)

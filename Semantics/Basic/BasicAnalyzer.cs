@@ -138,7 +138,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     {
                         parameter.Type.BeginFulfilling();
                         var type = analyzer
-                            .CheckTypeExpression(namedParameter.TypeExpression);
+                            .EvaluateType(namedParameter.TypeSyntax);
                         types.Add(parameter.Type.Fulfill(type));
                     }
                     break;
@@ -177,7 +177,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             switch (function)
             {
                 case NamedFunctionDeclarationSyntax namedFunction:
-                    ResolveReturnType(function, namedFunction.ReturnTypeExpression, analyzer);
+                    ResolveReturnType(function, namedFunction.ReturnTypeSyntax, analyzer);
                     return;
                 case ConstructorDeclarationSyntax _:
                     function.ReturnType.Fulfill(function.DeclaringType.DeclaresType.Fulfilled());
@@ -189,11 +189,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private static void ResolveReturnType(
             FunctionDeclarationSyntax function,
-            ExpressionSyntax returnTypeExpression,
+            TypeSyntax returnTypeSyntax,
             BasicExpressionAnalyzer analyzer)
         {
-            var returnType = returnTypeExpression != null
-                ? analyzer.CheckTypeExpression(returnTypeExpression)
+            var returnType = returnTypeSyntax != null
+                ? analyzer.EvaluateType(returnTypeSyntax)
                 : DataType.Void;
 
             // If we are returning ownership, then they can make it mutable
@@ -254,7 +254,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
             var resolver = new BasicExpressionAnalyzer(field.File, diagnostics);
             field.Type.BeginFulfilling();
-            var type = resolver.CheckTypeExpression(field.TypeExpression);
+            var type = resolver.EvaluateType(field.TypeSyntax);
             field.Type.Fulfill(type);
         }
 

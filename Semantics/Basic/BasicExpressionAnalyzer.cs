@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         private readonly Diagnostics diagnostics;
         private readonly DataType selfType;
         private readonly DataType returnType;
-        private readonly BasicTypeExpressionAnalyzer typeAnalyzer;
+        private readonly BasicTypeAnalyzer typeAnalyzer;
 
         public BasicExpressionAnalyzer(
             CodeFile file,
@@ -33,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             this.diagnostics = diagnostics;
             this.returnType = returnType;
             this.selfType = selfType;
-            typeAnalyzer = new BasicTypeExpressionAnalyzer(file, diagnostics, this);
+            typeAnalyzer = new BasicTypeAnalyzer(file, diagnostics, this);
         }
 
         public void ResolveTypesInStatement(StatementSyntax statement)
@@ -57,8 +57,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             InferExpressionType(variableDeclaration.Initializer);
 
             DataType type;
-            if (variableDeclaration.TypeExpression != null)
-                type = typeAnalyzer.Check(variableDeclaration.TypeExpression);
+            if (variableDeclaration.TypeSyntax != null)
+                type = typeAnalyzer.Evaluate(variableDeclaration.TypeSyntax);
             else if (variableDeclaration.Initializer != null)
             {
                 type = variableDeclaration.Initializer.Type;
@@ -322,30 +322,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             typeError = operandType != DataType.Bool;
                             unaryOperatorExpression.Type = DataType.Bool;
                             break;
-                        //case UnaryOperator.At:
-                        //    typeError = false; // TODO check that the expression can have a pointer taken
-                        //                       //if (operandType is Metatype)
-                        //                       //    unaryOperatorExpression.Type = DataType.Type; // constructing a type
-                        //                       //else
-                        //    unaryOperatorExpression.Type = new PointerType(operandType); // taking the address of something
-                        //    break;
                         case UnaryOperator.Question:
                             typeError = false; // TODO check that the expression can have a pointer taken
                             unaryOperatorExpression.Type = new OptionalType(operandType);
                             break;
-                        //case UnaryOperator.Caret:
-                        //    switch (operandType)
-                        //    {
-                        //        case PointerType pointerType:
-                        //            unaryOperatorExpression.Type = pointerType.Referent;
-                        //            typeError = false;
-                        //            break;
-                        //        default:
-                        //            unaryOperatorExpression.Type = DataType.Unknown;
-                        //            typeError = true;
-                        //            break;
-                        //    }
-                        //    break;
                         case UnaryOperator.Minus:
                         case UnaryOperator.Plus:
                             switch (operandType)
@@ -382,7 +362,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 {
                     var argumentTypes = newObjectExpression.Arguments.Select(InferArgumentType).ToFixedList();
                     // TODO handle named constructors here
-                    var constructingType = typeAnalyzer.Check(newObjectExpression.Constructor);
+                    var constructingType = typeAnalyzer.Evaluate(newObjectExpression.Constructor);
                     if (!constructingType.IsKnown)
                     {
                         diagnostics.Add(NameBindingError.CouldNotBindConstructor(file, newObjectExpression.Span));
@@ -421,19 +401,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
                     return newObjectExpression.Type = constructedType.AsOwnedUpgradable();
                 }
-                //case PlacementInitExpressionSyntax placementInitExpression:
-                //{
-                //    foreach (var argument in placementInitExpression.Arguments)
-                //        InferArgumentType(argument);
-
-                //    // TODO verify argument types against called function
-
-                //    return placementInitExpression.Type =
-                //        typeAnalyzer.Check(placementInitExpression.Initializer);
-                //}
                 case ForeachExpressionSyntax foreachExpression:
                 {
-                    var declaredType = typeAnalyzer.Check(foreachExpression.TypeExpression);
+                    var declaredType = typeAnalyzer.Evaluate(foreachExpression.TypeSyntax);
                     CheckForeachInType(declaredType, foreachExpression.InExpression);
                     foreachExpression.VariableType =
                         declaredType ?? foreachExpression.InExpression.Type;
@@ -487,27 +457,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case UnsafeExpressionSyntax unsafeExpression:
                     InferExpressionType(unsafeExpression.Expression);
                     return unsafeExpression.Type = unsafeExpression.Expression.Type;
-                case MutableExpressionSyntax mutableExpression:
-                {
-                    var expressionType = InferExpressionType(mutableExpression.Expression);
-                    DataType type;
+                //case MutableTypeSyntax mutableExpression:
+                //{
+                //    var expressionType = InferExpressionType(mutableExpression.Referent);
+                //    DataType type;
 
-                    switch (expressionType)
-                    {
-                        // If it is already mutable we can't redeclare it mutable (i.e. `mut mut x` is error)
-                        case UserObjectType objectType
-                            when objectType.Mutability.IsUpgradable:
-                            type = objectType.AsMutable();
-                            break;
-                        default:
-                            diagnostics.Add(TypeError.ExpressionCantBeMutable(file,
-                                mutableExpression.Expression));
-                            type = expressionType;
-                            break;
-                    }
-                   
-                    return mutableExpression.Type = type;
-                }
+                //    switch (expressionType)
+                //    {
+                //        // If it is already mutable we can't redeclare it mutable (i.e. `mut mut x` is error)
+                //        case UserObjectType objectType
+                //            when objectType.Mutability.IsUpgradable:
+                //            type = objectType.AsMutable();
+                //            break;
+                //        default:
+                //            diagnostics.Add(TypeError.ExpressionCantBeMutable(file,
+                //                mutableExpression.Referent));
+                //            type = expressionType;
+                //            break;
+                //    }
+
+                //    return mutableExpression.Type = type;
+                //}
                 case IfExpressionSyntax ifExpression:
                     CheckExpressionType(ifExpression.Condition, DataType.Bool);
                     InferExpressionType(ifExpression.ThenBlock);
@@ -568,8 +538,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case ImplicitConversionExpression _:
                     throw new Exception("ImplicitConversionExpressions are inserted by BasicExpressionAnalyzer. They should not be present in the AST yet.");
                 case LifetimeExpressionSyntax _:
-                case ReferenceLifetimeSyntax _:
-                case SelfTypeExpressionSyntax _:
                     throw new Exception("Should be inferring type of type expression");
                 case null:
                     return DataType.Unknown;
@@ -714,7 +682,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         }
 
         private DataType AssignReferencedSymbolAndType(
-            NameSyntax identifier,
+            IdentifierNameSyntax identifier,
             FixedList<ISymbol> memberSymbols)
         {
             switch (memberSymbols.Count)
@@ -798,9 +766,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         //}
 
         // Re-expose type analyzer to BasicAnalyzer
-        public DataType CheckTypeExpression(ExpressionSyntax typeExpression)
+        public DataType EvaluateType(TypeSyntax typeSyntax)
         {
-            return typeAnalyzer.Check(typeExpression);
+            return typeAnalyzer.Evaluate(typeSyntax);
         }
 
         private void InferExpressionTypeInInvocation(ExpressionSyntax callee, FixedList<DataType> argumentTypes)

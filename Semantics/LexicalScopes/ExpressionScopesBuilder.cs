@@ -7,11 +7,12 @@ using Adamant.Tools.Compiler.Bootstrap.Scopes;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 {
-    public class ExpressionLexicalScopesBuilder : ExpressionVisitor<LexicalScope>
+    public class ExpressionScopesBuilder : ExpressionVisitor<LexicalScope>
     {
         public override void VisitBlock(BlockSyntax block, LexicalScope containingScope)
         {
-            if (block == null) return;
+            if (block == null)
+                return;
 
             foreach (var statement in block.Statements)
             {
@@ -33,10 +34,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 
         public override void VisitForeachExpression(ForeachExpressionSyntax foreachExpression, LexicalScope containingScope)
         {
-            VisitExpression(foreachExpression.TypeExpression, containingScope);
+            VisitType(foreachExpression.TypeSyntax, containingScope);
             VisitExpression(foreachExpression.InExpression, containingScope);
             containingScope = new NestedScope(containingScope, foreachExpression.Yield(), Enumerable.Empty<ISymbol>());
             VisitExpression(foreachExpression.Block, containingScope);
+        }
+
+        public override void VisitTypeName(TypeNameSyntax typeName, LexicalScope containingScope)
+        {
+            typeName.ContainingScope = containingScope;
         }
     }
 }

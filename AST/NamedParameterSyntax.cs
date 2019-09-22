@@ -5,26 +5,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class NamedParameterSyntax : ParameterSyntax
     {
-        public ExpressionSyntax TypeExpression { get; }
+        public TypeSyntax TypeSyntax { get; }
         public ExpressionSyntax DefaultValue { get; }
 
         public NamedParameterSyntax(
             TextSpan span,
-            //bool isParams,
             bool isMutableBinding,
             Name fullName,
-            ExpressionSyntax typeExpression,
+            TypeSyntax typeSyntax,
             ExpressionSyntax defaultValue)
             : base(span, isMutableBinding, fullName)
         {
-            TypeExpression = typeExpression;
+            TypeSyntax = typeSyntax;
             DefaultValue = defaultValue;
         }
 
         public override string ToString()
         {
             var defaultValue = DefaultValue != null ? " = " + DefaultValue : "";
-            return $"{Name}: {TypeExpression}{defaultValue}";
+            return $"{Name}: {TypeSyntax}{defaultValue}";
         }
     }
 }

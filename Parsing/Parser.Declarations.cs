@@ -45,27 +45,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         public IEnumerable<DeclarationSyntax> ParseDeclaration()
         {
-            //var attributes = ParseAttributes();
             var modifiers = AcceptMany(Tokens.AcceptToken<IModiferToken>);
 
             switch (Tokens.Current)
             {
                 case INamespaceKeywordToken _:
-                    return ParseNamespaceDeclaration(/*attributes,*/ modifiers).Yield();
+                    return ParseNamespaceDeclaration(modifiers).Yield();
                 case IClassKeywordToken _:
-                    return ParseClass(/*attributes,*/ modifiers).Yield();
-                //case ITraitKeywordToken _:
-                //    return ParseTrait(attributes, modifiers).Yield();
-                //case IStructKeywordToken _:
-                //    return ParseStruct(attributes, modifiers).Yield();
-                //case IEnumKeywordToken _:
-                //    return ParseEnum(attributes, modifiers).Yield();
+                    return ParseClass(modifiers).Yield();
                 case IFunctionKeywordToken _:
-                    return ParseNamedFunction(/*attributes,*/ modifiers).Yield();
-                //case IConstKeywordToken _:
-                //    return ParseConst(attributes, modifiers).Yield();
-                //case IExternalKeywordToken _:
-                //    return ParseExternalBlock(attributes, modifiers);
+                    return ParseNamedFunction(modifiers).Yield();
                 default:
                     Tokens.UnexpectedToken();
                     throw new ParseFailedException();
@@ -87,39 +76,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         public MemberDeclarationSyntax ParseMemberDeclaration()
         {
-            //var attributes = ParseAttributes();
             var modifiers = AcceptMany(Tokens.AcceptToken<IModiferToken>);
 
             switch (Tokens.Current)
             {
                 case IClassKeywordToken _:
-                    return ParseClass(/*attributes,*/ modifiers);
-                //case ITraitKeywordToken _:
-                //    return ParseTrait(attributes, modifiers);
-                //case IStructKeywordToken _:
-                //    return ParseStruct(attributes, modifiers);
-                //case IEnumKeywordToken _:
-                //    return ParseEnum(attributes, modifiers);
+                    return ParseClass(modifiers);
                 case IFunctionKeywordToken _:
-                    return ParseNamedFunction(/*attributes,*/ modifiers);
-                //case IOperatorKeywordToken _:
-                //    return ParseOperator(attributes, modifiers);
+                    return ParseNamedFunction(modifiers);
                 case INewKeywordToken _:
-                    return ParseConstructor(/*attributes,*/ modifiers);
-                //case IInitKeywordToken _:
-                //    return ParseInitializer(attributes, modifiers);
-                //case IDeleteKeywordToken _:
-                //    return ParseDestructor(attributes, modifiers);
-                //case IGetKeywordToken _:
-                //    return ParseGetter(attributes, modifiers);
-                //case ISetKeywordToken _:
-                //    return ParseSetter(attributes, modifiers);
+                    return ParseConstructor(modifiers);
                 case ILetKeywordToken _:
-                    return ParseField(false,/* attributes,*/ modifiers);
+                    return ParseField(false, modifiers);
                 case IVarKeywordToken _:
-                    return ParseField(true, /*attributes,*/ modifiers);
-                //case IConstKeywordToken _:
-                //    return ParseConst(attributes, modifiers);
+                    return ParseField(true, modifiers);
                 default:
                     Tokens.UnexpectedToken();
                     throw new ParseFailedException();
@@ -128,7 +98,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         #region Parse Namespaces
         public NamespaceDeclarationSyntax ParseNamespaceDeclaration(
-             //FixedList<AttributeSyntax> attributes,
              FixedList<IModiferToken> modifiers)
         {
             // TODO generate errors for attributes or modifiers
@@ -167,55 +136,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         #endregion
 
         #region Parse Type Parts
-        //private FixedList<AttributeSyntax> ParseAttributes()
-        //{
-        //    var attributes = new List<AttributeSyntax>();
-        //    // Take modifiers until null
-        //    while (AcceptAttribute() is AttributeSyntax attribute)
-        //        attributes.Add(attribute);
-        //    return attributes.ToFixedList();
-        //}
-
-        //private AttributeSyntax AcceptAttribute()
-        //{
-        //    if (!Tokens.Accept<IHashHashToken>())
-        //        return null;
-        //    var name = ParseName();
-        //    FixedList<ArgumentSyntax> arguments = null;
-        //    if (Tokens.Accept<IOpenParenToken>())
-        //    {
-        //        arguments = ParseArguments();
-        //        Tokens.Expect<ICloseParenToken>();
-        //    }
-        //    return new AttributeSyntax(name, arguments);
-        //}
-
-        //private ExpressionSyntax AcceptBaseClass()
-        //{
-        //    if (!Tokens.Accept<IColonToken>())
-        //        return null;
-        //    return ParseExpression();
-        //}
-
-        //private FixedList<ExpressionSyntax> AcceptBaseTypes()
-        //{
-        //    if (!Tokens.Accept<ILessThanColonToken>())
-        //        return null;
-        //    return AcceptOneOrMore<ExpressionSyntax, ICommaToken>(ParseExpression);
-        //}
-
-        //private FixedList<ExpressionSyntax> ParseInvariants()
-        //{
-        //    return AcceptMany(AcceptInvariant);
-        //}
-
-        //private ExpressionSyntax AcceptInvariant()
-        //{
-        //    if (!Tokens.Accept<IInvariantKeywordToken>())
-        //        return null;
-        //    return ParseExpression();
-        //}
-
         private FixedList<MemberDeclarationSyntax> ParseMemberDeclarations()
         {
             return ParseMany<MemberDeclarationSyntax, ICloseBraceToken>(ParseMemberDeclaration);
@@ -246,28 +166,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         #region Parse Type Member Declarations
         private FieldDeclarationSyntax ParseField(
             bool mutableBinding,
-            //FixedList<AttributeSyntax> attributes,
             FixedList<IModiferToken> modifiers)
         {
             // We should only be called when there is a binding keyword
             Tokens.Expect<IBindingToken>();
-            //var getterAccess = AcceptFieldGetter();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(identifier.Value);
-            ExpressionSyntax typeExpression = null;
+            TypeSyntax type = null;
             if (Tokens.Accept<IColonToken>())
             {
                 // Need to not consume the assignment that separates the type from the initializer,
                 // hence the min operator precedence.
-                typeExpression = ParseExpression(OperatorPrecedence.AboveAssignment);
+                type = ParseType();
             }
             ExpressionSyntax initializer = null;
             if (Tokens.Accept<IEqualsToken>())
                 initializer = ParseExpression();
 
             Tokens.Expect<ISemicolonToken>();
-            return new FieldDeclarationSyntax(File, /*attributes,*/ modifiers, mutableBinding, /*getterAccess,*/ name,
-                identifier.Span, typeExpression, initializer);
+            return new FieldDeclarationSyntax(File, modifiers, mutableBinding, name,
+                identifier.Span, type, initializer);
         }
         #endregion
 
@@ -281,9 +199,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var bodyParser = NestedParser(name);
             var parameters = bodyParser.ParseParameters();
             var lifetimeBounds = bodyParser.ParseLifetimeBounds();
-            ExpressionSyntax returnType = null;
+            TypeSyntax returnType = null;
             if (Tokens.Accept<IRightArrowToken>())
-                returnType = ParseExpression();
+                returnType = ParseType();
             var body = bodyParser.ParseFunctionBody();
             return new NamedFunctionDeclarationSyntax(File, modifiers, name, identifier.Span,
                 parameters, lifetimeBounds, returnType, body);

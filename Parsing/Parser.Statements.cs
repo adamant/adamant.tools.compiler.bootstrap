@@ -13,15 +13,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IOpenBraceToken _:
                     return ParseBlock();
                 case ILetKeywordToken _:
-                {
                     Tokens.Expect<IBindingToken>();
                     return ParseRestOfVariableDeclaration(false);
-                }
                 case IVarKeywordToken _:
-                {
                     Tokens.Expect<IBindingToken>();
                     return ParseRestOfVariableDeclaration(true);
-                }
                 case IForeachKeywordToken _:
                     return ParseForeach();
                 case IWhileKeywordToken _:
@@ -30,16 +26,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     return ParseLoop();
                 case IIfKeywordToken _:
                     return ParseIf(ParseAs.Statement);
-                //case IMatchKeywordToken _:
-                //    return ParseMatch();
                 case IUnsafeKeywordToken _:
                     return ParseUnsafeExpression(ParseAs.Statement);
                 default:
-                {
                     var expression = ParseExpression();
                     Tokens.Expect<ISemicolonToken>();
                     return expression;
-                }
             }
         }
 
@@ -48,11 +40,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(variableNumbers.VariableName(identifier.Value));
-            ExpressionSyntax type = null;
+            TypeSyntax type = null;
             if (Tokens.Accept<IColonToken>())
-                // Need to not consume the assignment that separates the type from the initializer,
-                // hence the min operator precedence.
-                type = ParseExpression(OperatorPrecedence.AboveAssignment);
+                type = ParseType();
 
             ExpressionSyntax initializer = null;
             if (Tokens.Accept<IEqualsToken>())
@@ -88,17 +78,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         public ExpressionBlockSyntax ParseExpressionBlock()
         {
-            switch (Tokens.Current)
-            {
-                case IOpenBraceToken _:
-                    return ParseBlock();
-                case IEqualsGreaterThanToken _:
-                default:
-                    var equalsGreaterThan = Tokens.Expect<IEqualsGreaterThanToken>();
-                    var expression = ParseExpression();
-                    var span = TextSpan.Covering(equalsGreaterThan, expression.Span);
-                    return new ResultExpressionSyntax(span, expression);
-            }
+            if (Tokens.Current is IOpenBraceToken)
+                return ParseBlock();
+
+            var equalsGreaterThan = Tokens.Expect<IEqualsGreaterThanToken>();
+            var expression = ParseExpression();
+            var span = TextSpan.Covering(equalsGreaterThan, expression.Span);
+            return new ResultExpressionSyntax(span, expression);
         }
     }
 }

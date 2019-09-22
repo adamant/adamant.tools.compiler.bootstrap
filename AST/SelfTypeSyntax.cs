@@ -2,9 +2,9 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class SelfTypeExpressionSyntax : TypeSyntax
+    public class SelfTypeSyntax : TypeSyntax
     {
-        public SelfTypeExpressionSyntax(TextSpan span)
+        public SelfTypeSyntax(TextSpan span)
             : base(span)
         {
         }
