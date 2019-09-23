@@ -308,7 +308,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return binaryOperatorExpression.Type;
                 }
                 case NameSyntax identifierName:
-                    return InferIdentifierNameType(identifierName, false);
+                    return InferNameType(identifierName, false);
                 case UnaryExpressionSyntax unaryOperatorExpression:
                 {
                     var operandType = InferExpressionType(ref unaryOperatorExpression.Operand);
@@ -371,7 +371,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     }
                     var constructedType = (UserObjectType)constructingType;
                     var typeSymbol = GetSymbolForType(constructedType);
-                    var constructors = typeSymbol.ChildSymbols[SpecialName.New];
+                    var constructors = typeSymbol.ChildSymbols[SpecialName.New].OfType<IFunctionSymbol>().ToFixedList();
                     constructors = ResolveOverload(constructors, null, argumentTypes);
                     switch (constructors.Count)
                     {
@@ -432,7 +432,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     // * Invoke a function pointer
                     var argumentTypes = methodInvocation.Arguments.Select(InferArgumentType).ToFixedList();
                     InferExpressionType(ref methodInvocation.Target);
-                    var callee = methodInvocation.Target.Type;
+                    var targetType = methodInvocation.Target.Type;
 
                     //if (callee is FunctionType functionType)
                     //{
@@ -447,16 +447,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     //}
 
                     // If it is unknown, we already reported an error
-                    if (callee == DataType.Unknown)
+                    if (targetType == DataType.Unknown)
                         return methodInvocation.Type = DataType.Unknown;
 
                     diagnostics.Add(TypeError.MustBeCallable(file, methodInvocation.Target));
                     return methodInvocation.Type = DataType.Unknown;
                 }
                 case AssociatedFunctionInvocationSyntax associatedFunctionInvocation:
+
                     throw new NotImplementedException();
                 case FunctionInvocationSyntax functionInvocation:
-                    throw new NotImplementedException();
+                    return InferFunctionInvocationType(functionInvocation);
                 case UnsafeExpressionSyntax unsafeExpression:
                     InferExpressionType(ref unsafeExpression.Expression);
                     return unsafeExpression.Type = unsafeExpression.Expression.Type;
@@ -564,6 +565,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
         }
 
+        private DataType InferFunctionInvocationType(FunctionInvocationSyntax functionInvocation)
+        {
+            var argumentTypes = functionInvocation.Arguments.Select(InferArgumentType).ToFixedList();
+            var symbols = functionInvocation.FunctionNameSyntax.LookupInContainingScope()
+                .OfType<IFunctionSymbol>().ToFixedList();
+            symbols = ResolveOverload(symbols, null, argumentTypes);
+            var functionSymbol = symbols.Single();
+            functionInvocation.FunctionNameSyntax.ReferencedSymbol = functionSymbol;
+            foreach (var (arg, parameter) in functionInvocation.Arguments.Zip(functionSymbol.Parameters))
+            {
+                InsertImplicitConversionIfNeeded(ref arg.Value, parameter.Type);
+                CheckArgumentTypeCompatibility(parameter.Type, arg);
+            }
+
+            return functionInvocation.Type = functionSymbol.ReturnType;
+        }
+
         private DataType InferBlockType(IBlockOrResultSyntax blockOrResult)
         {
             switch (blockOrResult)
@@ -580,7 +598,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
         }
 
-        public DataType InferIdentifierNameType(NameSyntax name, bool isMove)
+        public DataType InferNameType(NameSyntax name, bool isMove)
         {
             var symbols = name.LookupInContainingScope();
             DataType type;
@@ -634,7 +652,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             switch (expression)
             {
                 case NameSyntax identifierName:
-                    return InferIdentifierNameType(identifierName, true);
+                    return InferNameType(identifierName, true);
                 default:
                     throw new NotImplementedException("Tried to move out of expression type that isn't implemented");
             }
@@ -696,7 +714,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             return false;
         }
 
-        private static ISymbol GetSymbolForType(DataType type)
+        private static ITypeSymbol GetSymbolForType(DataType type)
         {
             switch (type)
             {
@@ -705,9 +723,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case UserObjectType objectType:
                     return objectType.Symbol;
                 case SizedIntegerType integerType:
-                    return PrimitiveSymbols.Instance.Single(p => p.FullName == integerType.Name);
+                    return PrimitiveSymbols.Instance.OfType<ITypeSymbol>().Single(p => p.FullName == integerType.Name);
                 case UnsizedIntegerType integerType:
-                    return PrimitiveSymbols.Instance.Single(p => p.FullName == integerType.Name);
+                    return PrimitiveSymbols.Instance.OfType<ITypeSymbol>().Single(p => p.FullName == integerType.Name);
                 default:
                     throw new NotImplementedException();
             }
@@ -827,7 +845,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         //    }
         //}
 
-        private FixedList<ISymbol> ResolveOverload(FixedList<ISymbol> symbols, DataType selfType, FixedList<DataType> argumentTypes)
+        private FixedList<IFunctionSymbol> ResolveOverload(
+            FixedList<IFunctionSymbol> symbols,
+            DataType selfType,
+            FixedList<DataType> argumentTypes)
         {
             // Filter down to symbols that could possible match
             symbols = symbols.Where(s =>

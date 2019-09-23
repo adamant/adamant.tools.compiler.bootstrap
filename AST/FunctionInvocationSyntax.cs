@@ -1,17 +1,19 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class FunctionInvocationSyntax : InvocationSyntax
     {
-        internal FunctionInvocationSyntax(
+        public NameSyntax FunctionNameSyntax { get; }
+
+        public FunctionInvocationSyntax(
             TextSpan span,
-            Name functionName,
+            NameSyntax functionNameSyntax,
             FixedList<ArgumentSyntax> arguments)
-            : base(span, functionName, arguments)
+            : base(span, functionNameSyntax.Name, arguments)
         {
+            FunctionNameSyntax = functionNameSyntax;
         }
 
         public override string ToString()

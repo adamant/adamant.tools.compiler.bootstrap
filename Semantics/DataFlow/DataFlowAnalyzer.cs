@@ -66,7 +66,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
             }
         }
 
-        public override void VisitIdentifierName(NameSyntax name, Void args)
+        public override void VisitName(NameSyntax name, Void args)
         {
             currentState = checker.IdentifierName(name, currentState);
         }

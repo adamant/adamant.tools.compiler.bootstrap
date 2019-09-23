@@ -15,13 +15,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     // supplied is *partially constructed type*.
     public class UserObjectType : ObjectType, IEquatable<UserObjectType>
     {
-        public ISymbol Symbol { get; }
+        public ITypeSymbol Symbol { get; }
 
         // TODO for IsKnown, deal with the generic parameters and arguments
         public override bool IsKnown => true;
 
         private UserObjectType(
-            ISymbol symbol,
+            ITypeSymbol symbol,
             bool declaredMutable,
             Mutability mutability,
             Lifetime lifetime)
@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         }
 
         public static UserObjectType Declaration(
-            ISymbol symbol,
+            ITypeSymbol symbol,
             bool mutable)
         {
             return new UserObjectType(

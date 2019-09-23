@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             }
         }
 
-        public override void VisitIdentifierName(
+        public override void VisitName(
             NameSyntax name,
             LexicalScope containingScope)
         {

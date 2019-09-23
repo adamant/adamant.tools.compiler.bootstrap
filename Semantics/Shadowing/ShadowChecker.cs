@@ -70,7 +70,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
             }
         }
 
-        public override void VisitIdentifierName(NameSyntax name, BindingScope bindingScope)
+        public override void VisitName(NameSyntax name, BindingScope bindingScope)
         {
             if (!bindingScope.Lookup(name.Name, out var binding))
                 return;

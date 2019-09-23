@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public TypeSyntax TypeSyntax { get; }
         public SimpleName AssociatedFunctionName { get; }
 
-        internal AssociatedFunctionInvocationSyntax(
+        public AssociatedFunctionInvocationSyntax(
             TextSpan span,
             TypeSyntax typeSyntax,
             SimpleName associatedFunctionName,

@@ -47,7 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                     VisitLiteralExpression(literalExpression, args);
                     break;
                 case NameSyntax identifierName:
-                    VisitIdentifierName(identifierName, args);
+                    VisitName(identifierName, args);
                     break;
                 case UnaryExpressionSyntax unaryExpression:
                     VisitUnaryExpression(unaryExpression, args);
@@ -109,6 +109,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         {
             switch (type)
             {
+                default:
+                    throw ExhaustiveMatch.Failed(type);
+                case null:
+                    // Do nothing
+                    break;
                 case TypeNameSyntax typeName:
                     VisitTypeName(typeName, args);
                     break;
@@ -121,8 +126,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case SelfTypeSyntax selfType:
                     VisitSelfType(selfType, args);
                     break;
-                default:
-                    throw ExhaustiveMatch.Failed(type);
             }
         }
 
@@ -313,7 +316,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             VisitExpression(unaryExpression.Operand, args);
         }
 
-        public virtual void VisitIdentifierName(NameSyntax name, A args)
+        public virtual void VisitName(NameSyntax name, A args)
         {
         }
 
@@ -341,6 +344,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 
         public void VisitFunctionInvocation(FunctionInvocationSyntax functionInvocation, A args)
         {
+            VisitName(functionInvocation.FunctionNameSyntax, args);
             foreach (var argument in functionInvocation.Arguments)
                 VisitArgument(argument, args);
         }

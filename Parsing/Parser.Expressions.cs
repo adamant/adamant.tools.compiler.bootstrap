@@ -143,18 +143,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                             continue;
                         }
                         break;
-                    case IOpenParenToken _:
-                        if (minPrecedence <= OperatorPrecedence.Primary)
-                        {
-                            var callee = expression;
-                            Tokens.RequiredToken<IOpenParenToken>();
-                            var arguments = ParseArguments();
-                            var closeParenSpan = Tokens.Expect<ICloseParenToken>();
-                            var span = TextSpan.Covering(callee.Span, closeParenSpan);
-                            expression = new MethodInvocationSyntax(span, callee, null, arguments);
-                            continue;
-                        }
-                        break;
+                    //case IOpenParenToken _:
+                    //    if (minPrecedence <= OperatorPrecedence.Primary)
+                    //    {
+                    //        var callee = expression;
+                    //        Tokens.RequiredToken<IOpenParenToken>();
+                    //        var arguments = ParseArguments();
+                    //        var closeParenSpan = Tokens.Expect<ICloseParenToken>();
+                    //        var span = TextSpan.Covering(callee.Span, closeParenSpan);
+                    //        expression = new MethodInvocationSyntax(span, callee, null, arguments);
+                    //        continue;
+                    //    }
+                    //    break;
                     case IDotToken _:
                     case IQuestionDotToken _:
                         if (minPrecedence <= OperatorPrecedence.Primary)
@@ -327,7 +327,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     return new NoneLiteralExpressionSyntax(literal);
                 }
                 case IIdentifierToken _:
-                    return ParseSimpleName();
+                {
+                    var name = ParseSimpleName();
+                    if (!(Tokens.Current is IOpenParenToken))
+                        return name;
+                    Tokens.RequiredToken<IOpenParenToken>();
+                    var arguments = ParseArguments();
+                    var closeParenSpan = Tokens.Expect<ICloseParenToken>();
+                    var span = TextSpan.Covering(name.Span, closeParenSpan);
+                    return new FunctionInvocationSyntax(span, name, arguments);
+                }
                 case IForeachKeywordToken _:
                     return ParseForeach();
                 case IWhileKeywordToken _:

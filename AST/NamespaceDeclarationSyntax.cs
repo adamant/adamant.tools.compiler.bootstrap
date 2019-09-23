@@ -14,6 +14,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public bool InGlobalNamespace { get; }
         public Name Name { get; }
         public Name FullName { get; }
+        /// <summary>
+        /// The name context is the part of the namespace determined by the file
+        /// location and any containing namespace declarations.
+        /// </summary>
         public RootName NameContext { get; }
         public FixedList<UsingDirectiveSyntax> UsingDirectives { get; }
         public FixedList<DeclarationSyntax> Declarations { get; }
