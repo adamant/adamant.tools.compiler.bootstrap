@@ -42,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             var typeName = Name.From("String");
             var concatName = typeName.Qualify("concat");
             var concatFunc = Function.New(concatName);
-            var literalConstructor = Function.New(typeName.Qualify(SpecialName.New),
+            var literalConstructor = Function.New(typeName.Qualify(SpecialName.New), ("size", DataType.Size),
                 ("value", DataType.StringConstant));
             var symbols = new List<ISymbol>()
             {

@@ -536,20 +536,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     throw new NotImplementedException();
                 case UnsafeExpressionSyntax unsafeExpression:
                     return ConvertToValue(unsafeExpression.Expression);
-                case ImplicitLiteralConversionExpression implicitLiteralConversion:
+                case ImplicitStringLiteralConversionExpression implicitLiteralConversion:
                 {
                     var conversionFunction = implicitLiteralConversion.ConversionFunction;
-                    var literal =
-                        (StringLiteralExpressionSyntax)implicitLiteralConversion.Expression;
-                    //var constantLength = Utf8BytesConstant.Encoding.GetByteCount(literal.Value);
-                    //var sizeArgument = new IntegerConstant(constantLength, DataType.Size, literal.Span);
-                    //var bytesArgument = new Utf8BytesConstant(literal.Value, literal.Span);
-                    //return new FunctionCall(implicitLiteralConversion.Span,
-                    //    conversionFunction.FullName,
-                    //    //(FunctionType)conversionFunction.Type,
-                    //    sizeArgument,
-                    //    bytesArgument);
-                    throw new NotImplementedException();
+                    var literal = implicitLiteralConversion.Expression;
+                    var constantLength = StringConstant.Encoding.GetByteCount(literal.Value);
+                    var sizeArgument = new IntegerConstant(constantLength, DataType.Size, literal.Span);
+                    var bytesArgument = new StringConstant(literal.Value, literal.Span);
+                    return new FunctionCall(implicitLiteralConversion.Span,
+                        conversionFunction.FullName,
+                        sizeArgument,
+                        bytesArgument);
                 }
                 case ImplicitNoneConversionExpression implicitNoneConversion:
                     return new NoneConstant(implicitNoneConversion.ConvertToType,

@@ -1,4 +1,4 @@
-﻿#include "RuntimeLibrary.h"
+#include "RuntimeLibrary.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -46,7 +46,7 @@ EXTERN_INTEGER_OPERATIONS(_size)
 EXTERN_INTEGER_OPERATIONS(_offset)
 
 // `String` type
-extern String String___op_string_literal__2(_size count, _byte* bytes);
+extern String String___new__2(_size count, _byte* bytes);
 _bool String___op_equals__2(String left, String right)
 {
     if(left.byte_count._value != right.byte_count._value)

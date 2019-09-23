@@ -1,4 +1,4 @@
-﻿#include <stdint.h>
+#include <stdint.h>
 
 // Rather than including all of stdlib.h we only declare the things we need.
 void* malloc(size_t size);
@@ -68,7 +68,7 @@ typedef struct
     _byte* bytes;
 } String;
 
-inline String String___op_string_literal__2(_size byte_count, _byte* bytes)
+inline String String___new__2(_size byte_count, _byte* bytes)
 {
     return (String) { byte_count, bytes };
 }

@@ -7,14 +7,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     /// This kind of conversion is inserted when there is an implicit conversion
     /// from a literal to some data type.
     /// </summary>
-    public class ImplicitLiteralConversionExpression : ImplicitConversionExpression
+    public class ImplicitStringLiteralConversionExpression : ImplicitConversionExpression
     {
-        public ExpressionSyntax Expression { get; }
+        public StringLiteralExpressionSyntax Expression { get; }
         public DataType ConvertToType { get; }
         public ISymbol ConversionFunction { get; }
 
-        public ImplicitLiteralConversionExpression(
-            ExpressionSyntax expression,
+        public ImplicitStringLiteralConversionExpression(
+            StringLiteralExpressionSyntax expression,
             DataType convertToType,
             ISymbol conversionFunction)
             : base(expression.Span, convertToType)

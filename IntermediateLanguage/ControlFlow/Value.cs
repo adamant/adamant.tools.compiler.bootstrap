@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
@@ -8,6 +9,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     /// of an assignment.
     /// </summary>
     [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
+    [Closed(
+        typeof(BinaryOperation),
+        typeof(Constant),
+        typeof(ConstructSome),
+        typeof(FieldAccess),
+        typeof(FunctionCall),
+        typeof(ConstructorCall),
+        typeof(VirtualFunctionCall),
+        typeof(DeclaredValue),
+        typeof(Dereference),
+        typeof(UnaryOperation),
+        typeof(VariableReference))]
     public abstract class Value : IValue
     {
         public TextSpan Span { get; }

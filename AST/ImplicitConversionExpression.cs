@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(ImplicitOptionalConversionExpression),
         typeof(ImplicitNoneConversionExpression),
         typeof(ImplicitImmutabilityConversionExpression),
-        typeof(ImplicitLiteralConversionExpression))]
+        typeof(ImplicitStringLiteralConversionExpression))]
     public abstract class ImplicitConversionExpression : ExpressionSyntax
     {
         protected ImplicitConversionExpression(TextSpan span, DataType convertToType)

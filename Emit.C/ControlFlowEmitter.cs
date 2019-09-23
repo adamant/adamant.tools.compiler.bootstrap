@@ -115,10 +115,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             switch (value)
             {
+                default:
+                    throw ExhaustiveMatch.Failed(value);
                 case IntegerConstant integer:
                     return $"({ConvertType(integer.Type)}){{{integer.Value}}}";
-                //case Utf8BytesConstant utf8BytesConstant:
-                //    return $"((_byte*)u8\"{utf8BytesConstant.Value.Escape()}\")";
+                case StringConstant stringConstant:
+                    return $"((_byte*)u8\"{stringConstant.Value.Escape()}\")";
                 case BooleanConstant boolean:
                     var booleanValue = boolean.Value ? 1 : 0;
                     return $"({ConvertType(boolean.Type)}){{{booleanValue}}}";
@@ -235,8 +237,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     }
                     throw new NotImplementedException();
                 }
-                default:
-                    throw NonExhaustiveMatchException.For(value);
+                case UnaryOperation _:
+                    throw new NotImplementedException();
             }
         }
 

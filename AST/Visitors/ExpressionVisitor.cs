@@ -172,8 +172,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case ImplicitNumericConversionExpression implicitNumericConversionExpression:
                     VisitImplicitNumericConversionExpression(implicitNumericConversionExpression, args);
                     break;
-                case ImplicitLiteralConversionExpression implicitLiteralConversionExpression:
-                    VisitImplicitLiteralConversionExpression(implicitLiteralConversionExpression, args);
+                case ImplicitStringLiteralConversionExpression implicitLiteralConversionExpression:
+                    VisitImplicitStringLiteralConversionExpression(implicitLiteralConversionExpression, args);
                     break;
                 case ImplicitImmutabilityConversionExpression implicitImmutabilityConversionExpression:
                     VisitImplicitImmutabilityConversionExpression(implicitImmutabilityConversionExpression, args);
@@ -207,9 +207,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             VisitExpression(implicitImmutabilityConversionExpression.Expression, args);
         }
 
-        public virtual void VisitImplicitLiteralConversionExpression(ImplicitLiteralConversionExpression implicitLiteralConversionExpression, A args)
+        public virtual void VisitImplicitStringLiteralConversionExpression(ImplicitStringLiteralConversionExpression implicitStringLiteralConversionExpression, A args)
         {
-            VisitExpression(implicitLiteralConversionExpression.Expression, args);
+            VisitExpression(implicitStringLiteralConversionExpression.Expression, args);
         }
 
         public virtual void VisitImplicitNumericConversionExpression(ImplicitNumericConversionExpression implicitNumericConversionExpression, A args)

@@ -180,8 +180,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     if (symbol.FullName.Equals(Name.From("String")))
                     {
                         var stringConstructor = symbol.ChildSymbols[SpecialName.New]
-                            .Cast<IFunctionSymbol>().Single(c => c.Parameters.Count() == 1);
-                        expression = new ImplicitLiteralConversionExpression(expression, targetType,
+                            .Cast<IFunctionSymbol>()
+                            .Single(c =>
+                            {
+                                var parameters = c.Parameters.ToFixedList();
+                                return parameters.Count == 2
+                                       && parameters[0].Type == DataType.Size
+                                       && parameters[1].Type == DataType.StringConstant;
+                            });
+                        expression = new ImplicitStringLiteralConversionExpression((StringLiteralExpressionSyntax)expression, targetType,
                             stringConstructor);
                     }
                     else
