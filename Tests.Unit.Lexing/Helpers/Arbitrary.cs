@@ -240,7 +240,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             { "=>", typeof(IEqualsGreaterThanToken) },
             //{ "#", typeof(IHashToken) },
             //{ "##", typeof(IHashHashToken) },
-            //{ "published", typeof(IPublishedKeywordToken) },
+            { "published", typeof(IPublishedKeywordToken) },
             { "public", typeof(IPublicKeywordToken) },
             //{ "protected", typeof(IProtectedKeywordToken) },
             { "let", typeof(ILetKeywordToken) },

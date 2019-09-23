@@ -9,6 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     {
         private static readonly IReadOnlyList<Type> Keyword = new List<Type>()
         {
+            typeof(PublishedKeywordToken),
             typeof(PublicKeywordToken),
             typeof(LetKeywordToken),
             typeof(VarKeywordToken),
@@ -56,6 +57,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 
     public static partial class TokenFactory
     {
+        public static IPublishedKeywordToken PublishedKeyword(TextSpan span)
+        {
+            return new PublishedKeywordToken(span);
+        }
         public static IPublicKeywordToken PublicKeyword(TextSpan span)
         {
             return new PublicKeywordToken(span);
@@ -227,6 +232,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     }
 
     [Closed(
+        typeof(IPublishedKeywordToken),
         typeof(IPublicKeywordToken),
         typeof(ILetKeywordToken),
         typeof(IVarKeywordToken),
@@ -271,6 +277,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         typeof(INotKeywordToken))]
     public partial interface IKeywordToken : IToken { }
 
+
+    public partial interface IPublishedKeywordToken : IKeywordToken { }
+    internal partial class PublishedKeywordToken : Token, IPublishedKeywordToken
+    {
+        public PublishedKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
 
     public partial interface IPublicKeywordToken : IKeywordToken { }
     internal partial class PublicKeywordToken : Token, IPublicKeywordToken
