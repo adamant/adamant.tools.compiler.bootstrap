@@ -342,7 +342,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             }
         }
 
-        public void VisitFunctionInvocation(FunctionInvocationSyntax functionInvocation, A args)
+        public virtual void VisitFunctionInvocation(FunctionInvocationSyntax functionInvocation, A args)
         {
             VisitName(functionInvocation.FunctionNameSyntax, args);
             foreach (var argument in functionInvocation.Arguments)

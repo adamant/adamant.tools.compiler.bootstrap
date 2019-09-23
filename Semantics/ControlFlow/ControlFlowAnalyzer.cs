@@ -722,7 +722,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case AssociatedFunctionInvocationSyntax associatedFunctionInvocation:
                     throw new NotImplementedException();
                 case FunctionInvocationSyntax functionInvocation:
-                    throw new NotImplementedException();
+                    return ConvertInvocationToValue(functionInvocation);
             }
         }
 
@@ -766,6 +766,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 default:
                     throw NonExhaustiveMatchException.For(invocation.Target);
             }
+        }
+
+        private Value ConvertInvocationToValue(FunctionInvocationSyntax functionInvocation)
+        {
+            var functionSymbol = (IFunctionSymbol)functionInvocation.FunctionNameSyntax.ReferencedSymbol;
+            var arguments = functionInvocation.Arguments.Select(a => ConvertToOperand(a.Value)).ToList();
+            return new FunctionCall(functionSymbol.FullName, arguments, functionInvocation.Span);
         }
 
         private IPlace ConvertToPlace(ExpressionSyntax value)

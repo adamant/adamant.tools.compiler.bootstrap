@@ -78,5 +78,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
             base.VisitVariableDeclarationStatement(variableDeclaration, args);
             currentState = checker.VariableDeclaration(variableDeclaration, currentState);
         }
+
+        public override void VisitFunctionInvocation(FunctionInvocationSyntax functionInvocation, Void args)
+        {
+            // overriden to avoid visiting the function name
+            foreach (var argument in functionInvocation.Arguments)
+                VisitArgument(argument, args);
+        }
     }
 }
