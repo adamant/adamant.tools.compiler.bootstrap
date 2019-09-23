@@ -7,7 +7,10 @@ using Adamant.Tools.Compiler.Bootstrap.Scopes;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class IdentifierNameSyntax : ExpressionSyntax
+    /// <summary>
+    /// A name of a variable or namespace
+    /// </summary>
+    public class NameSyntax : ExpressionSyntax
     {
         public SimpleName Name { get; }
 
@@ -37,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             }
         }
 
-        public IdentifierNameSyntax(TextSpan span, SimpleName name)
+        public NameSyntax(TextSpan span, SimpleName name)
             : base(span)
         {
             Name = name;

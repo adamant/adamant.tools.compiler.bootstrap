@@ -20,11 +20,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         DataType ITypeSymbol.DeclaresType => DeclaresType.Fulfilled();
 
         protected TypeDeclarationSyntax(
+            TextSpan span,
             CodeFile file,
             TextSpan nameSpan,
             Name fullName,
             FixedList<MemberDeclarationSyntax> members)
-            : base(file, fullName, nameSpan, new SymbolSet(members))
+            : base(span, file, fullName, nameSpan, new SymbolSet(members))
         {
             Members = members;
             foreach (var member in Members)

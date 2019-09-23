@@ -112,27 +112,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 
         public virtual void VisitConstructorDeclaration(ConstructorDeclarationSyntax constructorDeclaration, A args)
         {
-            //if (constructorDeclaration.GenericParameters != null)
-            //    foreach (var genericParameter in constructorDeclaration.GenericParameters)
-            //        VisitGenericParameter(genericParameter, args);
-
             foreach (var parameter in constructorDeclaration.Parameters)
                 VisitParameter(parameter, args);
 
-            VisitExpression(constructorDeclaration.Body, args);
+            foreach (var statement in constructorDeclaration.Body)
+                VisitStatement(statement, args);
         }
 
         public virtual void VisitNamedFunctionDeclaration(NamedFunctionDeclarationSyntax namedFunctionDeclaration, A args)
         {
-            //if (namedFunctionDeclaration.GenericParameters != null)
-            //    foreach (var genericParameter in namedFunctionDeclaration.GenericParameters)
-            //        VisitGenericParameter(genericParameter, args);
-
             foreach (var parameter in namedFunctionDeclaration.Parameters)
                 VisitParameter(parameter, args);
 
             VisitType(namedFunctionDeclaration.ReturnTypeSyntax, args);
-            VisitExpression(namedFunctionDeclaration.Body, args);
+            foreach (var statement in namedFunctionDeclaration.Body)
+                VisitStatement(statement, args);
         }
 
         public virtual void VisitParameter(ParameterSyntax parameter, A args)

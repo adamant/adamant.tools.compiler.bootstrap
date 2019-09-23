@@ -29,14 +29,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
 
         private static void Check(FunctionDeclarationSyntax function, Diagnostics diagnostics)
         {
-            if (function.Body == null) return;
+            if (function.Body == null)
+                return;
 
             var bindingScope = EmptyBindingScope.Instance;
             foreach (var parameter in function.Parameters)
                 bindingScope = new VariableBindingScope(bindingScope, parameter);
 
             var shadowChecker = new ShadowChecker(function, diagnostics);
-            shadowChecker.VisitExpression(function.Body, bindingScope);
+            foreach (var statement in function.Body)
+                shadowChecker.VisitStatement(statement, bindingScope);
         }
 
         public override void VisitBlock(BlockSyntax block, BindingScope bindingScope)
@@ -68,12 +70,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
             }
         }
 
-        public override void VisitIdentifierName(IdentifierNameSyntax identifierName, BindingScope bindingScope)
+        public override void VisitIdentifierName(NameSyntax name, BindingScope bindingScope)
         {
-            if (!bindingScope.Lookup(identifierName.Name, out var binding)) return;
+            if (!bindingScope.Lookup(name.Name, out var binding))
+                return;
             var shadowedBy = binding.WasShadowedBy.LastOrDefault();
-            if (shadowedBy == null) return;
-            diagnostics.Add(SemanticError.CantShadow(function.File, shadowedBy.NameSpan, identifierName.Span));
+            if (shadowedBy == null)
+                return;
+            diagnostics.Add(SemanticError.CantShadow(function.File, shadowedBy.NameSpan, name.Span));
             function.MarkErrored();
         }
     }

@@ -2,17 +2,17 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class IfExpressionSyntax : ExpressionSyntax
+    public class IfExpressionSyntax : ExpressionSyntax, IElseClauseSyntax
     {
-        public ExpressionSyntax Condition { get; }
-        public ExpressionBlockSyntax ThenBlock { get; }
-        public ExpressionSyntax ElseClause { get; }
+        public ExpressionSyntax Condition;
+        public IBlockOrResultSyntax ThenBlock { get; }
+        public IElseClauseSyntax ElseClause;
 
         public IfExpressionSyntax(
             TextSpan span,
             ExpressionSyntax condition,
-            ExpressionBlockSyntax thenBlock,
-            ExpressionSyntax elseClause)
+            IBlockOrResultSyntax thenBlock,
+            IElseClauseSyntax elseClause)
             : base(span)
         {
             Condition = condition;

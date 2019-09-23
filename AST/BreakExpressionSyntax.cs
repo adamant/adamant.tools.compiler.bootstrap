@@ -4,7 +4,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class BreakExpressionSyntax : ExpressionSyntax
     {
-        public ExpressionSyntax Value { get; }
+        public ExpressionSyntax Value;
 
         public BreakExpressionSyntax(
             TextSpan span,

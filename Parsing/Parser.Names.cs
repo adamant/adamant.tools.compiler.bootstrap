@@ -19,11 +19,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return name;
         }
 
-        private IdentifierNameSyntax ParseSimpleName()
+        private NameSyntax ParseSimpleName()
         {
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = new SimpleName(identifier.Value);
-            return new IdentifierNameSyntax(identifier.Span, name);
+            return new NameSyntax(identifier.Span, name);
         }
     }
 }

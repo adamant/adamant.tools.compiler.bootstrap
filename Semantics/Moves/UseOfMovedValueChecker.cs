@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
         {
             switch (assignmentExpression.LeftOperand)
             {
-                case IdentifierNameSyntax identifierName:
+                case NameSyntax identifierName:
                     // We are assigning into this variable so it definitely has a value now
                     var symbol = identifierName.ReferencedSymbol;
                     return possiblyMoved.Set(symbol, false);
@@ -50,16 +50,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
             }
         }
 
-        public VariableFlags IdentifierName(IdentifierNameSyntax identifierName, VariableFlags possiblyMoved)
+        public VariableFlags IdentifierName(NameSyntax name, VariableFlags possiblyMoved)
         {
-            if (possiblyMoved[identifierName.ReferencedSymbol] == true)
-                diagnostics.Add(SemanticError.UseOfPossiblyMovedValue(file, identifierName.Span));
+            if (possiblyMoved[name.ReferencedSymbol] == true)
+                diagnostics.Add(SemanticError.UseOfPossiblyMovedValue(file, name.Span));
 
-            switch (identifierName.Type.ValueSemantics)
+            switch (name.Type.ValueSemantics)
             {
                 case ValueSemantics.Move:
                 case ValueSemantics.Own:
-                    return possiblyMoved.Set(identifierName.ReferencedSymbol, true);
+                    return possiblyMoved.Set(name.ReferencedSymbol, true);
                 case ValueSemantics.Copy:
                 case ValueSemantics.Borrow:
                 case ValueSemantics.Alias:
@@ -69,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
                 case ValueSemantics.LValue:
                     throw new NotImplementedException();
                 default:
-                    throw ExhaustiveMatch.Failed(identifierName.Type.ValueSemantics);
+                    throw ExhaustiveMatch.Failed(name.Type.ValueSemantics);
             }
         }
 

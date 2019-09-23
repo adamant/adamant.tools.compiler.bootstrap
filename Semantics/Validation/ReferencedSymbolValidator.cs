@@ -30,10 +30,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
             AssertHasReferencedSymbol(memberAccessExpression, memberAccessExpression.ReferencedSymbol);
         }
 
-        public override void VisitIdentifierName(IdentifierNameSyntax identifierName, Void args)
+        public override void VisitIdentifierName(NameSyntax name, Void args)
         {
-            base.VisitIdentifierName(identifierName, args);
-            AssertHasReferencedSymbol(identifierName, identifierName.ReferencedSymbol);
+            base.VisitIdentifierName(name, args);
+            AssertHasReferencedSymbol(name, name.ReferencedSymbol);
         }
     }
 }

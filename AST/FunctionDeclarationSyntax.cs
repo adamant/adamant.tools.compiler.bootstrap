@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public FixedList<IModiferToken> Modifiers { get; }
         public FixedList<ParameterSyntax> Parameters { get; }
-        public BlockSyntax Body { get; }
+        public FixedList<StatementSyntax> Body { get; }
         public TypePromise ReturnType { get; } = new TypePromise();
         public ControlFlowGraph ControlFlow { get; set; }
 
@@ -41,13 +41,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         DataType IFunctionSymbol.ReturnType => ReturnType.Fulfilled();
 
         protected FunctionDeclarationSyntax(
+            TextSpan span,
             CodeFile file,
             FixedList<IModiferToken> modifiers,
             Name fullName,
             TextSpan nameSpan,
             FixedList<ParameterSyntax> parameters,
-            BlockSyntax body)
-            : base(file, fullName, nameSpan,
+            FixedList<StatementSyntax> body)
+            : base(span, file, fullName, nameSpan,
                 new SymbolSet(GetChildSymbols(parameters, body)))
         {
             Modifiers = modifiers;
@@ -57,16 +58,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         private static IEnumerable<ISymbol> GetChildSymbols(
              FixedList<ParameterSyntax> parameters,
-             BlockSyntax body)
+             FixedList<StatementSyntax> body)
         {
             var variableDeclarations = GetVariableDeclarations(body);
             return ((IEnumerable<ISymbol>)parameters).Concat(variableDeclarations);
         }
 
-        private static IReadOnlyList<VariableDeclarationStatementSyntax> GetVariableDeclarations(BlockSyntax body)
+        private static IReadOnlyList<VariableDeclarationStatementSyntax> GetVariableDeclarations(
+            FixedList<StatementSyntax> body)
         {
             var visitor = new GetVariableDeclarationsVisitor();
-            visitor.VisitExpression(body, default);
+            foreach (var statement in body)
+                visitor.VisitStatement(statement, default);
             var variableDeclarations = visitor.VariableDeclarations;
             return variableDeclarations;
         }

@@ -19,16 +19,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
     {
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
-        private readonly BasicExpressionAnalyzer expressionAnalyzer;
+        private readonly BasicStatementAnalyzer statementAnalyzer;
 
         public BasicTypeAnalyzer(
             CodeFile file,
             Diagnostics diagnostics,
-            BasicExpressionAnalyzer expressionAnalyzer)
+            BasicStatementAnalyzer statementAnalyzer)
         {
             this.file = file;
             this.diagnostics = diagnostics;
-            this.expressionAnalyzer = expressionAnalyzer;
+            this.statementAnalyzer = statementAnalyzer;
         }
 
         public DataType Evaluate(TypeSyntax typeSyntax)

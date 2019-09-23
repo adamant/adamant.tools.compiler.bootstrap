@@ -23,11 +23,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public SymbolSet ChildSymbols { get; protected set; }
 
         protected MemberDeclarationSyntax(
+            TextSpan span,
             CodeFile file,
             Name fullName,
             TextSpan nameSpan,
             SymbolSet childSymbols = null)
-            : base(file, nameSpan)
+            : base(span, file, nameSpan)
         {
             FullName = fullName;
             ChildSymbols = childSymbols ?? SymbolSet.Empty;

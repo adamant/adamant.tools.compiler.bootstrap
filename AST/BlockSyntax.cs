@@ -4,7 +4,15 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class BlockSyntax : ExpressionBlockSyntax
+    /// <summary>
+    /// A block in a statement or expression. Not to be used to represent function
+    /// or type bodies.
+    /// </summary>
+    /// <remarks>This breaks with the convention of giving expression classes names
+    /// ending in "ExpressionSyntax". This is because a block can be either an
+    /// expression or can be a block for a control flow statement. In the latter
+    /// it is acting more like a statement.</remarks>
+    public class BlockSyntax : ExpressionSyntax, IBlockOrResultSyntax
     {
         public FixedList<StatementSyntax> Statements { get; }
 

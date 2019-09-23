@@ -26,10 +26,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         }
 
         public override void VisitIdentifierName(
-            IdentifierNameSyntax identifierName,
+            NameSyntax name,
             LexicalScope containingScope)
         {
-            identifierName.ContainingScope = containingScope;
+            name.ContainingScope = containingScope;
         }
 
         public override void VisitForeachExpression(ForeachExpressionSyntax foreachExpression, LexicalScope containingScope)

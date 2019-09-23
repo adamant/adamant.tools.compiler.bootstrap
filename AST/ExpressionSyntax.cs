@@ -1,4 +1,6 @@
+using System;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
@@ -16,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(MoveExpressionSyntax),
         typeof(LoopExpressionSyntax),
         typeof(LifetimeExpressionSyntax),
-        typeof(ExpressionBlockSyntax),
+        typeof(BlockSyntax),
         typeof(InvocationSyntax),
         typeof(ImplicitConversionExpression),
         typeof(ForeachExpressionSyntax),
@@ -25,11 +27,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(BreakExpressionSyntax),
         typeof(BinaryExpressionSyntax),
         typeof(InstanceExpressionSyntax),
-        typeof(IdentifierNameSyntax))]
-    public abstract class ExpressionSyntax : StatementSyntax
+        typeof(NameSyntax))]
+    public abstract class ExpressionSyntax : Syntax
     {
-        public TextSpan Span { get; }
-
         /// <summary>
         /// If an expression has been poisoned, then it is errored in some way
         /// and we won't report errors against it in the future. We may also
@@ -37,9 +37,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         /// </summary>
         public bool Poisoned { get; private set; }
 
-        protected ExpressionSyntax(TextSpan span)
+        private DataType type;
+        public DataType Type
         {
-            Span = span;
+            get => type;
+            set
+            {
+                if (type != null)
+                    throw new InvalidOperationException("Can't set type repeatedly");
+                type = value ?? throw new ArgumentNullException(nameof(Type),
+                           "Can't set type to null");
+            }
+        }
+
+        protected ExpressionSyntax(TextSpan span)
+            : base(span)
+        {
         }
 
         public void Poison()

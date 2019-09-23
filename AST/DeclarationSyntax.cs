@@ -21,7 +21,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         /// </summary>
         public TextSpan NameSpan { get; }
 
-        protected DeclarationSyntax(CodeFile file, TextSpan nameSpan)
+        protected DeclarationSyntax(TextSpan span, CodeFile file, TextSpan nameSpan)
+            : base(span)
         {
             NameSpan = nameSpan;
             File = file;

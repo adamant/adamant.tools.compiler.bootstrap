@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         public UnaryOperatorFixity Fixity { get; }
         public UnaryOperator Operator { get; }
-        public ExpressionSyntax Operand { get; }
+        public ExpressionSyntax Operand;
 
         public UnaryExpressionSyntax(
             TextSpan span,

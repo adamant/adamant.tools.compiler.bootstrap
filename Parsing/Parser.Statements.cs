@@ -11,32 +11,41 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             switch (Tokens.Current)
             {
                 case IOpenBraceToken _:
-                    return ParseBlock();
+                    var block = ParseBlock();
+                    return new ExpressionStatementSyntax(block.Span, block);
                 case ILetKeywordToken _:
-                    Tokens.Expect<IBindingToken>();
-                    return ParseRestOfVariableDeclaration(false);
+                    var let = Tokens.Expect<IBindingToken>();
+                    return ParseRestOfVariableDeclaration(let, false);
                 case IVarKeywordToken _:
-                    Tokens.Expect<IBindingToken>();
-                    return ParseRestOfVariableDeclaration(true);
+                    var @var = Tokens.Expect<IBindingToken>();
+                    return ParseRestOfVariableDeclaration(@var, true);
                 case IForeachKeywordToken _:
-                    return ParseForeach();
+                    var @foreach = ParseForeach();
+                    return new ExpressionStatementSyntax(@foreach.Span, @foreach);
                 case IWhileKeywordToken _:
-                    return ParseWhile();
+                    var @while = ParseWhile();
+                    return new ExpressionStatementSyntax(@while.Span, @while);
                 case ILoopKeywordToken _:
-                    return ParseLoop();
+                    var loop = ParseLoop();
+                    return new ExpressionStatementSyntax(loop.Span, loop);
                 case IIfKeywordToken _:
-                    return ParseIf(ParseAs.Statement);
+                    var @if = ParseIf(ParseAs.Statement);
+                    return new ExpressionStatementSyntax(@if.Span, @if);
                 case IUnsafeKeywordToken _:
-                    return ParseUnsafeExpression(ParseAs.Statement);
+                    return ParseUnsafeStatement();
                 default:
                     var expression = ParseExpression();
-                    Tokens.Expect<ISemicolonToken>();
-                    return expression;
+                    var semicolon = Tokens.Expect<ISemicolonToken>();
+                    return new ExpressionStatementSyntax(
+                        TextSpan.Covering(expression.Span, semicolon),
+                        expression);
             }
         }
 
         // Requires the binding has already been consumed
-        private StatementSyntax ParseRestOfVariableDeclaration(bool mutableBinding)
+        private StatementSyntax ParseRestOfVariableDeclaration(
+            TextSpan binding,
+            bool mutableBinding)
         {
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(variableNumbers.VariableName(identifier.Value));
@@ -48,17 +57,33 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (Tokens.Accept<IEqualsToken>())
                 initializer = ParseExpression();
 
-            Tokens.Expect<ISemicolonToken>();
-            return new VariableDeclarationStatementSyntax(mutableBinding, name, identifier.Span, type,
-                initializer);
+            var semicolon = Tokens.Expect<ISemicolonToken>();
+            var span = TextSpan.Covering(binding, semicolon);
+            return new VariableDeclarationStatementSyntax(span,
+                mutableBinding, name, identifier.Span, type, initializer);
+        }
+
+        private ExpressionStatementSyntax ParseUnsafeStatement()
+        {
+            var unsafeKeyword = Tokens.Expect<IUnsafeKeywordToken>();
+            var isBlock = Tokens.Current is IOpenBraceToken;
+            var expression = isBlock ? ParseBlock() : ParseParenthesizedExpression();
+            var span = TextSpan.Covering(unsafeKeyword, expression.Span);
+            var unsafeExpression = new UnsafeExpressionSyntax(span, expression);
+            if (!isBlock)
+            {
+                var semicolon = Tokens.Expect<ISemicolonToken>();
+                span = TextSpan.Covering(span, semicolon);
+            }
+            return new ExpressionStatementSyntax(span, unsafeExpression);
         }
 
         public BlockSyntax AcceptBlock()
         {
-            var openBrace = Tokens.Current.Span;
-            if (!Tokens.Accept<IOpenBraceToken>())
+            var openBrace = Tokens.AcceptToken<IOpenBraceToken>();
+            if (openBrace == null)
                 return null;
-            return ParseRestOfBlock(openBrace);
+            return ParseRestOfBlock(openBrace.Span);
         }
 
         public BlockSyntax ParseBlock()
@@ -76,7 +101,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new BlockSyntax(span, statements);
         }
 
-        public ExpressionBlockSyntax ParseExpressionBlock()
+        public IBlockOrResultSyntax ParseBlockOrResult()
         {
             if (Tokens.Current is IOpenBraceToken)
                 return ParseBlock();
@@ -84,7 +109,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var equalsGreaterThan = Tokens.Expect<IEqualsGreaterThanToken>();
             var expression = ParseExpression();
             var span = TextSpan.Covering(equalsGreaterThan, expression.Span);
-            return new ResultExpressionSyntax(span, expression);
+            return new ResultStatementSyntax(span, expression);
         }
     }
 }

@@ -1,26 +1,27 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Names;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class InvocationSyntax : ExpressionSyntax
+    [Closed(
+        typeof(MethodInvocationSyntax),
+        typeof(FunctionInvocationSyntax),
+        typeof(AssociatedFunctionInvocationSyntax))]
+    public abstract class InvocationSyntax : ExpressionSyntax
     {
-        public ExpressionSyntax Callee { get; set; }
+        public Name FunctionName { get; }
         public FixedList<ArgumentSyntax> Arguments { get; }
 
-        public InvocationSyntax(
+        private protected InvocationSyntax(
             TextSpan span,
-            ExpressionSyntax callee,
+            Name functionName,
             FixedList<ArgumentSyntax> arguments)
             : base(span)
         {
-            Callee = callee;
             Arguments = arguments;
-        }
-
-        public override string ToString()
-        {
-            return $"{Callee}({string.Join(", ", Arguments)})";
+            FunctionName = functionName;
         }
     }
 }

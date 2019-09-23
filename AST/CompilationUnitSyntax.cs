@@ -15,11 +15,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public FixedList<Diagnostic> Diagnostics { get; }
 
         public CompilationUnitSyntax(
-            CodeFile codeFile,
             RootName implicitNamespaceName,
+            TextSpan span,
+            CodeFile codeFile,
             FixedList<UsingDirectiveSyntax> usingDirectives,
             FixedList<DeclarationSyntax> declarations,
             FixedList<Diagnostic> diagnostics)
+            : base(span)
         {
             CodeFile = codeFile;
             ImplicitNamespaceName = implicitNamespaceName;

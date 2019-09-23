@@ -13,12 +13,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public FixedList<IModiferToken> Modifiers { get; }
 
         public ClassDeclarationSyntax(
+            TextSpan span,
             CodeFile file,
             FixedList<IModiferToken> modifiers,
             Name fullName,
             TextSpan nameSpan,
             FixedList<MemberDeclarationSyntax> members)
-            : base(file, nameSpan, fullName, members)
+            : base(span, file, nameSpan, fullName, members)
         {
             Modifiers = modifiers;
         }

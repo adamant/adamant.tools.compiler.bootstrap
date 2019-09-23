@@ -4,7 +4,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class WhileExpressionSyntax : ExpressionSyntax
     {
-        public ExpressionSyntax Condition { get; }
+        public ExpressionSyntax Condition;
         public BlockSyntax Block { get; }
 
         public WhileExpressionSyntax(

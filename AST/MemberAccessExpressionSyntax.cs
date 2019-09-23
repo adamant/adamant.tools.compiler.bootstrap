@@ -8,9 +8,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         /// <summary>
         /// This expression is null for implicit member access i.e. self and enums
         /// </summary>
-        public ExpressionSyntax Expression { get; }
+        public ExpressionSyntax Expression;
         public AccessOperator AccessOperator { get; }
-        public IdentifierNameSyntax Member { get; }
+        public NameSyntax Member { get; }
 
         public ISymbol ReferencedSymbol
         {
@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             TextSpan span,
             ExpressionSyntax expression,
             AccessOperator accessOperator,
-            IdentifierNameSyntax member)
+            NameSyntax member)
             : base(span)
         {
             Expression = expression;

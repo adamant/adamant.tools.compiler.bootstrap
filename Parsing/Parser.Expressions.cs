@@ -6,6 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
@@ -174,7 +175,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                             var arguments = ParseArguments();
                             var closeParenSpan = Tokens.Expect<ICloseParenToken>();
                             var span = TextSpan.Covering(callee.Span, closeParenSpan);
-                            expression = new InvocationSyntax(span, callee, arguments);
+                            expression = new MethodInvocationSyntax(span, callee, null, arguments);
                             continue;
                         }
                         break;
@@ -292,6 +293,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             switch (Tokens.Current)
             {
+                default:
+                    throw new NotImplementedException();
+                    throw ExhaustiveMatch.Failed(Tokens.Current);
                 case ISelfKeywordToken _:
                     var selfKeyword = Tokens.Expect<ISelfKeywordToken>();
                     return new SelfExpressionSyntax(selfKeyword);
@@ -312,8 +316,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var span = TextSpan.Covering(returnKeyword, expression?.Span);
                     return new ReturnExpressionSyntax(span, expression);
                 }
-                case IEqualsGreaterThanToken _:
-                    return ParseExpressionBlock();
                 case IOpenParenToken _:
                     return ParseParenthesizedExpression();
                 case IMinusToken _:
@@ -401,14 +403,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IQuestionToken _:
                 case ISemicolonToken _:
                 case ICloseParenToken _:
+
                 {
                     // If it is one of these, we assume there is a missing identifier
                     var identifierSpan = Tokens.Expect<IIdentifierToken>();
                     throw new NotImplementedException();
                     //return new IdentifierNameSyntax(identifierSpan, SpecialName.Underscore);
                 }
-                default:
-                    throw NonExhaustiveMatchException.For(Tokens.Current);
+                case IEqualsGreaterThanToken _:
+                    throw new NotImplementedException("`=>` in expression position");
             }
         }
 
@@ -488,16 +491,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new LoopExpressionSyntax(span, block);
         }
 
-        private ExpressionSyntax ParseIf(ParseAs parseAs = ParseAs.Expression)
+        private IfExpressionSyntax ParseIf(ParseAs parseAs = ParseAs.Expression)
         {
             var @if = Tokens.Expect<IIfKeywordToken>();
             var condition = ParseExpression();
-            var thenBlock = ParseExpressionBlock();
+            var thenBlock = ParseBlockOrResult();
             var elseClause = AcceptElse(parseAs);
             var span = TextSpan.Covering(@if, thenBlock.Span, elseClause?.Span);
             if (parseAs == ParseAs.Statement
                 && elseClause == null
-                && thenBlock is ResultExpressionSyntax)
+                && thenBlock is ResultStatementSyntax)
             {
                 var semicolon = Tokens.Expect<ISemicolonToken>();
                 span = TextSpan.Covering(span, semicolon);
@@ -505,15 +508,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new IfExpressionSyntax(span, condition, thenBlock, elseClause);
         }
 
-        private ExpressionSyntax AcceptElse(ParseAs parseAs)
+        private IElseClauseSyntax AcceptElse(ParseAs parseAs)
         {
             if (!Tokens.Accept<IElseKeywordToken>())
                 return null;
-            var expression = Tokens.Current is IIfKeywordToken
-                ? ParseIf(parseAs)
-                : ParseExpressionBlock();
+            IElseClauseSyntax expression = Tokens.Current is IIfKeywordToken
+                ? (IElseClauseSyntax)ParseIf(parseAs)
+                : ParseBlockOrResult();
             if (parseAs == ParseAs.Statement
-                && expression is ResultExpressionSyntax)
+                && expression is ResultStatementSyntax)
                 Tokens.Expect<ISemicolonToken>();
             return expression;
         }
@@ -533,11 +536,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         private ArgumentSyntax AcceptArgument()
         {
-            //var isParams = Tokens.Accept<IParamsKeywordToken>();
             var value = AcceptExpression();
-            //if (!isParams && value == null)
-            //    return null;
-            return new ArgumentSyntax(/*isParams, */value);
+            if (value == null)
+                return null;
+            return new ArgumentSyntax(value.Span, value);
         }
     }
 }

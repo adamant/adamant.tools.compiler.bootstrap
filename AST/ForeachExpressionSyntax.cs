@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SimpleName VariableName => FullVariableName.UnqualifiedName;
         public TypeSyntax TypeSyntax { get; }
-        public ExpressionSyntax InExpression { get; }
+        public ExpressionSyntax InExpression;
         public BlockSyntax Block { get; }
 
         DataType IBindingSymbol.Type => VariableType;

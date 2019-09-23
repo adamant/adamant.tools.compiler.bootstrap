@@ -8,13 +8,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public class ConstructorDeclarationSyntax : FunctionDeclarationSyntax
     {
         public ConstructorDeclarationSyntax(
+            TextSpan span,
             CodeFile file,
             FixedList<IModiferToken> modifiers,
             Name fullName,
             TextSpan nameSpan,
             FixedList<ParameterSyntax> parameters,
-            BlockSyntax body)
-            : base(file, modifiers, fullName, nameSpan, parameters, body)
+            FixedList<StatementSyntax> body)
+            : base(span, file, modifiers, fullName, nameSpan, parameters, body)
         {
         }
 

@@ -3,7 +3,12 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class PackageSyntax : Syntax
+    /// <summary>
+    /// Represents an extire package worth of syntax
+    /// </summary>
+    /// <remarks>Doesn't inherit from <see cref="Syntax"/> because it is never
+    /// matched as part of syntax. It is always treated as the singular root.</remarks>
+    public class PackageSyntax
     {
         public string Name { get; }
 

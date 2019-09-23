@@ -92,7 +92,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 ResolveSignatureTypesInTypeDeclaration(function.DeclaringType);
 
             var selfType = ResolveSelfType(function);
-            var analyzer = new BasicExpressionAnalyzer(function.File, diagnostics, selfType);
+            var analyzer = new BasicStatementAnalyzer(function.File, diagnostics, selfType);
 
             ResolveTypesInParameters(function, analyzer);
 
@@ -128,7 +128,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private void ResolveTypesInParameters(
             FunctionDeclarationSyntax function,
-            BasicExpressionAnalyzer analyzer)
+            BasicStatementAnalyzer analyzer)
         {
             var types = new List<DataType>();
             foreach (var parameter in function.Parameters)
@@ -171,7 +171,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private static void ResolveReturnType(
             FunctionDeclarationSyntax function,
-            BasicExpressionAnalyzer analyzer)
+            BasicStatementAnalyzer analyzer)
         {
             function.ReturnType.BeginFulfilling();
             switch (function)
@@ -190,7 +190,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         private static void ResolveReturnType(
             FunctionDeclarationSyntax function,
             TypeSyntax returnTypeSyntax,
-            BasicExpressionAnalyzer analyzer)
+            BasicStatementAnalyzer analyzer)
         {
             var returnType = returnTypeSyntax != null
                 ? analyzer.EvaluateType(returnTypeSyntax)
@@ -252,7 +252,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 default:
                     throw ExhaustiveMatch.Failed(field.Type.State);
             }
-            var resolver = new BasicExpressionAnalyzer(field.File, diagnostics);
+            var resolver = new BasicStatementAnalyzer(field.File, diagnostics);
             field.Type.BeginFulfilling();
             var type = resolver.EvaluateType(field.TypeSyntax);
             field.Type.Fulfill(type);
@@ -289,11 +289,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 return;
 
             var diagnosticCount = diagnostics.Count;
-            // TODO the return types of constructors and init functions should probably be void for purposes of expressions
-            var resolver = new BasicExpressionAnalyzer(function.File, diagnostics, function.SelfParameterType, function.ReturnType.Fulfilled());
-            // The body of a function shouldn't itself evaluate to anything.
-            // There should be no `=> value` for the block, so the type is `void`.
-            resolver.CheckExpressionType(function.Body, DataType.Void);
+            var resolver = new BasicStatementAnalyzer(function.File, diagnostics, function.SelfParameterType, function.ReturnType.Fulfilled());
+            foreach (var statement in function.Body)
+                resolver.ResolveTypesInStatement(statement);
             if (diagnosticCount != diagnostics.Count)
                 function.MarkErrored();
         }
@@ -309,8 +307,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 return;
 
             var diagnosticCount = diagnostics.Count;
-            var resolver = new BasicExpressionAnalyzer(fieldDeclaration.File, diagnostics);
-            resolver.CheckExpressionType(fieldDeclaration.Initializer, fieldDeclaration.Type.Fulfilled());
+            var resolver = new BasicStatementAnalyzer(fieldDeclaration.File, diagnostics);
+            resolver.CheckExpressionType(ref fieldDeclaration.Initializer, fieldDeclaration.Type.Fulfilled());
             if (diagnosticCount != diagnostics.Count)
                 fieldDeclaration.MarkErrored();
         }

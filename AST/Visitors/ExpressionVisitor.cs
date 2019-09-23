@@ -13,8 +13,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case VariableDeclarationStatementSyntax variableDeclaration:
                     VisitVariableDeclarationStatement(variableDeclaration, args);
                     break;
-                case ExpressionSyntax expression:
-                    VisitExpression(expression, args);
+                case ExpressionStatementSyntax expressionStatement:
+                    VisitExpression(expressionStatement.Expression, args);
                     break;
                 case null:
                     // Ignore
@@ -46,7 +46,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case LiteralExpressionSyntax literalExpression:
                     VisitLiteralExpression(literalExpression, args);
                     break;
-                case IdentifierNameSyntax identifierName:
+                case NameSyntax identifierName:
                     VisitIdentifierName(identifierName, args);
                     break;
                 case UnaryExpressionSyntax unaryExpression:
@@ -76,9 +76,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case IfExpressionSyntax ifExpression:
                     VisitIfExpression(ifExpression, args);
                     break;
-                case ResultExpressionSyntax resultExpression:
-                    VisitResultExpression(resultExpression, args);
-                    break;
+                //case ResultStatementSyntax resultExpression:
+                //    VisitResultExpression(resultExpression, args);
+                //    break;
                 case BreakExpressionSyntax breakExpression:
                     VisitBreakExpression(breakExpression, args);
                     break;
@@ -218,16 +218,46 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         {
         }
 
-        public virtual void VisitResultExpression(ResultExpressionSyntax resultExpression, A args)
+        public virtual void VisitResultStatement(ResultStatementSyntax resultStatement, A args)
         {
-            VisitExpression(resultExpression.Expression, args);
+            VisitExpression(resultStatement.Expression, args);
         }
 
         public virtual void VisitIfExpression(IfExpressionSyntax ifExpression, A args)
         {
             VisitExpression(ifExpression.Condition, args);
-            VisitExpression(ifExpression.ThenBlock, args);
-            VisitExpression(ifExpression.ElseClause, args);
+            VisitBlockOrResult(ifExpression.ThenBlock, args);
+            VisitElseClause(ifExpression.ElseClause, args);
+        }
+
+        public virtual void VisitBlockOrResult(IBlockOrResultSyntax blockOrResult, A args)
+        {
+            switch (blockOrResult)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(blockOrResult);
+                case BlockSyntax blockExpression:
+                    VisitBlock(blockExpression, args);
+                    break;
+                case ResultStatementSyntax resultStatement:
+                    VisitResultStatement(resultStatement, args);
+                    break;
+            }
+        }
+
+        public virtual void VisitElseClause(IElseClauseSyntax elseClause, A args)
+        {
+            switch (elseClause)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(elseClause);
+                case IBlockOrResultSyntax blockOrResult:
+                    VisitBlockOrResult(blockOrResult, args);
+                    break;
+                case IfExpressionSyntax ifExpression:
+                    VisitIfExpression(ifExpression, args);
+                    break;
+            }
         }
 
         public virtual void VisitLoopExpression(LoopExpressionSyntax loopExpression, A args)
@@ -283,7 +313,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             VisitExpression(unaryExpression.Operand, args);
         }
 
-        public virtual void VisitIdentifierName(IdentifierNameSyntax identifierName, A args)
+        public virtual void VisitIdentifierName(NameSyntax name, A args)
         {
         }
 
@@ -293,8 +323,38 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 
         public virtual void VisitInvocation(InvocationSyntax invocation, A args)
         {
-            VisitExpression(invocation.Callee, args);
-            foreach (var argument in invocation.Arguments)
+            switch (invocation)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(invocation);
+                case MethodInvocationSyntax methodInvocation:
+                    VisitMethodInvocation(methodInvocation, args);
+                    break;
+                case AssociatedFunctionInvocationSyntax associatedFunctionInvocation:
+                    VisitAssociatedFunctionInvocation(associatedFunctionInvocation, args);
+                    break;
+                case FunctionInvocationSyntax functionInvocation:
+                    VisitFunctionInvocation(functionInvocation, args);
+                    break;
+            }
+        }
+
+        public void VisitFunctionInvocation(FunctionInvocationSyntax functionInvocation, A args)
+        {
+            foreach (var argument in functionInvocation.Arguments)
+                VisitArgument(argument, args);
+        }
+
+        public virtual void VisitAssociatedFunctionInvocation(AssociatedFunctionInvocationSyntax associatedFunctionInvocation, A args)
+        {
+            foreach (var argument in associatedFunctionInvocation.Arguments)
+                VisitArgument(argument, args);
+        }
+
+        public virtual void VisitMethodInvocation(MethodInvocationSyntax methodInvocation, A args)
+        {
+            VisitExpression(methodInvocation.Target, args);
+            foreach (var argument in methodInvocation.Arguments)
                 VisitArgument(argument, args);
         }
 

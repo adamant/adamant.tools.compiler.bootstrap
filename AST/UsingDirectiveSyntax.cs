@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
@@ -7,7 +8,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         // For now, we only support namespace names
         public Name Name { get; }
 
-        public UsingDirectiveSyntax(Name name)
+        public UsingDirectiveSyntax(TextSpan span, Name name)
+            : base(span)
         {
             Name = name;
         }

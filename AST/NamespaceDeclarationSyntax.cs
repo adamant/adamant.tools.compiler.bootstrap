@@ -19,6 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public FixedList<DeclarationSyntax> Declarations { get; }
 
         public NamespaceDeclarationSyntax(
+            TextSpan span,
             CodeFile file,
             bool inGlobalNamespace,
             Name name,
@@ -26,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             RootName nameContext,
             FixedList<UsingDirectiveSyntax> usingDirectives,
             FixedList<DeclarationSyntax> declarations)
-            : base(file, nameSpan)
+            : base(span, file, nameSpan)
         {
             Name = name;
             FullName = nameContext.Qualify(name);

@@ -37,7 +37,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
         {
             checker = strategy.CheckerFor(function, diagnostics);
             currentState = checker.StartState();
-            VisitStatement(function.Body, default);
+            foreach (var statement in function.Body)
+                VisitStatement(statement, default);
         }
 
         public override void VisitAssignmentExpression(AssignmentExpressionSyntax assignmentExpression, Void args)
@@ -51,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
         {
             switch (expression)
             {
-                case IdentifierNameSyntax identifierName:
+                case NameSyntax identifierName:
                 case null:
                     // Ignore
                     break;
@@ -65,9 +66,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
             }
         }
 
-        public override void VisitIdentifierName(IdentifierNameSyntax identifierName, Void args)
+        public override void VisitIdentifierName(NameSyntax name, Void args)
         {
-            currentState = checker.IdentifierName(identifierName, currentState);
+            currentState = checker.IdentifierName(name, currentState);
         }
 
         public override void VisitVariableDeclarationStatement(

@@ -101,16 +101,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
              FixedList<IModiferToken> modifiers)
         {
             // TODO generate errors for attributes or modifiers
-            Tokens.Expect<INamespaceKeywordToken>();
+            var ns = Tokens.Expect<INamespaceKeywordToken>();
             var globalQualifier = Tokens.AcceptToken<IColonColonToken>();
-            var (name, span) = ParseNamespaceName();
-            span = TextSpan.Covering(span, globalQualifier?.Span);
+            var (name, nameSpan) = ParseNamespaceName();
+            nameSpan = TextSpan.Covering(nameSpan, globalQualifier?.Span);
             Tokens.Expect<IOpenBraceToken>();
             var bodyParser = NestedParser(nameContext.Qualify(name));
             var usingDirectives = bodyParser.ParseUsingDirectives();
             var declarations = bodyParser.ParseDeclarations();
-            Tokens.Expect<ICloseBraceToken>();
-            return new NamespaceDeclarationSyntax(File, globalQualifier != null, name, span,
+            var closeBrace = Tokens.Expect<ICloseBraceToken>();
+            var span = TextSpan.Covering(ns, closeBrace);
+            return new NamespaceDeclarationSyntax(span, File,
+                globalQualifier != null, name, nameSpan,
                 nameContext, usingDirectives, declarations);
         }
 
@@ -141,12 +143,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return ParseMany<MemberDeclarationSyntax, ICloseBraceToken>(ParseMemberDeclaration);
         }
 
-        private FixedList<MemberDeclarationSyntax> ParseTypeBody()
+        private (FixedList<MemberDeclarationSyntax> members, TextSpan span) ParseTypeBody()
         {
-            Tokens.Expect<IOpenBraceToken>();
+            var openBrace = Tokens.Expect<IOpenBraceToken>();
             var members = ParseMemberDeclarations();
-            Tokens.Expect<ICloseBraceToken>();
-            return members;
+            var closeBrace = Tokens.Expect<ICloseBraceToken>();
+            var span = TextSpan.Covering(openBrace, closeBrace);
+            return (members, span);
         }
         #endregion
 
@@ -154,12 +157,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private ClassDeclarationSyntax ParseClass(
              FixedList<IModiferToken> modifiers)
         {
-            Tokens.Expect<IClassKeywordToken>();
+            var @class = Tokens.Expect<IClassKeywordToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(identifier.Value);
             var bodyParser = NestedParser(name);
-            var members = bodyParser.ParseTypeBody();
-            return new ClassDeclarationSyntax(File, modifiers, name, identifier.Span, members);
+            var (members, bodySpan) = bodyParser.ParseTypeBody();
+            var span = TextSpan.Covering(@class, bodySpan);
+            return new ClassDeclarationSyntax(span, File, modifiers, name, identifier.Span, members);
         }
         #endregion
 
@@ -169,7 +173,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             FixedList<IModiferToken> modifiers)
         {
             // We should only be called when there is a binding keyword
-            Tokens.Expect<IBindingToken>();
+            var binding = Tokens.Expect<IBindingToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(identifier.Value);
             TypeSyntax type = null;
@@ -183,8 +187,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (Tokens.Accept<IEqualsToken>())
                 initializer = ParseExpression();
 
-            Tokens.Expect<ISemicolonToken>();
-            return new FieldDeclarationSyntax(File, modifiers, mutableBinding, name,
+            var semicolon = Tokens.Expect<ISemicolonToken>();
+            var span = TextSpan.Covering(binding, semicolon);
+            return new FieldDeclarationSyntax(span, File, modifiers, mutableBinding, name,
                 identifier.Span, type, initializer);
         }
         #endregion
@@ -193,7 +198,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public NamedFunctionDeclarationSyntax ParseNamedFunction(
             FixedList<IModiferToken> modifiers)
         {
-            Tokens.Expect<IFunctionKeywordToken>();
+            var fn = Tokens.Expect<IFunctionKeywordToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(identifier.Value);
             var bodyParser = NestedParser(name);
@@ -202,8 +207,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             TypeSyntax returnType = null;
             if (Tokens.Accept<IRightArrowToken>())
                 returnType = ParseType();
-            var body = bodyParser.ParseFunctionBody();
-            return new NamedFunctionDeclarationSyntax(File, modifiers, name, identifier.Span,
+
+            FixedList<StatementSyntax> body = null;
+            TextSpan span;
+            if (Tokens.Current is IOpenBraceToken)
+            {
+                (body, span) = bodyParser.ParseFunctionBody();
+                span = TextSpan.Covering(fn, span);
+            }
+            else
+            {
+                var semicolon = bodyParser.Tokens.Expect<ISemicolonToken>();
+                span = TextSpan.Covering(fn, semicolon);
+            }
+
+            return new NamedFunctionDeclarationSyntax(span, File, modifiers,
+                name, identifier.Span,
                 parameters, lifetimeBounds, returnType, body);
         }
 
@@ -215,8 +234,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var name = nameContext.Qualify(SpecialName.Constructor(identifier?.Value));
             var bodyParser = NestedParser(name);
             var parameters = bodyParser.ParseParameters();
-            var body = bodyParser.ParseBlock();
-            return new ConstructorDeclarationSyntax(File, modifiers, name,
+            var (body, bodySpan) = bodyParser.ParseFunctionBody();
+            var span = TextSpan.Covering(newKeywordSpan, bodySpan);
+            return new ConstructorDeclarationSyntax(span, File, modifiers, name,
                 TextSpan.Covering(newKeywordSpan, identifier?.Span), parameters, body);
         }
 
@@ -256,12 +276,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return parameters.ToFixedList();
         }
 
-        private BlockSyntax ParseFunctionBody()
+        private (FixedList<StatementSyntax>, TextSpan) ParseFunctionBody()
         {
-            var body = AcceptBlock();
-            if (body == null)
-                Tokens.Expect<ISemicolonToken>();
-            return body;
+            var openBrace = Tokens.Expect<IOpenBraceToken>();
+            var statements = ParseMany<StatementSyntax, ICloseBraceToken>(ParseStatement);
+            var closeBrace = Tokens.Expect<ICloseBraceToken>();
+            var span = TextSpan.Covering(openBrace, closeBrace);
+            return (statements, span);
         }
         #endregion
     }

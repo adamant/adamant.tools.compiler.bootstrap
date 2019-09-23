@@ -12,8 +12,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(MutableTypeSyntax))]
     public abstract class TypeSyntax : Syntax
     {
-        public TextSpan Span { get; }
-
         private DataType namedType;
 
         public DataType NamedType
@@ -36,8 +34,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public bool Poisoned { get; private set; }
 
         protected TypeSyntax(TextSpan span)
+            : base(span)
         {
-            Span = span;
         }
 
         public void Poison()

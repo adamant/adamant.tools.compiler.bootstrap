@@ -13,7 +13,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(FieldParameterSyntax))]
     public abstract class ParameterSyntax : Syntax, IBindingSymbol
     {
-        public TextSpan Span { get; }
         public bool IsMutableBinding { get; }
         public Name FullName { get; }
         [DebuggerHidden]
@@ -30,8 +29,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         SymbolSet ISymbol.ChildSymbols => SymbolSet.Empty;
 
         protected ParameterSyntax(TextSpan span, bool isMutableBinding, Name fullName)
+            : base(span)
         {
-            Span = span;
             IsMutableBinding = isMutableBinding;
             FullName = fullName;
             Unused = fullName.UnqualifiedName.Text.StartsWith("_");
