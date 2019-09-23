@@ -10,9 +10,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         typeof(ILessThanDotDotToken),
         typeof(IDotDotLessThanToken),
         typeof(ILessThanDotDotLessThanToken),
-        //typeof(IAtSignToken),
-        //typeof(ICaretToken),
-        //typeof(ICaretDotToken),
         typeof(IPlusToken),
         typeof(IMinusToken),
         typeof(IAsteriskToken),
@@ -29,10 +26,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         typeof(IAsteriskEqualsToken),
         typeof(ISlashEqualsToken),
         typeof(IDollarToken),
-        //typeof(IDollarLessThanToken),
-        //typeof(IDollarLessThanNotEqualToken),
-        //typeof(IDollarGreaterThanToken),
-        //typeof(IDollarGreaterThanNotEqualToken),
         typeof(IQuestionToken),
         typeof(IQuestionQuestionToken),
         typeof(IQuestionDotToken),
@@ -48,9 +41,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     public partial interface ILessThanDotDotToken : IOperatorToken { }
     public partial interface IDotDotLessThanToken : IOperatorToken { }
     public partial interface ILessThanDotDotLessThanToken : IOperatorToken { }
-    //public partial interface IAtSignToken : IOperatorToken { }
-    //public partial interface ICaretToken : IOperatorToken { }
-    //public partial interface ICaretDotToken : IOperatorToken { }
     public partial interface IPlusToken : IOperatorToken { }
     public partial interface IMinusToken : IOperatorToken { }
     public partial interface IAsteriskToken : IOperatorToken { }
@@ -67,10 +57,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     public partial interface IAsteriskEqualsToken : IOperatorToken { }
     public partial interface ISlashEqualsToken : IOperatorToken { }
     public partial interface IDollarToken : IOperatorToken { }
-    //public partial interface IDollarLessThanToken : IOperatorToken { }
-    //public partial interface IDollarLessThanNotEqualToken : IOperatorToken { }
-    //public partial interface IDollarGreaterThanToken : IOperatorToken { }
-    //public partial interface IDollarGreaterThanNotEqualToken : IOperatorToken { }
     public partial interface IQuestionToken : IOperatorToken { }
     public partial interface IQuestionQuestionToken : IOperatorToken { }
     public partial interface IQuestionDotToken : IOperatorToken { }

@@ -25,6 +25,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 //    }
 
                 //    break;
+                case IMutableKeywordToken _:
+                {
+                    //var mutableKeyword = Tokens.Expect<IMutableKeywordToken>();
+                    //var expression = ParseExpression(OperatorPrecedence.AboveAssignment);
+                    //var span = TextSpan.Covering(mutableKeyword, expression.Span);
+                    //return new MutableTypeSyntax(span, expression);
+                    throw new NotImplementedException();
+                }
                 case IIdentifierToken _:
                     return ParseTypeName();
                 case IPrimitiveTypeToken _:

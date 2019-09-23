@@ -15,7 +15,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         typeof(ITriviaToken),
         typeof(ILifetimeNameToken),
         typeof(IPrimitiveTypeToken),
-        typeof(IIntegerLiteralToken))]
+        typeof(IIntegerLiteralToken),
+        typeof(IBinaryOperatorToken))]
     public partial interface IToken
     {
         TextSpan Span { get; }

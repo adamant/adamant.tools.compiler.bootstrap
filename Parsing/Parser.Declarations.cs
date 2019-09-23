@@ -61,19 +61,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
-        /// <summary>
-        /// Skip tokens until we reach what we assume to be the end of a statement
-        /// </summary>
-        // TODO does this belong on a statement parser or something
-        private void SkipToEndOfStatement()
-        {
-            while (!Tokens.AtEnd<ISemicolonToken>())
-                Tokens.Next();
-
-            // Consume the semicolon is we aren't at the end of the file.
-            var _ = Tokens.Accept<ISemicolonToken>();
-        }
-
         public MemberDeclarationSyntax ParseMemberDeclaration()
         {
             var modifiers = AcceptMany(Tokens.AcceptToken<IModiferToken>);
@@ -118,14 +105,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         private (Name, TextSpan) ParseNamespaceName()
         {
-            var nameSegment = Tokens.RequiredToken<IIdentifierToken>();
-            var span = nameSegment.Span;
-            Name name = new SimpleName(nameSegment.Value);
+            var firstSegment = Tokens.RequiredToken<IIdentifierToken>();
+            var span = firstSegment.Span;
+            Name name = new SimpleName(firstSegment.Value);
 
             while (Tokens.Accept<IDotToken>())
             {
-                TextSpan segmentSpan;
-                (segmentSpan, nameSegment) = Tokens.ExpectIdentifier();
+                var (nameSegment, segmentSpan) = Tokens.ExpectIdentifier();
                 // We need the span to cover a trailing dot
                 span = TextSpan.Covering(span, segmentSpan);
                 if (nameSegment == null)
@@ -178,11 +164,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var name = nameContext.Qualify(identifier.Value);
             TypeSyntax type = null;
             if (Tokens.Accept<IColonToken>())
-            {
-                // Need to not consume the assignment that separates the type from the initializer,
-                // hence the min operator precedence.
                 type = ParseType();
-            }
+
             ExpressionSyntax initializer = null;
             if (Tokens.Accept<IEqualsToken>())
                 initializer = ParseExpression();
@@ -248,6 +231,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IOpenBraceToken _: // No return, starting body
                     return null;
                 default:
+                    // TODO maybe lifetime bounds should be treated as distinct from expressions
                     return AcceptExpression();
             }
         }

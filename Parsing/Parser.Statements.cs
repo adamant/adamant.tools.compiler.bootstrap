@@ -34,11 +34,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IUnsafeKeywordToken _:
                     return ParseUnsafeStatement();
                 default:
-                    var expression = ParseExpression();
-                    var semicolon = Tokens.Expect<ISemicolonToken>();
-                    return new ExpressionStatementSyntax(
-                        TextSpan.Covering(expression.Span, semicolon),
-                        expression);
+                    try
+                    {
+                        var expression = ParseExpression();
+                        var semicolon = Tokens.Expect<ISemicolonToken>();
+                        return new ExpressionStatementSyntax(
+                            TextSpan.Covering(expression.Span, semicolon), expression);
+                    }
+                    catch (ParseFailedException)
+                    {
+                        SkipToEndOfStatement();
+                        throw;
+                    }
             }
         }
 
@@ -78,38 +85,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new ExpressionStatementSyntax(span, unsafeExpression);
         }
 
-        public BlockSyntax AcceptBlock()
-        {
-            var openBrace = Tokens.AcceptToken<IOpenBraceToken>();
-            if (openBrace == null)
-                return null;
-            return ParseRestOfBlock(openBrace.Span);
-        }
-
         public BlockSyntax ParseBlock()
         {
             var openBrace = Tokens.Expect<IOpenBraceToken>();
-            return ParseRestOfBlock(openBrace);
-        }
-
-        // Requires the open brace has already been consumed
-        private BlockSyntax ParseRestOfBlock(TextSpan openBrace)
-        {
             var statements = ParseMany<StatementSyntax, ICloseBraceToken>(ParseStatement);
             var closeBrace = Tokens.Expect<ICloseBraceToken>();
             var span = TextSpan.Covering(openBrace, closeBrace);
             return new BlockSyntax(span, statements);
         }
 
-        public IBlockOrResultSyntax ParseBlockOrResult()
+        /// <summary>
+        /// Skip tokens until we reach what we assume to be the end of a statement
+        /// </summary>
+        private void SkipToEndOfStatement()
         {
-            if (Tokens.Current is IOpenBraceToken)
-                return ParseBlock();
+            while (!Tokens.AtEnd<ISemicolonToken>())
+                Tokens.Next();
 
-            var equalsGreaterThan = Tokens.Expect<IEqualsGreaterThanToken>();
-            var expression = ParseExpression();
-            var span = TextSpan.Covering(equalsGreaterThan, expression.Span);
-            return new ResultStatementSyntax(span, expression);
+            // Consume the semicolon if we aren't at the end of the file.
+            var _ = Tokens.Accept<ISemicolonToken>();
         }
     }
 }

@@ -99,30 +99,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                             @operator = Tokens.RequiredToken<IOperatorToken>();
                         }
                         break;
-                    //case IColonToken _: // type kind
-                    //    if (minPrecedence <= OperatorPrecedence.Relational)
-                    //    {
-                    //        var colon = Tokens.RequiredToken<IColonToken>();
-                    //        TypeKind typeKind;
-                    //        switch (Tokens.Current)
-                    //        {
-                    //            case IClassKeywordToken _:
-                    //                typeKind = TypeKind.Class;
-                    //                break;
-                    //            //case IStructKeywordToken _:
-                    //            //    typeKind = TypeKind.Struct;
-                    //            //    break;
-                    //            default:
-                    //                Tokens.Expect<ITypeKindKeywordToken>();
-                    //                // We saw a colon without what we expected after, just assume it is missing
-                    //                continue;
-                    //        }
-                    //        var typeKindSpan = Tokens.Expect<ITypeKindKeywordToken>();
-                    //        var span = TextSpan.Covering(colon.Span, typeKindSpan);
-                    //        expression = new TypeKindExpressionSyntax(span, typeKind);
-                    //        continue;
-                    //    }
-                    //    break;
                     case IDotDotToken _:
                     case ILessThanDotDotToken _:
                     case IDotDotLessThanToken _:
@@ -158,7 +134,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     //        continue;
                     //    }
                     //    break;
-                    case IQuestionToken _:
+                    case IQuestionToken _: // TODO this be a type
                         if (minPrecedence <= OperatorPrecedence.Unary)
                         {
                             var question = Tokens.Required<IQuestionToken>();
@@ -202,7 +178,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         operatorPrecedence += 1;
 
                     var rightOperand = ParseExpression(operatorPrecedence);
-                    expression = BuildOperatorExpression(expression, operatorToken, rightOperand);
+                    expression = BuildOperatorExpression(expression, (IBinaryOperatorToken)operatorToken, rightOperand);
                 }
                 else
                 {
@@ -216,23 +192,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             switch (accessOperatorToken)
             {
+                default:
+                    throw NonExhaustiveMatchException.For(accessOperatorToken);
                 case IDotToken _:
                     return AccessOperator.Standard;
                 case IQuestionDotToken _:
                     return AccessOperator.Conditional;
-                default:
-                    throw NonExhaustiveMatchException.For(accessOperatorToken);
             }
         }
 
         private static ExpressionSyntax BuildOperatorExpression(
              ExpressionSyntax left,
-             IOperatorToken operatorToken,
+             IBinaryOperatorToken operatorToken,
              ExpressionSyntax right)
         {
             BinaryOperator binaryOperator;
             switch (operatorToken)
             {
+                default:
+                    throw ExhaustiveMatch.Failed(operatorToken);
                 case IEqualsToken _:
                     return new AssignmentExpressionSyntax(left, AssignmentOperator.Direct, right);
                 case IPlusEqualsToken _:
@@ -282,8 +260,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IDotDotToken _:
                     binaryOperator = BinaryOperator.DotDot;
                     break;
-                default:
-                    throw NonExhaustiveMatchException.For(operatorToken);
+                case ILessThanDotDotToken _:
+                case IDotDotLessThanToken _:
+                case ILessThanDotDotLessThanToken _:
+                case IQuestionQuestionToken _:
+                case IDollarToken _:
+                    throw new NotImplementedException();
             }
             return new BinaryExpressionSyntax(left, binaryOperator, right);
         }
@@ -367,13 +349,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 }
                 case IUnsafeKeywordToken _:
                     return ParseUnsafeExpression();
-                //case IMutableKeywordToken _:
-                //{
-                //    var mutableKeyword = Tokens.Expect<IMutableKeywordToken>();
-                //    var expression = ParseExpression(OperatorPrecedence.AboveAssignment);
-                //    var span = TextSpan.Covering(mutableKeyword, expression.Span);
-                //    return new MutableTypeSyntax(span, expression);
-                //}
                 case IMoveKeywordToken _:
                 {
                     var moveKeyword = Tokens.Expect<IMoveKeywordToken>();
@@ -403,7 +378,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IQuestionToken _:
                 case ISemicolonToken _:
                 case ICloseParenToken _:
-
                 {
                     // If it is one of these, we assume there is a missing identifier
                     var identifierSpan = Tokens.Expect<IIdentifierToken>();
@@ -415,7 +389,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
-        private ExpressionSyntax ParseUnsafeExpression(ParseAs parseAs = ParseAs.Expression)
+        private ExpressionSyntax ParseUnsafeExpression()
         {
             var unsafeKeyword = Tokens.Expect<IUnsafeKeywordToken>();
             var isBlock = Tokens.Current is IOpenBraceToken;
@@ -423,11 +397,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 ? ParseBlock()
                 : ParseParenthesizedExpression();
             var span = TextSpan.Covering(unsafeKeyword, expression.Span);
-            if (parseAs == ParseAs.Statement && !isBlock)
-            {
-                var semicolon = Tokens.Expect<ISemicolonToken>();
-                span = TextSpan.Covering(span, semicolon);
-            }
             return new UnsafeExpressionSyntax(span, expression);
         }
 
@@ -512,7 +481,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             if (!Tokens.Accept<IElseKeywordToken>())
                 return null;
-            IElseClauseSyntax expression = Tokens.Current is IIfKeywordToken
+            var expression = Tokens.Current is IIfKeywordToken
                 ? (IElseClauseSyntax)ParseIf(parseAs)
                 : ParseBlockOrResult();
             if (parseAs == ParseAs.Statement
@@ -521,6 +490,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return expression;
         }
 
+        /// <summary>
+        /// Parse and expression that is required to have parenthesis around it.
+        /// for example `unsafe(x);`.
+        /// </summary>
+        /// <returns></returns>
         private ExpressionSyntax ParseParenthesizedExpression()
         {
             Tokens.Expect<IOpenParenToken>();
@@ -540,6 +514,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (value == null)
                 return null;
             return new ArgumentSyntax(value.Span, value);
+        }
+
+        public IBlockOrResultSyntax ParseBlockOrResult()
+        {
+            if (Tokens.Current is IOpenBraceToken)
+                return ParseBlock();
+
+            var equalsGreaterThan = Tokens.Expect<IEqualsGreaterThanToken>();
+            var expression = ParseExpression();
+            var span = TextSpan.Covering(equalsGreaterThan, expression.Span);
+            return new ResultStatementSyntax(span, expression);
         }
     }
 }
