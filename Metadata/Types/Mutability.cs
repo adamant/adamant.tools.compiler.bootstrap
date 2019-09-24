@@ -49,15 +49,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             this.upgradable = upgradable;
         }
 
-        public bool IsAssignableFrom(Mutability other)
+        public bool IsAssignableFrom(Mutability other, bool allowExplicitUpgrade = false)
         {
-            if (!mutable)
-                return true;
-            if (other.mutable)
-                return true;
-            if (other.upgradable == Upgradable.Implicitly)
-                return true;
-            return false;
+            return !mutable
+                   || other.mutable
+                   || other.upgradable == Upgradable.Implicitly
+                   || (allowExplicitUpgrade && other.upgradable == Upgradable.Explicitly);
         }
 
         public override string ToString()

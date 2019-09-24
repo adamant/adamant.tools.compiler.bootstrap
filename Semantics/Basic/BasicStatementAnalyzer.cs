@@ -440,25 +440,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var argumentTypes = methodInvocation.Arguments.Select(InferArgumentType).ToFixedList();
                     InferExpressionType(ref methodInvocation.Target);
                     var targetType = methodInvocation.Target.Type;
-
-                    //if (callee is FunctionType functionType)
-                    //{
-                    //    foreach (var (arg, type) in invocation.Arguments.Zip(functionType
-                    //        .ParameterTypes))
-                    //    {
-                    //        InsertImplicitConversionIfNeeded(ref arg.Value, type);
-                    //        CheckArgumentTypeCompatibility(type, arg);
-                    //    }
-
-                    //    return invocation.Type = functionType.ReturnType;
-                    //}
-
                     // If it is unknown, we already reported an error
                     if (targetType == DataType.Unknown)
                         return methodInvocation.Type = DataType.Unknown;
 
-                    diagnostics.Add(TypeError.MustBeCallable(file, methodInvocation.Target));
-                    return methodInvocation.Type = DataType.Unknown;
+                    // TODO improve function lookup and include the possibility that the symbol isn't a function
+                    //diagnostics.Add(TypeError.MustBeCallable(file, methodInvocation.Target));
+                    //return methodInvocation.Type = DataType.Unknown;
+                    var typeSymbol = GetSymbolForType(targetType);
+                    var functionSymbols = typeSymbol.ChildSymbols[methodInvocation.MethodName]
+                        .OfType<IFunctionSymbol>().ToFixedList();
+                    functionSymbols = ResolveOverload(functionSymbols, targetType, argumentTypes);
+                    var functionSymbol = functionSymbols.Single();
+
+                    var selfType = functionSymbol.Parameters.First().Type;
+                    InsertImplicitConversionIfNeeded(ref methodInvocation.Target, selfType);
+                    CheckArgumentTypeCompatibility(selfType, methodInvocation.Target, true);
+
+                    // Skip the self parameter
+                    foreach (var (arg, type) in methodInvocation.Arguments
+                            .Zip(functionSymbol.Parameters.Skip(1).Select(p => p.Type)))
+                    {
+                        InsertImplicitConversionIfNeeded(ref arg.Value, type);
+                        CheckArgumentTypeCompatibility(type, arg.Value);
+                    }
+
+                    return methodInvocation.Type = functionSymbol.ReturnType;
                 }
                 case AssociatedFunctionInvocationSyntax associatedFunctionInvocation:
 
@@ -583,7 +590,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             foreach (var (arg, parameter) in functionInvocation.Arguments.Zip(functionSymbol.Parameters))
             {
                 InsertImplicitConversionIfNeeded(ref arg.Value, parameter.Type);
-                CheckArgumentTypeCompatibility(parameter.Type, arg);
+                CheckArgumentTypeCompatibility(parameter.Type, arg.Value);
             }
 
             return functionInvocation.Type = functionSymbol.ReturnType;
@@ -689,17 +696,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
         }
 
-        private void CheckArgumentTypeCompatibility(DataType type, ArgumentSyntax arg)
+        private void CheckArgumentTypeCompatibility(DataType type, ExpressionSyntax arg, bool selfArgument = false)
         {
-            var fromType = arg.Value.Type;
-            if (!IsAssignableFrom(type, fromType))
-                diagnostics.Add(TypeError.CannotConvert(file, arg.Value, fromType, type));
+            var fromType = arg.Type;
+            if (!IsAssignableFrom(type, fromType, selfArgument))
+                diagnostics.Add(TypeError.CannotConvert(file, arg, fromType, type));
         }
 
         /// <summary>
         /// Tests whether a variable of the target type could be assigned from a variable of the source type
         /// </summary>
-        private static bool IsAssignableFrom(DataType target, DataType source)
+        private static bool IsAssignableFrom(DataType target, DataType source, bool allowUpgrade = false)
         {
             if (target.Equals(source))
                 return true;
@@ -708,7 +715,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 if (targetReference.IsOwned && !sourceReference.IsOwned)
                     return false;
 
-                if (!targetReference.Mutability.IsAssignableFrom(sourceReference.Mutability))
+                if (!targetReference.Mutability.IsAssignableFrom(sourceReference.Mutability, allowUpgrade))
                     return false;
 
                 // If they are equal except for lifetimes and mutability compatible, it is fine
@@ -716,7 +723,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
 
             if (target is OptionalType targetOptional && source is OptionalType sourceOptional)
-                return IsAssignableFrom(targetOptional.Referent, sourceOptional.Referent);
+                return IsAssignableFrom(targetOptional.Referent, sourceOptional.Referent, allowUpgrade);
 
             return false;
         }
@@ -857,16 +864,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             DataType selfType,
             FixedList<DataType> argumentTypes)
         {
+            var expectedArgumentCount = argumentTypes.Count + (selfType != null ? 1 : 0);
             // Filter down to symbols that could possible match
-            symbols = symbols.Where(s =>
+            symbols = symbols.Where(f =>
             {
-                //if (s.Type is FunctionType functionType)
-                //{
-                //    if (functionType.Arity != argumentTypes.Count)
-                //        return false;
-                //    // TODO check compatibility of self type
-                //    // TODO check compatibility over argument types
-                //}
+                if (f.Arity() != expectedArgumentCount)
+                    return false;
+                // TODO check compatibility of self type
+                // TODO check compatibility over argument types
 
                 return true;
             }).ToFixedList();

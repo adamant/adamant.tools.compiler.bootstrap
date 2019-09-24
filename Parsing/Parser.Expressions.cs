@@ -162,8 +162,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                             // Member Access
                             var accessOperator = BuildAccessOperator(Tokens.RequiredToken<IAccessOperatorToken>());
                             var member = ParseSimpleName();
-                            var span = TextSpan.Covering(expression.Span, member.Span);
-                            expression = new MemberAccessExpressionSyntax(span, expression, accessOperator, member);
+                            if (!(Tokens.Current is IOpenParenToken))
+                            {
+                                var memberAccessSpan = TextSpan.Covering(expression.Span, member.Span);
+                                expression = new MemberAccessExpressionSyntax(memberAccessSpan, expression, accessOperator, member);
+                            }
+                            else
+                            {
+                                Tokens.RequiredToken<IOpenParenToken>();
+                                var arguments = ParseArguments();
+                                var closeParenSpan = Tokens.Expect<ICloseParenToken>();
+                                var invocationSpan = TextSpan.Covering(expression.Span, closeParenSpan);
+                                expression = new MethodInvocationSyntax(invocationSpan, expression, member.Name, arguments);
+                            }
                             continue;
                         }
                         break;
