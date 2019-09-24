@@ -716,7 +716,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     throw ExhaustiveMatch.Failed(invocation);
                 case MethodInvocationSyntax methodInvocation:
                     return ConvertInvocationToValue(methodInvocation);
-                case AssociatedFunctionInvocationSyntax associatedFunctionInvocation:
+                case AssociatedFunctionInvocationSyntax _:
                     throw new NotImplementedException();
                 case FunctionInvocationSyntax functionInvocation:
                     return ConvertInvocationToValue(functionInvocation);
@@ -725,51 +725,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
         private Value ConvertInvocationToValue(MethodInvocationSyntax invocation)
         {
-            switch (invocation.Target)
+            var self = ConvertToOperand(invocation.Target);
+            var arguments = invocation.Arguments.Select(a => ConvertToOperand(a.Value)).ToList();
+            var symbol = (IFunctionSymbol)invocation.MethodNameSyntax.ReferencedSymbol;
+            switch (invocation.Target.Type)
             {
-                case NameSyntax identifier:
-                {
-                    var symbol = identifier.ReferencedSymbol;
-                    var arguments = invocation.Arguments.Select(a => ConvertToOperand(a.Value))
-                        .ToList();
-                    return new FunctionCall(symbol.FullName, /*(FunctionType)symbol.Type,*/
-                        arguments, invocation.Span);
-                }
-                case MemberAccessExpressionSyntax memberAccess:
-                {
-                    var self = ConvertToOperand(memberAccess.Expression);
-                    var arguments = invocation.Arguments.Select(a => ConvertToOperand(a.Value))
-                        .ToList();
-                    var symbol = memberAccess.ReferencedSymbol;
-                    switch (symbol)
-                    {
-                        case IFunctionSymbol function:
-                            switch (memberAccess.Expression.Type)
-                            {
-                                case SimpleType _:
-                                    // case StructType _:
-                                    // Full name because this isn't a member
-                                    return new FunctionCall(
-                                        function.FullName, /*(FunctionType)function.Type,*/ self,
-                                        arguments, invocation.Span);
-                                default:
-                                    return new VirtualFunctionCall(invocation.Span,
-                                        function.FullName.UnqualifiedName, self, arguments);
-                            }
-                        default:
-                            throw NonExhaustiveMatchException.For(symbol);
-                    }
-                }
+                case SimpleType _:
+                    // Full name because this isn't a member
+                    return new FunctionCall(symbol.FullName,
+                        self, arguments, invocation.Span);
                 default:
-                    throw NonExhaustiveMatchException.For(invocation.Target);
+                    return new VirtualFunctionCall(invocation.Span,
+                        symbol.FullName.UnqualifiedName, self, arguments);
             }
         }
 
-        private Value ConvertInvocationToValue(FunctionInvocationSyntax functionInvocation)
+        private Value ConvertInvocationToValue(FunctionInvocationSyntax invocation)
         {
-            var functionSymbol = (IFunctionSymbol)functionInvocation.FunctionNameSyntax.ReferencedSymbol;
-            var arguments = functionInvocation.Arguments.Select(a => ConvertToOperand(a.Value)).ToList();
-            return new FunctionCall(functionSymbol.FullName, arguments, functionInvocation.Span);
+            var functionSymbol = (IFunctionSymbol)invocation.FunctionNameSyntax.ReferencedSymbol;
+            var arguments = invocation.Arguments.Select(a => ConvertToOperand(a.Value)).ToList();
+            return new FunctionCall(functionSymbol.FullName, arguments, invocation.Span);
         }
 
         private IPlace ConvertToPlace(ExpressionSyntax value)

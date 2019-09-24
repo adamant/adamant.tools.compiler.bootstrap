@@ -448,10 +448,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     //diagnostics.Add(TypeError.MustBeCallable(file, methodInvocation.Target));
                     //return methodInvocation.Type = DataType.Unknown;
                     var typeSymbol = GetSymbolForType(targetType);
-                    var functionSymbols = typeSymbol.ChildSymbols[methodInvocation.MethodName]
+                    var functionSymbols = typeSymbol.ChildSymbols[methodInvocation.MethodNameSyntax.Name]
                         .OfType<IFunctionSymbol>().ToFixedList();
                     functionSymbols = ResolveOverload(functionSymbols, targetType, argumentTypes);
                     var functionSymbol = functionSymbols.Single();
+                    methodInvocation.MethodNameSyntax.ReferencedSymbol = functionSymbol;
 
                     var selfType = functionSymbol.Parameters.First().Type;
                     InsertImplicitConversionIfNeeded(ref methodInvocation.Target, selfType);

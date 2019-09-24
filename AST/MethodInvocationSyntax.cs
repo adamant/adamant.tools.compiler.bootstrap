@@ -1,28 +1,27 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class MethodInvocationSyntax : InvocationSyntax
     {
         public ExpressionSyntax Target;
-        public SimpleName MethodName { get; }
+        public NameSyntax MethodNameSyntax { get; }
 
         public MethodInvocationSyntax(
             TextSpan span,
             ExpressionSyntax target,
-            SimpleName methodName,
+            NameSyntax methodNameSyntax,
             FixedList<ArgumentSyntax> arguments)
-            : base(span, methodName, arguments)
+            : base(span, methodNameSyntax.Name, arguments)
         {
             Target = target;
-            MethodName = methodName;
+            MethodNameSyntax = methodNameSyntax;
         }
 
         public override string ToString()
         {
-            return $"{Target}.{MethodName}({string.Join(", ", Arguments)})";
+            return $"{Target}.{FunctionName}({string.Join(", ", Arguments)})";
         }
     }
 }

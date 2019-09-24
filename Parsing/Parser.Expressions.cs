@@ -173,7 +173,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                                 var arguments = ParseArguments();
                                 var closeParenSpan = Tokens.Expect<ICloseParenToken>();
                                 var invocationSpan = TextSpan.Covering(expression.Span, closeParenSpan);
-                                expression = new MethodInvocationSyntax(invocationSpan, expression, member.Name, arguments);
+                                expression = new MethodInvocationSyntax(invocationSpan, expression, member, arguments);
                             }
                             continue;
                         }
