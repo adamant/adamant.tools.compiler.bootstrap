@@ -1,5 +1,6 @@
 using System;
 using Adamant.Tools.Compiler.Bootstrap.AST;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
@@ -27,11 +28,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 //    break;
                 case IMutableKeywordToken _:
                 {
-                    //var mutableKeyword = Tokens.Expect<IMutableKeywordToken>();
-                    //var expression = ParseExpression(OperatorPrecedence.AboveAssignment);
-                    //var span = TextSpan.Covering(mutableKeyword, expression.Span);
-                    //return new MutableTypeSyntax(span, expression);
-                    throw new NotImplementedException();
+                    var mutableKeyword = Tokens.Expect<IMutableKeywordToken>();
+                    var referent = ParseType();
+                    var span = TextSpan.Covering(mutableKeyword, referent.Span);
+                    return new MutableTypeSyntax(span, referent);
                 }
                 case IIdentifierToken _:
                     return ParseTypeName();

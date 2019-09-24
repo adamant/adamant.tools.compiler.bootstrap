@@ -1,4 +1,3 @@
-using System;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using ExhaustiveMatching;
 
@@ -162,7 +161,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 
         public virtual void VisitMutableType(MutableTypeSyntax mutableType, A args)
         {
-            throw new NotImplementedException();
+            VisitType(mutableType.Referent, args);
         }
 
         public virtual void VisitImplicitConversionExpression(ImplicitConversionExpression implicitConversionExpression, A args)
