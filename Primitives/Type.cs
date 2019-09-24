@@ -14,6 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             IEnumerable<ISymbol> childSymbols = null)
             : base(fullName)
         {
+            DeclaresType = declaresType;
             ChildSymbols = new SymbolSet(childSymbols ?? Enumerable.Empty<ISymbol>());
         }
 
