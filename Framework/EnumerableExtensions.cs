@@ -37,14 +37,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         }
 
         [DebuggerStepThrough]
-        public static IEnumerable<Tuple<TFirst, TSecond>> Zip<TFirst, TSecond>(
-            this IEnumerable<TFirst> first,
-            IEnumerable<TSecond> second)
-        {
-            return first.Zip(second, Tuple.Create);
-        }
-
-        [DebuggerStepThrough]
         public static IEnumerable<TResult> CrossJoin<TFirst, TSecond, TResult>(
             this IEnumerable<TFirst> first,
             IEnumerable<TSecond> second,
