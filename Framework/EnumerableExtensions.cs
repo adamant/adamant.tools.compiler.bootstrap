@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         }
 
         [DebuggerStepThrough]
-        public static IEnumerable<T> YieldValue<T>(this T value)
+        public static IEnumerable<T> YieldValue<T>(this T? value)
             where T : class
         {
             if (value != null)
@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
 
         [DebuggerStepThrough]
         public static FixedList<T> ToFixedList<T>(this IEnumerable<T> values)
-            where T : class
+            where T : class?
         {
             return new FixedList<T>(values);
         }

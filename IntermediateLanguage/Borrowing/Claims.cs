@@ -41,21 +41,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
         public bool Remove(Claim claim)
         {
             var removed = claimsSet.Remove(claim);
-            if (removed) claimsList.Remove(claim);
+            if (removed)
+                claimsList.Remove(claim);
             return removed;
         }
 
-        public Claim ClaimBy(Variable variable)
+        public Claim? ClaimBy(Variable variable)
         {
             return claimsList.SingleOrDefault(c => c.Holder.Equals(variable));
         }
 
-        public Owns OwnedBy(Variable variable)
+        public Owns? OwnedBy(Variable variable)
         {
             return claimsList.OfType<Owns>().SingleOrDefault(o => o.Holder == variable);
         }
 
-        public Owns OwnerOf(Lifetime lifetime)
+        public Owns? OwnerOf(Lifetime lifetime)
         {
             return claimsList.OfType<Owns>().SingleOrDefault(o => o.Lifetime == lifetime);
         }
@@ -70,8 +71,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
 
         public bool SequenceEqual(Claims other)
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other))
+                return false;
+            if (ReferenceEquals(this, other))
+                return true;
             return claimsList.SequenceEqual(other.claimsList);
         }
 
@@ -111,7 +114,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
             var lifetimes = affectedLifetimes.ToQueue();
             while (lifetimes.TryDequeue(out var lifetime))
             {
-                if (claimsList.Any(c => c.Lifetime == lifetime)) continue;
+                if (claimsList.Any(c => c.Lifetime == lifetime))
+                    continue;
 
                 // Nothing is holding this lifetime, remove it
                 for (var i = claimsList.Count - 1; i >= 0; i--)

@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             this.variables = variables.ToList();
         }
 
-        public VariableDeclaration AddVariable(bool mutableBinding, DataType type, Scope scope, SimpleName name = null)
+        public VariableDeclaration AddVariable(bool mutableBinding, DataType type, Scope scope, SimpleName? name = null)
         {
             var variable = new VariableDeclaration(false, mutableBinding, type, new Variable(variables.Count), scope, name);
             variables.Add(variable);
@@ -78,7 +78,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         /// Doesn't create a new block if the current block is empty.
         public BlockBuilder NewEntryBlock(BlockBuilder currentBlock, TextSpan span, Scope scope)
         {
-            if (!currentBlock.Statements.Any()) return currentBlock;
+            if (!currentBlock.Statements.Any())
+                return currentBlock;
             var entryBlock = NewBlock();
             currentBlock.AddGoto(entryBlock, span, scope);
             return entryBlock;

@@ -1,3 +1,4 @@
+using System;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -7,6 +8,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class ConstructorDeclarationSyntax : FunctionDeclarationSyntax
     {
+        public override FixedList<StatementSyntax> Body => base.Body ?? throw new InvalidOperationException();
+
         public ConstructorDeclarationSyntax(
             TextSpan span,
             CodeFile file,

@@ -5,13 +5,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
 {
     internal class TreeWalker
     {
-        private readonly IDeclarationWalker declarationWalker;
-        private readonly IStatementWalker statementWalker;
+        private readonly IDeclarationWalker? declarationWalker;
+        private readonly IStatementWalker? statementWalker;
         private readonly ITypeWalker typeWalker;
 
         public TreeWalker(
-            IDeclarationWalker declarationWalker,
-            IStatementWalker statementWalker,
+            IDeclarationWalker? declarationWalker,
+            IStatementWalker? statementWalker,
             ITypeWalker typeWalker)
         {
             this.declarationWalker = declarationWalker;
@@ -24,11 +24,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
             switch (declaration)
             {
                 case ClassDeclarationSyntax classDeclaration:
-                    if (declarationWalker.Enter(classDeclaration))
+                    if (declarationWalker?.Enter(classDeclaration) ?? true)
                     {
                         foreach (var member in classDeclaration.Members)
                             Walk(member);
-                        declarationWalker.Exit(classDeclaration);
+                        declarationWalker?.Exit(classDeclaration);
                     }
                     break;
                 default:
@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
 
         public void Walk(TypeSyntax type)
         {
-            if (typeWalker?.ShouldSkip(type) ?? true)
+            if (typeWalker is null || typeWalker.ShouldSkip(type))
                 return;
 
             switch (type)

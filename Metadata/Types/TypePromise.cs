@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     public class TypePromise
     {
         public PromiseState State { get; private set; }
-        private DataType DataType { get; set; }
+        private DataType? dataType;
 
         [DebuggerHidden]
         public void BeginFulfilling()
@@ -34,7 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         {
             Requires.That(nameof(State), State == PromiseState.InProgress, "must be in progress is " + State);
             State = PromiseState.Fulfilled;
-            DataType = type ?? throw new ArgumentNullException(nameof(type));
+            dataType = type ?? throw new ArgumentNullException(nameof(type));
             return type;
         }
 
@@ -44,7 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             if (State != PromiseState.Fulfilled)
                 throw new InvalidOperationException("Promise not fulfilled");
 
-            return DataType;
+            return dataType!;
         }
 
 
@@ -57,7 +57,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             if (State != PromiseState.Fulfilled)
                 throw new InvalidOperationException("Promise not fulfilled");
 
-            return DataType.AssertKnown();
+            return dataType!.AssertKnown();
         }
 
         // Useful for debugging
@@ -70,7 +70,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                 case PromiseState.InProgress:
                     return "⧼in progress⧽";
                 case PromiseState.Fulfilled:
-                    return DataType.ToString();
+                    return dataType!.ToString();
                 default:
                     throw ExhaustiveMatch.Failed(State);
             }

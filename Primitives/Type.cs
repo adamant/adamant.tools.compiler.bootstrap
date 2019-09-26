@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
@@ -8,17 +9,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 {
     internal class Type : Primitive, ITypeSymbol
     {
+        private DataType? declaresType;
+
         protected Type(
             Name fullName,
-            DataType declaresType,
-            IEnumerable<ISymbol> childSymbols = null)
+            DataType? declaresType,
+            IEnumerable<ISymbol>? childSymbols = null)
             : base(fullName)
         {
-            DeclaresType = declaresType;
+            this.declaresType = declaresType;
             ChildSymbols = new SymbolSet(childSymbols ?? Enumerable.Empty<ISymbol>());
         }
 
-        public DataType DeclaresType { get; internal set; }
+        public DataType DeclaresType
+        {
+            get => declaresType ?? throw new InvalidOperationException();
+            internal set => declaresType = value;
+        }
 
         public static Type NewType(Name fullName, IEnumerable<ISymbol> childSymbols)
         {
@@ -27,12 +34,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 
         public static Type NewSimpleType(
             SimpleType type,
-            IEnumerable<ISymbol> childSymbols = null)
+            IEnumerable<ISymbol>? childSymbols = null)
         {
             return new Type(type.Name, type, childSymbols);
         }
 
-        public static Type New(Name fullName, DataType type = null)
+        public static Type New(Name fullName, DataType? type = null)
         {
             return new Type(fullName, type);
         }

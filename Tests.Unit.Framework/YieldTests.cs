@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Framework
         [Fact]
         public void YieldOfNullIsSingleItem()
         {
-            object x = null;
+            object? x = null;
             Assert.Single(x.Yield(), x);
         }
 
@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Framework
         [Fact]
         public void YieldValueOfNullClassIsEmpty()
         {
-            object x = null;
+            object? x = null;
             Assert.Empty(x.YieldValue());
         }
 

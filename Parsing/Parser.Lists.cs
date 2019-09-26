@@ -8,10 +8,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public partial class Parser
     {
-        public FixedList<T> AcceptMany<T>(Func<T> acceptItem)
+        public FixedList<T> AcceptMany<T>(Func<T?> acceptItem)
             where T : class
         {
-            return new Generator<T>(acceptItem)
+            return new Generator<T?>(acceptItem)
                 .TakeWhile(t => t != null).ToFixedList();
         }
 
@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return items.ToFixedList();
         }
 
-        public FixedList<T> AcceptSeparatedList<T, TSeparator>(Func<T> acceptItem)
+        public FixedList<T> AcceptSeparatedList<T, TSeparator>(Func<T?> acceptItem)
             where T : class
             where TSeparator : class, IToken
         {
@@ -43,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return items.ToFixedList();
         }
 
-        public FixedList<T> AcceptOneOrMore<T, TSeparator>(Func<T> acceptItem)
+        public FixedList<T> AcceptOneOrMore<T, TSeparator>(Func<T?> acceptItem)
             where T : class
             where TSeparator : class, IToken
         {

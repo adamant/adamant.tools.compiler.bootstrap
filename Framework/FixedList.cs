@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
     // These attributes make it so FixedList<T> is displayed nicely in the debugger similar to List<T>
     [DebuggerDisplay("Count = {" + nameof(Count) + "}")]
     [DebuggerTypeProxy(typeof(CollectionDebugView<>))]
-    public class FixedList<T> : IReadOnlyList<T>, IEquatable<FixedList<T>> where T : class
+    public class FixedList<T> : IReadOnlyList<T>, IEquatable<FixedList<T>>
     {
         public static readonly FixedList<T> Empty = new FixedList<T>(Enumerable.Empty<T>());
 
@@ -38,12 +38,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         public T this[int index] => items[index];
 
         #region Equality
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(obj as FixedList<T>);
         }
 
-        public bool Equals(FixedList<T> other)
+        public bool Equals(FixedList<T>? other)
         {
             return other != null && Count == other.Count && items.SequenceEqual(other.items);
         }

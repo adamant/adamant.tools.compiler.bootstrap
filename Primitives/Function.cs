@@ -18,6 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         private Function(Name fullName)
             : base(fullName)
         {
+            Parameters = FixedList<Parameter>.Empty;
         }
 
         public static Function New(Name fullName, params (string name, DataType type)[] parameters)

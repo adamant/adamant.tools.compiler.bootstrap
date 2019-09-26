@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public AccessOperator AccessOperator { get; }
         public NameSyntax Member { get; }
 
-        public ISymbol ReferencedSymbol
+        public ISymbol? ReferencedSymbol
         {
             get => Member.ReferencedSymbol;
             set => Member.ReferencedSymbol = value;

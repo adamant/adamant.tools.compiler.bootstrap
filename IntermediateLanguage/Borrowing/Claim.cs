@@ -21,14 +21,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
 
         public abstract override string ToString();
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(obj as Claim);
         }
 
-        public virtual bool Equals(Claim other)
+        public virtual bool Equals(Claim? other)
         {
-            return other != null &&
+            return !(other is null) &&
                    Holder == other.Holder &&
                    Lifetime == other.Lifetime;
         }

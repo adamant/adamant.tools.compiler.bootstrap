@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         /// If this declaration corresponds to an argument or local variable,
         /// what it was named. Not guaranteed unique
         /// </summary>
-        public readonly SimpleName Name;
+        public readonly SimpleName? Name;
         public readonly bool IsParameter;
         public readonly bool IsMutableBinding;
         public readonly DataType Type;
@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             DataType type,
             Variable variable,
             Scope? scope,
-            SimpleName name = null)
+            SimpleName? name = null)
         {
             IsParameter = isParameter;
             Variable = variable;
@@ -72,7 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public string ToStatementString()
         {
             var binding = IsMutableBinding ? "var" : "let";
-            var name = Name != null ? $"({Name})" : "";
+            var name = Name is null ? "" : $"({Name})";
             return $"{binding} {Variable}{name}: {Type};";
         }
 

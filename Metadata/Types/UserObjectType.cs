@@ -126,14 +126,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         }
 
         #region Equality
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(obj as UserObjectType);
         }
 
-        public bool Equals(UserObjectType other)
+        public bool Equals(UserObjectType? other)
         {
-            return other != null &&
+            return !(other is null) &&
                    EqualityComparer<ISymbol>.Default.Equals(Symbol, other.Symbol) &&
                    EqualityComparer<Name>.Default.Equals(Name, other.Name) &&
                    DeclaredMutable == other.DeclaredMutable &&

@@ -9,7 +9,8 @@
 
     <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Tests.Unit</RootNamespace>
 
-    <LangVersion>latest</LangVersion>
+    <LangVersion>8.0</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

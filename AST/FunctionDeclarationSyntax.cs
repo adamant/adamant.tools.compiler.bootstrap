@@ -18,8 +18,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(ConstructorDeclarationSyntax))]
     public abstract class FunctionDeclarationSyntax : MemberDeclarationSyntax, IFunctionSymbol
     {
-        private DataType selfParameterType;
-        public DataType SelfParameterType
+        private DataType? selfParameterType;
+        public DataType? SelfParameterType
         {
             get => selfParameterType;
             set
@@ -32,9 +32,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public FixedList<IModiferToken> Modifiers { get; }
         public FixedList<ParameterSyntax> Parameters { get; }
-        public FixedList<StatementSyntax> Body { get; }
+        public virtual FixedList<StatementSyntax>? Body { get; }
         public TypePromise ReturnType { get; } = new TypePromise();
-        public ControlFlowGraph ControlFlow { get; set; }
+        public ControlFlowGraph? ControlFlow { get; set; }
 
         IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;
 
@@ -47,7 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             Name fullName,
             TextSpan nameSpan,
             FixedList<ParameterSyntax> parameters,
-            FixedList<StatementSyntax> body)
+            FixedList<StatementSyntax>? body)
             : base(span, file, fullName, nameSpan,
                 new SymbolSet(GetChildSymbols(parameters, body)))
         {
@@ -58,18 +58,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         private static IEnumerable<ISymbol> GetChildSymbols(
              FixedList<ParameterSyntax> parameters,
-             FixedList<StatementSyntax> body)
+             FixedList<StatementSyntax>? body)
         {
             var variableDeclarations = GetVariableDeclarations(body);
             return ((IEnumerable<ISymbol>)parameters).Concat(variableDeclarations);
         }
 
         private static IReadOnlyList<VariableDeclarationStatementSyntax> GetVariableDeclarations(
-            FixedList<StatementSyntax> body)
+            FixedList<StatementSyntax>? body)
         {
             var visitor = new GetVariableDeclarationsVisitor();
-            foreach (var statement in body)
-                visitor.VisitStatement(statement, default);
+            if (body != null)
+                foreach (var statement in body)
+                    visitor.VisitStatement(statement, default);
             var variableDeclarations = visitor.VariableDeclarations;
             return variableDeclarations;
         }

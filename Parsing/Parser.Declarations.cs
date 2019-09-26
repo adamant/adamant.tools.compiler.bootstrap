@@ -162,11 +162,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var binding = Tokens.Expect<IBindingToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(identifier.Value);
-            TypeSyntax type = null;
+            TypeSyntax? type = null;
             if (Tokens.Accept<IColonToken>())
                 type = ParseType();
 
-            ExpressionSyntax initializer = null;
+            ExpressionSyntax? initializer = null;
             if (Tokens.Accept<IEqualsToken>())
                 initializer = ParseExpression();
 
@@ -187,11 +187,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var bodyParser = NestedParser(name);
             var parameters = bodyParser.ParseParameters();
             var lifetimeBounds = bodyParser.ParseLifetimeBounds();
-            TypeSyntax returnType = null;
+            TypeSyntax? returnType = null;
             if (Tokens.Accept<IRightArrowToken>())
                 returnType = ParseType();
 
-            FixedList<StatementSyntax> body = null;
+            FixedList<StatementSyntax>? body = null;
             TextSpan span;
             if (Tokens.Current is IOpenBraceToken)
             {
@@ -223,7 +223,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 TextSpan.Covering(newKeywordSpan, identifier?.Span), parameters, body);
         }
 
-        private ExpressionSyntax ParseLifetimeBounds()
+        private ExpressionSyntax? ParseLifetimeBounds()
         {
             switch (Tokens.Current)
             {

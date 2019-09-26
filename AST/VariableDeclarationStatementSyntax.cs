@@ -17,9 +17,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public TextSpan NameSpan { get; }
         public TypeSyntax TypeSyntax { get; }
-        private DataType type;
+        private DataType? type;
 
-        public DataType Type
+        DataType IBindingSymbol.Type => Type ?? throw new InvalidOperationException();
+        public DataType? Type
         {
             get => type;
             set

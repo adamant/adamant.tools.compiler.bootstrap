@@ -12,9 +12,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(MutableTypeSyntax))]
     public abstract class TypeSyntax : Syntax
     {
-        private DataType namedType;
+        private DataType? namedType;
 
-        public DataType NamedType
+        public DataType? NamedType
         {
             get => namedType;
             set

@@ -102,7 +102,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 function.MarkErrored();
         }
 
-        private static DataType ResolveSelfType(FunctionDeclarationSyntax function)
+        private static DataType? ResolveSelfType(FunctionDeclarationSyntax function)
         {
             var declaringType = function.DeclaringType?.DeclaresType.Fulfilled();
             if (declaringType == null)

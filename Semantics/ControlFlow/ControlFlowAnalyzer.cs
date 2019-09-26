@@ -40,22 +40,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         /// The block we are currently adding statements to. Thus after control flow statements this
         /// is the block the control flow exits to.
         /// </summary>
-        private BlockBuilder currentBlock;
+        private BlockBuilder? currentBlock;
 
         /// <summary>
         /// The block that a `break` statement should go to
         /// </summary>
-        private BlockBuilder breakToBlock;
+        private BlockBuilder? breakToBlock;
 
         /// <summary>
         /// The block that a `next` statement should go to
         /// </summary>
-        private BlockBuilder continueToBlock;
+        private BlockBuilder? continueToBlock;
 
         private Scope nextScope;
         private readonly Stack<Scope> scopes = new Stack<Scope>();
         private Scope CurrentScope => scopes.Peek();
-        private DataType returnType;
+        private DataType? returnType;
 
         private ControlFlowAnalyzer()
         {

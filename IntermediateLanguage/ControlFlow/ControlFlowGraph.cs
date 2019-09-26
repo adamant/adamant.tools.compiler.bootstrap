@@ -23,14 +23,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         /// <summary>
         /// If requested, the semantic analyzer will store the live variables here
         /// </summary>
-        public LiveVariables LiveVariables { get; set; }
+        public LiveVariables? LiveVariables { get; set; }
 
         /// <summary>
         /// If requested, the semantic analyzer will store the borrow claims here
         /// </summary>
-        public StatementClaims BorrowClaims { get; set; }
+        public StatementClaims? BorrowClaims { get; set; }
 
-        public InsertedDeletes InsertedDeletes { get; set; }
+        public InsertedDeletes? InsertedDeletes { get; set; }
 
         public ControlFlowGraph(
             IEnumerable<VariableDeclaration> variableDeclarations,

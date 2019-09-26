@@ -57,6 +57,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
                 if (Value is IReadOnlyList<Diagnostic> diagnostics
                     && token.Value is IReadOnlyList<Diagnostic> otherDiagnostics)
                 {
+                    // TODO this zip looks wrong, shouldn't it be comparing something rather than always returning false?
                     return diagnostics.Zip(otherDiagnostics, (d1, d2) => false).All(i => i);
                 }
                 return EqualityComparer<object>.Default.Equals(Value, token.Value);

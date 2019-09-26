@@ -37,8 +37,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         /// </summary>
         public bool Poisoned { get; private set; }
 
-        private DataType type;
-        public DataType Type
+        private DataType? type;
+        public DataType? Type
         {
             get => type;
             set

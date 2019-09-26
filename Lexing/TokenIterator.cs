@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
     public class TokenIterator : ITokenIterator
     {
         public ParseContext Context { get; }
-        private IEnumerator<IToken> tokens;
+        private IEnumerator<IToken>? tokens;
 
         public TokenIterator(ParseContext context, IEnumerable<IToken> tokens)
         {

@@ -6,6 +6,7 @@ using System.Linq;
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
     public sealed class DictionaryDebugView<K, V>
+        where K : notnull
     {
         private readonly IReadOnlyDictionary<K, V> dictionary;
 

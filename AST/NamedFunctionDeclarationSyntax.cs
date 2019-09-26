@@ -8,8 +8,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public class NamedFunctionDeclarationSyntax : FunctionDeclarationSyntax
     {
         public bool IsExternalFunction { get; set; }
-        public ExpressionSyntax LifetimeBounds { get; }
-        public TypeSyntax ReturnTypeSyntax { get; }
+        public ExpressionSyntax? LifetimeBounds { get; }
+        public TypeSyntax? ReturnTypeSyntax { get; }
 
         public NamedFunctionDeclarationSyntax(
             TextSpan span,
@@ -18,9 +18,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             Name fullName,
             TextSpan nameSpan,
             FixedList<ParameterSyntax> parameters, // For now we will not support pure meta functions
-            ExpressionSyntax lifetimeBounds,
-            TypeSyntax returnTypeSyntax,
-            FixedList<StatementSyntax> body)
+            ExpressionSyntax? lifetimeBounds,
+            TypeSyntax? returnTypeSyntax,
+            FixedList<StatementSyntax>? body)
             : base(span, file, modifiers, fullName, nameSpan, parameters, body)
         {
             LifetimeBounds = lifetimeBounds;

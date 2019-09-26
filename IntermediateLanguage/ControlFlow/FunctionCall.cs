@@ -8,36 +8,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     public class FunctionCall : Value
     {
         public readonly Name FunctionName;
-        //public readonly FunctionType Type;
-        public readonly IOperand Self;
+        public readonly IOperand? Self;
         public FixedList<IOperand> Arguments { get; }
         public int Arity => Arguments.Count;
 
         public FunctionCall(
             Name functionName,
-            //FunctionType type,
-            IOperand self,
+            IOperand? self,
             IEnumerable<IOperand> arguments,
             TextSpan span)
             : base(span)
         {
             FunctionName = functionName;
-            //Type = type;
             Self = self;
             Arguments = arguments.ToFixedList();
         }
 
-        public FunctionCall(Name functionName, /*FunctionType type,*/ IEnumerable<IOperand> arguments, TextSpan span)
-            : this(functionName, /*type,*/ null, arguments, span)
+        public FunctionCall(Name functionName, IEnumerable<IOperand> arguments, TextSpan span)
+            : this(functionName, null, arguments, span)
         {
         }
 
         public FunctionCall(
             TextSpan span,
             Name functionName,
-            //FunctionType type,
             params IOperand[] arguments)
-            : this(functionName, /*type,*/ null, arguments, span)
+            : this(functionName, null, arguments, span)
         {
         }
 

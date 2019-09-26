@@ -15,14 +15,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SimpleName VariableName => FullVariableName.UnqualifiedName;
-        public TypeSyntax TypeSyntax { get; }
+        public TypeSyntax? TypeSyntax { get; }
         public ExpressionSyntax InExpression;
         public BlockSyntax Block { get; }
 
-        DataType IBindingSymbol.Type => VariableType;
+        DataType IBindingSymbol.Type => VariableType ?? throw new InvalidOperationException();
 
-        private DataType variableType;
-        public DataType VariableType
+        private DataType? variableType;
+        public DataType? VariableType
         {
             get => variableType;
             set
@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             TextSpan span,
             bool isMutableBinding,
             Name fullVariableName,
-            TypeSyntax typeSyntax,
+            TypeSyntax? typeSyntax,
             ExpressionSyntax inExpression,
             BlockSyntax block)
             : base(span)

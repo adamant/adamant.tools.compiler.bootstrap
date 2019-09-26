@@ -13,5 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
         {
             Namespace = @namespace;
         }
+
+        public abstract override string ToString();
     }
 }

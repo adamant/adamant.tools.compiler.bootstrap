@@ -12,8 +12,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         public FixedList<IModiferToken> Modifiers { get; }
         public bool IsMutableBinding { get; }
-        public TypeSyntax TypeSyntax { get; }
-        public ExpressionSyntax Initializer;
+        public TypeSyntax? TypeSyntax { get; }
+        public ExpressionSyntax? Initializer;
         public TypePromise Type { get; } = new TypePromise();
 
         [DebuggerHidden]
@@ -27,8 +27,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             bool mutableBinding,
             Name fullName,
             TextSpan nameSpan,
-            TypeSyntax typeSyntax,
-            ExpressionSyntax initializer)
+            TypeSyntax? typeSyntax,
+            ExpressionSyntax? initializer)
             : base(span, file, fullName, nameSpan)
         {
             Modifiers = modifiers;

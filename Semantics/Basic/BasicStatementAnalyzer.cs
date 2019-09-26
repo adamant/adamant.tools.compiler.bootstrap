@@ -19,15 +19,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
     {
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
-        private readonly DataType selfType;
-        private readonly DataType returnType;
+        private readonly DataType? selfType;
+        private readonly DataType? returnType;
         private readonly BasicTypeAnalyzer typeAnalyzer;
 
         public BasicStatementAnalyzer(
             CodeFile file,
             Diagnostics diagnostics,
-            DataType selfType = null,
-            DataType returnType = null)
+            DataType? selfType = null,
+            DataType? returnType = null)
         {
             this.file = file;
             this.diagnostics = diagnostics;
@@ -699,7 +699,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private void CheckArgumentTypeCompatibility(DataType type, ExpressionSyntax arg, bool selfArgument = false)
         {
-            var fromType = arg.Type;
+            var fromType = arg.Type ?? throw new ArgumentException("argument must have a type");
             if (!IsAssignableFrom(type, fromType, selfArgument))
                 diagnostics.Add(TypeError.CannotConvert(file, arg, fromType, type));
         }

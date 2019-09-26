@@ -359,7 +359,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         }
 
         private static void AcquireReturnClaim(
-            IPlace assignToPlace,
+            IPlace? assignToPlace,
             Lifetime callLifetime,
             Claims outstandingClaims,
             Claims claimsAfterStatement,

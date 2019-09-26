@@ -19,19 +19,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
             return $"{Holder} borrows {Lifetime}";
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(obj as Borrows);
         }
 
-        public override bool Equals(Claim other)
+        public override bool Equals(Claim? other)
         {
             return Equals(other as Borrows);
         }
 
-        public bool Equals(Borrows other)
+        public bool Equals(Borrows? other)
         {
-            return other != null && base.Equals(other);
+            return !(other is null) && base.Equals(other);
         }
 
         public override int GetHashCode()

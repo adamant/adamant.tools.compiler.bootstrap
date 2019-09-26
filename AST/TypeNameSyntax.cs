@@ -14,8 +14,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         public Name Name { get; }
 
-        private ISymbol referencedSymbol;
-        public ISymbol ReferencedSymbol
+        private ISymbol? referencedSymbol;
+        public ISymbol? ReferencedSymbol
         {
             get => referencedSymbol;
             set
@@ -26,8 +26,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             }
         }
 
-        private LexicalScope containingScope;
-        public LexicalScope ContainingScope
+        private LexicalScope? containingScope;
+        public LexicalScope? ContainingScope
         {
             get => containingScope;
             set
@@ -46,7 +46,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public FixedList<ISymbol> LookupInContainingScope()
         {
-            return ContainingScope.LookupQualified(Name);
+            if (ContainingScope != null)
+                return ContainingScope.LookupQualified(Name);
+
+            throw new InvalidOperationException();
         }
 
         public override string ToString()

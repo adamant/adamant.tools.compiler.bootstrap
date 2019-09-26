@@ -38,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
         [System.Diagnostics.Contracts.Pure]
         public static TextSpan Covering(params TextSpan?[] spans)
         {
-            return spans.Where(s => s != null).Select(s => s.Value).Aggregate(Covering);
+            return spans.Where(s => s != null).Cast<TextSpan>().Aggregate(Covering);
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
 
         #region Equality
         [System.Diagnostics.Contracts.Pure]
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is TextSpan span && Equals(span);
         }

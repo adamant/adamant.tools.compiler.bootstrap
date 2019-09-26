@@ -89,7 +89,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             return HashCode.Combine(mutable, upgradable);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             var right = obj as Mutability?;
             return this == right;

@@ -29,8 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             TextSpan span,
             Scope scope)
         {
-            List<DeleteStatement> deletes;
-            if (!deletesAfter.TryGetValue(statement, out deletes))
+            if (!deletesAfter.TryGetValue(statement, out var deletes))
             {
                 deletes = new List<DeleteStatement>();
                 deletesAfter.Add(statement, deletes);

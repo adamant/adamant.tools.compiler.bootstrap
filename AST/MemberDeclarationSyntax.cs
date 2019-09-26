@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(TypeDeclarationSyntax))]
     public abstract class MemberDeclarationSyntax : DeclarationSyntax, ISymbol
     {
-        public TypeDeclarationSyntax DeclaringType { get; internal set; }
+        public TypeDeclarationSyntax? DeclaringType { get; internal set; }
 
         public Name FullName { get; }
 
@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             CodeFile file,
             Name fullName,
             TextSpan nameSpan,
-            SymbolSet childSymbols = null)
+            SymbolSet? childSymbols = null)
             : base(span, file, nameSpan)
         {
             FullName = fullName;

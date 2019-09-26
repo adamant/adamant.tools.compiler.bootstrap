@@ -73,14 +73,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         }
 
         #region Equals
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(obj as SimpleName);
         }
 
-        public bool Equals(SimpleName other)
+        public bool Equals(SimpleName? other)
         {
-            return other != null
+            return !(other is null)
                 && Text == other.Text
                 && IsSpecial == other.IsSpecial
                 && Number == other.Number;
@@ -91,12 +91,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
             return HashCode.Combine(Text, IsSpecial, Number);
         }
 
-        public static bool operator ==(SimpleName name1, SimpleName name2)
+        public static bool operator ==(SimpleName? name1, SimpleName? name2)
         {
             return EqualityComparer<SimpleName>.Default.Equals(name1, name2);
         }
 
-        public static bool operator !=(SimpleName name1, SimpleName name2)
+        public static bool operator !=(SimpleName? name1, SimpleName? name2)
         {
             return !(name1 == name2);
         }

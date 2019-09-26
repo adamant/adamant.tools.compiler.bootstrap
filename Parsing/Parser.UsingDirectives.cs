@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return AcceptMany(AcceptUsingDirective);
         }
 
-        public UsingDirectiveSyntax AcceptUsingDirective()
+        public UsingDirectiveSyntax? AcceptUsingDirective()
         {
             var accept = Tokens.AcceptToken<IUsingKeywordToken>();
             if (accept == null)

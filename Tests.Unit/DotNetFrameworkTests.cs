@@ -38,8 +38,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
         [Exploratory]
         public void LazyCycleThrowsInvalidOperation()
         {
-            Lazy<int> l2 = null;
-            var l1 = new Lazy<int>(() => l2.Value);
+            Lazy<int>? l2 = null;
+            var l1 = new Lazy<int>(() => l2!.Value);
             l2 = new Lazy<int>(() => l1.Value);
             Assert.Throws<InvalidOperationException>(() => l1.Value);
         }

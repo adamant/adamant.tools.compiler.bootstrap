@@ -8,6 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
     [DebuggerDisplay("Count = {" + nameof(Count) + "}")]
     [DebuggerTypeProxy(typeof(DictionaryDebugView<,>))]
     public class FixedDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue>
+        where TKey : notnull
     {
         public static readonly FixedDictionary<TKey, TValue> Empty = new FixedDictionary<TKey, TValue>(new Dictionary<TKey, TValue>());
 

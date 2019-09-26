@@ -42,14 +42,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         }
 
         #region Equals
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(obj as QualifiedName);
         }
 
-        public bool Equals(QualifiedName other)
+        public bool Equals(QualifiedName? other)
         {
-            return other != null
+            return !(other is null)
                    && UnqualifiedName.Equals(other.UnqualifiedName)
                    && Qualifier.Equals(other.Qualifier);
         }

@@ -16,8 +16,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         /// </summary>
         public TypeNameSyntax Constructor { get; }
         public FixedList<ArgumentSyntax> Arguments { get; }
-        private ISymbol constructorSymbol;
-        public ISymbol ConstructorSymbol
+        private ISymbol? constructorSymbol;
+        public ISymbol? ConstructorSymbol
         {
             get => constructorSymbol;
             set
@@ -27,8 +27,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
                 constructorSymbol = value ?? throw new ArgumentException();
             }
         }
-        private DataType constructorType;
-        public DataType ConstructorType
+        private DataType? constructorType;
+        public DataType? ConstructorType
         {
             get => constructorType;
             set

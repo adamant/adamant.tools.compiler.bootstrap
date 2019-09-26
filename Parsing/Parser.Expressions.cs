@@ -428,7 +428,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new UnaryExpressionSyntax(span, UnaryOperatorFixity.Prefix, @operator, operand);
         }
 
-        private (TextSpan, SimpleName) ParseLifetimeName()
+        private (TextSpan, SimpleName?) ParseLifetimeName()
         {
             switch (Tokens.Current)
             {
@@ -453,7 +453,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var mutableBinding = Tokens.Accept<IVarKeywordToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var variableName = nameContext.Qualify(variableNumbers.VariableName(identifier.Value));
-            TypeSyntax type = null;
+            TypeSyntax? type = null;
             if (Tokens.Accept<IColonToken>())
                 type = ParseType();
             Tokens.Expect<IInKeywordToken>();
@@ -528,12 +528,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return AcceptSeparatedList<ArgumentSyntax, ICommaToken>(AcceptArgument);
         }
 
-        private ArgumentSyntax AcceptArgument()
+        private ArgumentSyntax? AcceptArgument()
         {
             var value = AcceptExpression();
-            if (value == null)
-                return null;
-            return new ArgumentSyntax(value.Span, value);
+            return value == null ? null : new ArgumentSyntax(value.Span, value);
         }
 
         public IBlockOrResultSyntax ParseBlockOrResult()

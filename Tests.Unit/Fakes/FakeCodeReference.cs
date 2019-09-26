@@ -1,3 +1,4 @@
+using System;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 
@@ -13,5 +14,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Fakes
             : base(FixedList<string>.Empty)
         { }
         #endregion
+
+        public override string ToString()
+        {
+            throw new InvalidOperationException("Fake doesn't support ToString()");
+        }
     }
 }

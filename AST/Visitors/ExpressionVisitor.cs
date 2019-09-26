@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             VisitExpression(variableDeclaration.Initializer, args);
         }
 
-        public virtual void VisitExpression(ExpressionSyntax expression, A args)
+        public virtual void VisitExpression(ExpressionSyntax? expression, A args)
         {
             switch (expression)
             {
@@ -75,9 +75,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case IfExpressionSyntax ifExpression:
                     VisitIfExpression(ifExpression, args);
                     break;
-                //case ResultStatementSyntax resultExpression:
-                //    VisitResultExpression(resultExpression, args);
-                //    break;
                 case BreakExpressionSyntax breakExpression:
                     VisitBreakExpression(breakExpression, args);
                     break;
@@ -104,7 +101,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             }
         }
 
-        public virtual void VisitType(TypeSyntax type, A args)
+        public virtual void VisitType(TypeSyntax? type, A args)
         {
             switch (type)
             {

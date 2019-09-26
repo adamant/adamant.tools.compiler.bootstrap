@@ -101,7 +101,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     throw new NotImplementedException();
             }
 
-            return typeSyntax.NamedType;
+            return typeSyntax.NamedType ?? throw new InvalidOperationException();
         }
 
         public static Lifetime EvaluateLifetime(SimpleName lifetimeName)

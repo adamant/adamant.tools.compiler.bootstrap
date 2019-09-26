@@ -125,8 +125,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 VisitParameter(parameter, args);
 
             VisitType(namedFunctionDeclaration.ReturnTypeSyntax, args);
-            foreach (var statement in namedFunctionDeclaration.Body)
-                VisitStatement(statement, args);
+            if (namedFunctionDeclaration.Body != null)
+                foreach (var statement in namedFunctionDeclaration.Body)
+                    VisitStatement(statement, args);
         }
 
         public virtual void VisitParameter(ParameterSyntax parameter, A args)

@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         public static readonly SimpleName Size = SimpleName.Special("size");
         public static readonly SimpleName Offset = SimpleName.Special("offset");
 
-        public static SimpleName Constructor(string name = null)
+        public static SimpleName Constructor(string? name = null)
         {
             return name == null ? New : SimpleName.Special("new_" + name);
         }

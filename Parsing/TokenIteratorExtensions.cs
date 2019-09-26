@@ -58,7 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return false;
         }
 
-        public static T AcceptToken<T>(this ITokenIterator tokens)
+        public static T? AcceptToken<T>(this ITokenIterator tokens)
             where T : class, IToken
         {
             if (tokens.Current is T token)

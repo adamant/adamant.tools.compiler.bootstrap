@@ -17,9 +17,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         }
 
         public static NonExhaustiveMatchException For<T>(T value)
-            where T : class
+            where T : class?
         {
-            return new NonExhaustiveMatchException($"Matching value of type {value?.GetType()?.FullName ?? "<null>"}");
+            return new NonExhaustiveMatchException($"Matching value of type {value?.GetType().FullName ?? "<null>"}");
         }
     }
 }
