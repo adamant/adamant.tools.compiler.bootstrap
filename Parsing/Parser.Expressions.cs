@@ -223,7 +223,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 default:
                     throw ExhaustiveMatch.Failed(operatorToken);
                 case IEqualsToken _:
-                    return new AssignmentExpressionSyntax(left, AssignmentOperator.Direct, right);
+                    return new AssignmentExpressionSyntax(left, AssignmentOperator.Simple, right);
                 case IPlusEqualsToken _:
                     return new AssignmentExpressionSyntax(left, AssignmentOperator.Plus, right);
                 case IMinusEqualsToken _:

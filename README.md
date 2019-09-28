@@ -12,7 +12,7 @@ The current plan is to get a basic object-oriented subset of the language workin
 
 The basic object-oriented subset is planned to include a minimal set of features to support programming. The list below should be taken as a general guideline. Some very basic language features have been omitted. For features that are listed, often only a very basic version of them will be supported. At the end of the list are some features that may be necessary to include, but will be omitted if possible.
 
-The compiler will be simplified to include code only for these features. Not attempt will be made to structure code for features that aren't currently present. For example, function types will not be used internally because function types aren't supported in this version of the language. Additionally, the compiler will be multi-phase with errors in any phase preventing subsequent phases from running. It is expected the phases will be lexing and parsing; name binding and type checking; and borrow checking.
+The compiler will be simplified to include code only for these features. No attempt will be made to structure code for features that aren't currently present. For example, function types will not be used internally because function types aren't supported in this version of the language. Additionally, the compiler will be multi-phase with errors in any phase preventing subsequent phases from running. It is expected the phases will be lexing and parsing; name binding and type checking; and borrow checking.
 
 * [x] Stand-alone Functions - no generics
 * [x] Simple Types - `int`, `uint`, `size`, `offset`
@@ -36,7 +36,7 @@ These features should allow a number of basic programs and katas to be implement
 
 As this subset is developed, the plan will be to:
 
-* Make the Adamant source code as correct as possible given all current ideas on the design of the language with the exception of what isn't possible due to missing features (for example, generics).
+* Make the *Adamant source* code as correct as possible given all current ideas on the design of the language with the exception of what isn't possible due to missing features (for example, generics).
 * Ensure any language features used are in the language reference.
 * If needed, parts of what will be the standard library can be created as compiler intrinsics at first, but they should be replaced with correct standard library code when possible.
 

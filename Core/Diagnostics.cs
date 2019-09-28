@@ -11,6 +11,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
     {
         private readonly List<Diagnostic> items = new List<Diagnostic>();
 
+        public Diagnostics() { }
+
+        public Diagnostics(IEnumerable<Diagnostic> diagnostics)
+        {
+            items.AddRange(diagnostics);
+        }
+
         public int Count => items.Count;
 
         public void Add(Diagnostic diagnostic)

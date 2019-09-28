@@ -1,10 +1,13 @@
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     /// <summary>
-    /// Represents an extire package worth of syntax
+    /// Represents an entire package worth of syntax
     /// </summary>
     /// <remarks>Doesn't inherit from <see cref="Syntax"/> because it is never
     /// matched as part of syntax. It is always treated as the singular root.</remarks>
@@ -14,6 +17,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         public FixedList<CompilationUnitSyntax> CompilationUnits { get; }
+
+        public IEnumerable<Diagnostic> Diagnostics =>
+            CompilationUnits.SelectMany(cu => cu.Diagnostics);
 
         public PackageSyntax(
             string name,

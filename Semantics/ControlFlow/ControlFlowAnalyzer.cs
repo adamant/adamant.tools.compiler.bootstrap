@@ -432,14 +432,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     var value = ConvertToValue(assignmentExpression.RightOperand);
                     var place = ConvertToPlace(assignmentExpression.LeftOperand);
 
-                    if (assignmentExpression.Operator != AssignmentOperator.Direct)
+                    if (assignmentExpression.Operator != AssignmentOperator.Simple)
                     {
                         var type = (SimpleType)assignmentExpression.RightOperand.Type;
                         var rightOperand = ConvertToOperand(value, type);
                         BinaryOperator binaryOperator;
                         switch (assignmentExpression.Operator)
                         {
-                            case AssignmentOperator.Direct:
+                            case AssignmentOperator.Simple:
                                 throw new UnreachableCodeException("Case excluded by if statement");
                             case AssignmentOperator.Plus:
                                 binaryOperator = BinaryOperator.Plus;

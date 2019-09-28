@@ -36,8 +36,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             PackageSyntax packageSyntax,
             FixedDictionary<string, Package> references)
         {
-            // First pull over all the lexer and parser errors from the compilation units
-            var diagnostics = AllDiagnostics(packageSyntax);
+            // If there are errors from the previous phase, don't continue on
+            var parseDiagnostics = packageSyntax.Diagnostics.ToFixedList();
+            if (parseDiagnostics.Any(d => d.IsFatal))
+                throw new FatalCompilationErrorException(parseDiagnostics);
+
+            // First pull over all the lexer and parser warnings
+            var diagnostics = new Diagnostics(parseDiagnostics);
 
             var scopesBuilder = new LexicalScopesBuilder(diagnostics, packageSyntax, references);
             scopesBuilder.BuildScopesInPackage(packageSyntax);
@@ -81,14 +86,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             var entryPoint = DetermineEntryPoint(declarations, diagnostics);
 
             return new Package(packageSyntax.Name, diagnostics.Build(), references, declarations, entryPoint);
-        }
-
-        private static Diagnostics AllDiagnostics(PackageSyntax packageSyntax)
-        {
-            var diagnostics = new Diagnostics();
-            foreach (var compilationUnit in packageSyntax.CompilationUnits)
-                diagnostics.Add(compilationUnit.Diagnostics);
-            return diagnostics;
         }
 
         private static FunctionDeclaration DetermineEntryPoint(

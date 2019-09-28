@@ -4,7 +4,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public enum AssignmentOperator
     {
-        Direct,
+        Simple,
         Plus,
         Minus,
         Asterisk,
@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         {
             switch (@operator)
             {
-                case AssignmentOperator.Direct:
+                case AssignmentOperator.Simple:
                     return "=";
                 case AssignmentOperator.Plus:
                     return "+=";

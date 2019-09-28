@@ -38,14 +38,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
             Message = message;
         }
 
+        public bool IsFatal => Level == DiagnosticLevel.FatalCompilationError;
+
         public int CompareTo(Diagnostic other)
         {
-            if (ReferenceEquals(this, other)) return 0;
-            if (ReferenceEquals(null, other)) return 1;
+            if (ReferenceEquals(this, other))
+                return 0;
+            if (ReferenceEquals(null, other))
+                return 1;
             var startPositionComparison = StartPosition.CompareTo(other.StartPosition);
-            if (startPositionComparison != 0) return startPositionComparison;
+            if (startPositionComparison != 0)
+                return startPositionComparison;
             var endPositionComparison = EndPosition.CompareTo(other.EndPosition);
-            if (endPositionComparison != 0) return endPositionComparison;
+            if (endPositionComparison != 0)
+                return endPositionComparison;
             return ErrorCode.CompareTo(other.ErrorCode);
         }
 
