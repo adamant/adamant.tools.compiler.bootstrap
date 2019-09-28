@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -8,9 +9,22 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class ClassDeclarationSyntax : TypeDeclarationSyntax
+    public class ClassDeclarationSyntax : DeclarationSyntax, ITypeSymbol
     {
         public FixedList<IModiferToken> Modifiers { get; }
+        public Name FullName { get; }
+
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public SimpleName Name => FullName.UnqualifiedName;
+
+        public FixedList<MemberDeclarationSyntax> Members { get; }
+        public TypePromise DeclaresType { get; } = new TypePromise();
+        public SymbolSet ChildSymbols { get; protected set; }
+
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        DataType ITypeSymbol.DeclaresType => DeclaresType.Fulfilled();
 
         public ClassDeclarationSyntax(
             TextSpan span,
@@ -19,9 +33,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             Name fullName,
             TextSpan nameSpan,
             FixedList<MemberDeclarationSyntax> members)
-            : base(span, file, nameSpan, fullName, members)
+            : base(span, file, nameSpan)
         {
             Modifiers = modifiers;
+            FullName = fullName;
+            Members = members;
+            foreach (var member in Members)
+                member.DeclaringType = this;
+            ChildSymbols = new SymbolSet(members);
         }
 
         public void CreateDefaultConstructor()

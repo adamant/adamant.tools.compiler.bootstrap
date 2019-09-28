@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using ExhaustiveMatching;
@@ -38,6 +39,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public bool Poisoned { get; private set; }
 
         private DataType? type;
+
+        [DisallowNull]
         public DataType? Type
         {
             get => type;

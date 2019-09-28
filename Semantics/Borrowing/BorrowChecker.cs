@@ -78,9 +78,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         {
             switch (declaration)
             {
-                case TypeDeclarationSyntax typeDeclaration:
-                    Check(typeDeclaration);
-                    break;
                 case FieldDeclarationSyntax field:
                     Check(field);
                     break;
@@ -91,11 +88,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                 default:
                     throw NonExhaustiveMatchException.For(declaration);
             }
-        }
-
-        private static void Check(TypeDeclarationSyntax _type)
-        {
-            // Currently nothing to check
         }
 
         private static void Check(FieldDeclarationSyntax _field)

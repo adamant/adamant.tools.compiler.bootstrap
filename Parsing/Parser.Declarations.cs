@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             while (!Tokens.AtEnd<IEndOfFileToken>())
                 try
                 {
-                    declarations.AddRange(ParseDeclaration());
+                    declarations.Add(ParseDeclaration());
                 }
                 catch (ParseFailedException)
                 {
@@ -33,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             while (!Tokens.AtEnd<ICloseBraceToken>())
                 try
                 {
-                    declarations.AddRange(ParseDeclaration());
+                    declarations.Add(ParseDeclaration());
                 }
                 catch (ParseFailedException)
                 {
@@ -43,18 +43,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return declarations.ToFixedList();
         }
 
-        public IEnumerable<DeclarationSyntax> ParseDeclaration()
+        public DeclarationSyntax ParseDeclaration()
         {
             var modifiers = AcceptMany(Tokens.AcceptToken<IModiferToken>);
 
             switch (Tokens.Current)
             {
                 case INamespaceKeywordToken _:
-                    return ParseNamespaceDeclaration(modifiers).Yield();
+                    return ParseNamespaceDeclaration(modifiers);
                 case IClassKeywordToken _:
-                    return ParseClass(modifiers).Yield();
+                    return ParseClass(modifiers);
                 case IFunctionKeywordToken _:
-                    return ParseNamedFunction(modifiers).Yield();
+                    return ParseNamedFunction(modifiers);
                 default:
                     Tokens.UnexpectedToken();
                     throw new ParseFailedException();
@@ -67,8 +67,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
             switch (Tokens.Current)
             {
-                case IClassKeywordToken _:
-                    return ParseClass(modifiers);
                 case IFunctionKeywordToken _:
                     return ParseNamedFunction(modifiers);
                 case INewKeywordToken _:

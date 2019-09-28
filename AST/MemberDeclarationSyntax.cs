@@ -8,11 +8,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     [Closed(
         typeof(FunctionDeclarationSyntax),
-        typeof(FieldDeclarationSyntax),
-        typeof(TypeDeclarationSyntax))]
+        typeof(FieldDeclarationSyntax))]
     public abstract class MemberDeclarationSyntax : DeclarationSyntax, ISymbol
     {
-        public TypeDeclarationSyntax? DeclaringType { get; internal set; }
+        public ClassDeclarationSyntax? DeclaringType { get; internal set; }
 
         public Name FullName { get; }
 

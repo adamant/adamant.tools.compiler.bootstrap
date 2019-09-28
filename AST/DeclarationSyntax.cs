@@ -5,7 +5,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     [Closed(
         typeof(MemberDeclarationSyntax),
-        typeof(NamespaceDeclarationSyntax))]
+        typeof(NamespaceDeclarationSyntax),
+        typeof(ClassDeclarationSyntax))]
     public abstract class DeclarationSyntax : Syntax
     {
         public CodeFile File { get; }

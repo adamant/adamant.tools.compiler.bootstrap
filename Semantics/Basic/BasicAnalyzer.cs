@@ -44,7 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         private void ResolveTypesInDeclarations(FixedList<MemberDeclarationSyntax> declarations)
         {
             // Process all types first because they may be referenced by functions etc.
-            ResolveSignatureTypesInTypeDeclarations(declarations.OfType<TypeDeclarationSyntax>());
+            ResolveSignatureTypesInClassDeclarations(declarations.OfType<ClassDeclarationSyntax>());
             // Now resolve all other types (type declarations will already have types and won't be processed again)
             ResolveSignatureTypesInDeclarations(declarations);
             // Function bodies are checked after signatures to ensure that all function invocation
@@ -52,10 +52,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             ResolveBodyTypesInDeclarations(declarations);
         }
 
-        private void ResolveSignatureTypesInTypeDeclarations(IEnumerable<TypeDeclarationSyntax> typeDeclarations)
+        private void ResolveSignatureTypesInClassDeclarations(IEnumerable<ClassDeclarationSyntax> typeDeclarations)
         {
             foreach (var typeDeclaration in typeDeclarations)
-                ResolveSignatureTypesInTypeDeclaration(typeDeclaration);
+                ResolveSignatureTypesInClassDeclaration(typeDeclaration);
         }
 
         private void ResolveSignatureTypesInDeclarations(
@@ -72,9 +72,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case FunctionDeclarationSyntax f:
                     ResolveSignatureTypesInFunction(f);
                     break;
-                case TypeDeclarationSyntax t:
-                    ResolveSignatureTypesInTypeDeclaration(t);
-                    break;
                 case FieldDeclarationSyntax f:
                     ResolveSignatureTypesInField(f);
                     break;
@@ -89,7 +86,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             // Resolve the declaring type because we need its type for things like `self`
             if (function.DeclaringType != null)
-                ResolveSignatureTypesInTypeDeclaration(function.DeclaringType);
+                ResolveSignatureTypesInClassDeclaration(function.DeclaringType);
 
             var selfType = ResolveSelfType(function);
             var analyzer = new BasicStatementAnalyzer(function.File, diagnostics, selfType);
@@ -206,12 +203,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         /// If the type has not been resolved, this resolves it. This function
         /// also watches for type cycles and reports an error.
         /// </summary>
-        private void ResolveSignatureTypesInTypeDeclaration(TypeDeclarationSyntax declaration)
+        private void ResolveSignatureTypesInClassDeclaration(ClassDeclarationSyntax classDeclaration)
         {
-            switch (declaration.DeclaresType.State)
+            switch (classDeclaration.DeclaresType.State)
             {
                 case PromiseState.InProgress:
-                    diagnostics.Add(TypeError.CircularDefinition(declaration.File, declaration.NameSpan, declaration.Name));
+                    diagnostics.Add(TypeError.CircularDefinition(classDeclaration.File, classDeclaration.NameSpan, classDeclaration.Name));
                     return;
                 case PromiseState.Fulfilled:
                     return;   // We have already resolved it
@@ -219,22 +216,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     // we need to compute it
                     break;
                 default:
-                    throw ExhaustiveMatch.Failed(declaration.DeclaresType.State);
+                    throw ExhaustiveMatch.Failed(classDeclaration.DeclaresType.State);
             }
 
-            declaration.DeclaresType.BeginFulfilling();
+            classDeclaration.DeclaresType.BeginFulfilling();
 
-            switch (declaration)
-            {
-                case ClassDeclarationSyntax classDeclaration:
-                    var classType = UserObjectType.Declaration(declaration,
-                        classDeclaration.Modifiers.Any(m => m is IMutableKeywordToken));
-                    declaration.DeclaresType.Fulfill(classType);
-                    classDeclaration.CreateDefaultConstructor();
-                    break;
-                default:
-                    throw ExhaustiveMatch.Failed(declaration);
-            }
+
+            var classType = UserObjectType.Declaration(classDeclaration,
+                classDeclaration.Modifiers.Any(m => m is IMutableKeywordToken));
+            classDeclaration.DeclaresType.Fulfill(classType);
+            classDeclaration.CreateDefaultConstructor();
         }
 
         private void ResolveSignatureTypesInField(FieldDeclarationSyntax field)
@@ -272,9 +263,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case FunctionDeclarationSyntax f:
                     ResolveBodyTypesInFunction(f);
                     break;
-                case TypeDeclarationSyntax t:
-                    ResolveBodyTypesInTypeDeclaration(t);
-                    break;
                 case FieldDeclarationSyntax f:
                     ResolveBodyTypesInField(f);
                     break;
@@ -294,11 +282,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 resolver.ResolveTypesInStatement(statement);
             if (diagnosticCount != diagnostics.Count)
                 function.MarkErrored();
-        }
-
-        private static void ResolveBodyTypesInTypeDeclaration(TypeDeclarationSyntax _)
-        {
-            // No body types, members are already processed
         }
 
         private void ResolveBodyTypesInField(FieldDeclarationSyntax fieldDeclaration)

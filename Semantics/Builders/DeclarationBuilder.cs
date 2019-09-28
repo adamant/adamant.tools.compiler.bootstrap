@@ -39,12 +39,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                         namedFunction.DeclaringType != null, namedFunction.FullName, BuildParameters(namedFunction.Parameters),
                         namedFunction.ReturnType.Known(), namedFunction.ControlFlow);
                     break;
-                case ClassDeclarationSyntax classDeclaration:
-                    declaration = new TypeDeclaration(classDeclaration.FullName,
-                        classDeclaration.DeclaresType.Known(),
-                        //BuildGenericParameters(classDeclaration.GenericParameters),
-                        BuildClassMembers(classDeclaration));
-                    break;
                 case ConstructorDeclarationSyntax constructorDeclaration:
                     //var constructorType = (FunctionType)constructorDeclaration.Type.Known();
                     var parameters = BuildConstructorParameters(constructorDeclaration);

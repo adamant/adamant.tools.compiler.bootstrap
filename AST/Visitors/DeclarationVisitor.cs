@@ -23,6 +23,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case NamespaceDeclarationSyntax namespaceDeclaration:
                     VisitNamespaceDeclaration(namespaceDeclaration, args);
                     break;
+                case ClassDeclarationSyntax classDeclaration:
+                    VisitClassDeclaration(classDeclaration, args);
+                    break;
                 case null:
                     // Ignore
                     break;
@@ -51,9 +54,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case FunctionDeclarationSyntax functionDeclaration:
                     VisitFunctionDeclaration(functionDeclaration, args);
                     break;
-                case TypeDeclarationSyntax typeDeclaration:
-                    VisitTypeDeclaration(typeDeclaration, args);
-                    break;
                 case FieldDeclarationSyntax fieldDeclaration:
                     VisitFieldDeclaration(fieldDeclaration, args);
                     break;
@@ -69,21 +69,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         {
             VisitType(fieldDeclaration.TypeSyntax, args);
             VisitExpression(fieldDeclaration.Initializer, args);
-        }
-
-        public virtual void VisitTypeDeclaration(TypeDeclarationSyntax typeDeclaration, A args)
-        {
-            switch (typeDeclaration)
-            {
-                case ClassDeclarationSyntax classDeclaration:
-                    VisitClassDeclaration(classDeclaration, args);
-                    break;
-                case null:
-                    // Ignore
-                    break;
-                default:
-                    throw NonExhaustiveMatchException.For(typeDeclaration);
-            }
         }
 
         public virtual void VisitClassDeclaration(ClassDeclarationSyntax classDeclaration, A args)

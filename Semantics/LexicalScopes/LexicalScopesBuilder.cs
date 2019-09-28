@@ -126,9 +126,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     BuildScopesInFunctionParameters(constructor, containingScope, binder);
                     BuildScopesInFunctionBody(constructor, containingScope, binder);
                     break;
-                case TypeDeclarationSyntax typeDeclaration:
+                case ClassDeclarationSyntax classDeclaration:
                     // TODO name scope for type declaration
-                    foreach (var nestedDeclaration in typeDeclaration.Members)
+                    foreach (var nestedDeclaration in classDeclaration.Members)
                         BuildScopesInDeclaration(nestedDeclaration, containingScope);
                     break;
                 case FieldDeclarationSyntax fieldDeclaration:

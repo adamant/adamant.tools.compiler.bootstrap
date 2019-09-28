@@ -83,7 +83,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
             TakeByRef(ref testField);
         }
 
-        private void TakeByRef(ref string x)
+        private static void TakeByRef(ref string x)
         {
             x = "new";
         }
@@ -93,6 +93,38 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
         {
             var strings = new string[] { "old1", "old2" };
             TakeByRef(ref strings[0]);
+        }
+
+        [Fact]
+        public void BecomeNonNull()
+        {
+            var x = new Ref<string?>("Hello!");
+
+            var z = x.HasValue();
+            Assert.Equal("Hello!", z.Value);
+        }
+    }
+
+    public class Ref<T>
+        where T : class?
+    {
+        public T Value { get; }
+
+        public Ref(T value)
+        {
+            Value = value;
+        }
+
+    }
+
+    public static class RefExtensions
+    {
+        public static Ref<T> HasValue<T>(this Ref<T?> value)
+            where T : class
+        {
+            if (value.Value == null)
+                throw new InvalidOperationException();
+            return value!;
         }
     }
 }
