@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
     public class BorrowChecker
     {
         private readonly CodeFile file;
-        private readonly FixedDictionary<FunctionDeclarationSyntax, LiveVariables> liveness;
+        private readonly FixedDictionary<IFunctionDeclarationSyntax, LiveVariables> liveness;
         private readonly Diagnostics diagnostics;
         private readonly HashSet<TextSpan> reportedDiagnosticSpans = new HashSet<TextSpan>();
         private readonly bool saveBorrowClaims;
@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 
         private BorrowChecker(
             CodeFile file,
-            FixedDictionary<FunctionDeclarationSyntax, LiveVariables> liveness,
+            FixedDictionary<IFunctionDeclarationSyntax, LiveVariables> liveness,
             Diagnostics diagnostics,
             bool saveBorrowClaims)
         {
@@ -63,7 +63,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 
         public static void Check(
             IEnumerable<MemberDeclarationSyntax> declarations,
-            FixedDictionary<FunctionDeclarationSyntax, LiveVariables> liveness,
+            FixedDictionary<IFunctionDeclarationSyntax, LiveVariables> liveness,
             Diagnostics diagnostics,
             bool saveBorrowClaims)
         {
@@ -81,7 +81,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                 case FieldDeclarationSyntax field:
                     Check(field);
                     break;
-                case FunctionDeclarationSyntax function:
+                case IFunctionDeclarationSyntax function:
                     Check(function);
                     break;
 
@@ -95,7 +95,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             // Currently nothing to check
         }
 
-        private void Check(FunctionDeclarationSyntax function)
+        private void Check(IFunctionDeclarationSyntax function)
         {
             var variables = function.ControlFlow.VariableDeclarations;
             var liveVariables = liveness[function];
@@ -198,7 +198,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         }
 
         private Claims GetClaimsBeforeBlock(
-            FunctionDeclarationSyntax function,
+            IFunctionDeclarationSyntax function,
             BasicBlock block,
             StatementClaims claims)
         {
@@ -340,7 +340,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             }
         }
 
-        private Claims AcquireParameterClaims(FunctionDeclarationSyntax function)
+        private Claims AcquireParameterClaims(IFunctionDeclarationSyntax function)
         {
             var claimsBeforeStatement = new Claims();
             foreach (var parameter in function.ControlFlow.Parameters

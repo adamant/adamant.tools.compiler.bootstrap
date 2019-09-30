@@ -98,7 +98,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         }
 
         private void BuildScopesInDeclaration(
-            DeclarationSyntax declaration,
+            IDeclarationSyntax declaration,
             LexicalScope containingScope,
             ExpressionScopesBuilder binder)
         {
@@ -106,7 +106,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             {
                 default:
                     throw ExhaustiveMatch.Failed(declaration);
-                case NamespaceDeclarationSyntax ns:
+                case INamespaceDeclarationSyntax ns:
                     if (ns.InGlobalNamespace)
                         containingScope = globalScope;
 
@@ -116,22 +116,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     foreach (var nestedDeclaration in ns.Declarations)
                         BuildScopesInDeclaration(nestedDeclaration, containingScope);
                     break;
-                case NamedFunctionDeclarationSyntax function:
+                case INamedFunctionDeclarationSyntax function:
                     BuildScopesInFunctionParameters(function, containingScope, binder);
                     if (function.ReturnTypeSyntax != null)
                         new TypeScopesBuilder(containingScope).Walk(function.ReturnTypeSyntax);
                     BuildScopesInFunctionBody(function, containingScope, binder);
                     break;
-                case ConstructorDeclarationSyntax constructor:
+                case IConstructorDeclarationSyntax constructor:
                     BuildScopesInFunctionParameters(constructor, containingScope, binder);
                     BuildScopesInFunctionBody(constructor, containingScope, binder);
                     break;
-                case ClassDeclarationSyntax classDeclaration:
+                case IClassDeclarationSyntax classDeclaration:
                     // TODO name scope for type declaration
                     foreach (var nestedDeclaration in classDeclaration.Members)
                         BuildScopesInDeclaration(nestedDeclaration, containingScope);
                     break;
-                case FieldDeclarationSyntax fieldDeclaration:
+                case IFieldDeclarationSyntax fieldDeclaration:
                     new TypeScopesBuilder(containingScope).Walk(fieldDeclaration.TypeSyntax);
                     binder.VisitExpression(fieldDeclaration.Initializer, containingScope);
                     break;
@@ -139,7 +139,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         }
 
         private static void BuildScopesInFunctionParameters(
-            FunctionDeclarationSyntax function,
+            IFunctionDeclarationSyntax function,
             LexicalScope containingScope,
             ExpressionScopesBuilder binder)
         {
@@ -159,7 +159,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         }
 
         private static void BuildScopesInFunctionBody(
-            FunctionDeclarationSyntax function,
+            IFunctionDeclarationSyntax function,
             LexicalScope containingScope,
             ExpressionScopesBuilder binder)
         {

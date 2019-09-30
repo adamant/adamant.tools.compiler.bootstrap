@@ -3,6 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Parsing.Tree;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
@@ -54,7 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IClassKeywordToken _:
                     return ParseClass(modifiers);
                 case IFunctionKeywordToken _:
-                    return ParseNamedFunction(modifiers);
+                    return (DeclarationSyntax)ParseNamedFunction(modifiers);
                 default:
                     Tokens.UnexpectedToken();
                     throw new ParseFailedException();
@@ -68,9 +69,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             switch (Tokens.Current)
             {
                 case IFunctionKeywordToken _:
-                    return ParseNamedFunction(modifiers);
+                    return (MemberDeclarationSyntax)ParseNamedFunction(modifiers);
                 case INewKeywordToken _:
-                    return ParseConstructor(modifiers);
+                    return (MemberDeclarationSyntax)ParseConstructor(modifiers);
                 case ILetKeywordToken _:
                     return ParseField(false, modifiers);
                 case IVarKeywordToken _:
@@ -176,7 +177,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         #endregion
 
         #region Parse Functions
-        public NamedFunctionDeclarationSyntax ParseNamedFunction(
+        public INamedFunctionDeclarationSyntax ParseNamedFunction(
             FixedList<IModiferToken> modifiers)
         {
             var fn = Tokens.Expect<IFunctionKeywordToken>();
@@ -207,7 +208,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 parameters, lifetimeBounds, returnType, body);
         }
 
-        public ConstructorDeclarationSyntax ParseConstructor(
+        public IConstructorDeclarationSyntax ParseConstructor(
             FixedList<IModiferToken> modifiers)
         {
             var newKeywordSpan = Tokens.Expect<INewKeywordToken>();

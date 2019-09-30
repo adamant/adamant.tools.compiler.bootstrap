@@ -9,7 +9,7 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class ClassDeclarationSyntax : DeclarationSyntax, ITypeSymbol
+    public class ClassDeclarationSyntax : DeclarationSyntax, IClassDeclarationSyntax
     {
         public FixedList<IModiferToken> Modifiers { get; }
         public Name FullName { get; }
@@ -45,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public void CreateDefaultConstructor()
         {
-            if (Members.Any(m => m is ConstructorDeclarationSyntax))
+            if (Members.Any(m => m is IConstructorDeclarationSyntax))
                 return;
 
             var constructor = new DefaultConstructor((UserObjectType)DeclaresType.Fulfilled());

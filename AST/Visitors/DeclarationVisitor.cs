@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         {
             switch (memberDeclaration)
             {
-                case FunctionDeclarationSyntax functionDeclaration:
+                case IFunctionDeclarationSyntax functionDeclaration:
                     VisitFunctionDeclaration(functionDeclaration, args);
                     break;
                 case FieldDeclarationSyntax fieldDeclaration:
@@ -77,14 +77,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 VisitDeclaration(member, args);
         }
 
-        public virtual void VisitFunctionDeclaration(FunctionDeclarationSyntax functionDeclaration, A args)
+        public virtual void VisitFunctionDeclaration(IFunctionDeclarationSyntax functionDeclaration, A args)
         {
             switch (functionDeclaration)
             {
-                case NamedFunctionDeclarationSyntax namedFunction:
+                case INamedFunctionDeclarationSyntax namedFunction:
                     VisitNamedFunctionDeclaration(namedFunction, args);
                     break;
-                case ConstructorDeclarationSyntax constructorDeclaration:
+                case IConstructorDeclarationSyntax constructorDeclaration:
                     VisitConstructorDeclaration(constructorDeclaration, args);
                     break;
                 case null:
@@ -95,7 +95,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             }
         }
 
-        public virtual void VisitConstructorDeclaration(ConstructorDeclarationSyntax constructorDeclaration, A args)
+        public virtual void VisitConstructorDeclaration(IConstructorDeclarationSyntax constructorDeclaration, A args)
         {
             foreach (var parameter in constructorDeclaration.Parameters)
                 VisitParameter(parameter, args);
@@ -104,7 +104,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 VisitStatement(statement, args);
         }
 
-        public virtual void VisitNamedFunctionDeclaration(NamedFunctionDeclarationSyntax namedFunctionDeclaration, A args)
+        public virtual void VisitNamedFunctionDeclaration(INamedFunctionDeclarationSyntax namedFunctionDeclaration, A args)
         {
             foreach (var parameter in namedFunctionDeclaration.Parameters)
                 VisitParameter(parameter, args);

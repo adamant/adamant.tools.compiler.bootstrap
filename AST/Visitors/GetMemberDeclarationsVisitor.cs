@@ -14,12 +14,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             memberDeclarations.Add(memberDeclaration);
         }
 
-        public override void VisitFunctionDeclaration(FunctionDeclarationSyntax functionDeclaration, Void args)
+        public override void VisitFunctionDeclaration(IFunctionDeclarationSyntax functionDeclaration, Void args)
         {
             // No need to visit the children, no members there
         }
 
-        public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax constructorDeclaration, Void args)
+        public override void VisitConstructorDeclaration(IConstructorDeclarationSyntax constructorDeclaration, Void args)
         {
             // No need to visit the children, no members there
         }

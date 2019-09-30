@@ -12,10 +12,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
     /// </summary>
     internal class ShadowChecker : ExpressionVisitor<BindingScope>
     {
-        private readonly FunctionDeclarationSyntax function;
+        private readonly IFunctionDeclarationSyntax function;
         private readonly Diagnostics diagnostics;
 
-        private ShadowChecker(FunctionDeclarationSyntax function, Diagnostics diagnostics)
+        private ShadowChecker(IFunctionDeclarationSyntax function, Diagnostics diagnostics)
         {
             this.function = function;
             this.diagnostics = diagnostics;
@@ -23,11 +23,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
 
         public static void Check(IEnumerable<MemberDeclarationSyntax> memberDeclarations, Diagnostics diagnostics)
         {
-            foreach (var declaration in memberDeclarations.OfType<FunctionDeclarationSyntax>())
+            foreach (var declaration in memberDeclarations.OfType<IFunctionDeclarationSyntax>())
                 Check(declaration, diagnostics);
         }
 
-        private static void Check(FunctionDeclarationSyntax function, Diagnostics diagnostics)
+        private static void Check(IFunctionDeclarationSyntax function, Diagnostics diagnostics)
         {
             if (function.Body == null)
                 return;

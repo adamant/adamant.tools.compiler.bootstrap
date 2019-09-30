@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(TypeSyntax),
         typeof(ExpressionSyntax))]
     [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
-    public abstract class Syntax
+    public abstract class Syntax : ISyntax
     {
         public TextSpan Span { get; }
 

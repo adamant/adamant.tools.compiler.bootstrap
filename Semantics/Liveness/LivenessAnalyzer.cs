@@ -14,26 +14,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
     /// </summary>
     public class LivenessAnalyzer
     {
-        public static FixedDictionary<FunctionDeclarationSyntax, LiveVariables> Check(
+        public static FixedDictionary<IFunctionDeclarationSyntax, LiveVariables> Check(
             FixedList<MemberDeclarationSyntax> memberDeclarations,
             bool saveLivenessAnalysis)
         {
-            var analyses = new Dictionary<FunctionDeclarationSyntax, LiveVariables>();
+            var analyses = new Dictionary<IFunctionDeclarationSyntax, LiveVariables>();
             var livenessAnalyzer = new LivenessAnalyzer();
-            foreach (var function in memberDeclarations.OfType<FunctionDeclarationSyntax>())
+            foreach (var function in memberDeclarations.OfType<IFunctionDeclarationSyntax>())
             {
                 var liveness = livenessAnalyzer.CheckFunction(function);
                 if (liveness != null)
                 {
                     analyses.Add(function, liveness);
-                    if (saveLivenessAnalysis) function.ControlFlow.LiveVariables = liveness;
+                    if (saveLivenessAnalysis)
+                        function.ControlFlow.LiveVariables = liveness;
                 }
             }
 
             return analyses.ToFixedDictionary();
         }
 
-        private LiveVariables CheckFunction(FunctionDeclarationSyntax function)
+        private LiveVariables CheckFunction(IFunctionDeclarationSyntax function)
         {
             // Compute aliveness at point after each statement
             return ComputeLiveness(function.ControlFlow);
@@ -141,7 +142,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
                     variables[place.CoreVariable().Number] = true;
                     break;
                 case FunctionCall functionCall:
-                    if (functionCall.Self != null) EnlivenVariables(variables, functionCall.Self);
+                    if (functionCall.Self != null)
+                        EnlivenVariables(variables, functionCall.Self);
                     foreach (var argument in functionCall.Arguments)
                         EnlivenVariables(variables, argument);
                     break;

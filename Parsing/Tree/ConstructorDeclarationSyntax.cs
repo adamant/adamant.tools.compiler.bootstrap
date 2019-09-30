@@ -1,12 +1,13 @@
 using System;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    public class ConstructorDeclarationSyntax : FunctionDeclarationSyntax
+    internal class ConstructorDeclarationSyntax : FunctionDeclarationSyntax, IConstructorDeclarationSyntax
     {
         public override FixedList<StatementSyntax> Body => base.Body ?? throw new InvalidOperationException();
 

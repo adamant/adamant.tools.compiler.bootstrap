@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
     {
         public static void BuildGraphs(IEnumerable<MemberDeclarationSyntax> declarations)
         {
-            foreach (var function in declarations.OfType<FunctionDeclarationSyntax>()
+            foreach (var function in declarations.OfType<IFunctionDeclarationSyntax>()
                 .Where(ShouldBuildGraph))
             {
                 var builder = new ControlFlowAnalyzer();
@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
         }
 
-        private static bool ShouldBuildGraph(FunctionDeclarationSyntax function)
+        private static bool ShouldBuildGraph(IFunctionDeclarationSyntax function)
         {
             return function.Body != null // It is not abstract
                                          /* && function.GenericParameters == null*/
@@ -65,12 +65,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             nextScope = scope.Next();
         }
 
-        private void BuildGraph(FunctionDeclarationSyntax function)
+        private void BuildGraph(IFunctionDeclarationSyntax function)
         {
             returnType = function.ReturnType.Known();
 
             // Temp Variable for return
-            if (function is ConstructorDeclarationSyntax constructor)
+            if (function is IConstructorDeclarationSyntax constructor)
                 graph.AddSelfParameter(constructor.SelfParameterType);
             else
                 graph.AddReturnVariable(function.ReturnType.Known());

@@ -34,12 +34,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
 
             switch (memberDeclarations)
             {
-                case NamedFunctionDeclarationSyntax namedFunction:
+                case INamedFunctionDeclarationSyntax namedFunction:
                     declaration = new FunctionDeclaration(namedFunction.IsExternalFunction,
                         namedFunction.DeclaringType != null, namedFunction.FullName, BuildParameters(namedFunction.Parameters),
                         namedFunction.ReturnType.Known(), namedFunction.ControlFlow);
                     break;
-                case ConstructorDeclarationSyntax constructorDeclaration:
+                case IConstructorDeclarationSyntax constructorDeclaration:
                     //var constructorType = (FunctionType)constructorDeclaration.Type.Known();
                     var parameters = BuildConstructorParameters(constructorDeclaration);
                     //constructorType = new FunctionType(parameters.Select(p => p.Type),
@@ -111,7 +111,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
             return parameters.Select(BuildParameter).ToFixedList();
         }
 
-        private static FixedList<Parameter> BuildConstructorParameters(ConstructorDeclarationSyntax constructorDeclaration)
+        private static FixedList<Parameter> BuildConstructorParameters(IConstructorDeclarationSyntax constructorDeclaration)
         {
             var selfType = constructorDeclaration.SelfParameterType;
             var selfName = ((QualifiedName)constructorDeclaration.FullName).Qualifier.Qualify(SpecialName.Self);

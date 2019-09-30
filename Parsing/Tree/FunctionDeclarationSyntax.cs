@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.AST.Visitors;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -11,14 +13,15 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     [Closed(
         typeof(NamedFunctionDeclarationSyntax),
         typeof(ConstructorDeclarationSyntax))]
-    public abstract class FunctionDeclarationSyntax : MemberDeclarationSyntax, IFunctionSymbol
+    internal abstract class FunctionDeclarationSyntax : MemberDeclarationSyntax, IFunctionDeclarationSyntax
     {
         private DataType? selfParameterType;
+        [DisallowNull]
         public DataType? SelfParameterType
         {
             get => selfParameterType;
@@ -34,6 +37,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public FixedList<ParameterSyntax> Parameters { get; }
         public virtual FixedList<StatementSyntax>? Body { get; }
         public TypePromise ReturnType { get; } = new TypePromise();
+
+        [DisallowNull]
         public ControlFlowGraph? ControlFlow { get; set; }
 
         IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;

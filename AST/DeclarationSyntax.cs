@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(MemberDeclarationSyntax),
         typeof(NamespaceDeclarationSyntax),
         typeof(ClassDeclarationSyntax))]
-    public abstract class DeclarationSyntax : Syntax
+    public abstract class DeclarationSyntax : Syntax, IDeclarationSyntax
     {
         public CodeFile File { get; }
         public bool HasErrors { get; private set; }

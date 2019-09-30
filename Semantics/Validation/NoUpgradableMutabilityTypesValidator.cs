@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                 validator.VisitDeclaration(declaration);
         }
 
-        public override void VisitFunctionDeclaration(FunctionDeclarationSyntax functionDeclaration, Void args)
+        public override void VisitFunctionDeclaration(IFunctionDeclarationSyntax functionDeclaration, Void args)
         {
             base.VisitFunctionDeclaration(functionDeclaration, args);
             Validate(functionDeclaration.SelfParameterType);
@@ -88,7 +88,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                 case EmptyType _:
                 case SimpleType _:
                 case UnknownType _:
-                //case PointerType _:
+                    //case PointerType _:
                     // can't contain a reference type
                     break;
                 case null:

@@ -18,11 +18,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
     /// </summary>
     public class UseOfMovedValueChecker : IDataFlowAnalysisChecker<VariableFlags>
     {
-        private readonly FunctionDeclarationSyntax function;
+        private readonly IFunctionDeclarationSyntax function;
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
 
-        public UseOfMovedValueChecker(FunctionDeclarationSyntax function, Diagnostics diagnostics)
+        public UseOfMovedValueChecker(IFunctionDeclarationSyntax function, Diagnostics diagnostics)
         {
             this.function = function;
             file = function.File;

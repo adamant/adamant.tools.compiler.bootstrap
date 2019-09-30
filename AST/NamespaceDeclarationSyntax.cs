@@ -4,7 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class NamespaceDeclarationSyntax : DeclarationSyntax
+    public class NamespaceDeclarationSyntax : DeclarationSyntax, INamespaceDeclarationSyntax
     {
         /// <summary>
         /// Whether this namespace declaration is in the global namespace, the

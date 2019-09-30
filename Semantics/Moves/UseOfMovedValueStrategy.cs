@@ -1,6 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
@@ -13,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
         private UseOfMovedValueStrategy() { }
         #endregion
 
-        public IDataFlowAnalysisChecker<VariableFlags> CheckerFor(FunctionDeclarationSyntax function, Diagnostics diagnostics)
+        public IDataFlowAnalysisChecker<VariableFlags> CheckerFor(IFunctionDeclarationSyntax function, Diagnostics diagnostics)
         {
             return new UseOfMovedValueChecker(function, diagnostics);
         }

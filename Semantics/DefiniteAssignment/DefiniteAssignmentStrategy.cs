@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
         #endregion
 
         public IDataFlowAnalysisChecker<VariableFlags> CheckerFor(
-            FunctionDeclarationSyntax function,
+            IFunctionDeclarationSyntax function,
             Diagnostics diagnostics)
         {
             return new DefiniteAssignmentChecker(function, diagnostics);

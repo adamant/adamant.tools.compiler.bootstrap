@@ -8,11 +8,12 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class FieldDeclarationSyntax : MemberDeclarationSyntax, IBindingSymbol
+    public class FieldDeclarationSyntax : MemberDeclarationSyntax, IFieldDeclarationSyntax
     {
         public FixedList<IModiferToken> Modifiers { get; }
         public bool IsMutableBinding { get; }
         public TypeSyntax? TypeSyntax { get; }
+        ExpressionSyntax? IFieldDeclarationSyntax.Initializer => Initializer;
         public ExpressionSyntax? Initializer;
         public TypePromise Type { get; } = new TypePromise();
 

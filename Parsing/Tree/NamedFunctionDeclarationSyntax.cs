@@ -1,11 +1,12 @@
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    public class NamedFunctionDeclarationSyntax : FunctionDeclarationSyntax
+    internal class NamedFunctionDeclarationSyntax : FunctionDeclarationSyntax, INamedFunctionDeclarationSyntax
     {
         public bool IsExternalFunction { get; set; }
         public ExpressionSyntax? LifetimeBounds { get; }
