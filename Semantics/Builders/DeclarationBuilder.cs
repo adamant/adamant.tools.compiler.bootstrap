@@ -38,10 +38,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
             {
                 default:
                     throw ExhaustiveMatch.Failed(entityDeclaration);
-                case IMethodDeclarationSyntax namedFunction:
-                    declaration = new FunctionDeclaration(namedFunction.IsExternalFunction,
-                        namedFunction.DeclaringType != null, namedFunction.FullName, BuildParameters(namedFunction.Parameters),
-                        namedFunction.ReturnType.Known(), namedFunction.ControlFlow);
+                case IFunctionDeclarationSyntax function:
+                    declaration = new FunctionDeclaration(function.IsExternalFunction, false, function.FullName,
+                        BuildParameters(function.Parameters), function.ReturnType.Known(), function.ControlFlow);
+                    break;
+                case IMethodDeclarationSyntax method:
+                    declaration = new FunctionDeclaration(method.IsExternalFunction,
+                        method.DeclaringType != null, method.FullName, BuildParameters(method.Parameters),
+                        method.ReturnType.Known(), method.ControlFlow);
                     break;
                 case IConstructorDeclarationSyntax constructorDeclaration:
                     //var constructorType = (FunctionType)constructorDeclaration.Type.Known();

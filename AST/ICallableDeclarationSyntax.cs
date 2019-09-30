@@ -1,4 +1,7 @@
+using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
@@ -8,9 +11,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     /// </summary>
     [Closed(
         typeof(IConstructorDeclarationSyntax),
-        typeof(IMethodDeclarationSyntax))]
-    public interface ICallableDeclarationSyntax : IEntityDeclarationSyntax
+        typeof(IMethodDeclarationSyntax),
+        typeof(IFunctionDeclarationSyntax))]
+    public interface ICallableDeclarationSyntax : IEntityDeclarationSyntax, IFunctionSymbol
     {
+        new FixedList<IParameterSyntax> Parameters { get; }
         FixedList<StatementSyntax>? Body { get; }
+        [DisallowNull] ControlFlowGraph? ControlFlow { get; set; }
     }
 }

@@ -14,7 +14,7 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal abstract class FunctionLikeSyntax : MemberDeclarationSyntax
+    internal abstract class FunctionLikeSyntax : MemberDeclarationSyntax, ICallableDeclarationSyntax
     {
         private DataType? selfParameterType;
         [DisallowNull]
@@ -31,9 +31,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public FixedList<IModiferToken> Modifiers { get; }
         public FixedList<IParameterSyntax> Parameters { get; }
+        IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;
         public virtual FixedList<StatementSyntax>? Body { get; }
         public TypePromise ReturnType { get; } = new TypePromise();
-
+        DataType IFunctionSymbol.ReturnType => ReturnType.Fulfilled();
         [DisallowNull]
         public ControlFlowGraph? ControlFlow { get; set; }
 

@@ -21,9 +21,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                 validator.VisitDeclaration(declaration);
         }
 
-        public override void VisitFunctionDeclaration(IMethodDeclarationSyntax methodDeclaration, Void args)
+        public override void VisitMethodDeclaration(IMethodDeclarationSyntax methodDeclaration, Void args)
         {
-            base.VisitFunctionDeclaration(methodDeclaration, args);
+            base.VisitMethodDeclaration(methodDeclaration, args);
             Validate(methodDeclaration.SelfParameterType);
             ValidateReturn(methodDeclaration.ReturnType.Fulfilled());
         }

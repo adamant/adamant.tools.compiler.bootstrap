@@ -26,10 +26,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case IClassDeclarationSyntax classDeclaration:
                     VisitClassDeclaration(classDeclaration, args);
                     break;
+                case IFunctionDeclarationSyntax function:
+                    VisitFunctionDeclaration(function, args);
+                    break;
                 case null:
                     // Ignore
                     break;
             }
+        }
+
+        public virtual void VisitFunctionDeclaration(IFunctionDeclarationSyntax function, A args)
+        {
+            foreach (var parameter in function.Parameters)
+                VisitParameter(parameter, args);
+
+            VisitType(function.ReturnTypeSyntax, args);
+            if (function.Body != null)
+                foreach (var statement in function.Body)
+                    VisitStatement(statement, args);
         }
 
         public virtual void VisitNamespaceDeclaration(INamespaceDeclarationSyntax namespaceDeclaration, A args)
@@ -50,7 +64,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             switch (memberDeclaration)
             {
                 case IMethodDeclarationSyntax functionDeclaration:
-                    VisitFunctionDeclaration(functionDeclaration, args);
+                    VisitMethodDeclaration(functionDeclaration, args);
                     break;
                 case IFieldDeclarationSyntax fieldDeclaration:
                     VisitFieldDeclaration(fieldDeclaration, args);
@@ -87,7 +101,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 VisitStatement(statement, args);
         }
 
-        public virtual void VisitFunctionDeclaration(IMethodDeclarationSyntax methodDeclaration, A args)
+        public virtual void VisitMethodDeclaration(IMethodDeclarationSyntax methodDeclaration, A args)
         {
             foreach (var parameter in methodDeclaration.Parameters)
                 VisitParameter(parameter, args);

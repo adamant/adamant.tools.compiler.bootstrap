@@ -26,11 +26,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 {
                     default:
                         throw ExhaustiveMatch.Failed(callableDeclaration);
-                    case IMethodDeclarationSyntax function:
-                        builder.BuildGraph(function);
+                    case IMethodDeclarationSyntax method:
+                        builder.BuildGraph(method);
                         break;
                     case IConstructorDeclarationSyntax constructor:
                         builder.BuildGraph(constructor);
+                        break;
+                    case IFunctionDeclarationSyntax function:
+                        builder.BuildGraph(function);
                         break;
                 }
             }
@@ -130,6 +133,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
 
             constructor.ControlFlow = graph.Build();
+        }
+
+        private void BuildGraph(IFunctionDeclarationSyntax method)
+        {
+            returnType = method.ReturnType.Known();
+
+            // Temp Variable for return
+            graph.AddReturnVariable(method.ReturnType.Known());
+
+            // TODO don't emit temp variables for unused parameters
+            foreach (var parameter in method.Parameters.Where(p => !p.Unused))
+                graph.AddParameter(parameter.IsMutableBinding, parameter.Type.Fulfilled(),
+                    CurrentScope, parameter.Name.UnqualifiedName);
+
+            currentBlock = graph.NewBlock();
+            breakToBlock = null;
+            foreach (var statement in method.Body)
+                ConvertToStatement(statement);
+
+            // Generate the implicit return statement
+            if (currentBlock != null && !currentBlock.IsTerminated)
+            {
+                var span = method.Span.AtEnd();
+                EndScope(span);
+                currentBlock.AddReturn(span,
+                    Scope.Outer); // We officially ended the outer scope, but this is in it
+            }
+
+            method.ControlFlow = graph.Build();
         }
 
         private void EnterNewScope()

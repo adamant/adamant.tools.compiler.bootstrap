@@ -53,6 +53,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
                     case IMemberDeclarationSyntax member:
                         yield return member;
                         break;
+                    case IFunctionDeclarationSyntax function:
+                        yield return function;
+                        break;
                     case INamespaceDeclarationSyntax ns:
                         queue.EnqueueRange(ns.Declarations);
                         break;
