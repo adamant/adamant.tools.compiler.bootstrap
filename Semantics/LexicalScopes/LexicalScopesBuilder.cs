@@ -116,11 +116,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     foreach (var nestedDeclaration in ns.Declarations)
                         BuildScopesInDeclaration(nestedDeclaration, containingScope);
                     break;
-                case IMethodDeclarationSyntax function:
+                case IFunctionDeclarationSyntax function:
                     BuildScopesInFunctionParameters(containingScope, function.Parameters);
                     if (function.ReturnTypeSyntax != null)
                         new TypeScopesBuilder(containingScope).Walk(function.ReturnTypeSyntax);
-                    BuildScopesInFunctionBody(containingScope, binder, function.Parameters, function.Body);
+                    BuildScopesInFunctionBody(containingScope, binder, function.Parameters,
+                        function.Body);
+                    break;
+                case IMethodDeclarationSyntax method:
+                    BuildScopesInFunctionParameters(containingScope, method.Parameters);
+                    if (method.ReturnTypeSyntax != null)
+                        new TypeScopesBuilder(containingScope).Walk(method.ReturnTypeSyntax);
+                    BuildScopesInFunctionBody(containingScope, binder, method.Parameters, method.Body);
                     break;
                 case IConstructorDeclarationSyntax constructor:
                     BuildScopesInFunctionParameters(containingScope, constructor.Parameters);

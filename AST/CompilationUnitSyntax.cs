@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public CodeFile CodeFile { get; }
         public RootName ImplicitNamespaceName { get; }
         public FixedList<IUsingDirectiveSyntax> UsingDirectives { get; }
-        public FixedList<IDeclarationSyntax> Declarations { get; }
+        public FixedList<INonMemberDeclarationSyntax> Declarations { get; }
         public FixedList<IEntityDeclarationSyntax> EntityDeclarations { get; }
         public FixedList<Diagnostic> Diagnostics { get; }
 
@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             TextSpan span,
             CodeFile codeFile,
             FixedList<IUsingDirectiveSyntax> usingDirectives,
-            FixedList<IDeclarationSyntax> declarations,
+            FixedList<INonMemberDeclarationSyntax> declarations,
             FixedList<Diagnostic> diagnostics)
             : base(span)
         {

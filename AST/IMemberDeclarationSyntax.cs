@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(IConstructorDeclarationSyntax))]
     public interface IMemberDeclarationSyntax : IEntityDeclarationSyntax
     {
-        IClassDeclarationSyntax? DeclaringType { get; }
+        IClassDeclarationSyntax DeclaringType { get; }
         SimpleName Name { get; }
     }
 }

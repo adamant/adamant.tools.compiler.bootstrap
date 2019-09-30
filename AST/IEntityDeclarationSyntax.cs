@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     /// a thing, it just defines a group of names.
     /// </summary>
     [Closed(
-        typeof(IIndependentDeclarationSyntax),
+        typeof(INonMemberEntityDeclarationSyntax),
         typeof(IMemberDeclarationSyntax),
         typeof(ICallableDeclarationSyntax))]
     public interface IEntityDeclarationSyntax : IDeclarationSyntax, ISymbol

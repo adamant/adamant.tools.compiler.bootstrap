@@ -71,13 +71,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 default:
                     throw ExhaustiveMatch.Failed(declaration);
                 case IMethodDeclarationSyntax f:
-                    ResolveSignatureTypesInFunction(f);
+                    ResolveSignatureTypesInMethod(f);
                     break;
                 case IConstructorDeclarationSyntax c:
                     ResolveSignatureTypesInConstructor(c);
                     break;
                 case IFieldDeclarationSyntax f:
                     ResolveSignatureTypesInField(f);
+                    break;
+                case IFunctionDeclarationSyntax f:
+                    ResolveSignatureTypesInFunction(f);
                     break;
                 case IClassDeclarationSyntax _:
                     // Already processed
@@ -104,7 +107,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         }
 
 
-        private void ResolveSignatureTypesInFunction(IMethodDeclarationSyntax method)
+        private void ResolveSignatureTypesInMethod(IMethodDeclarationSyntax method)
         {
             var diagnosticCount = diagnostics.Count;
 
@@ -117,10 +120,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             ResolveTypesInParameters(analyzer, method.Parameters, method.DeclaringType);
 
-            ResolveReturnType(method, analyzer);
+            ResolveReturnType(method.ReturnType, method.ReturnTypeSyntax, analyzer);
 
             if (diagnosticCount != diagnostics.Count)
                 method.MarkErrored();
+        }
+
+        private void ResolveSignatureTypesInFunction(IFunctionDeclarationSyntax function)
+        {
+            var diagnosticCount = diagnostics.Count;
+
+            var analyzer = new BasicStatementAnalyzer(function.File, diagnostics, null);
+
+            ResolveTypesInParameters(analyzer, function.Parameters, null);
+
+            ResolveReturnType(function.ReturnType, function.ReturnTypeSyntax, analyzer);
+
+            if (diagnosticCount != diagnostics.Count)
+                function.MarkErrored();
         }
 
         private static DataType? ResolveSelfType(IMethodDeclarationSyntax method)
@@ -129,20 +146,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             if (declaringType == null)
                 return null;
 
-            switch (method)
-            {
-                default:
-                    throw ExhaustiveMatch.Failed(method);
-                case IMethodDeclarationSyntax namedFunction:
-                    var selfParameter = namedFunction.Parameters.OfType<ISelfParameterSyntax>().SingleOrDefault();
-                    if (selfParameter == null)
-                        return null; // Static function
-                    selfParameter.Type.BeginFulfilling();
-                    var selfType = (UserObjectType)declaringType;
-                    if (selfParameter.MutableSelf)
-                        selfType = selfType.AsMutable();
-                    return namedFunction.SelfParameterType = selfParameter.Type.Fulfill(selfType);
-            }
+            var selfParameter = method.Parameters.OfType<ISelfParameterSyntax>().SingleOrDefault();
+            if (selfParameter == null)
+                return null; // Static function
+            selfParameter.Type.BeginFulfilling();
+            var selfType = (UserObjectType)declaringType;
+            if (selfParameter.MutableSelf)
+                selfType = selfType.AsMutable();
+            return method.SelfParameterType = selfParameter.Type.Fulfill(selfType);
         }
 
         private void ResolveTypesInParameters(
@@ -190,18 +201,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         }
 
         private static void ResolveReturnType(
-            IMethodDeclarationSyntax method,
-            BasicStatementAnalyzer analyzer)
-        {
-            method.ReturnType.BeginFulfilling();
-            ResolveReturnType(method, method.ReturnTypeSyntax, analyzer);
-        }
-
-        private static void ResolveReturnType(
-            IMethodDeclarationSyntax method,
+            TypePromise returnTypePromise,
             TypeSyntax returnTypeSyntax,
             BasicStatementAnalyzer analyzer)
         {
+            returnTypePromise.BeginFulfilling();
             var returnType = returnTypeSyntax != null
                 ? analyzer.EvaluateType(returnTypeSyntax)
                 : DataType.Void;
@@ -209,7 +213,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             // If we are returning ownership, then they can make it mutable
             if (returnType is UserObjectType objectType && objectType.IsOwned)
                 returnType = objectType.AsImplicitlyUpgradable();
-            method.ReturnType.Fulfill(returnType);
+            returnTypePromise.Fulfill(returnType);
         }
 
         /// <summary>
@@ -275,8 +279,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             {
                 default:
                     throw ExhaustiveMatch.Failed(declaration);
-                case IMethodDeclarationSyntax f:
+                case IFunctionDeclarationSyntax f:
                     ResolveBodyTypesInFunction(f);
+                    break;
+                case IMethodDeclarationSyntax f:
+                    ResolveBodyTypesInMethod(f);
                     break;
                 case IFieldDeclarationSyntax f:
                     ResolveBodyTypesInField(f);
@@ -304,7 +311,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 constructor.MarkErrored();
         }
 
-        private void ResolveBodyTypesInFunction(IMethodDeclarationSyntax method)
+        private void ResolveBodyTypesInMethod(IMethodDeclarationSyntax method)
         {
             if (method.Body == null)
                 return;
@@ -315,6 +322,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 resolver.ResolveTypesInStatement(statement);
             if (diagnosticCount != diagnostics.Count)
                 method.MarkErrored();
+        }
+
+        private void ResolveBodyTypesInFunction(IFunctionDeclarationSyntax function)
+        {
+            if (function.Body == null)
+                return;
+
+            var diagnosticCount = diagnostics.Count;
+            var resolver = new BasicStatementAnalyzer(function.File, diagnostics,
+                null, function.ReturnType.Fulfilled());
+            foreach (var statement in function.Body)
+                resolver.ResolveTypesInStatement(statement);
+            if (diagnosticCount != diagnostics.Count)
+                function.MarkErrored();
         }
 
         private void ResolveBodyTypesInField(IFieldDeclarationSyntax fieldDeclaration)

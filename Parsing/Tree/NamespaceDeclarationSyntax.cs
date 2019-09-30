@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         /// </summary>
         public RootName NameContext { get; }
         public FixedList<IUsingDirectiveSyntax> UsingDirectives { get; }
-        public FixedList<IDeclarationSyntax> Declarations { get; }
+        public FixedList<INonMemberDeclarationSyntax> Declarations { get; }
 
         public NamespaceDeclarationSyntax(
             TextSpan span,
@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan nameSpan,
             RootName nameContext,
             FixedList<IUsingDirectiveSyntax> usingDirectives,
-            FixedList<IDeclarationSyntax> declarations)
+            FixedList<INonMemberDeclarationSyntax> declarations)
             : base(span, file, nameSpan)
         {
             Name = name;

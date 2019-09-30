@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     [Closed(
         typeof(IClassDeclarationSyntax),
         typeof(IFunctionDeclarationSyntax))]
-    public interface IIndependentDeclarationSyntax : IEntityDeclarationSyntax
+    public interface INonMemberEntityDeclarationSyntax : IEntityDeclarationSyntax, INonMemberDeclarationSyntax
     {
     }
 }

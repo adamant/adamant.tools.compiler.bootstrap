@@ -10,28 +10,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public partial class Parser
     {
-        public FixedList<IDeclarationSyntax> ParseTopLevelDeclarations()
+        public FixedList<INonMemberDeclarationSyntax> ParseIndependentDeclarations<T>()
+            where T : IToken
         {
-            var declarations = new List<IDeclarationSyntax>();
-            // Keep going to the end of the file
-            while (!Tokens.AtEnd<IEndOfFileToken>())
-                try
-                {
-                    declarations.Add(ParseDeclaration());
-                }
-                catch (ParseFailedException)
-                {
-                    // Ignore: we would have consumed something before failing, try to get the next declaration
-                }
-
-            return declarations.ToFixedList();
-        }
-
-        public FixedList<IDeclarationSyntax> ParseDeclarations()
-        {
-            var declarations = new List<IDeclarationSyntax>();
+            var declarations = new List<INonMemberDeclarationSyntax>();
             // Stop at end of file or close brace that contains these declarations
-            while (!Tokens.AtEnd<ICloseBraceToken>())
+            while (!Tokens.AtEnd<T>())
                 try
                 {
                     declarations.Add(ParseDeclaration());
@@ -44,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return declarations.ToFixedList();
         }
 
-        public IDeclarationSyntax ParseDeclaration()
+        public INonMemberDeclarationSyntax ParseDeclaration()
         {
             var modifiers = AcceptMany(Tokens.AcceptToken<IModiferToken>);
 
@@ -69,13 +53,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             switch (Tokens.Current)
             {
                 case IFunctionKeywordToken _:
-                    return (MemberDeclarationSyntax)ParseFunction(modifiers);
+                    return ParseMethod(modifiers);
                 case INewKeywordToken _:
-                    return (MemberDeclarationSyntax)ParseConstructor(modifiers);
+                    return ParseConstructor(modifiers);
                 case ILetKeywordToken _:
-                    return (MemberDeclarationSyntax)ParseField(false, modifiers);
+                    return ParseField(false, modifiers);
                 case IVarKeywordToken _:
-                    return (MemberDeclarationSyntax)ParseField(true, modifiers);
+                    return ParseField(true, modifiers);
                 default:
                     Tokens.UnexpectedToken();
                     throw new ParseFailedException();
@@ -94,7 +78,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             Tokens.Expect<IOpenBraceToken>();
             var bodyParser = NestedParser(nameContext.Qualify(name));
             var usingDirectives = bodyParser.ParseUsingDirectives();
-            var declarations = bodyParser.ParseDeclarations();
+            var declarations = bodyParser.ParseIndependentDeclarations<ICloseBraceToken>();
             var closeBrace = Tokens.Expect<ICloseBraceToken>();
             var span = TextSpan.Covering(ns, closeBrace);
             return new NamespaceDeclarationSyntax(span, File,
@@ -153,7 +137,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         #endregion
 
         #region Parse Type Member Declarations
-        private IFieldDeclarationSyntax ParseField(
+        internal FieldDeclarationSyntax ParseField(
             bool mutableBinding,
             FixedList<IModiferToken> modifiers)
         {
@@ -177,7 +161,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         #endregion
 
         #region Parse Functions
-        public IMethodDeclarationSyntax ParseFunction(
+        public IFunctionDeclarationSyntax ParseFunction(FixedList<IModiferToken> modifiers)
+        {
+            var fn = Tokens.Expect<IFunctionKeywordToken>();
+            var identifier = Tokens.RequiredToken<IIdentifierToken>();
+            var name = nameContext.Qualify(identifier.Value);
+            var bodyParser = NestedParser(name);
+            var parameters = bodyParser.ParseParameters();
+            var lifetimeBounds = bodyParser.ParseLifetimeBounds();
+            TypeSyntax? returnType = null;
+            if (Tokens.Accept<IRightArrowToken>())
+                returnType = ParseType();
+
+            FixedList<StatementSyntax>? body = null;
+            TextSpan span;
+            if (Tokens.Current is IOpenBraceToken)
+            {
+                (body, span) = bodyParser.ParseFunctionBody();
+                span = TextSpan.Covering(fn, span);
+            }
+            else
+            {
+                var semicolon = bodyParser.Tokens.Expect<ISemicolonToken>();
+                span = TextSpan.Covering(fn, semicolon);
+            }
+
+            return new FunctionDeclarationSyntax(span, File, modifiers, name, identifier.Span,
+                parameters, lifetimeBounds, returnType, body);
+        }
+
+        internal MethodDeclarationSyntax ParseMethod(
             FixedList<IModiferToken> modifiers)
         {
             var fn = Tokens.Expect<IFunctionKeywordToken>();
@@ -208,7 +221,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 parameters, lifetimeBounds, returnType, body);
         }
 
-        public IConstructorDeclarationSyntax ParseConstructor(
+        internal ConstructorDeclarationSyntax ParseConstructor(
             FixedList<IModiferToken> modifiers)
         {
             var newKeywordSpan = Tokens.Expect<INewKeywordToken>();

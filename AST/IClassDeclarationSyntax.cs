@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public interface IClassDeclarationSyntax : IIndependentDeclarationSyntax, ITypeSymbol
+    public interface IClassDeclarationSyntax : INonMemberEntityDeclarationSyntax, ITypeSymbol
     {
         FixedList<IModiferToken> Modifiers { get; }
         SimpleName Name { get; }
