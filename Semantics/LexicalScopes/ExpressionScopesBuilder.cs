@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                 VisitStatement(statement, containingScope);
                 // Each variable declaration effectively starts a new scope after it, this
                 // ensures a lookup returns the last declaration
-                if (statement is VariableDeclarationStatementSyntax variableDeclaration)
+                if (statement is IVariableDeclarationStatementSyntax variableDeclaration)
                     containingScope = new NestedScope(containingScope, variableDeclaration.Yield(),
                         Enumerable.Empty<ISymbol>());
             }

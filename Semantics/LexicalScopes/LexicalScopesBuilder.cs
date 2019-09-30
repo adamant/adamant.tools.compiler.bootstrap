@@ -168,7 +168,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             LexicalScope containingScope,
             ExpressionScopesBuilder binder,
             FixedList<IParameterSyntax> parameters,
-            FixedList<StatementSyntax> body)
+            FixedList<IStatementSyntax> body)
         {
             var symbols = new List<ISymbol>();
             foreach (var parameter in parameters)

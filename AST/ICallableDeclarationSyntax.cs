@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public interface ICallableDeclarationSyntax : IEntityDeclarationSyntax, IFunctionSymbol
     {
         new FixedList<IParameterSyntax> Parameters { get; }
-        FixedList<StatementSyntax>? Body { get; }
+        FixedList<IStatementSyntax>? Body { get; }
         [DisallowNull] ControlFlowGraph? ControlFlow { get; set; }
     }
 }

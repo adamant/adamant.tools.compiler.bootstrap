@@ -72,7 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
         }
 
         public override void VisitVariableDeclarationStatement(
-            VariableDeclarationStatementSyntax variableDeclaration,
+            IVariableDeclarationStatementSyntax variableDeclaration,
             Void args)
         {
             base.VisitVariableDeclarationStatement(variableDeclaration, args);

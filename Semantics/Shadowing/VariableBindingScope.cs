@@ -15,7 +15,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
             ContainingScope.AddShadowingBinding(VariableBinding);
         }
 
-        public VariableBindingScope(BindingScope containingScope, VariableDeclarationStatementSyntax variableDeclaration)
+        public VariableBindingScope(BindingScope containingScope,
+            IVariableDeclarationStatementSyntax variableDeclaration)
         {
             ContainingScope = containingScope;
             VariableBinding = new VariableBinding(variableDeclaration);

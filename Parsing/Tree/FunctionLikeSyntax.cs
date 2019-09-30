@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public FixedList<IModiferToken> Modifiers { get; }
         public FixedList<IParameterSyntax> Parameters { get; }
         IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;
-        public virtual FixedList<StatementSyntax>? Body { get; }
+        public virtual FixedList<IStatementSyntax>? Body { get; }
         public TypePromise ReturnType { get; } = new TypePromise();
         DataType IFunctionSymbol.ReturnType => ReturnType.Fulfilled();
         [DisallowNull]
@@ -45,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name fullName,
             TextSpan nameSpan,
             FixedList<IParameterSyntax> parameters,
-            FixedList<StatementSyntax>? body)
+            FixedList<IStatementSyntax>? body)
             : base(span, file, fullName, nameSpan,
                 new SymbolSet(GetChildSymbols(parameters, body)))
         {
@@ -56,14 +56,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         private static IEnumerable<ISymbol> GetChildSymbols(
              FixedList<IParameterSyntax> parameters,
-             FixedList<StatementSyntax>? body)
+             FixedList<IStatementSyntax>? body)
         {
             var variableDeclarations = GetVariableDeclarations(body);
             return ((IEnumerable<ISymbol>)parameters).Concat(variableDeclarations);
         }
 
-        private static IReadOnlyList<VariableDeclarationStatementSyntax> GetVariableDeclarations(
-            FixedList<StatementSyntax>? body)
+        private static IReadOnlyList<IVariableDeclarationStatementSyntax> GetVariableDeclarations(
+            FixedList<IStatementSyntax>? body)
         {
             var visitor = new GetVariableDeclarationsVisitor();
             if (body != null)
@@ -73,7 +73,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             return variableDeclarations;
         }
 
-        public IReadOnlyList<VariableDeclarationStatementSyntax> GetVariableDeclarations()
+        public IReadOnlyList<IVariableDeclarationStatementSyntax> GetVariableDeclarations()
         {
             return GetVariableDeclarations(Body);
         }

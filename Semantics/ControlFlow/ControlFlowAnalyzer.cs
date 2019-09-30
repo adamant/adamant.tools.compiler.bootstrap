@@ -231,11 +231,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             return tempVariable.Reference(value.Span);
         }
 
-        private void ConvertToStatement(StatementSyntax statement)
+        private void ConvertToStatement(IStatementSyntax statement)
         {
             switch (statement)
             {
-                case VariableDeclarationStatementSyntax variableDeclaration:
+                case IVariableDeclarationStatementSyntax variableDeclaration:
                 {
                     var variable = graph.AddVariable(variableDeclaration.IsMutableBinding,
                         variableDeclaration.Type, CurrentScope,
@@ -250,7 +250,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
                     return;
                 }
-                case ExpressionStatementSyntax expressionStatement:
+                case IExpressionStatementSyntax expressionStatement:
                 {
                     // Skip expressions with unknown type
                     var expression = expressionStatement.Expression;
@@ -283,10 +283,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             {
                 default:
                     throw ExhaustiveMatch.Failed(blockOrResult);
-                case BlockSyntax block:
-                    ConvertExpressionToStatement(block);
+                case IBlockSyntax block:
+                    ConvertExpressionToStatement((BlockSyntax)block);
                     break;
-                case ResultStatementSyntax resultStatement:
+                case IResultStatementSyntax resultStatement:
                     ConvertExpressionToStatement(resultStatement.Expression);
                     break;
             }
@@ -560,7 +560,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     var symbol = identifier.ReferencedSymbol;
                     switch (symbol)
                     {
-                        case VariableDeclarationStatementSyntax _:
+                        case IVariableDeclarationStatementSyntax _:
                         case IParameterSyntax _:
                         case ForeachExpressionSyntax _:
                             return graph.VariableFor(symbol.FullName.UnqualifiedName)

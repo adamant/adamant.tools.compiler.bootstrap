@@ -7,6 +7,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public interface IConstructorDeclarationSyntax : IMemberDeclarationSyntax, ICallableDeclarationSyntax
     {
         [DisallowNull] DataType? SelfParameterType { get; set; }
-        new FixedList<StatementSyntax> Body { get; }
+        new FixedList<IStatementSyntax> Body { get; }
     }
 }

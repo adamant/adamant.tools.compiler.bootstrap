@@ -1,20 +1,25 @@
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     /// <summary>
     /// A result statement must be the last statement of the enclosing block
     /// </summary>
-    public class ResultStatementSyntax : StatementSyntax, IBlockOrResultSyntax
+    internal class ResultStatementSyntax : StatementSyntax, IResultStatementSyntax
     {
-        public ExpressionSyntax Expression;
+        private ExpressionSyntax expression;
+
+        public ExpressionSyntax Expression => expression;
+
+        public ref ExpressionSyntax ExpressionRef => ref expression;
 
         public ResultStatementSyntax(
             TextSpan span,
             ExpressionSyntax expression)
             : base(span)
         {
-            Expression = expression;
+            this.expression = expression;
         }
 
         public override string ToString()

@@ -5,25 +5,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 {
     public class ExpressionVisitor<A>
     {
-        public virtual void VisitStatement(StatementSyntax statement, A args)
+        public virtual void VisitStatement(IStatementSyntax statement, A args)
         {
             switch (statement)
             {
-                case VariableDeclarationStatementSyntax variableDeclaration:
+                default:
+                    throw ExhaustiveMatch.Failed(statement);
+                case IVariableDeclarationStatementSyntax variableDeclaration:
                     VisitVariableDeclarationStatement(variableDeclaration, args);
                     break;
-                case ExpressionStatementSyntax expressionStatement:
+                case IExpressionStatementSyntax expressionStatement:
                     VisitExpression(expressionStatement.Expression, args);
+                    break;
+                case IResultStatementSyntax resultStatement:
+                    VisitResultStatement(resultStatement, args);
                     break;
                 case null:
                     // Ignore
                     break;
-                default:
-                    throw NonExhaustiveMatchException.For(statement);
             }
         }
 
-        public virtual void VisitVariableDeclarationStatement(VariableDeclarationStatementSyntax variableDeclaration, A args)
+        public virtual void VisitVariableDeclarationStatement(IVariableDeclarationStatementSyntax variableDeclaration, A args)
         {
             VisitType(variableDeclaration.TypeSyntax, args);
             VisitExpression(variableDeclaration.Initializer, args);
@@ -217,7 +220,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         {
         }
 
-        public virtual void VisitResultStatement(ResultStatementSyntax resultStatement, A args)
+        public virtual void VisitResultStatement(IResultStatementSyntax resultStatement, A args)
         {
             VisitExpression(resultStatement.Expression, args);
         }
@@ -235,10 +238,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             {
                 default:
                     throw ExhaustiveMatch.Failed(blockOrResult);
-                case BlockSyntax blockExpression:
-                    VisitBlock(blockExpression, args);
+                case IBlockSyntax blockExpression:
+                    VisitBlock((BlockSyntax)blockExpression, args);
                     break;
-                case ResultStatementSyntax resultStatement:
+                case IResultStatementSyntax resultStatement:
                     VisitResultStatement(resultStatement, args);
                     break;
             }

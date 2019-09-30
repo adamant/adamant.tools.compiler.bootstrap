@@ -47,12 +47,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
             {
                 VisitStatement(statement, bindingScope);
                 // Each variable declaration establishes a new binding scope
-                if (statement is VariableDeclarationStatementSyntax variableDeclaration)
+                if (statement is IVariableDeclarationStatementSyntax variableDeclaration)
                     bindingScope = new VariableBindingScope(bindingScope, variableDeclaration);
             }
         }
 
-        public override void VisitVariableDeclarationStatement(VariableDeclarationStatementSyntax variableDeclaration, BindingScope bindingScope)
+        public override void VisitVariableDeclarationStatement(IVariableDeclarationStatementSyntax variableDeclaration, BindingScope bindingScope)
         {
             base.VisitVariableDeclarationStatement(variableDeclaration, bindingScope);
             if (bindingScope.Lookup(variableDeclaration.Name, out var binding))

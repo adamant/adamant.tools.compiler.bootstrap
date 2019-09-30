@@ -58,7 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
         }
 
         public VariableFlags VariableDeclaration(
-            VariableDeclarationStatementSyntax variableDeclaration,
+            IVariableDeclarationStatementSyntax variableDeclaration,
             VariableFlags definitelyUnassigned)
         {
             if (variableDeclaration.Initializer == null)

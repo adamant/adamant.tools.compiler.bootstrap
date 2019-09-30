@@ -74,7 +74,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
         }
 
         public VariableFlags VariableDeclaration(
-            VariableDeclarationStatementSyntax variableDeclaration,
+            IVariableDeclarationStatementSyntax variableDeclaration,
             VariableFlags possiblyMoved)
         {
             // No affect on state since it should already be false

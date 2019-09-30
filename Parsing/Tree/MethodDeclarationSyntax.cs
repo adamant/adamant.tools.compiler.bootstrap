@@ -28,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IParameterSyntax> parameters, // For now we will not support pure meta functions
             ExpressionSyntax? lifetimeBounds,
             TypeSyntax? returnTypeSyntax,
-            FixedList<StatementSyntax>? body)
+            FixedList<IStatementSyntax>? body)
             : base(span, file, modifiers, fullName, nameSpan, parameters, body)
         {
             LifetimeBounds = lifetimeBounds;

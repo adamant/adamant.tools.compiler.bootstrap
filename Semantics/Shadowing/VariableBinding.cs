@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
             NameSpan = parameter.Span;
         }
 
-        public VariableBinding(VariableDeclarationStatementSyntax variableDeclaration)
+        public VariableBinding(IVariableDeclarationStatementSyntax variableDeclaration)
         {
             MutableBinding = variableDeclaration.IsMutableBinding;
             BindingName = variableDeclaration.Name;

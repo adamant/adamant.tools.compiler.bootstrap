@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         // TODO remove, there is no such thing as an external method
         bool IsExternalFunction { get; set; }
         new FixedList<IParameterSyntax> Parameters { get; }
-        FixedList<StatementSyntax>? Body { get; }
+        FixedList<IStatementSyntax>? Body { get; }
         [DisallowNull] DataType? SelfParameterType { get; set; }
         new TypePromise ReturnType { get; }
         TypeSyntax? ReturnTypeSyntax { get; }

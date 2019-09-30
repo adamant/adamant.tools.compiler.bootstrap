@@ -3,8 +3,8 @@ using ExhaustiveMatching;
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     [Closed(
-        typeof(BlockSyntax),
-        typeof(ResultStatementSyntax))]
+        typeof(IBlockSyntax),
+        typeof(IResultStatementSyntax))]
     public interface IBlockOrResultSyntax : IElseClauseSyntax
     {
     }

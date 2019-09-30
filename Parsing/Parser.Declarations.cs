@@ -173,7 +173,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (Tokens.Accept<IRightArrowToken>())
                 returnType = ParseType();
 
-            FixedList<StatementSyntax>? body = null;
+            FixedList<IStatementSyntax>? body = null;
             TextSpan span;
             if (Tokens.Current is IOpenBraceToken)
             {
@@ -203,7 +203,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (Tokens.Accept<IRightArrowToken>())
                 returnType = ParseType();
 
-            FixedList<StatementSyntax>? body = null;
+            FixedList<IStatementSyntax>? body = null;
             TextSpan span;
             if (Tokens.Current is IOpenBraceToken)
             {
@@ -272,10 +272,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return parameters.ToFixedList();
         }
 
-        private (FixedList<StatementSyntax>, TextSpan) ParseFunctionBody()
+        private (FixedList<IStatementSyntax>, TextSpan) ParseFunctionBody()
         {
             var openBrace = Tokens.Expect<IOpenBraceToken>();
-            var statements = ParseMany<StatementSyntax, ICloseBraceToken>(ParseStatement);
+            var statements = ParseMany<IStatementSyntax, ICloseBraceToken>(ParseStatement);
             var closeBrace = Tokens.Expect<ICloseBraceToken>();
             var span = TextSpan.Covering(openBrace, closeBrace);
             return (statements, span);

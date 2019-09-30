@@ -36,28 +36,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             typeAnalyzer = new BasicTypeAnalyzer(file, diagnostics, this);
         }
 
-        public void ResolveTypesInStatement(StatementSyntax statement)
+        public void ResolveTypesInStatement(IStatementSyntax statement)
         {
             switch (statement)
             {
                 default:
                     throw ExhaustiveMatch.Failed(statement);
-                case VariableDeclarationStatementSyntax variableDeclaration:
+                case IVariableDeclarationStatementSyntax variableDeclaration:
                     ResolveTypesInVariableDeclaration(variableDeclaration);
                     break;
-                case ExpressionStatementSyntax expressionStatement:
-                    InferExpressionType(ref expressionStatement.Expression);
+                case IExpressionStatementSyntax expressionStatement:
+                    InferExpressionType(ref expressionStatement.ExpressionRef);
                     break;
-                case ResultStatementSyntax resultStatement:
-                    InferExpressionType(ref resultStatement.Expression);
+                case IResultStatementSyntax resultStatement:
+                    InferExpressionType(ref resultStatement.ExpressionRef);
                     break;
             }
         }
 
-        private void ResolveTypesInVariableDeclaration(
-            VariableDeclarationStatementSyntax variableDeclaration)
+        private void ResolveTypesInVariableDeclaration(IVariableDeclarationStatementSyntax variableDeclaration)
         {
-            InferExpressionType(ref variableDeclaration.Initializer);
+            InferExpressionType(ref variableDeclaration.InitializerRef);
 
             DataType type;
             if (variableDeclaration.TypeSyntax != null)
@@ -88,7 +87,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             if (variableDeclaration.Initializer != null)
             {
-                InsertImplicitConversionIfNeeded(ref variableDeclaration.Initializer, type);
+                InsertImplicitConversionIfNeeded(ref variableDeclaration.InitializerRef, type);
                 var initializerType = variableDeclaration.Initializer.Type;
                 // If the source is an owned reference, then the declaration is implicitly owned
                 if (type is UserObjectType targetType && initializerType is UserObjectType sourceType
@@ -507,13 +506,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         case null:
                             break;
                         case IfExpressionSyntax _:
-                        case BlockSyntax _:
+                        case IBlockSyntax _:
                             var elseExpression = (ExpressionSyntax)ifExpression.ElseClause;
                             InferExpressionType(ref elseExpression);
                             //ifExpression.ElseClause = elseExpression;
                             break;
-                        case ResultStatementSyntax resultStatement:
-                            InferExpressionType(ref resultStatement.Expression);
+                        case IResultStatementSyntax resultStatement:
+                            InferExpressionType(ref resultStatement.ExpressionRef);
                             break;
                     }
                     // TODO assign a type to the expression
@@ -603,12 +602,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             {
                 default:
                     throw ExhaustiveMatch.Failed(blockOrResult);
-                case BlockSyntax block:
+                case IBlockSyntax block:
                     foreach (var statement in block.Statements)
                         ResolveTypesInStatement(statement);
 
                     return block.Type = DataType.Void; // TODO assign the correct type to the block
-                case ResultStatementSyntax result:
+                case IResultStatementSyntax result:
                     throw new NotImplementedException();
             }
         }

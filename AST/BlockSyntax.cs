@@ -12,13 +12,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     /// ending in "ExpressionSyntax". This is because a block can be either an
     /// expression or can be a block for a control flow statement. In the latter
     /// it is acting more like a statement.</remarks>
-    public class BlockSyntax : ExpressionSyntax, IBlockOrResultSyntax
+    public class BlockSyntax : ExpressionSyntax, IBlockSyntax
     {
-        public FixedList<StatementSyntax> Statements { get; }
+        public FixedList<IStatementSyntax> Statements { get; }
 
         public BlockSyntax(
             TextSpan span,
-            FixedList<StatementSyntax> statements)
+            FixedList<IStatementSyntax> statements)
             : base(span)
         {
             Statements = statements;

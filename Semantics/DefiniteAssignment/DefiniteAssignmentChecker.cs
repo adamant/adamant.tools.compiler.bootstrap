@@ -57,7 +57,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
         }
 
         public VariableFlags VariableDeclaration(
-            VariableDeclarationStatementSyntax variableDeclaration,
+            IVariableDeclarationStatementSyntax variableDeclaration,
             VariableFlags definitelyAssigned)
         {
             if (variableDeclaration.Initializer == null)

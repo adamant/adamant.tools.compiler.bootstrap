@@ -4,7 +4,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 {
     public static class ExpressionVisitorExtensions
     {
-        public static void VisitStatement(this ExpressionVisitor<Void> visitor, StatementSyntax statement)
+        public static void VisitStatement(this ExpressionVisitor<Void> visitor, IStatementSyntax statement)
         {
             visitor.VisitStatement(statement, default);
         }

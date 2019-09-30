@@ -1,13 +1,14 @@
 using System;
 using System.Diagnostics;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    public class VariableDeclarationStatementSyntax : StatementSyntax, IBindingSymbol
+    internal class VariableDeclarationStatementSyntax : StatementSyntax, IVariableDeclarationStatementSyntax
     {
         public bool IsMutableBinding { get; }
         public Name FullName { get; }
@@ -18,6 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public TextSpan NameSpan { get; }
         public TypeSyntax TypeSyntax { get; }
         private DataType? type;
+
 
         DataType IBindingSymbol.Type => Type ?? throw new InvalidOperationException();
         public DataType? Type
@@ -31,7 +33,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
                            "Can't set type to null");
             }
         }
-        public ExpressionSyntax Initializer;
+
+        private ExpressionSyntax initializer;
+        public ExpressionSyntax Initializer => initializer;
+        public ref ExpressionSyntax InitializerRef => ref initializer;
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -50,7 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             FullName = fullName;
             NameSpan = nameSpan;
             TypeSyntax = typeSyntax;
-            Initializer = initializer;
+            this.initializer = initializer;
         }
 
         public override string ToString()

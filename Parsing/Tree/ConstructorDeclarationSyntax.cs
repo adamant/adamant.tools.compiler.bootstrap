@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class ConstructorDeclarationSyntax : FunctionLikeSyntax, IConstructorDeclarationSyntax
     {
-        public override FixedList<StatementSyntax> Body => base.Body ?? throw new InvalidOperationException();
+        public override FixedList<IStatementSyntax> Body => base.Body ?? throw new InvalidOperationException();
 
         public ConstructorDeclarationSyntax(
             TextSpan span,
@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name fullName,
             TextSpan nameSpan,
             FixedList<IParameterSyntax> parameters,
-            FixedList<StatementSyntax> body)
+            FixedList<IStatementSyntax> body)
             : base(span, file, modifiers, fullName, nameSpan, parameters, body)
         {
         }
