@@ -30,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         }
 
         public FixedList<IModiferToken> Modifiers { get; }
-        public FixedList<ParameterSyntax> Parameters { get; }
+        public FixedList<IParameterSyntax> Parameters { get; }
         public virtual FixedList<StatementSyntax>? Body { get; }
         public TypePromise ReturnType { get; } = new TypePromise();
 
@@ -43,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IModiferToken> modifiers,
             Name fullName,
             TextSpan nameSpan,
-            FixedList<ParameterSyntax> parameters,
+            FixedList<IParameterSyntax> parameters,
             FixedList<StatementSyntax>? body)
             : base(span, file, fullName, nameSpan,
                 new SymbolSet(GetChildSymbols(parameters, body)))
@@ -54,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         }
 
         private static IEnumerable<ISymbol> GetChildSymbols(
-             FixedList<ParameterSyntax> parameters,
+             FixedList<IParameterSyntax> parameters,
              FixedList<StatementSyntax>? body)
         {
             var variableDeclarations = GetVariableDeclarations(body);

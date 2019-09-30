@@ -529,7 +529,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     switch (symbol)
                     {
                         case VariableDeclarationStatementSyntax _:
-                        case ParameterSyntax _:
+                        case IParameterSyntax _:
                         case ForeachExpressionSyntax _:
                             return graph.VariableFor(symbol.FullName.UnqualifiedName)
                                 .Reference(identifier.Span);

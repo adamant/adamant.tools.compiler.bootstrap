@@ -140,18 +140,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 
         private static void BuildScopesInFunctionParameters(
             LexicalScope containingScope,
-            FixedList<ParameterSyntax> parameters)
+            FixedList<IParameterSyntax> parameters)
         {
             foreach (var parameter in parameters)
                 switch (parameter)
                 {
                     default:
                         throw ExhaustiveMatch.Failed(parameter);
-                    case NamedParameterSyntax namedParameter:
+                    case INamedParameterSyntax namedParameter:
                         new TypeScopesBuilder(containingScope).Walk(namedParameter.TypeSyntax);
                         break;
-                    case SelfParameterSyntax _:
-                    case FieldParameterSyntax _:
+                    case ISelfParameterSyntax _:
+                    case IFieldParameterSyntax _:
                         // Nothing to bind
                         break;
                 }
@@ -160,7 +160,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         private static void BuildScopesInFunctionBody(
             LexicalScope containingScope,
             ExpressionScopesBuilder binder,
-            FixedList<ParameterSyntax> parameters,
+            FixedList<IParameterSyntax> parameters,
             FixedList<StatementSyntax> body)
         {
             var symbols = new List<ISymbol>();

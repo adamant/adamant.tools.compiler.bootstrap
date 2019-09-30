@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public interface IFunctionDeclarationSyntax : IMemberDeclarationSyntax,
         ICallableDeclarationSyntax, IFunctionSymbol
     {
-        new FixedList<ParameterSyntax> Parameters { get; }
+        new FixedList<IParameterSyntax> Parameters { get; }
         FixedList<StatementSyntax>? Body { get; }
         [DisallowNull]
         DataType? SelfParameterType { get; set; }

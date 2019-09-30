@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public interface IConstructorDeclarationSyntax : IMemberDeclarationSyntax, ICallableDeclarationSyntax
     {
-        FixedList<ParameterSyntax> Parameters { get; }
+        FixedList<IParameterSyntax> Parameters { get; }
         new FixedList<StatementSyntax> Body { get; }
         [DisallowNull] DataType? SelfParameterType { get; set; }
         [DisallowNull] ControlFlowGraph? ControlFlow { get; set; }

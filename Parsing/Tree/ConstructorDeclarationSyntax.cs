@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IModiferToken> modifiers,
             Name fullName,
             TextSpan nameSpan,
-            FixedList<ParameterSyntax> parameters,
+            FixedList<IParameterSyntax> parameters,
             FixedList<StatementSyntax> body)
             : base(span, file, modifiers, fullName, nameSpan, parameters, body)
         {

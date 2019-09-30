@@ -117,34 +117,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                     VisitStatement(statement, args);
         }
 
-        public virtual void VisitParameter(ParameterSyntax parameter, A args)
+        public virtual void VisitParameter(IParameterSyntax parameter, A args)
         {
             switch (parameter)
             {
-                case NamedParameterSyntax namedParameter:
+                default:
+                    throw ExhaustiveMatch.Failed(parameter);
+                case INamedParameterSyntax namedParameter:
                     VisitNamedParameter(namedParameter, args);
                     break;
-                case SelfParameterSyntax selfParameter:
+                case ISelfParameterSyntax selfParameter:
                     VisitSelfParameter(selfParameter, args);
                     break;
-                case FieldParameterSyntax fieldParameter:
+                case IFieldParameterSyntax fieldParameter:
                     VisitFieldParameter(fieldParameter, args);
                     break;
-                default:
-                    throw NonExhaustiveMatchException.For(parameter);
             }
         }
 
-        public virtual void VisitFieldParameter(FieldParameterSyntax fieldParameter, A args)
+        public virtual void VisitFieldParameter(IFieldParameterSyntax fieldParameter, A args)
         {
             VisitExpression(fieldParameter.DefaultValue, args);
         }
 
-        public virtual void VisitSelfParameter(SelfParameterSyntax selfParameter, A args)
+        public virtual void VisitSelfParameter(ISelfParameterSyntax selfParameter, A args)
         {
         }
 
-        public virtual void VisitNamedParameter(NamedParameterSyntax namedParameter, A args)
+        public virtual void VisitNamedParameter(INamedParameterSyntax namedParameter, A args)
         {
             VisitType(namedParameter.TypeSyntax, args);
             VisitExpression(namedParameter.DefaultValue, args);

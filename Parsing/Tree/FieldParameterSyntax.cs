@@ -1,9 +1,10 @@
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    public class FieldParameterSyntax : ParameterSyntax
+    internal class FieldParameterSyntax : ParameterSyntax, IFieldParameterSyntax
     {
         public SimpleName FieldName { get; }
 

@@ -109,7 +109,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
         //    throw new System.NotImplementedException();
         //}
 
-        private static FixedList<Parameter> BuildParameters(FixedList<ParameterSyntax> parameters)
+        private static FixedList<Parameter> BuildParameters(FixedList<IParameterSyntax> parameters)
         {
             return parameters.Select(BuildParameter).ToFixedList();
         }
@@ -123,16 +123,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                 .ToFixedList();
         }
 
-        private static Parameter BuildParameter(ParameterSyntax parameter)
+        private static Parameter BuildParameter(IParameterSyntax parameter)
         {
             switch (parameter)
             {
-                case NamedParameterSyntax namedParameter:
-                    return new Parameter(namedParameter.IsMutableBinding, namedParameter.Name, namedParameter.Type.Known());
-                case SelfParameterSyntax selfParameter:
-                    return new Parameter(selfParameter.IsMutableBinding, selfParameter.Name, selfParameter.Type.Known());
                 default:
-                    throw NonExhaustiveMatchException.For(parameter);
+                    throw ExhaustiveMatch.Failed(parameter);
+                case INamedParameterSyntax namedParameter:
+                    return new Parameter(namedParameter.IsMutableBinding, namedParameter.Name, namedParameter.Type.Known());
+                case ISelfParameterSyntax selfParameter:
+                    return new Parameter(selfParameter.IsMutableBinding, selfParameter.Name, selfParameter.Type.Known());
+                case IFieldParameterSyntax _:
+                    throw new NotImplementedException();
             }
         }
     }

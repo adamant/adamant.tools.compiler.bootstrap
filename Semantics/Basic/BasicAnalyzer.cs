@@ -134,7 +134,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 default:
                     throw ExhaustiveMatch.Failed(function);
                 case INamedFunctionDeclarationSyntax namedFunction:
-                    var selfParameter = namedFunction.Parameters.OfType<SelfParameterSyntax>().SingleOrDefault();
+                    var selfParameter = namedFunction.Parameters.OfType<ISelfParameterSyntax>().SingleOrDefault();
                     if (selfParameter == null)
                         return null; // Static function
                     selfParameter.Type.BeginFulfilling();
@@ -147,14 +147,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private void ResolveTypesInParameters(
             BasicStatementAnalyzer analyzer,
-            FixedList<ParameterSyntax> parameters,
+            FixedList<IParameterSyntax> parameters,
             IClassDeclarationSyntax declaringType)
         {
             var types = new List<DataType>();
             foreach (var parameter in parameters)
                 switch (parameter)
                 {
-                    case NamedParameterSyntax namedParameter:
+                    default:
+                        throw ExhaustiveMatch.Failed(parameter);
+                    case INamedParameterSyntax namedParameter:
                     {
                         parameter.Type.BeginFulfilling();
                         var type = analyzer
@@ -162,10 +164,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         types.Add(parameter.Type.Fulfill(type));
                     }
                     break;
-                    case SelfParameterSyntax _:
+                    case ISelfParameterSyntax _:
                         // Skip, we have already handled the self parameter
                         break;
-                    case FieldParameterSyntax fieldParameter:
+                    case IFieldParameterSyntax fieldParameter:
                         parameter.Type.BeginFulfilling();
                         var field = declaringType.Members
                             .OfType<IFieldDeclarationSyntax>()
@@ -182,8 +184,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             parameter.Type.Fulfill(field.Type.Fulfilled());
                         }
                         break;
-                    default:
-                        throw ExhaustiveMatch.Failed(parameter);
                 }
 
             types.ToFixedList();

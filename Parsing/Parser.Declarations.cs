@@ -235,7 +235,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
-        private FixedList<ParameterSyntax> ParseParameters()
+        private FixedList<IParameterSyntax> ParseParameters()
         {
             Tokens.Expect<IOpenParenToken>();
             return ParseRestOfParameters();
@@ -245,9 +245,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         /// Requires that the open paren has already been consumed
         /// </summary>
         /// <returns></returns>
-        private FixedList<ParameterSyntax> ParseRestOfParameters()
+        private FixedList<IParameterSyntax> ParseRestOfParameters()
         {
-            var parameters = new List<ParameterSyntax>();
+            var parameters = new List<IParameterSyntax>();
             while (!Tokens.AtEnd<ICloseParenToken>())
             {
                 parameters.Add(ParseParameter());

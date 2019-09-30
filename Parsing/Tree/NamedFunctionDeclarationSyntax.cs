@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IModiferToken> modifiers,
             Name fullName,
             TextSpan nameSpan,
-            FixedList<ParameterSyntax> parameters, // For now we will not support pure meta functions
+            FixedList<IParameterSyntax> parameters, // For now we will not support pure meta functions
             ExpressionSyntax? lifetimeBounds,
             TypeSyntax? returnTypeSyntax,
             FixedList<StatementSyntax>? body)
