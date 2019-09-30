@@ -198,7 +198,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         }
 
         private LexicalScope BuildUsingDirectivesScope(
-            FixedList<UsingDirectiveSyntax> usingDirectives,
+            FixedList<IUsingDirectiveSyntax> usingDirectives,
             LexicalScope containingScope)
         {
             if (!usingDirectives.Any())

@@ -42,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 VisitDeclaration(declaration, args);
         }
 
-        public virtual void VisitUsingDirective(UsingDirectiveSyntax usingDirective, A args)
+        public virtual void VisitUsingDirective(IUsingDirectiveSyntax usingDirective, A args)
         {
         }
 

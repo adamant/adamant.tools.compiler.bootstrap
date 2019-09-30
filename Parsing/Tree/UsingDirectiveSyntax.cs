@@ -1,9 +1,10 @@
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    public class UsingDirectiveSyntax : Syntax
+    internal class UsingDirectiveSyntax : Syntax, IUsingDirectiveSyntax
     {
         // For now, we only support namespace names
         public Name Name { get; }

@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         /// location and any containing namespace declarations.
         /// </summary>
         public RootName NameContext { get; }
-        public FixedList<UsingDirectiveSyntax> UsingDirectives { get; }
+        public FixedList<IUsingDirectiveSyntax> UsingDirectives { get; }
         public FixedList<IDeclarationSyntax> Declarations { get; }
 
         public NamespaceDeclarationSyntax(
@@ -30,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name name,
             TextSpan nameSpan,
             RootName nameContext,
-            FixedList<UsingDirectiveSyntax> usingDirectives,
+            FixedList<IUsingDirectiveSyntax> usingDirectives,
             FixedList<IDeclarationSyntax> declarations)
             : base(span, file, nameSpan)
         {

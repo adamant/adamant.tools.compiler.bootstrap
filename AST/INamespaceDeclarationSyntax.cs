@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         bool InGlobalNamespace { get; }
         Name Name { get; }
         Name FullName { get; }
-        FixedList<UsingDirectiveSyntax> UsingDirectives { get; }
+        FixedList<IUsingDirectiveSyntax> UsingDirectives { get; }
         FixedList<IDeclarationSyntax> Declarations { get; }
     }
 }
