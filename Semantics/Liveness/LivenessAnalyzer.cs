@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
         {
             var analyses = new Dictionary<ControlFlowGraph, LiveVariables>();
             var livenessAnalyzer = new LivenessAnalyzer();
-            foreach (var function in callableDeclarations.OfType<IFunctionDeclarationSyntax>())
+            foreach (var function in callableDeclarations.OfType<IMethodDeclarationSyntax>())
             {
                 var liveness = livenessAnalyzer.CheckFunction(function);
                 if (liveness != null)
@@ -34,10 +34,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
             return analyses.ToFixedDictionary();
         }
 
-        private LiveVariables CheckFunction(IFunctionDeclarationSyntax function)
+        private LiveVariables CheckFunction(IMethodDeclarationSyntax method)
         {
             // Compute aliveness at point after each statement
-            return ComputeLiveness(function.ControlFlow);
+            return ComputeLiveness(method.ControlFlow);
         }
 
         /// <summary>

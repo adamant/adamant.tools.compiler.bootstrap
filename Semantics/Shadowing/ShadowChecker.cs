@@ -12,32 +12,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
     /// </summary>
     internal class ShadowChecker : ExpressionVisitor<BindingScope>
     {
-        private readonly IFunctionDeclarationSyntax function;
+        private readonly IMethodDeclarationSyntax method;
         private readonly Diagnostics diagnostics;
 
-        private ShadowChecker(IFunctionDeclarationSyntax function, Diagnostics diagnostics)
+        private ShadowChecker(IMethodDeclarationSyntax method, Diagnostics diagnostics)
         {
-            this.function = function;
+            this.method = method;
             this.diagnostics = diagnostics;
         }
 
         public static void Check(IEnumerable<ICallableDeclarationSyntax> callableDeclarations, Diagnostics diagnostics)
         {
-            foreach (var declaration in callableDeclarations.OfType<IFunctionDeclarationSyntax>())
+            foreach (var declaration in callableDeclarations.OfType<IMethodDeclarationSyntax>())
                 Check(declaration, diagnostics);
         }
 
-        private static void Check(IFunctionDeclarationSyntax function, Diagnostics diagnostics)
+        private static void Check(IMethodDeclarationSyntax method, Diagnostics diagnostics)
         {
-            if (function.Body == null)
+            if (method.Body == null)
                 return;
 
             var bindingScope = EmptyBindingScope.Instance;
-            foreach (var parameter in function.Parameters)
+            foreach (var parameter in method.Parameters)
                 bindingScope = new VariableBindingScope(bindingScope, parameter);
 
-            var shadowChecker = new ShadowChecker(function, diagnostics);
-            foreach (var statement in function.Body)
+            var shadowChecker = new ShadowChecker(method, diagnostics);
+            foreach (var statement in method.Body)
                 shadowChecker.VisitStatement(statement, bindingScope);
         }
 
@@ -59,13 +59,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
             {
                 if (binding.MutableBinding)
                 {
-                    diagnostics.Add(SemanticError.CantRebindMutableBinding(function.File, variableDeclaration.NameSpan));
-                    function.MarkErrored();
+                    diagnostics.Add(SemanticError.CantRebindMutableBinding(method.File, variableDeclaration.NameSpan));
+                    method.MarkErrored();
                 }
                 else if (variableDeclaration.IsMutableBinding)
                 {
-                    diagnostics.Add(SemanticError.CantRebindAsMutableBinding(function.File, variableDeclaration.NameSpan));
-                    function.MarkErrored();
+                    diagnostics.Add(SemanticError.CantRebindAsMutableBinding(method.File, variableDeclaration.NameSpan));
+                    method.MarkErrored();
                 }
             }
         }
@@ -77,8 +77,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
             var shadowedBy = binding.WasShadowedBy.LastOrDefault();
             if (shadowedBy == null)
                 return;
-            diagnostics.Add(SemanticError.CantShadow(function.File, shadowedBy.NameSpan, name.Span));
-            function.MarkErrored();
+            diagnostics.Add(SemanticError.CantShadow(method.File, shadowedBy.NameSpan, name.Span));
+            method.MarkErrored();
         }
     }
 }

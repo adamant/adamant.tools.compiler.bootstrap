@@ -11,23 +11,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
     /// </summary>
     public class BindingMutabilityChecker : IDataFlowAnalysisChecker<VariableFlags>
     {
-        private readonly IFunctionDeclarationSyntax function;
+        private readonly IMethodDeclarationSyntax method;
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
 
-        public BindingMutabilityChecker(IFunctionDeclarationSyntax function, Diagnostics diagnostics)
+        public BindingMutabilityChecker(IMethodDeclarationSyntax method, Diagnostics diagnostics)
         {
-            this.function = function;
-            file = function.File;
+            this.method = method;
+            file = method.File;
             this.diagnostics = diagnostics;
         }
 
         public VariableFlags StartState()
         {
             // All variables start definitely unassigned
-            var definitelyUnassigned = new VariableFlags(function, true);
+            var definitelyUnassigned = new VariableFlags(method, true);
             // All parameters are assigned
-            definitelyUnassigned = definitelyUnassigned.Set(function.Parameters, false);
+            definitelyUnassigned = definitelyUnassigned.Set(method.Parameters, false);
             return definitelyUnassigned;
         }
 

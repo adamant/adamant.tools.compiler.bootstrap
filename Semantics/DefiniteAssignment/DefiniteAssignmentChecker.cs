@@ -9,24 +9,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
     // TODO check definite assignment of fields in constructors
     public class DefiniteAssignmentChecker : IDataFlowAnalysisChecker<VariableFlags>
     {
-        private readonly IFunctionDeclarationSyntax function;
+        private readonly IMethodDeclarationSyntax method;
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
 
         public DefiniteAssignmentChecker(
-            IFunctionDeclarationSyntax function,
+            IMethodDeclarationSyntax method,
             Diagnostics diagnostics)
         {
-            this.function = function;
-            this.file = function.File;
+            this.method = method;
+            this.file = method.File;
             this.diagnostics = diagnostics;
         }
 
         public VariableFlags StartState()
         {
-            var definitelyAssigned = new VariableFlags(function, false);
+            var definitelyAssigned = new VariableFlags(method, false);
             // All parameters are assigned
-            definitelyAssigned = definitelyAssigned.Set(function.Parameters, true);
+            definitelyAssigned = definitelyAssigned.Set(method.Parameters, true);
             return definitelyAssigned;
         }
 

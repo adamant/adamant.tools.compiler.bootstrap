@@ -83,7 +83,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                 case IFieldDeclarationSyntax field:
                     Check(field);
                     break;
-                case IFunctionDeclarationSyntax function:
+                case IMethodDeclarationSyntax function:
                     Check(function.ControlFlow);
                     break;
                 case IConstructorDeclarationSyntax constructor:

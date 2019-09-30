@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 {
                     default:
                         throw ExhaustiveMatch.Failed(callableDeclaration);
-                    case IFunctionDeclarationSyntax function:
+                    case IMethodDeclarationSyntax function:
                         builder.BuildGraph(function);
                         break;
                     case IConstructorDeclarationSyntax constructor:
@@ -74,33 +74,33 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             nextScope = scope.Next();
         }
 
-        private void BuildGraph(IFunctionDeclarationSyntax function)
+        private void BuildGraph(IMethodDeclarationSyntax method)
         {
-            returnType = function.ReturnType.Known();
+            returnType = method.ReturnType.Known();
 
             // Temp Variable for return
-            graph.AddReturnVariable(function.ReturnType.Known());
+            graph.AddReturnVariable(method.ReturnType.Known());
 
             // TODO don't emit temp variables for unused parameters
-            foreach (var parameter in function.Parameters.Where(p => !p.Unused))
+            foreach (var parameter in method.Parameters.Where(p => !p.Unused))
                 graph.AddParameter(parameter.IsMutableBinding, parameter.Type.Fulfilled(),
                     CurrentScope, parameter.Name.UnqualifiedName);
 
             currentBlock = graph.NewBlock();
             breakToBlock = null;
-            foreach (var statement in function.Body)
+            foreach (var statement in method.Body)
                 ConvertToStatement(statement);
 
             // Generate the implicit return statement
             if (currentBlock != null && !currentBlock.IsTerminated)
             {
-                var span = function.Span.AtEnd();
+                var span = method.Span.AtEnd();
                 EndScope(span);
                 currentBlock.AddReturn(span,
                     Scope.Outer); // We officially ended the outer scope, but this is in it
             }
 
-            function.ControlFlow = graph.Build();
+            method.ControlFlow = graph.Build();
         }
 
         private void BuildGraph(IConstructorDeclarationSyntax constructor)

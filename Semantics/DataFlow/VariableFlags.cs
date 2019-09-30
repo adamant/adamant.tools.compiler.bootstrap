@@ -12,9 +12,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
         private readonly FixedDictionary<ISymbol, int> symbolMap;
         private readonly BitArray flags;
 
-        public VariableFlags(IFunctionDeclarationSyntax function, bool defaultValue)
+        public VariableFlags(IMethodDeclarationSyntax method, bool defaultValue)
         {
-            symbolMap = function.ChildSymbols.Values.SelectMany(l => l).Enumerate()
+            symbolMap = method.ChildSymbols.Values.SelectMany(l => l).Enumerate()
                 .ToFixedDictionary(t => t.Item1, t => t.Item2);
             flags = new BitArray(symbolMap.Count, defaultValue);
         }

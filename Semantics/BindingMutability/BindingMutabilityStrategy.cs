@@ -12,9 +12,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
         private BindingMutabilityStrategy() { }
         #endregion
 
-        public IDataFlowAnalysisChecker<VariableFlags> CheckerFor(IFunctionDeclarationSyntax function, Diagnostics diagnostics)
+        public IDataFlowAnalysisChecker<VariableFlags> CheckerFor(IMethodDeclarationSyntax method, Diagnostics diagnostics)
         {
-            return new BindingMutabilityChecker(function, diagnostics);
+            return new BindingMutabilityChecker(method, diagnostics);
         }
     }
 }

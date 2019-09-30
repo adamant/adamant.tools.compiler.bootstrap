@@ -18,21 +18,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
     /// </summary>
     public class UseOfMovedValueChecker : IDataFlowAnalysisChecker<VariableFlags>
     {
-        private readonly IFunctionDeclarationSyntax function;
+        private readonly IMethodDeclarationSyntax method;
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
 
-        public UseOfMovedValueChecker(IFunctionDeclarationSyntax function, Diagnostics diagnostics)
+        public UseOfMovedValueChecker(IMethodDeclarationSyntax method, Diagnostics diagnostics)
         {
-            this.function = function;
-            file = function.File;
+            this.method = method;
+            file = method.File;
             this.diagnostics = diagnostics;
         }
 
         public VariableFlags StartState()
         {
             // All variables start without possibly having their values moved out of them
-            return new VariableFlags(function, false);
+            return new VariableFlags(method, false);
         }
 
         public VariableFlags Assignment(AssignmentExpressionSyntax assignmentExpression, VariableFlags possiblyMoved)

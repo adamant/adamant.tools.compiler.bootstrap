@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public interface IFunctionDeclarationSyntax : IMemberDeclarationSyntax,
+    public interface IMethodDeclarationSyntax : IMemberDeclarationSyntax,
         ICallableDeclarationSyntax, IFunctionSymbol
     {
         new FixedList<IParameterSyntax> Parameters { get; }

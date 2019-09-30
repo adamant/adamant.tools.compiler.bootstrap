@@ -49,7 +49,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         {
             switch (memberDeclaration)
             {
-                case IFunctionDeclarationSyntax functionDeclaration:
+                case IMethodDeclarationSyntax functionDeclaration:
                     VisitFunctionDeclaration(functionDeclaration, args);
                     break;
                 case IFieldDeclarationSyntax fieldDeclaration:
@@ -87,14 +87,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 VisitStatement(statement, args);
         }
 
-        public virtual void VisitFunctionDeclaration(IFunctionDeclarationSyntax functionDeclaration, A args)
+        public virtual void VisitFunctionDeclaration(IMethodDeclarationSyntax methodDeclaration, A args)
         {
-            foreach (var parameter in functionDeclaration.Parameters)
+            foreach (var parameter in methodDeclaration.Parameters)
                 VisitParameter(parameter, args);
 
-            VisitType(functionDeclaration.ReturnTypeSyntax, args);
-            if (functionDeclaration.Body != null)
-                foreach (var statement in functionDeclaration.Body)
+            VisitType(methodDeclaration.ReturnTypeSyntax, args);
+            if (methodDeclaration.Body != null)
+                foreach (var statement in methodDeclaration.Body)
                     VisitStatement(statement, args);
         }
 

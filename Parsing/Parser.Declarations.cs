@@ -177,7 +177,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         #endregion
 
         #region Parse Functions
-        public IFunctionDeclarationSyntax ParseFunction(
+        public IMethodDeclarationSyntax ParseFunction(
             FixedList<IModiferToken> modifiers)
         {
             var fn = Tokens.Expect<IFunctionKeywordToken>();
@@ -203,7 +203,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 span = TextSpan.Covering(fn, semicolon);
             }
 
-            return new NamedFunctionDeclarationSyntax(span, File, modifiers,
+            return new MethodDeclarationSyntax(span, File, modifiers,
                 name, identifier.Span,
                 parameters, lifetimeBounds, returnType, body);
         }

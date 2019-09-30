@@ -25,10 +25,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
             // Don't recur into body, we will see those as separate members
         }
 
-        public override void VisitFunctionDeclaration(IFunctionDeclarationSyntax functionDeclaration, Void args)
+        public override void VisitFunctionDeclaration(IMethodDeclarationSyntax methodDeclaration, Void args)
         {
-            base.VisitFunctionDeclaration(functionDeclaration, args);
-            functionDeclaration?.ReturnType.Fulfilled();
+            base.VisitFunctionDeclaration(methodDeclaration, args);
+            methodDeclaration?.ReturnType.Fulfilled();
         }
 
         public override void VisitVariableDeclarationStatement(

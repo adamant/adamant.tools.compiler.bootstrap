@@ -12,9 +12,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
         private UseOfMovedValueStrategy() { }
         #endregion
 
-        public IDataFlowAnalysisChecker<VariableFlags> CheckerFor(IFunctionDeclarationSyntax function, Diagnostics diagnostics)
+        public IDataFlowAnalysisChecker<VariableFlags> CheckerFor(IMethodDeclarationSyntax method, Diagnostics diagnostics)
         {
-            return new UseOfMovedValueChecker(function, diagnostics);
+            return new UseOfMovedValueChecker(method, diagnostics);
         }
     }
 }

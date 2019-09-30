@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     /// </summary>
     [Closed(
         typeof(IConstructorDeclarationSyntax),
-        typeof(IFunctionDeclarationSyntax))]
+        typeof(IMethodDeclarationSyntax))]
     public interface ICallableDeclarationSyntax : IEntityDeclarationSyntax
     {
         FixedList<StatementSyntax>? Body { get; }

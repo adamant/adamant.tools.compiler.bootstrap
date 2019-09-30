@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
         {
             switch (callableDeclaration)
             {
-                case IFunctionDeclarationSyntax function:
+                case IMethodDeclarationSyntax function:
                     Check(function);
                     break;
                 default:
@@ -33,11 +33,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
         private IDataFlowAnalysisChecker<TState> checker;
         private TState currentState;
 
-        private void Check(IFunctionDeclarationSyntax function)
+        private void Check(IMethodDeclarationSyntax method)
         {
-            checker = strategy.CheckerFor(function, diagnostics);
+            checker = strategy.CheckerFor(method, diagnostics);
             currentState = checker.StartState();
-            foreach (var statement in function.Body)
+            foreach (var statement in method.Body)
                 VisitStatement(statement, default);
         }
 
