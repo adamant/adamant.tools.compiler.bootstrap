@@ -6,7 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     [Closed(
         typeof(IMemberDeclarationSyntax),
         typeof(INamespaceDeclarationSyntax),
-        typeof(IClassDeclarationSyntax))]
+        typeof(INonMemberDeclarationSyntax))]
     public interface IDeclarationSyntax : ISyntax
     {
         CodeFile File { get; }
