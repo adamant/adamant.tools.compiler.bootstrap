@@ -10,9 +10,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public partial class Parser
     {
-        public FixedList<DeclarationSyntax> ParseTopLevelDeclarations()
+        public FixedList<IDeclarationSyntax> ParseTopLevelDeclarations()
         {
-            var declarations = new List<DeclarationSyntax>();
+            var declarations = new List<IDeclarationSyntax>();
             // Keep going to the end of the file
             while (!Tokens.AtEnd<IEndOfFileToken>())
                 try
@@ -27,9 +27,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return declarations.ToFixedList();
         }
 
-        public FixedList<DeclarationSyntax> ParseDeclarations()
+        public FixedList<IDeclarationSyntax> ParseDeclarations()
         {
-            var declarations = new List<DeclarationSyntax>();
+            var declarations = new List<IDeclarationSyntax>();
             // Stop at end of file or close brace that contains these declarations
             while (!Tokens.AtEnd<ICloseBraceToken>())
                 try
@@ -44,7 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return declarations.ToFixedList();
         }
 
-        public DeclarationSyntax ParseDeclaration()
+        public IDeclarationSyntax ParseDeclaration()
         {
             var modifiers = AcceptMany(Tokens.AcceptToken<IModiferToken>);
 
@@ -53,9 +53,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case INamespaceKeywordToken _:
                     return ParseNamespaceDeclaration(modifiers);
                 case IClassKeywordToken _:
-                    return (DeclarationSyntax)ParseClass(modifiers);
+                    return ParseClass(modifiers);
                 case IFunctionKeywordToken _:
-                    return (DeclarationSyntax)ParseNamedFunction(modifiers);
+                    return ParseNamedFunction(modifiers);
                 default:
                     Tokens.UnexpectedToken();
                     throw new ParseFailedException();
@@ -83,7 +83,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         }
 
         #region Parse Namespaces
-        public NamespaceDeclarationSyntax ParseNamespaceDeclaration(
+        internal NamespaceDeclarationSyntax ParseNamespaceDeclaration(
              FixedList<IModiferToken> modifiers)
         {
             // TODO generate errors for attributes or modifiers

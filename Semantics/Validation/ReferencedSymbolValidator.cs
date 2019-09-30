@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
         {
             var validator = new ReferencedSymbolValidator();
             foreach (var declaration in entityDeclaration)
-                validator.VisitDeclaration((DeclarationSyntax)declaration);
+                validator.VisitDeclaration(declaration);
         }
 
         private static void AssertHasReferencedSymbol(

@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(SelfParameterSyntax),
         typeof(NamedParameterSyntax),
         typeof(FieldParameterSyntax))]
-    public abstract class ParameterSyntax : Syntax, IBindingSymbol
+    public abstract class ParameterSyntax : Syntax, IParameterSyntax
     {
         public bool IsMutableBinding { get; }
         public Name FullName { get; }

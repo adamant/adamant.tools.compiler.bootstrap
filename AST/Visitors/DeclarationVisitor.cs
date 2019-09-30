@@ -6,9 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 {
     public class DeclarationVisitor<A> : ExpressionVisitor<A>
     {
-        public virtual void VisitDeclarations(
-             IEnumerable<DeclarationSyntax> declarations,
-            A args)
+        public virtual void VisitDeclarations(IEnumerable<IDeclarationSyntax> declarations, A args)
         {
             foreach (var declaration in declarations)
                 VisitDeclaration(declaration, args);
@@ -24,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                     VisitMemberDeclaration(memberDeclaration, args);
                     break;
                 case INamespaceDeclarationSyntax namespaceDeclaration:
-                    VisitNamespaceDeclaration((NamespaceDeclarationSyntax)namespaceDeclaration, args);
+                    VisitNamespaceDeclaration(namespaceDeclaration, args);
                     break;
                 case IClassDeclarationSyntax classDeclaration:
                     VisitClassDeclaration(classDeclaration, args);
@@ -35,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             }
         }
 
-        public virtual void VisitNamespaceDeclaration(NamespaceDeclarationSyntax namespaceDeclaration, A args)
+        public virtual void VisitNamespaceDeclaration(INamespaceDeclarationSyntax namespaceDeclaration, A args)
         {
             foreach (var usingDirective in namespaceDeclaration.UsingDirectives)
                 VisitUsingDirective(usingDirective, args);

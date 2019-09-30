@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(BinaryExpressionSyntax),
         typeof(InstanceExpressionSyntax),
         typeof(NameSyntax))]
-    public abstract class ExpressionSyntax : Syntax
+    public abstract class ExpressionSyntax : Syntax, IExpressionSyntax
     {
         /// <summary>
         /// If an expression has been poisoned, then it is errored in some way

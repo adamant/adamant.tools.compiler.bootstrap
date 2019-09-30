@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
         {
             var validator = new TypeFulfillmentValidator();
             foreach (var declaration in entityDeclarations)
-                validator.VisitDeclaration((DeclarationSyntax)declaration);
+                validator.VisitDeclaration(declaration);
         }
 
         public override void VisitClassDeclaration(IClassDeclarationSyntax classDeclaration, Void args)

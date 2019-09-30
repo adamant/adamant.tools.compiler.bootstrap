@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(SelfTypeSyntax),
         typeof(TypeNameSyntax),
         typeof(MutableTypeSyntax))]
-    public abstract class TypeSyntax : Syntax
+    public abstract class TypeSyntax : Syntax, ITypeSyntax
     {
         private DataType? namedType;
 

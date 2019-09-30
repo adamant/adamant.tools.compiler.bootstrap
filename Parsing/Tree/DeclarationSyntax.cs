@@ -1,8 +1,9 @@
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    public abstract class DeclarationSyntax : Syntax, IDeclarationSyntax
+    internal abstract class DeclarationSyntax : Syntax, IDeclarationSyntax
     {
         public CodeFile File { get; }
         public bool HasErrors { get; private set; }

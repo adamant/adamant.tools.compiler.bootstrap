@@ -9,6 +9,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         Name Name { get; }
         Name FullName { get; }
         FixedList<UsingDirectiveSyntax> UsingDirectives { get; }
-        FixedList<DeclarationSyntax> Declarations { get; }
+        FixedList<IDeclarationSyntax> Declarations { get; }
     }
 }

@@ -1,10 +1,11 @@
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    public class NamespaceDeclarationSyntax : DeclarationSyntax, INamespaceDeclarationSyntax
+    internal class NamespaceDeclarationSyntax : DeclarationSyntax, INamespaceDeclarationSyntax
     {
         /// <summary>
         /// Whether this namespace declaration is in the global namespace, the
@@ -20,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         /// </summary>
         public RootName NameContext { get; }
         public FixedList<UsingDirectiveSyntax> UsingDirectives { get; }
-        public FixedList<DeclarationSyntax> Declarations { get; }
+        public FixedList<IDeclarationSyntax> Declarations { get; }
 
         public NamespaceDeclarationSyntax(
             TextSpan span,
@@ -30,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             TextSpan nameSpan,
             RootName nameContext,
             FixedList<UsingDirectiveSyntax> usingDirectives,
-            FixedList<DeclarationSyntax> declarations)
+            FixedList<IDeclarationSyntax> declarations)
             : base(span, file, nameSpan)
         {
             Name = name;

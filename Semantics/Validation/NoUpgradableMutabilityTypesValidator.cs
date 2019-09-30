@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
         {
             var validator = new NoUpgradableMutabilityTypesValidator();
             foreach (var declaration in entityDeclarations)
-                validator.VisitDeclaration((DeclarationSyntax)declaration);
+                validator.VisitDeclaration(declaration);
         }
 
         public override void VisitFunctionDeclaration(IFunctionDeclarationSyntax functionDeclaration, Void args)

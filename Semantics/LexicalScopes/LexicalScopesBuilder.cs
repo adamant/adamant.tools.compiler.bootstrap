@@ -55,12 +55,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             // MemberDeclarationSyntax is the right type to use here because anything except namespaces can go in a type
             var declarations = new List<ISymbol>();
             declarations.AddRange(compilationUnit.Declarations.OfType<IMemberDeclarationSyntax>());
-            var namespaces = new Queue<NamespaceDeclarationSyntax>();
-            namespaces.EnqueueRange(compilationUnit.Declarations.OfType<NamespaceDeclarationSyntax>());
+            var namespaces = new Queue<INamespaceDeclarationSyntax>();
+            namespaces.EnqueueRange(compilationUnit.Declarations.OfType<INamespaceDeclarationSyntax>());
             while (namespaces.TryDequeue(out var ns))
             {
                 declarations.AddRange(ns.Declarations.OfType<IMemberDeclarationSyntax>());
-                namespaces.EnqueueRange(ns.Declarations.OfType<NamespaceDeclarationSyntax>());
+                namespaces.EnqueueRange(ns.Declarations.OfType<INamespaceDeclarationSyntax>());
             }
 
             return declarations.ToFixedList();

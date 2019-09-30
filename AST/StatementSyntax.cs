@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(VariableDeclarationStatementSyntax),
         typeof(ExpressionStatementSyntax),
         typeof(ResultStatementSyntax))]
-    public abstract class StatementSyntax : Syntax
+    public abstract class StatementSyntax : Syntax, IStatementSyntax
     {
         private protected StatementSyntax(TextSpan span)
             : base(span)
