@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                 validator.VisitDeclaration((DeclarationSyntax)declaration);
         }
 
-        public override void VisitClassDeclaration(ClassDeclarationSyntax classDeclaration, Void args)
+        public override void VisitClassDeclaration(IClassDeclarationSyntax classDeclaration, Void args)
         {
             classDeclaration?.DeclaresType.Fulfilled();
             // Don't recur into body, we will see those as separate members

@@ -19,11 +19,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
             this.typeWalker = typeWalker;
         }
 
-        public void Walk(DeclarationSyntax declaration)
+        public void Walk(IDeclarationSyntax declaration)
         {
             switch (declaration)
             {
-                case ClassDeclarationSyntax classDeclaration:
+                default:
+                    throw new NotImplementedException();
+                    throw ExhaustiveMatch.Failed(declaration);
+                case IClassDeclarationSyntax classDeclaration:
                     if (declarationWalker?.Enter(classDeclaration) ?? true)
                     {
                         foreach (var member in classDeclaration.Members)
@@ -31,9 +34,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                         declarationWalker?.Exit(classDeclaration);
                     }
                     break;
-                default:
-                    throw new NotImplementedException();
-                    throw ExhaustiveMatch.Failed(declaration);
             }
         }
 

@@ -1,12 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    [Closed(
-        typeof(MemberDeclarationSyntax),
-        typeof(NamespaceDeclarationSyntax),
-        typeof(ClassDeclarationSyntax))]
     public abstract class DeclarationSyntax : Syntax, IDeclarationSyntax
     {
         public CodeFile File { get; }

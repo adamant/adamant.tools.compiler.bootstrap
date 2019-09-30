@@ -53,7 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case INamespaceKeywordToken _:
                     return ParseNamespaceDeclaration(modifiers);
                 case IClassKeywordToken _:
-                    return ParseClass(modifiers);
+                    return (DeclarationSyntax)ParseClass(modifiers);
                 case IFunctionKeywordToken _:
                     return (DeclarationSyntax)ParseNamedFunction(modifiers);
                 default:
@@ -62,7 +62,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
-        public MemberDeclarationSyntax ParseMemberDeclaration()
+        internal MemberDeclarationSyntax ParseMemberDeclaration()
         {
             var modifiers = AcceptMany(Tokens.AcceptToken<IModiferToken>);
 
@@ -73,9 +73,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case INewKeywordToken _:
                     return (MemberDeclarationSyntax)ParseConstructor(modifiers);
                 case ILetKeywordToken _:
-                    return ParseField(false, modifiers);
+                    return (MemberDeclarationSyntax)ParseField(false, modifiers);
                 case IVarKeywordToken _:
-                    return ParseField(true, modifiers);
+                    return (MemberDeclarationSyntax)ParseField(true, modifiers);
                 default:
                     Tokens.UnexpectedToken();
                     throw new ParseFailedException();
@@ -139,7 +139,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         #endregion
 
         #region Parse Type Declarations
-        private ClassDeclarationSyntax ParseClass(
+        private IClassDeclarationSyntax ParseClass(
              FixedList<IModiferToken> modifiers)
         {
             var @class = Tokens.Expect<IClassKeywordToken>();
@@ -153,7 +153,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         #endregion
 
         #region Parse Type Member Declarations
-        private FieldDeclarationSyntax ParseField(
+        private IFieldDeclarationSyntax ParseField(
             bool mutableBinding,
             FixedList<IModiferToken> modifiers)
         {

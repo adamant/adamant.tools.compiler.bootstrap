@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
@@ -7,6 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
 {
@@ -22,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                 Build(memberDeclaration);
         }
 
-        private FixedList<Declaration> BuildList(IEnumerable<MemberDeclarationSyntax> memberDeclarations)
+        private FixedList<Declaration> BuildList(IEnumerable<IMemberDeclarationSyntax> memberDeclarations)
         {
             return memberDeclarations.Select(Build).ToFixedList();
         }
@@ -34,6 +36,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
 
             switch (entityDeclaration)
             {
+                default:
+                    throw ExhaustiveMatch.Failed(entityDeclaration);
                 case INamedFunctionDeclarationSyntax namedFunction:
                     declaration = new FunctionDeclaration(namedFunction.IsExternalFunction,
                         namedFunction.DeclaringType != null, namedFunction.FullName, BuildParameters(namedFunction.Parameters),
@@ -48,17 +52,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                         /*constructorType,*/ parameters, constructorDeclaration.SelfParameterType,
                         constructorDeclaration.ControlFlow);
                     break;
-                case FieldDeclarationSyntax fieldDeclaration:
+                case IFieldDeclarationSyntax fieldDeclaration:
                     declaration = new FieldDeclaration(fieldDeclaration.IsMutableBinding, fieldDeclaration.FullName, fieldDeclaration.Type.Known());
                     break;
-                default:
-                    throw NonExhaustiveMatchException.For(entityDeclaration);
+                case IClassDeclarationSyntax _:
+                    throw new NotImplementedException();
             }
             declarations.Add(entityDeclaration, declaration);
             return declaration;
         }
 
-        private FixedList<Declaration> BuildClassMembers(ClassDeclarationSyntax classDeclaration)
+        private FixedList<Declaration> BuildClassMembers(IClassDeclarationSyntax classDeclaration)
         {
             var members = BuildList(classDeclaration.Members);
             if (members.Any(m => m is ConstructorDeclaration))
@@ -68,8 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
             return members.Append(defaultConstructor).ToFixedList();
         }
 
-        private Declaration BuildDefaultConstructor(
-            ClassDeclarationSyntax classDeclaration)
+        private Declaration BuildDefaultConstructor(IClassDeclarationSyntax classDeclaration)
         {
             var symbol = classDeclaration.ChildSymbols.Values.SelectMany(l => l)
                             .OfType<DefaultConstructor>().Single();

@@ -54,12 +54,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         {
             // MemberDeclarationSyntax is the right type to use here because anything except namespaces can go in a type
             var declarations = new List<ISymbol>();
-            declarations.AddRange(compilationUnit.Declarations.OfType<MemberDeclarationSyntax>());
+            declarations.AddRange(compilationUnit.Declarations.OfType<IMemberDeclarationSyntax>());
             var namespaces = new Queue<NamespaceDeclarationSyntax>();
             namespaces.EnqueueRange(compilationUnit.Declarations.OfType<NamespaceDeclarationSyntax>());
             while (namespaces.TryDequeue(out var ns))
             {
-                declarations.AddRange(ns.Declarations.OfType<MemberDeclarationSyntax>());
+                declarations.AddRange(ns.Declarations.OfType<IMemberDeclarationSyntax>());
                 namespaces.EnqueueRange(ns.Declarations.OfType<NamespaceDeclarationSyntax>());
             }
 
@@ -87,7 +87,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         }
 
         private void BuildScopesInDeclaration(
-            DeclarationSyntax declaration,
+            IDeclarationSyntax declaration,
             LexicalScope containingScope)
         {
             var binder = new ExpressionScopesBuilder();

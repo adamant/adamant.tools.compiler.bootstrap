@@ -55,7 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         private void ResolveSignatureTypesInClassDeclarations(IEnumerable<IClassDeclarationSyntax> classDeclarations)
         {
             foreach (var classDeclaration in classDeclarations)
-                ResolveSignatureTypesInClassDeclaration((ClassDeclarationSyntax)classDeclaration);
+                ResolveSignatureTypesInClassDeclaration(classDeclaration);
         }
 
         private void ResolveSignatureTypesInDeclarations(IEnumerable<IEntityDeclarationSyntax> declarations)
@@ -77,7 +77,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     ResolveSignatureTypesInConstructor(c);
                     break;
                 case IFieldDeclarationSyntax f:
-                    ResolveSignatureTypesInField((FieldDeclarationSyntax)f);
+                    ResolveSignatureTypesInField(f);
                     break;
                 case IClassDeclarationSyntax _:
                     // Already processed
@@ -148,7 +148,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         private void ResolveTypesInParameters(
             BasicStatementAnalyzer analyzer,
             FixedList<ParameterSyntax> parameters,
-            ClassDeclarationSyntax declaringType)
+            IClassDeclarationSyntax declaringType)
         {
             var types = new List<DataType>();
             foreach (var parameter in parameters)
@@ -168,7 +168,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     case FieldParameterSyntax fieldParameter:
                         parameter.Type.BeginFulfilling();
                         var field = declaringType.Members
-                            .OfType<FieldDeclarationSyntax>()
+                            .OfType<IFieldDeclarationSyntax>()
                             .SingleOrDefault(f => f.Name == fieldParameter.FieldName);
                         if (field == null)
                         {
@@ -223,7 +223,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         /// If the type has not been resolved, this resolves it. This function
         /// also watches for type cycles and reports an error.
         /// </summary>
-        private void ResolveSignatureTypesInClassDeclaration(ClassDeclarationSyntax classDeclaration)
+        private void ResolveSignatureTypesInClassDeclaration(IClassDeclarationSyntax classDeclaration)
         {
             switch (classDeclaration.DeclaresType.State)
             {
@@ -248,7 +248,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             classDeclaration.CreateDefaultConstructor();
         }
 
-        private void ResolveSignatureTypesInField(FieldDeclarationSyntax field)
+        private void ResolveSignatureTypesInField(IFieldDeclarationSyntax field)
         {
             switch (field.Type.State)
             {
@@ -286,7 +286,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     ResolveBodyTypesInFunction(f);
                     break;
                 case IFieldDeclarationSyntax f:
-                    ResolveBodyTypesInField((FieldDeclarationSyntax)f);
+                    ResolveBodyTypesInField(f);
                     break;
                 case IConstructorDeclarationSyntax c:
                     ResolveBodyTypesInConstructor(c);
@@ -324,14 +324,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 function.MarkErrored();
         }
 
-        private void ResolveBodyTypesInField(FieldDeclarationSyntax fieldDeclaration)
+        private void ResolveBodyTypesInField(IFieldDeclarationSyntax fieldDeclaration)
         {
             if (fieldDeclaration.Initializer == null)
                 return;
 
             var diagnosticCount = diagnostics.Count;
             var resolver = new BasicStatementAnalyzer(fieldDeclaration.File, diagnostics);
-            resolver.CheckExpressionType(ref fieldDeclaration.Initializer, fieldDeclaration.Type.Fulfilled());
+            // Work around not being able to pass a ref to a property
+            var initializer = fieldDeclaration.Initializer;
+            resolver.CheckExpressionType(ref initializer, fieldDeclaration.Type.Fulfilled());
+            if (fieldDeclaration.Initializer != initializer)
+                fieldDeclaration.Initializer = initializer;
             if (diagnosticCount != diagnostics.Count)
                 fieldDeclaration.MarkErrored();
         }

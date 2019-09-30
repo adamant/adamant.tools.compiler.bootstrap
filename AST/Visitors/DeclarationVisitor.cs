@@ -14,24 +14,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 VisitDeclaration(declaration, args);
         }
 
-        public virtual void VisitDeclaration(DeclarationSyntax declaration, A args)
+        public virtual void VisitDeclaration(IDeclarationSyntax declaration, A args)
         {
             switch (declaration)
             {
-                case MemberDeclarationSyntax memberDeclaration:
+                default:
+                    throw ExhaustiveMatch.Failed(declaration);
+                case IMemberDeclarationSyntax memberDeclaration:
                     VisitMemberDeclaration(memberDeclaration, args);
                     break;
-                case NamespaceDeclarationSyntax namespaceDeclaration:
-                    VisitNamespaceDeclaration(namespaceDeclaration, args);
+                case INamespaceDeclarationSyntax namespaceDeclaration:
+                    VisitNamespaceDeclaration((NamespaceDeclarationSyntax)namespaceDeclaration, args);
                     break;
-                case ClassDeclarationSyntax classDeclaration:
+                case IClassDeclarationSyntax classDeclaration:
                     VisitClassDeclaration(classDeclaration, args);
                     break;
                 case null:
                     // Ignore
                     break;
-                default:
-                    throw NonExhaustiveMatchException.For(declaration);
             }
         }
 
@@ -56,7 +56,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                     VisitFunctionDeclaration(functionDeclaration, args);
                     break;
                 case IFieldDeclarationSyntax fieldDeclaration:
-                    VisitFieldDeclaration((FieldDeclarationSyntax)fieldDeclaration, args);
+                    VisitFieldDeclaration(fieldDeclaration, args);
                     break;
                 case IConstructorDeclarationSyntax constructor:
                     VisitConstructorDeclaration(constructor, args);
@@ -69,13 +69,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             }
         }
 
-        public virtual void VisitFieldDeclaration(FieldDeclarationSyntax fieldDeclaration, A args)
+        public virtual void VisitFieldDeclaration(IFieldDeclarationSyntax fieldDeclaration, A args)
         {
             VisitType(fieldDeclaration.TypeSyntax, args);
             VisitExpression(fieldDeclaration.Initializer, args);
         }
 
-        public virtual void VisitClassDeclaration(ClassDeclarationSyntax classDeclaration, A args)
+        public virtual void VisitClassDeclaration(IClassDeclarationSyntax classDeclaration, A args)
         {
             foreach (var member in classDeclaration.Members)
                 VisitDeclaration(member, args);
