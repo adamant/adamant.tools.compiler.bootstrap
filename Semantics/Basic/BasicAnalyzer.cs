@@ -91,7 +91,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             if (constructor.DeclaringType != null)
                 ResolveSignatureTypesInClassDeclaration(constructor.DeclaringType);
 
-            var analyzer = new BasicStatementAnalyzer(constructor.File, diagnostics, constructor.DeclaringType?.DeclaresType.Fulfilled());
+            var selfType = constructor.DeclaringType?.DeclaresType.Fulfilled();
+            constructor.SelfParameterType = ((UserObjectType)selfType).ForConstructorSelf();
+            var analyzer = new BasicStatementAnalyzer(constructor.File, diagnostics, selfType);
 
             ResolveTypesInParameters(analyzer, constructor.Parameters, constructor.DeclaringType);
 
@@ -127,8 +129,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             switch (function)
             {
-                case IConstructorDeclarationSyntax constructor:
-                    return constructor.SelfParameterType = ((UserObjectType)declaringType).ForConstructorSelf();
+                default:
+                    throw ExhaustiveMatch.Failed(function);
                 case INamedFunctionDeclarationSyntax namedFunction:
                     var selfParameter = namedFunction.Parameters.OfType<SelfParameterSyntax>().SingleOrDefault();
                     if (selfParameter == null)
@@ -138,8 +140,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     if (selfParameter.MutableSelf)
                         selfType = selfType.AsMutable();
                     return namedFunction.SelfParameterType = selfParameter.Type.Fulfill(selfType);
-                default:
-                    throw NonExhaustiveMatchException.For(function);
             }
         }
 

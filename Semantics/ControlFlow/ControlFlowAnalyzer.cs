@@ -25,6 +25,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 var builder = new ControlFlowAnalyzer();
                 builder.BuildGraph(function);
             }
+
+            foreach (var function in declarations.OfType<IConstructorDeclarationSyntax>())
+            {
+                var builder = new ControlFlowAnalyzer();
+                builder.BuildGraph(function);
+            }
         }
 
         private static bool ShouldBuildGraph(IFunctionDeclarationSyntax function)
