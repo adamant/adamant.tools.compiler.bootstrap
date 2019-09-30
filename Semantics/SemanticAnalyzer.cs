@@ -58,25 +58,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             ReferencedSymbolValidator.Validate(entityDeclarations);
 #endif
 
-            ShadowChecker.Check(entityDeclarations, diagnostics);
+            // From this point forward, analysis focuses on functions
+            var callableDeclarations = entityDeclarations.OfType<ICallableDeclarationSyntax>().ToFixedList();
+            ShadowChecker.Check(callableDeclarations, diagnostics);
 
             // TODO use DataFlowAnalysis to check for unused variables and report use of variables starting with `_`
 
-            DataFlowAnalysis.Check(DefiniteAssignmentStrategy.Instance, entityDeclarations, diagnostics);
+            DataFlowAnalysis.Check(DefiniteAssignmentStrategy.Instance, callableDeclarations, diagnostics);
 
-            DataFlowAnalysis.Check(BindingMutabilityStrategy.Instance, entityDeclarations, diagnostics);
+            DataFlowAnalysis.Check(BindingMutabilityStrategy.Instance, callableDeclarations, diagnostics);
 
-            DataFlowAnalysis.Check(UseOfMovedValueStrategy.Instance, entityDeclarations, diagnostics);
+            DataFlowAnalysis.Check(UseOfMovedValueStrategy.Instance, callableDeclarations, diagnostics);
 
             // If there are errors from the previous phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
 
             // --------------------------------------------------
             // This is where the representation transitions to IR
-            ControlFlowAnalyzer.BuildGraphs(entityDeclarations);
+            ControlFlowAnalyzer.BuildGraphs(callableDeclarations);
             // --------------------------------------------------
 
-            var liveness = LivenessAnalyzer.Check(entityDeclarations, SaveLivenessAnalysis);
+            var liveness = LivenessAnalyzer.Check(callableDeclarations, SaveLivenessAnalysis);
 
             BorrowChecker.Check(entityDeclarations, liveness, diagnostics, SaveBorrowClaims);
 

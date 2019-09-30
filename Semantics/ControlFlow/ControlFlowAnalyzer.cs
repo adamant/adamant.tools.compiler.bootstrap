@@ -17,26 +17,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
     // TODO seems like this should be name builder not analyzer, but we already have another class named builder
     public class ControlFlowAnalyzer
     {
-        public static void BuildGraphs(FixedList<IEntityDeclarationSyntax> entityDeclarations)
+        public static void BuildGraphs(FixedList<ICallableDeclarationSyntax> callableDeclarations)
         {
-            foreach (var function in entityDeclarations.OfType<IFunctionDeclarationSyntax>()
-                .Where(ShouldBuildGraph))
+            foreach (var callableDeclaration in callableDeclarations.Where(ShouldBuildGraph))
             {
                 var builder = new ControlFlowAnalyzer();
-                builder.BuildGraph(function);
-            }
-
-            foreach (var function in entityDeclarations.OfType<IConstructorDeclarationSyntax>())
-            {
-                var builder = new ControlFlowAnalyzer();
-                builder.BuildGraph(function);
+                switch (callableDeclaration)
+                {
+                    default:
+                        throw ExhaustiveMatch.Failed(callableDeclaration);
+                    case IFunctionDeclarationSyntax function:
+                        builder.BuildGraph(function);
+                        break;
+                    case IConstructorDeclarationSyntax constructor:
+                        builder.BuildGraph(constructor);
+                        break;
+                }
             }
         }
 
-        private static bool ShouldBuildGraph(IFunctionDeclarationSyntax function)
+        private static bool ShouldBuildGraph(ICallableDeclarationSyntax callableDeclaration)
         {
-            return function.Body != null // It is not abstract
-                                         /* && function.GenericParameters == null*/
+            return callableDeclaration.Body != null // It is not abstract
+                                                    /* && function.GenericParameters == null*/
                 ; // It is not generic, generic functions need monomorphized
         }
 

@@ -9,7 +9,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     [Closed(
         typeof(INamedFunctionDeclarationSyntax))]
-    public interface IFunctionDeclarationSyntax : IMemberDeclarationSyntax, IFunctionSymbol
+    public interface IFunctionDeclarationSyntax : IMemberDeclarationSyntax,
+        ICallableDeclarationSyntax, IFunctionSymbol
     {
         new FixedList<ParameterSyntax> Parameters { get; }
         FixedList<StatementSyntax>? Body { get; }
