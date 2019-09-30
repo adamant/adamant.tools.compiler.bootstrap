@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core
@@ -34,6 +35,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
         {
             items.Sort();
             return items.ToFixedList();
+        }
+
+        public void ThrowIfFatalErrors()
+        {
+            if (items.Any(i => i.IsFatal))
+                throw new FatalCompilationErrorException(items.ToFixedList());
         }
 
         public IEnumerator<Diagnostic> GetEnumerator()

@@ -36,13 +36,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             PackageSyntax packageSyntax,
             FixedDictionary<string, Package> references)
         {
-            // If there are errors from the previous phase, don't continue on
-            var parseDiagnostics = packageSyntax.Diagnostics.ToFixedList();
-            if (parseDiagnostics.Any(d => d.IsFatal))
-                throw new FatalCompilationErrorException(parseDiagnostics);
-
             // First pull over all the lexer and parser warnings
-            var diagnostics = new Diagnostics(parseDiagnostics);
+            var diagnostics = new Diagnostics(packageSyntax.Diagnostics);
+
+            // If there are errors from the previous phase, don't continue on
+            diagnostics.ThrowIfFatalErrors();
 
             var scopesBuilder = new LexicalScopesBuilder(diagnostics, packageSyntax, references);
             scopesBuilder.BuildScopesInPackage(packageSyntax);
@@ -70,6 +68,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             DataFlowAnalysis.Check(UseOfMovedValueStrategy.Instance, memberDeclarations, diagnostics);
 
+            // If there are errors from the previous phase, don't continue on
+            diagnostics.ThrowIfFatalErrors();
+
             // --------------------------------------------------
             // This is where the representation transitions to IR
             ControlFlowAnalyzer.BuildGraphs(memberDeclarations);
@@ -78,6 +79,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             var liveness = LivenessAnalyzer.Check(memberDeclarations, SaveLivenessAnalysis);
 
             BorrowChecker.Check(memberDeclarations, liveness, diagnostics, SaveBorrowClaims);
+
+            // If there are errors from the previous phase, don't continue on
+            diagnostics.ThrowIfFatalErrors();
 
             // Build final declaration objects and find the entry point
             var declarationBuilder = new DeclarationBuilder();
