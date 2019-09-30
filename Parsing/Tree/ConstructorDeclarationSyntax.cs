@@ -7,7 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal class ConstructorDeclarationSyntax : FunctionDeclarationSyntax, IConstructorDeclarationSyntax
+    internal class ConstructorDeclarationSyntax : FunctionLikeSyntax, IConstructorDeclarationSyntax
     {
         public override FixedList<StatementSyntax> Body => base.Body ?? throw new InvalidOperationException();
 

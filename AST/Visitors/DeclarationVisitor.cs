@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 {
@@ -47,21 +48,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         {
         }
 
-        public virtual void VisitMemberDeclaration(MemberDeclarationSyntax memberDeclaration, A args)
+        public virtual void VisitMemberDeclaration(IMemberDeclarationSyntax memberDeclaration, A args)
         {
             switch (memberDeclaration)
             {
                 case IFunctionDeclarationSyntax functionDeclaration:
                     VisitFunctionDeclaration(functionDeclaration, args);
                     break;
-                case FieldDeclarationSyntax fieldDeclaration:
-                    VisitFieldDeclaration(fieldDeclaration, args);
+                case IFieldDeclarationSyntax fieldDeclaration:
+                    VisitFieldDeclaration((FieldDeclarationSyntax)fieldDeclaration, args);
+                    break;
+                case IConstructorDeclarationSyntax constructor:
+                    VisitConstructorDeclaration(constructor, args);
                     break;
                 case null:
                     // Ignore
                     break;
                 default:
-                    throw NonExhaustiveMatchException.For(memberDeclaration);
+                    throw ExhaustiveMatch.Failed(memberDeclaration);
             }
         }
 

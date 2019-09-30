@@ -72,6 +72,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IFunctionDeclarationSyntax f:
                     ResolveSignatureTypesInFunction(f);
                     break;
+                case IConstructorDeclarationSyntax c:
+                    ResolveSignatureTypesInConstructor(c);
+                    break;
                 case IFieldDeclarationSyntax f:
                     ResolveSignatureTypesInField((FieldDeclarationSyntax)f);
                     break;
@@ -79,6 +82,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     throw ExhaustiveMatch.Failed(declaration);
             }
         }
+
+        private void ResolveSignatureTypesInConstructor(IConstructorDeclarationSyntax constructor)
+        {
+            var diagnosticCount = diagnostics.Count;
+
+            // Resolve the declaring type because we need its type for things like `self`
+            if (constructor.DeclaringType != null)
+                ResolveSignatureTypesInClassDeclaration(constructor.DeclaringType);
+
+            var analyzer = new BasicStatementAnalyzer(constructor.File, diagnostics, constructor.DeclaringType?.DeclaresType.Fulfilled());
+
+            ResolveTypesInParameters(analyzer, constructor.Parameters, constructor.DeclaringType);
+
+            if (diagnosticCount != diagnostics.Count)
+                constructor.MarkErrored();
+        }
+
 
         private void ResolveSignatureTypesInFunction(IFunctionDeclarationSyntax function)
         {
@@ -91,7 +111,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             var selfType = ResolveSelfType(function);
             var analyzer = new BasicStatementAnalyzer(function.File, diagnostics, selfType);
 
-            ResolveTypesInParameters(function, analyzer);
+            ResolveTypesInParameters(analyzer, function.Parameters, function.DeclaringType);
 
             ResolveReturnType(function, analyzer);
 
@@ -124,11 +144,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         }
 
         private void ResolveTypesInParameters(
-            IFunctionDeclarationSyntax function,
-            BasicStatementAnalyzer analyzer)
+            BasicStatementAnalyzer analyzer,
+            FixedList<ParameterSyntax> parameters,
+            ClassDeclarationSyntax declaringType)
         {
             var types = new List<DataType>();
-            foreach (var parameter in function.Parameters)
+            foreach (var parameter in parameters)
                 switch (parameter)
                 {
                     case NamedParameterSyntax namedParameter:
@@ -144,7 +165,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         break;
                     case FieldParameterSyntax fieldParameter:
                         parameter.Type.BeginFulfilling();
-                        var field = function.DeclaringType.Members
+                        var field = declaringType.Members
                             .OfType<FieldDeclarationSyntax>()
                             .SingleOrDefault(f => f.Name == fieldParameter.FieldName);
                         if (field == null)
@@ -175,9 +196,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             {
                 case INamedFunctionDeclarationSyntax namedFunction:
                     ResolveReturnType(function, namedFunction.ReturnTypeSyntax, analyzer);
-                    return;
-                case IConstructorDeclarationSyntax _:
-                    function.ReturnType.Fulfill(function.DeclaringType.DeclaresType.Fulfilled());
                     return;
                 default:
                     throw ExhaustiveMatch.Failed(function);
@@ -266,9 +284,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IFieldDeclarationSyntax f:
                     ResolveBodyTypesInField((FieldDeclarationSyntax)f);
                     break;
+                case IConstructorDeclarationSyntax c:
+                    ResolveBodyTypesInConstructor(c);
+                    break;
                 default:
                     throw ExhaustiveMatch.Failed(declaration);
             }
+        }
+
+        private void ResolveBodyTypesInConstructor(IConstructorDeclarationSyntax constructor)
+        {
+            if (constructor.Body == null)
+                return;
+
+            var diagnosticCount = diagnostics.Count;
+            var resolver = new BasicStatementAnalyzer(constructor.File, diagnostics,
+                constructor.SelfParameterType, constructor.SelfParameterType);
+            foreach (var statement in constructor.Body)
+                resolver.ResolveTypesInStatement(statement);
+            if (diagnosticCount != diagnostics.Count)
+                constructor.MarkErrored();
         }
 
         private void ResolveBodyTypesInFunction(IFunctionDeclarationSyntax function)

@@ -45,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                     //constructorType = new FunctionType(parameters.Select(p => p.Type),
                     //    constructorType.ReturnType);
                     declaration = new ConstructorDeclaration(constructorDeclaration.FullName,
-                        /*constructorType,*/ parameters, constructorDeclaration.ReturnType.Known(),
+                        /*constructorType,*/ parameters, constructorDeclaration.SelfParameterType,
                         constructorDeclaration.ControlFlow);
                     break;
                 case FieldDeclarationSyntax fieldDeclaration:

@@ -11,14 +11,10 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
-using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    [Closed(
-        typeof(NamedFunctionDeclarationSyntax),
-        typeof(ConstructorDeclarationSyntax))]
-    internal abstract class FunctionDeclarationSyntax : MemberDeclarationSyntax, IFunctionDeclarationSyntax
+    internal abstract class FunctionLikeSyntax : MemberDeclarationSyntax
     {
         private DataType? selfParameterType;
         [DisallowNull]
@@ -41,11 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         [DisallowNull]
         public ControlFlowGraph? ControlFlow { get; set; }
 
-        IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;
-
-        DataType IFunctionSymbol.ReturnType => ReturnType.Fulfilled();
-
-        protected FunctionDeclarationSyntax(
+        protected FunctionLikeSyntax(
             TextSpan span,
             CodeFile file,
             FixedList<IModiferToken> modifiers,

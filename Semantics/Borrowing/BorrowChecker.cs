@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
     public class BorrowChecker
     {
         private readonly CodeFile file;
-        private readonly FixedDictionary<IFunctionDeclarationSyntax, LiveVariables> liveness;
+        private readonly FixedDictionary<ControlFlowGraph, LiveVariables> liveness;
         private readonly Diagnostics diagnostics;
         private readonly HashSet<TextSpan> reportedDiagnosticSpans = new HashSet<TextSpan>();
         private readonly bool saveBorrowClaims;
@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 
         private BorrowChecker(
             CodeFile file,
-            FixedDictionary<IFunctionDeclarationSyntax, LiveVariables> liveness,
+            FixedDictionary<ControlFlowGraph, LiveVariables> liveness,
             Diagnostics diagnostics,
             bool saveBorrowClaims)
         {
@@ -63,7 +63,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 
         public static void Check(
             IEnumerable<MemberDeclarationSyntax> declarations,
-            FixedDictionary<IFunctionDeclarationSyntax, LiveVariables> liveness,
+            FixedDictionary<ControlFlowGraph, LiveVariables> liveness,
             Diagnostics diagnostics,
             bool saveBorrowClaims)
         {
@@ -74,42 +74,44 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             }
         }
 
-        public void Check(MemberDeclarationSyntax declaration)
+        public void Check(IMemberDeclarationSyntax declaration)
         {
             switch (declaration)
             {
-                case FieldDeclarationSyntax field:
+                default:
+                    throw ExhaustiveMatch.Failed(declaration);
+                case IFieldDeclarationSyntax field:
                     Check(field);
                     break;
                 case IFunctionDeclarationSyntax function:
-                    Check(function);
+                    Check(function.ControlFlow);
                     break;
-
-                default:
-                    throw NonExhaustiveMatchException.For(declaration);
+                case IConstructorDeclarationSyntax constructor:
+                    Check(constructor.ControlFlow);
+                    break;
             }
         }
 
-        private static void Check(FieldDeclarationSyntax _field)
+        private static void Check(IFieldDeclarationSyntax _field)
         {
             // Currently nothing to check
         }
 
-        private void Check(IFunctionDeclarationSyntax function)
+        private void Check(ControlFlowGraph controlFlow)
         {
-            var variables = function.ControlFlow.VariableDeclarations;
-            var liveVariables = liveness[function];
+            var variables = controlFlow.VariableDeclarations;
+            var liveVariables = liveness[controlFlow];
             // Do borrow checking with claims
             var blocks = new Queue<BasicBlock>();
-            blocks.Enqueue(function.ControlFlow.EntryBlock);
+            blocks.Enqueue(controlFlow.EntryBlock);
             // Compute parameter claims once in case for some reason we process the entry block repeatedly
-            var parameterClaims = AcquireParameterClaims(function);
+            var parameterClaims = AcquireParameterClaims(controlFlow);
             var claims = new StatementClaims(parameterClaims);
             var insertedDeletes = new InsertedDeletes();
 
             while (blocks.TryDequeue(out var block))
             {
-                var claimsBeforeStatement = GetClaimsBeforeBlock(function, block, claims);
+                var claimsBeforeStatement = GetClaimsBeforeBlock(controlFlow, block, claims);
 
                 foreach (var statement in block.ExpressionStatements)
                 {
@@ -139,7 +141,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                         }
                         case ExitScopeStatement exitScopeStatement:
                             // Any claims held by variables in this scope are released
-                            var variablesInScope = function.ControlFlow.VariableDeclarations
+                            var variablesInScope = controlFlow.VariableDeclarations
                                 .Where(d => d.Scope == exitScopeStatement.Scope)
                                 .Select(d => d.Variable)
                                 .ToList();
@@ -155,7 +157,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                                     .OfType<Variable>()).Distinct();
                             foreach (var variable in erroredVariables)
                             {
-                                var declaration = function.ControlFlow.VariableDeclarations
+                                var declaration = controlFlow.VariableDeclarations
                                                             .Single(d => d.Variable == variable);
                                 ReportDiagnostic(BorrowError.SharedValueDoesNotLiveLongEnough(file, exitScopeStatement.Span, declaration.Name));
                             }
@@ -178,11 +180,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     switch (block.Terminator)
                     {
                         case IfStatement ifStatement:
-                            blocks.Enqueue(function.ControlFlow[ifStatement.ThenBlock]);
-                            blocks.Enqueue(function.ControlFlow[ifStatement.ElseBlock]);
+                            blocks.Enqueue(controlFlow[ifStatement.ThenBlock]);
+                            blocks.Enqueue(controlFlow[ifStatement.ElseBlock]);
                             break;
                         case GotoStatement gotoStatement:
-                            blocks.Enqueue(function.ControlFlow[gotoStatement.GotoBlock]);
+                            blocks.Enqueue(controlFlow[gotoStatement.GotoBlock]);
                             break;
                         case ReturnStatement _:
                             break;
@@ -192,22 +194,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                 }
             }
 
-            function.ControlFlow.InsertedDeletes = insertedDeletes;
+            controlFlow.InsertedDeletes = insertedDeletes;
             if (saveBorrowClaims)
-                function.ControlFlow.BorrowClaims = claims;
+                controlFlow.BorrowClaims = claims;
         }
 
         private Claims GetClaimsBeforeBlock(
-            IFunctionDeclarationSyntax function,
+            ControlFlowGraph controlFlow,
             BasicBlock block,
             StatementClaims claims)
         {
             var claimsBeforeStatement = new Claims();
 
-            if (block == function.ControlFlow.EntryBlock)
+            if (block == controlFlow.EntryBlock)
                 claimsBeforeStatement.AddRange(claims.ParameterClaims);
 
-            foreach (var predecessor in function.ControlFlow.Edges.To(block).Select(b => b.Terminator))
+            foreach (var predecessor in controlFlow.Edges.To(block).Select(b => b.Terminator))
                 claimsBeforeStatement.AddRange(claims.After(predecessor));
 
             return claimsBeforeStatement;
@@ -340,10 +342,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             }
         }
 
-        private Claims AcquireParameterClaims(IFunctionDeclarationSyntax function)
+        private Claims AcquireParameterClaims(ControlFlowGraph controlFlow)
         {
             var claimsBeforeStatement = new Claims();
-            foreach (var parameter in function.ControlFlow.Parameters
+            foreach (var parameter in controlFlow.Parameters
                 .Where(v => v.Type is ReferenceType))
                 claimsBeforeStatement.Add(new Borrows(parameter.Variable, NewLifetime()));
 

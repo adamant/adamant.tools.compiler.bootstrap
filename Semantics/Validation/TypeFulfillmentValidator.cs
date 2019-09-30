@@ -29,14 +29,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
         {
             base.VisitFunctionDeclaration(functionDeclaration, args);
             functionDeclaration?.ReturnType.Fulfilled();
-            //functionDeclaration?.Type.Fulfilled();
-        }
-
-        public override void VisitConstructorDeclaration(IConstructorDeclarationSyntax constructorDeclaration, Void args)
-        {
-            base.VisitConstructorDeclaration(constructorDeclaration, args);
-            constructorDeclaration?.ReturnType.Fulfilled();
-            //constructorDeclaration?.Type.Fulfilled();
         }
 
         public override void VisitVariableDeclarationStatement(

@@ -70,10 +70,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             returnType = function.ReturnType.Known();
 
             // Temp Variable for return
-            if (function is IConstructorDeclarationSyntax constructor)
-                graph.AddSelfParameter(constructor.SelfParameterType);
-            else
-                graph.AddReturnVariable(function.ReturnType.Known());
+            graph.AddReturnVariable(function.ReturnType.Known());
 
             // TODO don't emit temp variables for unused parameters
             foreach (var parameter in function.Parameters.Where(p => !p.Unused))
@@ -95,6 +92,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
 
             function.ControlFlow = graph.Build();
+        }
+
+        private void BuildGraph(IConstructorDeclarationSyntax constructor)
+        {
+            returnType = constructor.DeclaringType.DeclaresType.Fulfilled();
+
+            // Temp Variable for return
+            graph.AddSelfParameter(constructor.SelfParameterType);
+
+            // TODO don't emit temp variables for unused parameters
+            foreach (var parameter in constructor.Parameters.Where(p => !p.Unused))
+                graph.AddParameter(parameter.IsMutableBinding, parameter.Type.Fulfilled(),
+                    CurrentScope, parameter.Name.UnqualifiedName);
+
+            currentBlock = graph.NewBlock();
+            breakToBlock = null;
+            foreach (var statement in constructor.Body)
+                ConvertToStatement(statement);
+
+            // Generate the implicit return statement
+            if (currentBlock != null && !currentBlock.IsTerminated)
+            {
+                var span = constructor.Span.AtEnd();
+                EndScope(span);
+                currentBlock.AddReturn(span,
+                    Scope.Outer); // We officially ended the outer scope, but this is in it
+            }
+
+            constructor.ControlFlow = graph.Build();
         }
 
         private void EnterNewScope()

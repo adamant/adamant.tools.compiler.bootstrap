@@ -117,14 +117,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                         BuildScopesInDeclaration(nestedDeclaration, containingScope);
                     break;
                 case INamedFunctionDeclarationSyntax function:
-                    BuildScopesInFunctionParameters(function, containingScope, binder);
+                    BuildScopesInFunctionParameters(containingScope, function.Parameters);
                     if (function.ReturnTypeSyntax != null)
                         new TypeScopesBuilder(containingScope).Walk(function.ReturnTypeSyntax);
-                    BuildScopesInFunctionBody(function, containingScope, binder);
+                    BuildScopesInFunctionBody(containingScope, binder, function.Parameters, function.Body);
                     break;
                 case IConstructorDeclarationSyntax constructor:
-                    BuildScopesInFunctionParameters(constructor, containingScope, binder);
-                    BuildScopesInFunctionBody(constructor, containingScope, binder);
+                    BuildScopesInFunctionParameters(containingScope, constructor.Parameters);
+                    BuildScopesInFunctionBody(containingScope, binder, constructor.Parameters, constructor.Body);
                     break;
                 case IClassDeclarationSyntax classDeclaration:
                     // TODO name scope for type declaration
@@ -139,11 +139,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         }
 
         private static void BuildScopesInFunctionParameters(
-            IFunctionDeclarationSyntax function,
             LexicalScope containingScope,
-            ExpressionScopesBuilder binder)
+            FixedList<ParameterSyntax> parameters)
         {
-            foreach (var parameter in function.Parameters)
+            foreach (var parameter in parameters)
                 switch (parameter)
                 {
                     default:
@@ -159,16 +158,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         }
 
         private static void BuildScopesInFunctionBody(
-            IFunctionDeclarationSyntax function,
             LexicalScope containingScope,
-            ExpressionScopesBuilder binder)
+            ExpressionScopesBuilder binder,
+            FixedList<ParameterSyntax> parameters,
+            FixedList<StatementSyntax> body)
         {
             var symbols = new List<ISymbol>();
-            foreach (var parameter in function.Parameters)
+            foreach (var parameter in parameters)
                 symbols.Add(parameter);
 
             containingScope = new NestedScope(containingScope, symbols, Enumerable.Empty<ISymbol>());
-            foreach (var statement in function.Body)
+            foreach (var statement in body)
                 binder.VisitStatement(statement, containingScope);
         }
 

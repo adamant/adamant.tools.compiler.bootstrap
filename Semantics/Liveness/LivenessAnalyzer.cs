@@ -14,18 +14,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
     /// </summary>
     public class LivenessAnalyzer
     {
-        public static FixedDictionary<IFunctionDeclarationSyntax, LiveVariables> Check(
+        public static FixedDictionary<ControlFlowGraph, LiveVariables> Check(
             FixedList<MemberDeclarationSyntax> memberDeclarations,
             bool saveLivenessAnalysis)
         {
-            var analyses = new Dictionary<IFunctionDeclarationSyntax, LiveVariables>();
+            var analyses = new Dictionary<ControlFlowGraph, LiveVariables>();
             var livenessAnalyzer = new LivenessAnalyzer();
             foreach (var function in memberDeclarations.OfType<IFunctionDeclarationSyntax>())
             {
                 var liveness = livenessAnalyzer.CheckFunction(function);
                 if (liveness != null)
                 {
-                    analyses.Add(function, liveness);
+                    analyses.Add(function.ControlFlow, liveness);
                     if (saveLivenessAnalysis)
                         function.ControlFlow.LiveVariables = liveness;
                 }

@@ -8,10 +8,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         public IReadOnlyList<MemberDeclarationSyntax> MemberDeclarations => memberDeclarations;
         private readonly List<MemberDeclarationSyntax> memberDeclarations = new List<MemberDeclarationSyntax>();
 
-        public override void VisitMemberDeclaration(MemberDeclarationSyntax memberDeclaration, Void args)
+        public override void VisitMemberDeclaration(IMemberDeclarationSyntax memberDeclaration, Void args)
         {
             base.VisitMemberDeclaration(memberDeclaration, args);
-            memberDeclarations.Add(memberDeclaration);
+            memberDeclarations.Add((MemberDeclarationSyntax)memberDeclaration);
         }
 
         public override void VisitFunctionDeclaration(IFunctionDeclarationSyntax functionDeclaration, Void args)

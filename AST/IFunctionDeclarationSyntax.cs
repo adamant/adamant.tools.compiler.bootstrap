@@ -8,7 +8,6 @@ using ExhaustiveMatching;
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     [Closed(
-        typeof(IConstructorDeclarationSyntax),
         typeof(INamedFunctionDeclarationSyntax))]
     public interface IFunctionDeclarationSyntax : IMemberDeclarationSyntax, IFunctionSymbol
     {
