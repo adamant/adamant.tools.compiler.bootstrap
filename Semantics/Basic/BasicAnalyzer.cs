@@ -133,7 +133,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             {
                 default:
                     throw ExhaustiveMatch.Failed(function);
-                case INamedFunctionDeclarationSyntax namedFunction:
+                case IFunctionDeclarationSyntax namedFunction:
                     var selfParameter = namedFunction.Parameters.OfType<ISelfParameterSyntax>().SingleOrDefault();
                     if (selfParameter == null)
                         return null; // Static function
@@ -194,14 +194,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             BasicStatementAnalyzer analyzer)
         {
             function.ReturnType.BeginFulfilling();
-            switch (function)
-            {
-                case INamedFunctionDeclarationSyntax namedFunction:
-                    ResolveReturnType(function, namedFunction.ReturnTypeSyntax, analyzer);
-                    return;
-                default:
-                    throw ExhaustiveMatch.Failed(function);
-            }
+            ResolveReturnType(function, function.ReturnTypeSyntax, analyzer);
         }
 
         private static void ResolveReturnType(

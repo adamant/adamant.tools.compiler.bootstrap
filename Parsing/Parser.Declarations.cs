@@ -55,7 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IClassKeywordToken _:
                     return ParseClass(modifiers);
                 case IFunctionKeywordToken _:
-                    return ParseNamedFunction(modifiers);
+                    return ParseFunction(modifiers);
                 default:
                     Tokens.UnexpectedToken();
                     throw new ParseFailedException();
@@ -69,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             switch (Tokens.Current)
             {
                 case IFunctionKeywordToken _:
-                    return (MemberDeclarationSyntax)ParseNamedFunction(modifiers);
+                    return (MemberDeclarationSyntax)ParseFunction(modifiers);
                 case INewKeywordToken _:
                     return (MemberDeclarationSyntax)ParseConstructor(modifiers);
                 case ILetKeywordToken _:
@@ -177,7 +177,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         #endregion
 
         #region Parse Functions
-        public INamedFunctionDeclarationSyntax ParseNamedFunction(
+        public IFunctionDeclarationSyntax ParseFunction(
             FixedList<IModiferToken> modifiers)
         {
             var fn = Tokens.Expect<IFunctionKeywordToken>();

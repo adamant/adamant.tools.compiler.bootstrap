@@ -3,12 +3,9 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    [Closed(
-        typeof(INamedFunctionDeclarationSyntax))]
     public interface IFunctionDeclarationSyntax : IMemberDeclarationSyntax,
         ICallableDeclarationSyntax, IFunctionSymbol
     {
@@ -19,5 +16,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         new TypePromise ReturnType { get; }
         [DisallowNull]
         ControlFlowGraph? ControlFlow { get; set; }
+
+        bool IsExternalFunction { get; set; }
+        TypeSyntax? ReturnTypeSyntax { get; }
     }
 }

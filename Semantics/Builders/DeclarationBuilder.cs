@@ -38,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
             {
                 default:
                     throw ExhaustiveMatch.Failed(entityDeclaration);
-                case INamedFunctionDeclarationSyntax namedFunction:
+                case IFunctionDeclarationSyntax namedFunction:
                     declaration = new FunctionDeclaration(namedFunction.IsExternalFunction,
                         namedFunction.DeclaringType != null, namedFunction.FullName, BuildParameters(namedFunction.Parameters),
                         namedFunction.ReturnType.Known(), namedFunction.ControlFlow);

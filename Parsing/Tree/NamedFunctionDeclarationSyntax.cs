@@ -9,7 +9,7 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal class NamedFunctionDeclarationSyntax : FunctionLikeSyntax, INamedFunctionDeclarationSyntax
+    internal class NamedFunctionDeclarationSyntax : FunctionLikeSyntax, IFunctionDeclarationSyntax
     {
         public bool IsExternalFunction { get; set; }
         public ExpressionSyntax? LifetimeBounds { get; }

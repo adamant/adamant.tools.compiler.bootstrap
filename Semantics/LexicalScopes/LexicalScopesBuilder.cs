@@ -116,7 +116,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     foreach (var nestedDeclaration in ns.Declarations)
                         BuildScopesInDeclaration(nestedDeclaration, containingScope);
                     break;
-                case INamedFunctionDeclarationSyntax function:
+                case IFunctionDeclarationSyntax function:
                     BuildScopesInFunctionParameters(containingScope, function.Parameters);
                     if (function.ReturnTypeSyntax != null)
                         new TypeScopesBuilder(containingScope).Walk(function.ReturnTypeSyntax);

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
@@ -79,24 +78,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 VisitDeclaration(member, args);
         }
 
-        public virtual void VisitFunctionDeclaration(IFunctionDeclarationSyntax functionDeclaration, A args)
-        {
-            switch (functionDeclaration)
-            {
-                case INamedFunctionDeclarationSyntax namedFunction:
-                    VisitNamedFunctionDeclaration(namedFunction, args);
-                    break;
-                case IConstructorDeclarationSyntax constructorDeclaration:
-                    VisitConstructorDeclaration(constructorDeclaration, args);
-                    break;
-                case null:
-                    // Ignore
-                    break;
-                default:
-                    throw NonExhaustiveMatchException.For(functionDeclaration);
-            }
-        }
-
         public virtual void VisitConstructorDeclaration(IConstructorDeclarationSyntax constructorDeclaration, A args)
         {
             foreach (var parameter in constructorDeclaration.Parameters)
@@ -106,14 +87,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 VisitStatement(statement, args);
         }
 
-        public virtual void VisitNamedFunctionDeclaration(INamedFunctionDeclarationSyntax namedFunctionDeclaration, A args)
+        public virtual void VisitFunctionDeclaration(IFunctionDeclarationSyntax functionDeclaration, A args)
         {
-            foreach (var parameter in namedFunctionDeclaration.Parameters)
+            foreach (var parameter in functionDeclaration.Parameters)
                 VisitParameter(parameter, args);
 
-            VisitType(namedFunctionDeclaration.ReturnTypeSyntax, args);
-            if (namedFunctionDeclaration.Body != null)
-                foreach (var statement in namedFunctionDeclaration.Body)
+            VisitType(functionDeclaration.ReturnTypeSyntax, args);
+            if (functionDeclaration.Body != null)
+                foreach (var statement in functionDeclaration.Body)
                     VisitStatement(statement, args);
         }
 
