@@ -11,10 +11,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class FieldDeclarationSyntax : MemberDeclarationSyntax, IFieldDeclarationSyntax
     {
+        private ExpressionSyntax? initializer;
         public FixedList<IModiferToken> Modifiers { get; }
         public bool IsMutableBinding { get; }
         public TypeSyntax? TypeSyntax { get; }
-        public ExpressionSyntax? Initializer { get; set; }
+
+        public ExpressionSyntax? Initializer => initializer;
+        public ref ExpressionSyntax? InitializerRef => ref initializer;
         public TypePromise Type { get; } = new TypePromise();
 
         [DebuggerHidden]
@@ -35,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Modifiers = modifiers;
             IsMutableBinding = mutableBinding;
             TypeSyntax = typeSyntax;
-            Initializer = initializer;
+            this.initializer = initializer;
         }
 
         public override string ToString()

@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         /// this expression's type could be either an object type, or member type.
         /// </summary>
         public TypeNameSyntax Constructor { get; }
-        public FixedList<ArgumentSyntax> Arguments { get; }
+        public FixedList<IArgumentSyntax> Arguments { get; }
         private ISymbol? constructorSymbol;
         public ISymbol? ConstructorSymbol
         {
@@ -42,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public NewObjectExpressionSyntax(
             TextSpan span,
             TypeNameSyntax constructor,
-            FixedList<ArgumentSyntax> arguments)
+            FixedList<IArgumentSyntax> arguments)
             : base(span)
         {
             Constructor = constructor;

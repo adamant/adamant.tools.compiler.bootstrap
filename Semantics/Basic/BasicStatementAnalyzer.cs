@@ -462,7 +462,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     foreach (var (arg, type) in methodInvocation.Arguments
                             .Zip(functionSymbol.Parameters.Skip(1).Select(p => p.Type)))
                     {
-                        InsertImplicitConversionIfNeeded(ref arg.Value, type);
+                        InsertImplicitConversionIfNeeded(ref arg.ValueRef, type);
                         CheckArgumentTypeCompatibility(type, arg.Value);
                     }
 
@@ -590,7 +590,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             functionInvocation.FunctionNameSyntax.ReferencedSymbol = functionSymbol;
             foreach (var (arg, parameter) in functionInvocation.Arguments.Zip(functionSymbol.Parameters))
             {
-                InsertImplicitConversionIfNeeded(ref arg.Value, parameter.Type);
+                InsertImplicitConversionIfNeeded(ref arg.ValueRef, parameter.Type);
                 CheckArgumentTypeCompatibility(parameter.Type, arg.Value);
             }
 
@@ -767,9 +767,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
         }
 
-        private DataType InferArgumentType(ArgumentSyntax argument)
+        private DataType InferArgumentType(IArgumentSyntax argument)
         {
-            return InferExpressionType(ref argument.Value);
+            return InferExpressionType(ref argument.ValueRef);
         }
 
         private bool NumericOperatorTypesAreCompatible(

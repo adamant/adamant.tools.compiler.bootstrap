@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             TextSpan span,
             TypeSyntax typeSyntax,
             SimpleName associatedFunctionName,
-            FixedList<ArgumentSyntax> arguments)
+            FixedList<IArgumentSyntax> arguments)
             : base(span, associatedFunctionName, arguments)
         {
             TypeSyntax = typeSyntax;

@@ -12,12 +12,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public abstract class InvocationSyntax : ExpressionSyntax
     {
         public Name FunctionName { get; }
-        public FixedList<ArgumentSyntax> Arguments { get; }
+        public FixedList<IArgumentSyntax> Arguments { get; }
 
         private protected InvocationSyntax(
             TextSpan span,
             Name functionName,
-            FixedList<ArgumentSyntax> arguments)
+            FixedList<IArgumentSyntax> arguments)
             : base(span)
         {
             Arguments = arguments;

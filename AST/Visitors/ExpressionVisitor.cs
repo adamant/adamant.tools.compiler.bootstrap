@@ -285,7 +285,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 VisitArgument(argument, args);
         }
 
-        public virtual void VisitArgument(ArgumentSyntax argument, A args)
+        public virtual void VisitArgument(IArgumentSyntax argument, A args)
         {
             VisitExpression(argument.Value, args);
         }

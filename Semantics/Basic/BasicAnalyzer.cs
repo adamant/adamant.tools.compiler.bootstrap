@@ -332,10 +332,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             var diagnosticCount = diagnostics.Count;
             var resolver = new BasicStatementAnalyzer(fieldDeclaration.File, diagnostics);
             // Work around not being able to pass a ref to a property
-            var initializer = fieldDeclaration.Initializer;
-            resolver.CheckExpressionType(ref initializer, fieldDeclaration.Type.Fulfilled());
-            if (fieldDeclaration.Initializer != initializer)
-                fieldDeclaration.Initializer = initializer;
+            resolver.CheckExpressionType(ref fieldDeclaration.InitializerRef, fieldDeclaration.Type.Fulfilled());
             if (diagnosticCount != diagnostics.Count)
                 fieldDeclaration.MarkErrored();
         }

@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public FunctionInvocationSyntax(
             TextSpan span,
             NameSyntax functionNameSyntax,
-            FixedList<ArgumentSyntax> arguments)
+            FixedList<IArgumentSyntax> arguments)
             : base(span, functionNameSyntax.Name, arguments)
         {
             FunctionNameSyntax = functionNameSyntax;

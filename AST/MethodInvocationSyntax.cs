@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             TextSpan span,
             ExpressionSyntax target,
             NameSyntax methodNameSyntax,
-            FixedList<ArgumentSyntax> arguments)
+            FixedList<IArgumentSyntax> arguments)
             : base(span, methodNameSyntax.Name, arguments)
         {
             Target = target;

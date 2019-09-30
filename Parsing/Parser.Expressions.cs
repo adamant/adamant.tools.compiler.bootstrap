@@ -5,6 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Parsing.Tree;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using ExhaustiveMatching;
 
@@ -523,12 +524,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return expression;
         }
 
-        public FixedList<ArgumentSyntax> ParseArguments()
+        public FixedList<IArgumentSyntax> ParseArguments()
         {
-            return AcceptSeparatedList<ArgumentSyntax, ICommaToken>(AcceptArgument);
+            return AcceptSeparatedList<IArgumentSyntax, ICommaToken>(AcceptArgument);
         }
 
-        private ArgumentSyntax? AcceptArgument()
+        private IArgumentSyntax? AcceptArgument()
         {
             var value = AcceptExpression();
             return value == null ? null : new ArgumentSyntax(value.Span, value);
