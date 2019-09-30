@@ -14,11 +14,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
     /// </summary>
     public class NoUpgradableMutabilityTypesValidator : DeclarationVisitor<Void>
     {
-        public static void Validate(IEnumerable<MemberDeclarationSyntax> allMemberDeclarations)
+        public static void Validate(IEnumerable<IEntityDeclarationSyntax> entityDeclarations)
         {
             var validator = new NoUpgradableMutabilityTypesValidator();
-            foreach (var declaration in allMemberDeclarations)
-                validator.VisitDeclaration(declaration);
+            foreach (var declaration in entityDeclarations)
+                validator.VisitDeclaration((DeclarationSyntax)declaration);
         }
 
         public override void VisitFunctionDeclaration(IFunctionDeclarationSyntax functionDeclaration, Void args)

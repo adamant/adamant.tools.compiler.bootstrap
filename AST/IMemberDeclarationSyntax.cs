@@ -1,4 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
@@ -7,7 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(IFunctionDeclarationSyntax),
         typeof(IFieldDeclarationSyntax),
         typeof(IConstructorDeclarationSyntax))]
-    public interface IMemberDeclarationSyntax : IDeclarationSyntax, ISymbol
+    public interface IMemberDeclarationSyntax : IEntityDeclarationSyntax
     {
         ClassDeclarationSyntax? DeclaringType { get; }
     }

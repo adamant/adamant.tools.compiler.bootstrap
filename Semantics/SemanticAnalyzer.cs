@@ -45,47 +45,47 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             var scopesBuilder = new LexicalScopesBuilder(diagnostics, packageSyntax, references);
             scopesBuilder.BuildScopesInPackage(packageSyntax);
 
-            // Make a list of all the member declarations (i.e. not namespaces)
-            var memberDeclarations = packageSyntax.CompilationUnits
-                .SelectMany(cu => cu.AllMemberDeclarations).ToFixedList();
+            // Make a list of all the entity declarations (i.e. not namespaces)
+            var entityDeclarations = packageSyntax.CompilationUnits
+                .SelectMany(cu => cu.EntityDeclarations).ToFixedList();
 
             // Basic Analysis includes: Name Binding, Type Checking, Constant Folding
-            BasicAnalyzer.Check(memberDeclarations, diagnostics);
+            BasicAnalyzer.Check(entityDeclarations, diagnostics);
 
 #if DEBUG
-            TypeFulfillmentValidator.Validate(memberDeclarations);
-            NoUpgradableMutabilityTypesValidator.Validate(memberDeclarations);
-            ReferencedSymbolValidator.Validate(memberDeclarations);
+            TypeFulfillmentValidator.Validate(entityDeclarations);
+            NoUpgradableMutabilityTypesValidator.Validate(entityDeclarations);
+            ReferencedSymbolValidator.Validate(entityDeclarations);
 #endif
 
-            ShadowChecker.Check(memberDeclarations, diagnostics);
+            ShadowChecker.Check(entityDeclarations, diagnostics);
 
             // TODO use DataFlowAnalysis to check for unused variables and report use of variables starting with `_`
 
-            DataFlowAnalysis.Check(DefiniteAssignmentStrategy.Instance, memberDeclarations, diagnostics);
+            DataFlowAnalysis.Check(DefiniteAssignmentStrategy.Instance, entityDeclarations, diagnostics);
 
-            DataFlowAnalysis.Check(BindingMutabilityStrategy.Instance, memberDeclarations, diagnostics);
+            DataFlowAnalysis.Check(BindingMutabilityStrategy.Instance, entityDeclarations, diagnostics);
 
-            DataFlowAnalysis.Check(UseOfMovedValueStrategy.Instance, memberDeclarations, diagnostics);
+            DataFlowAnalysis.Check(UseOfMovedValueStrategy.Instance, entityDeclarations, diagnostics);
 
             // If there are errors from the previous phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
 
             // --------------------------------------------------
             // This is where the representation transitions to IR
-            ControlFlowAnalyzer.BuildGraphs(memberDeclarations);
+            ControlFlowAnalyzer.BuildGraphs(entityDeclarations);
             // --------------------------------------------------
 
-            var liveness = LivenessAnalyzer.Check(memberDeclarations, SaveLivenessAnalysis);
+            var liveness = LivenessAnalyzer.Check(entityDeclarations, SaveLivenessAnalysis);
 
-            BorrowChecker.Check(memberDeclarations, liveness, diagnostics, SaveBorrowClaims);
+            BorrowChecker.Check(entityDeclarations, liveness, diagnostics, SaveBorrowClaims);
 
             // If there are errors from the previous phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
 
             // Build final declaration objects and find the entry point
             var declarationBuilder = new DeclarationBuilder();
-            declarationBuilder.Build(memberDeclarations);
+            declarationBuilder.Build(entityDeclarations);
             var declarations = declarationBuilder.AllDeclarations.ToFixedList();
             var entryPoint = DetermineEntryPoint(declarations, diagnostics);
 

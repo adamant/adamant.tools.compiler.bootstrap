@@ -62,19 +62,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         }
 
         public static void Check(
-            IEnumerable<MemberDeclarationSyntax> declarations,
+            IEnumerable<IEntityDeclarationSyntax> entityDeclarations,
             FixedDictionary<ControlFlowGraph, LiveVariables> liveness,
             Diagnostics diagnostics,
             bool saveBorrowClaims)
         {
-            foreach (var declaration in declarations)
+            foreach (var declaration in entityDeclarations)
             {
                 var borrowChecker = new BorrowChecker(declaration.File, liveness, diagnostics, saveBorrowClaims);
                 borrowChecker.Check(declaration);
             }
         }
 
-        public void Check(IMemberDeclarationSyntax declaration)
+        public void Check(IEntityDeclarationSyntax declaration)
         {
             switch (declaration)
             {
@@ -88,6 +88,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     break;
                 case IConstructorDeclarationSyntax constructor:
                     Check(constructor.ControlFlow);
+                    break;
+                case IClassDeclarationSyntax _:
+                    // borrow check doesn't apply
                     break;
             }
         }

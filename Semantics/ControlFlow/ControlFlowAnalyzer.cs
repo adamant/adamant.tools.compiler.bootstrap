@@ -17,16 +17,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
     // TODO seems like this should be name builder not analyzer, but we already have another class named builder
     public class ControlFlowAnalyzer
     {
-        public static void BuildGraphs(IEnumerable<MemberDeclarationSyntax> declarations)
+        public static void BuildGraphs(FixedList<IEntityDeclarationSyntax> entityDeclarations)
         {
-            foreach (var function in declarations.OfType<IFunctionDeclarationSyntax>()
+            foreach (var function in entityDeclarations.OfType<IFunctionDeclarationSyntax>()
                 .Where(ShouldBuildGraph))
             {
                 var builder = new ControlFlowAnalyzer();
                 builder.BuildGraph(function);
             }
 
-            foreach (var function in declarations.OfType<IConstructorDeclarationSyntax>())
+            foreach (var function in entityDeclarations.OfType<IConstructorDeclarationSyntax>())
             {
                 var builder = new ControlFlowAnalyzer();
                 builder.BuildGraph(function);

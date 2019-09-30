@@ -21,9 +21,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
             this.diagnostics = diagnostics;
         }
 
-        public static void Check(IEnumerable<MemberDeclarationSyntax> memberDeclarations, Diagnostics diagnostics)
+        public static void Check(IEnumerable<IEntityDeclarationSyntax> entityDeclarations, Diagnostics diagnostics)
         {
-            foreach (var declaration in memberDeclarations.OfType<IFunctionDeclarationSyntax>())
+            foreach (var declaration in entityDeclarations.OfType<IFunctionDeclarationSyntax>())
                 Check(declaration, diagnostics);
         }
 

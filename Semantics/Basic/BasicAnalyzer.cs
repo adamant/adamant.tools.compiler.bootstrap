@@ -35,40 +35,41 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             this.diagnostics = diagnostics;
         }
 
-        public static void Check(FixedList<MemberDeclarationSyntax> memberDeclarations, Diagnostics diagnostics)
+        public static void Check(FixedList<IEntityDeclarationSyntax> memberDeclarations, Diagnostics diagnostics)
         {
             var analyzer = new BasicAnalyzer(diagnostics);
             analyzer.ResolveTypesInDeclarations(memberDeclarations);
         }
 
-        private void ResolveTypesInDeclarations(FixedList<MemberDeclarationSyntax> declarations)
+        private void ResolveTypesInDeclarations(FixedList<IEntityDeclarationSyntax> declarations)
         {
             // Process all types first because they may be referenced by functions etc.
-            ResolveSignatureTypesInClassDeclarations(declarations.OfType<ClassDeclarationSyntax>());
-            // Now resolve all other types (type declarations will already have types and won't be processed again)
+            ResolveSignatureTypesInClassDeclarations(declarations.OfType<IClassDeclarationSyntax>());
+            // Now resolve all other types (class declarations will already have types and won't be processed again)
             ResolveSignatureTypesInDeclarations(declarations);
             // Function bodies are checked after signatures to ensure that all function invocation
             // expressions can get a type for the invoked function.
             ResolveBodyTypesInDeclarations(declarations);
         }
 
-        private void ResolveSignatureTypesInClassDeclarations(IEnumerable<ClassDeclarationSyntax> typeDeclarations)
+        private void ResolveSignatureTypesInClassDeclarations(IEnumerable<IClassDeclarationSyntax> classDeclarations)
         {
-            foreach (var typeDeclaration in typeDeclarations)
-                ResolveSignatureTypesInClassDeclaration(typeDeclaration);
+            foreach (var classDeclaration in classDeclarations)
+                ResolveSignatureTypesInClassDeclaration((ClassDeclarationSyntax)classDeclaration);
         }
 
-        private void ResolveSignatureTypesInDeclarations(
-             IEnumerable<MemberDeclarationSyntax> declarations)
+        private void ResolveSignatureTypesInDeclarations(IEnumerable<IEntityDeclarationSyntax> declarations)
         {
             foreach (var declaration in declarations)
                 ResolveSignatureTypesInDeclaration(declaration);
         }
 
-        private void ResolveSignatureTypesInDeclaration(IMemberDeclarationSyntax declaration)
+        private void ResolveSignatureTypesInDeclaration(IEntityDeclarationSyntax declaration)
         {
             switch (declaration)
             {
+                default:
+                    throw ExhaustiveMatch.Failed(declaration);
                 case IFunctionDeclarationSyntax f:
                     ResolveSignatureTypesInFunction(f);
                     break;
@@ -78,8 +79,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IFieldDeclarationSyntax f:
                     ResolveSignatureTypesInField((FieldDeclarationSyntax)f);
                     break;
-                default:
-                    throw ExhaustiveMatch.Failed(declaration);
+                case IClassDeclarationSyntax _:
+                    // Already processed
+                    break;
             }
         }
 
@@ -268,16 +270,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         }
 
         private void ResolveBodyTypesInDeclarations(
-             IEnumerable<MemberDeclarationSyntax> declarations)
+             IEnumerable<IEntityDeclarationSyntax> declarations)
         {
             foreach (var declaration in declarations)
                 ResolveBodyTypesInDeclaration(declaration);
         }
 
-        private void ResolveBodyTypesInDeclaration(IMemberDeclarationSyntax declaration)
+        private void ResolveBodyTypesInDeclaration(IEntityDeclarationSyntax declaration)
         {
             switch (declaration)
             {
+                default:
+                    throw ExhaustiveMatch.Failed(declaration);
                 case IFunctionDeclarationSyntax f:
                     ResolveBodyTypesInFunction(f);
                     break;
@@ -287,8 +291,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IConstructorDeclarationSyntax c:
                     ResolveBodyTypesInConstructor(c);
                     break;
-                default:
-                    throw ExhaustiveMatch.Failed(declaration);
+                case IClassDeclarationSyntax _:
+                    // body of class is processed as separate items
+                    break;
             }
         }
 

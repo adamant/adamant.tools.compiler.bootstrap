@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public interface IConstructorDeclarationSyntax : IMemberDeclarationSyntax
+    public interface IConstructorDeclarationSyntax : IMemberDeclarationSyntax, ICallableDeclarationSyntax
     {
         FixedList<ParameterSyntax> Parameters { get; }
         FixedList<StatementSyntax>? Body { get; }

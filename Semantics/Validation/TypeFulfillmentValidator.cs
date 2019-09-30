@@ -12,11 +12,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
     /// </summary>
     public class TypeFulfillmentValidator : DeclarationVisitor<Void>
     {
-        public static void Validate(IEnumerable<MemberDeclarationSyntax> allMemberDeclarations)
+        public static void Validate(IEnumerable<IEntityDeclarationSyntax> entityDeclarations)
         {
             var validator = new TypeFulfillmentValidator();
-            foreach (var declaration in allMemberDeclarations)
-                validator.VisitDeclaration(declaration);
+            foreach (var declaration in entityDeclarations)
+                validator.VisitDeclaration((DeclarationSyntax)declaration);
         }
 
         public override void VisitClassDeclaration(ClassDeclarationSyntax classDeclaration, Void args)

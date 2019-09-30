@@ -16,9 +16,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
             this.diagnostics = diagnostics;
         }
 
-        public void Check(MemberDeclarationSyntax memberDeclaration)
+        public void Check(IEntityDeclarationSyntax entityDeclaration)
         {
-            switch (memberDeclaration)
+            switch (entityDeclaration)
             {
                 case IFunctionDeclarationSyntax function:
                     Check(function);

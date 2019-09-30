@@ -15,12 +15,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
     public class LivenessAnalyzer
     {
         public static FixedDictionary<ControlFlowGraph, LiveVariables> Check(
-            FixedList<MemberDeclarationSyntax> memberDeclarations,
+            FixedList<IEntityDeclarationSyntax> entityDeclarations,
             bool saveLivenessAnalysis)
         {
             var analyses = new Dictionary<ControlFlowGraph, LiveVariables>();
             var livenessAnalyzer = new LivenessAnalyzer();
-            foreach (var function in memberDeclarations.OfType<IFunctionDeclarationSyntax>())
+            foreach (var function in entityDeclarations.OfType<IFunctionDeclarationSyntax>())
             {
                 var liveness = livenessAnalyzer.CheckFunction(function);
                 if (liveness != null)

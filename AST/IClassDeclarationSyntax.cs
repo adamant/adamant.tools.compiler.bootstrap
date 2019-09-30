@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public interface IClassDeclarationSyntax : INonMemberDeclarationSyntax, ITypeSymbol
+    public interface IClassDeclarationSyntax : IIndependentDeclarationSyntax, ITypeSymbol
     {
         FixedList<MemberDeclarationSyntax> Members { get; }
     }

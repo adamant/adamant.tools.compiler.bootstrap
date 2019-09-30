@@ -16,9 +16,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
 
         public IEnumerable<Declaration> AllDeclarations => declarations.Values;
 
-        public void Build(IEnumerable<MemberDeclarationSyntax> memberDeclarations)
+        public void Build(IEnumerable<IEntityDeclarationSyntax> entityDeclarations)
         {
-            foreach (var memberDeclaration in memberDeclarations)
+            foreach (var memberDeclaration in entityDeclarations)
                 Build(memberDeclaration);
         }
 
@@ -27,12 +27,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
             return memberDeclarations.Select(Build).ToFixedList();
         }
 
-        private Declaration Build(MemberDeclarationSyntax memberDeclarations)
+        private Declaration Build(IEntityDeclarationSyntax entityDeclaration)
         {
-            if (declarations.TryGetValue(memberDeclarations, out var declaration))
+            if (declarations.TryGetValue(entityDeclaration, out var declaration))
                 return declaration;
 
-            switch (memberDeclarations)
+            switch (entityDeclaration)
             {
                 case INamedFunctionDeclarationSyntax namedFunction:
                     declaration = new FunctionDeclaration(namedFunction.IsExternalFunction,
@@ -52,9 +52,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                     declaration = new FieldDeclaration(fieldDeclaration.IsMutableBinding, fieldDeclaration.FullName, fieldDeclaration.Type.Known());
                     break;
                 default:
-                    throw NonExhaustiveMatchException.For(memberDeclarations);
+                    throw NonExhaustiveMatchException.For(entityDeclaration);
             }
-            declarations.Add(memberDeclarations, declaration);
+            declarations.Add(entityDeclaration, declaration);
             return declaration;
         }
 

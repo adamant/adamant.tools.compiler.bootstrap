@@ -9,11 +9,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
 {
     public class ReferencedSymbolValidator : DeclarationVisitor<Void>
     {
-        public static void Validate(IEnumerable<MemberDeclarationSyntax> allMemberDeclarations)
+        public static void Validate(IEnumerable<IEntityDeclarationSyntax> entityDeclaration)
         {
             var validator = new ReferencedSymbolValidator();
-            foreach (var declaration in allMemberDeclarations)
-                validator.VisitDeclaration(declaration);
+            foreach (var declaration in entityDeclaration)
+                validator.VisitDeclaration((DeclarationSyntax)declaration);
         }
 
         private static void AssertHasReferencedSymbol(

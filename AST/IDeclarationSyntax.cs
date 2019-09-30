@@ -4,9 +4,8 @@ using ExhaustiveMatching;
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     [Closed(
-        typeof(IMemberDeclarationSyntax),
         typeof(INamespaceDeclarationSyntax),
-        typeof(INonMemberDeclarationSyntax))]
+        typeof(IEntityDeclarationSyntax))]
     public interface IDeclarationSyntax : ISyntax
     {
         CodeFile File { get; }
