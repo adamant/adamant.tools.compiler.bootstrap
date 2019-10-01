@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
                 VisitStatement(statement, default);
         }
 
-        public override void VisitAssignmentExpression(AssignmentExpressionSyntax assignmentExpression, Void args)
+        public override void VisitAssignmentExpression(IAssignmentExpressionSyntax assignmentExpression, Void args)
         {
             VisitLValueExpression(assignmentExpression.LeftOperand, args);
             VisitExpression(assignmentExpression.RightOperand, args);
@@ -54,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
             {
                 default:
                     throw NonExhaustiveMatchException.For(expression);
-                case NameSyntax identifierName:
+                case INameSyntax identifierName:
                 case null:
                     // Ignore
                     break;
@@ -66,7 +66,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
             }
         }
 
-        public override void VisitName(NameSyntax name, Void args)
+        public override void VisitName(INameSyntax name, Void args)
         {
             currentState = checker.IdentifierName(name, currentState);
         }

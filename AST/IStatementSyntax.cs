@@ -8,6 +8,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(IResultStatementSyntax))]
     public interface IStatementSyntax : ISyntax
     {
-
     }
 }

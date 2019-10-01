@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 {
     public class ExpressionScopesBuilder : ExpressionVisitor<LexicalScope>
     {
-        public override void VisitBlock(BlockSyntax block, LexicalScope containingScope)
+        public override void VisitBlock(IBlockSyntax block, LexicalScope containingScope)
         {
             if (block == null)
                 return;
@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         }
 
         public override void VisitName(
-            NameSyntax name,
+            INameSyntax name,
             LexicalScope containingScope)
         {
             name.ContainingScope = containingScope;

@@ -5,9 +5,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class LoopExpressionSyntax : ExpressionSyntax, ILoopExpressionSyntax
     {
-        public BlockSyntax Block { get; }
+        public IBlockSyntax Block { get; }
 
-        public LoopExpressionSyntax(TextSpan span, BlockSyntax block)
+        public LoopExpressionSyntax(TextSpan span, IBlockSyntax block)
             : base(span)
         {
             Block = block;

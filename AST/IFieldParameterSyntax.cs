@@ -5,6 +5,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public interface IFieldParameterSyntax : IParameterSyntax
     {
         SimpleName FieldName { get; }
-        ExpressionSyntax DefaultValue { get; }
+        IExpressionSyntax DefaultValue { get; }
     }
 }

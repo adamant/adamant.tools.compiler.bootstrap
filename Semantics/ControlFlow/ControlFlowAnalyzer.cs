@@ -284,7 +284,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 default:
                     throw ExhaustiveMatch.Failed(blockOrResult);
                 case IBlockSyntax block:
-                    ConvertExpressionToStatement((BlockSyntax)block);
+                    ConvertExpressionToStatement(block);
                     break;
                 case IResultStatementSyntax resultStatement:
                     ConvertExpressionToStatement(resultStatement.Expression);
@@ -315,13 +315,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             switch (expression)
             {
                 case IUnaryExpressionSyntax _:
-                case BinaryExpressionSyntax _:
+                case IBinaryExpressionSyntax _:
                     throw new NotImplementedException();
                 case InvocationSyntax invocation:
                     currentBlock.AddAction(ConvertInvocationToValue(invocation), invocation.Span,
                         CurrentScope);
                     return;
-                case ReturnExpressionSyntax returnExpression:
+                case IReturnExpressionSyntax returnExpression:
                 {
                     if (returnExpression.ReturnValue != null)
                     {
@@ -355,7 +355,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     //     x += 1;
                     //     if x > temp => break;
                     // }
-                    if (!(foreachExpression.InExpression is BinaryExpressionSyntax inExpression)
+                    if (!(foreachExpression.InExpression is IBinaryExpressionSyntax inExpression)
                         || inExpression.Operator != BinaryOperator.DotDot)
                         throw new NotImplementedException(
                             "`foreach` in non-range expression not implemented");
@@ -479,7 +479,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     currentBlock = exit;
                     return;
                 }
-                case BlockSyntax block:
+                case IBlockSyntax block:
                 {
                     // Starting a new nested scope
                     EnterNewScope();
@@ -494,7 +494,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case IUnsafeExpressionSyntax unsafeExpression:
                     ConvertExpressionToStatement(unsafeExpression.Expression);
                     return;
-                case AssignmentExpressionSyntax assignmentExpression:
+                case IAssignmentExpressionSyntax assignmentExpression:
                 {
                     var value = ConvertToValue(assignmentExpression.RightOperand);
                     var place = ConvertToPlace(assignmentExpression.LeftOperand);
@@ -557,7 +557,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     type = type.WithLifetime(Lifetime.None);
                     return new ConstructorCall(type, args, newObjectExpression.Span);
                 }
-                case NameSyntax identifier:
+                case INameSyntax identifier:
                 {
                     var symbol = identifier.ReferencedSymbol;
                     switch (symbol)
@@ -573,7 +573,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 }
                 case IUnaryExpressionSyntax unaryExpression:
                     return ConvertUnaryExpressionToValue(unaryExpression);
-                case BinaryExpressionSyntax binaryExpression:
+                case IBinaryExpressionSyntax binaryExpression:
                     return ConvertBinaryExpressionToValue(binaryExpression);
                 case IIntegerLiteralExpressionSyntax _:
                     throw new InvalidOperationException(
@@ -636,7 +636,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 //    // TODO shouldn't borrowing be explicit in the IR and don't we
                 //    // need to be able to check mutability on borrows?
                 //    return ConvertToValue(mutable.Referent);
-                case MoveExpressionSyntax move:
+                case IMoveExpressionSyntax move:
                     return ConvertToOwn(move.Expression, move.Span);
                 case ImplicitImmutabilityConversionExpression implicitImmutabilityConversion:
                 {
@@ -659,7 +659,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                             throw NonExhaustiveMatchException.For(expression);
                     }
                 }
-                case SelfExpressionSyntax selfExpression:
+                case ISelfExpressionSyntax selfExpression:
                     return graph.VariableFor(SpecialName.Self).Reference(selfExpression.Span);
             }
         }
@@ -692,7 +692,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             //return tempVariable.Reference(value.Span);
         }
 
-        private Value ConvertBinaryExpressionToValue(BinaryExpressionSyntax expression)
+        private Value ConvertBinaryExpressionToValue(IBinaryExpressionSyntax expression)
         {
             switch (expression.Operator)
             {
@@ -818,7 +818,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         {
             switch (value)
             {
-                case NameSyntax identifier:
+                case INameSyntax identifier:
                     // TODO what if this isn't just a variable?
                     return graph.VariableFor(identifier.ReferencedSymbol.FullName.UnqualifiedName).LValueReference(value.Span);
                 case MemberAccessExpressionSyntax memberAccessExpression:

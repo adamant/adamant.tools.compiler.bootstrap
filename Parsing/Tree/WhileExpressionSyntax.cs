@@ -8,12 +8,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         private IExpressionSyntax condition;
         public ref IExpressionSyntax Condition => ref condition;
 
-        public BlockSyntax Block { get; }
+        public IBlockSyntax Block { get; }
 
         public WhileExpressionSyntax(
             TextSpan span,
             IExpressionSyntax condition,
-            BlockSyntax block)
+            IBlockSyntax block)
             : base(span)
         {
             this.condition = condition;

@@ -314,7 +314,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return binaryOperatorExpression.Type;
                 }
                 case INameSyntax identifierName:
-                    return InferNameType((NameSyntax)identifierName, false);
+                    return InferNameType(identifierName, false);
                 case IUnaryExpressionSyntax unaryOperatorExpression:
                 {
                     var operandType = InferExpressionType(ref unaryOperatorExpression.OperandRef);
@@ -527,7 +527,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
                     switch (memberAccess.Member)
                     {
-                        case NameSyntax identifier:
+                        case INameSyntax identifier:
                             var memberSymbols = symbol.Lookup(identifier.Name).OfType<IBindingSymbol>().ToFixedList();
                             var type = AssignReferencedSymbolAndType(identifier, memberSymbols);
                             return memberAccess.Type = type;
@@ -612,7 +612,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
         }
 
-        public DataType InferNameType(NameSyntax name, bool isMove)
+        public DataType InferNameType(INameSyntax name, bool isMove)
         {
             var symbols = name.LookupInContainingScope();
             DataType type;
@@ -665,7 +665,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             switch (expression)
             {
-                case NameSyntax identifierName:
+                case INameSyntax identifierName:
                     return InferNameType(identifierName, true);
                 default:
                     throw new NotImplementedException("Tried to move out of expression type that isn't implemented");
@@ -746,7 +746,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         }
 
         private DataType AssignReferencedSymbolAndType(
-            NameSyntax identifier,
+            INameSyntax identifier,
             FixedList<IBindingSymbol> memberSymbols)
         {
             switch (memberSymbols.Count)

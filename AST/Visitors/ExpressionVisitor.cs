@@ -38,10 +38,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             {
                 default:
                     throw NonExhaustiveMatchException.For(expression);
-                case BinaryExpressionSyntax binaryExpression:
+                case IBinaryExpressionSyntax binaryExpression:
                     VisitBinaryExpression(binaryExpression, args);
                     break;
-                case ReturnExpressionSyntax returnExpression:
+                case IReturnExpressionSyntax returnExpression:
                     VisitReturnExpression(returnExpression, args);
                     break;
                 case InvocationSyntax invocation:
@@ -50,16 +50,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case ILiteralExpressionSyntax literalExpression:
                     VisitLiteralExpression(literalExpression, args);
                     break;
-                case NameSyntax identifierName:
+                case INameSyntax identifierName:
                     VisitName(identifierName, args);
                     break;
                 case IUnaryExpressionSyntax unaryExpression:
                     VisitUnaryExpression(unaryExpression, args);
                     break;
-                case AssignmentExpressionSyntax assignmentExpression:
+                case IAssignmentExpressionSyntax assignmentExpression:
                     VisitAssignmentExpression(assignmentExpression, args);
                     break;
-                case BlockSyntax block:
+                case IBlockSyntax block:
                     VisitBlock(block, args);
                     break;
                 case NewObjectExpressionSyntax newObjectExpression:
@@ -71,31 +71,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case IUnsafeExpressionSyntax unsafeExpression:
                     VisitUnsafeExpression(unsafeExpression, args);
                     break;
-                case SelfExpressionSyntax selfExpression:
+                case ISelfExpressionSyntax selfExpression:
                     VisitSelfExpression(selfExpression, args);
                     break;
-                case LoopExpressionSyntax loopExpression:
+                case ILoopExpressionSyntax loopExpression:
                     VisitLoopExpression(loopExpression, args);
                     break;
-                case IfExpressionSyntax ifExpression:
+                case IIfExpressionSyntax ifExpression:
                     VisitIfExpression(ifExpression, args);
                     break;
-                case BreakExpressionSyntax breakExpression:
+                case IBreakExpressionSyntax breakExpression:
                     VisitBreakExpression(breakExpression, args);
                     break;
                 case ImplicitConversionExpression implicitConversion:
                     VisitImplicitConversionExpression(implicitConversion, args);
                     break;
-                case MoveExpressionSyntax moveExpression:
+                case IMoveExpressionSyntax moveExpression:
                     VisitMoveExpression(moveExpression, args);
                     break;
-                case ForeachExpressionSyntax foreachExpression:
+                case IForeachExpressionSyntax foreachExpression:
                     VisitForeachExpression(foreachExpression, args);
                     break;
-                case NextExpressionSyntax nextExpression:
+                case INextExpressionSyntax nextExpression:
                     VisitNextExpression(nextExpression, args);
                     break;
-                case WhileExpressionSyntax whileExpression:
+                case IWhileExpressionSyntax whileExpression:
                     VisitWhileExpression(whileExpression, args);
                     break;
                 case null:
@@ -154,7 +154,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             VisitExpression(foreachExpression.Block, args);
         }
 
-        public virtual void VisitMoveExpression(MoveExpressionSyntax moveExpression, A args)
+        public virtual void VisitMoveExpression(IMoveExpressionSyntax moveExpression, A args)
         {
             VisitExpression(moveExpression.Expression, args);
         }
@@ -239,7 +239,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 default:
                     throw ExhaustiveMatch.Failed(blockOrResult);
                 case IBlockSyntax blockExpression:
-                    VisitBlock((BlockSyntax)blockExpression, args);
+                    VisitBlock(blockExpression, args);
                     break;
                 case IResultStatementSyntax resultStatement:
                     VisitResultStatement(resultStatement, args);
@@ -257,7 +257,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                     VisitBlockOrResult(blockOrResult, args);
                     break;
                 case IIfExpressionSyntax ifExpression:
-                    VisitIfExpression((IfExpressionSyntax)ifExpression, args);
+                    VisitIfExpression(ifExpression, args);
                     break;
             }
         }
@@ -267,7 +267,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             VisitExpression(loopExpression.Block, args);
         }
 
-        public virtual void VisitSelfExpression(SelfExpressionSyntax selfExpression, A args)
+        public virtual void VisitSelfExpression(ISelfExpressionSyntax selfExpression, A args)
         {
         }
 
@@ -298,13 +298,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             VisitType(referenceLifetime.ReferentType, args);
         }
 
-        public virtual void VisitBlock(BlockSyntax block, A args)
+        public virtual void VisitBlock(IBlockSyntax block, A args)
         {
             foreach (var statement in block.Statements)
                 VisitStatement(statement, args);
         }
 
-        public virtual void VisitAssignmentExpression(AssignmentExpressionSyntax assignmentExpression, A args)
+        public virtual void VisitAssignmentExpression(IAssignmentExpressionSyntax assignmentExpression, A args)
         {
             VisitExpression(assignmentExpression.LeftOperand, args);
             VisitExpression(assignmentExpression.RightOperand, args);
@@ -315,7 +315,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             VisitExpression(unaryExpression.Operand, args);
         }
 
-        public virtual void VisitName(NameSyntax name, A args)
+        public virtual void VisitName(INameSyntax name, A args)
         {
         }
 
@@ -362,12 +362,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 VisitArgument(argument, args);
         }
 
-        public virtual void VisitReturnExpression(ReturnExpressionSyntax returnExpression, A args)
+        public virtual void VisitReturnExpression(IReturnExpressionSyntax returnExpression, A args)
         {
             VisitExpression(returnExpression.ReturnValue, args);
         }
 
-        public virtual void VisitBinaryExpression(BinaryExpressionSyntax binaryExpression, A args)
+        public virtual void VisitBinaryExpression(IBinaryExpressionSyntax binaryExpression, A args)
         {
             VisitExpression(binaryExpression.LeftOperand, args);
             VisitExpression(binaryExpression.RightOperand, args);

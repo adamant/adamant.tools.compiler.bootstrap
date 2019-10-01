@@ -1,9 +1,10 @@
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    public class BinaryExpressionSyntax : ExpressionSyntax, IBinaryExpressionSyntax
+    internal class BinaryExpressionSyntax : ExpressionSyntax, IBinaryExpressionSyntax
     {
         private IExpressionSyntax leftOperand;
         public IExpressionSyntax LeftOperand => leftOperand;

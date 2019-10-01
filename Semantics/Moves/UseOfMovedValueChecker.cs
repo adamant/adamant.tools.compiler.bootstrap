@@ -35,11 +35,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
             return new VariableFlags(method, false);
         }
 
-        public VariableFlags Assignment(AssignmentExpressionSyntax assignmentExpression, VariableFlags possiblyMoved)
+        public VariableFlags Assignment(IAssignmentExpressionSyntax assignmentExpression, VariableFlags possiblyMoved)
         {
             switch (assignmentExpression.LeftOperand)
             {
-                case NameSyntax identifierName:
+                case INameSyntax identifierName:
                     // We are assigning into this variable so it definitely has a value now
                     var symbol = identifierName.ReferencedSymbol;
                     return possiblyMoved.Set(symbol, false);
@@ -50,7 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
             }
         }
 
-        public VariableFlags IdentifierName(NameSyntax name, VariableFlags possiblyMoved)
+        public VariableFlags IdentifierName(INameSyntax name, VariableFlags possiblyMoved)
         {
             if (possiblyMoved[name.ReferencedSymbol] == true)
                 diagnostics.Add(SemanticError.UseOfPossiblyMovedValue(file, name.Span));

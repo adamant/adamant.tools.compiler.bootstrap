@@ -61,7 +61,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (Tokens.Accept<IColonToken>())
                 type = ParseType();
 
-            ExpressionSyntax initializer = null;
+            IExpressionSyntax initializer = null;
             if (Tokens.Accept<IEqualsToken>())
                 initializer = ParseExpression();
 
@@ -86,7 +86,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new ExpressionStatementSyntax(span, unsafeExpression);
         }
 
-        public BlockSyntax ParseBlock()
+        public IBlockSyntax ParseBlock()
         {
             var openBrace = Tokens.Expect<IOpenBraceToken>();
             var statements = ParseMany<IStatementSyntax, ICloseBraceToken>(ParseStatement);

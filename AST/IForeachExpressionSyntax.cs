@@ -12,6 +12,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         new DataType? Type { get; set; }
         [DisallowNull] DataType? VariableType { get; set; }
         ref IExpressionSyntax InExpression { get; }
-        BlockSyntax Block { get; }
+        IBlockSyntax Block { get; }
     }
 }

@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public partial class Parser
     {
-        public ExpressionSyntax AcceptExpression()
+        public IExpressionSyntax AcceptExpression()
         {
             switch (Tokens.Current)
             {
@@ -28,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
-        public ExpressionSyntax ParseExpression()
+        public IExpressionSyntax ParseExpression()
         {
             return ParseExpression(OperatorPrecedence.Min);
         }
@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         /// <summary>
         /// For expressions, we switch to a precedence climbing parser.
         /// </summary>
-        public ExpressionSyntax ParseExpression(OperatorPrecedence minPrecedence)
+        public IExpressionSyntax ParseExpression(OperatorPrecedence minPrecedence)
         {
             var expression = ParseAtom();
 
@@ -214,9 +214,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         }
 
         private static ExpressionSyntax BuildOperatorExpression(
-             ExpressionSyntax left,
+             IExpressionSyntax left,
              IBinaryOperatorToken operatorToken,
-             ExpressionSyntax right)
+             IExpressionSyntax right)
         {
             BinaryOperator binaryOperator;
             switch (operatorToken)
@@ -283,7 +283,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         }
 
         // An atom is the unit of an expression that occurs between infix operators, i.e. an identifier, literal, group, or new
-        private ExpressionSyntax ParseAtom()
+        private IExpressionSyntax ParseAtom()
         {
             switch (Tokens.Current)
             {
@@ -410,7 +410,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
-        private ExpressionSyntax ParseUnsafeExpression()
+        private IExpressionSyntax ParseUnsafeExpression()
         {
             var unsafeKeyword = Tokens.Expect<IUnsafeKeywordToken>();
             var isBlock = Tokens.Current is IOpenBraceToken;
@@ -421,7 +421,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new UnsafeExpressionSyntax(span, expression);
         }
 
-        private ExpressionSyntax ParsePrefixUnaryOperator(UnaryOperator @operator)
+        private IExpressionSyntax ParsePrefixUnaryOperator(UnaryOperator @operator)
         {
             var operatorSpan = Tokens.Required<IOperatorToken>();
             var operand = ParseExpression(OperatorPrecedence.Unary);
@@ -516,7 +516,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         /// for example `unsafe(x);`.
         /// </summary>
         /// <returns></returns>
-        private ExpressionSyntax ParseParenthesizedExpression()
+        private IExpressionSyntax ParseParenthesizedExpression()
         {
             Tokens.Expect<IOpenParenToken>();
             var expression = ParseExpression();

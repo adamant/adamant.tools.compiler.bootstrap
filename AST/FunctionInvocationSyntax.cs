@@ -5,11 +5,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class FunctionInvocationSyntax : InvocationSyntax, IFunctionInvocationSyntax
     {
-        public NameSyntax FunctionNameSyntax { get; }
+        public INameSyntax FunctionNameSyntax { get; }
 
         public FunctionInvocationSyntax(
             TextSpan span,
-            NameSyntax functionNameSyntax,
+            INameSyntax functionNameSyntax,
             FixedList<IArgumentSyntax> arguments)
             : base(span, functionNameSyntax.Name, arguments)
         {

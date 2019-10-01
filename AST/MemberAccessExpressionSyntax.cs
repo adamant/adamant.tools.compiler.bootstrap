@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 
@@ -13,8 +14,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public ref IExpressionSyntax? Expression => ref expression;
 
         public AccessOperator AccessOperator { get; }
-        public NameSyntax Member { get; }
+        public INameSyntax Member { get; }
 
+        [DisallowNull]
         public ISymbol? ReferencedSymbol
         {
             get => Member.ReferencedSymbol;
@@ -25,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             TextSpan span,
             IExpressionSyntax? expression,
             AccessOperator accessOperator,
-            NameSyntax member)
+            INameSyntax member)
             : base(span)
         {
             this.expression = expression;

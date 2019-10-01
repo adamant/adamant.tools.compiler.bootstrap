@@ -1,8 +1,9 @@
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     /// <summary>
     /// A block in a statement or expression. Not to be used to represent function
@@ -12,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     /// ending in "ExpressionSyntax". This is because a block can be either an
     /// expression or can be a block for a control flow statement. In the latter
     /// it is acting more like a statement.</remarks>
-    public class BlockSyntax : ExpressionSyntax, IBlockSyntax
+    internal class BlockSyntax : ExpressionSyntax, IBlockSyntax
     {
         public FixedList<IStatementSyntax> Statements { get; }
 

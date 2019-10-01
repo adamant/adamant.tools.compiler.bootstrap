@@ -37,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         private IExpressionSyntax inExpression;
         public ref IExpressionSyntax InExpression => ref inExpression;
 
-        public BlockSyntax Block { get; }
+        public IBlockSyntax Block { get; }
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -49,7 +49,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name fullVariableName,
             ITypeSyntax? typeSyntax,
             IExpressionSyntax inExpression,
-            BlockSyntax block)
+            IBlockSyntax block)
             : base(span)
         {
             IsMutableBinding = isMutableBinding;

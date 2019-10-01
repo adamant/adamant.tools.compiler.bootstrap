@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
                 shadowChecker.VisitStatement(statement, bindingScope);
         }
 
-        public override void VisitBlock(BlockSyntax block, BindingScope bindingScope)
+        public override void VisitBlock(IBlockSyntax block, BindingScope bindingScope)
         {
             foreach (var statement in block.Statements)
             {
@@ -70,7 +70,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
             }
         }
 
-        public override void VisitName(NameSyntax name, BindingScope bindingScope)
+        public override void VisitName(INameSyntax name, BindingScope bindingScope)
         {
             if (!bindingScope.Lookup(name.Name, out var binding))
                 return;

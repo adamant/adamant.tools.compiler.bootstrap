@@ -31,12 +31,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
         }
 
         public VariableFlags Assignment(
-            AssignmentExpressionSyntax assignmentExpression,
+            IAssignmentExpressionSyntax assignmentExpression,
             VariableFlags definitelyAssigned)
         {
             switch (assignmentExpression.LeftOperand)
             {
-                case NameSyntax identifier:
+                case INameSyntax identifier:
                     return definitelyAssigned.Set(identifier.ReferencedSymbol, true);
                 case MemberAccessExpressionSyntax memberAccessExpression:
                     return definitelyAssigned;
@@ -46,7 +46,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
         }
 
         public VariableFlags IdentifierName(
-            NameSyntax name,
+            INameSyntax name,
             VariableFlags definitelyAssigned)
         {
             if (definitelyAssigned[name.ReferencedSymbol] == false)

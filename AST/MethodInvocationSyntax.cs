@@ -8,12 +8,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         private IExpressionSyntax target;
         public ref IExpressionSyntax Target => ref target;
 
-        public NameSyntax MethodNameSyntax { get; }
+        public INameSyntax MethodNameSyntax { get; }
 
         public MethodInvocationSyntax(
             TextSpan span,
             IExpressionSyntax target,
-            NameSyntax methodNameSyntax,
+            INameSyntax methodNameSyntax,
             FixedList<IArgumentSyntax> arguments)
             : base(span, methodNameSyntax.Name, arguments)
         {

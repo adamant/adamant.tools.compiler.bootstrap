@@ -32,12 +32,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
         }
 
         public VariableFlags Assignment(
-            AssignmentExpressionSyntax assignmentExpression,
+            IAssignmentExpressionSyntax assignmentExpression,
             VariableFlags definitelyUnassigned)
         {
             switch (assignmentExpression.LeftOperand)
             {
-                case NameSyntax identifier:
+                case INameSyntax identifier:
                     var symbol = identifier.ReferencedSymbol;
                     //if (!symbol.IsMutableBinding && definitelyUnassigned[symbol] == false)
                     //{
@@ -52,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
             }
         }
 
-        public VariableFlags IdentifierName(NameSyntax name, VariableFlags definitelyUnassigned)
+        public VariableFlags IdentifierName(INameSyntax name, VariableFlags definitelyUnassigned)
         {
             return definitelyUnassigned;
         }

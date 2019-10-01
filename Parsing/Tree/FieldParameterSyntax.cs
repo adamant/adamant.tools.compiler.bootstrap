@@ -8,13 +8,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     {
         public SimpleName FieldName { get; }
 
-        public ExpressionSyntax DefaultValue { get; }
+        public IExpressionSyntax DefaultValue { get; }
 
         public FieldParameterSyntax(
             TextSpan span,
             Name fullName,
             SimpleName fieldName,
-            ExpressionSyntax defaultValue)
+            IExpressionSyntax defaultValue)
             : base(span, false, fullName)
         {
             FieldName = fieldName;

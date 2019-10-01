@@ -1,20 +1,21 @@
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    public class AssignmentExpressionSyntax : ExpressionSyntax, IAssignmentExpressionSyntax
+    internal class AssignmentExpressionSyntax : ExpressionSyntax, IAssignmentExpressionSyntax
     {
-        private  IExpressionSyntax leftOperand;
+        private IExpressionSyntax leftOperand;
         public ref IExpressionSyntax LeftOperand => ref leftOperand;
 
         public AssignmentOperator Operator { get; }
-        private  IExpressionSyntax rightOperand;
+        private IExpressionSyntax rightOperand;
         public ref IExpressionSyntax RightOperand => ref rightOperand;
 
         public AssignmentExpressionSyntax(
             IExpressionSyntax leftOperand,
             AssignmentOperator @operator,
-            ExpressionSyntax rightOperand)
+            IExpressionSyntax rightOperand)
             : base(TextSpan.Covering(leftOperand.Span, rightOperand.Span))
         {
             this.leftOperand = leftOperand;

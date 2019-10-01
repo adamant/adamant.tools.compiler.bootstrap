@@ -7,14 +7,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal class NamedParameterSyntax : ParameterSyntax, INamedParameterSyntax
     {
         public ITypeSyntax TypeSyntax { get; }
-        public ExpressionSyntax DefaultValue { get; }
+        public IExpressionSyntax DefaultValue { get; }
 
         public NamedParameterSyntax(
             TextSpan span,
             bool isMutableBinding,
             Name fullName,
             ITypeSyntax typeSyntax,
-            ExpressionSyntax defaultValue)
+            IExpressionSyntax defaultValue)
             : base(span, isMutableBinding, fullName)
         {
             TypeSyntax = typeSyntax;

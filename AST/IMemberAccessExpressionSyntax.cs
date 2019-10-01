@@ -4,6 +4,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         ref IExpressionSyntax? Expression { get; }
         AccessOperator AccessOperator { get; }
-        NameSyntax Member { get; }
+        INameSyntax Member { get; }
     }
 }

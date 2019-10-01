@@ -1,4 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
@@ -6,8 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     [Closed(
         typeof(IBlockOrResultSyntax),
         typeof(IIfExpressionSyntax))]
-    public interface IElseClauseSyntax
+    public interface IElseClauseSyntax : ISyntax
     {
-        TextSpan Span { get; }
     }
 }

@@ -149,7 +149,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (Tokens.Accept<IColonToken>())
                 type = ParseType();
 
-            ExpressionSyntax? initializer = null;
+            IExpressionSyntax? initializer = null;
             if (Tokens.Accept<IEqualsToken>())
                 initializer = ParseExpression();
 
@@ -235,7 +235,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 TextSpan.Covering(newKeywordSpan, identifier?.Span), parameters, body);
         }
 
-        private ExpressionSyntax? ParseLifetimeBounds()
+        private IExpressionSyntax? ParseLifetimeBounds()
         {
             switch (Tokens.Current)
             {
