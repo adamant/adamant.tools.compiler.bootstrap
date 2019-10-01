@@ -1,8 +1,9 @@
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    public class WhileExpressionSyntax : ExpressionSyntax, IWhileExpressionSyntax
+    internal class WhileExpressionSyntax : ExpressionSyntax, IWhileExpressionSyntax
     {
         private IExpressionSyntax condition;
         public ref IExpressionSyntax Condition => ref condition;

@@ -1,14 +1,15 @@
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    public class ForeachExpressionSyntax : ExpressionSyntax, IForeachExpressionSyntax
+    internal class ForeachExpressionSyntax : ExpressionSyntax, IForeachExpressionSyntax
     {
         public bool IsMutableBinding { get; }
         Name ISymbol.FullName => FullVariableName;

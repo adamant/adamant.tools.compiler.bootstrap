@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             name.ContainingScope = containingScope;
         }
 
-        public override void VisitForeachExpression(ForeachExpressionSyntax foreachExpression, LexicalScope containingScope)
+        public override void VisitForeachExpression(IForeachExpressionSyntax foreachExpression, LexicalScope containingScope)
         {
             VisitType(foreachExpression.TypeSyntax, containingScope);
             VisitExpression(foreachExpression.InExpression, containingScope);

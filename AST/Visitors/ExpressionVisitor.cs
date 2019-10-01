@@ -68,7 +68,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case MemberAccessExpressionSyntax memberAccessExpression:
                     VisitMemberAccessExpression(memberAccessExpression, args);
                     break;
-                case UnsafeExpressionSyntax unsafeExpression:
+                case IUnsafeExpressionSyntax unsafeExpression:
                     VisitUnsafeExpression(unsafeExpression, args);
                     break;
                 case SelfExpressionSyntax selfExpression:
@@ -137,17 +137,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         {
         }
 
-        public virtual void VisitWhileExpression(WhileExpressionSyntax whileExpression, A args)
+        public virtual void VisitWhileExpression(IWhileExpressionSyntax whileExpression, A args)
         {
             VisitExpression(whileExpression.Condition, args);
             VisitExpression(whileExpression.Block, args);
         }
 
-        public virtual void VisitNextExpression(NextExpressionSyntax nextExpression, A args)
+        public virtual void VisitNextExpression(INextExpressionSyntax nextExpression, A args)
         {
         }
 
-        public virtual void VisitForeachExpression(ForeachExpressionSyntax foreachExpression, A args)
+        public virtual void VisitForeachExpression(IForeachExpressionSyntax foreachExpression, A args)
         {
             VisitType(foreachExpression.TypeSyntax, args);
             VisitExpression(foreachExpression.InExpression, args);
@@ -216,7 +216,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             VisitExpression(implicitNumericConversionExpression.Expression, args);
         }
 
-        public virtual void VisitBreakExpression(BreakExpressionSyntax breakExpression, A args)
+        public virtual void VisitBreakExpression(IBreakExpressionSyntax breakExpression, A args)
         {
         }
 
@@ -225,7 +225,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             VisitExpression(resultStatement.Expression, args);
         }
 
-        public virtual void VisitIfExpression(IfExpressionSyntax ifExpression, A args)
+        public virtual void VisitIfExpression(IIfExpressionSyntax ifExpression, A args)
         {
             VisitExpression(ifExpression.Condition, args);
             VisitBlockOrResult(ifExpression.ThenBlock, args);
@@ -262,7 +262,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             }
         }
 
-        public virtual void VisitLoopExpression(LoopExpressionSyntax loopExpression, A args)
+        public virtual void VisitLoopExpression(ILoopExpressionSyntax loopExpression, A args)
         {
             VisitExpression(loopExpression.Block, args);
         }

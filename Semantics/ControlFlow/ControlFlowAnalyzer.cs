@@ -342,7 +342,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     currentBlock = null;
                     return;
                 }
-                case ForeachExpressionSyntax foreachExpression:
+                case IForeachExpressionSyntax foreachExpression:
                 {
                     // For now, we support only range syntax `foreach x: T in z..y` ranges
                     // aren't yet supported by the rest of the language, so they must be directly
@@ -392,7 +392,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     currentBlock = loopExit;
                     return;
                 }
-                case WhileExpressionSyntax whileExpression:
+                case IWhileExpressionSyntax whileExpression:
                 {
                     // There is a block for the condition, it then goes either to
                     // the body or the after block.
@@ -413,7 +413,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     currentBlock = breakToBlock;
                     return;
                 }
-                case LoopExpressionSyntax loopExpression:
+                case ILoopExpressionSyntax loopExpression:
                 {
                     var loopEntry = graph.NewEntryBlock(currentBlock,
                         loopExpression.Block.Span.AtStart(), CurrentScope);
@@ -427,7 +427,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     currentBlock = breakToBlock;
                     return;
                 }
-                case BreakExpressionSyntax breakExpression:
+                case IBreakExpressionSyntax breakExpression:
                 {
                     ExitScope(breakExpression.Span.AtEnd());
                     currentBlock.AddGoto(breakToBlock ?? throw new InvalidOperationException(),
@@ -435,7 +435,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     currentBlock = null;
                     return;
                 }
-                case NextExpressionSyntax nextExpression:
+                case INextExpressionSyntax nextExpression:
                 {
                     ExitScope(nextExpression.Span.AtEnd());
                     currentBlock.AddGoto(continueToBlock ?? throw new InvalidOperationException(),
@@ -443,7 +443,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     currentBlock = null;
                     return;
                 }
-                case IfExpressionSyntax ifExpression:
+                case IIfExpressionSyntax ifExpression:
                 {
                     var containingBlock = currentBlock;
                     var condition = ConvertToOperand(ifExpression.Condition);
@@ -564,7 +564,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     {
                         case IVariableDeclarationStatementSyntax _:
                         case IParameterSyntax _:
-                        case ForeachExpressionSyntax _:
+                        case IForeachExpressionSyntax _:
                             return graph.VariableFor(symbol.FullName.UnqualifiedName)
                                 .Reference(identifier.Span);
                         default:
@@ -600,7 +600,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     return new ConstructSome(implicitOptionalConversionExpression.ConvertToType,
                         value, implicitOptionalConversionExpression.Span);
                 }
-                case IfExpressionSyntax ifExpression:
+                case IIfExpressionSyntax ifExpression:
                     // TODO deal with the value of the if expression
                     throw new NotImplementedException();
                 case IUnsafeExpressionSyntax unsafeExpression:
