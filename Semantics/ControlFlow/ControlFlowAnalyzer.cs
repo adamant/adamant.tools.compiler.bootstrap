@@ -491,7 +491,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     EndScope(block.Span.AtEnd());
                     return;
                 }
-                case UnsafeExpressionSyntax unsafeExpression:
+                case IUnsafeExpressionSyntax unsafeExpression:
                     ConvertExpressionToStatement(unsafeExpression.Expression);
                     return;
                 case AssignmentExpressionSyntax assignmentExpression:
@@ -603,7 +603,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case IfExpressionSyntax ifExpression:
                     // TODO deal with the value of the if expression
                     throw new NotImplementedException();
-                case UnsafeExpressionSyntax unsafeExpression:
+                case IUnsafeExpressionSyntax unsafeExpression:
                     return ConvertToValue(unsafeExpression.Expression);
                 case ImplicitStringLiteralConversionExpression implicitLiteralConversion:
                 {

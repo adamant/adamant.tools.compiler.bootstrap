@@ -53,7 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case NameSyntax identifierName:
                     VisitName(identifierName, args);
                     break;
-                case UnaryExpressionSyntax unaryExpression:
+                case IUnaryExpressionSyntax unaryExpression:
                     VisitUnaryExpression(unaryExpression, args);
                     break;
                 case AssignmentExpressionSyntax assignmentExpression:
@@ -271,7 +271,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         {
         }
 
-        public virtual void VisitUnsafeExpression(UnsafeExpressionSyntax unsafeExpression, A args)
+        public virtual void VisitUnsafeExpression(IUnsafeExpressionSyntax unsafeExpression, A args)
         {
             VisitExpression(unsafeExpression.Expression, args);
         }

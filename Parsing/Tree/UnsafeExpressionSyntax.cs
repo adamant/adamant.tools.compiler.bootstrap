@@ -1,8 +1,9 @@
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    public class UnsafeExpressionSyntax : ExpressionSyntax, IUnsafeExpressionSyntax
+    internal class UnsafeExpressionSyntax : ExpressionSyntax, IUnsafeExpressionSyntax
     {
         private IExpressionSyntax expression;
 
