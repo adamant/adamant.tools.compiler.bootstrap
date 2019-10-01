@@ -1,10 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    public class MemberAccessExpressionSyntax : ExpressionSyntax, IMemberAccessExpressionSyntax
+    internal class MemberAccessExpressionSyntax : ExpressionSyntax, IMemberAccessExpressionSyntax
     {
         private IExpressionSyntax expression;
 

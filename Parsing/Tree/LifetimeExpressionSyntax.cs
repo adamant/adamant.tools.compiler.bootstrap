@@ -1,9 +1,10 @@
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    public class LifetimeExpressionSyntax : ExpressionSyntax, ILifetimeExpressionSyntax
+    internal class LifetimeExpressionSyntax : ExpressionSyntax, ILifetimeExpressionSyntax
     {
         public SimpleName Lifetime { get; }
 

@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                 throw new Exception($"Expression doesn't have referenced symbol `{expression}`");
         }
 
-        public override void VisitMemberAccessExpression(MemberAccessExpressionSyntax memberAccessExpression, Void args)
+        public override void VisitMemberAccessExpression(IMemberAccessExpressionSyntax memberAccessExpression, Void args)
         {
             base.VisitMemberAccessExpression(memberAccessExpression, args);
             AssertHasReferencedSymbol(memberAccessExpression, memberAccessExpression.ReferencedSymbol);

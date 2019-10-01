@@ -548,7 +548,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             {
                 default:
                     throw NonExhaustiveMatchException.For(expression);
-                case NewObjectExpressionSyntax newObjectExpression:
+                case INewObjectExpressionSyntax newObjectExpression:
                 {
                     var args = newObjectExpression.Arguments.Select(a => ConvertToOperand(a.Value))
                         .ToFixedList();
@@ -622,7 +622,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         implicitNoneConversion.Span);
                 case IInvocationSyntax invocation:
                     return ConvertInvocationToValue(invocation);
-                case MemberAccessExpressionSyntax memberAccess:
+                case IMemberAccessExpressionSyntax memberAccess:
                 {
                     var value = ConvertToOperand(memberAccess.Expression);
                     var symbol = memberAccess.ReferencedSymbol;
@@ -821,7 +821,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case INameSyntax identifier:
                     // TODO what if this isn't just a variable?
                     return graph.VariableFor(identifier.ReferencedSymbol.FullName.UnqualifiedName).LValueReference(value.Span);
-                case MemberAccessExpressionSyntax memberAccessExpression:
+                case IMemberAccessExpressionSyntax memberAccessExpression:
                     var expressionValue = ConvertToOperand(memberAccessExpression.Expression);
                     return new FieldAccess(expressionValue, memberAccessExpression.Member.Name, memberAccessExpression.Span);
                 default:

@@ -44,7 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case IReturnExpressionSyntax returnExpression:
                     VisitReturnExpression(returnExpression, args);
                     break;
-                case InvocationSyntax invocation:
+                case IInvocationSyntax invocation:
                     VisitInvocation(invocation, args);
                     break;
                 case ILiteralExpressionSyntax literalExpression:
@@ -276,12 +276,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             VisitExpression(unsafeExpression.Expression, args);
         }
 
-        public virtual void VisitMemberAccessExpression(MemberAccessExpressionSyntax memberAccessExpression, A args)
+        public virtual void VisitMemberAccessExpression(IMemberAccessExpressionSyntax memberAccessExpression, A args)
         {
             VisitExpression(memberAccessExpression.Expression, args);
         }
 
-        public virtual void VisitNewObjectExpression(NewObjectExpressionSyntax newObjectExpression, A args)
+        public virtual void VisitNewObjectExpression(INewObjectExpressionSyntax newObjectExpression, A args)
         {
             VisitType(newObjectExpression.Constructor, args);
             foreach (var argument in newObjectExpression.Arguments)

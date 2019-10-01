@@ -58,7 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
                 case null:
                     // Ignore
                     break;
-                case MemberAccessExpressionSyntax memberAccessExpression:
+                case IMemberAccessExpressionSyntax memberAccessExpression:
                     // The expression we are accessing the member off of is an rvalue
                     VisitExpression(memberAccessExpression.Expression, args);
                     break;

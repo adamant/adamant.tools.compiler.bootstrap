@@ -45,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
                     //}
                     throw new NotImplementedException();
                     return definitelyUnassigned.Set(symbol, false);
-                case MemberAccessExpressionSyntax memberAccessExpression:
+                case IMemberAccessExpressionSyntax memberAccessExpression:
                     return definitelyUnassigned;
                 default:
                     throw new NotImplementedException("Complex assignments not yet implemented");
