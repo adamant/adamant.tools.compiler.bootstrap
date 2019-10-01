@@ -50,7 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         /// This gets the symbols for all declarations that are declared outside of a type.
         /// (i.e. directly in a namespace)
         /// </summary>
-        private static FixedList<ISymbol> GetAllNonMemberDeclarations(CompilationUnitSyntax compilationUnit)
+        private static FixedList<ISymbol> GetAllNonMemberDeclarations(ICompilationUnitSyntax compilationUnit)
         {
             // MemberDeclarationSyntax is the right type to use here because anything except namespaces can go in a type
             var declarations = new List<ISymbol>();
@@ -78,7 +78,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                 BuildScopesInCompilationUnit(compilationUnit);
         }
 
-        private void BuildScopesInCompilationUnit(CompilationUnitSyntax compilationUnit)
+        private void BuildScopesInCompilationUnit(ICompilationUnitSyntax compilationUnit)
         {
             var containingScope = BuildNamespaceScopes(compilationUnit.ImplicitNamespaceName, globalScope);
             containingScope = BuildUsingDirectivesScope(compilationUnit.UsingDirectives, containingScope);

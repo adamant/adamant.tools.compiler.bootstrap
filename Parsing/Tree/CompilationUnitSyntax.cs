@@ -1,13 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    public class CompilationUnitSyntax : Syntax
+    internal class CompilationUnitSyntax : Syntax, ICompilationUnitSyntax
     {
         public CodeFile CodeFile { get; }
         public RootName ImplicitNamespaceName { get; }

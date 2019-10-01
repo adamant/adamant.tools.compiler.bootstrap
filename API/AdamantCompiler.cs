@@ -42,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         {
             var lexer = new Lexer();
             var parser = new CompilationUnitParser();
-            var parseBlock = new TransformBlock<ICodeFileSource, CompilationUnitSyntax>(
+            var parseBlock = new TransformBlock<ICodeFileSource, ICompilationUnitSyntax>(
                 async (fileSource) =>
                 {
                     var file = await fileSource.LoadAsync();

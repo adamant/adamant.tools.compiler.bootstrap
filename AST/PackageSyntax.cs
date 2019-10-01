@@ -16,14 +16,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public string Name { get; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-        public FixedList<CompilationUnitSyntax> CompilationUnits { get; }
+        public FixedList<ICompilationUnitSyntax> CompilationUnits { get; }
 
         public IEnumerable<Diagnostic> Diagnostics =>
             CompilationUnits.SelectMany(cu => cu.Diagnostics);
 
         public PackageSyntax(
             string name,
-            FixedList<CompilationUnitSyntax> compilationUnits)
+            FixedList<ICompilationUnitSyntax> compilationUnits)
         {
             Name = name;
             CompilationUnits = compilationUnits;

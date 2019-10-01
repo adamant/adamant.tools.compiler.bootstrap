@@ -2,13 +2,14 @@ using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Parsing.Tree;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public class CompilationUnitParser
     {
-        public CompilationUnitSyntax Parse(ITokenIterator tokens)
+        public ICompilationUnitSyntax Parse(ITokenIterator tokens)
         {
             var implicitNamespaceName = ParseImplicitNamespaceName(tokens);
             var parser = new Parser(tokens, implicitNamespaceName);
