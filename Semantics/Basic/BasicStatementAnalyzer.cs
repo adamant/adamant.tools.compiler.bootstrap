@@ -471,7 +471,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
                     throw new NotImplementedException();
                 case IFunctionInvocationSyntax functionInvocation:
-                    return InferFunctionInvocationType((FunctionInvocationSyntax)functionInvocation);
+                    return InferFunctionInvocationType(functionInvocation);
                 case IUnsafeExpressionSyntax unsafeExpression:
                     InferExpressionType(ref unsafeExpression.Expression);
                     return unsafeExpression.Type = unsafeExpression.Expression.Type;
@@ -579,7 +579,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
         }
 
-        private DataType InferFunctionInvocationType(FunctionInvocationSyntax functionInvocation)
+        private DataType InferFunctionInvocationType(IFunctionInvocationSyntax functionInvocation)
         {
             var argumentTypes = functionInvocation.Arguments.Select(InferArgumentType).ToFixedList();
             var symbols = functionInvocation.FunctionNameSyntax.LookupInContainingScope()

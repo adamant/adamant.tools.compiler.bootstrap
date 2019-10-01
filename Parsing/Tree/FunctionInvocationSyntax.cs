@@ -1,9 +1,10 @@
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    public class FunctionInvocationSyntax : InvocationSyntax, IFunctionInvocationSyntax
+    internal class FunctionInvocationSyntax : InvocationSyntax, IFunctionInvocationSyntax
     {
         public INameSyntax FunctionNameSyntax { get; }
 

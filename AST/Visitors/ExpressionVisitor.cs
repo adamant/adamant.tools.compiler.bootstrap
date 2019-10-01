@@ -324,38 +324,38 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             // TODO this should dispatch on the type of literal
         }
 
-        public virtual void VisitInvocation(InvocationSyntax invocation, A args)
+        public virtual void VisitInvocation(IInvocationSyntax invocation, A args)
         {
             switch (invocation)
             {
                 default:
                     throw ExhaustiveMatch.Failed(invocation);
-                case MethodInvocationSyntax methodInvocation:
+                case IMethodInvocationSyntax methodInvocation:
                     VisitMethodInvocation(methodInvocation, args);
                     break;
-                case AssociatedFunctionInvocationSyntax associatedFunctionInvocation:
+                case IAssociatedFunctionInvocationSyntax associatedFunctionInvocation:
                     VisitAssociatedFunctionInvocation(associatedFunctionInvocation, args);
                     break;
-                case FunctionInvocationSyntax functionInvocation:
+                case IFunctionInvocationSyntax functionInvocation:
                     VisitFunctionInvocation(functionInvocation, args);
                     break;
             }
         }
 
-        public virtual void VisitFunctionInvocation(FunctionInvocationSyntax functionInvocation, A args)
+        public virtual void VisitFunctionInvocation(IFunctionInvocationSyntax functionInvocation, A args)
         {
             VisitName(functionInvocation.FunctionNameSyntax, args);
             foreach (var argument in functionInvocation.Arguments)
                 VisitArgument(argument, args);
         }
 
-        public virtual void VisitAssociatedFunctionInvocation(AssociatedFunctionInvocationSyntax associatedFunctionInvocation, A args)
+        public virtual void VisitAssociatedFunctionInvocation(IAssociatedFunctionInvocationSyntax associatedFunctionInvocation, A args)
         {
             foreach (var argument in associatedFunctionInvocation.Arguments)
                 VisitArgument(argument, args);
         }
 
-        public virtual void VisitMethodInvocation(MethodInvocationSyntax methodInvocation, A args)
+        public virtual void VisitMethodInvocation(IMethodInvocationSyntax methodInvocation, A args)
         {
             VisitExpression(methodInvocation.Target, args);
             foreach (var argument in methodInvocation.Arguments)

@@ -317,7 +317,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case IUnaryExpressionSyntax _:
                 case IBinaryExpressionSyntax _:
                     throw new NotImplementedException();
-                case InvocationSyntax invocation:
+                case IInvocationSyntax invocation:
                     currentBlock.AddAction(ConvertInvocationToValue(invocation), invocation.Span,
                         CurrentScope);
                     return;
@@ -620,7 +620,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case ImplicitNoneConversionExpression implicitNoneConversion:
                     return new NoneConstant(implicitNoneConversion.ConvertToType,
                         implicitNoneConversion.Span);
-                case InvocationSyntax invocation:
+                case IInvocationSyntax invocation:
                     return ConvertInvocationToValue(invocation);
                 case MemberAccessExpressionSyntax memberAccess:
                 {
@@ -775,22 +775,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
         }
 
-        private Value ConvertInvocationToValue(InvocationSyntax invocation)
+        private Value ConvertInvocationToValue(IInvocationSyntax invocation)
         {
             switch (invocation)
             {
                 default:
                     throw ExhaustiveMatch.Failed(invocation);
-                case MethodInvocationSyntax methodInvocation:
+                case IMethodInvocationSyntax methodInvocation:
                     return ConvertInvocationToValue(methodInvocation);
-                case AssociatedFunctionInvocationSyntax _:
+                case IAssociatedFunctionInvocationSyntax _:
                     throw new NotImplementedException();
-                case FunctionInvocationSyntax functionInvocation:
+                case IFunctionInvocationSyntax functionInvocation:
                     return ConvertInvocationToValue(functionInvocation);
             }
         }
 
-        private Value ConvertInvocationToValue(MethodInvocationSyntax invocation)
+        private Value ConvertInvocationToValue(IMethodInvocationSyntax invocation)
         {
             var self = ConvertToOperand(invocation.Target);
             var arguments = invocation.Arguments.Select(a => ConvertToOperand(a.Value)).ToList();
@@ -807,7 +807,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
         }
 
-        private Value ConvertInvocationToValue(FunctionInvocationSyntax invocation)
+        private Value ConvertInvocationToValue(IFunctionInvocationSyntax invocation)
         {
             var functionSymbol = (IFunctionSymbol)invocation.FunctionNameSyntax.ReferencedSymbol;
             var arguments = invocation.Arguments.Select(a => ConvertToOperand(a.Value)).ToList();

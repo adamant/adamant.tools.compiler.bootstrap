@@ -79,7 +79,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
             currentState = checker.VariableDeclaration(variableDeclaration, currentState);
         }
 
-        public override void VisitFunctionInvocation(FunctionInvocationSyntax functionInvocation, Void args)
+        public override void VisitFunctionInvocation(IFunctionInvocationSyntax functionInvocation, Void args)
         {
             // overriden to avoid visiting the function name
             foreach (var argument in functionInvocation.Arguments)

@@ -1,15 +1,11 @@
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    [Closed(
-        typeof(MethodInvocationSyntax),
-        typeof(FunctionInvocationSyntax),
-        typeof(AssociatedFunctionInvocationSyntax))]
-    public abstract class InvocationSyntax : ExpressionSyntax, IInvocationSyntax
+    internal abstract class InvocationSyntax : ExpressionSyntax, IInvocationSyntax
     {
         public Name FunctionName { get; }
         public FixedList<IArgumentSyntax> Arguments { get; }
