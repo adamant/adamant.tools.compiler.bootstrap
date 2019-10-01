@@ -314,7 +314,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         {
             switch (expression)
             {
-                case UnaryExpressionSyntax _:
+                case IUnaryExpressionSyntax _:
                 case BinaryExpressionSyntax _:
                     throw new NotImplementedException();
                 case InvocationSyntax invocation:
@@ -571,7 +571,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                             return new DeclaredValue(symbol.FullName, identifier.Span);
                     }
                 }
-                case UnaryExpressionSyntax unaryExpression:
+                case IUnaryExpressionSyntax unaryExpression:
                     return ConvertUnaryExpressionToValue(unaryExpression);
                 case BinaryExpressionSyntax binaryExpression:
                     return ConvertBinaryExpressionToValue(binaryExpression);
@@ -754,7 +754,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
         }
 
-        private Value ConvertUnaryExpressionToValue(UnaryExpressionSyntax expression)
+        private Value ConvertUnaryExpressionToValue(IUnaryExpressionSyntax expression)
         {
             switch (expression.Operator)
             {

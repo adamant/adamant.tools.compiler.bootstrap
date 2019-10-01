@@ -310,7 +310,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             VisitExpression(assignmentExpression.RightOperand, args);
         }
 
-        public virtual void VisitUnaryExpression(UnaryExpressionSyntax unaryExpression, A args)
+        public virtual void VisitUnaryExpression(IUnaryExpressionSyntax unaryExpression, A args)
         {
             VisitExpression(unaryExpression.Operand, args);
         }
