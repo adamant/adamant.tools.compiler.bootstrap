@@ -1,21 +1,20 @@
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitConversions
 {
     /// <summary>
     /// An implicit conversion from `T` to `T?`
     /// </summary>
-    public class ImplicitOptionalConversionExpression : ImplicitConversionExpression
+    internal class ImplicitOptionalConversionExpression : ImplicitConversionExpression
     {
-        public IExpressionSyntax Expression { get; }
         public OptionalType ConvertToType { get; }
 
         public ImplicitOptionalConversionExpression(
             IExpressionSyntax expression,
             OptionalType convertToType)
-            : base(expression.Span, convertToType)
+            : base(expression.Span, convertToType, expression)
         {
-            Expression = expression;
             ConvertToType = convertToType;
         }
 

@@ -1,17 +1,15 @@
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitConversions
 {
-    public class ImplicitImmutabilityConversionExpression : ImplicitConversionExpression
+    internal class ImplicitImmutabilityConversionExpression : ImplicitConversionExpression
     {
-        public IExpressionSyntax Expression { get; }
-
         public ImplicitImmutabilityConversionExpression(
             IExpressionSyntax expression,
             UserObjectType convertToType)
-            : base(expression.Span, convertToType)
+            : base(expression.Span, convertToType, expression)
         {
-            Expression = expression;
         }
 
         public override string ToString()

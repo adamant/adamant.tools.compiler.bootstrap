@@ -62,10 +62,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case IBlockSyntax block:
                     VisitBlock(block, args);
                     break;
-                case NewObjectExpressionSyntax newObjectExpression:
+                case INewObjectExpressionSyntax newObjectExpression:
                     VisitNewObjectExpression(newObjectExpression, args);
                     break;
-                case MemberAccessExpressionSyntax memberAccessExpression:
+                case IMemberAccessExpressionSyntax memberAccessExpression:
                     VisitMemberAccessExpression(memberAccessExpression, args);
                     break;
                 case IUnsafeExpressionSyntax unsafeExpression:
@@ -83,7 +83,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case IBreakExpressionSyntax breakExpression:
                     VisitBreakExpression(breakExpression, args);
                     break;
-                case ImplicitConversionExpression implicitConversion:
+                case IImplicitConversionExpression implicitConversion:
                     VisitImplicitConversionExpression(implicitConversion, args);
                     break;
                 case IMoveExpressionSyntax moveExpression:
@@ -164,23 +164,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             VisitType(mutableType.Referent, args);
         }
 
-        public virtual void VisitImplicitConversionExpression(ImplicitConversionExpression implicitConversionExpression, A args)
+        public virtual void VisitImplicitConversionExpression(IImplicitConversionExpression implicitConversionExpression, A args)
         {
             switch (implicitConversionExpression)
             {
-                case ImplicitNumericConversionExpression implicitNumericConversionExpression:
+                case IImplicitNumericConversionExpression implicitNumericConversionExpression:
                     VisitImplicitNumericConversionExpression(implicitNumericConversionExpression, args);
                     break;
-                case ImplicitStringLiteralConversionExpression implicitLiteralConversionExpression:
+                case IImplicitStringLiteralConversionExpression implicitLiteralConversionExpression:
                     VisitImplicitStringLiteralConversionExpression(implicitLiteralConversionExpression, args);
                     break;
-                case ImplicitImmutabilityConversionExpression implicitImmutabilityConversionExpression:
+                case IImplicitImmutabilityConversionExpression implicitImmutabilityConversionExpression:
                     VisitImplicitImmutabilityConversionExpression(implicitImmutabilityConversionExpression, args);
                     break;
-                case ImplicitNoneConversionExpression implicitNoneConversionExpression:
+                case IImplicitNoneConversionExpression implicitNoneConversionExpression:
                     VisitImplicitNoneConversionExpression(implicitNoneConversionExpression, args);
                     break;
-                case ImplicitOptionalConversionExpression implicitOptionalConversionExpression:
+                case IImplicitOptionalConversionExpression implicitOptionalConversionExpression:
                     VisitImplicitOptionalConversionExpression(implicitOptionalConversionExpression, args);
                     break;
                 case null:
@@ -191,27 +191,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             }
         }
 
-        public virtual void VisitImplicitOptionalConversionExpression(ImplicitOptionalConversionExpression implicitOptionalConversionExpression, A args)
+        public virtual void VisitImplicitOptionalConversionExpression(IImplicitOptionalConversionExpression implicitOptionalConversionExpression, A args)
         {
             VisitExpression(implicitOptionalConversionExpression.Expression, args);
         }
 
-        public virtual void VisitImplicitNoneConversionExpression(ImplicitNoneConversionExpression implicitNoneConversionExpression, A args)
+        public virtual void VisitImplicitNoneConversionExpression(IImplicitNoneConversionExpression implicitNoneConversionExpression, A args)
         {
             VisitExpression(implicitNoneConversionExpression.Expression, args);
         }
 
-        public virtual void VisitImplicitImmutabilityConversionExpression(ImplicitImmutabilityConversionExpression implicitImmutabilityConversionExpression, A args)
+        public virtual void VisitImplicitImmutabilityConversionExpression(IImplicitImmutabilityConversionExpression implicitImmutabilityConversionExpression, A args)
         {
             VisitExpression(implicitImmutabilityConversionExpression.Expression, args);
         }
 
-        public virtual void VisitImplicitStringLiteralConversionExpression(ImplicitStringLiteralConversionExpression implicitStringLiteralConversionExpression, A args)
+        public virtual void VisitImplicitStringLiteralConversionExpression(IImplicitStringLiteralConversionExpression implicitStringLiteralConversionExpression, A args)
         {
             VisitExpression((ExpressionSyntax)implicitStringLiteralConversionExpression.Expression, args);
         }
 
-        public virtual void VisitImplicitNumericConversionExpression(ImplicitNumericConversionExpression implicitNumericConversionExpression, A args)
+        public virtual void VisitImplicitNumericConversionExpression(IImplicitNumericConversionExpression implicitNumericConversionExpression, A args)
         {
             VisitExpression(implicitNumericConversionExpression.Expression, args);
         }

@@ -1,18 +1,17 @@
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitConversions
 {
-    public class ImplicitNumericConversionExpression : ImplicitConversionExpression
+    internal class ImplicitNumericConversionExpression : ImplicitConversionExpression
     {
-        public IExpressionSyntax Expression { get; }
         public NumericType ConvertToType { get; }
 
         public ImplicitNumericConversionExpression(
             IExpressionSyntax expression,
             NumericType convertToType)
-            : base(expression.Span, convertToType)
+            : base(expression.Span, convertToType, expression)
         {
-            Expression = expression;
             ConvertToType = convertToType;
         }
 

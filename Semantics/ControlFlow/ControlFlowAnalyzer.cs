@@ -586,7 +586,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case INoneLiteralExpressionSyntax _:
                     throw new InvalidOperationException(
                         "None literals should have an implicit conversion around them");
-                case ImplicitNumericConversionExpression implicitNumericConversion:
+                case IImplicitNumericConversionExpression implicitNumericConversion:
                     if (implicitNumericConversion.Expression.Type.AssertKnown() is
                         IntegerConstantType constantType)
                         return new IntegerConstant(constantType.Value,
@@ -594,7 +594,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                             implicitNumericConversion.Span);
                     else
                         throw new NotImplementedException();
-                case ImplicitOptionalConversionExpression implicitOptionalConversionExpression:
+                case IImplicitOptionalConversionExpression implicitOptionalConversionExpression:
                 {
                     var value = ConvertToOperand(implicitOptionalConversionExpression.Expression);
                     return new ConstructSome(implicitOptionalConversionExpression.ConvertToType,
@@ -605,7 +605,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     throw new NotImplementedException();
                 case IUnsafeExpressionSyntax unsafeExpression:
                     return ConvertToValue(unsafeExpression.Expression);
-                case ImplicitStringLiteralConversionExpression implicitLiteralConversion:
+                case IImplicitStringLiteralConversionExpression implicitLiteralConversion:
                 {
                     var conversionFunction = implicitLiteralConversion.ConversionFunction;
                     var literal = implicitLiteralConversion.Expression;
@@ -617,7 +617,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         sizeArgument,
                         bytesArgument);
                 }
-                case ImplicitNoneConversionExpression implicitNoneConversion:
+                case IImplicitNoneConversionExpression implicitNoneConversion:
                     return new NoneConstant(implicitNoneConversion.ConvertToType,
                         implicitNoneConversion.Span);
                 case IInvocationSyntax invocation:
@@ -638,7 +638,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 //    return ConvertToValue(mutable.Referent);
                 case IMoveExpressionSyntax move:
                     return ConvertToOwn(move.Expression, move.Span);
-                case ImplicitImmutabilityConversionExpression implicitImmutabilityConversion:
+                case IImplicitImmutabilityConversionExpression implicitImmutabilityConversion:
                 {
                     var operand = ConvertToOperand(implicitImmutabilityConversion.Expression);
                     switch (operand)
