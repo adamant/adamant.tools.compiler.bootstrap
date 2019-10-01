@@ -1,11 +1,12 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    public abstract class ExpressionSyntax : Syntax, IExpressionSyntax
+    internal abstract class ExpressionSyntax : Syntax, IExpressionSyntax
     {
         /// <summary>
         /// If an expression has been poisoned, then it is errored in some way

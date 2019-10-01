@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             visitor.VisitStatement(statement, default);
         }
 
-        public static void VisitExpression(this ExpressionVisitor<Void> visitor, ExpressionSyntax expression)
+        public static void VisitExpression(this ExpressionVisitor<Void> visitor, IExpressionSyntax expression)
         {
             visitor.VisitExpression(expression, default);
         }

@@ -208,7 +208,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 
         public virtual void VisitImplicitStringLiteralConversionExpression(IImplicitStringLiteralConversionExpression implicitStringLiteralConversionExpression, A args)
         {
-            VisitExpression((ExpressionSyntax)implicitStringLiteralConversionExpression.Expression, args);
+            VisitExpression(implicitStringLiteralConversionExpression.Expression, args);
         }
 
         public virtual void VisitImplicitNumericConversionExpression(IImplicitNumericConversionExpression implicitNumericConversionExpression, A args)

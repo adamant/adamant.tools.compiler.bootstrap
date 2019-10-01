@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
@@ -11,5 +12,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public interface IImplicitConversionExpression : IExpressionSyntax
     {
         IExpressionSyntax Expression { get; }
+        new DataType Type { get; }
     }
 }
