@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
@@ -7,7 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class ForeachExpressionSyntax : ExpressionSyntax, IBindingSymbol
+    public class ForeachExpressionSyntax : ExpressionSyntax, IForeachExpressionSyntax
     {
         public bool IsMutableBinding { get; }
         Name ISymbol.FullName => FullVariableName;
@@ -16,12 +17,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SimpleName VariableName => FullVariableName.UnqualifiedName;
         public ITypeSyntax? TypeSyntax { get; }
-        public ExpressionSyntax InExpression;
-        public BlockSyntax Block { get; }
-
         DataType IBindingSymbol.Type => VariableType ?? throw new InvalidOperationException();
-
         private DataType? variableType;
+
+        [DisallowNull]
         public DataType? VariableType
         {
             get => variableType;
@@ -29,9 +28,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             {
                 if (variableType != null)
                     throw new InvalidOperationException("Can't set type repeatedly");
-                variableType = value ?? throw new ArgumentNullException(nameof(Type), "Can't set type to null");
+                variableType =
+                    value ?? throw new ArgumentNullException(nameof(Type),
+                        "Can't set type to null");
             }
         }
+        private IExpressionSyntax inExpression;
+        public ref IExpressionSyntax InExpression => ref inExpression;
+
+        public BlockSyntax Block { get; }
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -42,13 +47,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             bool isMutableBinding,
             Name fullVariableName,
             ITypeSyntax? typeSyntax,
-            ExpressionSyntax inExpression,
+            IExpressionSyntax inExpression,
             BlockSyntax block)
             : base(span)
         {
             IsMutableBinding = isMutableBinding;
             FullVariableName = fullVariableName;
-            InExpression = inExpression;
+            this.inExpression = inExpression;
             Block = block;
             TypeSyntax = typeSyntax;
         }

@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(MethodInvocationSyntax),
         typeof(FunctionInvocationSyntax),
         typeof(AssociatedFunctionInvocationSyntax))]
-    public abstract class InvocationSyntax : ExpressionSyntax
+    public abstract class InvocationSyntax : ExpressionSyntax, IInvocationSyntax
     {
         public Name FunctionName { get; }
         public FixedList<IArgumentSyntax> Arguments { get; }

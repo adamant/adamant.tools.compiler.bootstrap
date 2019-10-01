@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     /// <summary>
     /// A name of a variable or namespace
     /// </summary>
-    public class NameSyntax : ExpressionSyntax
+    public class NameSyntax : ExpressionSyntax, INameSyntax
     {
         public SimpleName Name { get; }
 

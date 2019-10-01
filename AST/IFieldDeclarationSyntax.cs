@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         ITypeSyntax? TypeSyntax { get; }
         new TypePromise Type { get; }
-        ExpressionSyntax? Initializer { get; }
-        ref ExpressionSyntax? InitializerRef { get; }
+        IExpressionSyntax? Initializer { get; }
+        ref IExpressionSyntax? InitializerRef { get; }
     }
 }

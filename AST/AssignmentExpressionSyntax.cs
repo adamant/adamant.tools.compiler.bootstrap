@@ -2,20 +2,23 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class AssignmentExpressionSyntax : ExpressionSyntax
+    public class AssignmentExpressionSyntax : ExpressionSyntax, IAssignmentExpressionSyntax
     {
-        public ExpressionSyntax LeftOperand;
+        private  IExpressionSyntax leftOperand;
+        public ref IExpressionSyntax LeftOperand => ref leftOperand;
+
         public AssignmentOperator Operator { get; }
-        public ExpressionSyntax RightOperand;
+        private  IExpressionSyntax rightOperand;
+        public ref IExpressionSyntax RightOperand => ref rightOperand;
 
         public AssignmentExpressionSyntax(
-            ExpressionSyntax leftOperand,
+            IExpressionSyntax leftOperand,
             AssignmentOperator @operator,
             ExpressionSyntax rightOperand)
             : base(TextSpan.Covering(leftOperand.Span, rightOperand.Span))
         {
-            LeftOperand = leftOperand;
-            RightOperand = rightOperand;
+            this.leftOperand = leftOperand;
+            this.rightOperand = rightOperand;
             Operator = @operator;
         }
 

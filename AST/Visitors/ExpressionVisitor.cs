@@ -32,10 +32,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             VisitExpression(variableDeclaration.Initializer, args);
         }
 
-        public virtual void VisitExpression(ExpressionSyntax? expression, A args)
+        public virtual void VisitExpression(IExpressionSyntax? expression, A args)
         {
             switch (expression)
             {
+                default:
+                    throw NonExhaustiveMatchException.For(expression);
                 case BinaryExpressionSyntax binaryExpression:
                     VisitBinaryExpression(binaryExpression, args);
                     break;
@@ -45,7 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case InvocationSyntax invocation:
                     VisitInvocation(invocation, args);
                     break;
-                case LiteralExpressionSyntax literalExpression:
+                case ILiteralExpressionSyntax literalExpression:
                     VisitLiteralExpression(literalExpression, args);
                     break;
                 case NameSyntax identifierName:
@@ -99,8 +101,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case null:
                     // Ignore
                     break;
-                default:
-                    throw NonExhaustiveMatchException.For(expression);
             }
         }
 
@@ -208,7 +208,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 
         public virtual void VisitImplicitStringLiteralConversionExpression(ImplicitStringLiteralConversionExpression implicitStringLiteralConversionExpression, A args)
         {
-            VisitExpression(implicitStringLiteralConversionExpression.Expression, args);
+            VisitExpression((ExpressionSyntax)implicitStringLiteralConversionExpression.Expression, args);
         }
 
         public virtual void VisitImplicitNumericConversionExpression(ImplicitNumericConversionExpression implicitNumericConversionExpression, A args)
@@ -256,8 +256,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case IBlockOrResultSyntax blockOrResult:
                     VisitBlockOrResult(blockOrResult, args);
                     break;
-                case IfExpressionSyntax ifExpression:
-                    VisitIfExpression(ifExpression, args);
+                case IIfExpressionSyntax ifExpression:
+                    VisitIfExpression((IfExpressionSyntax)ifExpression, args);
                     break;
             }
         }
@@ -319,8 +319,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         {
         }
 
-        public virtual void VisitLiteralExpression(LiteralExpressionSyntax literalExpression, A args)
+        public virtual void VisitLiteralExpression(ILiteralExpressionSyntax literalExpression, A args)
         {
+            // TODO this should dispatch on the type of literal
         }
 
         public virtual void VisitInvocation(InvocationSyntax invocation, A args)

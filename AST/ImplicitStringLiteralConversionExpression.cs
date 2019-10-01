@@ -9,12 +9,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     /// </summary>
     public class ImplicitStringLiteralConversionExpression : ImplicitConversionExpression
     {
-        public StringLiteralExpressionSyntax Expression { get; }
+        public IStringLiteralExpressionSyntax Expression { get; }
         public DataType ConvertToType { get; }
         public ISymbol ConversionFunction { get; }
 
         public ImplicitStringLiteralConversionExpression(
-            StringLiteralExpressionSyntax expression,
+            IStringLiteralExpressionSyntax expression,
             DataType convertToType,
             ISymbol conversionFunction)
             : base(expression.Span, convertToType)

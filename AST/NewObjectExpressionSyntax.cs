@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
@@ -6,7 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class NewObjectExpressionSyntax : ExpressionSyntax
+    public class NewObjectExpressionSyntax : ExpressionSyntax, INewObjectExpressionSyntax
     {
         /// <summary>
         /// Note that this could represent a named or unnamed constructor. So
@@ -17,6 +18,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         public ITypeNameSyntax Constructor { get; }
         public FixedList<IArgumentSyntax> Arguments { get; }
         private ISymbol? constructorSymbol;
+
+        [DisallowNull]
         public ISymbol? ConstructorSymbol
         {
             get => constructorSymbol;
@@ -28,6 +31,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             }
         }
         private DataType? constructorType;
+
+        [DisallowNull]
         public DataType? ConstructorType
         {
             get => constructorType;

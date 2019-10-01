@@ -2,16 +2,17 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class BreakExpressionSyntax : ExpressionSyntax
+    public class BreakExpressionSyntax : ExpressionSyntax, IBreakExpressionSyntax
     {
-        public ExpressionSyntax Value;
+        private IExpressionSyntax? value;
+        public ref IExpressionSyntax? Value => ref value;
 
         public BreakExpressionSyntax(
             TextSpan span,
-            ExpressionSyntax value)
+            IExpressionSyntax value)
             : base(span)
         {
-            Value = value;
+            this.value = value;
         }
 
         public override string ToString()

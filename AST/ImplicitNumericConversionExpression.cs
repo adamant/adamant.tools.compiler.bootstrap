@@ -4,11 +4,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class ImplicitNumericConversionExpression : ImplicitConversionExpression
     {
-        public ExpressionSyntax Expression { get; }
+        public IExpressionSyntax Expression { get; }
         public NumericType ConvertToType { get; }
 
         public ImplicitNumericConversionExpression(
-            ExpressionSyntax expression,
+            IExpressionSyntax expression,
             NumericType convertToType)
             : base(expression.Span, convertToType)
         {

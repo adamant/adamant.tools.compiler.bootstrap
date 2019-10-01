@@ -2,33 +2,9 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    // An expression is also a statement
-    [Closed(
-        typeof(UnaryExpressionSyntax),
-        typeof(UnsafeExpressionSyntax),
-        typeof(NewObjectExpressionSyntax),
-        typeof(LiteralExpressionSyntax),
-        typeof(NextExpressionSyntax),
-        typeof(ReturnExpressionSyntax),
-        typeof(WhileExpressionSyntax),
-        typeof(MemberAccessExpressionSyntax),
-        typeof(MoveExpressionSyntax),
-        typeof(LoopExpressionSyntax),
-        typeof(LifetimeExpressionSyntax),
-        typeof(BlockSyntax),
-        typeof(InvocationSyntax),
-        typeof(ImplicitConversionExpression),
-        typeof(ForeachExpressionSyntax),
-        typeof(IfExpressionSyntax),
-        typeof(AssignmentExpressionSyntax),
-        typeof(BreakExpressionSyntax),
-        typeof(BinaryExpressionSyntax),
-        typeof(InstanceExpressionSyntax),
-        typeof(NameSyntax))]
     public abstract class ExpressionSyntax : Syntax, IExpressionSyntax
     {
         /// <summary>

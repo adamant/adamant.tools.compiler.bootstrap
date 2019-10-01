@@ -7,11 +7,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     /// </summary>
     public class ImplicitOptionalConversionExpression : ImplicitConversionExpression
     {
-        public ExpressionSyntax Expression { get; }
+        public IExpressionSyntax Expression { get; }
         public OptionalType ConvertToType { get; }
 
         public ImplicitOptionalConversionExpression(
-            ExpressionSyntax expression,
+            IExpressionSyntax expression,
             OptionalType convertToType)
             : base(expression.Span, convertToType)
         {

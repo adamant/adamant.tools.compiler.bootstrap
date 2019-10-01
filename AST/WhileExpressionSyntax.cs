@@ -2,24 +2,26 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class WhileExpressionSyntax : ExpressionSyntax
+    public class WhileExpressionSyntax : ExpressionSyntax, IWhileExpressionSyntax
     {
-        public ExpressionSyntax Condition;
+        private IExpressionSyntax condition;
+        public ref IExpressionSyntax Condition => ref condition;
+
         public BlockSyntax Block { get; }
 
         public WhileExpressionSyntax(
             TextSpan span,
-            ExpressionSyntax condition,
+            IExpressionSyntax condition,
             BlockSyntax block)
             : base(span)
         {
-            Condition = condition;
+            this.condition = condition;
             Block = block;
         }
 
         public override string ToString()
         {
-            return $"while {Condition} {Block}";
+            return $"while {condition} {Block}";
         }
     }
 }

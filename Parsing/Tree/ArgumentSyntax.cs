@@ -5,14 +5,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class ArgumentSyntax : Syntax, IArgumentSyntax
     {
-        private ExpressionSyntax value;
+        private IExpressionSyntax value;
 
-        public ExpressionSyntax Value => value;
-        public ref ExpressionSyntax ValueRef => ref value;
+        public IExpressionSyntax Value => value;
+        public ref IExpressionSyntax ValueRef => ref value;
 
         public ArgumentSyntax(
             TextSpan span,
-            ExpressionSyntax value)
+            IExpressionSyntax value)
             : base(span)
         {
             this.value = value;

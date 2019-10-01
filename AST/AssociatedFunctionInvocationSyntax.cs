@@ -4,7 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class AssociatedFunctionInvocationSyntax : InvocationSyntax
+    public class AssociatedFunctionInvocationSyntax : InvocationSyntax, IAssociatedFunctionInvocationSyntax
     {
         public ITypeSyntax TypeSyntax { get; }
         public SimpleName AssociatedFunctionName { get; }

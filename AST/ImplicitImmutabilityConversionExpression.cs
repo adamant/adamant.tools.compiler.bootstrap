@@ -4,10 +4,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class ImplicitImmutabilityConversionExpression : ImplicitConversionExpression
     {
-        public ExpressionSyntax Expression { get; }
+        public IExpressionSyntax Expression { get; }
 
         public ImplicitImmutabilityConversionExpression(
-            ExpressionSyntax expression,
+            IExpressionSyntax expression,
             UserObjectType convertToType)
             : base(expression.Span, convertToType)
         {

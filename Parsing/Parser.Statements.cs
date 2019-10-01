@@ -57,7 +57,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(variableNumbers.VariableName(identifier.Value));
-            TypeSyntax type = null;
+            ITypeSyntax type = null;
             if (Tokens.Accept<IColonToken>())
                 type = ParseType();
 

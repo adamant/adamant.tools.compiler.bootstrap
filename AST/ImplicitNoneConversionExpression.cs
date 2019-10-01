@@ -8,11 +8,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     /// </summary>
     public class ImplicitNoneConversionExpression : ImplicitConversionExpression
     {
-        public ExpressionSyntax Expression { get; }
+        public IExpressionSyntax Expression { get; }
         public OptionalType ConvertToType { get; }
 
         public ImplicitNoneConversionExpression(
-            ExpressionSyntax expression,
+            IExpressionSyntax expression,
             OptionalType convertToType)
             : base(expression.Span, convertToType)
         {

@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     [Closed(
         typeof(IBlockOrResultSyntax),
-        typeof(IfExpressionSyntax))]
+        typeof(IIfExpressionSyntax))]
     public interface IElseClauseSyntax
     {
         TextSpan Span { get; }

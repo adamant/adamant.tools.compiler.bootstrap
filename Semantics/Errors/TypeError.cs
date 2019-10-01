@@ -68,31 +68,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
                 $"Declaration of type `{typeDeclarationName}` is part of a circular definition");
         }
 
-        public static Diagnostic CannotConvert(CodeFile file, ExpressionSyntax expression, DataType ofType, DataType toType)
+        public static Diagnostic CannotConvert(CodeFile file, IExpressionSyntax expression, DataType ofType, DataType toType)
         {
             return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3007,
                 $"Cannot convert expression `{file.Code[expression.Span]}` of type `{ofType}` to type `{toType}`");
         }
 
-        public static Diagnostic MustBeCallable(CodeFile file, ExpressionSyntax expression)
+        public static Diagnostic MustBeCallable(CodeFile file, IExpressionSyntax expression)
         {
             return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3008,
                 $"Expression must be of callable type to be invoked `{file.Code[expression.Span]}`");
         }
 
-        public static Diagnostic CannotMoveBorrowedValue(CodeFile file, MoveExpressionSyntax expression)
+        public static Diagnostic CannotMoveBorrowedValue(CodeFile file, IMoveExpressionSyntax expression)
         {
             return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3009,
                 $"Cannot move borrowed value `{file.Code[expression.Expression.Span]}`");
         }
 
-        public static Diagnostic TypeDeclaredImmutable(CodeFile file, ExpressionSyntax expression)
+        public static Diagnostic TypeDeclaredImmutable(CodeFile file, IExpressionSyntax expression)
         {
             return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3010,
                 $"Type can't be made mutable because it was declared immutable `{file.Code[expression.Span]}`");
         }
 
-        public static Diagnostic ExpressionCantBeMutable(CodeFile file, ExpressionSyntax expression)
+        public static Diagnostic ExpressionCantBeMutable(CodeFile file, IExpressionSyntax expression)
         {
             return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3011,
                 $"Expression can't be made mutable `{file.Code[expression.Span]}`");

@@ -298,7 +298,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             {
                 default:
                     throw ExhaustiveMatch.Failed(elseClause);
-                case IfExpressionSyntax ifExpression:
+                case IIfExpressionSyntax ifExpression:
                     ConvertExpressionToStatement(ifExpression);
                     break;
                 case IBlockOrResultSyntax blockOrResult:
@@ -310,7 +310,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         /// <summary>
         /// Converts an expression of type `void` or `never` to a statement
         /// </summary>
-        private void ConvertExpressionToStatement(ExpressionSyntax expression)
+        private void ConvertExpressionToStatement(IExpressionSyntax expression)
         {
             switch (expression)
             {
@@ -542,10 +542,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
         }
 
-        private Value ConvertToValue(ExpressionSyntax expression)
+        private Value ConvertToValue(IExpressionSyntax expression)
         {
             switch (expression)
             {
+                default:
+                    throw NonExhaustiveMatchException.For(expression);
                 case NewObjectExpressionSyntax newObjectExpression:
                 {
                     var args = newObjectExpression.Arguments.Select(a => ConvertToOperand(a.Value))
@@ -573,15 +575,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     return ConvertUnaryExpressionToValue(unaryExpression);
                 case BinaryExpressionSyntax binaryExpression:
                     return ConvertBinaryExpressionToValue(binaryExpression);
-                case IntegerLiteralExpressionSyntax _:
+                case IIntegerLiteralExpressionSyntax _:
                     throw new InvalidOperationException(
                         "Integer literals should have an implicit conversion around them");
-                case StringLiteralExpressionSyntax _:
+                case IStringLiteralExpressionSyntax _:
                     throw new InvalidOperationException(
                         "String literals should have an implicit conversion around them");
-                case BoolLiteralExpressionSyntax boolLiteral:
+                case IBoolLiteralExpressionSyntax boolLiteral:
                     return new BooleanConstant(boolLiteral.Value, boolLiteral.Span);
-                case NoneLiteralExpressionSyntax _:
+                case INoneLiteralExpressionSyntax _:
                     throw new InvalidOperationException(
                         "None literals should have an implicit conversion around them");
                 case ImplicitNumericConversionExpression implicitNumericConversion:
@@ -659,12 +661,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 }
                 case SelfExpressionSyntax selfExpression:
                     return graph.VariableFor(SpecialName.Self).Reference(selfExpression.Span);
-                default:
-                    throw NonExhaustiveMatchException.For(expression);
             }
         }
 
-        private Value ConvertToOwn(ExpressionSyntax expression, TextSpan moveSpan)
+        private Value ConvertToOwn(IExpressionSyntax expression, TextSpan moveSpan)
         {
             var operand = ConvertToOperand(expression);
             switch (operand)
@@ -676,7 +676,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
         }
 
-        private IOperand ConvertToOperand(ExpressionSyntax expression)
+        private IOperand ConvertToOperand(IExpressionSyntax expression)
         {
             var value = ConvertToValue(expression);
             return ConvertToOperand(value, expression.Type);
@@ -814,7 +814,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             return new FunctionCall(functionSymbol.FullName, arguments, invocation.Span);
         }
 
-        private IPlace ConvertToPlace(ExpressionSyntax value)
+        private IPlace ConvertToPlace(IExpressionSyntax value)
         {
             switch (value)
             {

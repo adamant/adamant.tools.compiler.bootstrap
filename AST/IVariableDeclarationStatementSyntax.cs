@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         SimpleName Name { get; }
         ITypeSyntax TypeSyntax { get; }
         new DataType? Type { get; set; }
-        ExpressionSyntax Initializer { get; }
-        ref ExpressionSyntax InitializerRef { get; }
+        IExpressionSyntax Initializer { get; }
+        ref IExpressionSyntax InitializerRef { get; }
     }
 }

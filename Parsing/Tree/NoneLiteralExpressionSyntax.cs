@@ -1,8 +1,9 @@
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    public class NoneLiteralExpressionSyntax : LiteralExpressionSyntax
+    internal class NoneLiteralExpressionSyntax : LiteralExpressionSyntax, INoneLiteralExpressionSyntax
     {
         public NoneLiteralExpressionSyntax(TextSpan span)
             : base(span)

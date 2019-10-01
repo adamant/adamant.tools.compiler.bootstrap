@@ -2,16 +2,19 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class ReturnExpressionSyntax : ExpressionSyntax
+    public class ReturnExpressionSyntax : ExpressionSyntax, IReturnExpressionSyntax
     {
-        public ExpressionSyntax ReturnValue;
+        private IExpressionSyntax returnValue;
+
+        public IExpressionSyntax ReturnValue => returnValue;
+        public ref IExpressionSyntax ReturnValueRef => ref returnValue;
 
         public ReturnExpressionSyntax(
             TextSpan span,
-            ExpressionSyntax returnValue)
+            IExpressionSyntax returnValue)
             : base(span)
         {
-            ReturnValue = returnValue;
+            this.returnValue = returnValue;
         }
 
         public override string ToString()

@@ -3,12 +3,15 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class MemberAccessExpressionSyntax : ExpressionSyntax
+    public class MemberAccessExpressionSyntax : ExpressionSyntax, IMemberAccessExpressionSyntax
     {
+        private IExpressionSyntax expression;
+
         /// <summary>
         /// This expression is null for implicit member access i.e. self and enums
         /// </summary>
-        public ExpressionSyntax Expression;
+        public ref IExpressionSyntax? Expression => ref expression;
+
         public AccessOperator AccessOperator { get; }
         public NameSyntax Member { get; }
 
@@ -20,12 +23,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public MemberAccessExpressionSyntax(
             TextSpan span,
-            ExpressionSyntax expression,
+            IExpressionSyntax? expression,
             AccessOperator accessOperator,
             NameSyntax member)
             : base(span)
         {
-            Expression = expression;
+            this.expression = expression;
             AccessOperator = accessOperator;
             Member = member;
         }

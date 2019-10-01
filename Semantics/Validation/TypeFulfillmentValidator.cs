@@ -40,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                 throw new Exception("Variable declaration doesn't have type");
         }
 
-        public override void VisitExpression(ExpressionSyntax expression, Void args)
+        public override void VisitExpression(IExpressionSyntax expression, Void args)
         {
             base.VisitExpression(expression, args);
             if (expression != null && expression.Type == null)

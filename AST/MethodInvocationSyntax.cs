@@ -3,19 +3,21 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class MethodInvocationSyntax : InvocationSyntax
+    public class MethodInvocationSyntax : InvocationSyntax, IMethodInvocationSyntax
     {
-        public ExpressionSyntax Target;
+        private IExpressionSyntax target;
+        public ref IExpressionSyntax Target => ref target;
+
         public NameSyntax MethodNameSyntax { get; }
 
         public MethodInvocationSyntax(
             TextSpan span,
-            ExpressionSyntax target,
+            IExpressionSyntax target,
             NameSyntax methodNameSyntax,
             FixedList<IArgumentSyntax> arguments)
             : base(span, methodNameSyntax.Name, arguments)
         {
-            Target = target;
+            this.target = target;
             MethodNameSyntax = methodNameSyntax;
         }
 

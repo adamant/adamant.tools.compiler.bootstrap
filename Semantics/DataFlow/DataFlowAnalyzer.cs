@@ -48,10 +48,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
             currentState = checker.Assignment(assignmentExpression, currentState);
         }
 
-        private void VisitLValueExpression(ExpressionSyntax expression, Void args)
+        private void VisitLValueExpression(IExpressionSyntax expression, Void args)
         {
             switch (expression)
             {
+                default:
+                    throw NonExhaustiveMatchException.For(expression);
                 case NameSyntax identifierName:
                 case null:
                     // Ignore
@@ -60,9 +62,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
                     // The expression we are accessing the member off of is an rvalue
                     VisitExpression(memberAccessExpression.Expression, args);
                     break;
-                // TODO we will need to visit other expression types that also contain rvalues
-                default:
-                    throw NonExhaustiveMatchException.For(expression);
+                    // TODO we will need to visit other expression types that also contain rvalues
             }
         }
 

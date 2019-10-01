@@ -454,7 +454,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var mutableBinding = Tokens.Accept<IVarKeywordToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var variableName = nameContext.Qualify(variableNumbers.VariableName(identifier.Value));
-            TypeSyntax? type = null;
+            ITypeSyntax? type = null;
             if (Tokens.Accept<IColonToken>())
                 type = ParseType();
             Tokens.Expect<IInKeywordToken>();

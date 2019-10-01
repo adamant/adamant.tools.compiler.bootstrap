@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class LifetimeExpressionSyntax : ExpressionSyntax
+    public class LifetimeExpressionSyntax : ExpressionSyntax, ILifetimeExpressionSyntax
     {
         public SimpleName Lifetime { get; }
 

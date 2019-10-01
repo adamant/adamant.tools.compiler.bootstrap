@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class FunctionInvocationSyntax : InvocationSyntax
+    public class FunctionInvocationSyntax : InvocationSyntax, IFunctionInvocationSyntax
     {
         public NameSyntax FunctionNameSyntax { get; }
 

@@ -2,11 +2,11 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class MoveExpressionSyntax : ExpressionSyntax
+    public class MoveExpressionSyntax : ExpressionSyntax, IMoveExpressionSyntax
     {
-        public ExpressionSyntax Expression { get; }
+        public IExpressionSyntax Expression { get; }
 
-        public MoveExpressionSyntax(TextSpan span, ExpressionSyntax expression)
+        public MoveExpressionSyntax(TextSpan span, IExpressionSyntax expression)
             : base(span)
         {
             Expression = expression;

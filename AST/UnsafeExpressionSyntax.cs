@@ -2,14 +2,16 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class UnsafeExpressionSyntax : ExpressionSyntax
+    public class UnsafeExpressionSyntax : ExpressionSyntax, IUnsafeExpressionSyntax
     {
-        public ExpressionSyntax Expression;
+        private IExpressionSyntax expression;
 
-        public UnsafeExpressionSyntax(TextSpan span, ExpressionSyntax expression)
+        public ref IExpressionSyntax Expression => ref expression;
+
+        public UnsafeExpressionSyntax(TextSpan span, IExpressionSyntax expression)
             : base(span)
         {
-            Expression = expression;
+            this.expression = expression;
         }
 
         public override string ToString()

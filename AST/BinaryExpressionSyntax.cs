@@ -3,21 +3,27 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class BinaryExpressionSyntax : ExpressionSyntax
+    public class BinaryExpressionSyntax : ExpressionSyntax, IBinaryExpressionSyntax
     {
-        public ExpressionSyntax LeftOperand;
+        private IExpressionSyntax leftOperand;
+        public IExpressionSyntax LeftOperand => leftOperand;
+        public ref IExpressionSyntax LeftOperandRef => ref leftOperand;
+
         public BinaryOperator Operator { get; }
-        public ExpressionSyntax RightOperand;
+
+        private IExpressionSyntax rightOperand;
+        public IExpressionSyntax RightOperand => rightOperand;
+        public ref IExpressionSyntax RightOperandRef => ref rightOperand;
 
         public BinaryExpressionSyntax(
-            ExpressionSyntax leftOperand,
+            IExpressionSyntax leftOperand,
             BinaryOperator @operator,
-            ExpressionSyntax rightOperand)
+            IExpressionSyntax rightOperand)
             : base(TextSpan.Covering(leftOperand.Span, rightOperand.Span))
         {
-            LeftOperand = leftOperand;
+            this.leftOperand = leftOperand;
             Operator = @operator;
-            RightOperand = rightOperand;
+            this.rightOperand = rightOperand;
         }
 
         public override string ToString()

@@ -4,21 +4,23 @@ using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public class UnaryExpressionSyntax : ExpressionSyntax
+    public class UnaryExpressionSyntax : ExpressionSyntax, IUnaryExpressionSyntax
     {
         public UnaryOperatorFixity Fixity { get; }
         public UnaryOperator Operator { get; }
-        public ExpressionSyntax Operand;
+        private IExpressionSyntax operand;
+        public IExpressionSyntax Operand => operand;
+        public ref IExpressionSyntax OperandRef => ref operand;
 
         public UnaryExpressionSyntax(
             TextSpan span,
             UnaryOperatorFixity fixity,
             UnaryOperator @operator,
-            ExpressionSyntax operand)
+            IExpressionSyntax operand)
             : base(span)
         {
             Operator = @operator;
-            Operand = operand;
+            this.operand = operand;
             Fixity = fixity;
         }
 

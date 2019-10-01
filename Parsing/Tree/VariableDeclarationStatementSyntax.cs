@@ -34,9 +34,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             }
         }
 
-        private ExpressionSyntax initializer;
-        public ExpressionSyntax Initializer => initializer;
-        public ref ExpressionSyntax InitializerRef => ref initializer;
+        private IExpressionSyntax initializer;
+        public IExpressionSyntax Initializer => initializer;
+        public ref IExpressionSyntax InitializerRef => ref initializer;
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -48,7 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name fullName,
             TextSpan nameSpan,
             ITypeSyntax typeSyntax,
-            ExpressionSyntax initializer)
+            IExpressionSyntax initializer)
             : base(span)
         {
             IsMutableBinding = isMutableBinding;

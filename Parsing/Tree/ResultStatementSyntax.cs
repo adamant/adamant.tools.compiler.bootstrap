@@ -8,15 +8,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     /// </summary>
     internal class ResultStatementSyntax : StatementSyntax, IResultStatementSyntax
     {
-        private ExpressionSyntax expression;
+        private IExpressionSyntax expression;
 
-        public ExpressionSyntax Expression => expression;
+        public IExpressionSyntax Expression => expression;
 
-        public ref ExpressionSyntax ExpressionRef => ref expression;
+        public ref IExpressionSyntax ExpressionRef => ref expression;
 
         public ResultStatementSyntax(
             TextSpan span,
-            ExpressionSyntax expression)
+            IExpressionSyntax expression)
             : base(span)
         {
             this.expression = expression;
