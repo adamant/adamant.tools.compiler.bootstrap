@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     /// <summary>
     /// A name of a variable or namespace
     /// </summary>
-    internal class NameSyntax : ExpressionSyntax, INameSyntax
+    internal class NameExpressionSyntax : ExpressionSyntax, INameExpressionSyntax
     {
         public SimpleName Name { get; }
 
@@ -42,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             }
         }
 
-        public NameSyntax(TextSpan span, SimpleName name)
+        public NameExpressionSyntax(TextSpan span, SimpleName name)
             : base(span)
         {
             Name = name;

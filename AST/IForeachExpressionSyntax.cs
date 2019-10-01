@@ -9,9 +9,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         SimpleName VariableName { get; }
         ITypeSyntax? TypeSyntax { get; }
-        new DataType? Type { get; set; }
+        /// <summary>
+        /// The type of the foreach expression overall, not of the variable
+        /// </summary>
+        [DisallowNull] new DataType? Type { get; set; }
         [DisallowNull] DataType? VariableType { get; set; }
         ref IExpressionSyntax InExpression { get; }
-        IBlockSyntax Block { get; }
+        IBlockExpressionSyntax Block { get; }
     }
 }

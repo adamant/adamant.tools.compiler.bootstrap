@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
@@ -17,11 +18,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public SimpleName Name => FullName.UnqualifiedName;
 
         public TextSpan NameSpan { get; }
-        public ITypeSyntax TypeSyntax { get; }
+        public ITypeSyntax? TypeSyntax { get; }
         private DataType? type;
-
-
         DataType IBindingSymbol.Type => Type ?? throw new InvalidOperationException();
+
+        [DisallowNull]
         public DataType? Type
         {
             get => type;
@@ -34,9 +35,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             }
         }
 
-        private IExpressionSyntax initializer;
-        public IExpressionSyntax Initializer => initializer;
-        public ref IExpressionSyntax InitializerRef => ref initializer;
+        private IExpressionSyntax? initializer;
+        public ref IExpressionSyntax? Initializer => ref initializer;
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -47,8 +47,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             bool isMutableBinding,
             Name fullName,
             TextSpan nameSpan,
-            ITypeSyntax typeSyntax,
-            IExpressionSyntax initializer)
+            ITypeSyntax? typeSyntax,
+            IExpressionSyntax? initializer)
             : base(span)
         {
             IsMutableBinding = isMutableBinding;

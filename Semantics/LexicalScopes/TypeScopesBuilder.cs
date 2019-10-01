@@ -20,11 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         {
         }
 
-        public override void Enter(IReferenceLifetimeSyntax referenceLifetime)
-        {
-        }
-
-        public override void Enter(ISelfTypeSyntax selfType)
+        public override void Enter(IReferenceLifetimeTypeSyntax referenceLifetimeType)
         {
         }
 

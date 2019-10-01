@@ -1,10 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     [Closed(
-        typeof(IUnaryExpressionSyntax),
+        typeof(IUnaryOperatorExpressionSyntax),
         typeof(IUnsafeExpressionSyntax),
         typeof(INewObjectExpressionSyntax),
         typeof(ILiteralExpressionSyntax),
@@ -15,18 +16,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(IMoveExpressionSyntax),
         typeof(ILoopExpressionSyntax),
         typeof(ILifetimeExpressionSyntax),
-        typeof(IBlockSyntax),
-        typeof(IInvocationSyntax),
+        typeof(IBlockExpressionSyntax),
+        typeof(IInvocationExpressionSyntax),
         typeof(IImplicitConversionExpression),
         typeof(IForeachExpressionSyntax),
         typeof(IIfExpressionSyntax),
         typeof(IAssignmentExpressionSyntax),
         typeof(IBreakExpressionSyntax),
-        typeof(IBinaryExpressionSyntax),
-        typeof(IInstanceExpressionSyntax),
-        typeof(INameSyntax))]
+        typeof(IBinaryOperatorExpressionSyntax),
+        typeof(ISelfExpressionSyntax),
+        typeof(INameExpressionSyntax))]
     public interface IExpressionSyntax : ISyntax
     {
-        DataType? Type { get; set; }
+        [DisallowNull] DataType? Type { get; set; }
     }
 }

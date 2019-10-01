@@ -91,17 +91,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             LexicalScope containingScope)
         {
             var binder = new ExpressionScopesBuilder();
-            var diagnosticCount = diagnostics.Count;
-            BuildScopesInDeclaration(declaration, containingScope, binder);
-            if (diagnosticCount != diagnostics.Count)
-                declaration.MarkErrored();
-        }
-
-        private void BuildScopesInDeclaration(
-            IDeclarationSyntax declaration,
-            LexicalScope containingScope,
-            ExpressionScopesBuilder binder)
-        {
             switch (declaration)
             {
                 default:

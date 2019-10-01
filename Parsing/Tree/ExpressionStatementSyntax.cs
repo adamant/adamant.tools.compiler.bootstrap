@@ -6,8 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal class ExpressionStatementSyntax : StatementSyntax, IExpressionStatementSyntax
     {
         private IExpressionSyntax expression;
-        public IExpressionSyntax Expression => expression;
-        public ref IExpressionSyntax ExpressionRef => ref expression;
+        public ref IExpressionSyntax Expression => ref expression;
 
         public ExpressionStatementSyntax(TextSpan span, IExpressionSyntax expression)
             : base(span)

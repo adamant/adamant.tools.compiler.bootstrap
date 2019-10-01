@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         ref IExpressionSyntax? Expression { get; }
         AccessOperator AccessOperator { get; }
-        INameSyntax Member { get; }
+        INameExpressionSyntax Member { get; }
         [DisallowNull] ISymbol? ReferencedSymbol { get; set; }
     }
 }

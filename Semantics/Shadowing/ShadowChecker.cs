@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
                 shadowChecker.VisitStatement(statement, bindingScope);
         }
 
-        public override void VisitBlock(IBlockSyntax block, BindingScope bindingScope)
+        public override void VisitBlockExpression(IBlockExpressionSyntax block, BindingScope bindingScope)
         {
             foreach (var statement in block.Statements)
             {
@@ -58,27 +58,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
             if (bindingScope.Lookup(variableDeclaration.Name, out var binding))
             {
                 if (binding.MutableBinding)
-                {
                     diagnostics.Add(SemanticError.CantRebindMutableBinding(method.File, variableDeclaration.NameSpan));
-                    method.MarkErrored();
-                }
                 else if (variableDeclaration.IsMutableBinding)
-                {
                     diagnostics.Add(SemanticError.CantRebindAsMutableBinding(method.File, variableDeclaration.NameSpan));
-                    method.MarkErrored();
-                }
             }
         }
 
-        public override void VisitName(INameSyntax name, BindingScope bindingScope)
+        public override void VisitNameExpression(INameExpressionSyntax nameExpression, BindingScope bindingScope)
         {
-            if (!bindingScope.Lookup(name.Name, out var binding))
+            if (!bindingScope.Lookup(nameExpression.Name, out var binding))
                 return;
             var shadowedBy = binding.WasShadowedBy.LastOrDefault();
             if (shadowedBy == null)
                 return;
-            diagnostics.Add(SemanticError.CantShadow(method.File, shadowedBy.NameSpan, name.Span));
-            method.MarkErrored();
+            diagnostics.Add(SemanticError.CantShadow(method.File, shadowedBy.NameSpan, nameExpression.Span));
         }
     }
 }

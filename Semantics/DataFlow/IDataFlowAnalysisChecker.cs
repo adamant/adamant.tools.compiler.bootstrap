@@ -6,7 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
     {
         TState StartState();
         TState Assignment(IAssignmentExpressionSyntax assignmentExpression, TState state);
-        TState IdentifierName(INameSyntax name, TState state);
+        TState IdentifierName(INameExpressionSyntax nameExpression, TState state);
         TState VariableDeclaration(IVariableDeclarationStatementSyntax variableDeclaration, TState state);
     }
 }

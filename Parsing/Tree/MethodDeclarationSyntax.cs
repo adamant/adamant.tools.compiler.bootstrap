@@ -11,12 +11,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class MethodDeclarationSyntax : FunctionLikeSyntax, IMethodDeclarationSyntax
     {
-        public bool IsExternalFunction { get; set; }
+        IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;
         public IExpressionSyntax? LifetimeBounds { get; }
         public ITypeSyntax? ReturnTypeSyntax { get; }
-
-        IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;
-
         DataType IFunctionSymbol.ReturnType => ReturnType.Fulfilled();
 
         public MethodDeclarationSyntax(

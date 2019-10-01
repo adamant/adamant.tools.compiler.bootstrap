@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 
@@ -5,14 +6,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class ReturnExpressionSyntax : ExpressionSyntax, IReturnExpressionSyntax
     {
-        private IExpressionSyntax returnValue;
-
-        public IExpressionSyntax ReturnValue => returnValue;
-        public ref IExpressionSyntax ReturnValueRef => ref returnValue;
+        private IExpressionSyntax? returnValue;
+        [DisallowNull]
+        public ref IExpressionSyntax? ReturnValue => ref returnValue;
 
         public ReturnExpressionSyntax(
             TextSpan span,
-            IExpressionSyntax returnValue)
+            IExpressionSyntax? returnValue)
             : base(span)
         {
             this.returnValue = returnValue;

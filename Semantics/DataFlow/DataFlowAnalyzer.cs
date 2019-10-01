@@ -54,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
             {
                 default:
                     throw NonExhaustiveMatchException.For(expression);
-                case INameSyntax identifierName:
+                case INameExpressionSyntax identifierName:
                 case null:
                     // Ignore
                     break;
@@ -66,9 +66,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
             }
         }
 
-        public override void VisitName(INameSyntax name, Void args)
+        public override void VisitNameExpression(INameExpressionSyntax nameExpression, Void args)
         {
-            currentState = checker.IdentifierName(name, currentState);
+            currentState = checker.IdentifierName(nameExpression, currentState);
         }
 
         public override void VisitVariableDeclarationStatement(
@@ -79,10 +79,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
             currentState = checker.VariableDeclaration(variableDeclaration, currentState);
         }
 
-        public override void VisitFunctionInvocation(IFunctionInvocationSyntax functionInvocation, Void args)
+        public override void VisitFunctionInvocation(IFunctionInvocationExpressionSyntax functionInvocationExpression, Void args)
         {
             // overriden to avoid visiting the function name
-            foreach (var argument in functionInvocation.Arguments)
+            foreach (var argument in functionInvocationExpression.Arguments)
                 VisitArgument(argument, args);
         }
     }

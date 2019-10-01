@@ -7,8 +7,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public interface ITypeNameSyntax : ITypeSyntax
     {
-        [DisallowNull] ISymbol? ReferencedSymbol { get; set; }
         [DisallowNull] LexicalScope? ContainingScope { get; set; }
+        [DisallowNull] ISymbol? ReferencedSymbol { get; set; }
         FixedList<ISymbol> LookupInContainingScope();
     }
 }

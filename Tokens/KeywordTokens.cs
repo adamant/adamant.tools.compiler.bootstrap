@@ -36,7 +36,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             typeof(UnsafeKeywordToken),
             typeof(SafeKeywordToken),
             typeof(SelfKeywordToken),
-            typeof(SelfTypeKeywordToken),
             typeof(MutableKeywordToken),
             typeof(NoneKeywordToken),
             typeof(MoveKeywordToken),
@@ -165,10 +164,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         {
             return new SelfKeywordToken(span);
         }
-        public static ISelfTypeKeywordToken SelfTypeKeyword(TextSpan span)
-        {
-            return new SelfTypeKeywordToken(span);
-        }
         public static IMutableKeywordToken MutableKeyword(TextSpan span)
         {
             return new MutableKeywordToken(span);
@@ -259,7 +254,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         typeof(IUnsafeKeywordToken),
         typeof(ISafeKeywordToken),
         typeof(ISelfKeywordToken),
-        typeof(ISelfTypeKeywordToken),
         typeof(IMutableKeywordToken),
         typeof(INoneKeywordToken),
         typeof(IMoveKeywordToken),
@@ -516,15 +510,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     internal partial class SelfKeywordToken : Token, ISelfKeywordToken
     {
         public SelfKeywordToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
-    public partial interface ISelfTypeKeywordToken : IKeywordToken { }
-    internal partial class SelfTypeKeywordToken : Token, ISelfTypeKeywordToken
-    {
-        public SelfTypeKeywordToken(TextSpan span)
             : base(span)
         {
         }

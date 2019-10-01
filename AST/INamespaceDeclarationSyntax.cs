@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public interface INamespaceDeclarationSyntax : IDeclarationSyntax, INonMemberDeclarationSyntax
+    public interface INamespaceDeclarationSyntax : INonMemberDeclarationSyntax, IDeclarationSyntax
     {
         bool InGlobalNamespace { get; }
         Name Name { get; }

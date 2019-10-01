@@ -90,8 +90,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private void ResolveSignatureTypesInConstructor(IConstructorDeclarationSyntax constructor)
         {
-            var diagnosticCount = diagnostics.Count;
-
             // Resolve the declaring type because we need its type for things like `self`
             if (constructor.DeclaringType != null)
                 ResolveSignatureTypesInClassDeclaration(constructor.DeclaringType);
@@ -102,15 +100,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             ResolveTypesInParameters(analyzer, constructor.Parameters, constructor.DeclaringType);
 
-            if (diagnosticCount != diagnostics.Count)
-                constructor.MarkErrored();
         }
 
 
         private void ResolveSignatureTypesInMethod(IMethodDeclarationSyntax method)
         {
-            var diagnosticCount = diagnostics.Count;
-
             // Resolve the declaring type because we need its type for things like `self`
             if (method.DeclaringType != null)
                 ResolveSignatureTypesInClassDeclaration(method.DeclaringType);
@@ -121,23 +115,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             ResolveTypesInParameters(analyzer, method.Parameters, method.DeclaringType);
 
             ResolveReturnType(method.ReturnType, method.ReturnTypeSyntax, analyzer);
-
-            if (diagnosticCount != diagnostics.Count)
-                method.MarkErrored();
         }
 
         private void ResolveSignatureTypesInFunction(IFunctionDeclarationSyntax function)
         {
-            var diagnosticCount = diagnostics.Count;
-
             var analyzer = new BasicStatementAnalyzer(function.File, diagnostics, null);
 
             ResolveTypesInParameters(analyzer, function.Parameters, null);
 
             ResolveReturnType(function.ReturnType, function.ReturnTypeSyntax, analyzer);
-
-            if (diagnosticCount != diagnostics.Count)
-                function.MarkErrored();
         }
 
         private static DataType? ResolveSelfType(IMethodDeclarationSyntax method)
@@ -302,13 +288,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             if (constructor.Body == null)
                 return;
 
-            var diagnosticCount = diagnostics.Count;
             var resolver = new BasicStatementAnalyzer(constructor.File, diagnostics,
                 constructor.SelfParameterType, constructor.SelfParameterType);
             foreach (var statement in constructor.Body)
                 resolver.ResolveTypesInStatement(statement);
-            if (diagnosticCount != diagnostics.Count)
-                constructor.MarkErrored();
         }
 
         private void ResolveBodyTypesInMethod(IMethodDeclarationSyntax method)
@@ -316,12 +299,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             if (method.Body == null)
                 return;
 
-            var diagnosticCount = diagnostics.Count;
             var resolver = new BasicStatementAnalyzer(method.File, diagnostics, method.SelfParameterType, method.ReturnType.Fulfilled());
             foreach (var statement in method.Body)
                 resolver.ResolveTypesInStatement(statement);
-            if (diagnosticCount != diagnostics.Count)
-                method.MarkErrored();
         }
 
         private void ResolveBodyTypesInFunction(IFunctionDeclarationSyntax function)
@@ -329,13 +309,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             if (function.Body == null)
                 return;
 
-            var diagnosticCount = diagnostics.Count;
             var resolver = new BasicStatementAnalyzer(function.File, diagnostics,
                 null, function.ReturnType.Fulfilled());
             foreach (var statement in function.Body)
                 resolver.ResolveTypesInStatement(statement);
-            if (diagnosticCount != diagnostics.Count)
-                function.MarkErrored();
         }
 
         private void ResolveBodyTypesInField(IFieldDeclarationSyntax fieldDeclaration)
@@ -343,12 +320,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             if (fieldDeclaration.Initializer == null)
                 return;
 
-            var diagnosticCount = diagnostics.Count;
             var resolver = new BasicStatementAnalyzer(fieldDeclaration.File, diagnostics);
             // Work around not being able to pass a ref to a property
-            resolver.CheckExpressionType(ref fieldDeclaration.InitializerRef, fieldDeclaration.Type.Fulfilled());
-            if (diagnosticCount != diagnostics.Count)
-                fieldDeclaration.MarkErrored();
+            resolver.CheckExpressionType(ref fieldDeclaration.Initializer, fieldDeclaration.Type.Fulfilled());
         }
     }
 }

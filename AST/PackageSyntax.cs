@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public override string ToString()
         {
-            return $"package {Name} {CompilationUnits.Count} Compilation Units";
+            return $"package {Name}: {CompilationUnits.Count} Compilation Units";
         }
     }
 }

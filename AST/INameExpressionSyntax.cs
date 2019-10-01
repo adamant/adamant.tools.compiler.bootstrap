@@ -6,11 +6,11 @@ using Adamant.Tools.Compiler.Bootstrap.Scopes;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public interface INameSyntax : IExpressionSyntax
+    public interface INameExpressionSyntax : IExpressionSyntax
     {
         SimpleName Name { get; }
-        [DisallowNull] ISymbol? ReferencedSymbol { get; set; }
         [DisallowNull] LexicalScope? ContainingScope { get; set; }
+        [DisallowNull] ISymbol? ReferencedSymbol { get; set; }
         FixedList<ISymbol> LookupInContainingScope();
     }
 }

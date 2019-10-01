@@ -5,15 +5,14 @@ using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal class UnaryExpressionSyntax : ExpressionSyntax, IUnaryExpressionSyntax
+    internal class UnaryOperatorExpressionSyntax : ExpressionSyntax, IUnaryOperatorExpressionSyntax
     {
         public UnaryOperatorFixity Fixity { get; }
         public UnaryOperator Operator { get; }
         private IExpressionSyntax operand;
-        public IExpressionSyntax Operand => operand;
-        public ref IExpressionSyntax OperandRef => ref operand;
+        public ref IExpressionSyntax Operand => ref operand;
 
-        public UnaryExpressionSyntax(
+        public UnaryOperatorExpressionSyntax(
             TextSpan span,
             UnaryOperatorFixity fixity,
             UnaryOperator @operator,

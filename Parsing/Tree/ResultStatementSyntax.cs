@@ -9,10 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal class ResultStatementSyntax : StatementSyntax, IResultStatementSyntax
     {
         private IExpressionSyntax expression;
-
-        public IExpressionSyntax Expression => expression;
-
-        public ref IExpressionSyntax ExpressionRef => ref expression;
+        public ref IExpressionSyntax Expression => ref expression;
 
         public ResultStatementSyntax(
             TextSpan span,

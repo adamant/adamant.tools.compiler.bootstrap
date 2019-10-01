@@ -13,6 +13,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(ICallableDeclarationSyntax))]
     public interface IEntityDeclarationSyntax : IDeclarationSyntax, ISymbol
     {
-
     }
 }

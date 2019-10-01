@@ -9,7 +9,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public interface IDeclarationSyntax : ISyntax
     {
         CodeFile File { get; }
-        void MarkErrored();
 
         /// <summary>
         /// The span of whatever would count as the "name" of this declaration

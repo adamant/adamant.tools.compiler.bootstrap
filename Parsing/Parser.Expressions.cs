@@ -140,7 +140,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         {
                             var question = Tokens.Required<IQuestionToken>();
                             var span = TextSpan.Covering(expression.Span, question);
-                            expression = new UnaryExpressionSyntax(span, UnaryOperatorFixity.Postfix, UnaryOperator.Question, expression);
+                            expression = new UnaryOperatorExpressionSyntax(span, UnaryOperatorFixity.Postfix, UnaryOperator.Question, expression);
                             continue;
                         }
                         break;
@@ -174,7 +174,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                                 var arguments = ParseArguments();
                                 var closeParenSpan = Tokens.Expect<ICloseParenToken>();
                                 var invocationSpan = TextSpan.Covering(expression.Span, closeParenSpan);
-                                expression = new MethodInvocationSyntax(invocationSpan, expression, member, arguments);
+                                expression = new MethodInvocationExpressionSyntax(invocationSpan, expression, member, arguments);
                             }
                             continue;
                         }
@@ -279,7 +279,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IDollarToken _:
                     throw new NotImplementedException();
             }
-            return new BinaryExpressionSyntax(left, binaryOperator, right);
+            return new BinaryOperatorExpressionSyntax(left, binaryOperator, right);
         }
 
         // An atom is the unit of an expression that occurs between infix operators, i.e. an identifier, literal, group, or new
@@ -301,7 +301,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var arguments = ParseArguments();
                     var closeParen = Tokens.Expect<ICloseParenToken>();
                     var span = TextSpan.Covering(newKeyword, closeParen);
-                    return new NewObjectExpressionSyntax(span, type, arguments);
+                    return new NewObjectExpressionSyntax(span, type, null, arguments);
                 }
                 case IReturnKeywordToken _:
                 {
@@ -347,7 +347,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var arguments = ParseArguments();
                     var closeParenSpan = Tokens.Expect<ICloseParenToken>();
                     var span = TextSpan.Covering(name.Span, closeParenSpan);
-                    return new FunctionInvocationSyntax(span, name, arguments);
+                    return new FunctionInvocationExpressionSyntax(span, name, arguments);
                 }
                 case IForeachKeywordToken _:
                     return ParseForeach();
@@ -426,7 +426,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var operatorSpan = Tokens.Required<IOperatorToken>();
             var operand = ParseExpression(OperatorPrecedence.Unary);
             var span = TextSpan.Covering(operatorSpan, operand.Span);
-            return new UnaryExpressionSyntax(span, UnaryOperatorFixity.Prefix, @operator, operand);
+            return new UnaryOperatorExpressionSyntax(span, UnaryOperatorFixity.Prefix, @operator, operand);
         }
 
         private (TextSpan, SimpleName?) ParseLifetimeName()

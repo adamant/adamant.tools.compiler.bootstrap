@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
         {
             switch (assignmentExpression.LeftOperand)
             {
-                case INameSyntax identifier:
+                case INameExpressionSyntax identifier:
                     return definitelyAssigned.Set(identifier.ReferencedSymbol, true);
                 case IMemberAccessExpressionSyntax memberAccessExpression:
                     return definitelyAssigned;
@@ -46,12 +46,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
         }
 
         public VariableFlags IdentifierName(
-            INameSyntax name,
+            INameExpressionSyntax nameExpression,
             VariableFlags definitelyAssigned)
         {
-            if (definitelyAssigned[name.ReferencedSymbol] == false)
+            if (definitelyAssigned[nameExpression.ReferencedSymbol] == false)
                 diagnostics.Add(SemanticError.VariableMayNotHaveBeenAssigned(file,
-                    name.Span, name.Name));
+                    nameExpression.Span, nameExpression.Name));
 
             return definitelyAssigned;
         }

@@ -86,13 +86,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new ExpressionStatementSyntax(span, unsafeExpression);
         }
 
-        public IBlockSyntax ParseBlock()
+        public IBlockExpressionSyntax ParseBlock()
         {
             var openBrace = Tokens.Expect<IOpenBraceToken>();
             var statements = ParseMany<IStatementSyntax, ICloseBraceToken>(ParseStatement);
             var closeBrace = Tokens.Expect<ICloseBraceToken>();
             var span = TextSpan.Covering(openBrace, closeBrace);
-            return new BlockSyntax(span, statements);
+            return new BlockExpressionSyntax(span, statements);
         }
 
         /// <summary>

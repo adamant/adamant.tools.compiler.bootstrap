@@ -7,20 +7,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
     {
         private readonly IDeclarationWalker? declarationWalker;
         private readonly IStatementWalker? statementWalker;
-        private readonly ITypeWalker typeWalker;
+        private readonly ITypeWalker? typeWalker;
 
         public TreeWalker(
             IDeclarationWalker? declarationWalker,
             IStatementWalker? statementWalker,
-            ITypeWalker typeWalker)
+            ITypeWalker? typeWalker)
         {
             this.declarationWalker = declarationWalker;
             this.statementWalker = statementWalker;
             this.typeWalker = typeWalker;
         }
 
-        public void Walk(IDeclarationSyntax declaration)
+        public void Walk(IDeclarationSyntax? declaration)
         {
+            if (declaration == null
+               || (declarationWalker?.ShouldSkip(declaration) ?? false))
+                return;
+
             switch (declaration)
             {
                 default:
@@ -37,9 +41,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
             }
         }
 
-        public void Walk(ITypeSyntax type)
+        public void Walk(ITypeSyntax? type)
         {
-            if (typeWalker is null || typeWalker.ShouldSkip(type))
+            if (typeWalker is null
+                || type == null
+                || typeWalker.ShouldSkip(type))
                 return;
 
             switch (type)
@@ -51,14 +57,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                     Walk(mutableType.Referent);
                     typeWalker.Exit(mutableType);
                     break;
-                case IReferenceLifetimeSyntax referenceLifetime:
-                    typeWalker.Enter(referenceLifetime);
-                    Walk(referenceLifetime.ReferentType);
-                    typeWalker.Exit(referenceLifetime);
-                    break;
-                case ISelfTypeSyntax selfType:
-                    typeWalker.Enter(selfType);
-                    typeWalker.Exit(selfType);
+                case IReferenceLifetimeTypeSyntax referenceLifetimeType:
+                    typeWalker.Enter(referenceLifetimeType);
+                    Walk(referenceLifetimeType.ReferentType);
+                    typeWalker.Exit(referenceLifetimeType);
                     break;
                 case ITypeNameSyntax typeName:
                     typeWalker.Enter(typeName);

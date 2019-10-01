@@ -60,7 +60,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     }
                     break;
                 }
-                case IReferenceLifetimeSyntax referenceLifetime:
+                case IReferenceLifetimeTypeSyntax referenceLifetime:
                 {
                     var type = Evaluate(referenceLifetime.ReferentType);
                     if (type == DataType.Unknown)
@@ -97,8 +97,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     }
                     break;
                 }
-                case ISelfTypeSyntax selfType:
-                    throw new NotImplementedException();
             }
 
             return typeSyntax.NamedType ?? throw new InvalidOperationException();

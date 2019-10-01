@@ -4,13 +4,13 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal class FunctionInvocationSyntax : InvocationSyntax, IFunctionInvocationSyntax
+    internal class FunctionInvocationExpressionSyntax : InvocationExpressionSyntax, IFunctionInvocationExpressionSyntax
     {
-        public INameSyntax FunctionNameSyntax { get; }
+        public INameExpressionSyntax FunctionNameSyntax { get; }
 
-        public FunctionInvocationSyntax(
+        public FunctionInvocationExpressionSyntax(
             TextSpan span,
-            INameSyntax functionNameSyntax,
+            INameExpressionSyntax functionNameSyntax,
             FixedList<IArgumentSyntax> arguments)
             : base(span, functionNameSyntax.Name, arguments)
         {
@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public override string ToString()
         {
-            return $"{FunctionName}({string.Join(", ", Arguments)})";
+            return $"{FullName}({string.Join(", ", Arguments)})";
         }
     }
 }

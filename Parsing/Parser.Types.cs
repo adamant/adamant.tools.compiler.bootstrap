@@ -14,9 +14,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             switch (Tokens.Current)
             {
-                case ISelfTypeKeywordToken _:
-                    var selfTypeKeyword = Tokens.Expect<ISelfTypeKeywordToken>();
-                    return new SelfTypeSyntax(selfTypeKeyword);
                 //case IDollarToken _:
                 //    if (minPrecedence <= OperatorPrecedence.Lifetime)
                 //    {

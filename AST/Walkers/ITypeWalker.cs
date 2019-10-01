@@ -10,11 +10,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
         void Enter(IMutableTypeSyntax mutableType);
         void Exit(IMutableTypeSyntax mutableType);
 
-        void Enter(IReferenceLifetimeSyntax referenceLifetime);
-        void Exit(IReferenceLifetimeSyntax referenceLifetime);
-
-        void Enter(ISelfTypeSyntax selfType);
-        void Exit(ISelfTypeSyntax selfType);
+        void Enter(IReferenceLifetimeTypeSyntax referenceLifetimeType);
+        void Exit(IReferenceLifetimeTypeSyntax referenceLifetimeType);
 
         void Enter(ITypeNameSyntax typeName);
         void Exit(ITypeNameSyntax typeName);

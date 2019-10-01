@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal abstract class MemberDeclarationSyntax : DeclarationSyntax, IMemberDeclarationSyntax
     {
-        public IClassDeclarationSyntax? DeclaringType { get; internal set; }
+        public IClassDeclarationSyntax DeclaringType { get; internal set; }
 
         public Name FullName { get; }
 

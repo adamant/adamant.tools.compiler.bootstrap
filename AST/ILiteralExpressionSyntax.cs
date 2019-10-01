@@ -9,6 +9,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(IBoolLiteralExpressionSyntax))]
     public interface ILiteralExpressionSyntax : IExpressionSyntax
     {
-
     }
 }

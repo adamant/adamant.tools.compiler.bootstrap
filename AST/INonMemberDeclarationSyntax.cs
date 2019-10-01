@@ -10,6 +10,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(INonMemberEntityDeclarationSyntax))]
     public interface INonMemberDeclarationSyntax : IDeclarationSyntax
     {
-
     }
 }

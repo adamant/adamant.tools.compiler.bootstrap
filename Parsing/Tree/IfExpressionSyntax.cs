@@ -10,13 +10,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public ref IExpressionSyntax Condition => ref condition;
 
         public IBlockOrResultSyntax ThenBlock { get; }
-        public IElseClauseSyntax ElseClause { get; }
+        public IElseClauseSyntax? ElseClause { get; }
 
         public IfExpressionSyntax(
             TextSpan span,
             IExpressionSyntax condition,
             IBlockOrResultSyntax thenBlock,
-            IElseClauseSyntax elseClause)
+            IElseClauseSyntax? elseClause)
             : base(span)
         {
             this.condition = condition;

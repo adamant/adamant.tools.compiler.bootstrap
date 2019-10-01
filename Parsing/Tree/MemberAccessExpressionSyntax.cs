@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public ref IExpressionSyntax? Expression => ref expression;
 
         public AccessOperator AccessOperator { get; }
-        public INameSyntax Member { get; }
+        public INameExpressionSyntax Member { get; }
 
         [DisallowNull]
         public ISymbol? ReferencedSymbol
@@ -28,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan span,
             IExpressionSyntax? expression,
             AccessOperator accessOperator,
-            INameSyntax member)
+            INameExpressionSyntax member)
             : base(span)
         {
             this.expression = expression;

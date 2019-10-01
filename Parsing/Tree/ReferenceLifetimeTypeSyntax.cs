@@ -4,12 +4,12 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal class ReferenceLifetimeSyntax : TypeSyntax, IReferenceLifetimeSyntax
+    internal class ReferenceLifetimeTypeSyntax : TypeSyntax, IReferenceLifetimeTypeSyntax
     {
         public ITypeSyntax ReferentType { get; }
         public SimpleName Lifetime { get; }
 
-        public ReferenceLifetimeSyntax(
+        public ReferenceLifetimeTypeSyntax(
             ITypeSyntax referentType,
             TextSpan nameSpan,
             SimpleName lifetime)

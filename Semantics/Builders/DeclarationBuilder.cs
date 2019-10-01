@@ -43,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                         BuildParameters(function.Parameters), function.ReturnType.Known(), function.ControlFlow);
                     break;
                 case IMethodDeclarationSyntax method:
-                    declaration = new FunctionDeclaration(method.IsExternalFunction,
+                    declaration = new FunctionDeclaration(false,
                         method.DeclaringType != null, method.FullName, BuildParameters(method.Parameters),
                         method.ReturnType.Known(), method.ControlFlow);
                     break;

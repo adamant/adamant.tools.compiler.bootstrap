@@ -37,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
         {
             switch (assignmentExpression.LeftOperand)
             {
-                case INameSyntax identifier:
+                case INameExpressionSyntax identifier:
                     var symbol = identifier.ReferencedSymbol;
                     //if (!symbol.IsMutableBinding && definitelyUnassigned[symbol] == false)
                     //{
@@ -52,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
             }
         }
 
-        public VariableFlags IdentifierName(INameSyntax name, VariableFlags definitelyUnassigned)
+        public VariableFlags IdentifierName(INameExpressionSyntax nameExpression, VariableFlags definitelyUnassigned)
         {
             return definitelyUnassigned;
         }

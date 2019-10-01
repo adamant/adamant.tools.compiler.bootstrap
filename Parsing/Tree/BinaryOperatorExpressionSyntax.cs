@@ -4,19 +4,18 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal class BinaryExpressionSyntax : ExpressionSyntax, IBinaryExpressionSyntax
+    internal class BinaryOperatorExpressionSyntax : ExpressionSyntax, IBinaryOperatorExpressionSyntax
     {
         private IExpressionSyntax leftOperand;
-        public IExpressionSyntax LeftOperand => leftOperand;
-        public ref IExpressionSyntax LeftOperandRef => ref leftOperand;
+        public ref IExpressionSyntax LeftOperand => ref leftOperand;
 
         public BinaryOperator Operator { get; }
 
-        private IExpressionSyntax rightOperand;
-        public IExpressionSyntax RightOperand => rightOperand;
-        public ref IExpressionSyntax RightOperandRef => ref rightOperand;
 
-        public BinaryExpressionSyntax(
+        private IExpressionSyntax rightOperand;
+        public ref IExpressionSyntax RightOperand => ref rightOperand;
+
+        public BinaryOperatorExpressionSyntax(
             IExpressionSyntax leftOperand,
             BinaryOperator @operator,
             IExpressionSyntax rightOperand)

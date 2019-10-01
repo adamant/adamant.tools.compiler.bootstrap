@@ -6,9 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal class ArgumentSyntax : Syntax, IArgumentSyntax
     {
         private IExpressionSyntax value;
-
-        public IExpressionSyntax Value => value;
-        public ref IExpressionSyntax ValueRef => ref value;
+        public ref IExpressionSyntax Value => ref value;
 
         public ArgumentSyntax(
             TextSpan span,

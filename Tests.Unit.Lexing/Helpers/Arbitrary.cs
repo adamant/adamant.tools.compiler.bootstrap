@@ -275,7 +275,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             { "safe", typeof(ISafeKeywordToken) },
             //{ "base", typeof(IBaseKeywordToken) },
             { "fn", typeof(IFunctionKeywordToken) },
-            { "Self", typeof(ISelfTypeKeywordToken) },
+            //{ "Self", typeof(ISelfTypeKeywordToken) },
             //{ "init", typeof(IInitKeywordToken) },
             { "owned", typeof(IOwnedKeywordToken) },
             { "forever", typeof(IForeverKeywordToken) },

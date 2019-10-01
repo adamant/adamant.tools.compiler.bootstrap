@@ -16,7 +16,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         /// though, the type name is the name of the unnamed constructor. Thus,
         /// this expression's type could be either an object type, or member type.
         /// </summary>
-        public ITypeNameSyntax Constructor { get; }
+        public ITypeNameSyntax TypeSyntax { get; }
+
+        public INameExpressionSyntax? ConstructorName { get; }
+
         public FixedList<IArgumentSyntax> Arguments { get; }
         private ISymbol? constructorSymbol;
 
@@ -31,8 +34,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
                 constructorSymbol = value ?? throw new ArgumentException();
             }
         }
-        private DataType? constructorType;
 
+        private DataType? constructorType;
         [DisallowNull]
         public DataType? ConstructorType
         {
@@ -42,22 +45,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
                 if (constructorType != null)
                     throw new InvalidOperationException("Can't set constructor type repeatedly");
                 constructorType = value ?? throw new ArgumentException();
+
             }
         }
 
         public NewObjectExpressionSyntax(
             TextSpan span,
-            ITypeNameSyntax constructor,
+            ITypeNameSyntax typeSyntax,
+            INameExpressionSyntax? constructorName,
             FixedList<IArgumentSyntax> arguments)
             : base(span)
         {
-            Constructor = constructor;
+            TypeSyntax = typeSyntax;
             Arguments = arguments;
+            ConstructorName = constructorName;
         }
 
         public override string ToString()
         {
-            return $"new {Constructor}({string.Join(", ", Arguments)})";
+            return $"new {TypeSyntax}({string.Join(", ", Arguments)})";
         }
     }
 }

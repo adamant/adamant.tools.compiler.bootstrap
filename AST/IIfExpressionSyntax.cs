@@ -4,6 +4,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         ref IExpressionSyntax Condition { get; }
         IBlockOrResultSyntax ThenBlock { get; }
-        IElseClauseSyntax ElseClause { get; }
+        IElseClauseSyntax? ElseClause { get; }
     }
 }

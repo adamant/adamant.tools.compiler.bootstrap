@@ -44,7 +44,7 @@
         "Unsafe",
         "Safe",
         "Self",
-        "SelfType",
+        //"SelfType",
         //"Base",
         //"Type",
         "Mutable",

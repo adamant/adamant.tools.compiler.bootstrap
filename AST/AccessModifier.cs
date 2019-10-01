@@ -4,5 +4,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         Private = 1,
         Public,
+        Published,
     }
 }

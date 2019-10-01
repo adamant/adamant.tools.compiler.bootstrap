@@ -1,22 +1,18 @@
-using System.Collections.Generic;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 {
     public class DeclarationVisitor<A> : ExpressionVisitor<A>
     {
-        public virtual void VisitDeclarations(IEnumerable<IDeclarationSyntax> declarations, A args)
-        {
-            foreach (var declaration in declarations)
-                VisitDeclaration(declaration, args);
-        }
-
-        public virtual void VisitDeclaration(IDeclarationSyntax declaration, A args)
+        public void VisitDeclaration(IDeclarationSyntax? declaration, A args)
         {
             switch (declaration)
             {
                 default:
                     throw ExhaustiveMatch.Failed(declaration);
+                case null:
+                    // Ignore
+                    break;
                 case IMemberDeclarationSyntax memberDeclaration:
                     VisitMemberDeclaration(memberDeclaration, args);
                     break;
@@ -28,9 +24,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                     break;
                 case IFunctionDeclarationSyntax function:
                     VisitFunctionDeclaration(function, args);
-                    break;
-                case null:
-                    // Ignore
                     break;
             }
         }
@@ -59,10 +52,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         {
         }
 
-        public virtual void VisitMemberDeclaration(IMemberDeclarationSyntax memberDeclaration, A args)
+        public void VisitMemberDeclaration(IMemberDeclarationSyntax? memberDeclaration, A args)
         {
             switch (memberDeclaration)
             {
+                default:
+                    throw ExhaustiveMatch.Failed(memberDeclaration);
+                case null:
+                    // Ignore
+                    break;
                 case IMethodDeclarationSyntax functionDeclaration:
                     VisitMethodDeclaration(functionDeclaration, args);
                     break;
@@ -72,11 +70,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case IConstructorDeclarationSyntax constructor:
                     VisitConstructorDeclaration(constructor, args);
                     break;
-                case null:
-                    // Ignore
-                    break;
-                default:
-                    throw ExhaustiveMatch.Failed(memberDeclaration);
             }
         }
 
@@ -112,12 +105,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                     VisitStatement(statement, args);
         }
 
-        public virtual void VisitParameter(IParameterSyntax parameter, A args)
+        public virtual void VisitParameter(IParameterSyntax? parameter, A args)
         {
             switch (parameter)
             {
                 default:
                     throw ExhaustiveMatch.Failed(parameter);
+                case null:
+                    // Ignore
+                    break;
                 case INamedParameterSyntax namedParameter:
                     VisitNamedParameter(namedParameter, args);
                     break;

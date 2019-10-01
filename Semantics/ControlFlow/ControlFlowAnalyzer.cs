@@ -283,7 +283,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             {
                 default:
                     throw ExhaustiveMatch.Failed(blockOrResult);
-                case IBlockSyntax block:
+                case IBlockExpressionSyntax block:
                     ConvertExpressionToStatement(block);
                     break;
                 case IResultStatementSyntax resultStatement:
@@ -314,10 +314,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         {
             switch (expression)
             {
-                case IUnaryExpressionSyntax _:
-                case IBinaryExpressionSyntax _:
+                case IUnaryOperatorExpressionSyntax _:
+                case IBinaryOperatorExpressionSyntax _:
                     throw new NotImplementedException();
-                case IInvocationSyntax invocation:
+                case IInvocationExpressionSyntax invocation:
                     currentBlock.AddAction(ConvertInvocationToValue(invocation), invocation.Span,
                         CurrentScope);
                     return;
@@ -355,7 +355,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     //     x += 1;
                     //     if x > temp => break;
                     // }
-                    if (!(foreachExpression.InExpression is IBinaryExpressionSyntax inExpression)
+                    if (!(foreachExpression.InExpression is IBinaryOperatorExpressionSyntax inExpression)
                         || inExpression.Operator != BinaryOperator.DotDot)
                         throw new NotImplementedException(
                             "`foreach` in non-range expression not implemented");
@@ -479,7 +479,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     currentBlock = exit;
                     return;
                 }
-                case IBlockSyntax block:
+                case IBlockExpressionSyntax block:
                 {
                     // Starting a new nested scope
                     EnterNewScope();
@@ -557,7 +557,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     type = type.WithLifetime(Lifetime.None);
                     return new ConstructorCall(type, args, newObjectExpression.Span);
                 }
-                case INameSyntax identifier:
+                case INameExpressionSyntax identifier:
                 {
                     var symbol = identifier.ReferencedSymbol;
                     switch (symbol)
@@ -571,9 +571,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                             return new DeclaredValue(symbol.FullName, identifier.Span);
                     }
                 }
-                case IUnaryExpressionSyntax unaryExpression:
+                case IUnaryOperatorExpressionSyntax unaryExpression:
                     return ConvertUnaryExpressionToValue(unaryExpression);
-                case IBinaryExpressionSyntax binaryExpression:
+                case IBinaryOperatorExpressionSyntax binaryExpression:
                     return ConvertBinaryExpressionToValue(binaryExpression);
                 case IIntegerLiteralExpressionSyntax _:
                     throw new InvalidOperationException(
@@ -620,7 +620,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case IImplicitNoneConversionExpression implicitNoneConversion:
                     return new NoneConstant(implicitNoneConversion.ConvertToType,
                         implicitNoneConversion.Span);
-                case IInvocationSyntax invocation:
+                case IInvocationExpressionSyntax invocation:
                     return ConvertInvocationToValue(invocation);
                 case IMemberAccessExpressionSyntax memberAccess:
                 {
@@ -692,9 +692,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             //return tempVariable.Reference(value.Span);
         }
 
-        private Value ConvertBinaryExpressionToValue(IBinaryExpressionSyntax expression)
+        private Value ConvertBinaryExpressionToValue(IBinaryOperatorExpressionSyntax operatorExpression)
         {
-            switch (expression.Operator)
+            switch (operatorExpression.Operator)
             {
                 case BinaryOperator.Plus:
                 case BinaryOperator.Minus:
@@ -708,19 +708,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case BinaryOperator.GreaterThanOrEqual:
                 {
                     // TODO handle calls to overloaded operators
-                    var leftOperand = ConvertToOperand(expression.LeftOperand);
-                    var rightOperand = ConvertToOperand(expression.RightOperand);
-                    switch (expression.LeftOperand.Type)
+                    var leftOperand = ConvertToOperand(operatorExpression.LeftOperand);
+                    var rightOperand = ConvertToOperand(operatorExpression.RightOperand);
+                    switch (operatorExpression.LeftOperand.Type)
                     {
                         case SimpleType operandType:
                         {
                             // What matters is the type we are operating on, for comparisons, that is different than the result type which is bool
-                            return new BinaryOperation(leftOperand, expression.Operator,
+                            return new BinaryOperation(leftOperand, operatorExpression.Operator,
                                 rightOperand, operandType);
                         }
                         case UserObjectType operandType:
                         {
-                            if (expression.Operator != BinaryOperator.EqualsEquals)
+                            if (operatorExpression.Operator != BinaryOperator.EqualsEquals)
                                 throw new NotImplementedException();
                             //var equalityOperators = operandType.Symbol.Lookup(SpecialName.OperatorEquals);
                             //if (equalityOperators.Count == 1)
@@ -734,7 +734,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                             throw new NotImplementedException();
                         }
                         default:
-                            throw NonExhaustiveMatchException.For(expression.LeftOperand.Type);
+                            throw NonExhaustiveMatchException.For(operatorExpression.LeftOperand.Type);
                     }
                 }
                 case BinaryOperator.And:
@@ -742,83 +742,83 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 {
                     // TODO handle calls to overloaded operators
                     // TODO handle short circuiting if needed
-                    var leftOperand = ConvertToOperand(expression.LeftOperand);
-                    var rightOperand = ConvertToOperand(expression.RightOperand);
-                    return new BinaryOperation(leftOperand, expression.Operator, rightOperand,
-                        (SimpleType)expression.Type);
+                    var leftOperand = ConvertToOperand(operatorExpression.LeftOperand);
+                    var rightOperand = ConvertToOperand(operatorExpression.RightOperand);
+                    return new BinaryOperation(leftOperand, operatorExpression.Operator, rightOperand,
+                        (SimpleType)operatorExpression.Type);
                 }
                 case BinaryOperator.DotDot:
                     throw new NotImplementedException("Conversion of `..` for binary operators");
                 default:
-                    throw ExhaustiveMatch.Failed(expression.Operator);
+                    throw ExhaustiveMatch.Failed(operatorExpression.Operator);
             }
         }
 
-        private Value ConvertUnaryExpressionToValue(IUnaryExpressionSyntax expression)
+        private Value ConvertUnaryExpressionToValue(IUnaryOperatorExpressionSyntax operatorExpression)
         {
-            switch (expression.Operator)
+            switch (operatorExpression.Operator)
             {
                 case UnaryOperator.Not:
                 case UnaryOperator.Minus:
-                    var operand = ConvertToOperand(expression.Operand);
-                    return new UnaryOperation(expression.Operator, operand, expression.Span);
+                    var operand = ConvertToOperand(operatorExpression.Operand);
+                    return new UnaryOperation(operatorExpression.Operator, operand, operatorExpression.Span);
                 case UnaryOperator.Plus:
                     // This is a no-op
-                    return ConvertToValue(expression.Operand);
+                    return ConvertToValue(operatorExpression.Operand);
                 case UnaryOperator.Question:
                     //case UnaryOperator.At:
                     //case UnaryOperator.Caret:
                     throw new NotImplementedException(
                         "Unary expression conversion not implemented");
                 default:
-                    throw ExhaustiveMatch.Failed(expression.Operator);
+                    throw ExhaustiveMatch.Failed(operatorExpression.Operator);
             }
         }
 
-        private Value ConvertInvocationToValue(IInvocationSyntax invocation)
+        private Value ConvertInvocationToValue(IInvocationExpressionSyntax invocationExpression)
         {
-            switch (invocation)
+            switch (invocationExpression)
             {
                 default:
-                    throw ExhaustiveMatch.Failed(invocation);
-                case IMethodInvocationSyntax methodInvocation:
+                    throw ExhaustiveMatch.Failed(invocationExpression);
+                case IMethodInvocationExpressionSyntax methodInvocation:
                     return ConvertInvocationToValue(methodInvocation);
-                case IAssociatedFunctionInvocationSyntax _:
+                case IAssociatedFunctionInvocationExpressionSyntax _:
                     throw new NotImplementedException();
-                case IFunctionInvocationSyntax functionInvocation:
+                case IFunctionInvocationExpressionSyntax functionInvocation:
                     return ConvertInvocationToValue(functionInvocation);
             }
         }
 
-        private Value ConvertInvocationToValue(IMethodInvocationSyntax invocation)
+        private Value ConvertInvocationToValue(IMethodInvocationExpressionSyntax invocationExpression)
         {
-            var self = ConvertToOperand(invocation.Target);
-            var arguments = invocation.Arguments.Select(a => ConvertToOperand(a.Value)).ToList();
-            var symbol = (IFunctionSymbol)invocation.MethodNameSyntax.ReferencedSymbol;
-            switch (invocation.Target.Type)
+            var self = ConvertToOperand(invocationExpression.Target);
+            var arguments = invocationExpression.Arguments.Select(a => ConvertToOperand(a.Value)).ToList();
+            var symbol = (IFunctionSymbol)invocationExpression.MethodNameSyntax.ReferencedSymbol;
+            switch (invocationExpression.Target.Type)
             {
                 case SimpleType _:
                     // Full name because this isn't a member
                     return new FunctionCall(symbol.FullName,
-                        self, arguments, invocation.Span);
+                        self, arguments, invocationExpression.Span);
                 default:
-                    return new VirtualFunctionCall(invocation.Span,
+                    return new VirtualFunctionCall(invocationExpression.Span,
                         symbol.FullName.UnqualifiedName, self, arguments);
             }
         }
 
-        private Value ConvertInvocationToValue(IFunctionInvocationSyntax invocation)
+        private Value ConvertInvocationToValue(IFunctionInvocationExpressionSyntax invocationExpression)
         {
-            var functionSymbol = (IFunctionSymbol)invocation.FunctionNameSyntax.ReferencedSymbol;
-            var arguments = invocation.Arguments.Select(a => ConvertToOperand(a.Value)).ToList();
-            return new FunctionCall(functionSymbol.FullName, arguments, invocation.Span);
+            var functionSymbol = (IFunctionSymbol)invocationExpression.FunctionNameSyntax.ReferencedSymbol;
+            var arguments = invocationExpression.Arguments.Select(a => ConvertToOperand(a.Value)).ToList();
+            return new FunctionCall(functionSymbol.FullName, arguments, invocationExpression.Span);
         }
 
         private IPlace ConvertToPlace(IExpressionSyntax value)
         {
             switch (value)
             {
-                case INameSyntax identifier:
+                case INameExpressionSyntax identifier:
                     // TODO what if this isn't just a variable?
                     return graph.VariableFor(identifier.ReferencedSymbol.FullName.UnqualifiedName).LValueReference(value.Span);
                 case IMemberAccessExpressionSyntax memberAccessExpression:

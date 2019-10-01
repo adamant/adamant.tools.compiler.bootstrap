@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -11,13 +12,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class FieldDeclarationSyntax : MemberDeclarationSyntax, IFieldDeclarationSyntax
     {
-        private IExpressionSyntax? initializer;
         public FixedList<IModiferToken> Modifiers { get; }
         public bool IsMutableBinding { get; }
         public ITypeSyntax? TypeSyntax { get; }
-
-        public IExpressionSyntax? Initializer => initializer;
-        public ref IExpressionSyntax? InitializerRef => ref initializer;
+        private IExpressionSyntax? initializer;
+        [DisallowNull] public ref IExpressionSyntax? Initializer => ref initializer;
         public TypePromise Type { get; } = new TypePromise();
 
         [DebuggerHidden]

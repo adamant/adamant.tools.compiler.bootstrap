@@ -5,19 +5,19 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal abstract class InvocationSyntax : ExpressionSyntax, IInvocationSyntax
+    internal abstract class InvocationExpressionSyntax : ExpressionSyntax, IInvocationExpressionSyntax
     {
-        public Name FunctionName { get; }
+        public Name FullName { get; }
         public FixedList<IArgumentSyntax> Arguments { get; }
 
-        private protected InvocationSyntax(
+        private protected InvocationExpressionSyntax(
             TextSpan span,
             Name functionName,
             FixedList<IArgumentSyntax> arguments)
             : base(span)
         {
             Arguments = arguments;
-            FunctionName = functionName;
+            FullName = functionName;
         }
     }
 }

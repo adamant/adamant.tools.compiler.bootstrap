@@ -17,6 +17,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         {
             switch (@operator)
             {
+                default:
+                    throw ExhaustiveMatch.Failed(@operator);
                 case AssignmentOperator.Simple:
                     return "=";
                 case AssignmentOperator.Plus:
@@ -27,8 +29,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
                     return "*=";
                 case AssignmentOperator.Slash:
                     return "/=";
-                default:
-                    throw ExhaustiveMatch.Failed(@operator);
             }
         }
     }
