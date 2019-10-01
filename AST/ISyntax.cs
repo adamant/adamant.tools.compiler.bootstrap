@@ -8,7 +8,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(IStatementSyntax),
         typeof(IParameterSyntax),
         typeof(IUsingDirectiveSyntax),
-        typeof(IModifierSyntax),
         typeof(ICompilationUnitSyntax),
         typeof(IArgumentSyntax),
         typeof(ITypeSyntax),
