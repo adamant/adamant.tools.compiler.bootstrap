@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Scopes;
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 {
     /// <summary>
-    /// Assigns containing scopes to <see cref="TypeSyntax"/> nodes.
+    /// Assigns containing scopes to <see cref="Adamant.Tools.Compiler.Bootstrap.Parsing.Tree.TypeSyntax"/> nodes.
     /// </summary>
     public class TypeScopesBuilder : TypeWalker
     {
@@ -16,19 +16,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             this.containingScope = containingScope;
         }
 
-        public override void Enter(MutableTypeSyntax mutableType)
+        public override void Enter(IMutableTypeSyntax mutableType)
         {
         }
 
-        public override void Enter(ReferenceLifetimeSyntax referenceLifetime)
+        public override void Enter(IReferenceLifetimeSyntax referenceLifetime)
         {
         }
 
-        public override void Enter(SelfTypeSyntax selfType)
+        public override void Enter(ISelfTypeSyntax selfType)
         {
         }
 
-        public override void Enter(TypeNameSyntax typeName)
+        public override void Enter(ITypeNameSyntax typeName)
         {
             typeName.ContainingScope = containingScope;
         }

@@ -40,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             VisitExpression(foreachExpression.Block, containingScope);
         }
 
-        public override void VisitTypeName(TypeNameSyntax typeName, LexicalScope containingScope)
+        public override void VisitTypeName(ITypeNameSyntax typeName, LexicalScope containingScope)
         {
             typeName.ContainingScope = containingScope;
         }

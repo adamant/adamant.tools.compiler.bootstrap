@@ -104,7 +104,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             }
         }
 
-        public virtual void VisitType(TypeSyntax? type, A args)
+        public virtual void VisitType(ITypeSyntax? type, A args)
         {
             switch (type)
             {
@@ -113,27 +113,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case null:
                     // Do nothing
                     break;
-                case TypeNameSyntax typeName:
+                case ITypeNameSyntax typeName:
                     VisitTypeName(typeName, args);
                     break;
-                case MutableTypeSyntax mutableType:
+                case IMutableTypeSyntax mutableType:
                     VisitMutableType(mutableType, args);
                     break;
-                case ReferenceLifetimeSyntax referenceLifetime:
+                case IReferenceLifetimeSyntax referenceLifetime:
                     VisitReferenceLifetime(referenceLifetime, args);
                     break;
-                case SelfTypeSyntax selfType:
+                case ISelfTypeSyntax selfType:
                     VisitSelfType(selfType, args);
                     break;
             }
         }
 
-        public virtual void VisitSelfType(SelfTypeSyntax selfType, A args)
+        public virtual void VisitSelfType(ISelfTypeSyntax selfType, A args)
         {
 
         }
 
-        public virtual void VisitTypeName(TypeNameSyntax typeName, A args)
+        public virtual void VisitTypeName(ITypeNameSyntax typeName, A args)
         {
         }
 
@@ -159,7 +159,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             VisitExpression(moveExpression.Expression, args);
         }
 
-        public virtual void VisitMutableType(MutableTypeSyntax mutableType, A args)
+        public virtual void VisitMutableType(IMutableTypeSyntax mutableType, A args)
         {
             VisitType(mutableType.Referent, args);
         }
@@ -293,7 +293,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             VisitExpression(argument.Value, args);
         }
 
-        public virtual void VisitReferenceLifetime(ReferenceLifetimeSyntax referenceLifetime, A args)
+        public virtual void VisitReferenceLifetime(IReferenceLifetimeSyntax referenceLifetime, A args)
         {
             VisitType(referenceLifetime.ReferentType, args);
         }

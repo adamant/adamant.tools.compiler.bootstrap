@@ -13,7 +13,7 @@ using ExhaustiveMatching;
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 {
     /// <summary>
-    /// Analyzes a <see cref="TypeSyntax" /> to evaluate which type it refers to.
+    /// Analyzes a <see cref="Adamant.Tools.Compiler.Bootstrap.Parsing.Tree.TypeSyntax" /> to evaluate which type it refers to.
     /// </summary>
     public class BasicTypeAnalyzer
     {
@@ -31,13 +31,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             this.statementAnalyzer = statementAnalyzer;
         }
 
-        public DataType Evaluate(TypeSyntax typeSyntax)
+        public DataType Evaluate(ITypeSyntax typeSyntax)
         {
             switch (typeSyntax)
             {
                 default:
                     throw ExhaustiveMatch.Failed(typeSyntax);
-                case TypeNameSyntax typeName:
+                case ITypeNameSyntax typeName:
                 {
                     var symbols = typeName.LookupInContainingScope().OfType<ITypeSymbol>().ToFixedList();
                     switch (symbols.Count)
@@ -60,7 +60,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     }
                     break;
                 }
-                case ReferenceLifetimeSyntax referenceLifetime:
+                case IReferenceLifetimeSyntax referenceLifetime:
                 {
                     var type = Evaluate(referenceLifetime.ReferentType);
                     if (type == DataType.Unknown)
@@ -83,7 +83,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 //            // TODO evaluate to type
                 //            return DataType.Unknown;
                 //    }
-                case MutableTypeSyntax mutableType:
+                case IMutableTypeSyntax mutableType:
                 {
                     var type = Evaluate(mutableType.Referent);
                     switch (type)
@@ -97,7 +97,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     }
                     break;
                 }
-                case SelfTypeSyntax selfType:
+                case ISelfTypeSyntax selfType:
                     throw new NotImplementedException();
             }
 

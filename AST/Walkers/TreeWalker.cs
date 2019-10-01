@@ -37,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
             }
         }
 
-        public void Walk(TypeSyntax type)
+        public void Walk(ITypeSyntax type)
         {
             if (typeWalker is null || typeWalker.ShouldSkip(type))
                 return;
@@ -46,21 +46,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
             {
                 default:
                     throw ExhaustiveMatch.Failed(type);
-                case MutableTypeSyntax mutableType:
+                case IMutableTypeSyntax mutableType:
                     typeWalker.Enter(mutableType);
                     Walk(mutableType.Referent);
                     typeWalker.Exit(mutableType);
                     break;
-                case ReferenceLifetimeSyntax referenceLifetime:
+                case IReferenceLifetimeSyntax referenceLifetime:
                     typeWalker.Enter(referenceLifetime);
                     Walk(referenceLifetime.ReferentType);
                     typeWalker.Exit(referenceLifetime);
                     break;
-                case SelfTypeSyntax selfType:
+                case ISelfTypeSyntax selfType:
                     typeWalker.Enter(selfType);
                     typeWalker.Exit(selfType);
                     break;
-                case TypeNameSyntax typeName:
+                case ITypeNameSyntax typeName:
                     typeWalker.Enter(typeName);
                     typeWalker.Exit(typeName);
                     break;

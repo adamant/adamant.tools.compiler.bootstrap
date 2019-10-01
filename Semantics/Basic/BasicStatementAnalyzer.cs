@@ -829,7 +829,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         //}
 
         // Re-expose type analyzer to BasicAnalyzer
-        public DataType EvaluateType(TypeSyntax typeSyntax)
+        public DataType EvaluateType(ITypeSyntax typeSyntax)
         {
             return typeAnalyzer.Evaluate(typeSyntax);
         }

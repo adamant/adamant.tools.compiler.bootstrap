@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     {
         public bool IsExternalFunction { get; set; }
         public ExpressionSyntax? LifetimeBounds { get; }
-        public TypeSyntax? ReturnTypeSyntax { get; }
+        public ITypeSyntax? ReturnTypeSyntax { get; }
 
         IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;
 
@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan nameSpan,
             FixedList<IParameterSyntax> parameters, // For now we will not support pure meta functions
             ExpressionSyntax? lifetimeBounds,
-            TypeSyntax? returnTypeSyntax,
+            ITypeSyntax? returnTypeSyntax,
             FixedList<IStatementSyntax>? body)
             : base(span, file, modifiers, fullName, nameSpan, parameters, body)
         {

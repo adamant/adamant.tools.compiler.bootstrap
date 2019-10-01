@@ -1,19 +1,16 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    [Closed(
-        typeof(ReferenceLifetimeSyntax),
-        typeof(SelfTypeSyntax),
-        typeof(TypeNameSyntax),
-        typeof(MutableTypeSyntax))]
-    public abstract class TypeSyntax : Syntax, ITypeSyntax
+    internal abstract class TypeSyntax : Syntax, ITypeSyntax
     {
         private DataType? namedType;
 
+        [DisallowNull]
         public DataType? NamedType
         {
             get => namedType;

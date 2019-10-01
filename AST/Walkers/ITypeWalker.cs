@@ -1,22 +1,22 @@
 namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
 {
     /// <summary>
-    /// A walker for <see cref="TypeSyntax"/> trees.
+    /// A walker for <see cref="Adamant.Tools.Compiler.Bootstrap.Parsing.Tree.TypeSyntax"/> trees.
     /// </summary>
     public interface ITypeWalker
     {
-        bool ShouldSkip(TypeSyntax type);
+        bool ShouldSkip(ITypeSyntax type);
 
-        void Enter(MutableTypeSyntax mutableType);
-        void Exit(MutableTypeSyntax mutableType);
+        void Enter(IMutableTypeSyntax mutableType);
+        void Exit(IMutableTypeSyntax mutableType);
 
-        void Enter(ReferenceLifetimeSyntax referenceLifetime);
-        void Exit(ReferenceLifetimeSyntax referenceLifetime);
+        void Enter(IReferenceLifetimeSyntax referenceLifetime);
+        void Exit(IReferenceLifetimeSyntax referenceLifetime);
 
-        void Enter(SelfTypeSyntax selfType);
-        void Exit(SelfTypeSyntax selfType);
+        void Enter(ISelfTypeSyntax selfType);
+        void Exit(ISelfTypeSyntax selfType);
 
-        void Enter(TypeNameSyntax typeName);
-        void Exit(TypeNameSyntax typeName);
+        void Enter(ITypeNameSyntax typeName);
+        void Exit(ITypeNameSyntax typeName);
     }
 }

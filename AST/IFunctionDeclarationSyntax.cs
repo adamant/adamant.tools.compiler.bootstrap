@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public interface IFunctionDeclarationSyntax : INonMemberEntityDeclarationSyntax, ICallableDeclarationSyntax
     {
         bool IsExternalFunction { get; set; }
-        TypeSyntax? ReturnTypeSyntax { get; }
+        ITypeSyntax? ReturnTypeSyntax { get; }
         new TypePromise ReturnType { get; }
     }
 }

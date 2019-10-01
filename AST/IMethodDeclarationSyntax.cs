@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         FixedList<IStatementSyntax>? Body { get; }
         [DisallowNull] DataType? SelfParameterType { get; set; }
         new TypePromise ReturnType { get; }
-        TypeSyntax? ReturnTypeSyntax { get; }
+        ITypeSyntax? ReturnTypeSyntax { get; }
         [DisallowNull] ControlFlowGraph? ControlFlow { get; set; }
     }
 }

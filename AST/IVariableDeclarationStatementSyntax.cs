@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         TextSpan NameSpan { get; }
         SimpleName Name { get; }
-        TypeSyntax TypeSyntax { get; }
+        ITypeSyntax TypeSyntax { get; }
         new DataType? Type { get; set; }
         ExpressionSyntax Initializer { get; }
         ref ExpressionSyntax InitializerRef { get; }

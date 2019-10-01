@@ -3,13 +3,14 @@ using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Parsing.Tree;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public partial class Parser
     {
-        public TypeSyntax ParseType()
+        public ITypeSyntax ParseType()
         {
             switch (Tokens.Current)
             {
@@ -42,14 +43,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
-        private TypeNameSyntax ParseTypeName()
+        private ITypeNameSyntax ParseTypeName()
         {
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = new SimpleName(identifier.Value);
             return new TypeNameSyntax(identifier.Span, name);
         }
 
-        private TypeNameSyntax ParsePrimitiveType()
+        private ITypeNameSyntax ParsePrimitiveType()
         {
             var keyword = Tokens.RequiredToken<IPrimitiveTypeToken>();
             SimpleName name;

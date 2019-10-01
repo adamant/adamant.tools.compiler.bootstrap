@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         /// though, the type name is the name of the unnamed constructor. Thus,
         /// this expression's type could be either an object type, or member type.
         /// </summary>
-        public TypeNameSyntax Constructor { get; }
+        public ITypeNameSyntax Constructor { get; }
         public FixedList<IArgumentSyntax> Arguments { get; }
         private ISymbol? constructorSymbol;
         public ISymbol? ConstructorSymbol
@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 
         public NewObjectExpressionSyntax(
             TextSpan span,
-            TypeNameSyntax constructor,
+            ITypeNameSyntax constructor,
             FixedList<IArgumentSyntax> arguments)
             : base(span)
         {

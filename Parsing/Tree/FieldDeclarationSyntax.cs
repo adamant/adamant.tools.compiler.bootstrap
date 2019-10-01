@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         private ExpressionSyntax? initializer;
         public FixedList<IModiferToken> Modifiers { get; }
         public bool IsMutableBinding { get; }
-        public TypeSyntax? TypeSyntax { get; }
+        public ITypeSyntax? TypeSyntax { get; }
 
         public ExpressionSyntax? Initializer => initializer;
         public ref ExpressionSyntax? InitializerRef => ref initializer;
@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             bool mutableBinding,
             Name fullName,
             TextSpan nameSpan,
-            TypeSyntax? typeSyntax,
+            ITypeSyntax? typeSyntax,
             ExpressionSyntax? initializer)
             : base(span, file, fullName, nameSpan)
         {

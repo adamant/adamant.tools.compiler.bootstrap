@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SimpleName VariableName => FullVariableName.UnqualifiedName;
-        public TypeSyntax? TypeSyntax { get; }
+        public ITypeSyntax? TypeSyntax { get; }
         public ExpressionSyntax InExpression;
         public BlockSyntax Block { get; }
 
@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             TextSpan span,
             bool isMutableBinding,
             Name fullVariableName,
-            TypeSyntax? typeSyntax,
+            ITypeSyntax? typeSyntax,
             ExpressionSyntax inExpression,
             BlockSyntax block)
             : base(span)

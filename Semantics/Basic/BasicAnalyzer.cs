@@ -202,7 +202,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private static void ResolveReturnType(
             TypePromise returnTypePromise,
-            TypeSyntax returnTypeSyntax,
+            ITypeSyntax returnTypeSyntax,
             BasicStatementAnalyzer analyzer)
         {
             returnTypePromise.BeginFulfilling();

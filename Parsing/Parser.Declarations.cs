@@ -145,7 +145,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var binding = Tokens.Expect<IBindingToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(identifier.Value);
-            TypeSyntax? type = null;
+            ITypeSyntax? type = null;
             if (Tokens.Accept<IColonToken>())
                 type = ParseType();
 
@@ -169,7 +169,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var bodyParser = NestedParser(name);
             var parameters = bodyParser.ParseParameters();
             var lifetimeBounds = bodyParser.ParseLifetimeBounds();
-            TypeSyntax? returnType = null;
+            ITypeSyntax? returnType = null;
             if (Tokens.Accept<IRightArrowToken>())
                 returnType = ParseType();
 
@@ -199,7 +199,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var bodyParser = NestedParser(name);
             var parameters = bodyParser.ParseParameters();
             var lifetimeBounds = bodyParser.ParseLifetimeBounds();
-            TypeSyntax? returnType = null;
+            ITypeSyntax? returnType = null;
             if (Tokens.Accept<IRightArrowToken>())
                 returnType = ParseType();
 

@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public SimpleName Name => FullName.UnqualifiedName;
 
         public TextSpan NameSpan { get; }
-        public TypeSyntax TypeSyntax { get; }
+        public ITypeSyntax TypeSyntax { get; }
         private DataType? type;
 
 
@@ -47,7 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             bool isMutableBinding,
             Name fullName,
             TextSpan nameSpan,
-            TypeSyntax typeSyntax,
+            ITypeSyntax typeSyntax,
             ExpressionSyntax initializer)
             : base(span)
         {

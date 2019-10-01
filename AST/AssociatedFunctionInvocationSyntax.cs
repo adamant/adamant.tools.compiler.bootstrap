@@ -6,12 +6,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class AssociatedFunctionInvocationSyntax : InvocationSyntax
     {
-        public TypeSyntax TypeSyntax { get; }
+        public ITypeSyntax TypeSyntax { get; }
         public SimpleName AssociatedFunctionName { get; }
 
         public AssociatedFunctionInvocationSyntax(
             TextSpan span,
-            TypeSyntax typeSyntax,
+            ITypeSyntax typeSyntax,
             SimpleName associatedFunctionName,
             FixedList<IArgumentSyntax> arguments)
             : base(span, associatedFunctionName, arguments)
