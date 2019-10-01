@@ -1,11 +1,11 @@
 using System.Diagnostics;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-
     [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
-    public abstract class Syntax : ISyntax
+    internal abstract class Syntax : ISyntax
     {
         public TextSpan Span { get; }
 
