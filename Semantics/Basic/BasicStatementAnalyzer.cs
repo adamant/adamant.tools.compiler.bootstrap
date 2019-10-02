@@ -367,7 +367,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
                 case INewObjectExpressionSyntax newObjectExpression:
                 {
-                    var argumentTypes = newObjectExpression.Arguments.Select(InferArgumentType).ToFixedList();
+                    var argumentTypes = newObjectExpression.Arguments.Select(argument => InferExpressionType(ref argument.Value)).ToFixedList();
                     // TODO handle named constructors here
                     var constructingType = typeAnalyzer.Evaluate(newObjectExpression.TypeSyntax);
                     if (!constructingType.IsKnown)
@@ -437,7 +437,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     // * Invoke a static function
                     // * Invoke a method
                     // * Invoke a function pointer
-                    var argumentTypes = methodInvocation.Arguments.Select(InferArgumentType).ToFixedList();
+                    var argumentTypes = methodInvocation.Arguments.Select(argument => InferExpressionType(ref argument.Value)).ToFixedList();
                     InferExpressionType(ref methodInvocation.Target);
                     var targetType = methodInvocation.Target.Type;
                     // If it is unknown, we already reported an error
@@ -582,7 +582,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private DataType InferFunctionInvocationType(IFunctionInvocationExpressionSyntax functionInvocationExpression)
         {
-            var argumentTypes = functionInvocationExpression.Arguments.Select(InferArgumentType).ToFixedList();
+            var argumentTypes = functionInvocationExpression.Arguments.Select(argument => InferExpressionType(ref argument.Value)).ToFixedList();
             var symbols = functionInvocationExpression.FunctionNameSyntax.LookupInContainingScope()
                 .OfType<IFunctionSymbol>().ToFixedList();
             symbols = ResolveOverload(symbols, null, argumentTypes);
@@ -765,11 +765,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     identifier.ReferencedSymbol = UnknownSymbol.Instance;
                     return identifier.Type = DataType.Unknown;
             }
-        }
-
-        private DataType InferArgumentType(IArgumentSyntax argument)
-        {
-            return InferExpressionType(ref argument.Value);
         }
 
         private bool NumericOperatorTypesAreCompatible(

@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan span,
             ITypeSyntax typeSyntax,
             INameExpressionSyntax functionNameSyntax,
-            FixedList<IArgumentSyntax> arguments)
+            FixedList<Argument> arguments)
             : base(span, functionNameSyntax.Name, arguments)
         {
             TypeSyntax = typeSyntax;

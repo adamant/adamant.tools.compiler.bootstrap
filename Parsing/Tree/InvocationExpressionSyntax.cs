@@ -8,12 +8,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal abstract class InvocationExpressionSyntax : ExpressionSyntax, IInvocationExpressionSyntax
     {
         public Name FullName { get; }
-        public FixedList<IArgumentSyntax> Arguments { get; }
+        public FixedList<Argument> Arguments { get; }
 
         private protected InvocationExpressionSyntax(
             TextSpan span,
             Name functionName,
-            FixedList<IArgumentSyntax> arguments)
+            FixedList<Argument> arguments)
             : base(span)
         {
             Arguments = arguments;

@@ -9,7 +9,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(IParameterSyntax),
         typeof(IUsingDirectiveSyntax),
         typeof(ICompilationUnitSyntax),
-        typeof(IArgumentSyntax),
         typeof(ITypeSyntax),
         typeof(IExpressionSyntax))]
     public interface ISyntax

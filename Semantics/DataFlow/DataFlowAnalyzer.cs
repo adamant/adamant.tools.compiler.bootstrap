@@ -83,7 +83,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
         {
             // overriden to avoid visiting the function name
             foreach (var argument in functionInvocationExpression.Arguments)
-                VisitArgument(argument, args);
+                VisitExpression(argument.Value, args);
         }
     }
 }

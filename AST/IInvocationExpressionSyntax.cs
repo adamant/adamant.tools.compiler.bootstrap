@@ -11,6 +11,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public interface IInvocationExpressionSyntax : IExpressionSyntax
     {
         Name FullName { get; }
-        FixedList<IArgumentSyntax> Arguments { get; }
+        FixedList<Argument> Arguments { get; }
     }
 }

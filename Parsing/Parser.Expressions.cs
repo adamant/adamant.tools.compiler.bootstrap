@@ -517,15 +517,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return expression;
         }
 
-        public FixedList<IArgumentSyntax> ParseArguments()
+        public FixedList<Argument> ParseArguments()
         {
-            return AcceptSeparatedList<IArgumentSyntax, ICommaToken>(AcceptArgument);
+            return AcceptSeparatedList<Argument, ICommaToken>(AcceptArgument);
         }
 
-        private IArgumentSyntax? AcceptArgument()
+        private Argument? AcceptArgument()
         {
             var value = AcceptExpression();
-            return value == null ? null : new ArgumentSyntax(value.Span, value);
+            return value == null ? null : new Argument(value);
         }
 
         public IBlockOrResultSyntax ParseBlockOrResult()

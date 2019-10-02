@@ -1,4 +1,3 @@
-using System;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
@@ -296,12 +295,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         {
             VisitType(newObjectExpression.TypeSyntax, args);
             foreach (var argument in newObjectExpression.Arguments)
-                VisitArgument(argument, args);
-        }
-
-        public virtual void VisitArgument(IArgumentSyntax argument, A args)
-        {
-            VisitExpression(argument.Value, args);
+                VisitExpression(argument.Value, args);
         }
 
         public virtual void VisitReferenceLifetimeType(IReferenceLifetimeTypeSyntax referenceLifetimeType, A args)
@@ -361,20 +355,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         {
             VisitNameExpression(functionInvocationExpression.FunctionNameSyntax, args);
             foreach (var argument in functionInvocationExpression.Arguments)
-                VisitArgument(argument, args);
+                VisitExpression(argument.Value, args);
         }
 
         public virtual void VisitAssociatedFunctionInvocation(IAssociatedFunctionInvocationExpressionSyntax associatedFunctionInvocationExpression, A args)
         {
             foreach (var argument in associatedFunctionInvocationExpression.Arguments)
-                VisitArgument(argument, args);
+                VisitExpression(argument.Value, args);
         }
 
         public virtual void VisitMethodInvocation(IMethodInvocationExpressionSyntax methodInvocationExpression, A args)
         {
             VisitExpression(methodInvocationExpression.Target, args);
             foreach (var argument in methodInvocationExpression.Arguments)
-                VisitArgument(argument, args);
+                VisitExpression(argument.Value, args);
         }
 
         public virtual void VisitReturnExpression(IReturnExpressionSyntax returnExpression, A args)
