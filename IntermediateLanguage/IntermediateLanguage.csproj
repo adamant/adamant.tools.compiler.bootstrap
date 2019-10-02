@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <AssemblyName>Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage</AssemblyName>
-    <RootNamespace>Adamt.Tools.Compiler.Bootstrap.IntermediateLanguage</RootNamespace>
+    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage</RootNamespace>
     <LangVersion>8.0</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
