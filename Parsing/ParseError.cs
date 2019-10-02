@@ -31,11 +31,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new Diagnostic(file, found.Span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3003, $"Expected `{expected.GetFriendlyName()}` found `{found.Text(file.Code)}`");
         }
 
-        public static Diagnostic OwnedNotValidAsGenericLifetimeParameter(CodeFile file, TextSpan span)
-        {
-            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3004, "The lifetime `$owned` cannot be used as a generic lifetime parameter.");
-        }
-
         public static Diagnostic DeclarationNotAllowedInExternal(CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3004, "Only function declarations are allowed in external blocks");

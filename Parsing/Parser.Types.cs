@@ -1,10 +1,10 @@
 using System;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Parsing.Tree;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
@@ -14,16 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             switch (Tokens.Current)
             {
-                //case IDollarToken _:
-                //    if (minPrecedence <= OperatorPrecedence.Lifetime)
-                //    {
-                //        Tokens.RequiredToken<IDollarToken>();
-                //        var (nameSpan, lifetime) = ParseLifetimeName();
-                //        expression = new ReferenceLifetimeSyntax(expression, nameSpan, lifetime);
-                //        continue;
-                //    }
 
-                //    break;
                 case IMutableKeywordToken _:
                 {
                     var mutableKeyword = Tokens.Expect<IMutableKeywordToken>();
@@ -53,6 +44,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             SimpleName name;
             switch (keyword)
             {
+                default:
+                    throw ExhaustiveMatch.Failed(keyword);
                 case IVoidKeywordToken _:
                     name = SpecialName.Void;
                     break;
@@ -80,8 +73,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IOffsetKeywordToken _:
                     name = SpecialName.Offset;
                     break;
-                default:
-                    throw NonExhaustiveMatchException.For(keyword);
             }
 
             return new TypeNameSyntax(keyword.Span, name);

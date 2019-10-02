@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public partial class Parser
     {
-        private INameExpressionSyntax ParseSimpleName()
+        private INameExpressionSyntax ParseNameExpression()
         {
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = new SimpleName(identifier.Value);

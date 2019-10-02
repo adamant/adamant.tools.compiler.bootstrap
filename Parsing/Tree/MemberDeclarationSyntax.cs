@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -8,7 +9,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal abstract class MemberDeclarationSyntax : DeclarationSyntax, IMemberDeclarationSyntax
     {
-        public IClassDeclarationSyntax DeclaringType { get; internal set; }
+        private IClassDeclarationSyntax? declaringType;
+
+        public IClassDeclarationSyntax DeclaringType
+        {
+            get => declaringType ?? throw new InvalidOperationException("Declaring type not set");
+            internal set => declaringType = value ?? throw new ArgumentNullException();
+        }
 
         public Name FullName { get; }
 

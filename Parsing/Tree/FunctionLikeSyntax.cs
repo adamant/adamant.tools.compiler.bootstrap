@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
-using Adamant.Tools.Compiler.Bootstrap.AST.Visitors;
+using Adamant.Tools.Compiler.Bootstrap.AST.Walkers;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
@@ -24,8 +24,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             set
             {
                 if (selfParameterType != null)
-                    throw new InvalidOperationException("Can't set type repeatedly");
-                selfParameterType = value ?? throw new ArgumentException();
+                    throw new InvalidOperationException("Can't set SelfParameterType repeatedly");
+                selfParameterType = value ?? throw new ArgumentNullException();
             }
         }
 
@@ -35,8 +35,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public virtual FixedList<IStatementSyntax>? Body { get; }
         public TypePromise ReturnType { get; } = new TypePromise();
         DataType IFunctionSymbol.ReturnType => ReturnType.Fulfilled();
+
+        private ControlFlowGraph? controlFlow;
+
         [DisallowNull]
-        public ControlFlowGraph? ControlFlow { get; set; }
+        public ControlFlowGraph? ControlFlow
+        {
+            get => controlFlow;
+            set
+            {
+                if (controlFlow != null)
+                    throw new InvalidOperationException("Can't set ControlFlow repeatedly");
+                controlFlow = value ?? throw new ArgumentNullException();
+            }
+        }
 
         protected FunctionLikeSyntax(
             TextSpan span,
@@ -58,24 +70,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
              FixedList<IParameterSyntax> parameters,
              FixedList<IStatementSyntax>? body)
         {
-            var variableDeclarations = GetVariableDeclarations(body);
+            var variableDeclarations = body?.GetAllVariableDeclarations() ?? Enumerable.Empty<IVariableDeclarationStatementSyntax>();
             return ((IEnumerable<ISymbol>)parameters).Concat(variableDeclarations);
-        }
-
-        private static IReadOnlyList<IVariableDeclarationStatementSyntax> GetVariableDeclarations(
-            FixedList<IStatementSyntax>? body)
-        {
-            var visitor = new GetVariableDeclarationsVisitor();
-            if (body != null)
-                foreach (var statement in body)
-                    visitor.VisitStatement(statement, default);
-            var variableDeclarations = visitor.VariableDeclarations;
-            return variableDeclarations;
-        }
-
-        public IReadOnlyList<IVariableDeclarationStatementSyntax> GetVariableDeclarations()
-        {
-            return GetVariableDeclarations(Body);
         }
     }
 }

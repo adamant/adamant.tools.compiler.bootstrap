@@ -4,7 +4,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
     {
         bool ShouldSkip(IDeclarationSyntax declaration);
 
-        bool Enter(IClassDeclarationSyntax classDeclaration);
+        void Enter(IClassDeclarationSyntax classDeclaration);
         void Exit(IClassDeclarationSyntax classDeclaration);
     }
 }

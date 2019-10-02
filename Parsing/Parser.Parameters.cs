@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var dot = Tokens.Expect<IDotToken>();
                     var identifier = Tokens.RequiredToken<IIdentifierToken>();
                     var equals = Tokens.AcceptToken<IEqualsToken>();
-                    IExpressionSyntax defaultValue = null;
+                    IExpressionSyntax? defaultValue = null;
                     if (equals != null)
                         defaultValue = ParseExpression();
                     var span = TextSpan.Covering(dot, identifier.Span, defaultValue?.Span);
@@ -43,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var name = nameContext.Qualify(variableNumbers.VariableName(identifier.Value));
                     Tokens.Expect<IColonToken>();
                     var type = ParseType();
-                    IExpressionSyntax defaultValue = null;
+                    IExpressionSyntax? defaultValue = null;
                     if (Tokens.Accept<IEqualsToken>())
                         defaultValue = ParseExpression();
                     span = TextSpan.Covering(span, type.Span, defaultValue?.Span);

@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             where T : class
         {
             return new Generator<T?>(acceptItem)
-                .TakeWhile(t => t != null).ToFixedList();
+                .TakeWhile(t => t != null).ToFixedList()!;
         }
 
         public FixedList<T> ParseMany<T, TTerminator>(Func<T> parseItem)

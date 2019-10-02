@@ -333,7 +333,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         public virtual void VisitLiteralExpression(ILiteralExpressionSyntax literalExpression, A args)
         {
             // TODO this should dispatch on the type of literal
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         public void VisitInvocationExpression(IInvocationExpressionSyntax? invocation, A args)

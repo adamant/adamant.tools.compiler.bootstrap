@@ -57,11 +57,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(variableNumbers.VariableName(identifier.Value));
-            ITypeSyntax type = null;
+            ITypeSyntax? type = null;
             if (Tokens.Accept<IColonToken>())
                 type = ParseType();
 
-            IExpressionSyntax initializer = null;
+            IExpressionSyntax? initializer = null;
             if (Tokens.Accept<IEqualsToken>())
                 initializer = ParseExpression();
 
@@ -104,7 +104,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 Tokens.Next();
 
             // Consume the semicolon if we aren't at the end of the file.
-            var _ = Tokens.Accept<ISemicolonToken>();
+            _ = Tokens.Accept<ISemicolonToken>();
         }
     }
 }

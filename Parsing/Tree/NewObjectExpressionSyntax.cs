@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             {
                 if (constructorSymbol != null)
                     throw new InvalidOperationException("Can't set constructor symbol repeatedly");
-                constructorSymbol = value ?? throw new ArgumentException();
+                constructorSymbol = value ?? throw new ArgumentNullException();
             }
         }
 
@@ -44,7 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             {
                 if (constructorType != null)
                     throw new InvalidOperationException("Can't set constructor type repeatedly");
-                constructorType = value ?? throw new ArgumentException();
+                constructorType = value ?? throw new ArgumentNullException();
 
             }
         }
@@ -63,7 +63,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public override string ToString()
         {
-            return $"new {TypeSyntax}({string.Join(", ", Arguments)})";
+            var name = ConstructorName != null ? "."+ConstructorName : "";
+            return $"new {TypeSyntax}{name}({string.Join(", ", Arguments)})";
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public partial class Parser
     {
-        public IExpressionSyntax AcceptExpression()
+        public IExpressionSyntax? AcceptExpression()
         {
             switch (Tokens.Current)
             {
@@ -42,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
             for (; ; )
             {
-                IOperatorToken @operator = null;
+                IBinaryOperatorToken? @operator = null;
                 OperatorPrecedence? precedence = null;
                 var leftAssociative = true;
                 switch (Tokens.Current)
@@ -56,28 +56,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         {
                             precedence = OperatorPrecedence.Assignment;
                             leftAssociative = false;
-                            @operator = Tokens.RequiredToken<IOperatorToken>();
+                            @operator = Tokens.RequiredToken<IBinaryOperatorToken>();
                         }
                         break;
                     case IQuestionQuestionToken _:
                         if (minPrecedence <= OperatorPrecedence.Coalesce)
                         {
                             precedence = OperatorPrecedence.Coalesce;
-                            @operator = Tokens.RequiredToken<IOperatorToken>();
+                            @operator = Tokens.RequiredToken<IBinaryOperatorToken>();
                         }
                         break;
                     case IOrKeywordToken _:
                         if (minPrecedence <= OperatorPrecedence.LogicalOr)
                         {
                             precedence = OperatorPrecedence.LogicalOr;
-                            @operator = Tokens.RequiredToken<IOperatorToken>();
+                            @operator = Tokens.RequiredToken<IBinaryOperatorToken>();
                         }
                         break;
                     case IAndKeywordToken _:
                         if (minPrecedence <= OperatorPrecedence.LogicalAnd)
                         {
                             precedence = OperatorPrecedence.LogicalAnd;
-                            @operator = Tokens.RequiredToken<IOperatorToken>();
+                            @operator = Tokens.RequiredToken<IBinaryOperatorToken>();
                         }
                         break;
                     case IEqualsEqualsToken _:
@@ -85,7 +85,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         if (minPrecedence <= OperatorPrecedence.Equality)
                         {
                             precedence = OperatorPrecedence.Equality;
-                            @operator = Tokens.RequiredToken<IOperatorToken>();
+                            @operator = Tokens.RequiredToken<IBinaryOperatorToken>();
                         }
                         break;
                     case ILessThanToken _:
@@ -97,7 +97,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         if (minPrecedence <= OperatorPrecedence.Relational)
                         {
                             precedence = OperatorPrecedence.Relational;
-                            @operator = Tokens.RequiredToken<IOperatorToken>();
+                            @operator = Tokens.RequiredToken<IBinaryOperatorToken>();
                         }
                         break;
                     case IDotDotToken _:
@@ -107,7 +107,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         if (minPrecedence <= OperatorPrecedence.Range)
                         {
                             precedence = OperatorPrecedence.Range;
-                            @operator = Tokens.RequiredToken<IOperatorToken>();
+                            @operator = Tokens.RequiredToken<IBinaryOperatorToken>();
                         }
                         break;
                     case IPlusToken _:
@@ -115,7 +115,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         if (minPrecedence <= OperatorPrecedence.Additive)
                         {
                             precedence = OperatorPrecedence.Additive;
-                            @operator = Tokens.RequiredToken<IOperatorToken>();
+                            @operator = Tokens.RequiredToken<IBinaryOperatorToken>();
                         }
                         break;
                     case IAsteriskToken _:
@@ -123,18 +123,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         if (minPrecedence <= OperatorPrecedence.Multiplicative)
                         {
                             precedence = OperatorPrecedence.Multiplicative;
-                            @operator = Tokens.RequiredToken<IOperatorToken>();
+                            @operator = Tokens.RequiredToken<IBinaryOperatorToken>();
                         }
                         break;
-                    //case IDollarToken _:
-                    //    if (minPrecedence <= OperatorPrecedence.Lifetime)
-                    //    {
-                    //        Tokens.RequiredToken<IDollarToken>();
-                    //        var (nameSpan, lifetime) = ParseLifetimeName();
-                    //        expression = new ReferenceLifetimeSyntax(expression, nameSpan, lifetime);
-                    //        continue;
-                    //    }
-                    //    break;
                     case IQuestionToken _: // TODO this be a type
                         if (minPrecedence <= OperatorPrecedence.Unary)
                         {
@@ -162,7 +153,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         {
                             // Member Access
                             var accessOperator = BuildAccessOperator(Tokens.RequiredToken<IAccessOperatorToken>());
-                            var member = ParseSimpleName();
+                            var member = ParseNameExpression();
                             if (!(Tokens.Current is IOpenParenToken))
                             {
                                 var memberAccessSpan = TextSpan.Covering(expression.Span, member.Span);
@@ -183,14 +174,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         return expression;
                 }
 
-                if (@operator is IOperatorToken operatorToken &&
+                if (!(@operator is null) &&
                     precedence is OperatorPrecedence operatorPrecedence)
                 {
                     if (leftAssociative)
                         operatorPrecedence += 1;
 
                     var rightOperand = ParseExpression(operatorPrecedence);
-                    expression = BuildOperatorExpression(expression, (IBinaryOperatorToken)operatorToken, rightOperand);
+                    expression = BuildBinaryOperatorExpression(expression, @operator, rightOperand);
                 }
                 else
                 {
@@ -213,7 +204,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
-        private static ExpressionSyntax BuildOperatorExpression(
+        private static IExpressionSyntax BuildBinaryOperatorExpression(
              IExpressionSyntax left,
              IBinaryOperatorToken operatorToken,
              IExpressionSyntax right)
@@ -340,7 +331,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 }
                 case IIdentifierToken _:
                 {
-                    var name = ParseSimpleName();
+                    var name = ParseNameExpression();
                     if (!(Tokens.Current is IOpenParenToken))
                         return name;
                     Tokens.RequiredToken<IOpenParenToken>();
@@ -383,7 +374,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 {
                     // implicit self etc.
                     var dot = Tokens.Required<IDotToken>();
-                    var member = ParseSimpleName();
+                    var member = ParseNameExpression();
                     var span = TextSpan.Covering(dot, member.Span);
                     return new MemberAccessExpressionSyntax(span, null, AccessOperator.Standard, member);
                 }
@@ -391,6 +382,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 {
                     var dollar = Tokens.Required<IDollarToken>();
                     var (span, lifetime) = ParseLifetimeName();
+                    if (lifetime is null)
+                        throw new NotImplementedException();
                     span = TextSpan.Covering(dollar, span);
                     return new LifetimeExpressionSyntax(span, lifetime);
                 }
@@ -410,7 +403,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
-        private IExpressionSyntax ParseUnsafeExpression()
+        private IUnsafeExpressionSyntax ParseUnsafeExpression()
         {
             var unsafeKeyword = Tokens.Expect<IUnsafeKeywordToken>();
             var isBlock = Tokens.Current is IOpenBraceToken;
@@ -421,7 +414,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new UnsafeExpressionSyntax(span, expression);
         }
 
-        private IExpressionSyntax ParsePrefixUnaryOperator(UnaryOperator @operator)
+        private IUnaryOperatorExpressionSyntax ParsePrefixUnaryOperator(UnaryOperator @operator)
         {
             var operatorSpan = Tokens.Required<IOperatorToken>();
             var operand = ParseExpression(OperatorPrecedence.Unary);
@@ -448,7 +441,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
-        private ExpressionSyntax ParseForeach()
+        private IForeachExpressionSyntax ParseForeach()
         {
             var foreachKeyword = Tokens.Expect<IForeachKeywordToken>();
             var mutableBinding = Tokens.Accept<IVarKeywordToken>();
@@ -464,7 +457,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new ForeachExpressionSyntax(span, mutableBinding, variableName, type, expression, block);
         }
 
-        private WhileExpressionSyntax ParseWhile()
+        private IWhileExpressionSyntax ParseWhile()
         {
             var whileKeyword = Tokens.Expect<IWhileKeywordToken>();
             var condition = ParseExpression();
@@ -473,7 +466,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new WhileExpressionSyntax(span, condition, block);
         }
 
-        private LoopExpressionSyntax ParseLoop()
+        private ILoopExpressionSyntax ParseLoop()
         {
             var loopKeyword = Tokens.Expect<ILoopKeywordToken>();
             var block = ParseBlock();
@@ -481,7 +474,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new LoopExpressionSyntax(span, block);
         }
 
-        private IfExpressionSyntax ParseIf(ParseAs parseAs = ParseAs.Expression)
+        private IIfExpressionSyntax ParseIf(ParseAs parseAs = ParseAs.Expression)
         {
             var @if = Tokens.Expect<IIfKeywordToken>();
             var condition = ParseExpression();
@@ -490,7 +483,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var span = TextSpan.Covering(@if, thenBlock.Span, elseClause?.Span);
             if (parseAs == ParseAs.Statement
                 && elseClause == null
-                && thenBlock is ResultStatementSyntax)
+                && thenBlock is IResultStatementSyntax)
             {
                 var semicolon = Tokens.Expect<ISemicolonToken>();
                 span = TextSpan.Covering(span, semicolon);
@@ -498,7 +491,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new IfExpressionSyntax(span, condition, thenBlock, elseClause);
         }
 
-        private IElseClauseSyntax AcceptElse(ParseAs parseAs)
+        private IElseClauseSyntax? AcceptElse(ParseAs parseAs)
         {
             if (!Tokens.Accept<IElseKeywordToken>())
                 return null;
@@ -506,7 +499,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 ? (IElseClauseSyntax)ParseIf(parseAs)
                 : ParseBlockOrResult();
             if (parseAs == ParseAs.Statement
-                && expression is ResultStatementSyntax)
+                && expression is IResultStatementSyntax)
                 Tokens.Expect<ISemicolonToken>();
             return expression;
         }

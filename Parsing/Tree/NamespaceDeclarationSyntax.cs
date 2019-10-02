@@ -44,7 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public override string ToString()
         {
-            throw new System.NotImplementedException();
+            return $"namespace {FullName} {{ … }}";
         }
     }
 }

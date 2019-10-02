@@ -87,7 +87,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new TextSpan(tokens.Current.Span.Start, 0);
         }
 
-        public static (IIdentifierToken, TextSpan) ExpectIdentifier(this ITokenIterator tokens)
+        public static (IIdentifierToken?, TextSpan) ExpectIdentifier(this ITokenIterator tokens)
         {
             if (tokens.Current is IIdentifierToken identifier)
             {

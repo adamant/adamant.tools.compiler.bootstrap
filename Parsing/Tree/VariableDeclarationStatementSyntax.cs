@@ -36,6 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         }
 
         private IExpressionSyntax? initializer;
+        [DisallowNull]
         public ref IExpressionSyntax? Initializer => ref initializer;
 
         [DebuggerHidden]

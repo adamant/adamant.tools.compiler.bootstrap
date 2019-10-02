@@ -28,12 +28,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         {
             switch (Fixity)
             {
+                default:
+                    throw ExhaustiveMatch.Failed(Fixity);
                 case UnaryOperatorFixity.Prefix:
                     return $"{Operator.ToSymbolString()}{Operand}";
                 case UnaryOperatorFixity.Postfix:
                     return $"{Operand}{Operator.ToSymbolString()}";
-                default:
-                    throw ExhaustiveMatch.Failed(Fixity);
+
             }
         }
     }

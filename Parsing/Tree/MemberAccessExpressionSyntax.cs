@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -7,11 +8,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class MemberAccessExpressionSyntax : ExpressionSyntax, IMemberAccessExpressionSyntax
     {
-        private IExpressionSyntax expression;
+        private IExpressionSyntax? expression;
 
-        /// <summary>
-        /// This expression is null for implicit member access i.e. self and enums
-        /// </summary>
+        [DisallowNull]
         public ref IExpressionSyntax? Expression => ref expression;
 
         public AccessOperator AccessOperator { get; }
@@ -21,7 +20,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public ISymbol? ReferencedSymbol
         {
             get => Member.ReferencedSymbol;
-            set => Member.ReferencedSymbol = value;
+            set
+            {
+                if (Member.ReferencedSymbol != null)
+                    throw new InvalidOperationException("Can't set ReferencedSymbol repeatedly");
+                Member.ReferencedSymbol = value ?? throw new ArgumentNullException();
+            }
         }
 
         public MemberAccessExpressionSyntax(

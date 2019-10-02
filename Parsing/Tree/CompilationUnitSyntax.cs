@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             return CodeFile.Reference.ToString();
         }
 
-        private IEnumerable<IEntityDeclarationSyntax> GetEntityDeclarations(IEnumerable<IDeclarationSyntax> declarations)
+        private static IEnumerable<IEntityDeclarationSyntax> GetEntityDeclarations(IEnumerable<IDeclarationSyntax> declarations)
         {
             var queue = new Queue<IDeclarationSyntax>();
             queue.EnqueueRange(declarations);

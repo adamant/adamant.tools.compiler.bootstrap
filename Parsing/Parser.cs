@@ -23,6 +23,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             Tokens.Context.Diagnostics.Add(diagnostic);
         }
 
+        /// <summary>
+        /// A nested parser establishes a nested naming context for things parsed by it.
+        /// </summary>
         protected Parser NestedParser(Name name)
         {
             return new Parser(Tokens, name);

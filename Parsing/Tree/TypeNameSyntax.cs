@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             {
                 if (referencedSymbol != null)
                     throw new InvalidOperationException("Can't set referenced symbol repeatedly");
-                referencedSymbol = value ?? throw new ArgumentException();
+                referencedSymbol = value ?? throw new ArgumentNullException();
             }
         }
 
@@ -38,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             {
                 if (containingScope != null)
                     throw new InvalidOperationException("Can't set containing scope repeatedly");
-                containingScope = value ?? throw new ArgumentException();
+                containingScope = value ?? throw new ArgumentNullException();
             }
         }
 

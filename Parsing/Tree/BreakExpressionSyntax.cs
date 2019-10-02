@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public BreakExpressionSyntax(
             TextSpan span,
-            IExpressionSyntax value)
+            IExpressionSyntax? value)
             : base(span)
         {
             this.value = value;
