@@ -69,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
                         else
                         {
                             escaped.Append(@"\u(");
-                            escaped.Append(((ushort)c).ToString("x"));
+                            escaped.Append(((ushort)c).ToString("x", CultureInfo.InvariantCulture));
                             escaped.Append(@")");
                         }
 

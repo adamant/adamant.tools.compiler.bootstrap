@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
@@ -21,6 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
+        [SuppressMessage("Performance", "CA1819:Properties should not return arrays")]
         public T[] Items => collection.ToArray();
     }
 }

@@ -1,3 +1,5 @@
+using System;
+
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
     /// <summary>
@@ -11,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
     /// methods to actually return an object of the same type as the current
     /// class.
     /// </summary>
-    public struct Self
+    public struct Self : IEquatable<Self>
     {
         private readonly object self;
 
@@ -23,6 +25,33 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         public T Cast<T>()
         {
             return (T)self;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is Self other)
+                return ReferenceEquals(other.self, self);
+            return false;
+        }
+
+        public bool Equals(Self other)
+        {
+            return ReferenceEquals(other.self, self);
+        }
+
+        public override int GetHashCode()
+        {
+            return self?.GetHashCode() ?? 0;
+        }
+
+        public static bool operator ==(Self left, Self right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Self left, Self right)
+        {
+            return !(left==right);
         }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
@@ -31,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
             where E : Enum
         {
             if (!Enum.IsDefined(typeof(E), value))
-                throw new InvalidEnumArgumentException(parameter, Convert.ToInt32(value), typeof(E));
+                throw new InvalidEnumArgumentException(parameter, Convert.ToInt32(value, CultureInfo.InvariantCulture), typeof(E));
         }
 
         [DebuggerHidden]

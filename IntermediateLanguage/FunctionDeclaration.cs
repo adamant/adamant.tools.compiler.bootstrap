@@ -17,7 +17,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 
         IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;
 
-
         public FunctionDeclaration(
             bool isExternal,
             bool isMember,
