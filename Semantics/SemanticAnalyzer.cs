@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             // --------------------------------------------------
             // This is where the representation transitions to IR
-            var declarations = BuildIL(callableDeclarations, entityDeclarations);
+            var declarations = BuildIL(entityDeclarations);
             // --------------------------------------------------
 
             var liveness = LivenessAnalyzer.Check(callableDeclarations, SaveLivenessAnalysis);
@@ -115,7 +115,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         }
 
         private static FixedList<Declaration> BuildIL(
-            FixedList<ICallableDeclarationSyntax> callableDeclarations,
             FixedList<IEntityDeclarationSyntax> entityDeclarations)
         {
             // TODO construct IL while building control flow graphs, then analyze borrow check on that
