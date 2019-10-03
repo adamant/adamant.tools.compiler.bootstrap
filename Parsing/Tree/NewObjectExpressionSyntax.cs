@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             {
                 if (constructorSymbol != null)
                     throw new InvalidOperationException("Can't set constructor symbol repeatedly");
-                constructorSymbol = value ?? throw new ArgumentNullException();
+                constructorSymbol = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
@@ -44,7 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             {
                 if (constructorType != null)
                     throw new InvalidOperationException("Can't set constructor type repeatedly");
-                constructorType = value ?? throw new ArgumentNullException();
+                constructorType = value ?? throw new ArgumentNullException(nameof(value));
 
             }
         }

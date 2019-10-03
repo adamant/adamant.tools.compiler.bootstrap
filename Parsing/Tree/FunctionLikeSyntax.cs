@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             {
                 if (selfParameterType != null)
                     throw new InvalidOperationException("Can't set SelfParameterType repeatedly");
-                selfParameterType = value ?? throw new ArgumentNullException();
+                selfParameterType = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
@@ -46,7 +46,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             {
                 if (controlFlow != null)
                     throw new InvalidOperationException("Can't set ControlFlow repeatedly");
-                controlFlow = value ?? throw new ArgumentNullException();
+                controlFlow = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 

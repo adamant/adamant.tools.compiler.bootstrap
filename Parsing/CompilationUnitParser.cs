@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
@@ -9,6 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public class CompilationUnitParser
     {
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Entry point to class which may need to be non-static in future")]
         public ICompilationUnitSyntax Parse(ITokenIterator tokens)
         {
             var implicitNamespaceName = ParseImplicitNamespaceName(tokens);

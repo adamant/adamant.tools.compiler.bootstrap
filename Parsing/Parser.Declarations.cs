@@ -68,7 +68,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         #region Parse Namespaces
         internal NamespaceDeclarationSyntax ParseNamespaceDeclaration(
-             FixedList<IModiferToken> modifiers)
+             FixedList<IModiferToken> _)
         {
             // TODO generate errors for attributes or modifiers
             var ns = Tokens.Expect<INamespaceKeywordToken>();

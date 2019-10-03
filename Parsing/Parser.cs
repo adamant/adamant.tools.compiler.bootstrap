@@ -6,8 +6,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public partial class Parser
     {
-        protected readonly CodeFile File;
-        protected readonly ITokenIterator Tokens;
+        protected CodeFile File { get; }
+        protected ITokenIterator Tokens { get; }
         private readonly RootName nameContext;
         private readonly VariableNumbers variableNumbers = new VariableNumbers();
 

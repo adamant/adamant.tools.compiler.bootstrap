@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public IClassDeclarationSyntax DeclaringType
         {
             get => declaringType ?? throw new InvalidOperationException("Declaring type not set");
-            internal set => declaringType = value ?? throw new ArgumentNullException();
+            internal set => declaringType = value ?? throw new ArgumentNullException(nameof(value));
         }
 
         public Name FullName { get; }

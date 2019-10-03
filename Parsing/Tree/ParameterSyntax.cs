@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -29,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         {
             IsMutableBinding = isMutableBinding;
             FullName = fullName;
-            Unused = fullName.UnqualifiedName.Text.StartsWith("_");
+            Unused = fullName.UnqualifiedName.Text.StartsWith("_", StringComparison.Ordinal);
         }
     }
 }

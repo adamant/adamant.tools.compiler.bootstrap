@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             {
                 if (Member.ReferencedSymbol != null)
                     throw new InvalidOperationException("Can't set ReferencedSymbol repeatedly");
-                Member.ReferencedSymbol = value ?? throw new ArgumentNullException();
+                Member.ReferencedSymbol = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 

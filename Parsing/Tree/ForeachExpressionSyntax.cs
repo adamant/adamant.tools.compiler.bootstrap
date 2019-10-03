@@ -30,8 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
                 if (variableType != null)
                     throw new InvalidOperationException("Can't set VariableType repeatedly");
                 variableType =
-                    value ?? throw new ArgumentNullException(nameof(Type),
-                        "Can't set VariableType to null");
+                    value ?? throw new ArgumentNullException(nameof(value), "Can't set VariableType to null");
             }
         }
         private IExpressionSyntax inExpression;
