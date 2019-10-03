@@ -14,38 +14,11 @@ using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 {
-    // TODO seems like this should be name builder not analyzer, but we already have another class named builder
-    public class ControlFlowAnalyzer
+    /// <summary>
+    /// The fabrication of a single control flow graph from a single callable AST node
+    /// </summary>
+    public class ControlFlowFabrication
     {
-        public static void BuildGraphs(FixedList<ICallableDeclarationSyntax> callableDeclarations)
-        {
-            foreach (var callableDeclaration in callableDeclarations.Where(ShouldBuildGraph))
-            {
-                var builder = new ControlFlowAnalyzer();
-                switch (callableDeclaration)
-                {
-                    default:
-                        throw ExhaustiveMatch.Failed(callableDeclaration);
-                    case IMethodDeclarationSyntax method:
-                        builder.BuildGraph(method);
-                        break;
-                    case IConstructorDeclarationSyntax constructor:
-                        builder.BuildGraph(constructor);
-                        break;
-                    case IFunctionDeclarationSyntax function:
-                        builder.BuildGraph(function);
-                        break;
-                }
-            }
-        }
-
-        private static bool ShouldBuildGraph(ICallableDeclarationSyntax callableDeclaration)
-        {
-            return callableDeclaration.Body != null // It is not abstract
-                                                    /* && function.GenericParameters == null*/
-                ; // It is not generic, generic functions need monomorphized
-        }
-
         private readonly ControlFlowGraphBuilder graph = new ControlFlowGraphBuilder();
 
         /// <summary>
@@ -69,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private Scope CurrentScope => scopes.Peek();
         private DataType? returnType;
 
-        private ControlFlowAnalyzer()
+        public ControlFlowFabrication()
         {
             // We start in the outer scope and need that on the stack
             var scope = Scope.Outer;
@@ -77,7 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             nextScope = scope.Next();
         }
 
-        private void BuildGraph(IMethodDeclarationSyntax method)
+        public void CreateGraph(IMethodDeclarationSyntax method)
         {
             returnType = method.ReturnType.Known();
 
@@ -106,7 +79,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             method.ControlFlow = graph.Build();
         }
 
-        private void BuildGraph(IConstructorDeclarationSyntax constructor)
+        public void CreateGraph(IConstructorDeclarationSyntax constructor)
         {
             returnType = constructor.DeclaringType.DeclaresType.Fulfilled();
 
@@ -135,7 +108,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             constructor.ControlFlow = graph.Build();
         }
 
-        private void BuildGraph(IFunctionDeclarationSyntax method)
+        public void CreateGraph(IFunctionDeclarationSyntax method)
         {
             returnType = method.ReturnType.Known();
 

@@ -14,7 +14,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
 {
     public class DeclarationBuilder
     {
+        private readonly ControlFlowGraphFactory controlFlowGraphFactory;
         private readonly Dictionary<ISymbol, Declaration> declarations = new Dictionary<ISymbol, Declaration>();
+
+        public DeclarationBuilder(ControlFlowGraphFactory controlFlowGraphFactory)
+        {
+            this.controlFlowGraphFactory = controlFlowGraphFactory;
+        }
 
         public IEnumerable<Declaration> AllDeclarations => declarations.Values;
 
@@ -39,28 +45,40 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                 default:
                     throw ExhaustiveMatch.Failed(entityDeclaration);
                 case IFunctionDeclarationSyntax function:
-                    declaration = new FunctionDeclaration(function.IsExternalFunction, false, function.FullName,
-                        BuildParameters(function.Parameters), function.ReturnType.Known(), function.ControlFlow);
+                {
+                    var controlFlowGraph = controlFlowGraphFactory.CreateGraph(function);
+                    declaration = new FunctionDeclaration(function.IsExternalFunction, false,
+                        function.FullName, BuildParameters(function.Parameters),
+                        function.ReturnType.Known(), controlFlowGraph);
                     break;
+                }
                 case IMethodDeclarationSyntax method:
-                    declaration = new FunctionDeclaration(false,
-                        method.DeclaringType != null, method.FullName, BuildParameters(method.Parameters),
-                        method.ReturnType.Known(), method.ControlFlow);
+                {
+                    var controlFlowGraph = controlFlowGraphFactory.CreateGraph(method);
+                    declaration = new FunctionDeclaration(false, method.DeclaringType != null,
+                        method.FullName, BuildParameters(method.Parameters),
+                        method.ReturnType.Known(), controlFlowGraph);
                     break;
-                case IConstructorDeclarationSyntax constructorDeclaration:
+                }
+                case IConstructorDeclarationSyntax constructor:
+                {
+                    var controlFlowGraph = controlFlowGraphFactory.CreateGraph(constructor);
                     //var constructorType = (FunctionType)constructorDeclaration.Type.Known();
-                    var parameters = BuildConstructorParameters(constructorDeclaration);
+                    var parameters = BuildConstructorParameters(constructor);
                     //constructorType = new FunctionType(parameters.Select(p => p.Type),
                     //    constructorType.ReturnType);
-                    declaration = new ConstructorDeclaration(constructorDeclaration.FullName,
-                        /*constructorType,*/ parameters, constructorDeclaration.SelfParameterType,
-                        constructorDeclaration.ControlFlow);
+                    declaration = new ConstructorDeclaration(constructor.FullName,
+                        /*constructorType,*/ parameters, constructor.SelfParameterType, controlFlowGraph);
                     break;
+                }
                 case IFieldDeclarationSyntax fieldDeclaration:
                     declaration = new FieldDeclaration(fieldDeclaration.IsMutableBinding, fieldDeclaration.FullName, fieldDeclaration.Type.Known());
                     break;
-                case IClassDeclarationSyntax _:
-                    throw new NotImplementedException();
+                case IClassDeclarationSyntax classDeclaration:
+                    declaration = new ClassDeclaration(classDeclaration.FullName,
+                        classDeclaration.DeclaresType.Known(),
+                        BuildClassMembers(classDeclaration));
+                    break;
             }
             declarations.Add(entityDeclaration, declaration);
             return declaration;
@@ -106,12 +124,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
             declarations.Add(symbol, defaultConstructor);
             return defaultConstructor;
         }
-
-        //private static FixedList<GenericParameter> BuildGenericParameters(FixedList<GenericParameterSyntax> parameters)
-        //{
-        //    if (parameters == null) return null;
-        //    throw new System.NotImplementedException();
-        //}
 
         private static FixedList<Parameter> BuildParameters(FixedList<IParameterSyntax> parameters)
         {

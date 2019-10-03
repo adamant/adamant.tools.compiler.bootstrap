@@ -39,16 +39,53 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // First pull over all the lexer and parser warnings
             var diagnostics = new Diagnostics(packageSyntax.Diagnostics);
 
+            // If there are errors from the lex and parse phase, don't continue on
+            diagnostics.ThrowIfFatalErrors();
+
+            var entityDeclarations = BuildLexicalScopes(packageSyntax, references, diagnostics);
+
+            var callableDeclarations = CheckSemantics(entityDeclarations, diagnostics);
+
+            // If there are errors from the semantics phase, don't continue on
+            diagnostics.ThrowIfFatalErrors();
+
+            // --------------------------------------------------
+            // This is where the representation transitions to IR
+            var declarations = BuildIL(callableDeclarations, entityDeclarations);
+            // --------------------------------------------------
+
+            var liveness = LivenessAnalyzer.Check(callableDeclarations, SaveLivenessAnalysis);
+
+            BorrowChecker.Check(entityDeclarations, liveness, diagnostics, SaveBorrowClaims);
+
             // If there are errors from the previous phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
 
+            var entryPoint = DetermineEntryPoint(declarations, diagnostics);
+
+            return new Package(packageSyntax.Name, diagnostics.Build(), references, declarations, entryPoint);
+        }
+
+        private static FixedList<IEntityDeclarationSyntax> BuildLexicalScopes(
+            PackageSyntax packageSyntax,
+            FixedDictionary<string, Package> references,
+            Diagnostics diagnostics)
+        {
             var scopesBuilder = new LexicalScopesBuilder(diagnostics, packageSyntax, references);
             scopesBuilder.BuildScopesInPackage(packageSyntax);
 
             // Make a list of all the entity declarations (i.e. not namespaces)
-            var entityDeclarations = packageSyntax.CompilationUnits
-                .SelectMany(cu => cu.EntityDeclarations).ToFixedList();
+            var entityDeclarations1 = packageSyntax
+                .CompilationUnits.SelectMany(cu => cu.EntityDeclarations)
+                .ToFixedList();
 
+            return entityDeclarations1;
+        }
+
+        private static FixedList<ICallableDeclarationSyntax> CheckSemantics(
+            FixedList<IEntityDeclarationSyntax> entityDeclarations,
+            Diagnostics diagnostics)
+        {
             // Basic Analysis includes: Name Binding, Type Checking, Constant Folding
             BasicAnalyzer.Check(entityDeclarations, diagnostics);
 
@@ -59,39 +96,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 #endif
 
             // From this point forward, analysis focuses on functions
-            var callableDeclarations = entityDeclarations.OfType<ICallableDeclarationSyntax>().ToFixedList();
+            var callableDeclarations =
+                entityDeclarations.OfType<ICallableDeclarationSyntax>().ToFixedList();
             ShadowChecker.Check(callableDeclarations, diagnostics);
 
             // TODO use DataFlowAnalysis to check for unused variables and report use of variables starting with `_`
 
-            DataFlowAnalysis.Check(DefiniteAssignmentStrategy.Instance, callableDeclarations, diagnostics);
+            DataFlowAnalysis.Check(DefiniteAssignmentStrategy.Instance, callableDeclarations,
+                diagnostics);
 
-            DataFlowAnalysis.Check(BindingMutabilityStrategy.Instance, callableDeclarations, diagnostics);
+            DataFlowAnalysis.Check(BindingMutabilityStrategy.Instance, callableDeclarations,
+                diagnostics);
 
-            DataFlowAnalysis.Check(UseOfMovedValueStrategy.Instance, callableDeclarations, diagnostics);
+            DataFlowAnalysis.Check(UseOfMovedValueStrategy.Instance, callableDeclarations,
+                diagnostics);
 
-            // If there are errors from the previous phase, don't continue on
-            diagnostics.ThrowIfFatalErrors();
+            return callableDeclarations;
+        }
 
-            // --------------------------------------------------
-            // This is where the representation transitions to IR
-            ControlFlowAnalyzer.BuildGraphs(callableDeclarations);
-            // --------------------------------------------------
+        private static FixedList<Declaration> BuildIL(
+            FixedList<ICallableDeclarationSyntax> callableDeclarations,
+            FixedList<IEntityDeclarationSyntax> entityDeclarations)
+        {
+            // TODO construct IL while building control flow graphs, then analyze borrow check on that
 
-            var liveness = LivenessAnalyzer.Check(callableDeclarations, SaveLivenessAnalysis);
-
-            BorrowChecker.Check(entityDeclarations, liveness, diagnostics, SaveBorrowClaims);
-
-            // If there are errors from the previous phase, don't continue on
-            diagnostics.ThrowIfFatalErrors();
-
-            // Build final declaration objects and find the entry point
-            var declarationBuilder = new DeclarationBuilder();
+            var controlFlowGraphFactory = new ControlFlowGraphFactory();
+            var declarationBuilder = new DeclarationBuilder(controlFlowGraphFactory);
             declarationBuilder.Build(entityDeclarations);
-            var declarations = declarationBuilder.AllDeclarations.ToFixedList();
-            var entryPoint = DetermineEntryPoint(declarations, diagnostics);
-
-            return new Package(packageSyntax.Name, diagnostics.Build(), references, declarations, entryPoint);
+            return declarationBuilder.AllDeclarations.ToFixedList();
         }
 
         private static FunctionDeclaration DetermineEntryPoint(

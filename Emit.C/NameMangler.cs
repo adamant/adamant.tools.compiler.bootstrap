@@ -59,11 +59,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             return mapping.GetAscii(builder.ToString());
         }
 
-        public string MangleName(TypeDeclaration type)
+        public string MangleName(ClassDeclaration @class)
         {
             // builder with room for the characters we are likely to add
-            var builder = new StringBuilder(EstimateSize(type.FullName) + 5);
-            Mangle(type.FullName, builder);
+            var builder = new StringBuilder(EstimateSize(@class.FullName) + 5);
+            Mangle(@class.FullName, builder);
             //if (type.IsGeneric)
             //{
             //    builder.Append("__");

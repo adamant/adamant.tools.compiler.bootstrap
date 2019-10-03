@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         public string Disassemble(Package package)
         {
             var builder = new AssemblyBuilder();
-            var typeMembers = package.Declarations.OfType<TypeDeclaration>()
+            var typeMembers = package.Declarations.OfType<ClassDeclaration>()
                 .SelectMany(t => t.Members).ToList();
             foreach (var declaration in package.Declarations.Except(typeMembers))
             {
@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                 case ConstructorDeclaration constructor:
                     Disassemble(constructor, builder);
                     break;
-                case TypeDeclaration type:
+                case ClassDeclaration type:
                     Disassemble(type, builder);
                     break;
                 case FieldDeclaration field:
@@ -97,13 +97,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.EndBlock();
         }
 
-        public void Disassemble(TypeDeclaration type, AssemblyBuilder builder)
+        public void Disassemble(ClassDeclaration @class, AssemblyBuilder builder)
         {
             builder.BeginLine("type ");
-            builder.Append(type.FullName.ToString());
+            builder.Append(@class.FullName.ToString());
             builder.EndLine();
             builder.BeginBlock();
-            foreach (var member in type.Members)
+            foreach (var member in @class.Members)
             {
                 builder.DeclarationSeparatorLine();
                 Disassemble(member, builder);

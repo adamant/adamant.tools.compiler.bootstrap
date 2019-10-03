@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 case ConstructorDeclaration constructor:
                     EmitConstructor(constructor, code);
                     break;
-                case TypeDeclaration type:
+                case ClassDeclaration type:
                     EmitType(type, code);
                     break;
                 case FieldDeclaration _:
@@ -103,9 +103,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             return string.Join(", ", parameters.Select(parameterConverter.Convert));
         }
 
-        private void EmitType(TypeDeclaration type, Code code)
+        private void EmitType(ClassDeclaration @class, Code code)
         {
-            var typeName = nameMangler.MangleName(type);
+            var typeName = nameMangler.MangleName(@class);
 
             // Struct Declarations
             var selfType = $"{typeName}___Self";
@@ -118,7 +118,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             var structs = code.StructDeclarations;
             structs.AppendLine($"struct {selfType}");
             structs.BeginBlock();
-            foreach (var field in type.Members.OfType<FieldDeclaration>())
+            foreach (var field in @class.Members.OfType<FieldDeclaration>())
             {
                 var fieldType = typeConverter.Convert(field.Type.AssertKnown());
                 var fieldName = nameMangler.Mangle(field.Name);
@@ -127,7 +127,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             structs.EndBlockWithSemicolon();
             structs.AppendLine($"struct {vtableType}");
             structs.BeginBlock();
-            foreach (var function in type.Members.OfType<FunctionDeclaration>())
+            foreach (var function in @class.Members.OfType<FunctionDeclaration>())
             {
                 var name = nameMangler.MangleUnqualifiedName(function);
                 var parameters = Convert(function.Parameters);
@@ -139,7 +139,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             var globals = code.StructDeclarations;
             globals.AppendLine($"const {vtableType} {typeName}___vtable = ({vtableType})");
             globals.BeginBlock();
-            foreach (var function in type.Members.OfType<FunctionDeclaration>())
+            foreach (var function in @class.Members.OfType<FunctionDeclaration>())
             {
                 var fieldName = nameMangler.MangleUnqualifiedName(function);
                 var functionName = nameMangler.MangleName(function);

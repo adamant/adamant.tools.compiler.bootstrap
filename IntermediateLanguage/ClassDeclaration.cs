@@ -5,12 +5,12 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
-    public class TypeDeclaration : Declaration, ITypeSymbol
+    public class ClassDeclaration : Declaration, ITypeSymbol
     {
         public FixedList<Declaration> Members { get; }
         public DataType DeclaresType { get; }
 
-        public TypeDeclaration(
+        public ClassDeclaration(
             Name name,
             DataType declaresType,
             FixedList<Declaration> members)

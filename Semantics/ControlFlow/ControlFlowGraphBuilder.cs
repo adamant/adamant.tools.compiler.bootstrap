@@ -9,6 +9,9 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 {
+    /// <summary>
+    /// Builder pattern for control flow graphs used during control flow graph fabrication
+    /// </summary>
     public class ControlFlowGraphBuilder
     {
         private readonly List<VariableDeclaration> variables = new List<VariableDeclaration>();

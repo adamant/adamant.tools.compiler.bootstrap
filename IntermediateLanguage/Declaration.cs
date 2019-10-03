@@ -6,7 +6,7 @@ using ExhaustiveMatching;
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
     [Closed(
-        typeof(TypeDeclaration),
+        typeof(ClassDeclaration),
         typeof(FunctionDeclaration),
         typeof(FieldDeclaration),
         typeof(ConstructorDeclaration))]
