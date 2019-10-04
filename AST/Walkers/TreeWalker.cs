@@ -97,6 +97,61 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
             }
         }
 
+        public void Walk(IBlockOrResultSyntax? blockOrResult)
+        {
+            if (blockOrResult == null) return;
+
+            switch (blockOrResult)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(blockOrResult);
+                case IBlockExpressionSyntax blockExpression:
+                    Walk(blockExpression);
+                    break;
+                case IResultStatementSyntax resultStatement:
+                    if (!(statementWalker?.ShouldSkip(resultStatement) ?? false))
+                    {
+                        statementWalker?.Enter(resultStatement);
+                        Walk(resultStatement.Expression);
+                        statementWalker?.Exit(resultStatement);
+                    }
+                    break;
+            }
+        }
+
+        public void Walk(IElseClauseSyntax? elseClause)
+        {
+            if (elseClause == null) return;
+
+            switch (elseClause)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(elseClause);
+                case IBlockOrResultSyntax blockOrResult:
+                    Walk(blockOrResult);
+                    break;
+                case IIfExpressionSyntax ifExpression:
+                    if (!(expressionWalker?.ShouldSkip(ifExpression) ?? false))
+                    {
+                        expressionWalker?.Enter(ifExpression);
+                        Walk(ifExpression.Condition);
+                        Walk(ifExpression.ThenBlock);
+                        Walk(ifExpression.ElseClause);
+                        expressionWalker?.Exit(ifExpression);
+                    }
+                    break;
+            }
+        }
+
+        public void Walk(IBlockExpressionSyntax? blockExpression)
+        {
+            if (blockExpression == null || (expressionWalker?.ShouldSkip(blockExpression) ?? false)) return;
+
+            expressionWalker?.Enter(blockExpression);
+            foreach (var statement in blockExpression.Statements) Walk(statement);
+            expressionWalker?.Exit(blockExpression);
+        }
+
         public void Walk(IExpressionSyntax? expression)
         {
             if (expression == null || (expressionWalker?.ShouldSkip(expression) ?? false))
@@ -141,6 +196,96 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                 case IIntegerLiteralExpressionSyntax integerLiteralExpression:
                     expressionWalker?.Enter(integerLiteralExpression);
                     expressionWalker?.Exit(integerLiteralExpression);
+                    break;
+                case IMethodInvocationExpressionSyntax methodInvocationExpression:
+                    expressionWalker?.Enter(methodInvocationExpression);
+                    Walk(methodInvocationExpression.Target);
+                    Walk(methodInvocationExpression.MethodNameSyntax);
+                    foreach (var argument in methodInvocationExpression.Arguments)
+                        Walk(argument.Value);
+                    expressionWalker?.Exit(methodInvocationExpression);
+                    break;
+                case IAssignmentExpressionSyntax assignmentExpression:
+                    expressionWalker?.Enter(assignmentExpression);
+                    Walk(assignmentExpression.LeftOperand);
+                    Walk(assignmentExpression.RightOperand);
+                    expressionWalker?.Exit(assignmentExpression);
+                    break;
+                case INewObjectExpressionSyntax newObjectExpression:
+                    expressionWalker?.Enter(newObjectExpression);
+                    Walk(newObjectExpression.TypeSyntax);
+                    Walk(newObjectExpression.ConstructorName);
+                    foreach (var argument in newObjectExpression.Arguments)
+                        Walk(argument.Value);
+                    expressionWalker?.Exit(newObjectExpression);
+                    break;
+                case IBoolLiteralExpressionSyntax boolLiteralExpression:
+                    expressionWalker?.Enter(boolLiteralExpression);
+                    expressionWalker?.Exit(boolLiteralExpression);
+                    break;
+                case IIfExpressionSyntax ifExpression:
+                    expressionWalker?.Enter(ifExpression);
+                    Walk(ifExpression.Condition);
+                    Walk(ifExpression.ThenBlock);
+                    Walk(ifExpression.ElseClause);
+                    expressionWalker?.Exit(ifExpression);
+                    break;
+                case IBinaryOperatorExpressionSyntax binaryOperatorExpression:
+                    expressionWalker?.Enter(binaryOperatorExpression);
+                    Walk(binaryOperatorExpression.LeftOperand);
+                    Walk(binaryOperatorExpression.RightOperand);
+                    expressionWalker?.Exit(binaryOperatorExpression);
+                    break;
+                case IUnaryOperatorExpressionSyntax unaryOperatorExpression:
+                    expressionWalker?.Enter(unaryOperatorExpression);
+                    Walk(unaryOperatorExpression.Operand);
+                    expressionWalker?.Exit(unaryOperatorExpression);
+                    break;
+                case ILoopExpressionSyntax loopExpression:
+                    expressionWalker?.Enter(loopExpression);
+                    Walk(loopExpression.Block);
+                    expressionWalker?.Exit(loopExpression);
+                    break;
+                case IWhileExpressionSyntax whileExpression:
+                    expressionWalker?.Enter(whileExpression);
+                    Walk(whileExpression.Condition);
+                    Walk(whileExpression.Block);
+                    expressionWalker?.Exit(whileExpression);
+                    break;
+                case INoneLiteralExpressionSyntax noneLiteralExpression:
+                    expressionWalker?.Enter(noneLiteralExpression);
+                    expressionWalker?.Exit(noneLiteralExpression);
+                    break;
+                case ISelfExpressionSyntax selfExpression:
+                    expressionWalker?.Enter(selfExpression);
+                    expressionWalker?.Exit(selfExpression);
+                    break;
+                case INextExpressionSyntax nextExpression:
+                    expressionWalker?.Enter(nextExpression);
+                    expressionWalker?.Exit(nextExpression);
+                    break;
+                case IMoveExpressionSyntax moveExpression:
+                    expressionWalker?.Enter(moveExpression);
+                    Walk(moveExpression.Expression);
+                    expressionWalker?.Exit(moveExpression);
+                    break;
+                case IMemberAccessExpressionSyntax memberAccessExpression:
+                    expressionWalker?.Enter(memberAccessExpression);
+                    Walk(memberAccessExpression.Expression);
+                    Walk(memberAccessExpression.Member);
+                    expressionWalker?.Exit(memberAccessExpression);
+                    break;
+                case IBreakExpressionSyntax breakExpression:
+                    expressionWalker?.Enter(breakExpression);
+                    Walk(breakExpression.Value);
+                    expressionWalker?.Exit(breakExpression);
+                    break;
+                case IForeachExpressionSyntax foreachExpression:
+                    expressionWalker?.Enter(foreachExpression);
+                    Walk(foreachExpression.TypeSyntax);
+                    Walk(foreachExpression.InExpression);
+                    Walk(foreachExpression.Block);
+                    expressionWalker?.Exit(foreachExpression);
                     break;
             }
         }
