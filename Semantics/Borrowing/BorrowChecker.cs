@@ -5,6 +5,7 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
@@ -36,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
     public class BorrowChecker
     {
         private readonly CodeFile file;
-        private readonly FixedDictionary<ControlFlowGraph, LiveVariables> liveness;
+        private readonly FixedDictionary<ICallableDeclaration, LiveVariables> liveness;
         private readonly Diagnostics diagnostics;
         private readonly HashSet<TextSpan> reportedDiagnosticSpans = new HashSet<TextSpan>();
         private readonly bool saveBorrowClaims;
@@ -51,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 
         private BorrowChecker(
             CodeFile file,
-            FixedDictionary<ControlFlowGraph, LiveVariables> liveness,
+            FixedDictionary<ICallableDeclaration, LiveVariables> liveness,
             Diagnostics diagnostics,
             bool saveBorrowClaims)
         {
@@ -62,38 +63,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         }
 
         public static void Check(
-            IEnumerable<IEntityDeclarationSyntax> entityDeclarations,
-            FixedDictionary<ControlFlowGraph, LiveVariables> liveness,
+            IEnumerable<ICallableDeclaration> callables,
+            FixedDictionary<ICallableDeclaration, LiveVariables> liveness,
             Diagnostics diagnostics,
             bool saveBorrowClaims)
         {
-            foreach (var declaration in entityDeclarations)
+            foreach (var callable in callables)
             {
-                var borrowChecker = new BorrowChecker(declaration.File, liveness, diagnostics, saveBorrowClaims);
-                borrowChecker.Check(declaration);
+                var borrowChecker = new BorrowChecker(callable.ControlFlow.File, liveness, diagnostics, saveBorrowClaims);
+                borrowChecker.Check(callable);
             }
         }
 
-        public void Check(IEntityDeclarationSyntax declaration)
+        public void Check(ICallableDeclaration callable)
         {
-            switch (declaration)
+            switch (callable)
             {
                 default:
-                    throw ExhaustiveMatch.Failed(declaration);
-                case IFieldDeclarationSyntax field:
-                    Check(field);
+                    throw ExhaustiveMatch.Failed(callable);
+                case FunctionDeclaration function:
+                    Check(function, function.ControlFlow);
                     break;
-                case IFunctionDeclarationSyntax function:
-                    Check(function.ControlFlow);
-                    break;
-                case IMethodDeclarationSyntax method:
-                    Check(method.ControlFlow);
-                    break;
-                case IConstructorDeclarationSyntax constructor:
-                    Check(constructor.ControlFlow);
-                    break;
-                case IClassDeclarationSyntax _:
-                    // borrow check doesn't apply
+                case ConstructorDeclaration constructor:
+                    Check(constructor, constructor.ControlFlow);
                     break;
             }
         }
@@ -103,10 +95,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             // Currently nothing to check
         }
 
-        private void Check(ControlFlowGraph controlFlow)
+        private void Check(ICallableDeclaration callable, ControlFlowGraph controlFlow)
         {
             var variables = controlFlow.VariableDeclarations;
-            var liveVariables = liveness[controlFlow];
+            var liveVariables = liveness[callable];
             // Do borrow checking with claims
             var blocks = new Queue<BasicBlock>();
             blocks.Enqueue(controlFlow.EntryBlock);

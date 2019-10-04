@@ -7,7 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
-    public class FunctionDeclaration : Declaration, IFunctionSymbol
+    public class FunctionDeclaration : Declaration, ICallableDeclaration, IFunctionSymbol
     {
         public bool IsExternal { get; }
         public FixedList<Parameter> Parameters { get; }

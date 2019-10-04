@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -14,11 +15,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
     /// </summary>
     public class ControlFlowGraphBuilder
     {
+        private readonly CodeFile file;
         private readonly List<VariableDeclaration> variables = new List<VariableDeclaration>();
         public VariableDeclaration ReturnVariable => variables.First();
         private readonly List<BlockBuilder> blockBuilders = new List<BlockBuilder>();
 
-        public ControlFlowGraphBuilder() { }
+        public ControlFlowGraphBuilder(CodeFile file)
+        {
+            this.file = file;
+        }
 
         public ControlFlowGraphBuilder(FixedList<VariableDeclaration> variables)
         {
@@ -101,9 +106,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 blocks.Add(new BasicBlock(block.BlockName, statements, terminator));
             }
 
-            return new ControlFlowGraph(variables, blocks);
+            return new ControlFlowGraph(file, variables, blocks);
         }
 
+        [SuppressMessage("Design", "CA1043:Use Integral Or String Argument For Indexers", Justification = "Variable is a value type, essentially a strongly type integer")]
         public VariableDeclaration this[Variable variable]
         {
             get

@@ -7,11 +7,11 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 {
-    internal class Type : Primitive, ITypeSymbol
+    internal class PrimitiveTypeSymbol : PrimitiveSymbol, ITypeSymbol
     {
         private DataType? declaresType;
 
-        protected Type(
+        protected PrimitiveTypeSymbol(
             Name fullName,
             DataType? declaresType,
             IEnumerable<ISymbol>? childSymbols = null)
@@ -27,21 +27,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             internal set => declaresType = value;
         }
 
-        public static Type NewType(Name fullName, IEnumerable<ISymbol> childSymbols)
+        public static PrimitiveTypeSymbol NewType(Name fullName, IEnumerable<ISymbol> childSymbols)
         {
-            return new Type(fullName, null, childSymbols);
+            return new PrimitiveTypeSymbol(fullName, null, childSymbols);
         }
 
-        public static Type NewSimpleType(
+        public static PrimitiveTypeSymbol NewSimpleType(
             SimpleType type,
             IEnumerable<ISymbol>? childSymbols = null)
         {
-            return new Type(type.Name, type, childSymbols);
+            return new PrimitiveTypeSymbol(type.Name, type, childSymbols);
         }
 
-        public static Type New(Name fullName, DataType? type = null)
+        public static PrimitiveTypeSymbol New(Name fullName, DataType? type = null)
         {
-            return new Type(fullName, type);
+            return new PrimitiveTypeSymbol(fullName, type);
         }
     }
 }

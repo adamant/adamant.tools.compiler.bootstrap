@@ -41,8 +41,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         {
             var typeName = Name.From("String");
             var concatName = typeName.Qualify("concat");
-            var concatFunc = Function.New(concatName);
-            var literalConstructor = Function.New(typeName.Qualify(SpecialName.New), ("size", DataType.Size),
+            var concatFunc = PrimitiveFunctionSymbol.New(concatName);
+            var literalConstructor = PrimitiveFunctionSymbol.New(typeName.Qualify(SpecialName.New), ("size", DataType.Size),
                 ("value", DataType.StringConstant));
             var symbols = new List<ISymbol>()
             {
@@ -50,7 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
                 concatFunc,
             };
 
-            var stringSymbol = Type.NewType(typeName, symbols);
+            var stringSymbol = PrimitiveTypeSymbol.NewType(typeName, symbols);
             var stringType = UserObjectType.Declaration(stringSymbol, false);
             stringSymbol.DeclaresType = stringType;
             concatFunc.SetParameters(("other", stringType));
@@ -62,18 +62,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         private static ISymbol BuildPrintStringSymbol(DataType stringType)
         {
             var name = new SimpleName("print_string");
-            return Function.New(name, ("s", stringType));
+            return PrimitiveFunctionSymbol.New(name, ("s", stringType));
         }
 
         private static ISymbol BuildReadStringSymbol(DataType stringType)
         {
             var name = new SimpleName("read_string");
-            return Function.New(name, stringType);
+            return PrimitiveFunctionSymbol.New(name, stringType);
         }
 
         private static ISymbol BuildBoolSymbol()
         {
-            return Type.NewSimpleType(DataType.Bool);
+            return PrimitiveTypeSymbol.NewSimpleType(DataType.Bool);
         }
 
         private static ISymbol BuildIntegerTypeSymbol(
@@ -83,10 +83,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             var typeName = integerType.Name;
             var symbols = new List<ISymbol>
             {
-                Function.New(typeName.Qualify("remainder"), integerType, ("divisor", integerType)),
-                Function.New(typeName.Qualify("to_display_string"), stringType)
+                PrimitiveFunctionSymbol.New(typeName.Qualify("remainder"), integerType, ("divisor", integerType)),
+                PrimitiveFunctionSymbol.New(typeName.Qualify("to_display_string"), stringType)
             };
-            return Type.NewSimpleType(integerType, symbols);
+            return PrimitiveTypeSymbol.NewSimpleType(integerType, symbols);
         }
     }
 }

@@ -24,6 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         DataType IBindingSymbol.Type => Type.Fulfilled();
 
         public FieldDeclarationSyntax(
+            IClassDeclarationSyntax declaringType,
             TextSpan span,
             CodeFile file,
             FixedList<IModiferToken> modifiers,
@@ -32,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan nameSpan,
             ITypeSyntax? typeSyntax,
             IExpressionSyntax? initializer)
-            : base(span, file, fullName, nameSpan)
+            : base(declaringType, span, file, fullName, nameSpan)
         {
             Modifiers = modifiers;
             IsMutableBinding = mutableBinding;

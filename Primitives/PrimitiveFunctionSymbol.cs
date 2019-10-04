@@ -7,33 +7,33 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 {
-    internal class Function : Primitive, IFunctionSymbol
+    internal class PrimitiveFunctionSymbol : PrimitiveSymbol, IFunctionSymbol
     {
-        public FixedList<Parameter> Parameters { get; internal set; }
+        public FixedList<PrimitiveParameterSymbol> Parameters { get; internal set; }
 
         IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;
 
         public DataType ReturnType { get; internal set; } = DataType.Void;
 
-        private Function(Name fullName)
+        private PrimitiveFunctionSymbol(Name fullName)
             : base(fullName)
         {
-            Parameters = FixedList<Parameter>.Empty;
+            Parameters = FixedList<PrimitiveParameterSymbol>.Empty;
         }
 
-        public static Function New(Name fullName, params (string name, DataType type)[] parameters)
+        public static PrimitiveFunctionSymbol New(Name fullName, params (string name, DataType type)[] parameters)
         {
-            var func = new Function(fullName);
+            var func = new PrimitiveFunctionSymbol(fullName);
             func.SetParameters(parameters);
             return func;
         }
 
-        public static Function New(
+        public static PrimitiveFunctionSymbol New(
             Name fullName,
             DataType returnType,
             params (string name, DataType type)[] parameters)
         {
-            var func = new Function(fullName);
+            var func = new PrimitiveFunctionSymbol(fullName);
             func.SetParameters(parameters);
             func.ReturnType = returnType;
             return func;
@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 
         public void SetParameters(params (string name, DataType type)[] parameters)
         {
-            Parameters = parameters.Select(p => new Parameter(FullName.Qualify(p.name), p.type))
+            Parameters = parameters.Select(p => new PrimitiveParameterSymbol(FullName.Qualify(p.name), p.type))
                 .ToFixedList();
             ChildSymbols = new SymbolSet(Parameters);
         }

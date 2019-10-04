@@ -6,7 +6,6 @@ using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.AST.Walkers;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -14,8 +13,9 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal abstract class FunctionLikeSyntax : MemberDeclarationSyntax, ICallableDeclarationSyntax
+    internal abstract class CallableDeclarationSyntax : DeclarationSyntax, ICallableDeclarationSyntax
     {
+        public Name FullName { get; }
         private DataType? selfParameterType;
         [DisallowNull]
         public DataType? SelfParameterType
@@ -36,21 +36,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public TypePromise ReturnType { get; } = new TypePromise();
         DataType IFunctionSymbol.ReturnType => ReturnType.Fulfilled();
 
-        private ControlFlowGraph? controlFlow;
+        public SymbolSet ChildSymbols { get; protected set; }
 
-        [DisallowNull]
-        public ControlFlowGraph? ControlFlow
-        {
-            get => controlFlow;
-            set
-            {
-                if (controlFlow != null)
-                    throw new InvalidOperationException("Can't set ControlFlow repeatedly");
-                controlFlow = value ?? throw new ArgumentNullException(nameof(value));
-            }
-        }
-
-        protected FunctionLikeSyntax(
+        protected CallableDeclarationSyntax(
             TextSpan span,
             CodeFile file,
             FixedList<IModiferToken> modifiers,
@@ -58,12 +46,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan nameSpan,
             FixedList<IParameterSyntax> parameters,
             FixedList<IStatementSyntax>? body)
-            : base(span, file, fullName, nameSpan,
-                new SymbolSet(GetChildSymbols(parameters, body)))
+            : base(span, file, nameSpan)
         {
+            FullName = fullName;
             Modifiers = modifiers;
             Parameters = parameters;
             Body = body;
+            ChildSymbols = new SymbolSet(GetChildSymbols(parameters, body));
         }
 
         private static IEnumerable<ISymbol> GetChildSymbols(

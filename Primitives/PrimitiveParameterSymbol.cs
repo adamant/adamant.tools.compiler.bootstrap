@@ -4,21 +4,17 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 {
-    internal class Parameter : IBindingSymbol
+    internal class PrimitiveParameterSymbol : PrimitiveSymbol, IBindingSymbol
     {
-        public Name FullName { get; }
-
         public SimpleName Name => FullName.UnqualifiedName;
-
-        public SymbolSet ChildSymbols => SymbolSet.Empty;
 
         public DataType Type { get; }
 
         public bool IsMutableBinding => false;
 
-        public Parameter(Name fullName, DataType type)
+        public PrimitiveParameterSymbol(Name fullName, DataType type)
+            : base(fullName)
         {
-            FullName = fullName;
             Type = type;
         }
     }

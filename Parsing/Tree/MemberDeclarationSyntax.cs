@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -9,13 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal abstract class MemberDeclarationSyntax : DeclarationSyntax, IMemberDeclarationSyntax
     {
-        private IClassDeclarationSyntax? declaringType;
-
-        public IClassDeclarationSyntax DeclaringType
-        {
-            get => declaringType ?? throw new InvalidOperationException("Declaring type not set");
-            internal set => declaringType = value ?? throw new ArgumentNullException(nameof(value));
-        }
+        public IClassDeclarationSyntax DeclaringType { get; }
 
         public Name FullName { get; }
 
@@ -26,6 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public SymbolSet ChildSymbols { get; protected set; }
 
         protected MemberDeclarationSyntax(
+            IClassDeclarationSyntax declaringType,
             TextSpan span,
             CodeFile file,
             Name fullName,
@@ -33,6 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             SymbolSet? childSymbols = null)
             : base(span, file, nameSpan)
         {
+            DeclaringType = declaringType;
             FullName = fullName;
             ChildSymbols = childSymbols ?? SymbolSet.Empty;
         }

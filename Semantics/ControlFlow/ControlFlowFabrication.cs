@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
     /// </summary>
     public class ControlFlowFabrication
     {
-        private readonly ControlFlowGraphBuilder graph = new ControlFlowGraphBuilder();
+        private readonly ControlFlowGraphBuilder graph;
 
         /// <summary>
         /// The block we are currently adding statements to. Thus after control flow statements this
@@ -42,15 +42,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private Scope CurrentScope => scopes.Peek();
         private DataType? returnType;
 
-        public ControlFlowFabrication()
+        public ControlFlowFabrication(CodeFile file)
         {
+            graph = new ControlFlowGraphBuilder(file);
             // We start in the outer scope and need that on the stack
             var scope = Scope.Outer;
             scopes.Push(scope);
             nextScope = scope.Next();
         }
 
-        public void CreateGraph(IMethodDeclarationSyntax method)
+        public ControlFlowGraph CreateGraph(IMethodDeclarationSyntax method)
         {
             returnType = method.ReturnType.Known();
 
@@ -76,10 +77,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     Scope.Outer); // We officially ended the outer scope, but this is in it
             }
 
-            method.ControlFlow = graph.Build();
+            return graph.Build();
         }
 
-        public void CreateGraph(IConstructorDeclarationSyntax constructor)
+        public ControlFlowGraph CreateGraph(IConstructorDeclarationSyntax constructor)
         {
             returnType = constructor.DeclaringType.DeclaresType.Fulfilled();
 
@@ -105,10 +106,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     Scope.Outer); // We officially ended the outer scope, but this is in it
             }
 
-            constructor.ControlFlow = graph.Build();
+            return graph.Build();
         }
 
-        public void CreateGraph(IFunctionDeclarationSyntax method)
+        public ControlFlowGraph CreateGraph(IFunctionDeclarationSyntax method)
         {
             returnType = method.ReturnType.Known();
 
@@ -134,7 +135,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     Scope.Outer); // We officially ended the outer scope, but this is in it
             }
 
-            method.ControlFlow = graph.Build();
+            return graph.Build();
         }
 
         private void EnterNewScope()

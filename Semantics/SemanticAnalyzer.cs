@@ -51,19 +51,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             // --------------------------------------------------
             // This is where the representation transitions to IR
-            var declarations = BuildIL(entityDeclarations);
+            var ilDeclarations = BuildIL(entityDeclarations);
             // --------------------------------------------------
 
-            var liveness = LivenessAnalyzer.Check(callableDeclarations, SaveLivenessAnalysis);
+            var ilCallables = ilDeclarations.OfType<ICallableDeclaration>().ToFixedList();
 
-            BorrowChecker.Check(entityDeclarations, liveness, diagnostics, SaveBorrowClaims);
+            var liveness = LivenessAnalyzer.Check(ilCallables, SaveLivenessAnalysis);
+
+            BorrowChecker.Check(ilCallables, liveness, diagnostics, SaveBorrowClaims);
 
             // If there are errors from the previous phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
 
-            var entryPoint = DetermineEntryPoint(declarations, diagnostics);
+            var entryPoint = DetermineEntryPoint(ilDeclarations, diagnostics);
 
-            return new Package(packageSyntax.Name, diagnostics.Build(), references, declarations, entryPoint);
+            return new Package(packageSyntax.Name, diagnostics.Build(), references, ilDeclarations, entryPoint);
         }
 
         private static FixedList<IEntityDeclarationSyntax> BuildLexicalScopes(

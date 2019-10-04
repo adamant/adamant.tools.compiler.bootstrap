@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
     internal abstract class Syntax : ISyntax
     {
-        public TextSpan Span { get; }
+        public TextSpan Span { get; protected set; }
 
         protected Syntax(TextSpan span)
         {

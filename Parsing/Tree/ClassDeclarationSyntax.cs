@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
@@ -28,20 +29,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         DataType ITypeSymbol.DeclaresType => DeclaresType.Fulfilled();
 
         public ClassDeclarationSyntax(
-            TextSpan span,
+            TextSpan headerSpan,
             CodeFile file,
             FixedList<IModiferToken> modifiers,
             Name fullName,
             TextSpan nameSpan,
-            FixedList<MemberDeclarationSyntax> members)
-            : base(span, file, nameSpan)
+            Func<IClassDeclarationSyntax, (FixedList<IMemberDeclarationSyntax>, TextSpan)> parseMembers)
+            : base(headerSpan, file, nameSpan)
         {
             Modifiers = modifiers;
             FullName = fullName;
-            Members = members.ToFixedList<IMemberDeclarationSyntax>();
-            foreach (var member in members)
-                member.DeclaringType = this;
-            ChildSymbols = new SymbolSet(members);
+            var (members, bodySpan) = parseMembers(this);
+            Members = members;
+            ChildSymbols = new SymbolSet(Members);
+            Span = TextSpan.Covering(headerSpan, bodySpan);
         }
 
         public void CreateDefaultConstructor()

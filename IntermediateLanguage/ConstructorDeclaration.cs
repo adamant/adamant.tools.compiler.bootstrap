@@ -7,7 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
-    public class ConstructorDeclaration : Declaration, IFunctionSymbol
+    public class ConstructorDeclaration : Declaration, ICallableDeclaration, IFunctionSymbol
     {
         public FixedList<Parameter> Parameters { get; }
         public int Arity => Parameters.Count;

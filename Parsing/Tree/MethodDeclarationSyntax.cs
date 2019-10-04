@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -9,14 +10,20 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal class MethodDeclarationSyntax : FunctionLikeSyntax, IMethodDeclarationSyntax
+    internal class MethodDeclarationSyntax : CallableDeclarationSyntax, IMethodDeclarationSyntax
     {
+        public IClassDeclarationSyntax DeclaringType { get; }
+
+        [DebuggerHidden]
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public SimpleName Name => FullName.UnqualifiedName;
         IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;
         public IExpressionSyntax? LifetimeBounds { get; }
         public ITypeSyntax? ReturnTypeSyntax { get; }
         DataType IFunctionSymbol.ReturnType => ReturnType.Fulfilled();
 
         public MethodDeclarationSyntax(
+            IClassDeclarationSyntax declaringType,
             TextSpan span,
             CodeFile file,
             FixedList<IModiferToken> modifiers,
@@ -28,6 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IStatementSyntax>? body)
             : base(span, file, modifiers, fullName, nameSpan, parameters, body)
         {
+            DeclaringType = declaringType;
             LifetimeBounds = lifetimeBounds;
             ReturnTypeSyntax = returnTypeSyntax;
         }

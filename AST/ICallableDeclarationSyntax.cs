@@ -1,6 +1,4 @@
-using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using ExhaustiveMatching;
 
@@ -17,6 +15,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         new FixedList<IParameterSyntax> Parameters { get; }
         FixedList<IStatementSyntax>? Body { get; }
-        [DisallowNull] ControlFlowGraph? ControlFlow { get; set; }
     }
 }

@@ -2,8 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 
@@ -12,20 +12,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
     /// <summary>
     /// Compute where variables are live and return a structure of that
     /// </summary>
-    public class LivenessAnalyzer
+    public static class LivenessAnalyzer
     {
-        public static FixedDictionary<ControlFlowGraph, LiveVariables> Check(
-            FixedList<ICallableDeclarationSyntax> callableDeclarations,
+        public static FixedDictionary<ICallableDeclaration, LiveVariables> Check(
+            FixedList<ICallableDeclaration> functions,
             bool saveLivenessAnalysis)
         {
-            var analyses = new Dictionary<ControlFlowGraph, LiveVariables>();
-            var livenessAnalyzer = new LivenessAnalyzer();
-            foreach (var function in callableDeclarations.OfType<IMethodDeclarationSyntax>())
+            var analyses = new Dictionary<ICallableDeclaration, LiveVariables>();
+            foreach (var function in functions)
             {
-                var liveness = livenessAnalyzer.CheckFunction(function);
+                var liveness = ComputeLiveness(function);
                 if (liveness != null)
                 {
-                    analyses.Add(function.ControlFlow, liveness);
+                    analyses.Add(function, liveness);
                     if (saveLivenessAnalysis)
                         function.ControlFlow.LiveVariables = liveness;
                 }
@@ -34,31 +33,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
             return analyses.ToFixedDictionary();
         }
 
-        private LiveVariables CheckFunction(IMethodDeclarationSyntax method)
-        {
-            // Compute aliveness at point after each statement
-            return ComputeLiveness(method.ControlFlow);
-        }
-
         /// <summary>
         /// Perform a backwards data flow analysis to determine where each variable is live or dead
         /// </summary>
-        private static LiveVariables ComputeLiveness(ControlFlowGraph function)
+        private static LiveVariables ComputeLiveness(ICallableDeclaration function)
         {
+            var controlFlow = function.ControlFlow;
             var blocks = new Queue<BasicBlock>();
-            blocks.EnqueueRange(function.ExitBlocks);
-            var liveVariables = new LiveVariables(function);
-            var numberOfVariables = function.VariableDeclarations.Count;
+            blocks.EnqueueRange(controlFlow.ExitBlocks);
+            var liveVariables = new LiveVariables(controlFlow);
+            var numberOfVariables = controlFlow.VariableDeclarations.Count;
 
             while (blocks.TryDequeue(out var block))
             {
                 var liveBeforeBlock = new BitArray(liveVariables.Before(block.Statements.First()));
 
                 var liveAfterBlock = new BitArray(numberOfVariables);
-                foreach (var successor in function.Edges.From(block))
+                foreach (var successor in controlFlow.Edges.From(block))
                     liveAfterBlock.Or(liveVariables.Before(successor.Statements.First()));
 
-                if (block.Terminator is ReturnStatement && function.ReturnVariable.TypeIsNotEmpty)
+                if (block.Terminator is ReturnStatement && controlFlow.ReturnVariable.TypeIsNotEmpty)
                     liveAfterBlock[0] = true; // the return value is live after a block that returns
 
                 var liveAfterStatement = liveAfterBlock;
@@ -99,7 +93,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
                 }
 
                 if (!liveBeforeBlock.ValuesEqual(liveVariables.Before(block.Statements.First())))
-                    foreach (var basicBlock in function.Edges.To(block)
+                    foreach (var basicBlock in controlFlow.Edges.To(block)
                         .Where(fromBlock => !blocks.Contains(fromBlock)).ToList())
                         blocks.Enqueue(basicBlock);
             }

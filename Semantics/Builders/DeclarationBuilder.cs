@@ -108,7 +108,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
             var parameters = selfParameter.Yield().ToFixedList();
             //var constructorType = new FunctionType(selfType.Yield(), selfType);
 
-            var graph = new ControlFlowGraphBuilder();
+            var graph = new ControlFlowGraphBuilder(classDeclaration.File);
             graph.AddSelfParameter(selfType);
             var block = graph.NewBlock();
             block.AddReturn(classDeclaration.NameSpan, Scope.Outer);

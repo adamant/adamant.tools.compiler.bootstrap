@@ -8,8 +8,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         Not,
         Minus,
         Plus,
-        //At,
-        //Caret,
     }
 
     public static class UnaryOperatorExtensions
@@ -18,20 +16,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         {
             switch (@operator)
             {
-                //case UnaryOperator.At:
-                //    return "@";
+                default:
+                    throw ExhaustiveMatch.Failed(@operator);
                 case UnaryOperator.Not:
                     return "not ";
-                //case UnaryOperator.Caret:
-                //    return "^";
                 case UnaryOperator.Minus:
                     return "-";
                 case UnaryOperator.Plus:
                     return "+";
                 case UnaryOperator.Question:
                     return "?";
-                default:
-                    throw ExhaustiveMatch.Failed(@operator);
             }
         }
     }
