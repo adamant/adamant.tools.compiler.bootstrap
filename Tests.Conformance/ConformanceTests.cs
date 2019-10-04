@@ -58,74 +58,50 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             var stdLibPackage = CompileStdLib(compiler);
             references.Add("adamant.stdlib", stdLibPackage);
 
-            // Analyze
-            var package = compiler.CompilePackage("testPackage", codeFile.Yield(), references.ToFixedDictionary());
-
-            // Check for compiler errors
-            var expectedCompileErrorLines = ExpectedCompileErrorLines(codeFile, code);
-            Assert.NotNull(package.Diagnostics);
-            var diagnostics = package.Diagnostics;
-
-            if (diagnostics.Any())
+            try
             {
-                testOutput.WriteLine("Compiler Errors:");
-                foreach (var diagnostic in diagnostics)
-                {
-                    testOutput.WriteLine($"{testCase.RelativeCodePath}:{diagnostic.StartPosition.Line}:{diagnostic.StartPosition.Column} {diagnostic.Level} {diagnostic.ErrorCode}");
-                    testOutput.WriteLine(diagnostic.Message);
-                }
-                testOutput.WriteLine("");
+                // Analyze
+                var package = compiler.CompilePackage("testPackage", codeFile.Yield(),
+                    references.ToFixedDictionary());
+
+                // Check for compiler errors
+                Assert.NotNull(package.Diagnostics);
+                var diagnostics = package.Diagnostics;
+                var errorDiagnostics = CheckErrorsExpected(testCase, codeFile, code, diagnostics);
+
+                // Disassemble
+                var assembler = new Assembler();
+                testOutput.WriteLine(assembler.Disassemble(package));
+
+                // We got only expected errors, but need to not go on to emit code
+                if (errorDiagnostics.Any()) return;
+
+                // Emit Code
+                var codePath = Path.ChangeExtension(testCase.FullCodePath, "c");
+                EmitCode(package, stdLibPackage, codePath);
+
+                // Compile Code to Executable
+                var exePath = CompileToExecutable(codePath);
+
+                // Execute and check results
+                var process = Execute(exePath);
+
+                process.WaitForExit();
+                var stdout = process.StandardOutput.ReadToEnd();
+                testOutput.WriteLine("stdout:");
+                testOutput.WriteLine(stdout);
+                Assert.Equal(ExpectedOutput(code, "stdout", testCase.FullCodePath), stdout);
+                var stderr = process.StandardError.ReadToEnd();
+                testOutput.WriteLine("stderr:");
+                testOutput.WriteLine(stderr);
+                Assert.Equal(ExpectedOutput(code, "stderr", testCase.FullCodePath), stderr);
+                Assert.Equal(ExpectedExitCode(code), process.ExitCode);
             }
-
-            var errorDiagnostics = diagnostics
-                .Where(d => d.Level >= DiagnosticLevel.CompilationError).ToList();
-
-            var assembler = new Assembler();
-            testOutput.WriteLine(assembler.Disassemble(package));
-
-            if (expectedCompileErrorLines.Any())
+            catch (FatalCompilationErrorException ex)
             {
-                foreach (var expectedCompileErrorLine in expectedCompileErrorLines)
-                {
-                    // Assert a single error on the given line
-                    var errorsOnLine = errorDiagnostics.Count(e =>
-                        e.StartPosition.Line == expectedCompileErrorLine);
-                    Assert.True(errorsOnLine == 1,
-                        $"Expected one error on line {expectedCompileErrorLine}, found {errorsOnLine}");
-                }
+                var diagnostics = ex.Diagnostics;
+                CheckErrorsExpected(testCase, codeFile, code, diagnostics);
             }
-
-            foreach (var error in errorDiagnostics)
-            {
-                var errorLine = error.StartPosition.Line;
-                if (expectedCompileErrorLines.All(line => line != errorLine))
-                    Assert.True(false, $"Unexpected error on line {error.StartPosition.Line}");
-            }
-
-            // We got only expected errors, but need to not go on to emit code
-            if (errorDiagnostics.Any())
-                return;
-
-            // Emit Code
-            var codePath = Path.ChangeExtension(testCase.FullCodePath, "c");
-            EmitCode(package, stdLibPackage, codePath);
-
-            // Compile Code to Executable
-            var exePath = CompileToExecutable(codePath);
-
-            // Execute and check results
-            var process = Execute(exePath);
-
-            process.WaitForExit();
-            var stdout = process.StandardOutput.ReadToEnd();
-            testOutput.WriteLine("stdout:");
-            testOutput.WriteLine(stdout);
-            Assert.Equal(ExpectedOutput(code, "stdout", testCase.FullCodePath), stdout);
-            var stderr = process.StandardError.ReadToEnd();
-            testOutput.WriteLine("stderr:");
-            testOutput.WriteLine(stderr);
-            Assert.Equal(ExpectedOutput(code, "stderr", testCase.FullCodePath), stderr);
-            Assert.Equal(ExpectedExitCode(code), process.ExitCode);
         }
 
         private static Package CompileStdLib(AdamantCompiler compiler)
@@ -147,6 +123,53 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             var relativeDirectory = Path.GetDirectoryName(Path.GetRelativePath(sourceDir, path));
             var ns = rootNamespace.Concat(relativeDirectory.SplitOrEmpty(Path.DirectorySeparatorChar)).ToFixedList();
             return CodeFile.Load(path, ns);
+        }
+
+        private List<Diagnostic> CheckErrorsExpected(
+            TestCase testCase,
+            CodeFile codeFile,
+            string code,
+            FixedList<Diagnostic> diagnostics)
+        {
+            // Check for compiler errors
+            var expectedCompileErrorLines = ExpectedCompileErrorLines(codeFile, code);
+
+            if (diagnostics.Any())
+            {
+                testOutput.WriteLine("Compiler Errors:");
+                foreach (var diagnostic in diagnostics)
+                {
+                    testOutput.WriteLine(
+                        $"{testCase.RelativeCodePath}:{diagnostic.StartPosition.Line}:{diagnostic.StartPosition.Column} {diagnostic.Level} {diagnostic.ErrorCode}");
+                    testOutput.WriteLine(diagnostic.Message);
+                }
+
+                testOutput.WriteLine("");
+            }
+
+            var errorDiagnostics = diagnostics
+                .Where(d => d.Level >= DiagnosticLevel.CompilationError).ToList();
+
+            if (expectedCompileErrorLines.Any())
+            {
+                foreach (var expectedCompileErrorLine in expectedCompileErrorLines)
+                {
+                    // Assert a single error on the given line
+                    var errorsOnLine = errorDiagnostics.Count(e =>
+                        e.StartPosition.Line == expectedCompileErrorLine);
+                    Assert.True(errorsOnLine == 1,
+                        $"Expected one error on line {expectedCompileErrorLine}, found {errorsOnLine}");
+                }
+            }
+
+            foreach (var error in errorDiagnostics)
+            {
+                var errorLine = error.StartPosition.Line;
+                if (expectedCompileErrorLines.All(line => line != errorLine))
+                    Assert.True(false, $"Unexpected error on line {error.StartPosition.Line}");
+            }
+
+            return errorDiagnostics;
         }
 
         private static List<int> ExpectedCompileErrorLines(CodeFile codeFile, string code)
