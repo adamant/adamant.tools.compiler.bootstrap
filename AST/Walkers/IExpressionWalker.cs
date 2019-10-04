@@ -21,5 +21,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
 
         void Enter(IReturnExpressionSyntax returnExpression);
         void Exit(IReturnExpressionSyntax returnExpression);
+
+        void Enter(IIntegerLiteralExpressionSyntax integerLiteralExpression);
+        void Exit(IIntegerLiteralExpressionSyntax integerLiteralExpression);
     }
 }

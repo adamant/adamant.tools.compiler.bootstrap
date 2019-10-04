@@ -138,6 +138,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                     Walk(returnExpression.ReturnValue);
                     expressionWalker?.Exit(returnExpression);
                     break;
+                case IIntegerLiteralExpressionSyntax integerLiteralExpression:
+                    expressionWalker?.Enter(integerLiteralExpression);
+                    expressionWalker?.Exit(integerLiteralExpression);
+                    break;
             }
         }
     }
