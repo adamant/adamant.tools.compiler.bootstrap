@@ -82,7 +82,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
         public ControlFlowGraph CreateGraph(IConstructorDeclarationSyntax constructor)
         {
-            returnType = constructor.DeclaringType.DeclaresType.Fulfilled();
+            returnType = constructor.DeclaringClass.DeclaresType.Fulfilled();
 
             // Temp Variable for return
             graph.AddSelfParameter(constructor.SelfParameterType);

@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal abstract class MemberDeclarationSyntax : DeclarationSyntax, IMemberDeclarationSyntax
     {
-        public IClassDeclarationSyntax DeclaringType { get; }
+        public IClassDeclarationSyntax DeclaringClass { get; }
 
         public Name FullName { get; }
 
@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public SymbolSet ChildSymbols { get; protected set; }
 
         protected MemberDeclarationSyntax(
-            IClassDeclarationSyntax declaringType,
+            IClassDeclarationSyntax declaringClass,
             TextSpan span,
             CodeFile file,
             Name fullName,
@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             SymbolSet? childSymbols = null)
             : base(span, file, nameSpan)
         {
-            DeclaringType = declaringType;
+            DeclaringClass = declaringClass;
             FullName = fullName;
             ChildSymbols = childSymbols ?? SymbolSet.Empty;
         }

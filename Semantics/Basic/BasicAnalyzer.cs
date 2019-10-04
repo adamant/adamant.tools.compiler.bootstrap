@@ -91,14 +91,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         private void ResolveSignatureTypesInConstructor(IConstructorDeclarationSyntax constructor)
         {
             // Resolve the declaring type because we need its type for things like `self`
-            if (constructor.DeclaringType != null)
-                ResolveSignatureTypesInClassDeclaration(constructor.DeclaringType);
+            if (constructor.DeclaringClass != null)
+                ResolveSignatureTypesInClassDeclaration(constructor.DeclaringClass);
 
-            var selfType = constructor.DeclaringType?.DeclaresType.Fulfilled();
+            var selfType = constructor.DeclaringClass?.DeclaresType.Fulfilled();
             constructor.SelfParameterType = ((UserObjectType)selfType).ForConstructorSelf();
             var analyzer = new BasicStatementAnalyzer(constructor.File, diagnostics, selfType);
 
-            ResolveTypesInParameters(analyzer, constructor.Parameters, constructor.DeclaringType);
+            ResolveTypesInParameters(analyzer, constructor.Parameters, constructor.DeclaringClass);
 
         }
 
@@ -106,13 +106,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         private void ResolveSignatureTypesInMethod(IMethodDeclarationSyntax method)
         {
             // Resolve the declaring type because we need its type for things like `self`
-            if (method.DeclaringType != null)
-                ResolveSignatureTypesInClassDeclaration(method.DeclaringType);
+            if (method.DeclaringClass != null)
+                ResolveSignatureTypesInClassDeclaration(method.DeclaringClass);
 
             var selfType = ResolveSelfType(method);
             var analyzer = new BasicStatementAnalyzer(method.File, diagnostics, selfType);
 
-            ResolveTypesInParameters(analyzer, method.Parameters, method.DeclaringType);
+            ResolveTypesInParameters(analyzer, method.Parameters, method.DeclaringClass);
 
             ResolveReturnType(method.ReturnType, method.ReturnTypeSyntax, analyzer);
         }
@@ -128,7 +128,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private static DataType? ResolveSelfType(IMethodDeclarationSyntax method)
         {
-            var declaringType = method.DeclaringType?.DeclaresType.Fulfilled();
+            var declaringType = method.DeclaringClass?.DeclaresType.Fulfilled();
             if (declaringType == null)
                 return null;
 

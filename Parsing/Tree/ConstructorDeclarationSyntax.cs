@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class ConstructorDeclarationSyntax : CallableDeclarationSyntax, IConstructorDeclarationSyntax
     {
-        public IClassDeclarationSyntax DeclaringType { get; }
+        public IClassDeclarationSyntax DeclaringClass { get; }
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IStatementSyntax> body)
             : base(span, file, modifiers, fullName, nameSpan, parameters, body)
         {
-            DeclaringType = declaringType;
+            DeclaringClass = declaringType;
         }
 
         public override string ToString()

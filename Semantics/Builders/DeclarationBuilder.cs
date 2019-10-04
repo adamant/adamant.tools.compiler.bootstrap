@@ -55,7 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                 case IMethodDeclarationSyntax method:
                 {
                     var controlFlowGraph = controlFlowGraphFactory.CreateGraph(method);
-                    declaration = new FunctionDeclaration(false, method.DeclaringType != null,
+                    declaration = new FunctionDeclaration(false, method.DeclaringClass != null,
                         method.FullName, BuildParameters(method.Parameters),
                         method.ReturnType.Known(), controlFlowGraph);
                     break;

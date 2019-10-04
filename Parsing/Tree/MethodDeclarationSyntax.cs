@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class MethodDeclarationSyntax : CallableDeclarationSyntax, IMethodDeclarationSyntax
     {
-        public IClassDeclarationSyntax DeclaringType { get; }
+        public IClassDeclarationSyntax DeclaringClass { get; }
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         DataType IFunctionSymbol.ReturnType => ReturnType.Fulfilled();
 
         public MethodDeclarationSyntax(
-            IClassDeclarationSyntax declaringType,
+            IClassDeclarationSyntax declaringClass,
             TextSpan span,
             CodeFile file,
             FixedList<IModiferToken> modifiers,
@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IStatementSyntax>? body)
             : base(span, file, modifiers, fullName, nameSpan, parameters, body)
         {
-            DeclaringType = declaringType;
+            DeclaringClass = declaringClass;
             LifetimeBounds = lifetimeBounds;
             ReturnTypeSyntax = returnTypeSyntax;
         }
