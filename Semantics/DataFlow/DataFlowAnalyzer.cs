@@ -44,7 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
         public override void VisitAssignmentExpression(IAssignmentExpressionSyntax assignmentExpression, Void args)
         {
             VisitLValueExpression(assignmentExpression.LeftOperand, args);
-            VisitExpression(assignmentExpression.RightOperand, args);
+            VisitTransfer(assignmentExpression.RightOperand, args);
             currentState = checker.Assignment(assignmentExpression, currentState);
         }
 
@@ -83,7 +83,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
         {
             // overriden to avoid visiting the function name
             foreach (var argument in functionInvocationExpression.Arguments)
-                VisitExpression(argument.Value, args);
+                VisitTransfer(argument, args);
         }
     }
 }

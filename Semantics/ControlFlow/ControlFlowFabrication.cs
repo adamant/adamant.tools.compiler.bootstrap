@@ -301,9 +301,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     {
                         var isOwn = returnType.ValueSemantics == ValueSemantics.Own;
                         var value = isOwn
-                            ? ConvertToOwn(returnExpression.ReturnValue, returnExpression.Span)
+                            ? ConvertToOwn(returnExpression.ReturnValue.Expression, returnExpression.Span)
                             // TODO avoid getting a move from this just because it is a new object expression
-                            : ConvertToValue(returnExpression.ReturnValue);
+                            : ConvertToValue(returnExpression.ReturnValue.Expression);
                         AssignToPlace(
                             graph.ReturnVariable.LValueReference(returnExpression.ReturnValue.Span),
                             value, returnExpression.ReturnValue.Span);
@@ -470,7 +470,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     return;
                 case IAssignmentExpressionSyntax assignmentExpression:
                 {
-                    var value = ConvertToValue(assignmentExpression.RightOperand);
+                    var value = ConvertToValue(assignmentExpression.RightOperand.Expression);
                     var place = ConvertToPlace(assignmentExpression.LeftOperand);
 
                     if (assignmentExpression.Operator != AssignmentOperator.Simple)
@@ -524,7 +524,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     throw NonExhaustiveMatchException.For(expression);
                 case INewObjectExpressionSyntax newObjectExpression:
                 {
-                    var args = newObjectExpression.Arguments.Select(a => ConvertToOperand(a.Value))
+                    var args = newObjectExpression.Arguments.Select(a => ConvertToOperand(a.Expression))
                         .ToFixedList();
                     var type = (UserObjectType)newObjectExpression.Type;
                     // lifetime is implicitly owned since we are making a new one
@@ -610,7 +610,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 //    // TODO shouldn't borrowing be explicit in the IR and don't we
                 //    // need to be able to check mutability on borrows?
                 //    return ConvertToValue(mutable.Referent);
-                case IMoveExpressionSyntax move:
+                case IMoveTransferSyntax move:
                     return ConvertToOwn(move.Expression, move.Span);
                 case IImplicitImmutabilityConversionExpression implicitImmutabilityConversion:
                 {
@@ -767,7 +767,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private Value ConvertInvocationToValue(IMethodInvocationExpressionSyntax invocationExpression)
         {
             var self = ConvertToOperand(invocationExpression.Target);
-            var arguments = invocationExpression.Arguments.Select(a => ConvertToOperand(a.Value)).ToList();
+            var arguments = invocationExpression.Arguments.Select(a => ConvertToOperand(a.Expression)).ToList();
             var symbol = (IFunctionSymbol)invocationExpression.MethodNameSyntax.ReferencedSymbol;
             switch (invocationExpression.Target.Type)
             {
@@ -784,7 +784,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private Value ConvertInvocationToValue(IFunctionInvocationExpressionSyntax invocationExpression)
         {
             var functionSymbol = (IFunctionSymbol)invocationExpression.FunctionNameSyntax.ReferencedSymbol;
-            var arguments = invocationExpression.Arguments.Select(a => ConvertToOperand(a.Value)).ToList();
+            var arguments = invocationExpression.Arguments.Select(a => ConvertToOperand(a.Expression)).ToList();
             return new FunctionCall(functionSymbol.FullName, arguments, invocationExpression.Span);
         }
 

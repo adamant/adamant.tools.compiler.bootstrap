@@ -14,7 +14,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             switch (Tokens.Current)
             {
-
+                default:
+                    throw new NotImplementedException();
                 case IMutableKeywordToken _:
                 {
                     var mutableKeyword = Tokens.Expect<IMutableKeywordToken>();
@@ -26,8 +27,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     return ParseTypeName();
                 case IPrimitiveTypeToken _:
                     return ParsePrimitiveType();
-                default:
-                    throw new NotImplementedException();
             }
         }
 

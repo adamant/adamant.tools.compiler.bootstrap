@@ -96,9 +96,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 case IImplicitConversionExpression implicitConversionExpression:
                     VisitImplicitConversionExpression(implicitConversionExpression, args);
                     break;
-                case IMoveExpressionSyntax moveExpression:
-                    VisitMoveExpression(moveExpression, args);
-                    break;
                 case IForeachExpressionSyntax foreachExpression:
                     VisitForeachExpression(foreachExpression, args);
                     break;
@@ -157,9 +154,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             VisitExpression(foreachExpression.Block, args);
         }
 
-        public virtual void VisitMoveExpression(IMoveExpressionSyntax moveExpression, A args)
+        public virtual void VisitMoveTransfer(IMoveTransferSyntax moveTransfer, A args)
         {
-            VisitExpression(moveExpression.Expression, args);
+            VisitExpression(moveTransfer.Expression, args);
         }
 
         public virtual void VisitMutableType(IMutableTypeSyntax mutableType, A args)
@@ -272,6 +269,37 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             }
         }
 
+        public virtual void VisitTransfer(ITransferSyntax? transfer, A args)
+        {
+            switch (transfer)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(transfer);
+                case null:
+                    // ignore
+                    break;
+                case IImmutableTransferSyntax immutableTransfer:
+                    VisitImmutableTransfer(immutableTransfer, args);
+                    break;
+                case IMutableTransferSyntax mutableTransfer:
+                    VisitMutableTransfer(mutableTransfer, args);
+                    break;
+                case IMoveTransferSyntax moveTransfer:
+                    VisitMoveTransfer(moveTransfer, args);
+                    break;
+            }
+        }
+
+        public virtual void VisitMutableTransfer(IMutableTransferSyntax mutableTransfer, A args)
+        {
+            VisitExpression(mutableTransfer.Expression, args);
+        }
+
+        public virtual void VisitImmutableTransfer(IImmutableTransferSyntax immutableTransfer, A args)
+        {
+            VisitExpression(immutableTransfer.Expression, args);
+        }
+
         public virtual void VisitLoopExpression(ILoopExpressionSyntax loopExpression, A args)
         {
             VisitExpression(loopExpression.Block, args);
@@ -295,7 +323,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         {
             VisitType(newObjectExpression.TypeSyntax, args);
             foreach (var argument in newObjectExpression.Arguments)
-                VisitExpression(argument.Value, args);
+                VisitTransfer(argument, args);
         }
 
         public virtual void VisitReferenceLifetimeType(IReferenceLifetimeTypeSyntax referenceLifetimeType, A args)
@@ -312,7 +340,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         public virtual void VisitAssignmentExpression(IAssignmentExpressionSyntax assignmentExpression, A args)
         {
             VisitExpression(assignmentExpression.LeftOperand, args);
-            VisitExpression(assignmentExpression.RightOperand, args);
+            VisitTransfer(assignmentExpression.RightOperand, args);
         }
 
         public virtual void VisitUnaryOperatorExpression(IUnaryOperatorExpressionSyntax unaryOperatorExpression, A args)
@@ -355,25 +383,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
         {
             VisitNameExpression(functionInvocationExpression.FunctionNameSyntax, args);
             foreach (var argument in functionInvocationExpression.Arguments)
-                VisitExpression(argument.Value, args);
+                VisitTransfer(argument, args);
         }
 
         public virtual void VisitAssociatedFunctionInvocation(IAssociatedFunctionInvocationExpressionSyntax associatedFunctionInvocationExpression, A args)
         {
             foreach (var argument in associatedFunctionInvocationExpression.Arguments)
-                VisitExpression(argument.Value, args);
+                VisitTransfer(argument, args);
         }
 
         public virtual void VisitMethodInvocation(IMethodInvocationExpressionSyntax methodInvocationExpression, A args)
         {
             VisitExpression(methodInvocationExpression.Target, args);
             foreach (var argument in methodInvocationExpression.Arguments)
-                VisitExpression(argument.Value, args);
+                VisitTransfer(argument, args);
         }
 
         public virtual void VisitReturnExpression(IReturnExpressionSyntax returnExpression, A args)
         {
-            VisitExpression(returnExpression.ReturnValue, args);
+            VisitTransfer(returnExpression.ReturnValue, args);
         }
 
         public virtual void VisitBinaryOperatorExpression(IBinaryOperatorExpressionSyntax binaryOperatorExpression, A args)

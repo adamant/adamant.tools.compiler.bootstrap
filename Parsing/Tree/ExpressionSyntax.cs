@@ -16,7 +16,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public bool Poisoned { get; private set; }
 
         private DataType? type;
-
         [DisallowNull]
         public DataType? Type
         {

@@ -24,8 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
 
         public void Walk(IDeclarationSyntax? declaration)
         {
-            if (declaration == null
-               || (declarationWalker?.ShouldSkip(declaration) ?? false))
+            if (declaration == null || (declarationWalker?.ShouldSkip(declaration) ?? false))
                 return;
 
             switch (declaration)
@@ -35,8 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                     throw ExhaustiveMatch.Failed(declaration);
                 case IClassDeclarationSyntax classDeclaration:
                     declarationWalker?.Enter(classDeclaration);
-                    foreach (var member in classDeclaration.Members)
-                        Walk(member);
+                    foreach (var member in classDeclaration.Members) Walk(member);
                     declarationWalker?.Exit(classDeclaration);
                     break;
             }
@@ -44,8 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
 
         public void Walk(ITypeSyntax? type)
         {
-            if (typeWalker is null || type == null || typeWalker.ShouldSkip(type))
-                return;
+            if (typeWalker is null || type == null || typeWalker.ShouldSkip(type)) return;
 
             switch (type)
             {
@@ -70,9 +67,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
 
         public void Walk(IStatementSyntax? statement)
         {
-            if (statement == null
-                || (statementWalker?.ShouldSkip(statement) ?? false))
-                return;
+            if (statement == null || (statementWalker?.ShouldSkip(statement) ?? false)) return;
 
             switch (statement)
             {
@@ -115,6 +110,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                         Walk(resultStatement.Expression);
                         statementWalker?.Exit(resultStatement);
                     }
+
                     break;
             }
         }
@@ -139,13 +135,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                         Walk(ifExpression.ElseClause);
                         expressionWalker?.Exit(ifExpression);
                     }
+
                     break;
             }
         }
 
         public void Walk(IBlockExpressionSyntax? blockExpression)
         {
-            if (blockExpression == null || (expressionWalker?.ShouldSkip(blockExpression) ?? false)) return;
+            if (blockExpression == null || (expressionWalker?.ShouldSkip(blockExpression) ?? false))
+                return;
 
             expressionWalker?.Enter(blockExpression);
             foreach (var statement in blockExpression.Statements) Walk(statement);
@@ -154,8 +152,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
 
         public void Walk(IExpressionSyntax? expression)
         {
-            if (expression == null || (expressionWalker?.ShouldSkip(expression) ?? false))
-                return;
+            if (expression == null || (expressionWalker?.ShouldSkip(expression) ?? false)) return;
 
             switch (expression)
             {
@@ -169,15 +166,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                     break;
                 case IBlockExpressionSyntax blockExpression:
                     expressionWalker?.Enter(blockExpression);
-                    foreach (var statement in blockExpression.Statements)
-                        Walk(statement);
+                    foreach (var statement in blockExpression.Statements) Walk(statement);
                     expressionWalker?.Exit(blockExpression);
                     break;
                 case IFunctionInvocationExpressionSyntax functionInvocationExpression:
                     expressionWalker?.Enter(functionInvocationExpression);
                     Walk(functionInvocationExpression.FunctionNameSyntax);
                     foreach (var argument in functionInvocationExpression.Arguments)
-                        Walk(argument.Value);
+                        Walk(argument);
                     expressionWalker?.Exit(functionInvocationExpression);
                     break;
                 case INameExpressionSyntax nameExpression:
@@ -202,7 +198,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                     Walk(methodInvocationExpression.Target);
                     Walk(methodInvocationExpression.MethodNameSyntax);
                     foreach (var argument in methodInvocationExpression.Arguments)
-                        Walk(argument.Value);
+                        Walk(argument);
                     expressionWalker?.Exit(methodInvocationExpression);
                     break;
                 case IAssignmentExpressionSyntax assignmentExpression:
@@ -215,8 +211,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                     expressionWalker?.Enter(newObjectExpression);
                     Walk(newObjectExpression.TypeSyntax);
                     Walk(newObjectExpression.ConstructorName);
-                    foreach (var argument in newObjectExpression.Arguments)
-                        Walk(argument.Value);
+                    foreach (var argument in newObjectExpression.Arguments) Walk(argument);
                     expressionWalker?.Exit(newObjectExpression);
                     break;
                 case IBoolLiteralExpressionSyntax boolLiteralExpression:
@@ -264,7 +259,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                     expressionWalker?.Enter(nextExpression);
                     expressionWalker?.Exit(nextExpression);
                     break;
-                case IMoveExpressionSyntax moveExpression:
+                case IMoveTransferSyntax moveExpression:
                     expressionWalker?.Enter(moveExpression);
                     Walk(moveExpression.Expression);
                     expressionWalker?.Exit(moveExpression);
@@ -288,6 +283,33 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                     expressionWalker?.Exit(foreachExpression);
                     break;
             }
+        }
+
+        public void Walk(ITransferSyntax? transfer)
+        {
+            if (transfer == null || (expressionWalker?.ShouldSkip(transfer) ?? false)) return;
+
+            switch (transfer)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(transfer);
+                case IImmutableTransferSyntax immutableTransfer:
+                    expressionWalker?.Enter(immutableTransfer);
+                    Walk(immutableTransfer.Expression);
+                    expressionWalker?.Exit(immutableTransfer);
+                    break;
+                case IMutableTransferSyntax mutableTransfer:
+                    expressionWalker?.Enter(mutableTransfer);
+                    Walk(mutableTransfer.Expression);
+                    expressionWalker?.Exit(mutableTransfer);
+                    break;
+                case IMoveTransferSyntax moveTransfer:
+                    expressionWalker?.Enter(moveTransfer);
+                    Walk(moveTransfer.Expression);
+                    expressionWalker?.Exit(moveTransfer);
+                    break;
+            }
+
         }
     }
 }

@@ -3,6 +3,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
     public interface IExpressionWalker
     {
         bool ShouldSkip(IExpressionSyntax expression);
+        bool ShouldSkip(ITransferSyntax transfer);
 
         void Enter(IUnsafeExpressionSyntax unsafeExpression);
         void Exit(IUnsafeExpressionSyntax unsafeExpression);
@@ -61,8 +62,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
         void Enter(INextExpressionSyntax nextExpression);
         void Exit(INextExpressionSyntax nextExpression);
 
-        void Enter(IMoveExpressionSyntax moveExpression);
-        void Exit(IMoveExpressionSyntax moveExpression);
+        void Enter(IMoveTransferSyntax moveTransfer);
+        void Exit(IMoveTransferSyntax moveTransfer);
 
         void Enter(IMemberAccessExpressionSyntax memberAccessExpression);
         void Exit(IMemberAccessExpressionSyntax memberAccessExpression);
@@ -72,5 +73,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
 
         void Enter(IForeachExpressionSyntax foreachExpression);
         void Exit(IForeachExpressionSyntax foreachExpression);
+
+        void Enter(IImmutableTransferSyntax immutableTransfer);
+        void Exit(IImmutableTransferSyntax immutableTransfer);
+
+        void Enter(IMutableTransferSyntax mutableTransfer);
+        void Exit(IMutableTransferSyntax mutableTransfer);
     }
 }

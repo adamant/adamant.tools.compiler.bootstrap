@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan span,
             IExpressionSyntax target,
             INameExpressionSyntax methodNameSyntax,
-            FixedList<Argument> arguments)
+            FixedList<ITransferSyntax> arguments)
             : base(span, methodNameSyntax.Name, arguments)
         {
             this.target = target;

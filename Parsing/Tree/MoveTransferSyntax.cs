@@ -3,14 +3,11 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal class MoveExpressionSyntax : ExpressionSyntax, IMoveExpressionSyntax
+    internal class MoveTransferSyntax : TransferSyntax, IMoveTransferSyntax
     {
-        public IExpressionSyntax Expression { get; }
-
-        public MoveExpressionSyntax(TextSpan span, IExpressionSyntax expression)
-            : base(span)
+        public MoveTransferSyntax(TextSpan span, IExpressionSyntax expression)
+            : base(span, expression)
         {
-            Expression = expression;
         }
 
         public override string ToString()

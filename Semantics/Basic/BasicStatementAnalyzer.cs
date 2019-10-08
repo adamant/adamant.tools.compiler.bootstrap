@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -138,17 +139,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             switch (expression.Type)
             {
                 case SizedIntegerType expressionType:
-                {
                     switch (targetType)
                     {
                         case SizedIntegerType expectedType:
                             if (expectedType.Bits > expressionType.Bits
                                 && (!expressionType.IsSigned || expectedType.IsSigned))
-                                expression = new ImplicitNumericConversionExpression(expression, expectedType);
+                                expression =
+                                    new ImplicitNumericConversionExpression(expression,
+                                        expectedType);
                             break;
                     }
-                }
-                break;
+                    break;
                 case IntegerConstantType expressionType:
                     var requireSigned = expressionType.Value < 0;
                     switch (targetType)
@@ -222,30 +223,33 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             return actualType;
         }
 
-        private DataType InferExpressionType(ref IExpressionSyntax expression)
+        private DataType InferExpressionType([DisallowNull] ref IExpressionSyntax? expression)
         {
             switch (expression)
             {
                 default:
                     throw ExhaustiveMatch.Failed(expression);
+                case null:
+                    return DataType.Unknown;
                 case IReturnExpressionSyntax returnExpression:
                 {
                     if (returnExpression.ReturnValue != null)
                     {
+                        // TODO report an error instead of throwing
                         if (returnType == null)
-                            throw new NotImplementedException("Null return type. Report an error?");
+                            throw new NotImplementedException("Return statement in constructor");
 
                         // If we return ownership, there is an implicit move
                         if (returnType is UserObjectType objectType && objectType.IsOwned)
-                            InferMoveExpressionType(returnExpression.ReturnValue);
+                            InferMoveExpressionType(returnExpression.ReturnValue.Expression);
                         else
-                            InferExpressionType(ref returnExpression.ReturnValue);
-                        InsertImplicitConversionIfNeeded(ref returnExpression.ReturnValue,
+                            InferExpressionType(ref returnExpression.ReturnValue.Expression);
+                        InsertImplicitConversionIfNeeded(ref returnExpression.ReturnValue.Expression,
                             returnType);
                         var type = returnExpression.ReturnValue.Type;
                         if (!IsAssignableFrom(returnType, type))
                             diagnostics.Add(TypeError.CannotConvert(file,
-                                returnExpression.ReturnValue, type, returnType));
+                                returnExpression.ReturnValue.Expression, type, returnType));
                     }
                     else if (returnType == DataType.Never)
                         diagnostics.Add(
@@ -367,7 +371,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
                 case INewObjectExpressionSyntax newObjectExpression:
                 {
-                    var argumentTypes = newObjectExpression.Arguments.Select(argument => InferExpressionType(ref argument.Value)).ToFixedList();
+                    var argumentTypes = newObjectExpression.Arguments.Select(argument => InferExpressionType(ref argument.Expression)).ToFixedList();
                     // TODO handle named constructors here
                     var constructingType = typeAnalyzer.Evaluate(newObjectExpression.TypeSyntax);
                     if (!constructingType.IsKnown)
@@ -437,7 +441,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     // * Invoke a static function
                     // * Invoke a method
                     // * Invoke a function pointer
-                    var argumentTypes = methodInvocation.Arguments.Select(argument => InferExpressionType(ref argument.Value)).ToFixedList();
+                    var argumentTypes = methodInvocation.Arguments.Select(argument => InferExpressionType(ref argument.Expression)).ToFixedList();
                     InferExpressionType(ref methodInvocation.Target);
                     var targetType = methodInvocation.Target.Type;
                     // If it is unknown, we already reported an error
@@ -462,8 +466,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     foreach (var (arg, type) in methodInvocation.Arguments
                             .Zip(functionSymbol.Parameters.Skip(1).Select(p => p.Type)))
                     {
-                        InsertImplicitConversionIfNeeded(ref arg.Value, type);
-                        CheckArgumentTypeCompatibility(type, arg.Value);
+                        InsertImplicitConversionIfNeeded(ref arg.Expression, type);
+                        CheckArgumentTypeCompatibility(type, arg.Expression);
                     }
 
                     return methodInvocation.Type = functionSymbol.ReturnType;
@@ -544,29 +548,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IAssignmentExpressionSyntax assignmentExpression:
                 {
                     var left = InferExpressionType(ref assignmentExpression.LeftOperand);
-                    InferExpressionType(ref assignmentExpression.RightOperand);
-                    InsertImplicitConversionIfNeeded(ref assignmentExpression.RightOperand, left);
+                    InferExpressionType(ref assignmentExpression.RightOperand.Expression);
+                    InsertImplicitConversionIfNeeded(ref assignmentExpression.RightOperand.Expression, left);
                     var right = assignmentExpression.RightOperand.Type;
                     if (!IsAssignableFrom(left, right))
                         diagnostics.Add(TypeError.CannotConvert(file,
-                            assignmentExpression.RightOperand, right, left));
+                            assignmentExpression.RightOperand.Expression, right, left));
                     return assignmentExpression.Type = DataType.Void;
                 }
                 case ISelfExpressionSyntax selfExpression:
                     return selfExpression.Type = selfType ?? DataType.Unknown;
-                case IMoveExpressionSyntax moveExpression:
-                {
-                    var type = InferMoveExpressionType(moveExpression.Expression);
-                    if (type is ReferenceType referenceType && !referenceType.IsOwned)
-                    {
-                        diagnostics.Add(TypeError.CannotMoveBorrowedValue(file, moveExpression));
-                        type = referenceType.WithLifetime(Lifetime.Owned);
-                    }
+                //case IMoveTransferSyntax moveExpression:
+                //{
+                //    var type = InferMoveExpressionType(moveExpression.Expression);
+                //    if (type is ReferenceType referenceType && !referenceType.IsOwned)
+                //    {
+                //        diagnostics.Add(TypeError.CannotMoveBorrowedValue(file, moveExpression));
+                //        type = referenceType.WithLifetime(Lifetime.Owned);
+                //    }
 
-                    if (type is UserObjectType objectType)
-                        type = objectType.AsOwnedUpgradable();
-                    return moveExpression.Type = type;
-                }
+                //    if (type is UserObjectType objectType)
+                //        type = objectType.AsOwnedUpgradable();
+                //    return moveExpression.Type = type;
+                //}
                 case INoneLiteralExpressionSyntax noneLiteralExpression:
                     return noneLiteralExpression.Type = DataType.None;
                 case IImplicitConversionExpression _:
@@ -575,14 +579,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     throw new Exception("Should be inferring type of type expression");
                 case IBlockExpressionSyntax blockSyntax:
                     return InferBlockType(blockSyntax);
-                case null:
-                    return DataType.Unknown;
             }
         }
 
         private DataType InferFunctionInvocationType(IFunctionInvocationExpressionSyntax functionInvocationExpression)
         {
-            var argumentTypes = functionInvocationExpression.Arguments.Select(argument => InferExpressionType(ref argument.Value)).ToFixedList();
+            var argumentTypes = functionInvocationExpression.Arguments.Select(argument => InferExpressionType(ref argument.Expression)).ToFixedList();
             var symbols = functionInvocationExpression.FunctionNameSyntax.LookupInContainingScope()
                 .OfType<IFunctionSymbol>().ToFixedList();
             symbols = ResolveOverload(symbols, null, argumentTypes);
@@ -590,8 +592,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             functionInvocationExpression.FunctionNameSyntax.ReferencedSymbol = functionSymbol;
             foreach (var (arg, parameter) in functionInvocationExpression.Arguments.Zip(functionSymbol.Parameters))
             {
-                InsertImplicitConversionIfNeeded(ref arg.Value, parameter.Type);
-                CheckArgumentTypeCompatibility(parameter.Type, arg.Value);
+                InsertImplicitConversionIfNeeded(ref arg.Expression, parameter.Type);
+                CheckArgumentTypeCompatibility(parameter.Type, arg.Expression);
             }
 
             return functionInvocationExpression.Type = functionSymbol.ReturnType;

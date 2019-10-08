@@ -13,7 +13,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(IReturnExpressionSyntax),
         typeof(IWhileExpressionSyntax),
         typeof(IMemberAccessExpressionSyntax),
-        typeof(IMoveExpressionSyntax),
         typeof(ILoopExpressionSyntax),
         typeof(ILifetimeExpressionSyntax),
         typeof(IBlockExpressionSyntax),

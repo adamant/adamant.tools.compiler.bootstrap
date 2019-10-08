@@ -55,7 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             var references = new Dictionary<string, Package>();
 
             // Reference Standard Library
-            var stdLibPackage = CompileStdLib(compiler);
+            var stdLibPackage = CompileStdLib(testCase, compiler);
             references.Add("adamant.stdlib", stdLibPackage);
 
             try
@@ -74,7 +74,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
                 testOutput.WriteLine(assembler.Disassemble(package));
 
                 // We got only expected errors, but need to not go on to emit code
-                if (errorDiagnostics.Any()) return;
+                if (errorDiagnostics.Any())
+                    return;
 
                 // Emit Code
                 var codePath = Path.ChangeExtension(testCase.FullCodePath, "c");
@@ -104,15 +105,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             }
         }
 
-        private static Package CompileStdLib(AdamantCompiler compiler)
+        private Package CompileStdLib(TestCase testCase, AdamantCompiler compiler)
         {
-            var sourceDir = Path.Combine(SolutionDirectory.Get(), @"stdlib\src");
-            var sourcePaths = Directory.EnumerateFiles(sourceDir, "*.ad", SearchOption.AllDirectories);
-            var rootNamespace = FixedList<string>.Empty;
-            var codeFiles = sourcePaths.Select(p => LoadCode(p, sourceDir, rootNamespace)).ToList();
-            return compiler.CompilePackage("adamant.stdlib",
-                codeFiles,
-                FixedDictionary<string, Package>.Empty);
+            try
+            {
+                var sourceDir = Path.Combine(SolutionDirectory.Get(), @"stdlib\src");
+                var sourcePaths =
+                    Directory.EnumerateFiles(sourceDir, "*.ad", SearchOption.AllDirectories);
+                var rootNamespace = FixedList<string>.Empty;
+                var codeFiles = sourcePaths.Select(p => LoadCode(p, sourceDir, rootNamespace))
+                    .ToList();
+                return compiler.CompilePackage("adamant.stdlib", codeFiles,
+                    FixedDictionary<string, Package>.Empty);
+            }
+            catch (FatalCompilationErrorException ex)
+            {
+                testOutput.WriteLine("Std Lib Compiler Errors:");
+                foreach (var diagnostic in ex.Diagnostics)
+                {
+                    testOutput.WriteLine(
+                        $"{testCase.RelativeCodePath}:{diagnostic.StartPosition.Line}:{diagnostic.StartPosition.Column} {diagnostic.Level} {diagnostic.ErrorCode}");
+                    testOutput.WriteLine(diagnostic.Message);
+                }
+                Assert.True(false, "Compilation errors in standard library");
+                throw new UnreachableCodeException();
+            }
         }
 
         private static CodeFile LoadCode(

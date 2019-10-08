@@ -54,9 +54,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     case ISlashEqualsToken _:
                         if (minPrecedence <= OperatorPrecedence.Assignment)
                         {
-                            precedence = OperatorPrecedence.Assignment;
-                            leftAssociative = false;
-                            @operator = Tokens.RequiredToken<IBinaryOperatorToken>();
+                            var assignmentOperator = BuildAssignmentOperator(Tokens.RequiredToken<IAssignmentToken>());
+                            var transfer = ParseTransfer();
+                            expression = new AssignmentExpressionSyntax(expression, assignmentOperator, transfer);
+                            continue;
                         }
                         break;
                     case IQuestionQuestionToken _:
@@ -191,6 +192,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
+        private static AssignmentOperator BuildAssignmentOperator(IAssignmentToken assignmentToken)
+        {
+            switch (assignmentToken)
+            {
+                default:
+                    throw NonExhaustiveMatchException.For(assignmentToken);
+                case IEqualsToken _:
+                    return AssignmentOperator.Simple;
+                case IPlusEqualsToken _:
+                    return AssignmentOperator.Plus;
+                case IMinusEqualsToken _:
+                    return AssignmentOperator.Minus;
+                case IAsteriskEqualsToken _:
+                    return AssignmentOperator.Asterisk;
+                case ISlashEqualsToken _:
+                    return AssignmentOperator.Slash;
+            }
+        }
+
         private static AccessOperator BuildAccessOperator(IAccessOperatorToken accessOperatorToken)
         {
             switch (accessOperatorToken)
@@ -214,16 +234,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             {
                 default:
                     throw ExhaustiveMatch.Failed(operatorToken);
-                case IEqualsToken _:
-                    return new AssignmentExpressionSyntax(left, AssignmentOperator.Simple, right);
-                case IPlusEqualsToken _:
-                    return new AssignmentExpressionSyntax(left, AssignmentOperator.Plus, right);
-                case IMinusEqualsToken _:
-                    return new AssignmentExpressionSyntax(left, AssignmentOperator.Minus, right);
-                case IAsteriskEqualsToken _:
-                    return new AssignmentExpressionSyntax(left, AssignmentOperator.Asterisk, right);
-                case ISlashEqualsToken _:
-                    return new AssignmentExpressionSyntax(left, AssignmentOperator.Slash, right);
                 case IPlusToken _:
                     binaryOperator = BinaryOperator.Plus;
                     break;
@@ -297,7 +307,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IReturnKeywordToken _:
                 {
                     var returnKeyword = Tokens.Expect<IReturnKeywordToken>();
-                    var expression = Tokens.AtEnd<ISemicolonToken>() ? null : ParseExpression();
+                    var expression = Tokens.AtEnd<ISemicolonToken>() ? null : ParseTransfer();
                     var span = TextSpan.Covering(returnKeyword, expression?.Span);
                     return new ReturnExpressionSyntax(span, expression);
                 }
@@ -361,13 +371,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 }
                 case IUnsafeKeywordToken _:
                     return ParseUnsafeExpression();
-                case IMoveKeywordToken _:
-                {
-                    var moveKeyword = Tokens.Expect<IMoveKeywordToken>();
-                    var expression = ParseExpression();
-                    var span = TextSpan.Covering(moveKeyword, expression.Span);
-                    return new MoveExpressionSyntax(span, expression);
-                }
                 case IIfKeywordToken _:
                     return ParseIf();
                 case IDotToken _:
@@ -517,15 +520,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return expression;
         }
 
-        public FixedList<Argument> ParseArguments()
+        public FixedList<ITransferSyntax> ParseArguments()
         {
-            return AcceptSeparatedList<Argument, ICommaToken>(AcceptArgument);
+            return AcceptSeparatedList<ITransferSyntax, ICommaToken>(AcceptTransfer);
         }
 
-        private Argument? AcceptArgument()
+        private ITransferSyntax? AcceptTransfer()
         {
-            var value = AcceptExpression();
-            return value == null ? null : new Argument(value);
+            switch (Tokens.Current)
+            {
+                case ICloseParenToken _:
+                case ICloseBraceToken _:
+                case ISemicolonToken _:
+                case ICommaToken _:
+                case IRightArrowToken _:
+                    return null;
+                default:
+                    return ParseTransfer();
+            }
         }
 
         public IBlockOrResultSyntax ParseBlockOrResult()
@@ -537,6 +549,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var expression = ParseExpression();
             var span = TextSpan.Covering(equalsGreaterThan, expression.Span);
             return new ResultStatementSyntax(span, expression);
+        }
+
+        public ITransferSyntax ParseTransfer()
+        {
+            switch (Tokens.Current)
+            {
+                case IMoveKeywordToken _:
+                {
+                    var moveKeyword = Tokens.Required<IMoveKeywordToken>();
+                    var expression = ParseExpression();
+                    var span = TextSpan.Covering(moveKeyword, expression.Span);
+                    return new MoveTransferSyntax(span, expression);
+                }
+                case IMutableKeywordToken _:
+                {
+                    var mutKeyword = Tokens.Required<IMutableKeywordToken>();
+                    var expression = ParseExpression();
+                    var span = TextSpan.Covering(mutKeyword, expression.Span);
+                    return new MutableTransferSyntax(span, expression);
+                }
+                default:
+                {
+                    var expression = ParseExpression();
+                    return new ImmutableTransferSyntax(expression.Span, expression);
+                }
+            }
         }
     }
 }
