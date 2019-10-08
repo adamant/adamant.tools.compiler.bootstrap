@@ -112,11 +112,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     BuildScopesInFunctionBody(containingScope, binder, function.Parameters,
                         function.Body);
                     break;
-                case IMethodDeclarationSyntax method:
-                    BuildScopesInFunctionParameters(containingScope, method.Parameters);
-                    if (method.ReturnTypeSyntax != null)
-                        new TypeScopesBuilder(containingScope).Walk(method.ReturnTypeSyntax);
-                    BuildScopesInFunctionBody(containingScope, binder, method.Parameters, method.Body);
+                case IConcreteMethodDeclarationSyntax concreteMethod:
+                    BuildScopesInFunctionParameters(containingScope, concreteMethod.Parameters);
+                    if (concreteMethod.ReturnTypeSyntax != null)
+                        new TypeScopesBuilder(containingScope).Walk(concreteMethod.ReturnTypeSyntax);
+                    BuildScopesInFunctionBody(containingScope, binder, concreteMethod.Parameters, concreteMethod.Body);
+                    break;
+                case IAbstractMethodDeclarationSyntax abstractMethod:
+                    BuildScopesInFunctionParameters(containingScope, abstractMethod.Parameters);
+                    if (abstractMethod.ReturnTypeSyntax != null)
+                        new TypeScopesBuilder(containingScope).Walk(abstractMethod.ReturnTypeSyntax);
                     break;
                 case IConstructorDeclarationSyntax constructor:
                     BuildScopesInFunctionParameters(containingScope, constructor.Parameters);

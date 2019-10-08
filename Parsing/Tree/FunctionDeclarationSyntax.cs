@@ -9,7 +9,7 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal class FunctionDeclarationSyntax : CallableDeclarationSyntax, IFunctionDeclarationSyntax
+    internal class FunctionDeclarationSyntax : ConcreteCallableDeclarationSyntax, IFunctionDeclarationSyntax
     {
         public bool IsExternalFunction { get; set; }
         public IExpressionSyntax? LifetimeBounds { get; }
@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
                 parameters, // For now we will not support pure meta functions
             IExpressionSyntax? lifetimeBounds,
             ITypeSyntax? returnTypeSyntax,
-            FixedList<IStatementSyntax>? body)
+            FixedList<IStatementSyntax> body)
             : base(span, file, modifiers, fullName, nameSpan, parameters, body)
         {
             LifetimeBounds = lifetimeBounds;

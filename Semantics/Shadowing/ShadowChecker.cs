@@ -12,10 +12,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
     /// </summary>
     internal class ShadowChecker : ExpressionVisitor<BindingScope>
     {
-        private readonly IMethodDeclarationSyntax method;
+        private readonly IConcreteMethodDeclarationSyntax method;
         private readonly Diagnostics diagnostics;
 
-        private ShadowChecker(IMethodDeclarationSyntax method, Diagnostics diagnostics)
+        private ShadowChecker(IConcreteMethodDeclarationSyntax method, Diagnostics diagnostics)
         {
             this.method = method;
             this.diagnostics = diagnostics;
@@ -23,15 +23,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
 
         public static void Check(IEnumerable<ICallableDeclarationSyntax> callableDeclarations, Diagnostics diagnostics)
         {
-            foreach (var declaration in callableDeclarations.OfType<IMethodDeclarationSyntax>())
+            foreach (var declaration in callableDeclarations.OfType<IConcreteMethodDeclarationSyntax>())
                 Check(declaration, diagnostics);
         }
 
-        private static void Check(IMethodDeclarationSyntax method, Diagnostics diagnostics)
+        private static void Check(IConcreteMethodDeclarationSyntax method, Diagnostics diagnostics)
         {
-            if (method.Body == null)
-                return;
-
             var bindingScope = EmptyBindingScope.Instance;
             foreach (var parameter in method.Parameters)
                 bindingScope = new VariableBindingScope(bindingScope, parameter);

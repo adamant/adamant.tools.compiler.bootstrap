@@ -8,12 +8,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     /// Base type for any declaration that declares a callable thing
     /// </summary>
     [Closed(
-        typeof(IConstructorDeclarationSyntax),
         typeof(IMethodDeclarationSyntax),
-        typeof(IFunctionDeclarationSyntax))]
+        typeof(IConcreteCallableDeclarationSyntax))]
     public interface ICallableDeclarationSyntax : IEntityDeclarationSyntax, IFunctionSymbol
     {
         new FixedList<IParameterSyntax> Parameters { get; }
-        FixedList<IStatementSyntax>? Body { get; }
     }
 }

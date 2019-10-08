@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using ExhaustiveMatching;
@@ -9,16 +10,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
     /// </summary>
     public class ControlFlowGraphFactory
     {
-        public ControlFlowGraph? CreateGraph(ICallableDeclarationSyntax callableDeclaration)
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Factory is passed as a dependency")]
+        public ControlFlowGraph? CreateGraph(IConcreteCallableDeclarationSyntax callableDeclaration)
         {
-            if (!ShouldBuildGraph(callableDeclaration)) return null;
+            if (!ShouldBuildGraph(callableDeclaration))
+                return null;
 
             var fabrication = new ControlFlowFabrication(callableDeclaration.File);
             switch (callableDeclaration)
             {
                 default:
                     throw ExhaustiveMatch.Failed(callableDeclaration);
-                case IMethodDeclarationSyntax method:
+                case IConcreteMethodDeclarationSyntax method:
                     return fabrication.CreateGraph(method);
                 case IConstructorDeclarationSyntax constructor:
                     return fabrication.CreateGraph(constructor);
@@ -27,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
         }
 
-        private static bool ShouldBuildGraph(ICallableDeclarationSyntax callableDeclaration)
+        private static bool ShouldBuildGraph(IConcreteCallableDeclarationSyntax callableDeclaration)
         {
             return callableDeclaration.Body != null // It is not abstract
                                                     /* && function.GenericParameters == null*/

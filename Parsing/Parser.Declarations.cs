@@ -120,18 +120,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (Tokens.Accept<IRightArrowToken>())
                 returnType = ParseType();
 
-            FixedList<IStatementSyntax>? body = null;
-            TextSpan span;
-            if (Tokens.Current is IOpenBraceToken)
-            {
-                (body, span) = bodyParser.ParseFunctionBody();
-                span = TextSpan.Covering(fn, span);
-            }
-            else
-            {
-                var semicolon = bodyParser.Tokens.Expect<ISemicolonToken>();
-                span = TextSpan.Covering(fn, semicolon);
-            }
+            var (body, span) = bodyParser.ParseFunctionBody();
+            span = TextSpan.Covering(fn, span);
 
             return new FunctionDeclarationSyntax(span, File, modifiers, name, identifier.Span,
                 parameters, lifetimeBounds, returnType, body);
@@ -250,22 +240,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (Tokens.Accept<IRightArrowToken>())
                 returnType = ParseType();
 
-            FixedList<IStatementSyntax>? body = null;
-            TextSpan span;
             if (Tokens.Current is IOpenBraceToken)
             {
-                (body, span) = bodyParser.ParseFunctionBody();
+                var (body, span) = bodyParser.ParseFunctionBody();
                 span = TextSpan.Covering(fn, span);
+                return new ConcreteMethodDeclarationSyntax(declaringType, span, File, modifiers, name,
+                    identifier.Span, parameters, lifetimeBounds, returnType, body);
             }
             else
             {
                 var semicolon = bodyParser.Tokens.Expect<ISemicolonToken>();
-                span = TextSpan.Covering(fn, semicolon);
+                var span = TextSpan.Covering(fn, semicolon);
+                return new AbstractMethodDeclarationSyntax(declaringType, span, File, modifiers, name,
+                    identifier.Span, parameters, lifetimeBounds, returnType);
             }
-
-            return new MethodDeclarationSyntax(declaringType, span, File, modifiers,
-                name, identifier.Span,
-                parameters, lifetimeBounds, returnType, body);
         }
 
         internal ConstructorDeclarationSyntax ParseConstructor(

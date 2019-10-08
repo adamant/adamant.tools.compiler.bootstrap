@@ -268,8 +268,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IFunctionDeclarationSyntax f:
                     ResolveBodyTypesInFunction(f);
                     break;
-                case IMethodDeclarationSyntax f:
-                    ResolveBodyTypesInMethod(f);
+                case IConcreteMethodDeclarationSyntax m:
+                    ResolveBodyTypesInMethod(m);
+                    break;
+                case IAbstractMethodDeclarationSyntax _:
+                    // has no body, so nothing to resolve
                     break;
                 case IFieldDeclarationSyntax f:
                     ResolveBodyTypesInField(f);
@@ -294,11 +297,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 resolver.ResolveTypesInStatement(statement);
         }
 
-        private void ResolveBodyTypesInMethod(IMethodDeclarationSyntax method)
+        private void ResolveBodyTypesInMethod(IConcreteMethodDeclarationSyntax method)
         {
-            if (method.Body == null)
-                return;
-
             var resolver = new BasicStatementAnalyzer(method.File, diagnostics, method.SelfParameterType, method.ReturnType.Fulfilled());
             foreach (var statement in method.Body)
                 resolver.ResolveTypesInStatement(statement);

@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -8,15 +7,13 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal class ConstructorDeclarationSyntax : CallableDeclarationSyntax, IConstructorDeclarationSyntax
+    internal class ConstructorDeclarationSyntax : ConcreteCallableDeclarationSyntax, IConstructorDeclarationSyntax
     {
         public IClassDeclarationSyntax DeclaringClass { get; }
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SimpleName Name => FullName.UnqualifiedName;
-
-        public override FixedList<IStatementSyntax> Body => base.Body ?? throw new InvalidOperationException();
 
         public ConstructorDeclarationSyntax(
             IClassDeclarationSyntax declaringType,

@@ -10,7 +10,7 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal class MethodDeclarationSyntax : CallableDeclarationSyntax, IMethodDeclarationSyntax
+    internal abstract class MethodDeclarationSyntax : CallableDeclarationSyntax, IMethodDeclarationSyntax
     {
         public IClassDeclarationSyntax DeclaringClass { get; }
 
@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public ITypeSyntax? ReturnTypeSyntax { get; }
         DataType IFunctionSymbol.ReturnType => ReturnType.Fulfilled();
 
-        public MethodDeclarationSyntax(
+        protected MethodDeclarationSyntax(
             IClassDeclarationSyntax declaringClass,
             TextSpan span,
             CodeFile file,
@@ -32,19 +32,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IParameterSyntax> parameters, // For now we will not support pure meta functions
             IExpressionSyntax? lifetimeBounds,
             ITypeSyntax? returnTypeSyntax,
-            FixedList<IStatementSyntax>? body)
-            : base(span, file, modifiers, fullName, nameSpan, parameters, body)
+            SymbolSet childSymbols)
+            : base(span, file, modifiers, fullName, nameSpan, parameters, childSymbols)
         {
             DeclaringClass = declaringClass;
             LifetimeBounds = lifetimeBounds;
             ReturnTypeSyntax = returnTypeSyntax;
-        }
-
-        public override string ToString()
-        {
-            var returnType = ReturnTypeSyntax != null ? " -> " + ReturnTypeSyntax : "";
-            var body = Body != null ? " {{ … }}" : ";";
-            return $"fn {FullName}({string.Join(", ", Parameters)}){returnType}{body}";
         }
     }
 }

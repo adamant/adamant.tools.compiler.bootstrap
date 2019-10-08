@@ -8,6 +8,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         typeof(ConstructorDeclaration))]
     public interface ICallableDeclaration
     {
-        ControlFlowGraph ControlFlow { get; }
+        ControlFlowGraph? ControlFlow { get; }
     }
 }

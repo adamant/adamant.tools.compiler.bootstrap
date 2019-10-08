@@ -94,15 +94,40 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 VisitStatement(statement, args);
         }
 
-        public virtual void VisitMethodDeclaration(IMethodDeclarationSyntax methodDeclaration, A args)
+        public virtual void VisitMethodDeclaration(IMethodDeclarationSyntax? methodDeclaration, A args)
         {
-            foreach (var parameter in methodDeclaration.Parameters)
+            switch (methodDeclaration)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(methodDeclaration);
+                case null:
+                    // Ignore
+                    break;
+                case IConcreteMethodDeclarationSyntax concreteMethod:
+                    VisitConcreteMethodDeclaration(concreteMethod, args);
+                    break;
+                case IAbstractMethodDeclarationSyntax abstractMethod:
+                    VisitAbstractMethodDeclaration(abstractMethod, args);
+                    break;
+            }
+        }
+
+        private void VisitAbstractMethodDeclaration(IAbstractMethodDeclarationSyntax abstractMethodDeclaration, A args)
+        {
+            foreach (var parameter in abstractMethodDeclaration.Parameters)
                 VisitParameter(parameter, args);
 
-            VisitType(methodDeclaration.ReturnTypeSyntax, args);
-            if (methodDeclaration.Body != null)
-                foreach (var statement in methodDeclaration.Body)
-                    VisitStatement(statement, args);
+            VisitType(abstractMethodDeclaration.ReturnTypeSyntax, args);
+        }
+
+        public virtual void VisitConcreteMethodDeclaration(IConcreteMethodDeclarationSyntax concreteMethodDeclaration, A args)
+        {
+            foreach (var parameter in concreteMethodDeclaration.Parameters)
+                VisitParameter(parameter, args);
+
+            VisitType(concreteMethodDeclaration.ReturnTypeSyntax, args);
+            foreach (var statement in concreteMethodDeclaration.Body)
+                VisitStatement(statement, args);
         }
 
         public virtual void VisitParameter(IParameterSyntax? parameter, A args)

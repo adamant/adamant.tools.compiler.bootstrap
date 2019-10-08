@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             nextScope = scope.Next();
         }
 
-        public ControlFlowGraph CreateGraph(IMethodDeclarationSyntax method)
+        public ControlFlowGraph CreateGraph(IConcreteMethodDeclarationSyntax method)
         {
             returnType = method.ReturnType.Known();
 
