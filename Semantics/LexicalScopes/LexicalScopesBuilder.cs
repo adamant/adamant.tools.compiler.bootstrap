@@ -169,8 +169,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                 symbols.Add(parameter);
 
             containingScope = new NestedScope(containingScope, symbols, Enumerable.Empty<ISymbol>());
-            foreach (var statement in body)
-                binder.VisitStatement(statement, containingScope);
+            binder.VisitStatements(body, containingScope);
         }
 
         private LexicalScope BuildNamespaceScopes(

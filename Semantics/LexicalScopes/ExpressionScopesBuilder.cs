@@ -9,12 +9,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 {
     public class ExpressionScopesBuilder : ExpressionVisitor<LexicalScope>
     {
-        public override void VisitBlockExpression(IBlockExpressionSyntax block, LexicalScope containingScope)
+        public void VisitStatements(
+            FixedList<IStatementSyntax> statements,
+            LexicalScope containingScope)
         {
-            if (block == null)
-                return;
-
-            foreach (var statement in block.Statements)
+            foreach (var statement in statements)
             {
                 VisitStatement(statement, containingScope);
                 // Each variable declaration effectively starts a new scope after it, this
@@ -23,6 +22,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     containingScope = new NestedScope(containingScope, variableDeclaration.Yield(),
                         Enumerable.Empty<ISymbol>());
             }
+        }
+
+        public override void VisitBlockExpression(IBlockExpressionSyntax block, LexicalScope containingScope)
+        {
+            if (block == null)
+                return;
+
+            var statements = block.Statements;
+            VisitStatements(statements, containingScope);
         }
 
         public override void VisitNameExpression(

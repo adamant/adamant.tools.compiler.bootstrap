@@ -24,13 +24,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         /// Whether to store the liveness analysis for each function and method.
         /// Default Value: false
         /// </summary>
-        public bool SaveLivenessAnalysis = false;
+        public bool SaveLivenessAnalysis { get; set; } = false;
 
         /// <summary>
         /// Whether to store the borrow checker claims for each function and method.
         /// Default Value: false
         /// </summary>
-        public bool SaveBorrowClaims = false;
+        public bool SaveBorrowClaims { get; set; } = false;
 
         public Package Check(
             PackageSyntax packageSyntax,
@@ -42,9 +42,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // If there are errors from the lex and parse phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
 
-            var entityDeclarations = BuildLexicalScopes(packageSyntax, references, diagnostics);
+            BuildLexicalScopes(packageSyntax, references, diagnostics);
 
-            var callableDeclarations = CheckSemantics(entityDeclarations, diagnostics);
+            // Make a list of all the entity declarations (i.e. not namespaces)
+            var entityDeclarations = GetEntityDeclarations(packageSyntax);
+
+            CheckSemantics(entityDeclarations, diagnostics);
 
             // If there are errors from the semantics phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
@@ -68,23 +71,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             return new Package(packageSyntax.Name, diagnostics.Build(), references, ilDeclarations, entryPoint);
         }
 
-        private static FixedList<IEntityDeclarationSyntax> BuildLexicalScopes(
+        private static void BuildLexicalScopes(
             PackageSyntax packageSyntax,
             FixedDictionary<string, Package> references,
             Diagnostics diagnostics)
         {
             var scopesBuilder = new LexicalScopesBuilder(diagnostics, packageSyntax, references);
             scopesBuilder.BuildScopesInPackage(packageSyntax);
-
-            // Make a list of all the entity declarations (i.e. not namespaces)
-            var entityDeclarations1 = packageSyntax
-                .CompilationUnits.SelectMany(cu => cu.EntityDeclarations)
-                .ToFixedList();
-
-            return entityDeclarations1;
         }
 
-        private static FixedList<ICallableDeclarationSyntax> CheckSemantics(
+        private static FixedList<IEntityDeclarationSyntax> GetEntityDeclarations(
+            PackageSyntax packageSyntax)
+        {
+            return packageSyntax.CompilationUnits
+                .SelectMany(cu => cu.EntityDeclarations)
+                .ToFixedList();
+        }
+
+        private static void CheckSemantics(
             FixedList<IEntityDeclarationSyntax> entityDeclarations,
             Diagnostics diagnostics)
         {
@@ -112,8 +116,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             DataFlowAnalysis.Check(UseOfMovedValueStrategy.Instance, callableDeclarations,
                 diagnostics);
-
-            return callableDeclarations;
         }
 
         private static FixedList<Declaration> BuildIL(

@@ -551,7 +551,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var left = InferExpressionType(ref assignmentExpression.LeftOperand);
                     InferExpressionType(ref assignmentExpression.RightOperand.Expression);
                     InsertImplicitConversionIfNeeded(ref assignmentExpression.RightOperand.Expression, left);
-                    var right = assignmentExpression.RightOperand.Type;
+                    var right = assignmentExpression.RightOperand.Type
+                        = assignmentExpression.RightOperand.Expression.Type ?? throw new InvalidOperationException();
                     if (!IsAssignableFrom(left, right))
                         diagnostics.Add(TypeError.CannotConvert(file,
                             assignmentExpression.RightOperand.Expression, right, left));
