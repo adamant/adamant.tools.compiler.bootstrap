@@ -246,7 +246,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             InferExpressionType(ref returnExpression.ReturnValue.Expression);
                         InsertImplicitConversionIfNeeded(ref returnExpression.ReturnValue.Expression,
                             returnType);
-                        var type = returnExpression.ReturnValue.Type;
+                        var type = returnExpression.ReturnValue.Type =
+                            returnExpression.ReturnValue.Expression.Type ?? throw new InvalidOperationException();
                         if (!IsAssignableFrom(returnType, type))
                             diagnostics.Add(TypeError.CannotConvert(file,
                                 returnExpression.ReturnValue.Expression, type, returnType));
