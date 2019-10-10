@@ -73,7 +73,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             // TODO generate errors for attributes or modifiers
             var ns = Tokens.Expect<INamespaceKeywordToken>();
-            var globalQualifier = Tokens.AcceptToken<IColonColonToken>();
+            var globalQualifier = Tokens.AcceptToken<IColonColonDotToken>();
             var (name, nameSpan) = ParseNamespaceName();
             nameSpan = TextSpan.Covering(nameSpan, globalQualifier?.Span);
             Tokens.Expect<IOpenBraceToken>();

@@ -72,9 +72,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                             yield return TokenFactory.Dot(SymbolSpan());
                         break;
                     case ':':
-                        if (NextCharIs(':'))
-                            // it is `::`
-                            yield return TokenFactory.ColonColon(SymbolSpan(2));
+                        if (NextCharIs(':') && CharAtIs(2, '.'))
+                            // it is `::.`
+                            yield return TokenFactory.ColonColonDot(SymbolSpan(3));
                         else
                             // it is `:`
                             yield return TokenFactory.Colon(SymbolSpan());

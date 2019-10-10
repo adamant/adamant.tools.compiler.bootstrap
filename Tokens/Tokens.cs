@@ -70,9 +70,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             return new DotToken(span);
         }
 
-        public static IColonColonToken ColonColon(TextSpan span)
+        public static IColonColonDotToken ColonColonDot(TextSpan span)
         {
-            return new ColonColonToken(span);
+            return new ColonColonDotToken(span);
         }
 
         public static IDotDotToken DotDot(TextSpan span)
@@ -216,7 +216,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         typeof(IColonToken),
         typeof(IRightArrowToken),
         typeof(IDotToken),
-        typeof(IColonColonToken),
+        typeof(IColonColonDotToken),
         typeof(IDotDotToken),
         typeof(ILessThanDotDotToken),
         typeof(IDotDotLessThanToken),
@@ -362,10 +362,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IColonColonToken : IToken { }
-    internal partial class ColonColonToken : Token, IColonColonToken
+    public partial interface IColonColonDotToken : IToken { }
+    internal partial class ColonColonDotToken : Token, IColonColonDotToken
     {
-        public ColonColonToken(TextSpan span)
+        public ColonColonDotToken(TextSpan span)
             : base(span)
         {
         }

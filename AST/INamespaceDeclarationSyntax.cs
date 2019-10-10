@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public interface INamespaceDeclarationSyntax : INonMemberDeclarationSyntax, IDeclarationSyntax
     {
-        bool InGlobalNamespace { get; }
+        bool IsGlobalQualified { get; }
         Name Name { get; }
         Name FullName { get; }
         FixedList<IUsingDirectiveSyntax> UsingDirectives { get; }

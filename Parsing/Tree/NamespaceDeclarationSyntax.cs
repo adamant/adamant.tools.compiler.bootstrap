@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         /// implicit file namespace is in the global namespace. As are namespaces
         /// declared using the package qualifier `namespace ::example { }`.
         /// </summary>
-        public bool InGlobalNamespace { get; }
+        public bool IsGlobalQualified { get; }
         public Name Name { get; }
         public Name FullName { get; }
         /// <summary>
@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public NamespaceDeclarationSyntax(
             TextSpan span,
             CodeFile file,
-            bool inGlobalNamespace,
+            bool isGlobalQualified,
             Name name,
             TextSpan nameSpan,
             RootName nameContext,
@@ -38,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FullName = nameContext.Qualify(name);
             UsingDirectives = usingDirectives;
             Declarations = declarations;
-            InGlobalNamespace = inGlobalNamespace;
+            IsGlobalQualified = isGlobalQualified;
             NameContext = nameContext;
         }
 

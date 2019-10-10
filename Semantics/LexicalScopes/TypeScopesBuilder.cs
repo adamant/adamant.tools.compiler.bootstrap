@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Scopes;
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 {
     /// <summary>
-    /// Assigns containing scopes to <see cref="Adamant.Tools.Compiler.Bootstrap.Parsing.Tree.TypeSyntax"/> nodes.
+    /// Assigns containing scopes to <see cref="ITypeSyntax"/> nodes.
     /// </summary>
     public class TypeScopesBuilder : TypeWalker
     {

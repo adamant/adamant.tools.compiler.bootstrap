@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitConversions
 {
-    internal class ImplicitImmutabilityConversionExpression : ImplicitConversionExpression
+    internal class ImplicitImmutabilityConversionExpression : ImplicitConversionExpression, IImplicitImmutabilityConversionExpression
     {
         public ImplicitImmutabilityConversionExpression(
             IExpressionSyntax expression,

@@ -25,7 +25,7 @@
         //"Hash", // `#` U+0023
         //"HashHash", // `##` U+0023, U+0023
         "Dot", // `.` U+002E
-        "ColonColon", // `::` U+003A, U+003A
+        "ColonColonDot", // `::,` U+003A, U+003A, U+002E
         "DotDot", // `..` U+002E, U+002E
         "LessThanDotDot", // `<..` U+003C, U+002E, U+002E
         "DotDotLessThan", // `..<` U+002E, U+002E, U+003C

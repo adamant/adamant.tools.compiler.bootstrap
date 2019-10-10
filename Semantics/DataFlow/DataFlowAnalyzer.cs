@@ -26,7 +26,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
                 default:
                     // Nothing to check
                     break;
-
             }
         }
 

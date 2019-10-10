@@ -202,7 +202,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             { ";", typeof(ISemicolonToken) },
             { ",", typeof(ICommaToken) },
             { ".", typeof(IDotToken) },
-            { "::", typeof(IColonColonToken) },
+            { "::.", typeof(IColonColonDotToken) },
             { "..", typeof(IDotDotToken) },
             { "<..", typeof(ILessThanDotDotToken) },
             { "..<", typeof(IDotDotLessThanToken) },

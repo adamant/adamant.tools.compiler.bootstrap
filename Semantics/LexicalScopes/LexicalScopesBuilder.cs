@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         // Also need to account for empty directories?
 
         private readonly Diagnostics diagnostics;
-        private readonly FixedList<ISymbol> allSymbols;
+        private readonly FixedList<ISymbol> nonMemberEntitySymbols;
         private readonly GlobalScope globalScope;
 
         public LexicalScopesBuilder(
@@ -32,11 +32,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
              FixedDictionary<string, Package> references)
         {
             this.diagnostics = diagnostics;
-            allSymbols = GetAllSymbols(packageSyntax, references);
-            globalScope = new GlobalScope(GetAllGlobalSymbols(), allSymbols);
+            nonMemberEntitySymbols = GetNonMemberEntitySymbols(packageSyntax, references);
+            globalScope = new GlobalScope(GetAllGlobalSymbols(nonMemberEntitySymbols), nonMemberEntitySymbols);
         }
 
-        private static FixedList<ISymbol> GetAllSymbols(
+        private static FixedList<ISymbol> GetNonMemberEntitySymbols(
              PackageSyntax packageSyntax,
              FixedDictionary<string, Package> references)
         {
@@ -47,28 +47,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         }
 
         /// <summary>
-        /// This gets the symbols for all declarations that are declared outside of a type.
+        /// This gets the symbols for all entities that are declared outside of a class.
         /// (i.e. directly in a namespace)
         /// </summary>
         private static FixedList<ISymbol> GetAllNonMemberDeclarations(ICompilationUnitSyntax compilationUnit)
         {
-            // MemberDeclarationSyntax is the right type to use here because anything except namespaces can go in a type
             var declarations = new List<ISymbol>();
-            declarations.AddRange(compilationUnit.Declarations.OfType<IMemberDeclarationSyntax>());
+            declarations.AddRange(compilationUnit.Declarations.OfType<INonMemberEntityDeclarationSyntax>());
             var namespaces = new Queue<INamespaceDeclarationSyntax>();
             namespaces.EnqueueRange(compilationUnit.Declarations.OfType<INamespaceDeclarationSyntax>());
             while (namespaces.TryDequeue(out var ns))
             {
-                declarations.AddRange(ns.Declarations.OfType<IMemberDeclarationSyntax>());
+                declarations.AddRange(ns.Declarations.OfType<INonMemberEntityDeclarationSyntax>());
                 namespaces.EnqueueRange(ns.Declarations.OfType<INamespaceDeclarationSyntax>());
             }
 
             return declarations.ToFixedList();
         }
 
-        private IEnumerable<ISymbol> GetAllGlobalSymbols()
+        private static IEnumerable<ISymbol> GetAllGlobalSymbols(FixedList<ISymbol> symbols)
         {
-            return allSymbols.Where(s => s.IsGlobal())
+            return symbols.Where(s => s.IsGlobal())
                 .Concat(PrimitiveSymbols.Instance);
         }
 
@@ -87,7 +86,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         }
 
         private void BuildScopesInDeclaration(
-            IDeclarationSyntax declaration,
+            INonMemberDeclarationSyntax declaration,
             LexicalScope containingScope)
         {
             var binder = new ExpressionScopesBuilder();
@@ -96,12 +95,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                 default:
                     throw ExhaustiveMatch.Failed(declaration);
                 case INamespaceDeclarationSyntax ns:
-                    if (ns.InGlobalNamespace)
+                    if (ns.IsGlobalQualified)
                         containingScope = globalScope;
 
                     containingScope = BuildNamespaceScopes(ns.Name, containingScope);
-                    containingScope =
-                        BuildUsingDirectivesScope(ns.UsingDirectives, containingScope);
+                    containingScope = BuildUsingDirectivesScope(ns.UsingDirectives, containingScope);
                     foreach (var nestedDeclaration in ns.Declarations)
                         BuildScopesInDeclaration(nestedDeclaration, containingScope);
                     break;
@@ -109,14 +107,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     BuildScopesInFunctionParameters(containingScope, function.Parameters);
                     if (function.ReturnTypeSyntax != null)
                         new TypeScopesBuilder(containingScope).Walk(function.ReturnTypeSyntax);
-                    BuildScopesInFunctionBody(containingScope, binder, function.Parameters,
-                        function.Body);
+                    BuildScopesInBody(containingScope, binder, function.Parameters, function.Body);
                     break;
+                case IClassDeclarationSyntax classDeclaration:
+                    // TODO name scope for type declaration
+                    foreach (var nestedDeclaration in classDeclaration.Members)
+                        BuildScopesInDeclaration(nestedDeclaration, containingScope);
+                    break;
+            }
+        }
+
+        private void BuildScopesInDeclaration(
+            IMemberDeclarationSyntax declaration,
+            LexicalScope containingScope)
+        {
+            var binder = new ExpressionScopesBuilder();
+            switch (declaration)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(declaration);
                 case IConcreteMethodDeclarationSyntax concreteMethod:
                     BuildScopesInFunctionParameters(containingScope, concreteMethod.Parameters);
                     if (concreteMethod.ReturnTypeSyntax != null)
                         new TypeScopesBuilder(containingScope).Walk(concreteMethod.ReturnTypeSyntax);
-                    BuildScopesInFunctionBody(containingScope, binder, concreteMethod.Parameters, concreteMethod.Body);
+                    BuildScopesInBody(containingScope, binder, concreteMethod.Parameters, concreteMethod.Body);
                     break;
                 case IAbstractMethodDeclarationSyntax abstractMethod:
                     BuildScopesInFunctionParameters(containingScope, abstractMethod.Parameters);
@@ -125,12 +139,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     break;
                 case IConstructorDeclarationSyntax constructor:
                     BuildScopesInFunctionParameters(containingScope, constructor.Parameters);
-                    BuildScopesInFunctionBody(containingScope, binder, constructor.Parameters, constructor.Body);
-                    break;
-                case IClassDeclarationSyntax classDeclaration:
-                    // TODO name scope for type declaration
-                    foreach (var nestedDeclaration in classDeclaration.Members)
-                        BuildScopesInDeclaration(nestedDeclaration, containingScope);
+                    BuildScopesInBody(containingScope, binder, constructor.Parameters, constructor.Body);
                     break;
                 case IFieldDeclarationSyntax fieldDeclaration:
                     new TypeScopesBuilder(containingScope).Walk(fieldDeclaration.TypeSyntax);
@@ -158,7 +167,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                 }
         }
 
-        private static void BuildScopesInFunctionBody(
+        private static void BuildScopesInBody(
             LexicalScope containingScope,
             ExpressionScopesBuilder binder,
             FixedList<IParameterSyntax> parameters,
@@ -182,6 +191,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                 default:
                     throw ExhaustiveMatch.Failed(ns);
                 case GlobalNamespaceName _:
+                    // TODO is this correct for namespace declarations that are global qualified (i.e. `::.`)?
+                    // Perhaps it is because it could be nested inside other using statements
                     return containingScope;
                 case QualifiedName qualifiedName:
                     containingScope = BuildNamespaceScopes(qualifiedName.Qualifier, containingScope);
@@ -192,8 +203,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     break;
             }
 
-            var symbolsInNamespace = allSymbols.Where(s => s.FullName.HasQualifier(name));
-            var symbolsNestedInNamespace = allSymbols.Where(s => s.FullName.IsNestedIn(name));
+            var symbolsInNamespace = nonMemberEntitySymbols.Where(s => s.FullName.HasQualifier(name));
+            var symbolsNestedInNamespace = nonMemberEntitySymbols.Where(s => s.FullName.IsNestedIn(name));
             return new NestedScope(containingScope, symbolsInNamespace, symbolsNestedInNamespace);
         }
 
@@ -205,7 +216,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                 return containingScope;
 
             var importedSymbols = usingDirectives
-                .SelectMany(d => allSymbols.Where(s => s.FullName.HasQualifier(d.Name)));
+                .SelectMany(d => nonMemberEntitySymbols.Where(s => s.FullName.HasQualifier(d.Name)));
             return new NestedScope(containingScope, importedSymbols, Enumerable.Empty<ISymbol>());
         }
     }

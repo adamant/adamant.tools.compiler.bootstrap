@@ -7,6 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Scopes;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 {
+    // TODO Change this over to a walker
     public class ExpressionScopesBuilder : ExpressionVisitor<LexicalScope>
     {
         public void VisitStatements(
