@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
     public class BindingMutabilityStrategy : IDataFlowAnalysisStrategy<VariableFlags>
     {
         #region Singleton
-        public static BindingMutabilityStrategy Instance = new BindingMutabilityStrategy();
+        public static readonly BindingMutabilityStrategy Instance = new BindingMutabilityStrategy();
 
         private BindingMutabilityStrategy() { }
         #endregion

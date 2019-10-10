@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
     public class UseOfMovedValueStrategy : IDataFlowAnalysisStrategy<VariableFlags>
     {
         #region Singleton
-        public static UseOfMovedValueStrategy Instance = new UseOfMovedValueStrategy();
+        public static readonly UseOfMovedValueStrategy Instance = new UseOfMovedValueStrategy();
 
         private UseOfMovedValueStrategy() { }
         #endregion

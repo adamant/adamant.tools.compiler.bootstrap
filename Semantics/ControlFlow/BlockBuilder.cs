@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 {
     public class BlockBuilder
     {
-        public readonly BasicBlockName BlockName;
+        public BasicBlockName BlockName { get; }
         private readonly List<Statement> statements = new List<Statement>();
         public IReadOnlyList<Statement> Statements => statements;
         public bool IsTerminated => statements.LastOrDefault() is BlockTerminatorStatement;

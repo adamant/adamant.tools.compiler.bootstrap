@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
     public class DefiniteAssignmentStrategy : IDataFlowAnalysisStrategy<VariableFlags>
     {
         #region Singleton
-        public static DefiniteAssignmentStrategy Instance = new DefiniteAssignmentStrategy();
+        public static readonly DefiniteAssignmentStrategy Instance = new DefiniteAssignmentStrategy();
 
         private DefiniteAssignmentStrategy() { }
         #endregion
