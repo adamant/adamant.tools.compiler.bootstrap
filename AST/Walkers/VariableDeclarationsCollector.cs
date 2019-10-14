@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 
@@ -18,9 +19,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                 case IVariableDeclarationStatementSyntax variableDeclaration:
                     variableDeclarations.Add(variableDeclaration);
                     break;
-                case IExpressionSyntax _:
                 case ITypeSyntax _:
                     return false;
+                case IDeclarationSyntax _:
+                    throw new InvalidOperationException($"Can't get variable declarations of {syntax.GetType().Name}");
             }
 
             return true;
