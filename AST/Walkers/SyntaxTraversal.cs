@@ -14,10 +14,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
 
         public void Walk(ISyntax? syntax)
         {
+            if (syntax == null) return;
             switch (syntax)
             {
                 default:
-                    throw new NotImplementedException();
+                    throw new NotImplementedException(syntax.GetType().Name);
                     throw ExhaustiveMatch.Failed(syntax);
                 case IClassDeclarationSyntax classDeclaration:
                     if (walker.Enter(classDeclaration, this))
@@ -39,6 +40,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                     walker.Enter(typeName, this);
                     walker.Exit(typeName, this);
                     break;
+                case IBodySyntax body:
+                    if (walker.Enter(body, this))
+                        foreach (var statement in body.Statements)
+                            Walk(statement);
+                    walker.Exit(body, this);
+                    break;
                 case IVariableDeclarationStatementSyntax variableDeclaration:
                     if (walker.Enter(variableDeclaration, this))
                     {
@@ -56,6 +63,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                     if (walker.Enter(resultStatement, this))
                         Walk(resultStatement.Expression);
                     walker.Exit(resultStatement, this);
+                    break;
+                case IImmutableTransferSyntax immutableTransfer:
+                    if (walker.Enter(immutableTransfer, this))
+                        Walk(immutableTransfer.Expression);
+                    walker.Exit(immutableTransfer, this);
+                    break;
+                case IMutableTransferSyntax mutableTransfer:
+                    if (walker.Enter(mutableTransfer, this))
+                        Walk(mutableTransfer.Expression);
+                    walker.Exit(mutableTransfer, this);
+                    break;
+                case IMoveTransferSyntax moveTransfer:
+                    if (walker.Enter(moveTransfer, this))
+                        Walk(moveTransfer.Expression);
+                    walker.Exit(moveTransfer, this);
                     break;
                 case IIfExpressionSyntax ifExpression:
                     if (walker.Enter(ifExpression, this))
@@ -172,11 +194,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                 case INextExpressionSyntax nextExpression:
                     walker.Enter(nextExpression, this);
                     walker.Exit(nextExpression, this);
-                    break;
-                case IMoveTransferSyntax moveExpression:
-                    if (walker.Enter(moveExpression, this))
-                        Walk(moveExpression.Expression);
-                    walker.Exit(moveExpression, this);
                     break;
                 case IMemberAccessExpressionSyntax memberAccessExpression:
                     if (walker.Enter(memberAccessExpression, this))
