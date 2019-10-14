@@ -120,8 +120,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (Tokens.Accept<IRightArrowToken>())
                 returnType = ParseType();
 
-            var (body, span) = bodyParser.ParseFunctionBody();
-            span = TextSpan.Covering(fn, span);
+            var body = bodyParser.ParseFunctionBody();
+            var span = TextSpan.Covering(fn, body.Span);
 
             return new FunctionDeclarationSyntax(span, File, modifiers, name, identifier.Span,
                 parameters, lifetimeBounds, returnType, body);
@@ -164,13 +164,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return parameters.ToFixedList();
         }
 
-        private (FixedList<IStatementSyntax>, TextSpan) ParseFunctionBody()
+        private IBodySyntax ParseFunctionBody()
         {
             var openBrace = Tokens.Expect<IOpenBraceToken>();
             var statements = ParseMany<IStatementSyntax, ICloseBraceToken>(ParseStatement);
             var closeBrace = Tokens.Expect<ICloseBraceToken>();
             var span = TextSpan.Covering(openBrace, closeBrace);
-            return (statements, span);
+            return new BodySyntax(span, statements);
         }
         #endregion
 
@@ -242,8 +242,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
             if (Tokens.Current is IOpenBraceToken)
             {
-                var (body, span) = bodyParser.ParseFunctionBody();
-                span = TextSpan.Covering(fn, span);
+                var body = bodyParser.ParseFunctionBody();
+                var span = TextSpan.Covering(fn, body.Span);
                 return new ConcreteMethodDeclarationSyntax(declaringType, span, File, modifiers, name,
                     identifier.Span, parameters, lifetimeBounds, returnType, body);
             }
@@ -265,8 +265,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var name = nameContext.Qualify(SpecialName.Constructor(identifier?.Value));
             var bodyParser = NestedParser(name);
             var parameters = bodyParser.ParseParameters();
-            var (body, bodySpan) = bodyParser.ParseFunctionBody();
-            var span = TextSpan.Covering(newKeywordSpan, bodySpan);
+            var body = bodyParser.ParseFunctionBody();
+            var span = TextSpan.Covering(newKeywordSpan, body.Span);
             return new ConstructorDeclarationSyntax(declaringType, span, File, modifiers, name,
                 TextSpan.Covering(newKeywordSpan, identifier?.Span), parameters, body);
         }

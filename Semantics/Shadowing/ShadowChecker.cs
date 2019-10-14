@@ -34,7 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
                 bindingScope = new VariableBindingScope(bindingScope, parameter);
 
             var shadowChecker = new ShadowChecker(method, diagnostics);
-            foreach (var statement in method.Body)
+            foreach (var statement in method.Body.Statements)
                 shadowChecker.VisitStatement(statement, bindingScope);
         }
 

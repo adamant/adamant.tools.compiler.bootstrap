@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
 {
-    internal class VariableDeclarationsCollector : StatementWalker
+    internal class VariableDeclarationsCollector : SyntaxWalker
     {
         private readonly List<IVariableDeclarationStatementSyntax> variableDeclarations
             = new List<IVariableDeclarationStatementSyntax>();
@@ -11,15 +11,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
         public FixedList<IVariableDeclarationStatementSyntax> Declarations =>
             variableDeclarations.ToFixedList();
 
-        public override bool Enter(FixedList<IStatementSyntax> statements, ITreeWalker walker)
+        public override bool Enter(ISyntax syntax, ISyntaxTraversal traversal)
         {
-            return true;
-        }
+            switch (syntax)
+            {
+                case IVariableDeclarationStatementSyntax variableDeclaration:
+                    variableDeclarations.Add(variableDeclaration);
+                    break;
+                case IExpressionSyntax _:
+                case ITypeSyntax _:
+                    return false;
+            }
 
-        public override bool Enter(IStatementSyntax statement, ITreeWalker walker)
-        {
-            if (statement is IVariableDeclarationStatementSyntax variableDeclaration)
-                variableDeclarations.Add(variableDeclaration);
             return true;
         }
     }

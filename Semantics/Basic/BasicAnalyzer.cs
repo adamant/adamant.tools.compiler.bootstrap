@@ -293,14 +293,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             var resolver = new BasicStatementAnalyzer(constructor.File, diagnostics,
                 constructor.SelfParameterType, constructor.SelfParameterType);
-            foreach (var statement in constructor.Body)
+            foreach (var statement in constructor.Body.Statements)
                 resolver.ResolveTypesInStatement(statement);
         }
 
         private void ResolveBodyTypesInMethod(IConcreteMethodDeclarationSyntax method)
         {
             var resolver = new BasicStatementAnalyzer(method.File, diagnostics, method.SelfParameterType, method.ReturnType.Fulfilled());
-            foreach (var statement in method.Body)
+            foreach (var statement in method.Body.Statements)
                 resolver.ResolveTypesInStatement(statement);
         }
 
@@ -311,7 +311,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             var resolver = new BasicStatementAnalyzer(function.File, diagnostics,
                 null, function.ReturnType.Fulfilled());
-            foreach (var statement in function.Body)
+            foreach (var statement in function.Body.Statements)
                 resolver.ResolveTypesInStatement(statement);
         }
 

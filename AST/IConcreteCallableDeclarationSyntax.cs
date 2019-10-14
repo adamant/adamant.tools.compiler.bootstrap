@@ -1,4 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
@@ -9,6 +8,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(IFunctionDeclarationSyntax))]
     public interface IConcreteCallableDeclarationSyntax : ICallableDeclarationSyntax
     {
-        FixedList<IStatementSyntax> Body { get; }
+        IBodySyntax Body { get; }
     }
 }

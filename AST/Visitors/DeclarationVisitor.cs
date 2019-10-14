@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 
             VisitType(function.ReturnTypeSyntax, args);
             if (function.Body != null)
-                foreach (var statement in function.Body)
+                foreach (var statement in function.Body.Statements)
                     VisitStatement(statement, args);
         }
 
@@ -90,7 +90,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
             foreach (var parameter in constructorDeclaration.Parameters)
                 VisitParameter(parameter, args);
 
-            foreach (var statement in constructorDeclaration.Body)
+            foreach (var statement in constructorDeclaration.Body.Statements)
                 VisitStatement(statement, args);
         }
 
@@ -126,7 +126,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
                 VisitParameter(parameter, args);
 
             VisitType(concreteMethodDeclaration.ReturnTypeSyntax, args);
-            foreach (var statement in concreteMethodDeclaration.Body)
+            foreach (var statement in concreteMethodDeclaration.Body.Statements)
                 VisitStatement(statement, args);
         }
 

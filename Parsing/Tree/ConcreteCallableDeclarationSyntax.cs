@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal abstract class ConcreteCallableDeclarationSyntax : CallableDeclarationSyntax
     {
-        public virtual FixedList<IStatementSyntax> Body { get; }
+        public virtual IBodySyntax Body { get; }
 
         protected ConcreteCallableDeclarationSyntax(
             TextSpan span,
@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name fullName,
             TextSpan nameSpan,
             FixedList<IParameterSyntax> parameters,
-            FixedList<IStatementSyntax> body)
+            IBodySyntax body)
             : base(span, file, modifiers, fullName, nameSpan, parameters,
                 GetChildSymbols(parameters, body))
         {
@@ -30,9 +30,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         internal static SymbolSet GetChildSymbols(
             FixedList<IParameterSyntax> parameters,
-            FixedList<IStatementSyntax>? body)
+            IBodySyntax body)
         {
-            var variableDeclarations = body?.GetAllVariableDeclarations()
+            var variableDeclarations = body.GetAllVariableDeclarations()
                                        ?? Enumerable.Empty<IVariableDeclarationStatementSyntax>();
             var childSymbols = ((IEnumerable<ISymbol>)parameters).Concat(variableDeclarations);
             return new SymbolSet(childSymbols);

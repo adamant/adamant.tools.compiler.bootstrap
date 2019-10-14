@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     // TODO No error is reported if IConcreteMethodDeclarationSyntax is missing
     internal class ConcreteMethodDeclarationSyntax : MethodDeclarationSyntax, IConcreteMethodDeclarationSyntax
     {
-        public virtual FixedList<IStatementSyntax> Body { get; }
+        public virtual IBodySyntax Body { get; }
 
         public ConcreteMethodDeclarationSyntax(
             IClassDeclarationSyntax declaringClass,
@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IParameterSyntax> parameters,
             IExpressionSyntax? lifetimeBounds,
             ITypeSyntax? returnTypeSyntax,
-            FixedList<IStatementSyntax> body)
+            IBodySyntax body)
             : base(declaringClass, span, file, modifiers, fullName, nameSpan, parameters, lifetimeBounds, returnTypeSyntax,
                 ConcreteCallableDeclarationSyntax.GetChildSymbols(parameters, body))
         {

@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name fullName,
             TextSpan nameSpan,
             FixedList<IParameterSyntax> parameters,
-            FixedList<IStatementSyntax> body)
+            IBodySyntax body)
             : base(span, file, modifiers, fullName, nameSpan, parameters, body)
         {
             DeclaringClass = declaringType;

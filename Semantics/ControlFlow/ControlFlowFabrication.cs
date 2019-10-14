@@ -65,7 +65,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
             currentBlock = graph.NewBlock();
             breakToBlock = null;
-            foreach (var statement in method.Body)
+            foreach (var statement in method.Body.Statements)
                 ConvertToStatement(statement);
 
             // Generate the implicit return statement
@@ -94,7 +94,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
             currentBlock = graph.NewBlock();
             breakToBlock = null;
-            foreach (var statement in constructor.Body)
+            foreach (var statement in constructor.Body.Statements)
                 ConvertToStatement(statement);
 
             // Generate the implicit return statement
@@ -123,7 +123,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
             currentBlock = graph.NewBlock();
             breakToBlock = null;
-            foreach (var statement in method.Body)
+            foreach (var statement in method.Body.Statements)
                 ConvertToStatement(statement);
 
             // Generate the implicit return statement
@@ -692,7 +692,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                             return new BinaryOperation(leftOperand, operatorExpression.Operator,
                                 rightOperand, operandType);
                         }
-                        case UserObjectType operandType:
+                        case UserObjectType _:
                         {
                             if (operatorExpression.Operator != BinaryOperator.EqualsEquals)
                                 throw new NotImplementedException();

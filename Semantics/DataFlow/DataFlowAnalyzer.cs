@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
         {
             checker = strategy.CheckerFor(method, diagnostics);
             currentState = checker.StartState();
-            foreach (var statement in method.Body)
+            foreach (var statement in method.Body.Statements)
                 VisitStatement(statement, default);
         }
 
@@ -53,7 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
             {
                 default:
                     throw NonExhaustiveMatchException.For(expression);
-                case INameExpressionSyntax identifierName:
+                case INameExpressionSyntax _:
                 case null:
                     // Ignore
                     break;

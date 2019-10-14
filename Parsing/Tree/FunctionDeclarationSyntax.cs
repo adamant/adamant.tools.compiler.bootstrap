@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
                 parameters, // For now we will not support pure meta functions
             IExpressionSyntax? lifetimeBounds,
             ITypeSyntax? returnTypeSyntax,
-            FixedList<IStatementSyntax> body)
+            IBodySyntax body)
             : base(span, file, modifiers, fullName, nameSpan, parameters, body)
         {
             LifetimeBounds = lifetimeBounds;
