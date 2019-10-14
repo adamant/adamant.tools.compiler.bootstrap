@@ -1,16 +1,13 @@
+using Adamant.Tools.Compiler.Bootstrap.Framework;
+
 namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
 {
     public interface IStatementWalker
     {
-        bool ShouldSkip(IStatementSyntax declaration);
+        bool Enter(FixedList<IStatementSyntax> statements, ITreeWalker walker);
+        void Exit(FixedList<IStatementSyntax> statements, ITreeWalker walker);
 
-        void Enter(IVariableDeclarationStatementSyntax variableDeclaration);
-        void Exit(IVariableDeclarationStatementSyntax variableDeclaration);
-
-        void Enter(IExpressionStatementSyntax expressionStatement);
-        void Exit(IExpressionStatementSyntax expressionStatement);
-
-        void Enter(IResultStatementSyntax resultStatement);
-        void Exit(IResultStatementSyntax resultStatement);
+        bool Enter(IStatementSyntax statement, ITreeWalker walker);
+        void Exit(IStatementSyntax statement, ITreeWalker walker);
     }
 }

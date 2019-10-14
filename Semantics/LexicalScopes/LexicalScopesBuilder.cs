@@ -89,7 +89,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             INonMemberDeclarationSyntax declaration,
             LexicalScope containingScope)
         {
-            var binder = new ExpressionScopesBuilder();
             switch (declaration)
             {
                 default:
@@ -107,7 +106,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     BuildScopesInFunctionParameters(containingScope, function.Parameters);
                     if (function.ReturnTypeSyntax != null)
                         new TypeScopesBuilder(containingScope).Walk(function.ReturnTypeSyntax);
-                    BuildScopesInBody(containingScope, binder, function.Parameters, function.Body);
+                    BuildScopesInBody(containingScope, function.Parameters, function.Body);
                     break;
                 case IClassDeclarationSyntax classDeclaration:
                     // TODO name scope for type declaration
@@ -121,7 +120,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             IMemberDeclarationSyntax declaration,
             LexicalScope containingScope)
         {
-            var binder = new ExpressionScopesBuilder();
             switch (declaration)
             {
                 default:
@@ -130,7 +128,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     BuildScopesInFunctionParameters(containingScope, concreteMethod.Parameters);
                     if (concreteMethod.ReturnTypeSyntax != null)
                         new TypeScopesBuilder(containingScope).Walk(concreteMethod.ReturnTypeSyntax);
-                    BuildScopesInBody(containingScope, binder, concreteMethod.Parameters, concreteMethod.Body);
+                    BuildScopesInBody(containingScope, concreteMethod.Parameters, concreteMethod.Body);
                     break;
                 case IAbstractMethodDeclarationSyntax abstractMethod:
                     BuildScopesInFunctionParameters(containingScope, abstractMethod.Parameters);
@@ -139,11 +137,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     break;
                 case IConstructorDeclarationSyntax constructor:
                     BuildScopesInFunctionParameters(containingScope, constructor.Parameters);
-                    BuildScopesInBody(containingScope, binder, constructor.Parameters, constructor.Body);
+                    BuildScopesInBody(containingScope, constructor.Parameters, constructor.Body);
                     break;
                 case IFieldDeclarationSyntax fieldDeclaration:
                     new TypeScopesBuilder(containingScope).Walk(fieldDeclaration.TypeSyntax);
-                    binder.VisitExpression(fieldDeclaration.Initializer, containingScope);
+                    new ExpressionScopesBuilder(containingScope).Walk(fieldDeclaration.Initializer);
                     break;
             }
         }
@@ -169,7 +167,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 
         private static void BuildScopesInBody(
             LexicalScope containingScope,
-            ExpressionScopesBuilder binder,
             FixedList<IParameterSyntax> parameters,
             FixedList<IStatementSyntax> body)
         {
@@ -178,7 +175,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                 symbols.Add(parameter);
 
             containingScope = new NestedScope(containingScope, symbols, Enumerable.Empty<ISymbol>());
-            binder.VisitStatements(body, containingScope);
+            new ExpressionScopesBuilder(containingScope).Walk(body);
         }
 
         private LexicalScope BuildNamespaceScopes(

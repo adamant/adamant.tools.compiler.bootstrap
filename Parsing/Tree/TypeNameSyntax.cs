@@ -53,7 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             if (ContainingScope != null)
                 return ContainingScope.LookupQualified(Name);
 
-            throw new InvalidOperationException();
+            throw new InvalidOperationException("Can't lookup type name without containing scope");
         }
 
         public override string ToString()

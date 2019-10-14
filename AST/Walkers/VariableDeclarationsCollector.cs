@@ -11,13 +11,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
         public FixedList<IVariableDeclarationStatementSyntax> Declarations =>
             variableDeclarations.ToFixedList();
 
-        public override void Enter(IVariableDeclarationStatementSyntax variableDeclaration)
+        public override bool Enter(FixedList<IStatementSyntax> statements, ITreeWalker walker)
         {
-            variableDeclarations.Add(variableDeclaration);
+            return true;
         }
 
-        public override void Enter(IExpressionStatementSyntax expressionStatement) { }
-
-        public override void Enter(IResultStatementSyntax resultStatement) { }
+        public override bool Enter(IStatementSyntax statement, ITreeWalker walker)
+        {
+            if (statement is IVariableDeclarationStatementSyntax variableDeclaration)
+                variableDeclarations.Add(variableDeclaration);
+            return true;
+        }
     }
 }

@@ -11,10 +11,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
             treeWalker.Walk(type);
         }
 
+        public static void Walk(this IStatementWalker walker, FixedList<IStatementSyntax>? statements)
+        {
+            var treeWalker = new TreeWalker(null, walker as ITypeWalker, walker, walker as IExpressionWalker);
+            treeWalker.Walk(statements);
+        }
+
         public static void Walk(this IStatementWalker walker, IStatementSyntax? statement)
         {
             var treeWalker = new TreeWalker(null, walker as ITypeWalker, walker, walker as IExpressionWalker);
             treeWalker.Walk(statement);
+        }
+
+        public static void Walk(this IExpressionWalker walker, IExpressionSyntax? expression)
+        {
+            var treeWalker = new TreeWalker(null, walker as ITypeWalker, walker as IStatementWalker, walker);
+            treeWalker.Walk(expression);
         }
 
         public static FixedList<IVariableDeclarationStatementSyntax> GetAllVariableDeclarations(

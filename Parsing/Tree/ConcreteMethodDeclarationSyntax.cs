@@ -6,6 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
+    // TODO No error is reported if IConcreteMethodDeclarationSyntax is missing
     internal class ConcreteMethodDeclarationSyntax : MethodDeclarationSyntax, IConcreteMethodDeclarationSyntax
     {
         public virtual FixedList<IStatementSyntax> Body { get; }
