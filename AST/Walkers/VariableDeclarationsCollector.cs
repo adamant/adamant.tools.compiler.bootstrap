@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
         public FixedList<IVariableDeclarationStatementSyntax> Declarations =>
             variableDeclarations.ToFixedList();
 
-        public override bool Enter(ISyntax syntax, ISyntaxTraversal traversal)
+        protected override void WalkNonNull(ISyntax syntax)
         {
             switch (syntax)
             {
@@ -20,12 +20,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                     variableDeclarations.Add(variableDeclaration);
                     break;
                 case ITypeSyntax _:
-                    return false;
+                    return;
                 case IDeclarationSyntax _:
                     throw new InvalidOperationException($"Can't get variable declarations of {syntax.GetType().Name}");
             }
 
-            return true;
+            WalkChildren(syntax);
         }
     }
 }

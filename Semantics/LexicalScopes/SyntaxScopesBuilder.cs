@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             scopes.Push(containingScope);
         }
 
-        public override bool Enter(ISyntax syntax, ISyntaxTraversal traversal)
+        protected override void WalkNonNull(ISyntax syntax)
         {
             switch (syntax)
             {
@@ -34,28 +34,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     typeName.ContainingScope = ContainingScope;
                     break;
                 case IForeachExpressionSyntax foreachExpression:
-                    traversal.Walk(foreachExpression.TypeSyntax);
-                    traversal.Walk(foreachExpression.InExpression);
-                    scopes.Push(
-                        new NestedScope(ContainingScope, foreachExpression.Yield(), Enumerable.Empty<ISymbol>()));
-                    traversal.Walk(foreachExpression.Block);
+                    Walk(foreachExpression.TypeSyntax);
+                    Walk(foreachExpression.InExpression);
+                    scopes.Push(new NestedScope(ContainingScope, foreachExpression.Yield(), Enumerable.Empty<ISymbol>()));
+                    Walk(foreachExpression.Block);
                     scopes.Pop();
-                    return false;
+                    return;
                 case IBodyOrBlockSyntax bodyOrBlock:
                 {
                     var scopeDepth = scopes.Count;
 
                     foreach (var statement in bodyOrBlock.Statements)
-                        traversal.Walk(statement);
+                        Walk(statement);
 
                     // Remove any scopes created by variable declarations
                     while (scopes.Count > scopeDepth) scopes.Pop();
 
-                    return false;
+                    return;
                 }
             }
 
-            return true;
+            WalkChildren(syntax);
         }
     }
 }
