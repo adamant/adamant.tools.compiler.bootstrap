@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.AST;
-using Adamant.Tools.Compiler.Bootstrap.AST.Visitors;
+using Adamant.Tools.Compiler.Bootstrap.AST.Walkers;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using ExhaustiveMatching;
-using Void = Adamant.Tools.Compiler.Bootstrap.Framework.Void;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
 {
@@ -12,34 +11,37 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
     /// No variable types, parameter types, return types should have any
     /// implicitly mutable types in them.
     /// </summary>
-    public class NoUpgradableMutabilityTypesValidator : DeclarationVisitor<Void>
+    public class NoUpgradableMutabilityTypesValidator : SyntaxWalker
     {
-        public static void Validate(IEnumerable<IEntityDeclarationSyntax> entityDeclarations)
+        public void Walk(IEnumerable<IEntityDeclarationSyntax> entityDeclarations)
         {
-            var validator = new NoUpgradableMutabilityTypesValidator();
-            foreach (var declaration in entityDeclarations)
-                validator.VisitDeclaration(declaration);
+            foreach (var declaration in entityDeclarations) WalkNonNull(declaration);
         }
 
-        public override void VisitMethodDeclaration(IMethodDeclarationSyntax methodDeclaration, Void args)
+        protected override void WalkNonNull(ISyntax syntax)
         {
-            base.VisitMethodDeclaration(methodDeclaration, args);
-            Validate(methodDeclaration.SelfParameterType);
-            ValidateReturn(methodDeclaration.ReturnType.Fulfilled());
-        }
+            switch (syntax)
+            {
+                case IMethodDeclarationSyntax methodDeclaration:
+                    WalkChildren(methodDeclaration);
+                    Validate(methodDeclaration.SelfParameterType!);
+                    ValidateReturn(methodDeclaration.ReturnType.Fulfilled());
+                    break;
+                case IConstructorDeclarationSyntax constructorDeclaration:
+                    WalkChildren(constructorDeclaration);
+                    Validate(constructorDeclaration.SelfParameterType);
+                    break;
+                case IParameterSyntax parameter:
+                    WalkChildren(parameter);
+                    Validate(parameter.Type.Fulfilled());
+                    return;
+                case IVariableDeclarationStatementSyntax variableDeclaration:
+                    WalkChildren(variableDeclaration);
+                    Validate(variableDeclaration.Type!);
+                    break;
+            }
 
-        public override void VisitParameter(IParameterSyntax? parameter, Void args)
-        {
-            if (parameter != null)
-                Validate(parameter.Type.Fulfilled());
-        }
-
-        public override void VisitVariableDeclarationStatement(
-            IVariableDeclarationStatementSyntax variableDeclaration,
-            Void args)
-        {
-            base.VisitVariableDeclarationStatement(variableDeclaration, args);
-            Validate(variableDeclaration.Type);
+            WalkChildren(syntax);
         }
 
         private static void Validate(DataType type)

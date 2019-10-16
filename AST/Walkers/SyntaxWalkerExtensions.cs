@@ -16,6 +16,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                     foreach (var member in classDeclaration.Members)
                         walker.Walk(member);
                     break;
+                case IConstructorDeclarationSyntax constructorDeclaration:
+                    foreach (var parameter in constructorDeclaration.Parameters)
+                        walker.Walk(parameter);
+                    walker.Walk(constructorDeclaration.Body);
+                    break;
+                case IConcreteMethodDeclarationSyntax concreteMethodDeclaration:
+                    foreach (var parameter in concreteMethodDeclaration.Parameters)
+                        walker.Walk(parameter);
+                    walker.Walk(concreteMethodDeclaration.ReturnTypeSyntax);
+                    walker.Walk(concreteMethodDeclaration.Body);
+                    break;
+                case IAbstractMethodDeclarationSyntax abstractMethodDeclaration:
+                    foreach (var parameter in abstractMethodDeclaration.Parameters)
+                        walker.Walk(parameter);
+                    walker.Walk(abstractMethodDeclaration.ReturnTypeSyntax);
+                    break;
+                case IFunctionDeclarationSyntax functionDeclaration:
+                    foreach (var parameter in functionDeclaration.Parameters)
+                        walker.Walk(parameter);
+                    walker.Walk(functionDeclaration.ReturnTypeSyntax);
+                    walker.Walk(functionDeclaration.Body);
+                    break;
+                case IImplicitConversionExpression implicitConversion:
+                    walker.Walk(implicitConversion.Expression);
+                    break;
+                case INamedParameterSyntax namedParameter:
+                    walker.Walk(namedParameter.TypeSyntax);
+                    walker.Walk(namedParameter.DefaultValue);
+                    break;
                 case IMutableTypeSyntax mutableType:
                     walker.Walk(mutableType.Referent);
                     break;
