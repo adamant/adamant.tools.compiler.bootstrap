@@ -96,7 +96,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             BasicAnalyzer.Check(entityDeclarations, diagnostics);
 
 #if DEBUG
-            TypeFulfillmentValidator.Validate(entityDeclarations);
+            new TypeFulfillmentValidator().Walk(entityDeclarations);
             new NoUpgradableMutabilityTypesValidator().Walk(entityDeclarations);
             new ReferencedSymbolValidator().Walk(entityDeclarations);
 #endif
