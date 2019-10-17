@@ -2,7 +2,7 @@ using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST.Visitors
 {
-    public class ExpressionVisitor<A>
+    public abstract class ExpressionVisitor<A>
     {
         public void VisitStatement(IStatementSyntax? statement, A args)
         {
