@@ -30,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
     {
         public static void Check<TState>(
             IDataFlowAnalysisStrategy<TState> strategy,
-            FixedList<ICallableDeclarationSyntax> callableDeclarations,
+            FixedList<IConcreteCallableDeclarationSyntax> callableDeclarations,
             Diagnostics diagnostics)
         {
             var dataFlowAnalyzer = new DataFlowAnalyzer<TState>(strategy, diagnostics);

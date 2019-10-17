@@ -101,21 +101,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             new ReferencedSymbolValidator().Walk(entityDeclarations);
 #endif
 
-            // From this point forward, analysis focuses on functions
-            var callableDeclarations =
-                entityDeclarations.OfType<ICallableDeclarationSyntax>().ToFixedList();
+            // From this point forward, analysis focuses on callable bodies
+            var callableDeclarations = entityDeclarations.OfType<IConcreteCallableDeclarationSyntax>().ToFixedList();
             ShadowChecker.Check(callableDeclarations, diagnostics);
 
             // TODO use DataFlowAnalysis to check for unused variables and report use of variables starting with `_`
 
-            DataFlowAnalysis.Check(DefiniteAssignmentStrategy.Instance, callableDeclarations,
-                diagnostics);
+            DataFlowAnalysis.Check(DefiniteAssignmentStrategy.Instance, callableDeclarations, diagnostics);
 
-            DataFlowAnalysis.Check(BindingMutabilityStrategy.Instance, callableDeclarations,
-                diagnostics);
+            DataFlowAnalysis.Check(BindingMutabilityStrategy.Instance, callableDeclarations, diagnostics);
 
-            DataFlowAnalysis.Check(UseOfMovedValueStrategy.Instance, callableDeclarations,
-                diagnostics);
+            DataFlowAnalysis.Check(UseOfMovedValueStrategy.Instance, callableDeclarations, diagnostics);
         }
 
         private static FixedList<Declaration> BuildIL(

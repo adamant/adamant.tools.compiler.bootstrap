@@ -24,6 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         private readonly Diagnostics diagnostics;
         private readonly FixedList<ISymbol> nonMemberEntitySymbols;
         private readonly GlobalScope globalScope;
+        private readonly SyntaxScopesBuilder scopesBuilder = new SyntaxScopesBuilder();
 
         public LexicalScopesBuilder(
              Diagnostics diagnostics,
@@ -104,7 +105,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                 case IFunctionDeclarationSyntax function:
                     BuildScopesInFunctionParameters(containingScope, function.Parameters);
                     if (function.ReturnTypeSyntax != null)
-                        new SyntaxScopesBuilder(containingScope).Walk(function.ReturnTypeSyntax);
+                        scopesBuilder.Walk(function.ReturnTypeSyntax, containingScope);
                     BuildScopesInBody(containingScope, function.Parameters, function.Body);
                     break;
                 case IClassDeclarationSyntax classDeclaration:
@@ -126,26 +127,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                 case IConcreteMethodDeclarationSyntax concreteMethod:
                     BuildScopesInFunctionParameters(containingScope, concreteMethod.Parameters);
                     if (concreteMethod.ReturnTypeSyntax != null)
-                        new SyntaxScopesBuilder(containingScope).Walk(concreteMethod.ReturnTypeSyntax);
+                        scopesBuilder.Walk(concreteMethod.ReturnTypeSyntax, containingScope);
                     BuildScopesInBody(containingScope, concreteMethod.Parameters, concreteMethod.Body);
                     break;
                 case IAbstractMethodDeclarationSyntax abstractMethod:
                     BuildScopesInFunctionParameters(containingScope, abstractMethod.Parameters);
                     if (abstractMethod.ReturnTypeSyntax != null)
-                        new SyntaxScopesBuilder(containingScope).Walk(abstractMethod.ReturnTypeSyntax);
+                        scopesBuilder.Walk(abstractMethod.ReturnTypeSyntax, containingScope);
                     break;
                 case IConstructorDeclarationSyntax constructor:
                     BuildScopesInFunctionParameters(containingScope, constructor.Parameters);
                     BuildScopesInBody(containingScope, constructor.Parameters, constructor.Body);
                     break;
                 case IFieldDeclarationSyntax fieldDeclaration:
-                    new SyntaxScopesBuilder(containingScope).Walk(fieldDeclaration.TypeSyntax);
-                    new SyntaxScopesBuilder(containingScope).Walk(fieldDeclaration.Initializer);
+                    scopesBuilder.Walk(fieldDeclaration.TypeSyntax, containingScope);
+                    scopesBuilder.Walk(fieldDeclaration.Initializer, containingScope);
                     break;
             }
         }
 
-        private static void BuildScopesInFunctionParameters(
+        private void BuildScopesInFunctionParameters(
             LexicalScope containingScope,
             FixedList<IParameterSyntax> parameters)
         {
@@ -155,7 +156,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     default:
                         throw ExhaustiveMatch.Failed(parameter);
                     case INamedParameterSyntax namedParameter:
-                        new SyntaxScopesBuilder(containingScope).Walk(namedParameter.TypeSyntax);
+                        scopesBuilder.Walk(namedParameter.TypeSyntax, containingScope);
                         break;
                     case ISelfParameterSyntax _:
                     case IFieldParameterSyntax _:
@@ -164,7 +165,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                 }
         }
 
-        private static void BuildScopesInBody(
+        private void BuildScopesInBody(
             LexicalScope containingScope,
             FixedList<IParameterSyntax> parameters,
             IBodySyntax body)
@@ -174,7 +175,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                 symbols.Add(parameter);
 
             containingScope = new NestedScope(containingScope, symbols, Enumerable.Empty<ISymbol>());
-            new SyntaxScopesBuilder(containingScope).Walk(body);
+            scopesBuilder.Walk(body, containingScope);
         }
 
         private LexicalScope BuildNamespaceScopes(

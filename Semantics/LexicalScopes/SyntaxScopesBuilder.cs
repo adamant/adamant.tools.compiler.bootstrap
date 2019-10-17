@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.AST.Walkers;
@@ -8,50 +7,37 @@ using Adamant.Tools.Compiler.Bootstrap.Scopes;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 {
-    public class SyntaxScopesBuilder : SyntaxWalker
+    public class SyntaxScopesBuilder : SyntaxWalker<LexicalScope>
     {
-        private readonly Stack<LexicalScope> scopes = new Stack<LexicalScope>();
-        private LexicalScope ContainingScope => scopes.Peek();
-
-        public SyntaxScopesBuilder(LexicalScope containingScope)
-        {
-            scopes.Push(containingScope);
-        }
-
-        protected override void WalkNonNull(ISyntax syntax)
+        protected override void WalkNonNull(ISyntax syntax, LexicalScope containingScope)
         {
             switch (syntax)
             {
-                case IVariableDeclarationStatementSyntax variableDeclaration:
-                    // Each variable declaration effectively starts a new scope after it, this
-                    // ensures a lookup returns the last declaration
-                    scopes.Push(new NestedScope(ContainingScope, variableDeclaration.Yield(), Enumerable.Empty<ISymbol>()));
-                    break;
                 case IHasContainingScope hasContainingScope:
-                    hasContainingScope.ContainingScope = ContainingScope;
+                    hasContainingScope.ContainingScope = containingScope;
                     break;
                 case IForeachExpressionSyntax foreachExpression:
-                    Walk(foreachExpression.TypeSyntax);
-                    Walk(foreachExpression.InExpression);
-                    scopes.Push(new NestedScope(ContainingScope, foreachExpression.Yield(), Enumerable.Empty<ISymbol>()));
-                    Walk(foreachExpression.Block);
-                    scopes.Pop();
+                    Walk(foreachExpression.TypeSyntax, containingScope);
+                    Walk(foreachExpression.InExpression, containingScope);
+                    containingScope = new NestedScope(containingScope, foreachExpression.Yield(), Enumerable.Empty<ISymbol>());
+                    Walk(foreachExpression.Block, containingScope);
                     return;
                 case IBodyOrBlockSyntax bodyOrBlock:
-                {
-                    var scopeDepth = scopes.Count;
-
                     foreach (var statement in bodyOrBlock.Statements)
-                        Walk(statement);
-
-                    // Remove any scopes created by variable declarations
-                    while (scopes.Count > scopeDepth) scopes.Pop();
-
+                    {
+                        Walk(statement, containingScope);
+                        // Each variable declaration effectively starts a new scope after it, this
+                        // ensures a lookup returns the last declaration
+                        if (statement is IVariableDeclarationStatementSyntax variableDeclaration)
+                            containingScope = new NestedScope(
+                                                containingScope,
+                                                variableDeclaration.Yield(),
+                                                Enumerable.Empty<ISymbol>());
+                    }
                     return;
-                }
             }
 
-            WalkChildren(syntax);
+            WalkChildren(syntax, containingScope);
         }
     }
 }
