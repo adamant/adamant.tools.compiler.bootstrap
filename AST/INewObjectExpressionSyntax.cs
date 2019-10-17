@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public interface INewObjectExpressionSyntax : IExpressionSyntax
     {
         ITypeNameSyntax TypeSyntax { get; }
-        INameExpressionSyntax? ConstructorName { get; }
+        ICallableNameSyntax? ConstructorName { get; }
         FixedList<ITransferSyntax> Arguments { get; }
         [DisallowNull] ISymbol? ConstructorSymbol { get; set; }
         /// <summary>

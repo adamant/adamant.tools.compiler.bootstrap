@@ -27,6 +27,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     // ensures a lookup returns the last declaration
                     scopes.Push(new NestedScope(ContainingScope, variableDeclaration.Yield(), Enumerable.Empty<ISymbol>()));
                     break;
+                case ICallableNameSyntax callableName:
+                    callableName.ContainingScope = ContainingScope;
+                    break;
                 case INameExpressionSyntax nameExpression:
                     nameExpression.ContainingScope = ContainingScope;
                     break;

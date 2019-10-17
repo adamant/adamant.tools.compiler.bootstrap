@@ -9,12 +9,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         private IExpressionSyntax target;
         public ref IExpressionSyntax Target => ref target;
 
-        public INameExpressionSyntax MethodNameSyntax { get; }
+        public ICallableNameSyntax MethodNameSyntax { get; }
 
         public MethodInvocationExpressionSyntax(
             TextSpan span,
             IExpressionSyntax target,
-            INameExpressionSyntax methodNameSyntax,
+            ICallableNameSyntax methodNameSyntax,
             FixedList<ITransferSyntax> arguments)
             : base(span, methodNameSyntax.Name, arguments)
         {

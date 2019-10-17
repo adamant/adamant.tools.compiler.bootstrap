@@ -34,6 +34,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     WalkChildren(nameExpression);
                     AssertHasReferencedSymbol(nameExpression, nameExpression.ReferencedSymbol);
                     return;
+                case ICallableNameSyntax callableName:
+                    WalkChildren(callableName);
+                    AssertHasReferencedSymbol(callableName, callableName.ReferencedSymbol);
+                    return;
                 case ITypeNameSyntax typeName:
                     WalkChildren(typeName);
                     AssertHasReferencedSymbol(typeName, typeName.ReferencedSymbol);

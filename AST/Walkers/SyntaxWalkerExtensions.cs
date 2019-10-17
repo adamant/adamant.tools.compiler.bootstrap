@@ -154,6 +154,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                 case ITypeNameSyntax _:
                 case INameExpressionSyntax _:
                 case ISelfParameterSyntax _:
+                case ICallableNameSyntax _:
                     // No Children
                     break;
             }

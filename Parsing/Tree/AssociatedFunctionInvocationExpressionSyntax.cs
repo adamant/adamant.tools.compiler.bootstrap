@@ -9,12 +9,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal class AssociatedFunctionInvocationExpressionSyntax : InvocationExpressionSyntax, IAssociatedFunctionInvocationExpressionSyntax
     {
         public ITypeSyntax TypeSyntax { get; }
-        public INameExpressionSyntax FunctionNameSyntax { get; }
+        public ICallableNameSyntax FunctionNameSyntax { get; }
 
         public AssociatedFunctionInvocationExpressionSyntax(
             TextSpan span,
             ITypeSyntax typeSyntax,
-            INameExpressionSyntax functionNameSyntax,
+            ICallableNameSyntax functionNameSyntax,
             FixedList<ITransferSyntax> arguments)
             : base(span, functionNameSyntax.Name, arguments)
         {
