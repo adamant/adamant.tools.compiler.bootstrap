@@ -1,39 +1,46 @@
 using System;
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.AST;
-using Adamant.Tools.Compiler.Bootstrap.AST.Visitors;
+using Adamant.Tools.Compiler.Bootstrap.AST.Walkers;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
-using Void = Adamant.Tools.Compiler.Bootstrap.Framework.Void;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
 {
-    public class ReferencedSymbolValidator : DeclarationVisitor<Void>
+    public class ReferencedSymbolValidator : SyntaxWalker
     {
-        public static void Validate(IEnumerable<IEntityDeclarationSyntax> entityDeclaration)
+        public void Walk(IEnumerable<IEntityDeclarationSyntax> entityDeclaration)
         {
-            var validator = new ReferencedSymbolValidator();
             foreach (var declaration in entityDeclaration)
-                validator.VisitDeclaration(declaration);
+                WalkNonNull(declaration);
         }
 
         private static void AssertHasReferencedSymbol(
-            IExpressionSyntax expression,
-            ISymbol referencedSymbol)
+            ISyntax syntax,
+            ISymbol? referencedSymbol)
         {
             if (referencedSymbol == null)
-                throw new Exception($"Expression doesn't have referenced symbol `{expression}`");
+                throw new Exception($"Expression doesn't have referenced symbol `{syntax}`");
         }
 
-        public override void VisitMemberAccessExpression(IMemberAccessExpressionSyntax memberAccessExpression, Void args)
+        protected override void WalkNonNull(ISyntax syntax)
         {
-            base.VisitMemberAccessExpression(memberAccessExpression, args);
-            AssertHasReferencedSymbol(memberAccessExpression, memberAccessExpression.ReferencedSymbol);
-        }
+            switch (syntax)
+            {
+                case IMemberAccessExpressionSyntax memberAccessExpression:
+                    WalkChildren(memberAccessExpression);
+                    AssertHasReferencedSymbol(memberAccessExpression, memberAccessExpression.ReferencedSymbol);
+                    return;
+                case INameExpressionSyntax nameExpression:
+                    WalkChildren(nameExpression);
+                    AssertHasReferencedSymbol(nameExpression, nameExpression.ReferencedSymbol);
+                    return;
+                case ITypeNameSyntax typeName:
+                    WalkChildren(typeName);
+                    AssertHasReferencedSymbol(typeName, typeName.ReferencedSymbol);
+                    return;
+            }
 
-        public override void VisitNameExpression(INameExpressionSyntax nameExpression, Void args)
-        {
-            base.VisitNameExpression(nameExpression, args);
-            AssertHasReferencedSymbol(nameExpression, nameExpression.ReferencedSymbol);
+            WalkChildren(syntax);
         }
     }
 }

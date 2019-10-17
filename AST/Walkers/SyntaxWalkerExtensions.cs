@@ -38,6 +38,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                     walker.Walk(functionDeclaration.ReturnTypeSyntax);
                     walker.Walk(functionDeclaration.Body);
                     break;
+                case IFieldDeclarationSyntax fieldDeclaration:
+                    walker.Walk(fieldDeclaration.TypeSyntax);
+                    walker.Walk(fieldDeclaration.Initializer);
+                    break;
                 case IImplicitConversionExpression implicitConversion:
                     walker.Walk(implicitConversion.Expression);
                     break;
@@ -89,6 +93,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                 case IFunctionInvocationExpressionSyntax functionInvocationExpression:
                     walker.Walk(functionInvocationExpression.FunctionNameSyntax);
                     foreach (var argument in functionInvocationExpression.Arguments)
+                        walker.Walk(argument);
+                    break;
+                case IAssociatedFunctionInvocationExpressionSyntax associatedFunctionInvocation:
+                    walker.Walk(associatedFunctionInvocation.FunctionNameSyntax);
+                    foreach (var argument in associatedFunctionInvocation.Arguments)
                         walker.Walk(argument);
                     break;
                 case IReturnExpressionSyntax returnExpression:
