@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
@@ -12,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
         {
             ContainingScope = containingScope;
             VariableBinding = new VariableBinding(parameter);
-            ContainingScope.AddShadowingBinding(VariableBinding);
+            ContainingScope.NestedBindingDeclared(VariableBinding);
         }
 
         public VariableBindingScope(BindingScope containingScope,
@@ -20,24 +21,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
         {
             ContainingScope = containingScope;
             VariableBinding = new VariableBinding(variableDeclaration);
-            ContainingScope.AddShadowingBinding(VariableBinding);
+            ContainingScope.NestedBindingDeclared(VariableBinding);
         }
 
-        protected override bool LookupWithoutNumber(SimpleName name, out VariableBinding binding)
+        protected override bool LookupWithoutNumber(SimpleName name, [NotNullWhen(true)] out VariableBinding? binding)
         {
-            if (VariableBinding.Name == name)
-            {
-                binding = VariableBinding;
-                return true;
-            }
+            if (VariableBinding.Name != name)
+                return ContainingScope.Lookup(name, out binding);
 
-            return ContainingScope.Lookup(name, out binding);
+            binding = VariableBinding;
+            return true;
         }
 
-        protected internal override void AddShadowingBinding(VariableBinding binding)
+        protected internal override void NestedBindingDeclared(VariableBinding binding)
         {
-            VariableBinding.AddShadowingBinding(binding);
-            ContainingScope.AddShadowingBinding(binding);
+            VariableBinding.NestedBindingDeclared(binding);
+            ContainingScope.NestedBindingDeclared(binding);
         }
     }
 }

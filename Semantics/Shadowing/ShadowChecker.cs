@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
         public static void Check(IEnumerable<ICallableDeclarationSyntax> callableDeclarations, Diagnostics diagnostics)
         {
             foreach (var callable in callableDeclarations.OfType<IConcreteCallableDeclarationSyntax>())
-                new ShadowChecker(callable, diagnostics).Walk(callable, null);
+                new ShadowChecker(callable, diagnostics).Walk(callable, EmptyBindingScope.Instance);
         }
 
         protected override void WalkNonNull(ISyntax syntax, BindingScope bindingScope)
@@ -33,17 +33,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
             switch (syntax)
             {
                 case IConcreteCallableDeclarationSyntax callable:
-                {
-                    bindingScope = EmptyBindingScope.Instance;
                     foreach (var parameter in callable.Parameters)
                         bindingScope = new VariableBindingScope(bindingScope, parameter);
-
-                    foreach (var statement in callable.Body.Statements)
-                        WalkNonNull(statement, bindingScope);
-                }
-                return;
-                case IBlockExpressionSyntax block:
-                    foreach (var statement in block.Statements)
+                    break;
+                case IBodyOrBlockSyntax bodyOrBlock:
+                    foreach (var statement in bodyOrBlock.Statements)
                     {
                         WalkNonNull(statement, bindingScope);
                         // Each variable declaration establishes a new binding scope
@@ -67,6 +61,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
                 }
                 case INameExpressionSyntax nameExpression:
                 {
+                    // This checks for cases where a variable was shadowed, but then used later
                     if (!bindingScope.Lookup(nameExpression.Name, out var binding)) return;
                     if (binding.WasShadowedBy.Any())
                         diagnostics.Add(SemanticError.CantShadow(callableDeclaration.File, binding.WasShadowedBy[^1].NameSpan, nameExpression.Span));

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
@@ -10,14 +11,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
         private EmptyBindingScope() { }
         #endregion
 
-        protected override bool LookupWithoutNumber(SimpleName name, out VariableBinding binding)
+        protected override bool LookupWithoutNumber(SimpleName name, [NotNullWhen(true)] out VariableBinding? binding)
         {
             binding = null;
             return false;
         }
 
-        protected internal override void AddShadowingBinding(VariableBinding binding)
+        protected internal override void NestedBindingDeclared(VariableBinding binding)
         {
+            // Empty scope has no bindings, so nested bindings don't matter
         }
     }
 }

@@ -13,9 +13,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public override SimpleName UnqualifiedName => this;
-        public readonly string Text;
-        public readonly int? Number;
-        public readonly bool IsSpecial;
+        public string Text { get; }
+        public int? Number { get; }
+        public bool IsSpecial { get; }
 
         public SimpleName(string text)
             : this(text, false, null)

@@ -30,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
             NameSpan = variableDeclaration.NameSpan;
         }
 
-        public void AddShadowingBinding(VariableBinding binding)
+        public void NestedBindingDeclared(VariableBinding binding)
         {
             if (Name == binding.Name)
                 wasShadowedBy.Add(binding);
