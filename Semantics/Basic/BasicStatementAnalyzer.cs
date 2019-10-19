@@ -453,25 +453,44 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     //diagnostics.Add(TypeError.MustBeCallable(file, methodInvocation.Target));
                     //return methodInvocation.Type = DataType.Unknown;
                     var typeSymbol = GetSymbolForType(targetType);
-                    var functionSymbols = typeSymbol.ChildSymbols[methodInvocation.MethodNameSyntax.Name]
+                    var methodSymbols = typeSymbol.ChildSymbols[methodInvocation.MethodNameSyntax.Name]
                         .OfType<IFunctionSymbol>().ToFixedList();
-                    functionSymbols = ResolveOverload(functionSymbols, targetType, argumentTypes);
-                    var functionSymbol = functionSymbols.Single();
-                    methodInvocation.MethodNameSyntax.ReferencedSymbol = functionSymbol;
-
-                    var selfType = functionSymbol.Parameters.First().Type;
-                    InsertImplicitConversionIfNeeded(ref methodInvocation.Target, selfType);
-                    CheckArgumentTypeCompatibility(selfType, methodInvocation.Target, true);
-
-                    // Skip the self parameter
-                    foreach (var (arg, type) in methodInvocation.Arguments
-                            .Zip(functionSymbol.Parameters.Skip(1).Select(p => p.Type)))
+                    methodSymbols = ResolveOverload(methodSymbols, targetType, argumentTypes);
+                    switch (methodSymbols.Count)
                     {
-                        InsertImplicitConversionIfNeeded(ref arg.Expression, type);
-                        CheckArgumentTypeCompatibility(type, arg.Expression);
+                        case 0:
+                            diagnostics.Add(
+                                NameBindingError.CouldNotBindMethod(file, methodInvocation.Span));
+                            methodInvocation.MethodNameSyntax.ReferencedSymbol = UnknownSymbol.Instance;
+                            methodInvocation.Type = DataType.Unknown;
+                            break;
+                        case 1:
+                            var functionSymbol = methodSymbols.Single();
+                            methodInvocation.MethodNameSyntax.ReferencedSymbol = functionSymbol;
+
+                            var selfType = functionSymbol.Parameters.First().Type;
+                            InsertImplicitConversionIfNeeded(ref methodInvocation.Target, selfType);
+                            CheckArgumentTypeCompatibility(selfType, methodInvocation.Target, true);
+
+                            // Skip the self parameter
+                            foreach (var (arg, type) in methodInvocation.Arguments.Zip(functionSymbol
+                                                                                       .Parameters.Skip(1)
+                                                                                       .Select(p => p.Type)))
+                            {
+                                InsertImplicitConversionIfNeeded(ref arg.Expression, type);
+                                CheckArgumentTypeCompatibility(type, arg.Expression);
+                            }
+                            methodInvocation.Type = functionSymbol.ReturnType;
+                            break;
+                        default:
+                            diagnostics.Add(
+                                NameBindingError.AmbiguousMethodCall(file, methodInvocation.Span));
+                            methodInvocation.MethodNameSyntax.ReferencedSymbol = UnknownSymbol.Instance;
+                            methodInvocation.Type = DataType.Unknown;
+                            break;
                     }
 
-                    return methodInvocation.Type = functionSymbol.ReturnType;
+                    return methodInvocation.Type;
                 }
                 case IAssociatedFunctionInvocationExpressionSyntax associatedFunctionInvocation:
 
@@ -587,16 +606,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         private DataType InferFunctionInvocationType(IFunctionInvocationExpressionSyntax functionInvocationExpression)
         {
             var argumentTypes = functionInvocationExpression.Arguments.Select(argument => InferExpressionType(ref argument.Expression)).ToFixedList();
-            var symbols = functionInvocationExpression.FunctionNameSyntax.LookupInContainingScope()
+            var functionSymbols = functionInvocationExpression.FunctionNameSyntax.LookupInContainingScope()
                 .OfType<IFunctionSymbol>().ToFixedList();
-            if (!symbols.Any())
-            {
-                diagnostics.Add(NameBindingError.CouldNotBindFunction(file, functionInvocationExpression.Span));
-                functionInvocationExpression.FunctionNameSyntax.ReferencedSymbol = UnknownSymbol.Instance;
-                return functionInvocationExpression.Type = DataType.Unknown;
-            }
-            symbols = ResolveOverload(symbols, null, argumentTypes);
-            switch (symbols.Count)
+            functionSymbols = ResolveOverload(functionSymbols, null, argumentTypes);
+            switch (functionSymbols.Count)
             {
                 case 0:
                     diagnostics.Add(NameBindingError.CouldNotBindFunction(file, functionInvocationExpression.Span));
@@ -604,7 +617,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     functionInvocationExpression.Type = DataType.Unknown;
                     break;
                 case 1:
-                    var functionSymbol = symbols.Single();
+                    var functionSymbol = functionSymbols.Single();
                     functionInvocationExpression.FunctionNameSyntax.ReferencedSymbol = functionSymbol;
                     foreach (var (arg, parameter) in
                         functionInvocationExpression.Arguments.Zip(functionSymbol.Parameters))

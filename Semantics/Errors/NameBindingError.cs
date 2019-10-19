@@ -46,13 +46,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
         public static Diagnostic CouldNotBindFunction(CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5001,
-                $"Could not find function with this name");
+                $"Could not find function with this name and number of arguments.");
         }
 
         public static Diagnostic AmbiguousFunctionCall(CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5002,
                 $"Function call is ambiguous.");
+        }
+
+        public static Diagnostic CouldNotBindMethod(CodeFile file, TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5001,
+                $"Could not find method with this name and number of arguments.");
+        }
+
+        public static Diagnostic AmbiguousMethodCall(CodeFile file, TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5002,
+                $"Method call is ambiguous.");
         }
     }
 }
