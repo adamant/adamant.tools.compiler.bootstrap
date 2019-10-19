@@ -635,7 +635,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
                     return block.Type = DataType.Void; // TODO assign the correct type to the block
                 case IResultStatementSyntax result:
-                    throw new NotImplementedException();
+                    InferExpressionType(ref result.Expression);
+                    return result.Expression.Type!;
             }
         }
 
