@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -135,8 +136,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IOpenBraceToken _: // No return, starting body
                     return null;
                 default:
+                    throw new NotImplementedException();
                     // TODO maybe lifetime bounds should be treated as distinct from expressions
-                    return AcceptExpression();
+                    //return AcceptExpression();
             }
         }
 

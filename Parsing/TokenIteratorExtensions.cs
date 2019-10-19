@@ -87,6 +87,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new TextSpan(tokens.Current.Span.Start, 0);
         }
 
+        public static T? ExpectToken<T>(this ITokenIterator<IToken> tokens)
+            where T : class, IToken
+        {
+            if (tokens.Current is T token)
+            {
+                tokens.Next();
+                return token;
+            }
+
+            tokens.Context.Diagnostics.Add(ParseError.MissingToken(tokens.Context.File, typeof(T), tokens.Current));
+            return null;
+        }
+
         public static (IIdentifierToken?, TextSpan) ExpectIdentifier(this ITokenIterator<IToken> tokens)
         {
             if (tokens.Current is IIdentifierToken identifier)

@@ -388,15 +388,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     // TODO we need to check for method call
                     return new MemberAccessExpressionSyntax(span, null, AccessOperator.Standard, member.ToExpression());
                 }
-                case IDollarToken _:
-                {
-                    var dollar = Tokens.Required<IDollarToken>();
-                    var (span, lifetime) = ParseLifetimeName();
-                    if (lifetime is null)
-                        throw new NotImplementedException();
-                    span = TextSpan.Covering(dollar, span);
-                    return new LifetimeExpressionSyntax(span, lifetime);
-                }
                 case IBinaryOperatorToken _:
                 case IAssignmentToken _:
                 case IQuestionDotToken _:
@@ -440,25 +431,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var operand = ParseExpression(OperatorPrecedence.Unary);
             var span = TextSpan.Covering(operatorSpan, operand.Span);
             return new UnaryOperatorExpressionSyntax(span, UnaryOperatorFixity.Prefix, @operator, operand);
-        }
-
-        private (TextSpan, SimpleName?) ParseLifetimeName()
-        {
-            switch (Tokens.Current)
-            {
-                case IIdentifierToken _:
-                    var identifier = Tokens.RequiredToken<IIdentifierToken>();
-                    return (identifier.Span, new SimpleName(identifier.Value));
-                case IOwnedKeywordToken _:
-                    var ownedKeyword = Tokens.RequiredToken<IOwnedKeywordToken>();
-                    return (ownedKeyword.Span, SpecialName.Owned);
-                case IForeverKeywordToken _:
-                    var foreverKeyword = Tokens.RequiredToken<IForeverKeywordToken>();
-                    return (foreverKeyword.Span, SpecialName.Forever);
-                default:
-                    var span = Tokens.Expect<IIdentifierToken>();
-                    return (span, null);
-            }
         }
 
         private IForeachExpressionSyntax ParseForeach()

@@ -24,9 +24,43 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     return new MutableTypeSyntax(span, referent);
                 }
                 case IIdentifierToken _:
-                    return ParseTypeName();
+                    return ParseReferenceTypeSyntax();
                 case IPrimitiveTypeToken _:
                     return ParsePrimitiveType();
+            }
+        }
+
+        private ITypeSyntax ParseReferenceTypeSyntax()
+        {
+            var typeNameSyntax = ParseTypeName();
+            if (Tokens.Accept<IDollarToken>())
+            {
+                var (lifetimeSpan, lifetimeName) = ParseLifetimeName();
+                if (lifetimeName != null)
+                {
+                    var span = TextSpan.Covering(typeNameSyntax.Span, lifetimeSpan);
+                    return new ReferenceLifetimeTypeSyntax(typeNameSyntax, span, lifetimeName);
+                }
+            }
+            return typeNameSyntax;
+        }
+
+        private (TextSpan, SimpleName?) ParseLifetimeName()
+        {
+            switch (Tokens.Current)
+            {
+                case IIdentifierToken _:
+                    var identifier = Tokens.RequiredToken<IIdentifierToken>();
+                    return (identifier.Span, new SimpleName(identifier.Value));
+                case IOwnedKeywordToken _:
+                    var ownedKeyword = Tokens.RequiredToken<IOwnedKeywordToken>();
+                    return (ownedKeyword.Span, SpecialName.Owned);
+                case IForeverKeywordToken _:
+                    var foreverKeyword = Tokens.RequiredToken<IForeverKeywordToken>();
+                    return (foreverKeyword.Span, SpecialName.Forever);
+                default:
+                    var span = Tokens.Expect<IIdentifierToken>();
+                    return (span, null);
             }
         }
 
@@ -54,7 +88,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IBoolKeywordToken _:
                     name = SpecialName.Bool;
                     break;
-                case IAnyKeywordToken _:
+                case IAnyKeywordToken _: // TODO Any could have a lifetime
                     name = SpecialName.Any;
                     break;
                 case IByteKeywordToken _:

@@ -169,7 +169,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                 case ISelfParameterSyntax _:
                 case ICallableNameSyntax _:
                 case IUsingDirectiveSyntax _:
-                case ILifetimeExpressionSyntax _:
                     // No Children
                     break;
             }

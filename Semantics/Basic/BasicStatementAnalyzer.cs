@@ -593,8 +593,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return noneLiteralExpression.Type = DataType.None;
                 case IImplicitConversionExpression _:
                     throw new Exception("ImplicitConversionExpressions are inserted by BasicExpressionAnalyzer. They should not be present in the AST yet.");
-                case ILifetimeExpressionSyntax _:
-                    throw new Exception("Should be inferring type of type expression");
                 case IBlockExpressionSyntax blockSyntax:
                     return InferBlockType(blockSyntax);
             }
