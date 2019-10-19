@@ -69,14 +69,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 // Use the initializer type unless it is constant
                 switch (type)
                 {
-                    case IntegerConstantType integerConstant:
-                        var value = integerConstant.Value;
-                        var byteCount = value.GetByteCount();
-                        //type = byteCount <= 4 ? DataType.Int : DataType.Int64;
+                    case IntegerConstantType _:
                         type = DataType.Int;
-                        throw new NotImplementedException("account for small integer constants");
                         break;
-                    case StringConstantType stringConstant:
+                    case StringConstantType _:
                         throw new NotImplementedException();
                 }
             }
