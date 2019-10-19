@@ -7,9 +7,6 @@
 <#
     var tokens = new List<string>()
     {
-        "Whitespace",
-        "Comment",
-        "Unexpected",
         "EndOfFile",
         "OpenBrace", // `{` U+007B
         "CloseBrace", // `}` U+007D
@@ -80,7 +77,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 
 <# foreach(var token in tokens) {#>
 
-    public partial interface I<#=token#>Token : IToken { }
+    public partial interface I<#=token#>Token : IEssentialToken { }
     internal partial class <#=token#>Token : Token, I<#=token#>Token
     {
         public <#=token#>Token(TextSpan span)

@@ -5,12 +5,13 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Lexing
 {
-    public class TokenIterator : ITokenIterator
+    public class TokenIterator<TToken> : ITokenIterator<TToken>
+        where TToken : class, IToken
     {
         public ParseContext Context { get; }
-        private IEnumerator<IToken>? tokens;
+        private IEnumerator<TToken>? tokens;
 
-        public TokenIterator(ParseContext context, IEnumerable<IToken> tokens)
+        public TokenIterator(ParseContext context, IEnumerable<TToken> tokens)
         {
             Context = context;
             this.tokens = tokens.GetEnumerator();
@@ -26,6 +27,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
             return tokens != null;
         }
 
-        public IToken Current => (tokens ?? throw new InvalidOperationException("Can't access `TokenIterator.Current` after `Next()` has returned false")).Current;
+        public TToken Current => (tokens ?? throw new InvalidOperationException("Can't access `TokenIterator.Current` after `Next()` has returned false")).Current;
     }
 }

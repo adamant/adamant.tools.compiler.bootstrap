@@ -15,16 +15,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     {
         public IExpressionSyntax? AcceptExpression()
         {
-            switch (Tokens.Current)
+            try
             {
-                case ICloseParenToken _:
-                case ICloseBraceToken _:
-                case ISemicolonToken _:
-                case ICommaToken _:
-                case IRightArrowToken _:
-                    return null;
-                default:
-                    return ParseExpression();
+                switch (Tokens.Current)
+                {
+                    case ICloseParenToken _:
+                    case ICloseBraceToken _:
+                    case ISemicolonToken _:
+                    case ICommaToken _:
+                    case IRightArrowToken _:
+                        return null;
+                    default:
+                        return ParseExpression();
+                }
+            }
+            catch (ParseFailedException)
+            {
+                return null;
             }
         }
 
@@ -289,7 +296,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             switch (Tokens.Current)
             {
                 default:
-                    throw new NotImplementedException();
                     throw ExhaustiveMatch.Failed(Tokens.Current);
                 case ISelfKeywordToken _:
                     var selfKeyword = Tokens.Expect<ISelfKeywordToken>();
@@ -313,10 +319,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 }
                 case IOpenParenToken _:
                     return ParseParenthesizedExpression();
-                case IMinusToken _:
-                    return ParsePrefixUnaryOperator(UnaryOperator.Minus);
                 case IPlusToken _:
                     return ParsePrefixUnaryOperator(UnaryOperator.Plus);
+                case IMinusToken _:
+                    return ParsePrefixUnaryOperator(UnaryOperator.Minus);
                 case INotKeywordToken _:
                     return ParsePrefixUnaryOperator(UnaryOperator.Not);
                 case IBooleanLiteralToken _:
@@ -391,17 +397,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     span = TextSpan.Covering(dollar, span);
                     return new LifetimeExpressionSyntax(span, lifetime);
                 }
-                case IAsteriskToken _:
-                case ISlashToken _:
-                case IQuestionToken _:
+                case IBinaryOperatorToken _:
+                case IAssignmentToken _:
+                case IQuestionDotToken _:
                 case ISemicolonToken _:
                 case ICloseParenToken _:
                 {
                     // If it is one of these, we assume there is a missing identifier
                     var identifierSpan = Tokens.Expect<IIdentifierToken>();
-                    throw new NotImplementedException();
-                    //return new IdentifierNameSyntax(identifierSpan, SpecialName.Underscore);
+                    return new NameExpressionSyntax(identifierSpan, SpecialName.Unknown);
                 }
+                case IOpenBraceToken _:
+                case ICloseBraceToken _:
+                case IColonToken _:
+                case IColonColonDotToken _:
+                case ILessThanColonToken _:
+                case ICommaToken _:
+                case IQuestionToken _:
+                case IKeywordToken _:
+                case IEndOfFileToken _:
+                    Add(ParseError.UnexpectedEndOfExpression(File, Tokens.Current.Span.AtStart()));
+                    throw new ParseFailedException("Unexpected end of expression");
                 case IEqualsGreaterThanToken _:
                     throw new NotImplementedException("`=>` in expression position");
             }

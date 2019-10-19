@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         //typeof(IRefKeywordToken),
         typeof(IForeverKeywordToken),
         typeof(IIdentifierToken))]
-    public interface ILifetimeNameToken : IToken { }
+    public interface ILifetimeNameToken : IEssentialToken { }
 
     public partial interface IOwnedKeywordToken : ILifetimeNameToken { }
     //public partial interface IRefKeywordToken : ILifetimeNameToken { }

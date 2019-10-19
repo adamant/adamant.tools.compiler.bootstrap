@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     public class CompilationUnitParser
     {
         [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Entry point to class which may need to be non-static in future")]
-        public ICompilationUnitSyntax Parse(ITokenIterator tokens)
+        public ICompilationUnitSyntax Parse(ITokenIterator<IEssentialToken> tokens)
         {
             var implicitNamespaceName = ParseImplicitNamespaceName(tokens);
             var parser = new Parser(tokens, implicitNamespaceName);
@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 declarations, tokens.Context.Diagnostics.Build());
         }
 
-        private static RootName ParseImplicitNamespaceName(ITokenIterator tokens)
+        private static RootName ParseImplicitNamespaceName(ITokenIterator<IEssentialToken> tokens)
         {
             RootName name = GlobalNamespaceName.Instance;
             foreach (var segment in tokens.Context.File.Reference.Namespace)

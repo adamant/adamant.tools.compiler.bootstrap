@@ -5,21 +5,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
     public static partial class TokenFactory
     {
-        public static IWhitespaceToken Whitespace(TextSpan span)
-        {
-            return new WhitespaceToken(span);
-        }
-
-        public static ICommentToken Comment(TextSpan span)
-        {
-            return new CommentToken(span);
-        }
-
-        public static IUnexpectedToken Unexpected(TextSpan span)
-        {
-            return new UnexpectedToken(span);
-        }
-
         public static IEndOfFileToken EndOfFile(TextSpan span)
         {
             return new EndOfFileToken(span);
@@ -203,9 +188,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     }
 
     [Closed(
-        typeof(IWhitespaceToken),
-        typeof(ICommentToken),
-        typeof(IUnexpectedToken),
         typeof(IEndOfFileToken),
         typeof(IOpenBraceToken),
         typeof(ICloseBraceToken),
@@ -245,34 +227,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     public partial interface IToken { }
 
 
-    public partial interface IWhitespaceToken : IToken { }
-    internal partial class WhitespaceToken : Token, IWhitespaceToken
-    {
-        public WhitespaceToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
-    public partial interface ICommentToken : IToken { }
-    internal partial class CommentToken : Token, ICommentToken
-    {
-        public CommentToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
-    public partial interface IUnexpectedToken : IToken { }
-    internal partial class UnexpectedToken : Token, IUnexpectedToken
-    {
-        public UnexpectedToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
-    public partial interface IEndOfFileToken : IToken { }
+    public partial interface IEndOfFileToken : IEssentialToken { }
     internal partial class EndOfFileToken : Token, IEndOfFileToken
     {
         public EndOfFileToken(TextSpan span)
@@ -281,7 +236,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IOpenBraceToken : IToken { }
+    public partial interface IOpenBraceToken : IEssentialToken { }
     internal partial class OpenBraceToken : Token, IOpenBraceToken
     {
         public OpenBraceToken(TextSpan span)
@@ -290,7 +245,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface ICloseBraceToken : IToken { }
+    public partial interface ICloseBraceToken : IEssentialToken { }
     internal partial class CloseBraceToken : Token, ICloseBraceToken
     {
         public CloseBraceToken(TextSpan span)
@@ -299,7 +254,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IOpenParenToken : IToken { }
+    public partial interface IOpenParenToken : IEssentialToken { }
     internal partial class OpenParenToken : Token, IOpenParenToken
     {
         public OpenParenToken(TextSpan span)
@@ -308,7 +263,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface ICloseParenToken : IToken { }
+    public partial interface ICloseParenToken : IEssentialToken { }
     internal partial class CloseParenToken : Token, ICloseParenToken
     {
         public CloseParenToken(TextSpan span)
@@ -317,7 +272,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface ISemicolonToken : IToken { }
+    public partial interface ISemicolonToken : IEssentialToken { }
     internal partial class SemicolonToken : Token, ISemicolonToken
     {
         public SemicolonToken(TextSpan span)
@@ -326,7 +281,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface ICommaToken : IToken { }
+    public partial interface ICommaToken : IEssentialToken { }
     internal partial class CommaToken : Token, ICommaToken
     {
         public CommaToken(TextSpan span)
@@ -335,7 +290,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IColonToken : IToken { }
+    public partial interface IColonToken : IEssentialToken { }
     internal partial class ColonToken : Token, IColonToken
     {
         public ColonToken(TextSpan span)
@@ -344,7 +299,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IRightArrowToken : IToken { }
+    public partial interface IRightArrowToken : IEssentialToken { }
     internal partial class RightArrowToken : Token, IRightArrowToken
     {
         public RightArrowToken(TextSpan span)
@@ -353,7 +308,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IDotToken : IToken { }
+    public partial interface IDotToken : IEssentialToken { }
     internal partial class DotToken : Token, IDotToken
     {
         public DotToken(TextSpan span)
@@ -362,7 +317,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IColonColonDotToken : IToken { }
+    public partial interface IColonColonDotToken : IEssentialToken { }
     internal partial class ColonColonDotToken : Token, IColonColonDotToken
     {
         public ColonColonDotToken(TextSpan span)
@@ -371,7 +326,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IDotDotToken : IToken { }
+    public partial interface IDotDotToken : IEssentialToken { }
     internal partial class DotDotToken : Token, IDotDotToken
     {
         public DotDotToken(TextSpan span)
@@ -380,7 +335,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface ILessThanDotDotToken : IToken { }
+    public partial interface ILessThanDotDotToken : IEssentialToken { }
     internal partial class LessThanDotDotToken : Token, ILessThanDotDotToken
     {
         public LessThanDotDotToken(TextSpan span)
@@ -389,7 +344,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IDotDotLessThanToken : IToken { }
+    public partial interface IDotDotLessThanToken : IEssentialToken { }
     internal partial class DotDotLessThanToken : Token, IDotDotLessThanToken
     {
         public DotDotLessThanToken(TextSpan span)
@@ -398,7 +353,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface ILessThanDotDotLessThanToken : IToken { }
+    public partial interface ILessThanDotDotLessThanToken : IEssentialToken { }
     internal partial class LessThanDotDotLessThanToken : Token, ILessThanDotDotLessThanToken
     {
         public LessThanDotDotLessThanToken(TextSpan span)
@@ -407,7 +362,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IPlusToken : IToken { }
+    public partial interface IPlusToken : IEssentialToken { }
     internal partial class PlusToken : Token, IPlusToken
     {
         public PlusToken(TextSpan span)
@@ -416,7 +371,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IMinusToken : IToken { }
+    public partial interface IMinusToken : IEssentialToken { }
     internal partial class MinusToken : Token, IMinusToken
     {
         public MinusToken(TextSpan span)
@@ -425,7 +380,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IAsteriskToken : IToken { }
+    public partial interface IAsteriskToken : IEssentialToken { }
     internal partial class AsteriskToken : Token, IAsteriskToken
     {
         public AsteriskToken(TextSpan span)
@@ -434,7 +389,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface ISlashToken : IToken { }
+    public partial interface ISlashToken : IEssentialToken { }
     internal partial class SlashToken : Token, ISlashToken
     {
         public SlashToken(TextSpan span)
@@ -443,7 +398,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IEqualsToken : IToken { }
+    public partial interface IEqualsToken : IEssentialToken { }
     internal partial class EqualsToken : Token, IEqualsToken
     {
         public EqualsToken(TextSpan span)
@@ -452,7 +407,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IEqualsEqualsToken : IToken { }
+    public partial interface IEqualsEqualsToken : IEssentialToken { }
     internal partial class EqualsEqualsToken : Token, IEqualsEqualsToken
     {
         public EqualsEqualsToken(TextSpan span)
@@ -461,7 +416,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface INotEqualToken : IToken { }
+    public partial interface INotEqualToken : IEssentialToken { }
     internal partial class NotEqualToken : Token, INotEqualToken
     {
         public NotEqualToken(TextSpan span)
@@ -470,7 +425,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IGreaterThanToken : IToken { }
+    public partial interface IGreaterThanToken : IEssentialToken { }
     internal partial class GreaterThanToken : Token, IGreaterThanToken
     {
         public GreaterThanToken(TextSpan span)
@@ -479,7 +434,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IGreaterThanOrEqualToken : IToken { }
+    public partial interface IGreaterThanOrEqualToken : IEssentialToken { }
     internal partial class GreaterThanOrEqualToken : Token, IGreaterThanOrEqualToken
     {
         public GreaterThanOrEqualToken(TextSpan span)
@@ -488,7 +443,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface ILessThanToken : IToken { }
+    public partial interface ILessThanToken : IEssentialToken { }
     internal partial class LessThanToken : Token, ILessThanToken
     {
         public LessThanToken(TextSpan span)
@@ -497,7 +452,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface ILessThanOrEqualToken : IToken { }
+    public partial interface ILessThanOrEqualToken : IEssentialToken { }
     internal partial class LessThanOrEqualToken : Token, ILessThanOrEqualToken
     {
         public LessThanOrEqualToken(TextSpan span)
@@ -506,7 +461,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IPlusEqualsToken : IToken { }
+    public partial interface IPlusEqualsToken : IEssentialToken { }
     internal partial class PlusEqualsToken : Token, IPlusEqualsToken
     {
         public PlusEqualsToken(TextSpan span)
@@ -515,7 +470,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IMinusEqualsToken : IToken { }
+    public partial interface IMinusEqualsToken : IEssentialToken { }
     internal partial class MinusEqualsToken : Token, IMinusEqualsToken
     {
         public MinusEqualsToken(TextSpan span)
@@ -524,7 +479,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IAsteriskEqualsToken : IToken { }
+    public partial interface IAsteriskEqualsToken : IEssentialToken { }
     internal partial class AsteriskEqualsToken : Token, IAsteriskEqualsToken
     {
         public AsteriskEqualsToken(TextSpan span)
@@ -533,7 +488,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface ISlashEqualsToken : IToken { }
+    public partial interface ISlashEqualsToken : IEssentialToken { }
     internal partial class SlashEqualsToken : Token, ISlashEqualsToken
     {
         public SlashEqualsToken(TextSpan span)
@@ -542,7 +497,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IDollarToken : IToken { }
+    public partial interface IDollarToken : IEssentialToken { }
     internal partial class DollarToken : Token, IDollarToken
     {
         public DollarToken(TextSpan span)
@@ -551,7 +506,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IQuestionToken : IToken { }
+    public partial interface IQuestionToken : IEssentialToken { }
     internal partial class QuestionToken : Token, IQuestionToken
     {
         public QuestionToken(TextSpan span)
@@ -560,7 +515,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IQuestionQuestionToken : IToken { }
+    public partial interface IQuestionQuestionToken : IEssentialToken { }
     internal partial class QuestionQuestionToken : Token, IQuestionQuestionToken
     {
         public QuestionQuestionToken(TextSpan span)
@@ -569,7 +524,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IQuestionDotToken : IToken { }
+    public partial interface IQuestionDotToken : IEssentialToken { }
     internal partial class QuestionDotToken : Token, IQuestionDotToken
     {
         public QuestionDotToken(TextSpan span)
@@ -578,7 +533,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface ILessThanColonToken : IToken { }
+    public partial interface ILessThanColonToken : IEssentialToken { }
     internal partial class LessThanColonToken : Token, ILessThanColonToken
     {
         public LessThanColonToken(TextSpan span)
@@ -587,7 +542,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IEqualsGreaterThanToken : IToken { }
+    public partial interface IEqualsGreaterThanToken : IEssentialToken { }
     internal partial class EqualsGreaterThanToken : Token, IEqualsGreaterThanToken
     {
         public EqualsGreaterThanToken(TextSpan span)

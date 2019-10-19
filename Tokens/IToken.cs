@@ -7,16 +7,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     /// A non-missing token
     /// </summary>
     [Closed(
-        typeof(IStringLiteralToken),
-        typeof(IKeywordToken),
-        typeof(IIdentifierOrUnderscoreToken),
-        typeof(IOperatorToken),
-        typeof(ILiteralToken),
-        typeof(ITriviaToken),
-        typeof(ILifetimeNameToken),
-        typeof(IPrimitiveTypeToken),
-        typeof(IIntegerLiteralToken),
-        typeof(IBinaryOperatorToken))]
+        typeof(IEssentialToken),
+        typeof(ITriviaToken))]
     public partial interface IToken
     {
         TextSpan Span { get; }

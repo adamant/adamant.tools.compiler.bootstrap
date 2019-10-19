@@ -4,13 +4,14 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Lexing
 {
-    public interface ITokenIterator
+    public interface ITokenIterator<out TToken>
+        where TToken : class, IToken
     {
         ParseContext Context { get; }
 
         bool Next();
 
         /// <exception cref="InvalidOperationException">If current is accessed after Next() has returned false</exception>
-        IToken Current { get; }
+        TToken Current { get; }
     }
 }

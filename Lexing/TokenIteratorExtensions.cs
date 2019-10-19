@@ -6,19 +6,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
 {
     public static class TokenIteratorExtensions
     {
-        public static ITokenIterator WhereNotTrivia(this ITokenIterator tokens)
+        public static ITokenIterator<IEssentialToken> WhereNotTrivia(this ITokenIterator<IToken> tokens)
         {
             return new WhereNotTriviaIterator(tokens);
         }
 
-        private class WhereNotTriviaIterator : ITokenIterator
+        private class WhereNotTriviaIterator : ITokenIterator<IEssentialToken>
         {
-            private readonly ITokenIterator tokens;
+            private readonly ITokenIterator<IToken> tokens;
 
-            public WhereNotTriviaIterator(ITokenIterator tokens)
+            public WhereNotTriviaIterator(ITokenIterator<IToken> tokens)
             {
                 this.tokens = tokens;
-                if (Current is ITriviaToken)
+                if (tokens.Current is ITriviaToken)
                     Next();
             }
 
@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                 return true;
             }
 
-            public IToken Current => tokens.Current;
+            public IEssentialToken Current => (IEssentialToken)tokens.Current;
         }
     }
 }

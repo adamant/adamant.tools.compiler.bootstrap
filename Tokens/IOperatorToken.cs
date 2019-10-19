@@ -33,8 +33,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         typeof(IEqualsGreaterThanToken),
         typeof(IAndKeywordToken),
         typeof(IOrKeywordToken),
-        typeof(INotKeywordToken))]
-    public interface IOperatorToken : IToken { }
+        typeof(INotKeywordToken),
+        typeof(IAssignmentToken))]
+    public interface IOperatorToken : IEssentialToken { }
 
     public partial interface IDotToken : IOperatorToken { }
     public partial interface IDotDotToken : IOperatorToken { }

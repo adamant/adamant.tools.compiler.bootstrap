@@ -1,5 +1,8 @@
+using ExhaustiveMatching;
+
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
+    [Closed(typeof(IDollarToken))]
     public interface ILifetimeOperatorToken : IOperatorToken
     {
     }

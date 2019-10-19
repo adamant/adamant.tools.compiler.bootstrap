@@ -35,5 +35,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3004, "Only function declarations are allowed in external blocks");
         }
+
+        public static Diagnostic UnexpectedEndOfExpression(CodeFile file, TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3005, "Unexpected end of expression");
+        }
     }
 }

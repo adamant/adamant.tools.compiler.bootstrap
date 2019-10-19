@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         //typeof(IFloat32KeywordToken),
         //typeof(IFloatKeywordToken)
         )]
-    public interface IPrimitiveTypeToken : IToken { }
+    public interface IPrimitiveTypeToken : IEssentialToken { }
 
     public partial interface IVoidKeywordToken : IPrimitiveTypeToken { }
     public partial interface INeverKeywordToken : IPrimitiveTypeToken { }

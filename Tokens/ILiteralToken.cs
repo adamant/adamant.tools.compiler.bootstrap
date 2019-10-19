@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         typeof(INoneKeywordToken)
         //typeof(IUninitializedKeywordToken)
         )]
-    public interface ILiteralToken : IToken { }
+    public interface ILiteralToken : IEssentialToken { }
 
     public partial interface IBooleanLiteralToken : ILiteralToken { }
     public partial interface IIntegerLiteralToken : ILiteralToken { }

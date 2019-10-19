@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         typeof(IQuestionQuestionToken),
         typeof(IAndKeywordToken),
         typeof(IOrKeywordToken))]
-    public interface IBinaryOperatorToken : IToken
+    public interface IBinaryOperatorToken : IEssentialToken
     {
     }
 

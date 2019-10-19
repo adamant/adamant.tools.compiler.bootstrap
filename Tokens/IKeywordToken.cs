@@ -9,5 +9,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         typeof(IAccessModifierToken),
         typeof(ITypeKindKeywordToken),
         typeof(IBooleanLiteralToken))]
-    public partial interface IKeywordToken : IToken { }
+    public partial interface IKeywordToken : IEssentialToken { }
 }

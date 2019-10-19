@@ -10,9 +10,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
 {
     public class Lexer
     {
-        public ITokenIterator Lex(ParseContext context)
+        public ITokenIterator<IToken> Lex(ParseContext context)
         {
-            return new TokenIterator(context, Lex(context.File, context.Diagnostics));
+            return new TokenIterator<IToken>(context, Lex(context.File, context.Diagnostics));
         }
 
         private static IEnumerable<IToken> Lex(CodeFile file, Diagnostics diagnostics)

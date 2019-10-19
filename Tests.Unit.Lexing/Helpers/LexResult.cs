@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
         public readonly FixedList<IToken> Tokens;
         public readonly FixedList<Diagnostic> Diagnostics;
 
-        public LexResult(ITokenIterator iterator)
+        public LexResult(ITokenIterator<IToken> iterator)
         {
             var tokens = new List<IToken>();
             do
