@@ -61,9 +61,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (Tokens.Accept<IColonToken>())
                 type = ParseType();
 
-            IExpressionSyntax? initializer = null;
+            ITransferSyntax? initializer = null;
             if (Tokens.Accept<IEqualsToken>())
-                initializer = ParseExpression();
+                initializer = ParseTransfer();
 
             var semicolon = Tokens.Expect<ISemicolonToken>();
             var span = TextSpan.Covering(binding, semicolon);

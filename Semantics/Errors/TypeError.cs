@@ -68,7 +68,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
                 $"Declaration of type `{typeDeclarationName}` is part of a circular definition");
         }
 
-        public static Diagnostic CannotConvert(CodeFile file, IExpressionSyntax expression, DataType ofType, DataType toType)
+        public static Diagnostic CannotConvert(CodeFile file, ISyntax expression, DataType ofType, DataType toType)
         {
             return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3007,
                 $"Cannot convert expression `{file.Code[expression.Span]}` of type `{ofType}` to type `{toType}`");

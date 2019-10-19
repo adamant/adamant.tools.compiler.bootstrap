@@ -216,7 +216,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         variableDeclaration.Name.UnqualifiedName);
                     if (variableDeclaration.Initializer != null)
                     {
-                        var value = ConvertToValue(variableDeclaration.Initializer);
+                        var value = ConvertToValue(variableDeclaration.Initializer.Expression);
                         AssignToPlace(
                             variable.LValueReference(variableDeclaration.Initializer.Span), value,
                             variableDeclaration.Initializer.Span);

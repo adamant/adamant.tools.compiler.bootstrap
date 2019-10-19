@@ -58,14 +58,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private void ResolveTypesInVariableDeclaration(IVariableDeclarationStatementSyntax variableDeclaration)
         {
-            InferExpressionType(ref variableDeclaration.Initializer);
+            if (variableDeclaration.Initializer != null)
+                InferExpressionType(ref variableDeclaration.Initializer.Expression);
 
             DataType type;
             if (variableDeclaration.TypeSyntax != null)
                 type = typeAnalyzer.Evaluate(variableDeclaration.TypeSyntax);
             else if (variableDeclaration.Initializer != null)
             {
-                type = variableDeclaration.Initializer.Type;
+                type = variableDeclaration.Initializer.Expression.Type!;
                 // Use the initializer type unless it is constant
                 switch (type)
                 {
@@ -85,8 +86,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             if (variableDeclaration.Initializer != null)
             {
-                InsertImplicitConversionIfNeeded(ref variableDeclaration.Initializer, type);
-                var initializerType = variableDeclaration.Initializer.Type;
+                InsertImplicitConversionIfNeeded(ref variableDeclaration.Initializer.Expression, type);
+                var initializerType = variableDeclaration.Initializer.Type = variableDeclaration.Initializer.Expression.Type!;
                 // If the source is an owned reference, then the declaration is implicitly owned
                 if (type is UserObjectType targetType && initializerType is UserObjectType sourceType
                       && sourceType.Lifetime == Lifetime.Owned
@@ -219,7 +220,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             return actualType;
         }
 
-        private DataType InferExpressionType([DisallowNull] ref IExpressionSyntax? expression)
+        private DataType InferExpressionType([NotNull] ref IExpressionSyntax? expression)
         {
             switch (expression)
             {
