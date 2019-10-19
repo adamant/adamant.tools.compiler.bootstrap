@@ -405,7 +405,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             //    }
                             break;
                         default:
-                            diagnostics.Add(NameBindingError.AmbiguousConstructor(file, newObjectExpression.Span));
+                            diagnostics.Add(NameBindingError.AmbiguousConstructorCall(file, newObjectExpression.Span));
                             newObjectExpression.ConstructorSymbol = UnknownSymbol.Instance;
                             newObjectExpression.ConstructorType = DataType.Unknown;
                             break;
@@ -589,16 +589,38 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             var argumentTypes = functionInvocationExpression.Arguments.Select(argument => InferExpressionType(ref argument.Expression)).ToFixedList();
             var symbols = functionInvocationExpression.FunctionNameSyntax.LookupInContainingScope()
                 .OfType<IFunctionSymbol>().ToFixedList();
-            symbols = ResolveOverload(symbols, null, argumentTypes);
-            var functionSymbol = symbols.Single();
-            functionInvocationExpression.FunctionNameSyntax.ReferencedSymbol = functionSymbol;
-            foreach (var (arg, parameter) in functionInvocationExpression.Arguments.Zip(functionSymbol.Parameters))
+            if (!symbols.Any())
             {
-                InsertImplicitConversionIfNeeded(ref arg.Expression, parameter.Type);
-                CheckArgumentTypeCompatibility(parameter.Type, arg.Expression);
+                diagnostics.Add(NameBindingError.CouldNotBindFunction(file, functionInvocationExpression.Span));
+                functionInvocationExpression.FunctionNameSyntax.ReferencedSymbol = UnknownSymbol.Instance;
+                return functionInvocationExpression.Type = DataType.Unknown;
             }
-
-            return functionInvocationExpression.Type = functionSymbol.ReturnType;
+            symbols = ResolveOverload(symbols, null, argumentTypes);
+            switch (symbols.Count)
+            {
+                case 0:
+                    diagnostics.Add(NameBindingError.CouldNotBindFunction(file, functionInvocationExpression.Span));
+                    functionInvocationExpression.FunctionNameSyntax.ReferencedSymbol = UnknownSymbol.Instance;
+                    functionInvocationExpression.Type = DataType.Unknown;
+                    break;
+                case 1:
+                    var functionSymbol = symbols.Single();
+                    functionInvocationExpression.FunctionNameSyntax.ReferencedSymbol = functionSymbol;
+                    foreach (var (arg, parameter) in
+                        functionInvocationExpression.Arguments.Zip(functionSymbol.Parameters))
+                    {
+                        InsertImplicitConversionIfNeeded(ref arg.Expression, parameter.Type);
+                        CheckArgumentTypeCompatibility(parameter.Type, arg.Expression);
+                    }
+                    functionInvocationExpression.Type = functionSymbol.ReturnType;
+                    break;
+                default:
+                    diagnostics.Add(NameBindingError.AmbiguousFunctionCall(file, functionInvocationExpression.Span));
+                    functionInvocationExpression.FunctionNameSyntax.ReferencedSymbol = UnknownSymbol.Instance;
+                    functionInvocationExpression.Type = DataType.Unknown;
+                    break;
+            }
+            return functionInvocationExpression.Type;
         }
 
         private DataType InferBlockType(IBlockOrResultSyntax blockOrResult)

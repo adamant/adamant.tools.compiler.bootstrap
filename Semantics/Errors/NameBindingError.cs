@@ -37,10 +37,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
                 $"Type doesn't have a constructor with this name and number of arguments.");
         }
 
-        public static Diagnostic AmbiguousConstructor(CodeFile file, TextSpan span)
+        public static Diagnostic AmbiguousConstructorCall(CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5002,
                 $"Constructor call is ambiguous.");
+        }
+
+        public static Diagnostic CouldNotBindFunction(CodeFile file, TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5001,
+                $"Could not find function with this name");
+        }
+
+        public static Diagnostic AmbiguousFunctionCall(CodeFile file, TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5002,
+                $"Function call is ambiguous.");
         }
     }
 }
