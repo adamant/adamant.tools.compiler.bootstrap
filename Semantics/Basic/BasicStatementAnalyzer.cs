@@ -631,11 +631,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case 1:
                 {
                     var symbol = symbols.Single();
-                    nameExpression.ReferencedSymbol = symbol;
                     switch (symbol)
                     {
                         case IBindingSymbol binding:
                         {
+                            nameExpression.ReferencedSymbol = binding;
                             type = binding.Type;
                             if (type is UserObjectType objectType)
                             {

@@ -26,16 +26,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
     /// makes sense to stabilize an inner loop before repeating an outer loop
     /// or not.
     /// </summary>
-    public class DataFlowAnalysis
+    public static class DataFlowAnalysis
     {
         public static void Check<TState>(
             IDataFlowAnalysisStrategy<TState> strategy,
             FixedList<IConcreteCallableDeclarationSyntax> callableDeclarations,
             Diagnostics diagnostics)
+            where TState : class
         {
             var dataFlowAnalyzer = new DataFlowAnalyzer<TState>(strategy, diagnostics);
-            foreach (var memberDeclaration in callableDeclarations)
-                dataFlowAnalyzer.Check(memberDeclaration);
+            foreach (var callableDeclaration in callableDeclarations)
+                dataFlowAnalyzer.Walk(callableDeclaration, false);
         }
     }
 }

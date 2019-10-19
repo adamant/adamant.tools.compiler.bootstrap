@@ -9,24 +9,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
     // TODO check definite assignment of fields in constructors
     public class DefiniteAssignmentChecker : IDataFlowAnalysisChecker<VariableFlags>
     {
-        private readonly IMethodDeclarationSyntax method;
+        private readonly IConcreteCallableDeclarationSyntax callable;
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
 
         public DefiniteAssignmentChecker(
-            IMethodDeclarationSyntax method,
+            IConcreteCallableDeclarationSyntax callable,
             Diagnostics diagnostics)
         {
-            this.method = method;
-            this.file = method.File;
+            this.callable = callable;
+            this.file = callable.File;
             this.diagnostics = diagnostics;
         }
 
         public VariableFlags StartState()
         {
-            var definitelyAssigned = new VariableFlags(method, false);
+            var definitelyAssigned = new VariableFlags(callable, false);
             // All parameters are assigned
-            definitelyAssigned = definitelyAssigned.Set(method.Parameters, true);
+            definitelyAssigned = definitelyAssigned.Set(callable.Parameters, true);
             return definitelyAssigned;
         }
 
@@ -38,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
             {
                 case INameExpressionSyntax identifier:
                     return definitelyAssigned.Set(identifier.ReferencedSymbol, true);
-                case IMemberAccessExpressionSyntax memberAccessExpression:
+                case IMemberAccessExpressionSyntax _:
                     return definitelyAssigned;
                 default:
                     throw new NotImplementedException("Complex assignments not yet implemented");

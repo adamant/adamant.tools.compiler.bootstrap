@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public interface INameExpressionSyntax : IExpressionSyntax, IHasContainingScope
     {
         SimpleName Name { get; }
-        [DisallowNull] ISymbol? ReferencedSymbol { get; set; }
+        [DisallowNull] IBindingSymbol? ReferencedSymbol { get; set; }
         FixedList<ISymbol> LookupInContainingScope();
     }
 }

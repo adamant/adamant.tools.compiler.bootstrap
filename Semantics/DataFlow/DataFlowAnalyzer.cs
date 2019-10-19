@@ -1,11 +1,12 @@
+using System;
 using Adamant.Tools.Compiler.Bootstrap.AST;
-using Adamant.Tools.Compiler.Bootstrap.AST.Visitors;
+using Adamant.Tools.Compiler.Bootstrap.AST.Walkers;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
 {
-    public class DataFlowAnalyzer<TState> : ExpressionVisitor<Void>
+    public class DataFlowAnalyzer<TState> : SyntaxWalker<bool>
+        where TState : class
     {
         private readonly IDataFlowAnalysisStrategy<TState> strategy;
         private readonly Diagnostics diagnostics;
@@ -16,73 +17,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
             this.diagnostics = diagnostics;
         }
 
-        public void Check(ICallableDeclarationSyntax callableDeclaration)
-        {
-            switch (callableDeclaration)
-            {
-                case IConcreteMethodDeclarationSyntax function:
-                    Check(function);
-                    break;
-                default:
-                    // Nothing to check
-                    break;
-            }
-        }
-
         private IDataFlowAnalysisChecker<TState> checker;
-        private TState currentState;
+        private TState? currentState;
 
-        private void Check(IConcreteMethodDeclarationSyntax method)
+        protected override void WalkNonNull(ISyntax syntax, bool isLValue)
         {
-            checker = strategy.CheckerFor(method, diagnostics);
-            currentState = checker.StartState();
-            foreach (var statement in method.Body.Statements)
-                VisitStatement(statement, default);
-        }
-
-        public override void VisitAssignmentExpression(IAssignmentExpressionSyntax assignmentExpression, Void args)
-        {
-            VisitLValueExpression(assignmentExpression.LeftOperand, args);
-            VisitTransfer(assignmentExpression.RightOperand, args);
-            currentState = checker.Assignment(assignmentExpression, currentState);
-        }
-
-        private void VisitLValueExpression(IExpressionSyntax expression, Void args)
-        {
-            switch (expression)
+            switch (syntax)
             {
-                default:
-                    throw NonExhaustiveMatchException.For(expression);
-                case INameExpressionSyntax _:
-                case null:
-                    // Ignore
+                case IConcreteCallableDeclarationSyntax callableDeclaration:
+                    checker = strategy.CheckerFor(callableDeclaration, diagnostics);
+                    currentState = checker.StartState();
                     break;
-                case IMemberAccessExpressionSyntax memberAccessExpression:
-                    // The expression we are accessing the member off of is an rvalue
-                    VisitExpression(memberAccessExpression.Expression, args);
-                    break;
-                    // TODO we will need to visit other expression types that also contain rvalues
+                case IAssignmentExpressionSyntax assignmentExpression:
+                    WalkNonNull(assignmentExpression.LeftOperand, true);
+                    WalkNonNull(assignmentExpression.RightOperand, false);
+                    currentState = checker.Assignment(assignmentExpression, currentState);
+                    return;
+                case INameExpressionSyntax nameExpression:
+                    if (isLValue) return; // ignore
+                    currentState = checker.IdentifierName(nameExpression, currentState);
+                    return;
+                case IVariableDeclarationStatementSyntax variableDeclaration:
+                    WalkChildren(variableDeclaration, false);
+                    currentState = checker.VariableDeclaration(variableDeclaration, currentState);
+                    return;
+                case IDeclarationSyntax _:
+                    throw new InvalidOperationException($"Analyze data flow of declaration of type {syntax.GetType().Name}");
             }
-        }
-
-        public override void VisitNameExpression(INameExpressionSyntax nameExpression, Void args)
-        {
-            currentState = checker.IdentifierName(nameExpression, currentState);
-        }
-
-        public override void VisitVariableDeclarationStatement(
-            IVariableDeclarationStatementSyntax variableDeclaration,
-            Void args)
-        {
-            base.VisitVariableDeclarationStatement(variableDeclaration, args);
-            currentState = checker.VariableDeclaration(variableDeclaration, currentState);
-        }
-
-        public override void VisitFunctionInvocation(IFunctionInvocationExpressionSyntax functionInvocationExpression, Void args)
-        {
-            // overriden to avoid visiting the function name
-            foreach (var argument in functionInvocationExpression.Arguments)
-                VisitTransfer(argument, args);
+            WalkChildren(syntax, false);
         }
     }
 }

@@ -6,7 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
     public interface IDataFlowAnalysisStrategy<TState>
     {
         IDataFlowAnalysisChecker<TState> CheckerFor(
-            IMethodDeclarationSyntax method,
+            IConcreteCallableDeclarationSyntax callable,
             Diagnostics diagnostics);
     }
 }

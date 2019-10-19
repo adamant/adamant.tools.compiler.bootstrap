@@ -12,6 +12,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         ref IExpressionSyntax? Expression { get; }
         AccessOperator AccessOperator { get; }
         INameExpressionSyntax Member { get; }
-        [DisallowNull] ISymbol? ReferencedSymbol { get; set; }
+        [DisallowNull] IBindingSymbol? ReferencedSymbol { get; set; }
     }
 }

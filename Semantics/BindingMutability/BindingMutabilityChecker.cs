@@ -2,6 +2,7 @@ using System;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
 {
@@ -11,23 +12,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
     /// </summary>
     public class BindingMutabilityChecker : IDataFlowAnalysisChecker<VariableFlags>
     {
-        private readonly IMethodDeclarationSyntax method;
+        private readonly IConcreteCallableDeclarationSyntax callable;
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
 
-        public BindingMutabilityChecker(IMethodDeclarationSyntax method, Diagnostics diagnostics)
+        public BindingMutabilityChecker(IConcreteCallableDeclarationSyntax callable, Diagnostics diagnostics)
         {
-            this.method = method;
-            file = method.File;
+            this.callable = callable;
+            file = callable.File;
             this.diagnostics = diagnostics;
         }
 
         public VariableFlags StartState()
         {
             // All variables start definitely unassigned
-            var definitelyUnassigned = new VariableFlags(method, true);
+            var definitelyUnassigned = new VariableFlags(callable, true);
             // All parameters are assigned
-            definitelyUnassigned = definitelyUnassigned.Set(method.Parameters, false);
+            definitelyUnassigned = definitelyUnassigned.Set(callable.Parameters, false);
             return definitelyUnassigned;
         }
 
@@ -39,13 +40,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
             {
                 case INameExpressionSyntax identifier:
                     var symbol = identifier.ReferencedSymbol;
-                    //if (!symbol.IsMutableBinding && definitelyUnassigned[symbol] == false)
-                    //{
-                    //    diagnostics.Add(SemanticError.VariableMayAlreadyBeAssigned(file, identifier.Span, identifier.Name));
-                    //}
-                    throw new NotImplementedException();
+                    if (!symbol.IsMutableBinding && definitelyUnassigned[symbol] == false)
+                    {
+                        diagnostics.Add(SemanticError.VariableMayAlreadyBeAssigned(file, identifier.Span, identifier.Name));
+                    }
                     return definitelyUnassigned.Set(symbol, false);
-                case IMemberAccessExpressionSyntax memberAccessExpression:
+                case IMemberAccessExpressionSyntax _:
                     return definitelyUnassigned;
                 default:
                     throw new NotImplementedException("Complex assignments not yet implemented");

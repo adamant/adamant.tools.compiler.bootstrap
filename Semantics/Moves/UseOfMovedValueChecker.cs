@@ -18,21 +18,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
     /// </summary>
     public class UseOfMovedValueChecker : IDataFlowAnalysisChecker<VariableFlags>
     {
-        private readonly IMethodDeclarationSyntax method;
+        private readonly IConcreteCallableDeclarationSyntax callable;
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
 
-        public UseOfMovedValueChecker(IMethodDeclarationSyntax method, Diagnostics diagnostics)
+        public UseOfMovedValueChecker(IConcreteCallableDeclarationSyntax callable, Diagnostics diagnostics)
         {
-            this.method = method;
-            file = method.File;
+            this.callable = callable;
+            file = callable.File;
             this.diagnostics = diagnostics;
         }
 
         public VariableFlags StartState()
         {
             // All variables start without possibly having their values moved out of them
-            return new VariableFlags(method, false);
+            return new VariableFlags(callable, false);
         }
 
         public VariableFlags Assignment(IAssignmentExpressionSyntax assignmentExpression, VariableFlags possiblyMoved)
@@ -43,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
                     // We are assigning into this variable so it definitely has a value now
                     var symbol = identifierName.ReferencedSymbol;
                     return possiblyMoved.Set(symbol, false);
-                case IMemberAccessExpressionSyntax memberAccessExpression:
+                case IMemberAccessExpressionSyntax _:
                     return possiblyMoved;
                 default:
                     throw new NotImplementedException("Complex assignments not yet implemented");

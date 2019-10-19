@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public INameExpressionSyntax Member { get; }
 
         [DisallowNull]
-        public ISymbol? ReferencedSymbol
+        public IBindingSymbol? ReferencedSymbol
         {
             get => Member.ReferencedSymbol;
             set

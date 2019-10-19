@@ -16,9 +16,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     {
         public SimpleName Name { get; }
 
-        private ISymbol? referencedSymbol;
+        private IBindingSymbol? referencedSymbol;
         [DisallowNull]
-        public ISymbol? ReferencedSymbol
+        public IBindingSymbol? ReferencedSymbol
         {
             get => referencedSymbol;
             set
