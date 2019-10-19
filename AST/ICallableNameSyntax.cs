@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public interface ICallableNameSyntax : ISyntax, IHasContainingScope
     {
         SimpleName Name { get; }
-        [DisallowNull] ISymbol? ReferencedSymbol { get; set; }
+        [DisallowNull] IFunctionSymbol? ReferencedSymbol { get; set; }
         FixedList<ISymbol> LookupInContainingScope();
     }
 }

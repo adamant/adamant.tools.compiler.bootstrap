@@ -13,10 +13,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     {
         public SimpleName Name { get; }
 
-        private ISymbol? referencedSymbol;
+        private IFunctionSymbol? referencedSymbol;
 
         [DisallowNull]
-        public ISymbol? ReferencedSymbol
+        public IFunctionSymbol? ReferencedSymbol
         {
             get => referencedSymbol;
             set
