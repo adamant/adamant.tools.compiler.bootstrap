@@ -1,4 +1,3 @@
-using System;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
@@ -10,8 +9,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
             switch (syntax)
             {
                 default:
-                    throw new NotImplementedException(syntax.GetType().Name);
                     throw ExhaustiveMatch.Failed(syntax);
+                case ICompilationUnitSyntax compilationUnit:
+                    foreach (var usingDirective in compilationUnit.UsingDirectives)
+                        walker.Walk(usingDirective, arg);
+                    foreach (var declaration in compilationUnit.Declarations)
+                        walker.Walk(declaration, arg);
+                    break;
+                case INamespaceDeclarationSyntax namespaceDeclaration:
+                    foreach (var usingDirective in namespaceDeclaration.UsingDirectives)
+                        walker.Walk(usingDirective, arg);
+                    foreach (var declaration in namespaceDeclaration.Declarations)
+                        walker.Walk(declaration, arg);
+                    break;
                 case IClassDeclarationSyntax classDeclaration:
                     foreach (var member in classDeclaration.Members)
                         walker.Walk(member, arg);
@@ -48,6 +58,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                 case INamedParameterSyntax namedParameter:
                     walker.Walk(namedParameter.TypeSyntax, arg);
                     walker.Walk(namedParameter.DefaultValue, arg);
+                    break;
+                case IFieldParameterSyntax fieldParameter:
+                    walker.Walk(fieldParameter.DefaultValue, arg);
                     break;
                 case IMutableTypeSyntax mutableType:
                     walker.Walk(mutableType.Referent, arg);
@@ -155,6 +168,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                 case INameExpressionSyntax _:
                 case ISelfParameterSyntax _:
                 case ICallableNameSyntax _:
+                case IUsingDirectiveSyntax _:
+                case ILifetimeExpressionSyntax _:
                     // No Children
                     break;
             }
