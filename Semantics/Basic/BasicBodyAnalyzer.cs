@@ -225,8 +225,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     throw ExhaustiveMatch.Failed(expression);
                 case null:
                     return DataType.Unknown;
-                case IMoveExpressionSyntax _:
-                    throw new NotImplementedException();
+                case IMoveExpressionSyntax moveExpression:
+                {
+                    var type = InferMoveExpressionType(moveExpression.Referent);
+                    if (type is ReferenceType referenceType && !referenceType.IsOwned)
+                    {
+                        diagnostics.Add(TypeError.CannotMoveBorrowedValue(file, moveExpression));
+                        type = referenceType.WithLifetime(Lifetime.Owned);
+                    }
+
+                    if (type is UserObjectType objectType)
+                        type = objectType.AsOwnedUpgradable();
+                    return moveExpression.Type = type;
+                }
                 case IMutableExpressionSyntax mutableExpression:
                 {
                     var expressionType = InferType(ref mutableExpression.Referent);
@@ -547,19 +558,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
                 case ISelfExpressionSyntax selfExpression:
                     return selfExpression.Type = selfType ?? DataType.Unknown;
-                //case IMoveTransferSyntax moveExpression:
-                //{
-                //    var type = InferMoveExpressionType(moveExpression.Expression);
-                //    if (type is ReferenceType referenceType && !referenceType.IsOwned)
-                //    {
-                //        diagnostics.Add(TypeError.CannotMoveBorrowedValue(file, moveExpression));
-                //        type = referenceType.WithLifetime(Lifetime.Owned);
-                //    }
-
-                //    if (type is UserObjectType objectType)
-                //        type = objectType.AsOwnedUpgradable();
-                //    return moveExpression.Type = type;
-                //}
                 case INoneLiteralExpressionSyntax noneLiteralExpression:
                     return noneLiteralExpression.Type = DataType.None;
                 case IImplicitConversionExpression _:

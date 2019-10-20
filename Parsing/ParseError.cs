@@ -40,5 +40,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3005, "Unexpected end of expression");
         }
+
+        public static Diagnostic CantMoveOutOfExpression(CodeFile file, TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3006,
+                "Can't move out of expression. Can only move out of variable.");
+        }
     }
 }

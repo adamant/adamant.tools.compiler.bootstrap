@@ -387,6 +387,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var span = TextSpan.Covering(mut, expression.Span);
                     return new MutableExpressionSyntax(span, expression);
                 }
+                case IMoveKeywordToken _:
+                {
+                    var move = Tokens.Required<IMoveKeywordToken>();
+                    // `move` is like a unary operator
+                    var expression = ParseExpression(OperatorPrecedence.Unary);
+                    var span = TextSpan.Covering(move, expression.Span);
+                    if (expression is INameExpressionSyntax name)
+                        return new MoveExpressionSyntax(span, name);
+                    Add(ParseError.CantMoveOutOfExpression(File, span));
+                    return expression;
+                }
                 case IBinaryOperatorToken _:
                 case IAssignmentToken _:
                 case IQuestionDotToken _:
