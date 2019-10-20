@@ -68,7 +68,7 @@ typedef struct
     _byte* bytes;
 } String;
 
-inline String _String_new(size_t byte_count, uint8_t* bytes)
+inline String _String_new(size_t byte_count, char* bytes)
 {
     return (String) {(_size){byte_count}, (_byte*)bytes };
 }

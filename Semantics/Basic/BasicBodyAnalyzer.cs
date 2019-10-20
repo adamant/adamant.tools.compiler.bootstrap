@@ -80,7 +80,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             if (variableDeclaration.TypeSyntax != null)
             {
                 type = typeAnalyzer.Evaluate(variableDeclaration.TypeSyntax);
-                CheckType(ref variableDeclaration.Initializer, type);
+                CheckType(ref variableDeclaration.Initializer, type, allowOwned: true);
             }
             else if (variableDeclaration.Initializer != null)
             {
@@ -131,13 +131,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             return type;
         }
 
-        public void CheckType([NotNull] ref IExpressionSyntax? expression, DataType expectedType)
+        public DataType CheckType([NotNull] ref IExpressionSyntax? expression, DataType expectedType, bool allowOwned = false)
         {
             InferType(ref expression, expectedType);
             var actualType = InsertImplicitConversionIfNeeded(ref expression, expectedType);
+            if (allowOwned && expectedType is UserObjectType expectedObjectType
+                           && actualType is UserObjectType actualObjectType
+                           && expectedObjectType.EqualExceptLifetimeAndMutability(actualObjectType))
+                return actualType;
             // TODO check for type compatibility not equality
             if (!expectedType.Equals(actualType))
                 diagnostics.Add(TypeError.CannotConvert(file, expression, actualType, expectedType));
+            return actualType;
         }
 
         /// <summary>
