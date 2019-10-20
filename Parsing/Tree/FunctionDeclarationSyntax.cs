@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal class FunctionDeclarationSyntax : ConcreteCallableDeclarationSyntax, IFunctionDeclarationSyntax
     {
         public bool IsExternalFunction { get; set; }
-        public IExpressionSyntax? LifetimeBounds { get; }
+        public ILifetimeBoundSyntax? LifetimeBounds { get; }
         public ITypeSyntax? ReturnTypeSyntax { get; }
 
         IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;
@@ -25,9 +25,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IModiferToken> modifiers,
             Name fullName,
             TextSpan nameSpan,
-            FixedList<IParameterSyntax>
-                parameters, // For now we will not support pure meta functions
-            IExpressionSyntax? lifetimeBounds,
+            FixedList<IParameterSyntax> parameters, // For now we will not support pure meta functions
+            ILifetimeBoundSyntax? lifetimeBounds,
             ITypeSyntax? returnTypeSyntax,
             IBodySyntax body)
             : base(span, file, modifiers, fullName, nameSpan, parameters, body)

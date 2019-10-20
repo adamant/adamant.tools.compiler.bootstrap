@@ -128,20 +128,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 parameters, lifetimeBounds, returnType, body);
         }
 
-        private IExpressionSyntax? ParseLifetimeBounds()
-        {
-            switch (Tokens.Current)
-            {
-                case IRightArrowToken _: // No Lifetime Bounds
-                case IOpenBraceToken _: // No return, starting body
-                    return null;
-                default:
-                    throw new NotImplementedException();
-                    // TODO maybe lifetime bounds should be treated as distinct from expressions
-                    //return AcceptExpression();
-            }
-        }
-
         private FixedList<IParameterSyntax> ParseParameters()
         {
             Tokens.Expect<IOpenParenToken>();
@@ -164,6 +150,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
             Tokens.Expect<ICloseParenToken>();
             return parameters.ToFixedList();
+        }
+
+        private ILifetimeBoundSyntax? ParseLifetimeBounds()
+        {
+            switch (Tokens.Current)
+            {
+                case IRightArrowToken _: // No Lifetime Bounds
+                case IOpenBraceToken _: // No return, starting body
+                    return null;
+                case IDollarToken _:
+                    return ParseParameterLifetimeBound();
+                default:
+                    throw new NotImplementedException();
+                    // TODO maybe lifetime bounds should be treated as distinct from expressions
+                    //return AcceptExpression();
+            }
+        }
+
+        private IParameterLifetimeBoundSyntax ParseParameterLifetimeBound()
+        {
+            var dollar = Tokens.Expect<IDollarToken>();
+            var identifier = Tokens.RequiredToken<IIdentifierToken>();
+            var span = TextSpan.Covering(dollar, identifier.Span);
+            return new ParameterLifetimeBoundSyntax(span, new SimpleName(identifier.Value));
         }
 
         private IBodySyntax ParseFunctionBody()

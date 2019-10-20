@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SimpleName Name => FullName.UnqualifiedName;
         IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;
-        public IExpressionSyntax? LifetimeBounds { get; }
+        public ILifetimeBoundSyntax? LifetimeBounds { get; }
         public ITypeSyntax? ReturnTypeSyntax { get; }
         DataType IFunctionSymbol.ReturnType => ReturnType.Fulfilled();
 
@@ -30,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name fullName,
             TextSpan nameSpan,
             FixedList<IParameterSyntax> parameters, // For now we will not support pure meta functions
-            IExpressionSyntax? lifetimeBounds,
+            ILifetimeBoundSyntax? lifetimeBounds,
             ITypeSyntax? returnTypeSyntax,
             SymbolSet childSymbols)
             : base(span, file, modifiers, fullName, nameSpan, parameters, childSymbols)
