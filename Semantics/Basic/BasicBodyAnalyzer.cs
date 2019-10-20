@@ -17,6 +17,14 @@ using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 {
+    /// <summary>
+    /// Do basic analysis of bodies.
+    ///
+    /// Note: type checking doesn't concern itself with lifetimes. Lifetime compatibility
+    /// is not enforced. The only time lifetimes are dealt with is when there
+    /// are implicit lifetimes as part of a type. In that case, basic analysis will
+    /// assign it the correct type including lifetimes.
+    /// </summary>
     public class BasicBodyAnalyzer
     {
         private readonly CodeFile file;
@@ -131,6 +139,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         public DataType CheckType([NotNull] ref IExpressionSyntax? expression, DataType expectedType, bool allowOwned = false)
         {
+            if (expression == null) return DataType.Unknown;
             InferType(ref expression);
             var actualType = InsertImplicitConversionIfNeeded(ref expression, expectedType);
             if (allowOwned && expectedType is UserObjectType expectedObjectType
@@ -138,7 +147,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                            && expectedObjectType.EqualExceptLifetimeAndMutability(actualObjectType))
                 return actualType;
             // TODO check for type compatibility not equality
-            if (!expectedType.Equals(actualType))
+            // Type checking doesn't concern itself with lifetimes
+            if (!expectedType.EqualExceptLifetime(actualType))
                 diagnostics.Add(TypeError.CannotConvert(file, expression, actualType, expectedType));
             return actualType;
         }

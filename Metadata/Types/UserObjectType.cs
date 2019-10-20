@@ -163,5 +163,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                    && EqualityComparer<Name>.Default.Equals(Name, other.Name)
                    && DeclaredMutable == other.DeclaredMutable;
         }
+
+        public override bool EqualExceptLifetime(DataType other)
+        {
+            return other is UserObjectType otherUserType
+                    && EqualityComparer<ISymbol>.Default.Equals(Symbol, otherUserType.Symbol)
+                    && EqualityComparer<Name>.Default.Equals(Name, otherUserType.Name)
+                    && DeclaredMutable == otherUserType.DeclaredMutable
+                    && Mutability == otherUserType.Mutability;
+        }
     }
 }

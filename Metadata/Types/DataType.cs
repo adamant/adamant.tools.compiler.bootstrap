@@ -74,6 +74,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             return this;
         }
 
+        public virtual bool EqualExceptLifetime(DataType other)
+        {
+            return Equals(other);
+        }
+
         public abstract override string ToString();
 
         public static implicit operator Self(DataType type)
