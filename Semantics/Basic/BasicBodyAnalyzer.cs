@@ -49,7 +49,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         ResolveTypes(variableDeclaration);
                         break;
                     case IExpressionStatementSyntax expressionStatement:
-                        InferType(ref expressionStatement.Expression, DataType.Unknown);
+                        InferType(ref expressionStatement.Expression);
                         break;
                     case IResultStatementSyntax _:
                         throw new InvalidOperationException("Result statement in body");
@@ -66,10 +66,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     ResolveTypes(variableDeclaration);
                     break;
                 case IExpressionStatementSyntax expressionStatement:
-                    InferType(ref expressionStatement.Expression, DataType.Unknown);
+                    InferType(ref expressionStatement.Expression);
                     break;
                 case IResultStatementSyntax resultStatement:
-                    InferType(ref resultStatement.Expression, DataType.Unknown);
+                    InferType(ref resultStatement.Expression);
                     break;
             }
         }
@@ -119,21 +119,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         /// </summary>
         private DataType InferDeclarableType([NotNull] ref IExpressionSyntax? expression)
         {
-            var type = InferType(ref expression, DataType.Unknown);
-            // Use the initializer type unless it is constant
+            var type = InferType(ref expression);
             switch (type)
             {
                 case IntegerConstantType _:
-                    type = DataType.Int;
-                    break;
+                    return InsertImplicitConversionIfNeeded(ref expression, DataType.Int);
+                default:
+                    return type;
             }
-            // TODO insert a cast
-            return type;
         }
 
         public DataType CheckType([NotNull] ref IExpressionSyntax? expression, DataType expectedType, bool allowOwned = false)
         {
-            InferType(ref expression, expectedType);
+            InferType(ref expression);
             var actualType = InsertImplicitConversionIfNeeded(ref expression, expectedType);
             if (allowOwned && expectedType is UserObjectType expectedObjectType
                            && actualType is UserObjectType actualObjectType
@@ -219,7 +217,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             return expression.Type!;
         }
 
-        private DataType InferType([NotNull] ref IExpressionSyntax? expression, DataType expectedType)
+        private DataType InferType([NotNull] ref IExpressionSyntax expression)
         {
             switch (expression)
             {
@@ -231,7 +229,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     throw new NotImplementedException();
                 case IMutableExpressionSyntax mutableExpression:
                 {
-                    var expressionType = InferType(ref mutableExpression.Referent, expectedType);
+                    var expressionType = InferType(ref mutableExpression.Referent);
                     DataType type;
                     switch (expressionType)
                     {
@@ -278,10 +276,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return boolLiteral.Type = DataType.Bool;
                 case IBinaryOperatorExpressionSyntax binaryOperatorExpression:
                 {
-                    InferType(ref binaryOperatorExpression.LeftOperand, expectedType);
+                    InferType(ref binaryOperatorExpression.LeftOperand);
                     var leftType = binaryOperatorExpression.LeftOperand.Type;
                     var @operator = binaryOperatorExpression.Operator;
-                    InferType(ref binaryOperatorExpression.RightOperand, expectedType);
+                    InferType(ref binaryOperatorExpression.RightOperand);
                     var rightType = binaryOperatorExpression.RightOperand.Type;
 
                     // If either is unknown, then we can't know whether there is a a problem.
@@ -343,7 +341,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             break;
                         case UnaryOperator.Minus:
                         case UnaryOperator.Plus:
-                            var operandType = InferType(ref unaryOperatorExpression.Operand, expectedType);
+                            var operandType = InferType(ref unaryOperatorExpression.Operand);
                             switch (operandType)
                             {
                                 case IntegerConstantType integerType:
@@ -368,8 +366,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
                 case INewObjectExpressionSyntax newObjectExpression:
                 {
-                    var argumentTypes = newObjectExpression.Arguments.Select(argument => InferType(ref argument.Expression,
-                        expectedType)).ToFixedList();
+                    var argumentTypes = newObjectExpression.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
                     // TODO handle named constructors here
                     var constructingType = typeAnalyzer.Evaluate(newObjectExpression.TypeSyntax);
                     if (!constructingType.IsKnown)
@@ -439,10 +436,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     // * Invoke a static function
                     // * Invoke a method
                     // * Invoke a function pointer
-                    var argumentTypes = methodInvocation.Arguments.Select(argument => InferType(ref argument.Expression,
-                        expectedType)).ToFixedList();
-                    InferType(ref methodInvocation.Target, expectedType);
-                    var targetType = methodInvocation.Target.Type;
+                    var argumentTypes = methodInvocation.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
+                    var targetType = InferType(ref methodInvocation.Target);
                     // If it is unknown, we already reported an error
                     if (targetType == DataType.Unknown)
                         return methodInvocation.Type = DataType.Unknown;
@@ -496,7 +491,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IFunctionInvocationExpressionSyntax functionInvocation:
                     return InferFunctionInvocationType(functionInvocation);
                 case IUnsafeExpressionSyntax unsafeExpression:
-                    InferType(ref unsafeExpression.Expression, expectedType);
+                    InferType(ref unsafeExpression.Expression);
                     return unsafeExpression.Type = unsafeExpression.Expression.Type;
                 case IIfExpressionSyntax ifExpression:
                     CheckType(ref ifExpression.Condition, DataType.Bool);
@@ -510,18 +505,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         case IIfExpressionSyntax _:
                         case IBlockExpressionSyntax _:
                             var elseExpression = (IExpressionSyntax)ifExpression.ElseClause;
-                            InferType(ref elseExpression, expectedType);
+                            InferType(ref elseExpression);
                             //ifExpression.ElseClause = elseExpression;
                             break;
                         case IResultStatementSyntax resultStatement:
-                            InferType(ref resultStatement.Expression, expectedType);
+                            InferType(ref resultStatement.Expression);
                             break;
                     }
                     // TODO assign a type to the expression
                     return ifExpression.Type = DataType.Void;
                 case IMemberAccessExpressionSyntax memberAccess:
                 {
-                    var left = InferType(ref memberAccess.Expression, expectedType);
+                    var left = InferType(ref memberAccess.Expression);
                     var symbol = GetSymbolForType(left);
 
                     switch (memberAccess.Member)
@@ -535,14 +530,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     }
                 }
                 case IBreakExpressionSyntax breakExpression:
-                    InferType(ref breakExpression.Value, expectedType);
+                    InferType(ref breakExpression.Value);
                     return breakExpression.Type = DataType.Never;
                 case INextExpressionSyntax nextExpression:
                     return nextExpression.Type = DataType.Never;
                 case IAssignmentExpressionSyntax assignmentExpression:
                 {
-                    var left = InferType(ref assignmentExpression.LeftOperand, expectedType);
-                    InferType(ref assignmentExpression.RightOperand, expectedType);
+                    var left = InferType(ref assignmentExpression.LeftOperand);
+                    InferType(ref assignmentExpression.RightOperand);
                     InsertImplicitConversionIfNeeded(ref assignmentExpression.RightOperand, left);
                     var right = assignmentExpression.RightOperand.Type ?? throw new InvalidOperationException();
                     if (!IsAssignableFrom(left, right))
@@ -576,7 +571,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private DataType InferFunctionInvocationType(IFunctionInvocationExpressionSyntax functionInvocationExpression)
         {
-            var argumentTypes = functionInvocationExpression.Arguments.Select(argument => InferType(ref argument.Expression, DataType.Unknown)).ToFixedList();
+            var argumentTypes = functionInvocationExpression.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
             var functionSymbols = functionInvocationExpression.FunctionNameSyntax.LookupInContainingScope()
                 .OfType<IFunctionSymbol>().ToFixedList();
             functionSymbols = ResolveOverload(functionSymbols, null, argumentTypes);
@@ -619,7 +614,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
                     return block.Type = DataType.Void; // TODO assign the correct type to the block
                 case IResultStatementSyntax result:
-                    InferType(ref result.Expression, DataType.Unknown);
+                    InferType(ref result.Expression);
                     return result.Expression.Type!;
             }
         }
@@ -698,8 +693,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             switch (inExpression)
             {
                 case IBinaryOperatorExpressionSyntax binaryExpression when binaryExpression.Operator == BinaryOperator.DotDot:
-                    InferType(ref binaryExpression.LeftOperand, DataType.Unknown);
-                    InferType(ref binaryExpression.RightOperand, DataType.Unknown);
+                    InferType(ref binaryExpression.LeftOperand);
+                    InferType(ref binaryExpression.RightOperand);
                     if (declaredType != null)
                     {
                         InsertImplicitConversionIfNeeded(ref binaryExpression.LeftOperand, declaredType);
@@ -707,7 +702,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     }
                     return inExpression.Type = binaryExpression.LeftOperand.Type;
                 default:
-                    return InferType(ref inExpression, DataType.Unknown);
+                    return InferType(ref inExpression);
             }
         }
 

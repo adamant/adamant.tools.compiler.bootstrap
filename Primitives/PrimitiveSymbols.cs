@@ -80,8 +80,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             var typeName = integerType.Name;
             var symbols = new List<ISymbol>
             {
-                PrimitiveFunctionSymbol.New(typeName.Qualify("remainder"), integerType, ("divisor", integerType)),
-                PrimitiveFunctionSymbol.New(typeName.Qualify("to_display_string"), stringType)
+                PrimitiveFunctionSymbol.New(typeName.Qualify("remainder"), integerType, ("self",integerType), ("divisor", integerType)),
+                PrimitiveFunctionSymbol.New(typeName.Qualify("to_display_string"), stringType, ("self", integerType))
             };
             return PrimitiveTypeSymbol.NewSimpleType(integerType, symbols);
         }
