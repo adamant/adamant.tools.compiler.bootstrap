@@ -30,100 +30,81 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
     {
         private readonly Diagnostics diagnostics;
 
-        private BasicAnalyzer(Diagnostics diagnostics)
+        public BasicAnalyzer(Diagnostics diagnostics)
         {
             this.diagnostics = diagnostics;
         }
 
-        public static void Check(FixedList<IEntityDeclarationSyntax> memberDeclarations, Diagnostics diagnostics)
-        {
-            var analyzer = new BasicAnalyzer(diagnostics);
-            analyzer.ResolveTypesInDeclarations(memberDeclarations);
-        }
-
-        private void ResolveTypesInDeclarations(FixedList<IEntityDeclarationSyntax> declarations)
+        public void Analyze(FixedList<IEntityDeclarationSyntax> entities)
         {
             // Process all types first because they may be referenced by functions etc.
-            ResolveSignatureTypesInClassDeclarations(declarations.OfType<IClassDeclarationSyntax>());
+            foreach (var @class in entities.OfType<IClassDeclarationSyntax>())
+                ResolveSignatureTypes(@class);
+
             // Now resolve all other types (class declarations will already have types and won't be processed again)
-            ResolveSignatureTypesInDeclarations(declarations);
+            foreach (var entity in entities)
+                ResolveSignatureTypes(entity);
+
             // Function bodies are checked after signatures to ensure that all function invocation
             // expressions can get a type for the invoked function.
-            ResolveBodyTypesInDeclarations(declarations);
+            foreach (var entity in entities)
+                ResolveBodyTypes(entity);
         }
 
-        private void ResolveSignatureTypesInClassDeclarations(IEnumerable<IClassDeclarationSyntax> classDeclarations)
-        {
-            foreach (var classDeclaration in classDeclarations)
-                ResolveSignatureTypesInClassDeclaration(classDeclaration);
-        }
-
-        private void ResolveSignatureTypesInDeclarations(IEnumerable<IEntityDeclarationSyntax> declarations)
-        {
-            foreach (var declaration in declarations)
-                ResolveSignatureTypesInDeclaration(declaration);
-        }
-
-        private void ResolveSignatureTypesInDeclaration(IEntityDeclarationSyntax declaration)
+        /// <summary>
+        /// If the type has not been resolved, this resolves it. This function
+        /// also watches for type cycles and reports an error.
+        /// </summary>
+        private void ResolveSignatureTypes(IEntityDeclarationSyntax declaration)
         {
             switch (declaration)
             {
                 default:
                     throw ExhaustiveMatch.Failed(declaration);
-                case IMethodDeclarationSyntax f:
-                    ResolveSignatureTypesInMethod(f);
+                case IMethodDeclarationSyntax method:
+                {
+                    var selfType = ResolveSelfType(method);
+                    var analyzer = new BasicStatementAnalyzer(method.File, diagnostics, selfType);
+                    ResolveTypesInParameters(analyzer, method.Parameters, method.DeclaringClass);
+                    ResolveReturnType(method.ReturnType, method.ReturnTypeSyntax, analyzer);
                     break;
-                case IConstructorDeclarationSyntax c:
-                    ResolveSignatureTypesInConstructor(c);
+                }
+                case IConstructorDeclarationSyntax @class:
+                {
+                    var selfType = @class.DeclaringClass?.DeclaresType.Fulfilled();
+                    @class.SelfParameterType = ((UserObjectType)selfType).ForConstructorSelf();
+                    var analyzer = new BasicStatementAnalyzer(@class.File, diagnostics, selfType);
+                    ResolveTypesInParameters(analyzer, @class.Parameters, @class.DeclaringClass);
                     break;
-                case IFieldDeclarationSyntax f:
-                    ResolveSignatureTypesInField(f);
+                }
+                case IFieldDeclarationSyntax field:
+                    if (field.Type.TryBeginFulfilling(() =>
+                        diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan, field.Name))))
+                    {
+                        var resolver = new BasicStatementAnalyzer(field.File, diagnostics);
+                        field.Type.BeginFulfilling();
+                        var type = resolver.EvaluateType(field.TypeSyntax);
+                        field.Type.Fulfill(type);
+                    }
                     break;
-                case IFunctionDeclarationSyntax f:
-                    ResolveSignatureTypesInFunction(f);
+                case IFunctionDeclarationSyntax function:
+                {
+                    var analyzer = new BasicStatementAnalyzer(function.File, diagnostics);
+                    ResolveTypesInParameters(analyzer, function.Parameters, null);
+                    ResolveReturnType(function.ReturnType, function.ReturnTypeSyntax, analyzer);
                     break;
-                case IClassDeclarationSyntax _:
-                    // Already processed
+                }
+                case IClassDeclarationSyntax c:
+                    if (c.DeclaresType.TryBeginFulfilling(() => diagnostics.Add(
+                        TypeError.CircularDefinition(c.File, c.NameSpan, c.Name))))
+                    {
+                        var classType = UserObjectType.Declaration(c,
+                            c.Modifiers.Any(m => m is IMutableKeywordToken));
+                        c.DeclaresType.Fulfill(classType);
+                        c.CreateDefaultConstructor();
+                    }
                     break;
             }
-        }
-
-        private void ResolveSignatureTypesInConstructor(IConstructorDeclarationSyntax constructor)
-        {
-            // Resolve the declaring type because we need its type for things like `self`
-            if (constructor.DeclaringClass != null)
-                ResolveSignatureTypesInClassDeclaration(constructor.DeclaringClass);
-
-            var selfType = constructor.DeclaringClass?.DeclaresType.Fulfilled();
-            constructor.SelfParameterType = ((UserObjectType)selfType).ForConstructorSelf();
-            var analyzer = new BasicStatementAnalyzer(constructor.File, diagnostics, selfType);
-
-            ResolveTypesInParameters(analyzer, constructor.Parameters, constructor.DeclaringClass);
-
-        }
-
-
-        private void ResolveSignatureTypesInMethod(IMethodDeclarationSyntax method)
-        {
-            // Resolve the declaring type because we need its type for things like `self`
-            if (method.DeclaringClass != null)
-                ResolveSignatureTypesInClassDeclaration(method.DeclaringClass);
-
-            var selfType = ResolveSelfType(method);
-            var analyzer = new BasicStatementAnalyzer(method.File, diagnostics, selfType);
-
-            ResolveTypesInParameters(analyzer, method.Parameters, method.DeclaringClass);
-
-            ResolveReturnType(method.ReturnType, method.ReturnTypeSyntax, analyzer);
-        }
-
-        private void ResolveSignatureTypesInFunction(IFunctionDeclarationSyntax function)
-        {
-            var analyzer = new BasicStatementAnalyzer(function.File, diagnostics, null);
-
-            ResolveTypesInParameters(analyzer, function.Parameters, null);
-
-            ResolveReturnType(function.ReturnType, function.ReturnTypeSyntax, analyzer);
         }
 
         private static DataType? ResolveSelfType(IMethodDeclarationSyntax method)
@@ -145,7 +126,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         private void ResolveTypesInParameters(
             BasicStatementAnalyzer analyzer,
             FixedList<IParameterSyntax> parameters,
-            IClassDeclarationSyntax declaringType)
+            IClassDeclarationSyntax? declaringType)
         {
             var types = new List<DataType>();
             foreach (var parameter in parameters)
@@ -177,7 +158,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         }
                         else
                         {
-                            ResolveSignatureTypesInField(field);
+                            if (field.Type.TryBeginFulfilling(() =>
+                                diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan, field.Name))))
+                            {
+                                var resolver = new BasicStatementAnalyzer(field.File, diagnostics);
+                                field.Type.BeginFulfilling();
+                                var type = resolver.EvaluateType(field.TypeSyntax);
+                                field.Type.Fulfill(type);
+                            }
+
                             parameter.Type.Fulfill(field.Type.Fulfilled());
                         }
                         break;
@@ -188,7 +177,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private static void ResolveReturnType(
             TypePromise returnTypePromise,
-            ITypeSyntax returnTypeSyntax,
+            ITypeSyntax? returnTypeSyntax,
             BasicStatementAnalyzer analyzer)
         {
             returnTypePromise.BeginFulfilling();
@@ -202,127 +191,48 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             returnTypePromise.Fulfill(returnType);
         }
 
-        /// <summary>
-        /// If the type has not been resolved, this resolves it. This function
-        /// also watches for type cycles and reports an error.
-        /// </summary>
-        private void ResolveSignatureTypesInClassDeclaration(IClassDeclarationSyntax classDeclaration)
-        {
-            switch (classDeclaration.DeclaresType.State)
-            {
-                case PromiseState.InProgress:
-                    diagnostics.Add(TypeError.CircularDefinition(classDeclaration.File, classDeclaration.NameSpan, classDeclaration.Name));
-                    return;
-                case PromiseState.Fulfilled:
-                    return;   // We have already resolved it
-                case PromiseState.Pending:
-                    // we need to compute it
-                    break;
-                default:
-                    throw ExhaustiveMatch.Failed(classDeclaration.DeclaresType.State);
-            }
-
-            classDeclaration.DeclaresType.BeginFulfilling();
-
-
-            var classType = UserObjectType.Declaration(classDeclaration,
-                classDeclaration.Modifiers.Any(m => m is IMutableKeywordToken));
-            classDeclaration.DeclaresType.Fulfill(classType);
-            classDeclaration.CreateDefaultConstructor();
-        }
-
-        private void ResolveSignatureTypesInField(IFieldDeclarationSyntax field)
-        {
-            switch (field.Type.State)
-            {
-                case PromiseState.InProgress:
-                    diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan, field.Name));
-                    return;
-                case PromiseState.Fulfilled:
-                    return;   // We have already resolved it
-                case PromiseState.Pending:
-                    // we need to compute it
-                    break;
-                default:
-                    throw ExhaustiveMatch.Failed(field.Type.State);
-            }
-            var resolver = new BasicStatementAnalyzer(field.File, diagnostics);
-            field.Type.BeginFulfilling();
-            var type = resolver.EvaluateType(field.TypeSyntax);
-            field.Type.Fulfill(type);
-        }
-
-        private void ResolveBodyTypesInDeclarations(
-             IEnumerable<IEntityDeclarationSyntax> declarations)
-        {
-            foreach (var declaration in declarations)
-                ResolveBodyTypesInDeclaration(declaration);
-        }
-
-        private void ResolveBodyTypesInDeclaration(IEntityDeclarationSyntax declaration)
+        private void ResolveBodyTypes(IEntityDeclarationSyntax declaration)
         {
             switch (declaration)
             {
                 default:
                     throw ExhaustiveMatch.Failed(declaration);
-                case IFunctionDeclarationSyntax f:
-                    ResolveBodyTypesInFunction(f);
+                case IFunctionDeclarationSyntax function:
+                {
+                    var resolver = new BasicStatementAnalyzer(function.File, diagnostics, null, function.ReturnType.Fulfilled());
+                    foreach (var statement in function.Body.Statements)
+                        resolver.ResolveTypesInStatement(statement);
                     break;
-                case IConcreteMethodDeclarationSyntax m:
-                    ResolveBodyTypesInMethod(m);
+                }
+                case IConcreteMethodDeclarationSyntax method:
+                {
+                    var resolver = new BasicStatementAnalyzer(method.File, diagnostics, method.SelfParameterType, method.ReturnType.Fulfilled());
+                    foreach (var statement in method.Body.Statements)
+                        resolver.ResolveTypesInStatement(statement);
                     break;
+                }
                 case IAbstractMethodDeclarationSyntax _:
                     // has no body, so nothing to resolve
                     break;
-                case IFieldDeclarationSyntax f:
-                    ResolveBodyTypesInField(f);
+                case IFieldDeclarationSyntax field:
+                    if (field.Initializer != null)
+                    {
+                        var resolver = new BasicStatementAnalyzer(field.File, diagnostics);
+                        // Work around not being able to pass a ref to a property
+                        resolver.CheckExpressionType(ref field.Initializer, field.Type.Fulfilled());
+                    }
                     break;
-                case IConstructorDeclarationSyntax c:
-                    ResolveBodyTypesInConstructor(c);
+                case IConstructorDeclarationSyntax constructor:
+                {
+                    var resolver = new BasicStatementAnalyzer(constructor.File, diagnostics, constructor.SelfParameterType, constructor.SelfParameterType);
+                    foreach (var statement in constructor.Body.Statements)
+                        resolver.ResolveTypesInStatement(statement);
                     break;
+                }
                 case IClassDeclarationSyntax _:
                     // body of class is processed as separate items
                     break;
             }
-        }
-
-        private void ResolveBodyTypesInConstructor(IConstructorDeclarationSyntax constructor)
-        {
-            if (constructor.Body == null)
-                return;
-
-            var resolver = new BasicStatementAnalyzer(constructor.File, diagnostics,
-                constructor.SelfParameterType, constructor.SelfParameterType);
-            foreach (var statement in constructor.Body.Statements)
-                resolver.ResolveTypesInStatement(statement);
-        }
-
-        private void ResolveBodyTypesInMethod(IConcreteMethodDeclarationSyntax method)
-        {
-            var resolver = new BasicStatementAnalyzer(method.File, diagnostics, method.SelfParameterType, method.ReturnType.Fulfilled());
-            foreach (var statement in method.Body.Statements)
-                resolver.ResolveTypesInStatement(statement);
-        }
-
-        private void ResolveBodyTypesInFunction(IFunctionDeclarationSyntax function)
-        {
-            if (function.Body == null)
-                return;
-
-            var resolver = new BasicStatementAnalyzer(function.File, diagnostics,
-                null, function.ReturnType.Fulfilled());
-            foreach (var statement in function.Body.Statements)
-                resolver.ResolveTypesInStatement(statement);
-        }
-
-        private void ResolveBodyTypesInField(IFieldDeclarationSyntax fieldDeclaration)
-        {
-            if (fieldDeclaration.Initializer == null)
-                return;
-
-            var resolver = new BasicStatementAnalyzer(fieldDeclaration.File, diagnostics);
-            // Work around not being able to pass a ref to a property
-            resolver.CheckExpressionType(ref fieldDeclaration.Initializer, fieldDeclaration.Type.Fulfilled());
         }
     }
 }

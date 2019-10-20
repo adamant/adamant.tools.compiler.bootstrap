@@ -45,30 +45,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             BuildLexicalScopes(packageSyntax, references, diagnostics);
 
             // Make a list of all the entity declarations (i.e. not namespaces)
-            var entityDeclarations = GetEntityDeclarations(packageSyntax);
+            var entities = GetEntityDeclarations(packageSyntax);
 
-            CheckSemantics(entityDeclarations, diagnostics);
+            CheckSemantics(entities, diagnostics);
 
             // If there are errors from the semantics phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
 
             // --------------------------------------------------
             // This is where the representation transitions to IR
-            var ilDeclarations = BuildIL(entityDeclarations);
+            var declarations = BuildIL(entities);
             // --------------------------------------------------
 
-            var ilCallables = ilDeclarations.OfType<ICallableDeclaration>().ToFixedList();
+            var callables = declarations.OfType<ICallableDeclaration>().ToFixedList();
 
-            var liveness = LivenessAnalyzer.Check(ilCallables, SaveLivenessAnalysis);
+            var liveness = LivenessAnalyzer.Check(callables, SaveLivenessAnalysis);
 
-            BorrowChecker.Check(ilCallables, liveness, diagnostics, SaveBorrowClaims);
+            BorrowChecker.Check(callables, liveness, diagnostics, SaveBorrowClaims);
 
             // If there are errors from the previous phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
 
-            var entryPoint = DetermineEntryPoint(ilDeclarations, diagnostics);
+            var entryPoint = DetermineEntryPoint(declarations, diagnostics);
 
-            return new Package(packageSyntax.Name, diagnostics.Build(), references, ilDeclarations, entryPoint);
+            return new Package(packageSyntax.Name, diagnostics.Build(), references, declarations, entryPoint);
         }
 
         private static void BuildLexicalScopes(
@@ -89,29 +89,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         }
 
         private static void CheckSemantics(
-            FixedList<IEntityDeclarationSyntax> entityDeclarations,
+            FixedList<IEntityDeclarationSyntax> entities,
             Diagnostics diagnostics)
         {
             // Basic Analysis includes: Name Binding, Type Checking, Constant Folding
-            BasicAnalyzer.Check(entityDeclarations, diagnostics);
+            new BasicAnalyzer(diagnostics).Analyze(entities);
 
 #if DEBUG
-            new TypeFulfillmentValidator().Walk(entityDeclarations);
-            new NoUpgradableMutabilityTypesValidator().Walk(entityDeclarations);
-            new ReferencedSymbolValidator().Walk(entityDeclarations);
+            new TypeFulfillmentValidator().Walk(entities);
+            new NoUpgradableMutabilityTypesValidator().Walk(entities);
+            new ReferencedSymbolValidator().Walk(entities);
 #endif
 
             // From this point forward, analysis focuses on callable bodies
-            var callableDeclarations = entityDeclarations.OfType<IConcreteCallableDeclarationSyntax>().ToFixedList();
-            ShadowChecker.Check(callableDeclarations, diagnostics);
+            var callables = entities.OfType<IConcreteCallableDeclarationSyntax>().ToFixedList();
+            ShadowChecker.Check(callables, diagnostics);
 
             // TODO use DataFlowAnalysis to check for unused variables and report use of variables starting with `_`
 
-            DataFlowAnalysis.Check(DefiniteAssignmentStrategy.Instance, callableDeclarations, diagnostics);
+            DataFlowAnalysis.Check(DefiniteAssignmentStrategy.Instance, callables, diagnostics);
 
-            DataFlowAnalysis.Check(BindingMutabilityStrategy.Instance, callableDeclarations, diagnostics);
+            DataFlowAnalysis.Check(BindingMutabilityStrategy.Instance, callables, diagnostics);
 
-            DataFlowAnalysis.Check(UseOfMovedValueStrategy.Instance, callableDeclarations, diagnostics);
+            DataFlowAnalysis.Check(UseOfMovedValueStrategy.Instance, callables, diagnostics);
         }
 
         private static FixedList<Declaration> BuildIL(

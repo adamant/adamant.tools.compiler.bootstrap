@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     containingScope = BuildNamespaceScopes(ns.Name, containingScope);
                     containingScope = BuildUsingDirectivesScope(ns.UsingDirectives, containingScope);
                     break;
-                case IClassDeclarationSyntax classDeclaration:
+                case IClassDeclarationSyntax _:
                     // TODO name scope for type declaration
                     break;
                 case IFunctionDeclarationSyntax function:
