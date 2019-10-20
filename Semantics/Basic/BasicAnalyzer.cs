@@ -209,7 +209,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     if (field.Initializer != null)
                     {
                         var resolver = new BasicBodyAnalyzer(field.File, diagnostics);
-                        resolver.CheckExpressionType(ref field.Initializer, field.Type.Fulfilled());
+                        resolver.CheckType(ref field.Initializer, field.Type.Fulfilled());
                     }
                     break;
                 case IConstructorDeclarationSyntax constructor:

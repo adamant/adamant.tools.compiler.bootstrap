@@ -726,11 +726,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case UnaryOperator.Plus:
                     // This is a no-op
                     return ConvertToValue(operatorExpression.Operand);
-                case UnaryOperator.Question:
-                    //case UnaryOperator.At:
-                    //case UnaryOperator.Caret:
-                    throw new NotImplementedException(
-                        "Unary expression conversion not implemented");
                 default:
                     throw ExhaustiveMatch.Failed(operatorExpression.Operator);
             }

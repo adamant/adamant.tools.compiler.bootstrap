@@ -134,15 +134,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                             @operator = Tokens.RequiredToken<IBinaryOperatorToken>();
                         }
                         break;
-                    case IQuestionToken _: // TODO this be a type
-                        if (minPrecedence <= OperatorPrecedence.Unary)
-                        {
-                            var question = Tokens.Required<IQuestionToken>();
-                            var span = TextSpan.Covering(expression.Span, question);
-                            expression = new UnaryOperatorExpressionSyntax(span, UnaryOperatorFixity.Postfix, UnaryOperator.Question, expression);
-                            continue;
-                        }
-                        break;
+                    //case IQuestionToken _: // TODO this be a type
+                    //    if (minPrecedence <= OperatorPrecedence.Unary)
+                    //    {
+                    //        var question = Tokens.Required<IQuestionToken>();
+                    //        var span = TextSpan.Covering(expression.Span, question);
+                    //        expression = new UnaryOperatorExpressionSyntax(span, UnaryOperatorFixity.Postfix, UnaryOperator.Question, expression);
+                    //        continue;
+                    //    }
+                    //    break;
                     //case IOpenParenToken _:
                     //    if (minPrecedence <= OperatorPrecedence.Primary)
                     //    {

@@ -6,15 +6,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class ReturnExpressionSyntax : ExpressionSyntax, IReturnExpressionSyntax
     {
-        [DisallowNull]
-        public ITransferSyntax? ReturnValue { get; }
+        private ITransferSyntax? returnValue;
+        [DisallowNull] public ref ITransferSyntax? ReturnValue => ref returnValue;
 
         public ReturnExpressionSyntax(
             TextSpan span,
             ITransferSyntax? returnValue)
             : base(span)
         {
-            ReturnValue = returnValue;
+            this.returnValue = returnValue;
         }
 
         public override string ToString()

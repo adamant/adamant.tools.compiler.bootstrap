@@ -4,7 +4,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
     public enum UnaryOperator
     {
-        Question,
         Not,
         Minus,
         Plus,
@@ -24,8 +23,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
                     return "-";
                 case UnaryOperator.Plus:
                     return "+";
-                case UnaryOperator.Question:
-                    return "?";
             }
         }
     }

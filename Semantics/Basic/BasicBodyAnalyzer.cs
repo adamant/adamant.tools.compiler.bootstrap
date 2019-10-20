@@ -12,6 +12,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Primitives;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitConversions;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using ExhaustiveMatching;
 
@@ -41,10 +42,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         public void ResolveTypes(IBodySyntax body)
         {
             foreach (var statement in body.Statements)
-                ResolveTypesInStatement(statement);
+                // TODO inline and remove ResultStatement case
+                ResolveTypes(statement);
         }
 
-        public void ResolveTypesInStatement(IStatementSyntax statement)
+        public void ResolveTypes(IStatementSyntax statement)
         {
             switch (statement)
             {
@@ -54,10 +56,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     ResolveTypes(variableDeclaration);
                     break;
                 case IExpressionStatementSyntax expressionStatement:
-                    InferExpressionType(ref expressionStatement.Expression);
+                    InferType(ref expressionStatement.Expression, DataType.Unknown);
                     break;
                 case IResultStatementSyntax resultStatement:
-                    InferExpressionType(ref resultStatement.Expression);
+                    InferType(ref resultStatement.Expression, DataType.Unknown);
                     break;
             }
         }
@@ -72,7 +74,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
             else if (variableDeclaration.Initializer != null)
             {
-                type = InferType(variableDeclaration.Initializer);
+                type = InferType(variableDeclaration.Initializer, DataType.Unknown);
                 // Use the initializer type unless it is constant
                 switch (type)
                 {
@@ -185,27 +187,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         public DataType CheckType(ITransferSyntax? transfer, DataType expectedType)
         {
             if (transfer == null) return DataType.Unknown;
-            return transfer.Type = CheckExpressionType(ref transfer.Expression, expectedType);
+            return transfer.Type = CheckType(ref transfer.Expression, expectedType);
         }
 
-        public DataType CheckExpressionType(
-            ref IExpressionSyntax expression,
-            DataType expectedType)
+        public DataType CheckType([NotNull] ref IExpressionSyntax? expression, DataType expectedType)
         {
-            var actualType = InferExpressionType(ref expression);
+            var actualType = InferType(ref expression, expectedType);
+            InsertImplicitConversionIfNeeded(ref expression, expectedType);
             // TODO check for type compatibility not equality
             if (!expectedType.Equals(actualType))
                 diagnostics.Add(TypeError.CannotConvert(file, expression, actualType, expectedType));
             return actualType;
         }
 
-        private DataType InferType(ITransferSyntax? transfer)
+        private DataType InferType(ITransferSyntax? transfer, DataType expectedType)
         {
             if (transfer == null) return DataType.Unknown;
-            return transfer.Type = InferExpressionType(ref transfer.Expression);
+            return transfer.Type = InferType(ref transfer.Expression, expectedType);
         }
 
-        private DataType InferExpressionType([NotNull] ref IExpressionSyntax? expression)
+        private DataType InferType([NotNull] ref IExpressionSyntax? expression, DataType expectedType)
         {
             switch (expression)
             {
@@ -217,29 +218,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 {
                     if (returnExpression.ReturnValue != null)
                     {
-                        // TODO report an error instead of throwing
-                        if (returnType == null)
-                            throw new NotImplementedException("Return statement in constructor");
+                        var returnValue = returnExpression.ReturnValue;
+                        expectedType = returnType ?? throw new InvalidOperationException("Return statement in constructor");
+                        // If we return ownership, there can be an implicit move
+                        if (returnExpression.ReturnValue is IImmutableTransferSyntax
+                            && returnType is UserObjectType objectType
+                            && objectType.IsOwned)
+                            returnValue = returnExpression.ReturnValue = new ImplicitMoveTransferSyntax(returnValue.Span, returnValue.Expression);
 
-                        // If we return ownership, there is an implicit move
-                        if (returnType is UserObjectType objectType && objectType.IsOwned)
-                            InferMoveExpressionType(returnExpression.ReturnValue.Expression);
-                        else
-                            InferExpressionType(ref returnExpression.ReturnValue.Expression);
-                        InsertImplicitConversionIfNeeded(ref returnExpression.ReturnValue.Expression,
-                            returnType);
-                        var type = returnExpression.ReturnValue.Type =
-                            returnExpression.ReturnValue.Expression.Type ?? throw new InvalidOperationException();
+                        var type = CheckType(returnValue, expectedType);
+                        //InsertImplicitConversionIfNeeded(ref returnExpression.ReturnValue.Expression, returnType);
                         if (!IsAssignableFrom(returnType, type))
                             diagnostics.Add(TypeError.CannotConvert(file,
                                 returnExpression.ReturnValue.Expression, type, returnType));
                     }
                     else if (returnType == DataType.Never)
-                        diagnostics.Add(
-                            TypeError.CantReturnFromNeverFunction(file, returnExpression.Span));
+                        diagnostics.Add(TypeError.CantReturnFromNeverFunction(file, returnExpression.Span));
                     else if (returnType != DataType.Void)
                         diagnostics.Add(TypeError.ReturnExpressionMustHaveValue(file,
-                            returnExpression.Span, returnType));
+                            returnExpression.Span, returnType ?? DataType.Unknown));
 
                     return returnExpression.Type = DataType.Never;
                 }
@@ -251,10 +248,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return boolLiteral.Type = DataType.Bool;
                 case IBinaryOperatorExpressionSyntax binaryOperatorExpression:
                 {
-                    InferExpressionType(ref binaryOperatorExpression.LeftOperand);
+                    InferType(ref binaryOperatorExpression.LeftOperand, expectedType);
                     var leftType = binaryOperatorExpression.LeftOperand.Type;
                     var @operator = binaryOperatorExpression.Operator;
-                    InferExpressionType(ref binaryOperatorExpression.RightOperand);
+                    InferType(ref binaryOperatorExpression.RightOperand, expectedType);
                     var rightType = binaryOperatorExpression.RightOperand.Type;
 
                     // If either is unknown, then we can't know whether there is a a problem.
@@ -305,56 +302,44 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return InferNameType(identifierName, false);
                 case IUnaryOperatorExpressionSyntax unaryOperatorExpression:
                 {
-                    var operandType = InferExpressionType(ref unaryOperatorExpression.Operand);
                     var @operator = unaryOperatorExpression.Operator;
-
-                    // If either is unknown, then we can't know whether there is a a problem
-                    // (technically not true, for example, we could know that one arg should
-                    // be a bool and isn't)
-                    if (operandType == DataType.Unknown)
-                        return unaryOperatorExpression.Type = DataType.Unknown;
-
-                    bool typeError;
                     switch (@operator)
                     {
+                        default:
+                            throw ExhaustiveMatch.Failed(@operator);
                         case UnaryOperator.Not:
-                            typeError = operandType != DataType.Bool;
+                            CheckType(ref unaryOperatorExpression.Operand, DataType.Bool);
                             unaryOperatorExpression.Type = DataType.Bool;
-                            break;
-                        case UnaryOperator.Question:
-                            typeError = false; // TODO check that the expression can have a pointer taken
-                            unaryOperatorExpression.Type = new OptionalType(operandType);
                             break;
                         case UnaryOperator.Minus:
                         case UnaryOperator.Plus:
+                            var operandType = InferType(ref unaryOperatorExpression.Operand, expectedType);
                             switch (operandType)
                             {
                                 case IntegerConstantType integerType:
-                                    typeError = false;
                                     unaryOperatorExpression.Type = integerType;
                                     break;
                                 case SizedIntegerType sizedIntegerType:
-                                    typeError = false;
                                     unaryOperatorExpression.Type = sizedIntegerType;
                                     break;
-                                default:
+                                case UnknownType _:
                                     unaryOperatorExpression.Type = DataType.Unknown;
-                                    typeError = true;
+                                    break;
+                                default:
+                                    diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandOfType(file,
+                                        unaryOperatorExpression.Span, @operator, operandType));
+                                    unaryOperatorExpression.Type = DataType.Unknown;
                                     break;
                             }
                             break;
-                        default:
-                            throw ExhaustiveMatch.Failed(@operator);
                     }
-                    if (typeError)
-                        diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandOfType(file,
-                            unaryOperatorExpression.Span, @operator, operandType));
 
                     return unaryOperatorExpression.Type;
                 }
                 case INewObjectExpressionSyntax newObjectExpression:
                 {
-                    var argumentTypes = newObjectExpression.Arguments.Select(argument => InferExpressionType(ref argument.Expression)).ToFixedList();
+                    var argumentTypes = newObjectExpression.Arguments.Select(argument => InferType(ref argument.Expression,
+                        expectedType)).ToFixedList();
                     // TODO handle named constructors here
                     var constructingType = typeAnalyzer.Evaluate(newObjectExpression.TypeSyntax);
                     if (!constructingType.IsKnown)
@@ -408,7 +393,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
                 case IWhileExpressionSyntax whileExpression:
                 {
-                    CheckExpressionType(ref whileExpression.Condition, DataType.Bool);
+                    CheckType(ref whileExpression.Condition, DataType.Bool);
                     InferBlockType(whileExpression.Block);
                     // TODO assign correct type to the expression
                     return whileExpression.Type = DataType.Void;
@@ -424,8 +409,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     // * Invoke a static function
                     // * Invoke a method
                     // * Invoke a function pointer
-                    var argumentTypes = methodInvocation.Arguments.Select(argument => InferExpressionType(ref argument.Expression)).ToFixedList();
-                    InferExpressionType(ref methodInvocation.Target);
+                    var argumentTypes = methodInvocation.Arguments.Select(argument => InferType(ref argument.Expression,
+                        expectedType)).ToFixedList();
+                    InferType(ref methodInvocation.Target, expectedType);
                     var targetType = methodInvocation.Target.Type;
                     // If it is unknown, we already reported an error
                     if (targetType == DataType.Unknown)
@@ -480,7 +466,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IFunctionInvocationExpressionSyntax functionInvocation:
                     return InferFunctionInvocationType(functionInvocation);
                 case IUnsafeExpressionSyntax unsafeExpression:
-                    InferExpressionType(ref unsafeExpression.Expression);
+                    InferType(ref unsafeExpression.Expression, expectedType);
                     return unsafeExpression.Type = unsafeExpression.Expression.Type;
                 //case MutableTypeSyntax mutableExpression:
                 //{
@@ -504,7 +490,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 //    return mutableExpression.Type = type;
                 //}
                 case IIfExpressionSyntax ifExpression:
-                    CheckExpressionType(ref ifExpression.Condition, DataType.Bool);
+                    CheckType(ref ifExpression.Condition, DataType.Bool);
                     InferBlockType(ifExpression.ThenBlock);
                     switch (ifExpression.ElseClause)
                     {
@@ -515,11 +501,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         case IIfExpressionSyntax _:
                         case IBlockExpressionSyntax _:
                             var elseExpression = (IExpressionSyntax)ifExpression.ElseClause;
-                            InferExpressionType(ref elseExpression);
+                            InferType(ref elseExpression, expectedType);
                             //ifExpression.ElseClause = elseExpression;
                             break;
                         case IResultStatementSyntax resultStatement:
-                            InferExpressionType(ref resultStatement.Expression);
+                            InferType(ref resultStatement.Expression, expectedType);
                             break;
                     }
                     // TODO assign a type to the expression
@@ -529,7 +515,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 //    return resultExpression.Type = DataType.Never;
                 case IMemberAccessExpressionSyntax memberAccess:
                 {
-                    var left = InferExpressionType(ref memberAccess.Expression);
+                    var left = InferType(ref memberAccess.Expression, expectedType);
                     var symbol = GetSymbolForType(left);
 
                     switch (memberAccess.Member)
@@ -543,14 +529,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     }
                 }
                 case IBreakExpressionSyntax breakExpression:
-                    InferExpressionType(ref breakExpression.Value);
+                    InferType(ref breakExpression.Value, expectedType);
                     return breakExpression.Type = DataType.Never;
                 case INextExpressionSyntax nextExpression:
                     return nextExpression.Type = DataType.Never;
                 case IAssignmentExpressionSyntax assignmentExpression:
                 {
-                    var left = InferExpressionType(ref assignmentExpression.LeftOperand);
-                    InferExpressionType(ref assignmentExpression.RightOperand.Expression);
+                    var left = InferType(ref assignmentExpression.LeftOperand, expectedType);
+                    InferType(ref assignmentExpression.RightOperand.Expression, expectedType);
                     InsertImplicitConversionIfNeeded(ref assignmentExpression.RightOperand.Expression, left);
                     var right = assignmentExpression.RightOperand.Type
                         = assignmentExpression.RightOperand.Expression.Type ?? throw new InvalidOperationException();
@@ -585,7 +571,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private DataType InferFunctionInvocationType(IFunctionInvocationExpressionSyntax functionInvocationExpression)
         {
-            var argumentTypes = functionInvocationExpression.Arguments.Select(argument => InferExpressionType(ref argument.Expression)).ToFixedList();
+            var argumentTypes = functionInvocationExpression.Arguments.Select(argument => InferType(ref argument.Expression, DataType.Unknown)).ToFixedList();
             var functionSymbols = functionInvocationExpression.FunctionNameSyntax.LookupInContainingScope()
                 .OfType<IFunctionSymbol>().ToFixedList();
             functionSymbols = ResolveOverload(functionSymbols, null, argumentTypes);
@@ -624,11 +610,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     throw ExhaustiveMatch.Failed(blockOrResult);
                 case IBlockExpressionSyntax block:
                     foreach (var statement in block.Statements)
-                        ResolveTypesInStatement(statement);
+                        ResolveTypes(statement);
 
                     return block.Type = DataType.Void; // TODO assign the correct type to the block
                 case IResultStatementSyntax result:
-                    InferExpressionType(ref result.Expression);
+                    InferType(ref result.Expression, DataType.Unknown);
                     return result.Expression.Type!;
             }
         }
@@ -665,7 +651,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         }
                         break;
                         default:
-                            throw new NotImplementedException();
+                            diagnostics.Add(NameBindingError.CouldNotBindName(file, nameExpression.Span));
+                            nameExpression.ReferencedSymbol = UnknownSymbol.Instance;
+                            type = DataType.Unknown;
+                            break;
                     }
                     break;
                 }
@@ -704,8 +693,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             switch (inExpression)
             {
                 case IBinaryOperatorExpressionSyntax binaryExpression when binaryExpression.Operator == BinaryOperator.DotDot:
-                    InferExpressionType(ref binaryExpression.LeftOperand);
-                    InferExpressionType(ref binaryExpression.RightOperand);
+                    InferType(ref binaryExpression.LeftOperand, DataType.Unknown);
+                    InferType(ref binaryExpression.RightOperand, DataType.Unknown);
                     if (declaredType != null)
                     {
                         InsertImplicitConversionIfNeeded(ref binaryExpression.LeftOperand, declaredType);
@@ -713,7 +702,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     }
                     return inExpression.Type = binaryExpression.LeftOperand.Type;
                 default:
-                    return InferExpressionType(ref inExpression);
+                    return InferType(ref inExpression, DataType.Unknown);
             }
         }
 
