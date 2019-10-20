@@ -5,8 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     [Closed(
         typeof(BoolType),
-        typeof(NumericType),
-        typeof(StringConstantType))]
+        typeof(NumericType))]
     public abstract class SimpleType : ValueType
     {
         public Name Name { get; }

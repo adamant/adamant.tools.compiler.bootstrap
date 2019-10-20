@@ -552,9 +552,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case IIntegerLiteralExpressionSyntax _:
                     throw new InvalidOperationException(
                         "Integer literals should have an implicit conversion around them");
-                case IStringLiteralExpressionSyntax _:
-                    throw new InvalidOperationException(
-                        "String literals should have an implicit conversion around them");
+                case IStringLiteralExpressionSyntax stringLiteral:
+                    return new StringConstant(stringLiteral.Value, stringLiteral.Span, stringLiteral.Type.AssertKnown());
                 case IBoolLiteralExpressionSyntax boolLiteral:
                     return new BooleanConstant(boolLiteral.Value, boolLiteral.Span);
                 case INoneLiteralExpressionSyntax _:
@@ -579,18 +578,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     throw new NotImplementedException();
                 case IUnsafeExpressionSyntax unsafeExpression:
                     return ConvertToValue(unsafeExpression.Expression);
-                case IImplicitStringLiteralConversionExpression implicitLiteralConversion:
-                {
-                    var conversionFunction = implicitLiteralConversion.ConversionFunction;
-                    var literal = implicitLiteralConversion.Expression;
-                    var constantLength = StringConstant.Encoding.GetByteCount(literal.Value);
-                    var sizeArgument = new IntegerConstant(constantLength, DataType.Size, literal.Span);
-                    var bytesArgument = new StringConstant(literal.Value, literal.Span);
-                    return new FunctionCall(implicitLiteralConversion.Span,
-                        conversionFunction.FullName,
-                        sizeArgument,
-                        bytesArgument);
-                }
                 case IImplicitNoneConversionExpression implicitNoneConversion:
                     return new NoneConstant(implicitNoneConversion.ConvertToType,
                         implicitNoneConversion.Span);

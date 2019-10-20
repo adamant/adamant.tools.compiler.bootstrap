@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 default:
                     throw ExhaustiveMatch.Failed(statement);
                 case IVariableDeclarationStatementSyntax variableDeclaration:
-                    ResolveTypesInVariableDeclaration(variableDeclaration);
+                    ResolveTypes(variableDeclaration);
                     break;
                 case IExpressionStatementSyntax expressionStatement:
                     InferExpressionType(ref expressionStatement.Expression);
@@ -62,25 +62,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
         }
 
-        private void ResolveTypesInVariableDeclaration(IVariableDeclarationStatementSyntax variableDeclaration)
+        private void ResolveTypes(IVariableDeclarationStatementSyntax variableDeclaration)
         {
-            if (variableDeclaration.Initializer != null)
-                InferExpressionType(ref variableDeclaration.Initializer.Expression);
-
             DataType type;
             if (variableDeclaration.TypeSyntax != null)
+            {
                 type = typeAnalyzer.Evaluate(variableDeclaration.TypeSyntax);
+                CheckType(variableDeclaration.Initializer, type);
+            }
             else if (variableDeclaration.Initializer != null)
             {
-                type = variableDeclaration.Initializer.Expression.Type!;
+                type = InferType(variableDeclaration.Initializer);
                 // Use the initializer type unless it is constant
                 switch (type)
                 {
                     case IntegerConstantType _:
                         type = DataType.Int;
                         break;
-                    case StringConstantType _:
-                        throw new NotImplementedException();
                 }
             }
             else
@@ -92,8 +90,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             if (variableDeclaration.Initializer != null)
             {
-                InsertImplicitConversionIfNeeded(ref variableDeclaration.Initializer.Expression, type);
-                var initializerType = variableDeclaration.Initializer.Type = variableDeclaration.Initializer.Expression.Type!;
+                var initializerType = variableDeclaration.Initializer.Type ?? throw new InvalidOperationException("Initializer type should be determined");
                 // If the source is an owned reference, then the declaration is implicitly owned
                 if (type is UserObjectType targetType && initializerType is UserObjectType sourceType
                       && sourceType.Lifetime == Lifetime.Owned
@@ -169,36 +166,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             break;
                     }
                     break;
-                case StringConstantType _:
-                {
-                    ISymbol symbol;
-                    switch (targetType)
-                    {
-                        case UserObjectType objectType:
-                            symbol = objectType.Symbol;
-                            break;
-                        default:
-                            throw new NotImplementedException();
-                    }
-
-                    if (symbol.FullName.Equals(Name.From("String")))
-                    {
-                        var stringConstructor = symbol.ChildSymbols[SpecialName.New]
-                            .Cast<IFunctionSymbol>()
-                            .Single(c =>
-                            {
-                                var parameters = c.Parameters.ToFixedList();
-                                return parameters.Count == 2
-                                       && parameters[0].Type == DataType.Size
-                                       && parameters[1].Type == DataType.StringConstant;
-                            });
-                        expression = new ImplicitStringLiteralConversionExpression((IStringLiteralExpressionSyntax)expression, targetType,
-                            stringConstructor);
-                    }
-                    else
-                        throw new NotImplementedException("Trying to use string literal as non-string type");
-                }
-                break;
                 case UserObjectType objectType:
                     if (targetType is UserObjectType targetObjectType
                         && targetObjectType.Mutability == Mutability.Immutable
@@ -215,6 +182,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             // No conversion
         }
 
+        public DataType CheckType(ITransferSyntax? transfer, DataType expectedType)
+        {
+            if (transfer == null) return DataType.Unknown;
+            return transfer.Type = CheckExpressionType(ref transfer.Expression, expectedType);
+        }
+
         public DataType CheckExpressionType(
             ref IExpressionSyntax expression,
             DataType expectedType)
@@ -224,6 +197,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             if (!expectedType.Equals(actualType))
                 diagnostics.Add(TypeError.CannotConvert(file, expression, actualType, expectedType));
             return actualType;
+        }
+
+        private DataType InferType(ITransferSyntax? transfer)
+        {
+            if (transfer == null) return DataType.Unknown;
+            return transfer.Type = InferExpressionType(ref transfer.Expression);
         }
 
         private DataType InferExpressionType([NotNull] ref IExpressionSyntax? expression)
@@ -267,7 +246,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IIntegerLiteralExpressionSyntax integerLiteral:
                     return integerLiteral.Type = new IntegerConstantType(integerLiteral.Value);
                 case IStringLiteralExpressionSyntax stringLiteral:
-                    return stringLiteral.Type = DataType.StringConstant;
+                    return stringLiteral.Type = PrimitiveSymbols.StringSymbol.DeclaresType;
                 case IBoolLiteralExpressionSyntax boolLiteral:
                     return boolLiteral.Type = DataType.Bool;
                 case IBinaryOperatorExpressionSyntax binaryOperatorExpression:
@@ -836,8 +815,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case ReferenceType _:
                 case BoolType _:
                 case VoidType _: // This might need a special error message
-                case StringConstantType _: // String concatenation will be handled outside this function
-                                           // Other object types can't be used in numeric expressions
                     return false;
                 default:
                     // In theory we could just return false here, but this way we are forced to note

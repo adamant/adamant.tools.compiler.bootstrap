@@ -7,8 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(IImplicitNumericConversionExpression),
         typeof(IImplicitOptionalConversionExpression),
         typeof(IImplicitNoneConversionExpression),
-        typeof(IImplicitImmutabilityConversionExpression),
-        typeof(IImplicitStringLiteralConversionExpression))]
+        typeof(IImplicitImmutabilityConversionExpression))]
     public interface IImplicitConversionExpression : IExpressionSyntax
     {
         IExpressionSyntax Expression { get; }

@@ -68,9 +68,9 @@ typedef struct
     _byte* bytes;
 } String;
 
-inline String String___new__2(_size byte_count, _byte* bytes)
+inline String _String_new(size_t byte_count, uint8_t* bytes)
 {
-    return (String) { byte_count, bytes };
+    return (String) {(_size){byte_count}, (_byte*)bytes };
 }
 _bool String___op_equals__2(String left, String right);
 

@@ -11,15 +11,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
     /// </summary>
     public static class PrimitiveSymbols
     {
-        public static readonly FixedList<ISymbol> Instance = BuildPrimitives();
+        public static readonly FixedList<ISymbol> Instance;
+        public static readonly ITypeSymbol StringSymbol;
 
-        private static FixedList<ISymbol> BuildPrimitives()
+        static PrimitiveSymbols()
         {
-            var stringSymbol = BuildStringSymbol();
-            var stringType = stringSymbol.DeclaresType;
-            return new List<ISymbol>
+            StringSymbol = BuildStringSymbol();
+            var stringType = StringSymbol.DeclaresType;
+            Instance = new List<ISymbol>
             {
-                stringSymbol,
+                StringSymbol,
                 BuildPrintStringSymbol(stringType),
                 BuildReadStringSymbol(stringType),
 
@@ -42,11 +43,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             var typeName = Name.From("String");
             var concatName = typeName.Qualify("concat");
             var concatFunc = PrimitiveFunctionSymbol.New(concatName);
-            var literalConstructor = PrimitiveFunctionSymbol.New(typeName.Qualify(SpecialName.New), ("size", DataType.Size),
-                ("value", DataType.StringConstant));
             var symbols = new List<ISymbol>()
             {
-                literalConstructor,
                 concatFunc,
             };
 
@@ -55,7 +53,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             stringSymbol.DeclaresType = stringType;
             concatFunc.SetParameters(("other", stringType));
             concatFunc.ReturnType = stringType;
-            literalConstructor.ReturnType = stringType;
             return stringSymbol;
         }
 

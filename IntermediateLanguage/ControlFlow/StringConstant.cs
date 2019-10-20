@@ -11,8 +11,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 
         public readonly string Value;
 
-        public StringConstant(string value, TextSpan span)
-            : base(DataType.StringConstant, span)
+        public StringConstant(string value, TextSpan span, DataType type)
+            : base(type, span)
         {
             Value = value;
         }

@@ -37,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public static readonly UnsizedIntegerType Offset = UnsizedIntegerType.Offset;
         //public static readonly FloatingPointType Float32 = FloatingPointType.Float32;
         //public static readonly FloatingPointType Float = FloatingPointType.Float;
-        public static readonly StringConstantType StringConstant = StringConstantType.Instance;
+        //public static readonly StringConstantType StringConstant = StringConstantType.Instance;
 
         //public static readonly PointerType BytePointer = new PointerType(Byte);
         /// <summary>
