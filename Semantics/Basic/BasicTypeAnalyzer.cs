@@ -72,17 +72,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         referenceLifetime.NamedType = DataType.Unknown;
                     break;
                 }
-                //case UnaryExpressionSyntax unaryOperatorExpression:
-                //    switch (unaryOperatorExpression.Operator)
-                //    {
-                //        case UnaryOperator.Question:
-                //            //unaryOperatorExpression.Type = DataType.Type;
-                //            var referent = Check(unaryOperatorExpression.Operand);
-                //            return new OptionalType(referent);
-                //        default:
-                //            // TODO evaluate to type
-                //            return DataType.Unknown;
-                //    }
+                case IOptionalTypeSyntax optionalType:
+                {
+                    var referent = Evaluate(optionalType.Referent);
+                    return new OptionalType(referent);
+                }
                 case IMutableTypeSyntax mutableType:
                 {
                     var type = Evaluate(mutableType.Referent);

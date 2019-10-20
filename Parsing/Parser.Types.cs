@@ -1,6 +1,6 @@
-using System;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Parsing.Tree;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
@@ -12,37 +12,55 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     {
         public ITypeSyntax ParseType()
         {
-            switch (Tokens.Current)
+            var typeSyntax = ParseTypeWithMutability();
+
+            IQuestionToken? question;
+            while ((question = Tokens.AcceptToken<IQuestionToken>())!=null)
             {
-                default:
-                    throw new NotImplementedException();
-                case IMutableKeywordToken _:
-                {
-                    var mutableKeyword = Tokens.Expect<IMutableKeywordToken>();
-                    var referent = ParseType();
-                    var span = TextSpan.Covering(mutableKeyword, referent.Span);
-                    return new MutableTypeSyntax(span, referent);
-                }
-                case IIdentifierToken _:
-                    return ParseReferenceTypeSyntax();
-                case IPrimitiveTypeToken _:
-                    return ParsePrimitiveType();
+                var span = TextSpan.Covering(typeSyntax.Span, question.Span);
+                return new OptionalTypeSyntax(span, typeSyntax);
             }
+
+            return typeSyntax;
         }
 
-        private ITypeSyntax ParseReferenceTypeSyntax()
+        private ITypeSyntax ParseTypeWithMutability()
         {
-            var typeNameSyntax = ParseTypeName();
+            var mutableKeyword = Tokens.AcceptToken<IMutableKeywordToken>();
+            var referent = ParseTypeWithLifetime();
+            if (mutableKeyword == null)
+                return referent;
+
+            var span = TextSpan.Covering(mutableKeyword.Span, referent.Span);
+            return new MutableTypeSyntax(span, referent);
+        }
+
+        private ITypeSyntax ParseTypeWithLifetime()
+        {
+            ITypeSyntax type;
+            switch (Tokens.Current)
+            {
+                case IPrimitiveTypeToken _:
+                    type = ParsePrimitiveType();
+                    if (!(type.NamedType is ReferenceType))
+                        return type;
+                    break;
+                default: // otherwise we want a type name
+                    type = ParseTypeName();
+                    break;
+            }
+
             if (Tokens.Accept<IDollarToken>())
             {
                 var (lifetimeSpan, lifetimeName) = ParseLifetimeName();
                 if (lifetimeName != null)
                 {
-                    var span = TextSpan.Covering(typeNameSyntax.Span, lifetimeSpan);
-                    return new ReferenceLifetimeTypeSyntax(typeNameSyntax, span, lifetimeName);
+                    var span = TextSpan.Covering(type.Span, lifetimeSpan);
+                    return new ReferenceLifetimeTypeSyntax(type, span, lifetimeName);
                 }
             }
-            return typeNameSyntax;
+
+            return type;
         }
 
         private (TextSpan, SimpleName?) ParseLifetimeName()
