@@ -23,21 +23,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public static readonly NeverType Never = NeverType.Instance;
         public static readonly BoolType Bool = BoolType.Instance;
         public static readonly AnyType Any = AnyType.ImmutableInstance;
-        public static readonly AnyType MutableAny = AnyType.MutableInstance;
-        //public static readonly TypeType Type = TypeType.Instance;
-        //public static readonly SizedIntegerType Int8 = SizedIntegerType.Int8;
         public static readonly SizedIntegerType Byte = SizedIntegerType.Byte;
-        //public static readonly SizedIntegerType Int16 = SizedIntegerType.Int16;
-        //public static readonly SizedIntegerType UInt16 = SizedIntegerType.UInt16;
         public static readonly SizedIntegerType Int = SizedIntegerType.Int;
         public static readonly SizedIntegerType UInt = SizedIntegerType.UInt;
-        //public static readonly SizedIntegerType Int64 = SizedIntegerType.Int64;
-        //public static readonly SizedIntegerType UInt64 = SizedIntegerType.UInt64;
         public static readonly UnsizedIntegerType Size = UnsizedIntegerType.Size;
         public static readonly UnsizedIntegerType Offset = UnsizedIntegerType.Offset;
-        //public static readonly FloatingPointType Float32 = FloatingPointType.Float32;
-        //public static readonly FloatingPointType Float = FloatingPointType.Float;
-        //public static readonly StringConstantType StringConstant = StringConstantType.Instance;
 
         //public static readonly PointerType BytePointer = new PointerType(Byte);
         /// <summary>

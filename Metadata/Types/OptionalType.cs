@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// types are like an immutable struct type `Optional[T]`. However, the value
     /// semantics are strange. They depend on the referent type.
     /// </summary>
-    public class OptionalType : ValueType
+    public class OptionalType : ValueType, IEquatable<OptionalType>
     {
         public readonly DataType Referent;
 
@@ -24,9 +24,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             IsKnown = referent.IsKnown;
         }
 
+
+
         public override string ToString()
         {
             return $"({Referent})?";
+        }
+
+        public override bool Equals(object? other)
+        {
+            return Equals(other as OptionalType);
+        }
+
+        public bool Equals(OptionalType? other)
+        {
+            if (other is null) return false;
+            return ReferenceEquals(this, other)
+                || Equals(Referent, other.Referent);
+        }
+
+        public override int GetHashCode()
+        {
+            return (Referent != null ? Referent.GetHashCode() : 0);
         }
     }
 }

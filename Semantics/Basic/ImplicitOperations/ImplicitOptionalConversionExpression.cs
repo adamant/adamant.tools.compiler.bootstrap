@@ -6,7 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
     /// <summary>
     /// An implicit conversion from `T` to `T?`
     /// </summary>
-    internal class ImplicitOptionalConversionExpression : ImplicitConversionExpression
+    internal class ImplicitOptionalConversionExpression : ImplicitConversionExpression, IImplicitOptionalConversionExpression
     {
         public OptionalType ConvertToType { get; }
 
