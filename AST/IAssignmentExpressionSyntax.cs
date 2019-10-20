@@ -4,6 +4,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         ref IExpressionSyntax LeftOperand { get; }
         AssignmentOperator Operator { get; }
-        ITransferSyntax RightOperand { get; }
+        ref IExpressionSyntax RightOperand { get; }
     }
 }

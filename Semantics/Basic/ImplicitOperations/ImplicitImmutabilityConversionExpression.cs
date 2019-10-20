@@ -1,7 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitConversions
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
 {
     // TODO No error is reported if IImplicitImmutabilityConversionExpression is missing
     internal class ImplicitImmutabilityConversionExpression : ImplicitConversionExpression, IImplicitImmutabilityConversionExpression

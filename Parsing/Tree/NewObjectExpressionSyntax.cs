@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public ICallableNameSyntax? ConstructorName { get; }
 
-        public FixedList<ITransferSyntax> Arguments { get; }
+        public FixedList<IArgumentSyntax> Arguments { get; }
         private ISymbol? constructorSymbol;
 
         [DisallowNull]
@@ -53,7 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan span,
             ITypeNameSyntax typeSyntax,
             ICallableNameSyntax? constructorName,
-            FixedList<ITransferSyntax> arguments)
+            FixedList<IArgumentSyntax> arguments)
             : base(span)
         {
             TypeSyntax = typeSyntax;

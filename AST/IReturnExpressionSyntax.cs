@@ -4,6 +4,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public interface IReturnExpressionSyntax : IExpressionSyntax
     {
-        [DisallowNull] ref ITransferSyntax? ReturnValue { get; }
+        [DisallowNull] ref IExpressionSyntax? ReturnValue { get; }
     }
 }

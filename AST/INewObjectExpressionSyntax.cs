@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         ITypeNameSyntax TypeSyntax { get; }
         ICallableNameSyntax? ConstructorName { get; }
-        FixedList<ITransferSyntax> Arguments { get; }
+        FixedList<IArgumentSyntax> Arguments { get; }
         [DisallowNull] ISymbol? ConstructorSymbol { get; set; }
         /// <summary>
         /// Because of ownership in the type, the constructed type is different

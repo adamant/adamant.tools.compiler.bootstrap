@@ -6,12 +6,10 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
 {
-    internal class ImplicitMoveTransferSyntax : IMoveTransferSyntax
+    internal class ImplicitMoveSyntax : IMoveExpressionSyntax
     {
         public TextSpan Span { get; }
-
-        private IExpressionSyntax expression;
-        public ref IExpressionSyntax Expression => ref expression;
+        public INameExpressionSyntax Expression { get; }
 
         [DisallowNull]
         public DataType? Type
@@ -25,10 +23,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
         }
 
         private DataType? type;
-        public ImplicitMoveTransferSyntax(TextSpan span, IExpressionSyntax expression)
+        public ImplicitMoveSyntax(TextSpan span, INameExpressionSyntax expression)
         {
             Span = span;
-            this.expression = expression;
+            Expression = expression;
+        }
+
+        public override string ToString()
+        {
+            return $"(move) {Expression}";
         }
     }
 }

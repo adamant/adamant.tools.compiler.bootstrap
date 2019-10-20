@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public FunctionInvocationExpressionSyntax(
             TextSpan span,
             ICallableNameSyntax functionNameSyntax,
-            FixedList<ITransferSyntax> arguments)
+            FixedList<IArgumentSyntax> arguments)
             : base(span, functionNameSyntax.Name, arguments)
         {
             FunctionNameSyntax = functionNameSyntax;

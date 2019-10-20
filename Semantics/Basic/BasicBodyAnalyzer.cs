@@ -11,7 +11,6 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Primitives;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitConversions;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using ExhaustiveMatching;
@@ -42,8 +41,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         public void ResolveTypes(IBodySyntax body)
         {
             foreach (var statement in body.Statements)
-                // TODO inline and remove ResultStatement case
-                ResolveTypes(statement);
+                switch (statement)
+                {
+                    default:
+                        throw ExhaustiveMatch.Failed(statement);
+                    case IVariableDeclarationStatementSyntax variableDeclaration:
+                        ResolveTypes(variableDeclaration);
+                        break;
+                    case IExpressionStatementSyntax expressionStatement:
+                        InferType(ref expressionStatement.Expression, DataType.Unknown);
+                        break;
+                    case IResultStatementSyntax _:
+                        throw new InvalidOperationException("Result statement in body");
+                }
         }
 
         public void ResolveTypes(IStatementSyntax statement)
@@ -70,18 +80,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             if (variableDeclaration.TypeSyntax != null)
             {
                 type = typeAnalyzer.Evaluate(variableDeclaration.TypeSyntax);
-                CheckType(variableDeclaration.Initializer, type);
+                CheckType(ref variableDeclaration.Initializer, type);
             }
             else if (variableDeclaration.Initializer != null)
             {
-                type = InferType(variableDeclaration.Initializer, DataType.Unknown);
-                // Use the initializer type unless it is constant
-                switch (type)
-                {
-                    case IntegerConstantType _:
-                        type = DataType.Int;
-                        break;
-                }
+                type = InferDeclarableType(ref variableDeclaration.Initializer);
             }
             else
             {
@@ -112,9 +115,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         }
 
         /// <summary>
+        /// Infer a type that can be used as the type of a variable
+        /// </summary>
+        private DataType InferDeclarableType([NotNull] ref IExpressionSyntax? expression)
+        {
+            var type = InferType(ref expression, DataType.Unknown);
+            // Use the initializer type unless it is constant
+            switch (type)
+            {
+                case IntegerConstantType _:
+                    type = DataType.Int;
+                    break;
+            }
+            // TODO insert a cast
+            return type;
+        }
+
+        public void CheckType([NotNull] ref IExpressionSyntax? expression, DataType expectedType)
+        {
+            InferType(ref expression, expectedType);
+            var actualType = InsertImplicitConversionIfNeeded(ref expression, expectedType);
+            // TODO check for type compatibility not equality
+            if (!expectedType.Equals(actualType))
+                diagnostics.Add(TypeError.CannotConvert(file, expression, actualType, expectedType));
+        }
+
+        /// <summary>
         /// Create an implicit conversion if allowed and needed
         /// </summary>
-        private static void InsertImplicitConversionIfNeeded(
+        private static DataType InsertImplicitConversionIfNeeded(
             ref IExpressionSyntax expression,
             DataType targetType)
         {
@@ -135,7 +164,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         expression = new ImplicitOptionalConversionExpression(expression, optionalType);
                 }
 
-                return;
+                return expression.Type!;
             }
 
             switch (expression.Type)
@@ -181,29 +210,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     break;
             }
 
-            // No conversion
-        }
-
-        public DataType CheckType(ITransferSyntax? transfer, DataType expectedType)
-        {
-            if (transfer == null) return DataType.Unknown;
-            return transfer.Type = CheckType(ref transfer.Expression, expectedType);
-        }
-
-        public DataType CheckType([NotNull] ref IExpressionSyntax? expression, DataType expectedType)
-        {
-            var actualType = InferType(ref expression, expectedType);
-            InsertImplicitConversionIfNeeded(ref expression, expectedType);
-            // TODO check for type compatibility not equality
-            if (!expectedType.Equals(actualType))
-                diagnostics.Add(TypeError.CannotConvert(file, expression, actualType, expectedType));
-            return actualType;
-        }
-
-        private DataType InferType(ITransferSyntax? transfer, DataType expectedType)
-        {
-            if (transfer == null) return DataType.Unknown;
-            return transfer.Type = InferType(ref transfer.Expression, expectedType);
+            // else No conversion
+            return expression.Type!;
         }
 
         private DataType InferType([NotNull] ref IExpressionSyntax? expression, DataType expectedType)
@@ -214,29 +222,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     throw ExhaustiveMatch.Failed(expression);
                 case null:
                     return DataType.Unknown;
+                case IMoveExpressionSyntax _:
+                case IMutableExpressionSyntax _:
+                    throw new NotImplementedException();
                 case IReturnExpressionSyntax returnExpression:
                 {
                     if (returnExpression.ReturnValue != null)
                     {
                         var returnValue = returnExpression.ReturnValue;
-                        expectedType = returnType ?? throw new InvalidOperationException("Return statement in constructor");
+                        var expectedReturnType = returnType ?? throw new InvalidOperationException("Return statement in constructor");
                         // If we return ownership, there can be an implicit move
-                        if (returnExpression.ReturnValue is IImmutableTransferSyntax
+                        if (returnExpression.ReturnValue is INameExpressionSyntax name
                             && returnType is UserObjectType objectType
                             && objectType.IsOwned)
-                            returnValue = returnExpression.ReturnValue = new ImplicitMoveTransferSyntax(returnValue.Span, returnValue.Expression);
+                            returnExpression.ReturnValue = new ImplicitMoveSyntax(returnValue.Span, name);
 
-                        var type = CheckType(returnValue, expectedType);
-                        //InsertImplicitConversionIfNeeded(ref returnExpression.ReturnValue.Expression, returnType);
-                        if (!IsAssignableFrom(returnType, type))
-                            diagnostics.Add(TypeError.CannotConvert(file,
-                                returnExpression.ReturnValue.Expression, type, returnType));
+                        CheckType(ref returnExpression.ReturnValue, expectedReturnType);
                     }
                     else if (returnType == DataType.Never)
                         diagnostics.Add(TypeError.CantReturnFromNeverFunction(file, returnExpression.Span));
                     else if (returnType != DataType.Void)
-                        diagnostics.Add(TypeError.ReturnExpressionMustHaveValue(file,
-                            returnExpression.Span, returnType ?? DataType.Unknown));
+                        diagnostics.Add(TypeError.ReturnExpressionMustHaveValue(file, returnExpression.Span, returnType ?? DataType.Unknown));
 
                     return returnExpression.Type = DataType.Never;
                 }
@@ -510,9 +516,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     }
                     // TODO assign a type to the expression
                     return ifExpression.Type = DataType.Void;
-                //case ResultStatementSyntax resultExpression:
-                //    InferExpressionType(ref resultExpression.Expression);
-                //    return resultExpression.Type = DataType.Never;
                 case IMemberAccessExpressionSyntax memberAccess:
                 {
                     var left = InferType(ref memberAccess.Expression, expectedType);
@@ -536,13 +539,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IAssignmentExpressionSyntax assignmentExpression:
                 {
                     var left = InferType(ref assignmentExpression.LeftOperand, expectedType);
-                    InferType(ref assignmentExpression.RightOperand.Expression, expectedType);
-                    InsertImplicitConversionIfNeeded(ref assignmentExpression.RightOperand.Expression, left);
-                    var right = assignmentExpression.RightOperand.Type
-                        = assignmentExpression.RightOperand.Expression.Type ?? throw new InvalidOperationException();
+                    InferType(ref assignmentExpression.RightOperand, expectedType);
+                    InsertImplicitConversionIfNeeded(ref assignmentExpression.RightOperand, left);
+                    var right = assignmentExpression.RightOperand.Type ?? throw new InvalidOperationException();
                     if (!IsAssignableFrom(left, right))
                         diagnostics.Add(TypeError.CannotConvert(file,
-                            assignmentExpression.RightOperand.Expression, right, left));
+                            assignmentExpression.RightOperand, right, left));
                     return assignmentExpression.Type = DataType.Void;
                 }
                 case ISelfExpressionSyntax selfExpression:

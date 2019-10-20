@@ -1,7 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitConversions
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
 {
     /// <summary>
     /// An implicit conversion from `none` of type `never?` to some other optional

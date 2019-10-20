@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitConversions
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
 {
     /// <summary>
     /// The implicit conversions do not have "Syntax" in their name, because

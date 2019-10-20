@@ -9,16 +9,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public ref IExpressionSyntax LeftOperand => ref leftOperand;
 
         public AssignmentOperator Operator { get; }
-        public ITransferSyntax RightOperand { get; }
+        private IExpressionSyntax rightOperand;
+        public ref IExpressionSyntax RightOperand => ref rightOperand;
 
         public AssignmentExpressionSyntax(
             IExpressionSyntax leftOperand,
             AssignmentOperator @operator,
-            ITransferSyntax rightOperand)
+            IExpressionSyntax rightOperand)
             : base(TextSpan.Covering(leftOperand.Span, rightOperand.Span))
         {
             this.leftOperand = leftOperand;
-            RightOperand = rightOperand;
+            this.rightOperand = rightOperand;
             Operator = @operator;
         }
 

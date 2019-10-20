@@ -52,6 +52,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                     walker.Walk(fieldDeclaration.TypeSyntax, arg);
                     walker.Walk(fieldDeclaration.Initializer, arg);
                     break;
+                case IArgumentSyntax argument:
+                    walker.Walk(argument.Expression, arg);
+                    break;
                 case IImplicitConversionExpression implicitConversion:
                     walker.Walk(implicitConversion.Expression, arg);
                     break;
@@ -85,13 +88,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                 case IResultStatementSyntax resultStatement:
                     walker.Walk(resultStatement.Expression, arg);
                     break;
-                case IImmutableTransferSyntax immutableTransfer:
-                    walker.Walk(immutableTransfer.Expression, arg);
-                    break;
-                case IMutableTransferSyntax mutableTransfer:
+                case IMutableExpressionSyntax mutableTransfer:
                     walker.Walk(mutableTransfer.Expression, arg);
                     break;
-                case IMoveTransferSyntax moveTransfer:
+                case IMoveExpressionSyntax moveTransfer:
                     walker.Walk(moveTransfer.Expression, arg);
                     break;
                 case IIfExpressionSyntax ifExpression:

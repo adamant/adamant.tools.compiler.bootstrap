@@ -216,7 +216,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         variableDeclaration.Name.UnqualifiedName);
                     if (variableDeclaration.Initializer != null)
                     {
-                        var value = ConvertToValue(variableDeclaration.Initializer.Expression);
+                        var value = ConvertToValue(variableDeclaration.Initializer);
                         AssignToPlace(
                             variable.LValueReference(variableDeclaration.Initializer.Span), value,
                             variableDeclaration.Initializer.Span);
@@ -301,9 +301,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     {
                         var isOwn = returnType.ValueSemantics == ValueSemantics.Own;
                         var value = isOwn
-                            ? ConvertToOwn(returnExpression.ReturnValue.Expression, returnExpression.Span)
+                            ? ConvertToOwn(returnExpression.ReturnValue, returnExpression.Span)
                             // TODO avoid getting a move from this just because it is a new object expression
-                            : ConvertToValue(returnExpression.ReturnValue.Expression);
+                            : ConvertToValue(returnExpression.ReturnValue);
                         AssignToPlace(
                             graph.ReturnVariable.LValueReference(returnExpression.ReturnValue.Span),
                             value, returnExpression.ReturnValue.Span);
@@ -470,7 +470,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     return;
                 case IAssignmentExpressionSyntax assignmentExpression:
                 {
-                    var value = ConvertToValue(assignmentExpression.RightOperand.Expression);
+                    var value = ConvertToValue(assignmentExpression.RightOperand);
                     var place = ConvertToPlace(assignmentExpression.LeftOperand);
 
                     if (assignmentExpression.Operator != AssignmentOperator.Simple)
@@ -597,7 +597,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 //    // TODO shouldn't borrowing be explicit in the IR and don't we
                 //    // need to be able to check mutability on borrows?
                 //    return ConvertToValue(mutable.Referent);
-                case IMoveTransferSyntax move:
+                case IMoveExpressionSyntax move:
                     return ConvertToOwn(move.Expression, move.Span);
                 case IImplicitImmutabilityConversionExpression implicitImmutabilityConversion:
                 {
