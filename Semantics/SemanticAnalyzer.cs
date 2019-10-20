@@ -76,8 +76,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             FixedDictionary<string, Package> references,
             Diagnostics diagnostics)
         {
-            var scopesBuilder = new LexicalScopesBuilder(diagnostics, packageSyntax, references);
-            scopesBuilder.BuildScopesInPackage(packageSyntax);
+            var scopesBuilder = new PackageLexicalScopesBuilder(diagnostics, packageSyntax, references);
+            scopesBuilder.BuildScopesFor(packageSyntax);
         }
 
         private static FixedList<IEntityDeclarationSyntax> GetEntityDeclarations(
