@@ -89,10 +89,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                     walker.Walk(resultStatement.Expression, arg);
                     break;
                 case IMutableExpressionSyntax mutableTransfer:
-                    walker.Walk(mutableTransfer.Expression, arg);
+                    walker.Walk(mutableTransfer.Referent, arg);
                     break;
                 case IMoveExpressionSyntax moveTransfer:
-                    walker.Walk(moveTransfer.Expression, arg);
+                    walker.Walk(moveTransfer.Referent, arg);
                     break;
                 case IIfExpressionSyntax ifExpression:
                     walker.Walk(ifExpression.Condition, arg);

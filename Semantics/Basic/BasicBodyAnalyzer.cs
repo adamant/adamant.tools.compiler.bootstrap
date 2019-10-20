@@ -228,8 +228,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case null:
                     return DataType.Unknown;
                 case IMoveExpressionSyntax _:
-                case IMutableExpressionSyntax _:
                     throw new NotImplementedException();
+                case IMutableExpressionSyntax mutableExpression:
+                {
+                    var expressionType = InferType(ref mutableExpression.Referent, expectedType);
+                    DataType type;
+                    switch (expressionType)
+                    {
+                        // If it is already mutable we can't redeclare it mutable (i.e. `mut mut x` is error)
+                        case UserObjectType objectType
+                            when objectType.Mutability.IsUpgradable:
+                            type = objectType.AsMutable();
+                            break;
+                        default:
+                            diagnostics.Add(TypeError.ExpressionCantBeMutable(file,
+                                mutableExpression.Referent));
+                            type = expressionType;
+                            break;
+                    }
+
+                    return mutableExpression.Type = type;
+                }
                 case IReturnExpressionSyntax returnExpression:
                 {
                     if (returnExpression.ReturnValue != null)
@@ -479,27 +498,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IUnsafeExpressionSyntax unsafeExpression:
                     InferType(ref unsafeExpression.Expression, expectedType);
                     return unsafeExpression.Type = unsafeExpression.Expression.Type;
-                //case MutableTypeSyntax mutableExpression:
-                //{
-                //    var expressionType = InferExpressionType(mutableExpression.Referent);
-                //    DataType type;
-
-                //    switch (expressionType)
-                //    {
-                //        // If it is already mutable we can't redeclare it mutable (i.e. `mut mut x` is error)
-                //        case UserObjectType objectType
-                //            when objectType.Mutability.IsUpgradable:
-                //            type = objectType.AsMutable();
-                //            break;
-                //        default:
-                //            diagnostics.Add(TypeError.ExpressionCantBeMutable(file,
-                //                mutableExpression.Referent));
-                //            type = expressionType;
-                //            break;
-                //    }
-
-                //    return mutableExpression.Type = type;
-                //}
                 case IIfExpressionSyntax ifExpression:
                     CheckType(ref ifExpression.Condition, DataType.Bool);
                     InferBlockType(ifExpression.ThenBlock);

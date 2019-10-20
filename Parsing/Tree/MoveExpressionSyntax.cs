@@ -7,17 +7,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     [SuppressMessage("Performance", "CA1812:Class Never Instantiated")]
     internal class MoveExpressionSyntax : ExpressionSyntax, IMoveExpressionSyntax
     {
-        public INameExpressionSyntax Expression { get; }
+        public INameExpressionSyntax Referent { get; }
 
-        public MoveExpressionSyntax(TextSpan span, INameExpressionSyntax expression)
+        public MoveExpressionSyntax(TextSpan span, INameExpressionSyntax referent)
             : base(span)
         {
-            Expression = expression;
+            Referent = referent;
         }
 
         public override string ToString()
         {
-            return $"move {Expression}";
+            return $"move {Referent}";
         }
     }
 }

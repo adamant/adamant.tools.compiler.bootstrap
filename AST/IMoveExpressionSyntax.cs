@@ -5,6 +5,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     /// </summary>
     public interface IMoveExpressionSyntax : IExpressionSyntax
     {
-        INameExpressionSyntax Expression { get; }
+        INameExpressionSyntax Referent { get; }
     }
 }

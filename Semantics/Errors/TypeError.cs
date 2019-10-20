@@ -83,7 +83,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
         public static Diagnostic CannotMoveBorrowedValue(CodeFile file, IMoveExpressionSyntax expression)
         {
             return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3009,
-                $"Cannot move borrowed value `{file.Code[expression.Expression.Span]}`");
+                $"Cannot move borrowed value `{file.Code[expression.Referent.Span]}`");
         }
 
         public static Diagnostic TypeDeclaredImmutable(CodeFile file, IExpressionSyntax expression)

@@ -134,15 +134,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                             @operator = Tokens.RequiredToken<IBinaryOperatorToken>();
                         }
                         break;
-                    //case IQuestionToken _: // TODO this be a type
-                    //    if (minPrecedence <= OperatorPrecedence.Unary)
-                    //    {
-                    //        var question = Tokens.Required<IQuestionToken>();
-                    //        var span = TextSpan.Covering(expression.Span, question);
-                    //        expression = new UnaryOperatorExpressionSyntax(span, UnaryOperatorFixity.Postfix, UnaryOperator.Question, expression);
-                    //        continue;
-                    //    }
-                    //    break;
                     //case IOpenParenToken _:
                     //    if (minPrecedence <= OperatorPrecedence.Primary)
                     //    {
@@ -387,6 +378,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var span = TextSpan.Covering(dot, member.Span);
                     // TODO we need to check for method call
                     return new MemberAccessExpressionSyntax(span, null, AccessOperator.Standard, member.ToExpression());
+                }
+                case IMutableKeywordToken _:
+                {
+                    var mut = Tokens.Required<IMutableKeywordToken>();
+                    // `mut` is like a unary operator
+                    var expression = ParseExpression(OperatorPrecedence.Unary);
+                    var span = TextSpan.Covering(mut, expression.Span);
+                    return new MutableExpressionSyntax(span, expression);
                 }
                 case IBinaryOperatorToken _:
                 case IAssignmentToken _:

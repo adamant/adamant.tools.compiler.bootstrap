@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
     internal class ImplicitMoveSyntax : IMoveExpressionSyntax
     {
         public TextSpan Span { get; }
-        public INameExpressionSyntax Expression { get; }
+        public INameExpressionSyntax Referent { get; }
 
         [DisallowNull]
         public DataType? Type
@@ -26,12 +26,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
         public ImplicitMoveSyntax(TextSpan span, INameExpressionSyntax expression)
         {
             Span = span;
-            Expression = expression;
+            Referent = expression;
         }
 
         public override string ToString()
         {
-            return $"(move) {Expression}";
+            return $"(move) {Referent}";
         }
     }
 }
