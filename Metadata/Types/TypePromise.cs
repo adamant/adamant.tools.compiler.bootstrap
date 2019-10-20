@@ -30,6 +30,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         }
 
         [DebuggerHidden]
+        public bool TryBeginFulfilling(Action whenInProgress)
+        {
+            switch (State)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(State);
+                case PromiseState.InProgress:
+                    whenInProgress();
+                    return false;
+                case PromiseState.Fulfilled:
+                    // We have already resolved it
+                    return false;
+                case PromiseState.Pending:
+                    State = PromiseState.InProgress;
+                    // we need to compute it
+                    return true;
+            }
+        }
+
+        [DebuggerHidden]
         public DataType Fulfill(DataType type)
         {
             Requires.That(nameof(State), State == PromiseState.InProgress, "must be in progress is " + State);
