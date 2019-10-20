@@ -41,9 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
                 case INameExpressionSyntax identifier:
                     var symbol = identifier.ReferencedSymbol;
                     if (!symbol.IsMutableBinding && definitelyUnassigned[symbol] == false)
-                    {
                         diagnostics.Add(SemanticError.VariableMayAlreadyBeAssigned(file, identifier.Span, identifier.Name));
-                    }
                     return definitelyUnassigned.Set(symbol, false);
                 case IMemberAccessExpressionSyntax _:
                     return definitelyUnassigned;

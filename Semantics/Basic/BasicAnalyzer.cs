@@ -82,7 +82,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan, field.Name))))
                     {
                         var resolver = new BasicTypeAnalyzer(field.File, diagnostics);
-                        field.Type.BeginFulfilling();
                         var type = resolver.Evaluate(field.TypeSyntax);
                         field.Type.Fulfill(type);
                     }
