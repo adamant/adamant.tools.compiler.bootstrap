@@ -224,10 +224,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var binding = Tokens.Expect<IBindingToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(identifier.Value);
-            ITypeSyntax? type = null;
-            if (Tokens.Accept<IColonToken>())
-                type = ParseType();
-
+            var type = ParseType();
             IExpressionSyntax? initializer = null;
             if (Tokens.Accept<IEqualsToken>())
                 initializer = ParseExpression();

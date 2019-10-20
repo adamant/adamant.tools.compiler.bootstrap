@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             this.diagnostics = diagnostics;
             this.returnType = returnType;
             this.selfType = selfType;
-            typeAnalyzer = new BasicTypeAnalyzer(file, diagnostics, this);
+            typeAnalyzer = new BasicTypeAnalyzer(file, diagnostics);
         }
 
         public void ResolveTypesInStatement(IStatementSyntax statement)

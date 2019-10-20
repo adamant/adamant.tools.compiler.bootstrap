@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -17,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
     /// other classes.
     ///
     /// All basic analysis uses specific terminology to distinguish different
-    /// aspects of type checking. (The entry method `Check` is an exception. It
+    /// aspects of type checking. (The entry method `Analyze` is an exception. It
     /// is named to match other analyzers but performs a resolve.)
     ///
     /// Terminology:
@@ -63,9 +62,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     throw ExhaustiveMatch.Failed(declaration);
                 case IMethodDeclarationSyntax method:
                 {
-                    var selfType = ResolveSelfType(method);
-                    var analyzer = new BasicStatementAnalyzer(method.File, diagnostics, selfType);
-                    ResolveTypesInParameters(analyzer, method.Parameters, method.DeclaringClass);
+                    var analyzer = new BasicTypeAnalyzer(method.File, diagnostics);
+                    method.SelfParameterType = ResolveTypesInParameters(analyzer, method.Parameters, method.DeclaringClass)
+                        ?? throw new InvalidOperationException("Method doesn't have self parameter");
                     ResolveReturnType(method.ReturnType, method.ReturnTypeSyntax, analyzer);
                     break;
                 }
@@ -73,7 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 {
                     var selfType = @class.DeclaringClass?.DeclaresType.Fulfilled();
                     @class.SelfParameterType = ((UserObjectType)selfType).ForConstructorSelf();
-                    var analyzer = new BasicStatementAnalyzer(@class.File, diagnostics, selfType);
+                    var analyzer = new BasicTypeAnalyzer(@class.File, diagnostics);
                     ResolveTypesInParameters(analyzer, @class.Parameters, @class.DeclaringClass);
                     break;
                 }
@@ -81,15 +80,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     if (field.Type.TryBeginFulfilling(() =>
                         diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan, field.Name))))
                     {
-                        var resolver = new BasicStatementAnalyzer(field.File, diagnostics);
+                        var resolver = new BasicTypeAnalyzer(field.File, diagnostics);
                         field.Type.BeginFulfilling();
-                        var type = resolver.EvaluateType(field.TypeSyntax);
+                        var type = resolver.Evaluate(field.TypeSyntax);
                         field.Type.Fulfill(type);
                     }
                     break;
                 case IFunctionDeclarationSyntax function:
                 {
-                    var analyzer = new BasicStatementAnalyzer(function.File, diagnostics);
+                    var analyzer = new BasicTypeAnalyzer(function.File, diagnostics);
                     ResolveTypesInParameters(analyzer, function.Parameters, null);
                     ResolveReturnType(function.ReturnType, function.ReturnTypeSyntax, analyzer);
                     break;
@@ -107,28 +106,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
         }
 
-        private static DataType? ResolveSelfType(IMethodDeclarationSyntax method)
-        {
-            var declaringType = method.DeclaringClass?.DeclaresType.Fulfilled();
-            if (declaringType == null)
-                return null;
-
-            var selfParameter = method.Parameters.OfType<ISelfParameterSyntax>().SingleOrDefault();
-            if (selfParameter == null)
-                return null; // Static function
-            selfParameter.Type.BeginFulfilling();
-            var selfType = (UserObjectType)declaringType;
-            if (selfParameter.MutableSelf)
-                selfType = selfType.AsMutable();
-            return method.SelfParameterType = selfParameter.Type.Fulfill(selfType);
-        }
-
-        private void ResolveTypesInParameters(
-            BasicStatementAnalyzer analyzer,
+        private UserObjectType? ResolveTypesInParameters(
+            BasicTypeAnalyzer analyzer,
             FixedList<IParameterSyntax> parameters,
-            IClassDeclarationSyntax? declaringType)
+            IClassDeclarationSyntax? declaringClass)
         {
-            var types = new List<DataType>();
+            UserObjectType? selfType = null;
             foreach (var parameter in parameters)
                 switch (parameter)
                 {
@@ -137,19 +120,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     case INamedParameterSyntax namedParameter:
                     {
                         parameter.Type.BeginFulfilling();
-                        var type = analyzer
-                            .EvaluateType(namedParameter.TypeSyntax);
-                        types.Add(parameter.Type.Fulfill(type));
+                        var type = analyzer.Evaluate(namedParameter.TypeSyntax);
+                        parameter.Type.Fulfill(type);
                     }
                     break;
-                    case ISelfParameterSyntax _:
-                        // Skip, we have already handled the self parameter
-                        break;
+                    case ISelfParameterSyntax selfParameter:
+                    {
+                        var declaringType = declaringClass?.DeclaresType.Fulfilled()
+                                            ?? throw new InvalidOperationException("Self parameter outside of class declaration");
+                        selfParameter.Type.BeginFulfilling();
+                        selfType = (UserObjectType)declaringType;
+                        if (selfParameter.MutableSelf) selfType = selfType.AsMutable();
+                        selfParameter.Type.Fulfill(selfType);
+                    }
+                    break;
                     case IFieldParameterSyntax fieldParameter:
+                    {
                         parameter.Type.BeginFulfilling();
-                        var field = declaringType.Members
-                            .OfType<IFieldDeclarationSyntax>()
-                            .SingleOrDefault(f => f.Name == fieldParameter.FieldName);
+                        var field = (declaringClass?? throw new InvalidOperationException("Field parameter outside of class declaration"))
+                                    .Members.OfType<IFieldDeclarationSyntax>()
+                                    .SingleOrDefault(f => f.Name == fieldParameter.FieldName);
                         if (field == null)
                         {
                             parameter.Type.Fulfill(DataType.Unknown);
@@ -159,7 +149,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         else
                         {
                             if (field.Type.TryBeginFulfilling(() =>
-                                diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan, field.Name))))
+                                diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan,
+                                    field.Name))))
                             {
                                 var resolver = new BasicStatementAnalyzer(field.File, diagnostics);
                                 field.Type.BeginFulfilling();
@@ -169,20 +160,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
                             parameter.Type.Fulfill(field.Type.Fulfilled());
                         }
-                        break;
+                    }
+                    break;
                 }
 
-            types.ToFixedList();
+            return selfType;
         }
 
         private static void ResolveReturnType(
             TypePromise returnTypePromise,
             ITypeSyntax? returnTypeSyntax,
-            BasicStatementAnalyzer analyzer)
+            BasicTypeAnalyzer analyzer)
         {
             returnTypePromise.BeginFulfilling();
             var returnType = returnTypeSyntax != null
-                ? analyzer.EvaluateType(returnTypeSyntax)
+                ? analyzer.Evaluate(returnTypeSyntax)
                 : DataType.Void;
 
             // If we are returning ownership, then they can make it mutable

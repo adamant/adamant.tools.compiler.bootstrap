@@ -6,7 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public interface IFieldDeclarationSyntax : IMemberDeclarationSyntax, IBindingSymbol
     {
-        ITypeSyntax? TypeSyntax { get; }
+        ITypeSyntax TypeSyntax { get; }
         new TypePromise Type { get; }
         [DisallowNull] ref IExpressionSyntax? Initializer { get; }
     }
