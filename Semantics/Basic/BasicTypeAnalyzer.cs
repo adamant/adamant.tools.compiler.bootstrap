@@ -13,7 +13,7 @@ using ExhaustiveMatching;
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 {
     /// <summary>
-    /// Analyzes a <see cref="Adamant.Tools.Compiler.Bootstrap.Parsing.Tree.TypeSyntax" /> to evaluate which type it refers to.
+    /// Analyzes an <see cref="ITypeSyntax" /> to evaluate which type it refers to.
     /// </summary>
     public class BasicTypeAnalyzer
     {

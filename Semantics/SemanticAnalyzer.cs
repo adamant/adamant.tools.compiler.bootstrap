@@ -93,7 +93,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             Diagnostics diagnostics)
         {
             // Basic Analysis includes: Name Binding, Type Checking, Constant Folding
-            new BasicAnalyzer(diagnostics).Analyze(entities);
+            new BasicAnalyzer(diagnostics).Check(entities);
 
 #if DEBUG
             new TypeFulfillmentValidator().Walk(entities);

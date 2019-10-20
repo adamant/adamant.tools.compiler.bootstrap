@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
     /// other classes.
     ///
     /// All basic analysis uses specific terminology to distinguish different
-    /// aspects of type checking. (The entry method `Analyze` is an exception. It
+    /// aspects of type checking. (The entry method `Check` is an exception. It
     /// is named to match other analyzers but performs a resolve.)
     ///
     /// Terminology:
@@ -24,6 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
     /// * Resolve - includes type inference and checking
     /// * Check - check something has an expected type
     /// * Infer - infer what type something has
+    /// * Evaluate - determine the type for some type syntax
     /// </summary>
     public class BasicAnalyzer
     {
@@ -34,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             this.diagnostics = diagnostics;
         }
 
-        public void Analyze(FixedList<IEntityDeclarationSyntax> entities)
+        public void Check(FixedList<IEntityDeclarationSyntax> entities)
         {
             // Process all types first because they may be referenced by functions etc.
             foreach (var @class in entities.OfType<IClassDeclarationSyntax>())
@@ -70,7 +71,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
                 case IConstructorDeclarationSyntax @class:
                 {
-                    var selfType = @class.DeclaringClass?.DeclaresType.Fulfilled();
+                    var selfType = @class.DeclaringClass.DeclaresType.Fulfilled();
                     @class.SelfParameterType = ((UserObjectType)selfType).ForConstructorSelf();
                     var analyzer = new BasicTypeAnalyzer(@class.File, diagnostics);
                     ResolveTypesInParameters(analyzer, @class.Parameters, @class.DeclaringClass);
@@ -152,7 +153,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                 diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan,
                                     field.Name))))
                             {
-                                var resolver = new BasicStatementAnalyzer(field.File, diagnostics);
+                                var resolver = new BasicBodyAnalyzer(field.File, diagnostics);
                                 field.Type.BeginFulfilling();
                                 var type = resolver.EvaluateType(field.TypeSyntax);
                                 field.Type.Fulfill(type);
@@ -191,16 +192,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     throw ExhaustiveMatch.Failed(declaration);
                 case IFunctionDeclarationSyntax function:
                 {
-                    var resolver = new BasicStatementAnalyzer(function.File, diagnostics, null, function.ReturnType.Fulfilled());
-                    foreach (var statement in function.Body.Statements)
-                        resolver.ResolveTypesInStatement(statement);
+                    var resolver = new BasicBodyAnalyzer(function.File, diagnostics, null, function.ReturnType.Fulfilled());
+                    resolver.ResolveTypes(function.Body);
                     break;
                 }
                 case IConcreteMethodDeclarationSyntax method:
                 {
-                    var resolver = new BasicStatementAnalyzer(method.File, diagnostics, method.SelfParameterType, method.ReturnType.Fulfilled());
-                    foreach (var statement in method.Body.Statements)
-                        resolver.ResolveTypesInStatement(statement);
+                    var resolver = new BasicBodyAnalyzer(method.File, diagnostics, method.SelfParameterType, method.ReturnType.Fulfilled());
+                    resolver.ResolveTypes(method.Body);
                     break;
                 }
                 case IAbstractMethodDeclarationSyntax _:
@@ -209,16 +208,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IFieldDeclarationSyntax field:
                     if (field.Initializer != null)
                     {
-                        var resolver = new BasicStatementAnalyzer(field.File, diagnostics);
-                        // Work around not being able to pass a ref to a property
+                        var resolver = new BasicBodyAnalyzer(field.File, diagnostics);
                         resolver.CheckExpressionType(ref field.Initializer, field.Type.Fulfilled());
                     }
                     break;
                 case IConstructorDeclarationSyntax constructor:
                 {
-                    var resolver = new BasicStatementAnalyzer(constructor.File, diagnostics, constructor.SelfParameterType, constructor.SelfParameterType);
-                    foreach (var statement in constructor.Body.Statements)
-                        resolver.ResolveTypesInStatement(statement);
+                    var resolver = new BasicBodyAnalyzer(constructor.File, diagnostics, constructor.SelfParameterType, constructor.SelfParameterType);
+                    resolver.ResolveTypes(constructor.Body);
                     break;
                 }
                 case IClassDeclarationSyntax _:

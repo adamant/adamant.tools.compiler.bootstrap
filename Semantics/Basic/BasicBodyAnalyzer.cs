@@ -17,7 +17,7 @@ using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 {
-    public class BasicStatementAnalyzer
+    public class BasicBodyAnalyzer
     {
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         private readonly DataType? returnType;
         private readonly BasicTypeAnalyzer typeAnalyzer;
 
-        public BasicStatementAnalyzer(
+        public BasicBodyAnalyzer(
             CodeFile file,
             Diagnostics diagnostics,
             DataType? selfType = null,
@@ -36,6 +36,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             this.returnType = returnType;
             this.selfType = selfType;
             typeAnalyzer = new BasicTypeAnalyzer(file, diagnostics);
+        }
+
+        public void ResolveTypes(IBodySyntax body)
+        {
+            foreach (var statement in body.Statements)
+                ResolveTypesInStatement(statement);
         }
 
         public void ResolveTypesInStatement(IStatementSyntax statement)
