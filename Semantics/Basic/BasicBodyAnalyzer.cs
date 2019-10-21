@@ -467,7 +467,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     //diagnostics.Add(TypeError.MustBeCallable(file, methodInvocation.Target));
                     //return methodInvocation.Type = DataType.Unknown;
                     var typeSymbol = GetSymbolForType(targetType);
-                    var methodSymbols = typeSymbol.ChildSymbols[methodInvocation.MethodNameSyntax.Name]
+                    typeSymbol.ChildSymbols.TryGetValue(methodInvocation.MethodNameSyntax.Name, out var childSymbols);
+                    var methodSymbols = (childSymbols ?? FixedList<ISymbol>.Empty)
                         .OfType<IFunctionSymbol>().ToFixedList();
                     methodSymbols = ResolveOverload(methodSymbols, targetType, argumentTypes);
                     switch (methodSymbols.Count)
