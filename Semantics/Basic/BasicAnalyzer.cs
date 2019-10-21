@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -108,7 +109,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private UserObjectType? ResolveTypesInParameters(
             BasicTypeAnalyzer analyzer,
-            FixedList<IParameterSyntax> parameters,
+            IEnumerable<IParameterSyntax> parameters,
             IClassDeclarationSyntax? declaringClass)
         {
             UserObjectType? selfType = null;

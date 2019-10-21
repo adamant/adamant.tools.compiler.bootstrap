@@ -132,7 +132,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
             return defaultConstructor;
         }
 
-        private static FixedList<Parameter> BuildParameters(FixedList<IParameterSyntax> parameters)
+        private static FixedList<Parameter> BuildParameters(IEnumerable<IParameterSyntax> parameters)
         {
             return parameters.Select(BuildParameter).ToFixedList();
         }

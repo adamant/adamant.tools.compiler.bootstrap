@@ -8,7 +8,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
     public partial class Parser
     {
-        public IParameterSyntax ParseParameter()
+        public INamedParameterSyntax ParseFunctionParameter()
+        {
+            var span = Tokens.Current.Span;
+            var mutableBinding = Tokens.Accept<IVarKeywordToken>();
+            var identifier = Tokens.RequiredToken<IIdentifierOrUnderscoreToken>();
+            var name = nameContext.Qualify(variableNumbers.VariableName(identifier.Value));
+            Tokens.Expect<IColonToken>();
+            var type = ParseType();
+            IExpressionSyntax? defaultValue = null;
+            if (Tokens.Accept<IEqualsToken>()) defaultValue = ParseExpression();
+            span = TextSpan.Covering(span, type.Span, defaultValue?.Span);
+            return new NamedParameterSyntax(span, mutableBinding, name, type, defaultValue);
+        }
+
+        public IMethodParameterSyntax ParseMethodParameter()
         {
             switch (Tokens.Current)
             {
@@ -22,33 +36,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var name = nameContext.Qualify(SpecialName.Self);
                     return new SelfParameterSyntax(span, name, mutableSelf);
                 }
+                default:
+                    return ParseFunctionParameter();
+            }
+        }
+
+        public IConstructorParameterSyntax ParseConstructorParameter()
+        {
+            switch (Tokens.Current)
+            {
                 case IDotToken _:
                 {
                     var dot = Tokens.Expect<IDotToken>();
                     var identifier = Tokens.RequiredToken<IIdentifierToken>();
                     var equals = Tokens.AcceptToken<IEqualsToken>();
                     IExpressionSyntax? defaultValue = null;
-                    if (equals != null)
-                        defaultValue = ParseExpression();
+                    if (equals != null) defaultValue = ParseExpression();
                     var span = TextSpan.Covering(dot, identifier.Span, defaultValue?.Span);
                     var fullName = nameContext.Qualify(SimpleName.Special("field_" + identifier.Value));
                     var fieldName = new SimpleName(identifier.Value);
                     return new FieldParameterSyntax(span, fullName, fieldName, defaultValue);
                 }
                 default:
-                {
-                    var span = Tokens.Current.Span;
-                    var mutableBinding = Tokens.Accept<IVarKeywordToken>();
-                    var identifier = Tokens.RequiredToken<IIdentifierOrUnderscoreToken>();
-                    var name = nameContext.Qualify(variableNumbers.VariableName(identifier.Value));
-                    Tokens.Expect<IColonToken>();
-                    var type = ParseType();
-                    IExpressionSyntax? defaultValue = null;
-                    if (Tokens.Accept<IEqualsToken>())
-                        defaultValue = ParseExpression();
-                    span = TextSpan.Covering(span, type.Span, defaultValue?.Span);
-                    return new NamedParameterSyntax(span, mutableBinding, name, type, defaultValue);
-                }
+                    return ParseFunctionParameter();
             }
         }
     }

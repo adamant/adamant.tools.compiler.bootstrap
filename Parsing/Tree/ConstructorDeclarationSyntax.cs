@@ -15,6 +15,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SimpleName Name => FullName.UnqualifiedName;
 
+        public new FixedList<IConstructorParameterSyntax> Parameters { get; }
+
         public ConstructorDeclarationSyntax(
             IClassDeclarationSyntax declaringType,
             TextSpan span,
@@ -22,11 +24,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IModiferToken> modifiers,
             Name fullName,
             TextSpan nameSpan,
-            FixedList<IParameterSyntax> parameters,
+            FixedList<IConstructorParameterSyntax> parameters,
             IBodySyntax body)
-            : base(span, file, modifiers, fullName, nameSpan, parameters, body)
+            : base(span, file, modifiers, fullName, nameSpan, parameters.ToFixedList<IParameterSyntax>(), body)
         {
             DeclaringClass = declaringType;
+            Parameters = parameters;
         }
 
         public override string ToString()

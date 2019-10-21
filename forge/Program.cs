@@ -43,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge
                         var verbose = verboseOption.HasValue();
                         var packagePath = packageOption.Value() ?? ".";
 
-                        await Build(packagePath, verbose, allowParallel, maxConcurrency);
+                        await Build(packagePath, verbose, allowParallel, maxConcurrency).ConfigureAwait(false);
                     });
                 });
 
@@ -69,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge
             var taskScheduler = NewTaskScheduler(
                 allowParallel,
                 maxConcurrency);
-            await projectSet.Build(taskScheduler, verbose);
+            await projectSet.Build(taskScheduler, verbose).ConfigureAwait(false);
         }
 
         private static TaskScheduler NewTaskScheduler(bool allowParallel, int? maxConcurrency)

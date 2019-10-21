@@ -118,12 +118,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             return new NestedScope(containingScope, importedSymbols, Enumerable.Empty<ISymbol>());
         }
 
-        private static LexicalScope BuildBodyScope(FixedList<IParameterSyntax> parameters, LexicalScope containingScope)
+        private static LexicalScope BuildBodyScope(IEnumerable<IParameterSyntax> parameters, LexicalScope containingScope)
         {
-            var symbols = new List<ISymbol>();
-            foreach (var parameter in parameters) symbols.Add(parameter);
-
-            return new NestedScope(containingScope, symbols, Enumerable.Empty<ISymbol>());
+            return new NestedScope(containingScope, parameters, Enumerable.Empty<ISymbol>());
         }
     }
 }

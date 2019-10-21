@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -17,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SimpleName Name => FullName.UnqualifiedName;
-        IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;
+        public new FixedList<IMethodParameterSyntax> Parameters { get; }
         public ILifetimeBoundSyntax? LifetimeBounds { get; }
         public ITypeSyntax? ReturnTypeSyntax { get; }
         DataType IFunctionSymbol.ReturnType => ReturnType.Fulfilled();
@@ -29,13 +28,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IModiferToken> modifiers,
             Name fullName,
             TextSpan nameSpan,
-            FixedList<IParameterSyntax> parameters, // For now we will not support pure meta functions
+            FixedList<IMethodParameterSyntax> parameters, // For now we will not support pure meta functions
             ILifetimeBoundSyntax? lifetimeBounds,
             ITypeSyntax? returnTypeSyntax,
             SymbolSet childSymbols)
-            : base(span, file, modifiers, fullName, nameSpan, parameters, childSymbols)
+            : base(span, file, modifiers, fullName, nameSpan, parameters.ToFixedList<IParameterSyntax>(), childSymbols)
         {
             DeclaringClass = declaringClass;
+            Parameters = parameters;
             LifetimeBounds = lifetimeBounds;
             ReturnTypeSyntax = returnTypeSyntax;
         }

@@ -29,12 +29,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         }
 
         internal static SymbolSet GetChildSymbols(
-            FixedList<IParameterSyntax> parameters,
+            IEnumerable<IParameterSyntax> parameters,
             IBodySyntax body)
         {
             var variableDeclarations = body.GetAllVariableDeclarations()
                                        ?? Enumerable.Empty<IVariableDeclarationStatementSyntax>();
-            var childSymbols = ((IEnumerable<ISymbol>)parameters).Concat(variableDeclarations);
+            var childSymbols = parameters.Cast<ISymbol>().Concat(variableDeclarations);
             return new SymbolSet(childSymbols);
         }
     }

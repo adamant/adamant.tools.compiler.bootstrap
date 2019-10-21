@@ -115,7 +115,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(identifier.Value);
             var bodyParser = NestedParser(name);
-            var parameters = bodyParser.ParseParameters();
+            var parameters = bodyParser.ParseParameters(ParseFunctionParameter);
             var lifetimeBounds = bodyParser.ParseLifetimeBounds();
             ITypeSyntax? returnType = null;
             if (Tokens.Accept<IRightArrowToken>())
@@ -128,26 +128,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 parameters, lifetimeBounds, returnType, body);
         }
 
-        private FixedList<IParameterSyntax> ParseParameters()
+        private FixedList<TParameter> ParseParameters<TParameter>(Func<TParameter> parseParameter)
+            where TParameter : class, IParameterSyntax
         {
             Tokens.Expect<IOpenParenToken>();
-            return ParseRestOfParameters();
-        }
-
-        /// <summary>
-        /// Requires that the open paren has already been consumed
-        /// </summary>
-        /// <returns></returns>
-        private FixedList<IParameterSyntax> ParseRestOfParameters()
-        {
-            var parameters = new List<IParameterSyntax>();
-            while (!Tokens.AtEnd<ICloseParenToken>())
-            {
-                parameters.Add(ParseParameter());
-                if (Tokens.Current is ICommaToken)
-                    Tokens.Expect<ICommaToken>();
-            }
-
+            var parameters = ParseMany<TParameter, ICommaToken, ICloseParenToken>(parseParameter);
             Tokens.Expect<ICloseParenToken>();
             return parameters.ToFixedList();
         }
@@ -244,7 +229,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(identifier.Value);
             var bodyParser = NestedParser(name);
-            var parameters = bodyParser.ParseParameters();
+            var parameters = bodyParser.ParseParameters(ParseMethodParameter);
             var lifetimeBounds = bodyParser.ParseLifetimeBounds();
             ITypeSyntax? returnType = null;
             if (Tokens.Accept<IRightArrowToken>())
@@ -274,7 +259,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var identifier = Tokens.AcceptToken<IIdentifierToken>();
             var name = nameContext.Qualify(SpecialName.Constructor(identifier?.Value));
             var bodyParser = NestedParser(name);
-            var parameters = bodyParser.ParseParameters();
+            var parameters = bodyParser.ParseParameters(ParseConstructorParameter);
             var body = bodyParser.ParseFunctionBody();
             var span = TextSpan.Covering(newKeywordSpan, body.Span);
             return new ConstructorDeclarationSyntax(declaringType, span, File, modifiers, name,

@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IModiferToken> modifiers,
             Name fullName,
             TextSpan nameSpan,
-            FixedList<IParameterSyntax> parameters,
+            FixedList<IMethodParameterSyntax> parameters,
             ILifetimeBoundSyntax? lifetimeBounds,
             ITypeSyntax? returnTypeSyntax,
             IBodySyntax body)

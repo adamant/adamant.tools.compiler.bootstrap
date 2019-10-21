@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -15,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public ILifetimeBoundSyntax? LifetimeBounds { get; }
         public ITypeSyntax? ReturnTypeSyntax { get; }
 
-        IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;
+        public new FixedList<INamedParameterSyntax> Parameters { get; }
 
         DataType IFunctionSymbol.ReturnType => ReturnType.Fulfilled();
 
@@ -25,12 +24,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IModiferToken> modifiers,
             Name fullName,
             TextSpan nameSpan,
-            FixedList<IParameterSyntax> parameters, // For now we will not support pure meta functions
+            FixedList<INamedParameterSyntax> parameters, // For now we will not support pure meta functions
             ILifetimeBoundSyntax? lifetimeBounds,
             ITypeSyntax? returnTypeSyntax,
             IBodySyntax body)
-            : base(span, file, modifiers, fullName, nameSpan, parameters, body)
+            : base(span, file, modifiers, fullName, nameSpan, parameters.ToFixedList<IParameterSyntax>(), body)
         {
+            Parameters = parameters;
             LifetimeBounds = lifetimeBounds;
             ReturnTypeSyntax = returnTypeSyntax;
         }
