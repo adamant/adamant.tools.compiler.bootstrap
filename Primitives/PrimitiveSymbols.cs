@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             var stringSymbol = PrimitiveTypeSymbol.NewType(typeName, symbols);
             var stringType = UserObjectType.Declaration(stringSymbol, false);
             stringSymbol.DeclaresType = stringType;
-            concatFunc.SetParameters(("other", stringType));
+            concatFunc.SetParameters(("self", stringType), ("other", stringType));
             concatFunc.ReturnType = stringType;
             return stringSymbol;
         }
@@ -81,7 +81,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             var symbols = new List<ISymbol>
             {
                 PrimitiveFunctionSymbol.New(typeName.Qualify("remainder"), integerType, ("self",integerType), ("divisor", integerType)),
-                PrimitiveFunctionSymbol.New(typeName.Qualify("to_display_string"), stringType, ("self", integerType))
+                PrimitiveFunctionSymbol.New(typeName.Qualify("to_display_string"), stringType, ("self", integerType)),
             };
             return PrimitiveTypeSymbol.NewSimpleType(integerType, symbols);
         }
