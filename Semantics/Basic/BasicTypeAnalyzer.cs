@@ -99,7 +99,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return Lifetime.Owned;
                 if (lifetimeName == SpecialName.Forever)
                     return Lifetime.Forever;
-                throw NonExhaustiveMatchException.For(lifetimeName.Text);
+                throw new InvalidOperationException($"Invalid special lifetime name: {lifetimeName.Text}");
             }
 
             return new NamedLifetime(lifetimeName.Text);

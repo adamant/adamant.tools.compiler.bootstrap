@@ -50,5 +50,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6006,
                 $"Use of possibly moved value.");
         }
+
+        public static Diagnostic ImplicitSelfOutsideMethod(CodeFile file, TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6007,
+                $"Can't use implicit self reference outside of a method");
+        }
+
+        public static Diagnostic SelfOutsideMethod(CodeFile file, TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6008,
+                $"Can't use `self` outside of a method");
+        }
     }
 }

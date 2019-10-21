@@ -506,14 +506,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
                     return methodInvocation.Type;
                 }
-                case IAssociatedFunctionInvocationExpressionSyntax associatedFunctionInvocation:
-
+                case IAssociatedFunctionInvocationExpressionSyntax _:
                     throw new NotImplementedException();
                 case IFunctionInvocationExpressionSyntax functionInvocation:
                     return InferFunctionInvocationType(functionInvocation);
                 case IUnsafeExpressionSyntax unsafeExpression:
-                    InferType(ref unsafeExpression.Expression);
-                    return unsafeExpression.Type = unsafeExpression.Expression.Type;
+                    return unsafeExpression.Type = InferType(ref unsafeExpression.Expression);
                 case IIfExpressionSyntax ifExpression:
                     CheckType(ref ifExpression.Condition, DataType.Bool);
                     InferBlockType(ifExpression.ThenBlock);
@@ -537,18 +535,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return ifExpression.Type = DataType.Void;
                 case IMemberAccessExpressionSyntax memberAccess:
                 {
-                    var left = InferType(ref memberAccess.Expression);
-                    var symbol = GetSymbolForType(left);
-
-                    switch (memberAccess.Member)
+                    DataType targetType;
+                    if (memberAccess.Expression == null)
                     {
-                        case INameExpressionSyntax identifier:
-                            var memberSymbols = symbol.Lookup(identifier.Name).OfType<IBindingSymbol>().ToFixedList();
-                            var type = AssignReferencedSymbolAndType(identifier, memberSymbols);
-                            return memberAccess.Type = type;
-                        default:
-                            throw NonExhaustiveMatchException.For(memberAccess.Member);
+                        if (selfType == null)
+                        {
+                            diagnostics.Add(SemanticError.ImplicitSelfOutsideMethod(file, memberAccess.Span.AtStart()));
+                            targetType = DataType.Unknown;
+                        }
+                        else
+                            targetType = selfType;
                     }
+                    else
+                        targetType = InferType(ref memberAccess.Expression);
+
+                    var symbol = GetSymbolForType(targetType);
+                    var member = memberAccess.Member;
+                    var memberSymbols = symbol.Lookup(member.Name).OfType<IBindingSymbol>().ToFixedList();
+                    var type = AssignReferencedSymbolAndType(member, memberSymbols);
+                    return memberAccess.Type = type;
                 }
                 case IBreakExpressionSyntax breakExpression:
                     InferType(ref breakExpression.Value);
@@ -567,6 +572,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return assignmentExpression.Type = DataType.Void;
                 }
                 case ISelfExpressionSyntax selfExpression:
+                    if (selfType == null)
+                        diagnostics.Add(SemanticError.SelfOutsideMethod(file, selfExpression.Span));
                     return selfExpression.Type = selfType ?? DataType.Unknown;
                 case INoneLiteralExpressionSyntax noneLiteralExpression:
                     return noneLiteralExpression.Type = DataType.None;
