@@ -195,7 +195,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             switch (assignmentToken)
             {
                 default:
-                    throw NonExhaustiveMatchException.For(assignmentToken);
+                    throw ExhaustiveMatch.Failed(assignmentToken);
                 case IEqualsToken _:
                     return AssignmentOperator.Simple;
                 case IPlusEqualsToken _:
@@ -214,7 +214,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             switch (accessOperatorToken)
             {
                 default:
-                    throw NonExhaustiveMatchException.For(accessOperatorToken);
+                    throw ExhaustiveMatch.Failed(accessOperatorToken);
                 case IDotToken _:
                     return AccessOperator.Standard;
                 case IQuestionDotToken _:

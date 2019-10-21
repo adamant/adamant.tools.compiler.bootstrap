@@ -4,6 +4,7 @@ using System.Runtime.Serialization;
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
     [Serializable]
+    [Obsolete("Use ExhaustiveMatch.Failed() instead")]
     public class NonExhaustiveMatchException : Exception
     {
         private NonExhaustiveMatchException(string message)
