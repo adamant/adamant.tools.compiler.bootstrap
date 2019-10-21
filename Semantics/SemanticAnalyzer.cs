@@ -95,6 +95,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // Basic Analysis includes: Name Binding, Type Checking, Constant Folding
             new BasicAnalyzer(diagnostics).Check(entities);
 
+            // If there are errors from the basic analysis phase, don't continue on
+            diagnostics.ThrowIfFatalErrors();
+
 #if DEBUG
             new TypeFulfillmentValidator().Walk(entities);
             new NoUpgradableMutabilityTypesValidator().Walk(entities);

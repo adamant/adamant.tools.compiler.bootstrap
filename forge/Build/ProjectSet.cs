@@ -81,10 +81,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             }
             projectBuildsSource.SetResult(projectBuilds.ToFixedDictionary());
 
-            await Task.WhenAll(projectBuilds.Values);
+            await Task.WhenAll(projectBuilds.Values).ConfigureAwait(false);
         }
 
-        private static async Task<Package> Build(
+        private static async Task<Package?> Build(
             AdamantCompiler compiler,
             Project project,
             Task<FixedDictionary<Project, Task<Package>>> projectBuildsTask,
@@ -104,26 +104,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
                 Console.WriteLine($"Compiling {project.Name} ({project.Path})...");
             }
             var codeFiles = sourcePaths.Select(p => LoadCode(p, sourceDir, project.RootNamespace)).ToList();
-            var package = compiler.CompilePackage(project.Name, codeFiles, references.ToFixedDictionary());
-            // TODO switch to the async version of the compiler
-            //var codeFiles = sourcePaths.Select(p => new CodePath(p)).ToList();
-            //var references = project.References.ToDictionary(r => r.Name, r => projectBuilds[r.Project]);
-            //var package = await compiler.CompilePackageAsync(project.Name, codeFiles, references);
-            if (OutputDiagnostics(project, package, consoleLock))
-                return package;
-
-            var cacheDir = PrepareCacheDir(project);
-            var codePath = EmitCode(project, package, cacheDir);
-            var success = CompileCode(project, cacheDir, codePath, consoleLock);
-
-            lock (consoleLock)
+            try
             {
-                Console.WriteLine(success
-                    ? $"Build SUCCEEDED {project.Name} ({project.Path})"
-                    : $"Build FAILED {project.Name} ({project.Path})");
-            }
+                var package = compiler.CompilePackage(project.Name, codeFiles, references.ToFixedDictionary());
+                // TODO switch to the async version of the compiler
+                //var codeFiles = sourcePaths.Select(p => new CodePath(p)).ToList();
+                //var references = project.References.ToDictionary(r => r.Name, r => projectBuilds[r.Project]);
+                //var package = await compiler.CompilePackageAsync(project.Name, codeFiles, references);
 
-            return package;
+                if (OutputDiagnostics(project, package.Diagnostics, consoleLock))
+                    return package;
+
+                var cacheDir = PrepareCacheDir(project);
+                var codePath = EmitCode(project, package, cacheDir);
+                var success = CompileCode(project, cacheDir, codePath, consoleLock);
+
+                lock (consoleLock)
+                {
+                    Console.WriteLine(success
+                        ? $"Build SUCCEEDED {project.Name} ({project.Path})"
+                        : $"Build FAILED {project.Name} ({project.Path})");
+                }
+
+                return package;
+            }
+            catch (FatalCompilationErrorException ex)
+            {
+                OutputDiagnostics(project, ex.Diagnostics, consoleLock);
+                return null;
+            }
         }
 
         private static CodeFile LoadCode(
@@ -151,12 +160,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             return cacheDir;
         }
 
-        private static bool OutputDiagnostics(
-            Project project,
-            Package package,
-            object consoleLock)
+        private static bool OutputDiagnostics(Project project, FixedList<Diagnostic> diagnostics, object consoleLock)
         {
-            var diagnostics = package.Diagnostics;
             if (!diagnostics.Any())
                 return false;
             lock (consoleLock)
