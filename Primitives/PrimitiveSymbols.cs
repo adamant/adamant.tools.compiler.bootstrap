@@ -32,6 +32,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 
                 BuildIntegerTypeSymbol(DataType.Size, stringType),
                 BuildIntegerTypeSymbol(DataType.Offset, stringType),
+
+                PrimitiveTypeSymbol.NewEmptyType(DataType.Void),
+                PrimitiveTypeSymbol.NewEmptyType(DataType.Never),
             }.ToFixedList();
         }
 

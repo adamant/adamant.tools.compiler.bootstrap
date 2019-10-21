@@ -17,6 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             switch (type)
             {
                 case VoidType _:
+                case NeverType _:
                     return "void";
                 case SimpleType simpleType:
                     return nameMangler.Mangle(simpleType.Name);

@@ -148,7 +148,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 return actualType;
             // TODO check for type compatibility not equality
             // Type checking doesn't concern itself with lifetimes
-            if (!expectedType.EqualExceptLifetime(actualType))
+            if (!IsAssignableFrom(expectedType, actualType))
                 diagnostics.Add(TypeError.CannotConvert(file, expression, actualType, expectedType));
             return actualType;
         }
@@ -734,7 +734,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         /// </summary>
         private static bool IsAssignableFrom(DataType target, DataType source, bool allowUpgrade = false)
         {
-            if (target.Equals(source))
+            if (target.Equals(source) || source is UnknownType || target is UnknownType)
                 return true;
             if (target is UserObjectType targetReference && source is UserObjectType sourceReference)
             {

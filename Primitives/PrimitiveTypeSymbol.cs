@@ -39,6 +39,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             return new PrimitiveTypeSymbol(type.Name, type, childSymbols);
         }
 
+        public static PrimitiveTypeSymbol NewEmptyType(EmptyType type)
+        {
+            return new PrimitiveTypeSymbol(type.Name, type);
+        }
+
         public static PrimitiveTypeSymbol New(Name fullName, DataType? type = null)
         {
             return new PrimitiveTypeSymbol(fullName, type);
