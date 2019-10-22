@@ -1,18 +1,19 @@
+using System;
 using System.Collections.Generic;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
     public class TextLines
     {
-        public readonly string Text; // TODO don't keep a reference to the whole string, we only need the length
         public int Count => startOfLine.Count;
-        public readonly IReadOnlyList<int> StartOfLine;
+        public IReadOnlyList<int> StartOfLine { get; }
+        // Keep the original list since read only list doesn't have binary search
         private readonly List<int> startOfLine;
+        private readonly int textLength;
 
         public TextLines(string text)
         {
-            Text = text;
+            textLength = text.Length;
             startOfLine = LineStarts(text);
             StartOfLine = startOfLine.AsReadOnly();
         }
@@ -39,11 +40,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
                         position += 1;
                 }
                 else if (c == '\n'
-                         || c == '\x0B'
+                         || c == '\x0B' // vertical tab
                          || c == '\f'
-                         || c == '\x85')
-                // || c == '\u2028'
-                // || c == '\u2029'
+                         || c == '\x85' // next line
+                         || c == '\u2028' // line separator
+                         || c == '\u2029') // paragraph separator
                 {
                     // Do Nothing
                 }
@@ -61,9 +62,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
         /// </summary>
         public int LineIndexContainingOffset(int charOffset)
         {
-            Requires.InString(Text, nameof(charOffset), charOffset);
+            // Start is allowed to be equal to length to allow for a zero length span after the last character
+            if (charOffset < 0 || charOffset > textLength)
+                throw new ArgumentOutOfRangeException(nameof(charOffset), charOffset,
+                    $"Character offset not in text lines of length {textLength}");
+
             var searchResult = startOfLine.BinarySearch(charOffset);
-            // TODO not sure this is right
             if (searchResult < 0)
             {
                 // Not found, bitwise complement of next larger element

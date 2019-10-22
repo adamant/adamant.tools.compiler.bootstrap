@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -38,6 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
         private static readonly Regex ExitCodePattern = new Regex(@"//[ \t]*exit code: (?<exitCode>\d+)", RegexOptions.Compiled);
         private const string ExpectedOutputFileFormat = @"//[ \t]*{0} file: (?<file>[a-zA-Z0-9_.]+)";
         private const string ExpectedOutputFormat = @"\/\*[ \t]*{0}:\r?\n(?<output>(\*+[^/]|[^*])*)\*\/";
+        private static readonly Regex ExpectCompileErrorsPattern = new Regex(@"//[ \t]*compile: errors", RegexOptions.Compiled);
         private static readonly Regex ErrorPattern = new Regex(@"//[ \t]*ERROR([ \t].*)?", RegexOptions.Compiled | RegexOptions.Multiline);
 
         [Theory]
@@ -149,6 +151,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             FixedList<Diagnostic> diagnostics)
         {
             // Check for compiler errors
+            var expectCompileErrors = ExpectCompileErrors(code);
             var expectedCompileErrorLines = ExpectedCompileErrorLines(codeFile, code);
 
             if (diagnostics.Any())
@@ -179,14 +182,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
                 }
             }
 
-            foreach (var error in errorDiagnostics)
-            {
-                var errorLine = error.StartPosition.Line;
-                if (expectedCompileErrorLines.All(line => line != errorLine))
-                    Assert.True(false, $"Unexpected error on line {error.StartPosition.Line}");
-            }
+            if (expectCompileErrors)
+                Assert.True(errorDiagnostics.Any(), "Expected compilation errors and there were none");
+            else
+                foreach (var error in errorDiagnostics)
+                {
+                    var errorLine = error.StartPosition.Line;
+                    if (expectedCompileErrorLines.All(line => line != errorLine))
+                        Assert.True(false, $"Unexpected error on line {error.StartPosition.Line}");
+                }
 
             return errorDiagnostics;
+        }
+
+        private static bool ExpectCompileErrors(string code)
+        {
+            return ExpectCompileErrorsPattern.IsMatch(code);
         }
 
         private static List<int> ExpectedCompileErrorLines(CodeFile codeFile, string code)
@@ -232,7 +243,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
         private static int ExpectedExitCode(string code)
         {
             var exitCode = ExitCodePattern.Match(code).Groups["exitCode"]?.Captures.SingleOrDefault()?.Value ?? "0";
-            return int.Parse(exitCode);
+            return int.Parse(exitCode, CultureInfo.InvariantCulture);
         }
 
         private static string ExpectedOutput(
