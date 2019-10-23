@@ -126,7 +126,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
                 foreach (var diagnostic in ex.Diagnostics)
                 {
                     testOutput.WriteLine(
-                        $"{testCase.RelativeCodePath}:{diagnostic.StartPosition.Line}:{diagnostic.StartPosition.Column} {diagnostic.Level} {diagnostic.ErrorCode}");
+                        $"{diagnostic.File.Reference}:{diagnostic.StartPosition.Line}:{diagnostic.StartPosition.Column} {diagnostic.Level} {diagnostic.ErrorCode}");
                     testOutput.WriteLine(diagnostic.Message);
                 }
                 Assert.True(false, "Compilation errors in standard library");
