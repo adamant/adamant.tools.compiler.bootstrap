@@ -38,13 +38,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
                 PrimitiveTypeSymbol.NewEmptyType(DataType.Never),
 
                 // Intrinsic functions used by the standard library
-                PrimitiveFunctionSymbol.New(Name.From("intrinsics.mem_allocate"), DataType.Size, ("length", DataType.Size)),
-                PrimitiveFunctionSymbol.New(Name.From("intrinsics.mem_deallocate"), ("ptr", DataType.Size)),
-                PrimitiveFunctionSymbol.New(Name.From("intrinsics.mem_copy"),
+                PrimitiveFunctionSymbol.New(Name.From("intrinsics", "mem_allocate"), DataType.Size, ("length", DataType.Size)),
+                PrimitiveFunctionSymbol.New(Name.From("intrinsics", "mem_deallocate"), ("ptr", DataType.Size)),
+                PrimitiveFunctionSymbol.New(Name.From("intrinsics", "mem_copy"),
                     ("from_ptr", DataType.Size), ("to_ptr", DataType.Size), ("length", DataType.Size)),
-                PrimitiveFunctionSymbol.New(Name.From("intrinsics.mem_set_byte"), ("ptr", DataType.Size), ("value", DataType.Byte)),
-                PrimitiveFunctionSymbol.New(Name.From("intrinsics.mem_get_byte"), DataType.Byte, ("ptr", DataType.Size)),
-                PrimitiveFunctionSymbol.New(Name.From("intrinsics.print_utf8_bytes"), ("ptr", DataType.Size), ("length", DataType.Size)),
+                PrimitiveFunctionSymbol.New(Name.From("intrinsics", "mem_set_byte"), ("ptr", DataType.Size), ("value", DataType.Byte)),
+                PrimitiveFunctionSymbol.New(Name.From("intrinsics", "mem_get_byte"), DataType.Byte, ("ptr", DataType.Size)),
+                PrimitiveFunctionSymbol.New(Name.From("intrinsics", "print_utf8_bytes"), ("ptr", DataType.Size), ("length", DataType.Size)),
             }.ToFixedList();
         }
 
