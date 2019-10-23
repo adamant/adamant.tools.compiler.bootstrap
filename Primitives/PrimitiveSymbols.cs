@@ -21,9 +21,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             Instance = new List<ISymbol>
             {
                 StringSymbol,
-                BuildPrintStringSymbol(stringType),
-                BuildReadStringSymbol(stringType),
+                PrimitiveFunctionSymbol.New(Name.From("print_string"), ("s", stringType)),
+                PrimitiveFunctionSymbol.New(Name.From("read_string"), stringType),
 
+                // Simple Types
                 BuildBoolSymbol(),
 
                 BuildIntegerTypeSymbol(DataType.Byte, stringType),
@@ -35,6 +36,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 
                 PrimitiveTypeSymbol.NewEmptyType(DataType.Void),
                 PrimitiveTypeSymbol.NewEmptyType(DataType.Never),
+
+                // Intrinsic functions used by the standard library
+                PrimitiveFunctionSymbol.New(Name.From("intrinsics.mem_allocate"), DataType.Size, ("length", DataType.Size)),
+                PrimitiveFunctionSymbol.New(Name.From("intrinsics.mem_deallocate"), ("ptr", DataType.Size)),
+                PrimitiveFunctionSymbol.New(Name.From("intrinsics.mem_copy"),
+                    ("from_ptr", DataType.Size), ("to_ptr", DataType.Size), ("length", DataType.Size)),
+                PrimitiveFunctionSymbol.New(Name.From("intrinsics.mem_set_byte"), ("ptr", DataType.Size), ("value", DataType.Byte)),
+                PrimitiveFunctionSymbol.New(Name.From("intrinsics.mem_get_byte"), DataType.Byte, ("ptr", DataType.Size)),
+                PrimitiveFunctionSymbol.New(Name.From("intrinsics.print_utf8_bytes"), ("ptr", DataType.Size), ("length", DataType.Size)),
             }.ToFixedList();
         }
 
@@ -57,18 +67,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             concatFunc.SetParameters(("self", stringType), ("other", stringType));
             concatFunc.ReturnType = stringType;
             return stringSymbol;
-        }
-
-        private static ISymbol BuildPrintStringSymbol(DataType stringType)
-        {
-            var name = new SimpleName("print_string");
-            return PrimitiveFunctionSymbol.New(name, ("s", stringType));
-        }
-
-        private static ISymbol BuildReadStringSymbol(DataType stringType)
-        {
-            var name = new SimpleName("read_string");
-            return PrimitiveFunctionSymbol.New(name, stringType);
         }
 
         private static ISymbol BuildBoolSymbol()
