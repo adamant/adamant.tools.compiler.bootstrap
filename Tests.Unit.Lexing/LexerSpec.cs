@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
         [Theory]
         [InlineData("hello", "hello")]
         [InlineData(@"\class", "class")]
-        // TODO [InlineData(@"\""Hello World!""", "Hello World!", Skip = "Escaped String Identifiers Not Implemented")]
+        [InlineData(@"\""Hello World!""", "Hello World!", Skip = "Escaped String Identifiers Not Implemented")]
         public void Identifier_value(string identifier, string value)
         {
             var result = Lex(identifier);
