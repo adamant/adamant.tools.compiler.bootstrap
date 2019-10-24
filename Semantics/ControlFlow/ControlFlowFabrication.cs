@@ -19,6 +19,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
     /// </summary>
     public class ControlFlowFabrication
     {
+        private readonly IConcreteCallableDeclarationSyntax callable;
+        private readonly DataType? selfType;
+        private readonly DataType returnType;
         private readonly ControlFlowGraphBuilder graph;
 
         /// <summary>
@@ -37,102 +40,60 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         /// </summary>
         private BlockBuilder? continueToBlock;
 
+        /// <summary>
+        /// The next available scope number
+        /// </summary>
         private Scope nextScope;
         private readonly Stack<Scope> scopes = new Stack<Scope>();
         private Scope CurrentScope => scopes.Peek();
-        private DataType? returnType;
 
-        public ControlFlowFabrication(CodeFile file)
+        public ControlFlowFabrication(IConcreteCallableDeclarationSyntax callable)
         {
-            graph = new ControlFlowGraphBuilder(file);
+            this.callable = callable;
+            graph = new ControlFlowGraphBuilder(callable.File);
             // We start in the outer scope and need that on the stack
             var scope = Scope.Outer;
             scopes.Push(scope);
             nextScope = scope.Next();
-        }
-
-        public ControlFlowGraph CreateGraph(IConcreteMethodDeclarationSyntax method)
-        {
-            returnType = method.ReturnType.Known();
-
-            // Temp Variable for return
-            graph.AddReturnVariable(method.ReturnType.Known());
-
-            // TODO don't emit temp variables for unused parameters
-            foreach (var parameter in method.Parameters.Where(p => !p.Unused))
-                graph.AddParameter(parameter.IsMutableBinding, parameter.Type.Fulfilled(),
-                    CurrentScope, parameter.Name.UnqualifiedName);
-
-            currentBlock = graph.NewBlock();
-            breakToBlock = null;
-            foreach (var statement in method.Body.Statements)
-                ConvertToStatement(statement);
-
-            // Generate the implicit return statement
-            if (currentBlock != null && !currentBlock.IsTerminated)
+            switch (callable)
             {
-                var span = method.Span.AtEnd();
-                EndScope(span);
-                currentBlock.AddReturn(span,
-                    Scope.Outer); // We officially ended the outer scope, but this is in it
+                default:
+                    throw ExhaustiveMatch.Failed(callable);
+                case IConcreteMethodDeclarationSyntax method:
+                    returnType = method.ReturnType.Known();
+                    break;
+                case IConstructorDeclarationSyntax constructor:
+                    selfType = constructor.SelfParameterType ?? throw new InvalidOperationException("Constructor doesn't have self parameter type");
+                    returnType = constructor.DeclaringClass.DeclaresType.Fulfilled();
+                    break;
+                case IFunctionDeclarationSyntax function:
+                    returnType = function.ReturnType.Known();
+                    break;
             }
-
-            return graph.Build();
         }
 
-        public ControlFlowGraph CreateGraph(IConstructorDeclarationSyntax constructor)
+        public ControlFlowGraph CreateGraph()
         {
-            returnType = constructor.DeclaringClass.DeclaresType.Fulfilled();
-
             // Temp Variable for return
-            graph.AddSelfParameter(constructor.SelfParameterType);
+            if (selfType != null) graph.AddSelfParameter(selfType);
+            else graph.AddReturnVariable(returnType);
 
             // TODO don't emit temp variables for unused parameters
-            foreach (var parameter in constructor.Parameters.Where(p => !p.Unused))
-                graph.AddParameter(parameter.IsMutableBinding, parameter.Type.Fulfilled(),
-                    CurrentScope, parameter.Name.UnqualifiedName);
+            foreach (var parameter in callable.Parameters.Where(p => !p.Unused))
+                graph.AddParameter(parameter.IsMutableBinding, parameter.Type.Fulfilled(), CurrentScope,
+                    parameter.Name.UnqualifiedName);
 
             currentBlock = graph.NewBlock();
             breakToBlock = null;
-            foreach (var statement in constructor.Body.Statements)
+            foreach (var statement in callable.Body.Statements)
                 ConvertToStatement(statement);
 
             // Generate the implicit return statement
             if (currentBlock != null && !currentBlock.IsTerminated)
             {
-                var span = constructor.Span.AtEnd();
+                var span = callable.Span.AtEnd();
                 EndScope(span);
-                currentBlock.AddReturn(span,
-                    Scope.Outer); // We officially ended the outer scope, but this is in it
-            }
-
-            return graph.Build();
-        }
-
-        public ControlFlowGraph CreateGraph(IFunctionDeclarationSyntax method)
-        {
-            returnType = method.ReturnType.Known();
-
-            // Temp Variable for return
-            graph.AddReturnVariable(method.ReturnType.Known());
-
-            // TODO don't emit temp variables for unused parameters
-            foreach (var parameter in method.Parameters.Where(p => !p.Unused))
-                graph.AddParameter(parameter.IsMutableBinding, parameter.Type.Fulfilled(),
-                    CurrentScope, parameter.Name.UnqualifiedName);
-
-            currentBlock = graph.NewBlock();
-            breakToBlock = null;
-            foreach (var statement in method.Body.Statements)
-                ConvertToStatement(statement);
-
-            // Generate the implicit return statement
-            if (currentBlock != null && !currentBlock.IsTerminated)
-            {
-                var span = method.Span.AtEnd();
-                EndScope(span);
-                currentBlock.AddReturn(span,
-                    Scope.Outer); // We officially ended the outer scope, but this is in it
+                currentBlock.AddReturn(span, Scope.Outer); // We officially ended the outer scope, but this is in it
             }
 
             return graph.Build();
