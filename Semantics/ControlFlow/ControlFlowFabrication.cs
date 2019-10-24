@@ -64,7 +64,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     break;
                 case IConstructorDeclarationSyntax constructor:
                     selfType = constructor.SelfParameterType ?? throw new InvalidOperationException("Constructor doesn't have self parameter type");
-                    returnType = constructor.DeclaringClass.DeclaresType.Fulfilled();
+                    returnType = DataType.Void; // the body should `return;`
                     break;
                 case IFunctionDeclarationSyntax function:
                     returnType = function.ReturnType.Known();
@@ -78,10 +78,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             if (selfType != null) graph.AddSelfParameter(selfType);
             else graph.AddReturnVariable(returnType);
 
-            // TODO don't emit temp variables for unused parameters
             foreach (var parameter in callable.Parameters.Where(p => !p.Unused))
-                graph.AddParameter(parameter.IsMutableBinding, parameter.Type.Fulfilled(), CurrentScope,
-                    parameter.Name.UnqualifiedName);
+                graph.AddParameter(parameter.IsMutableBinding, parameter.Type.Fulfilled(), CurrentScope, parameter.Name.UnqualifiedName);
 
             currentBlock = graph.NewBlock();
             breakToBlock = null;
@@ -106,7 +104,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         }
 
         /// <summary>
-        /// An exist point for the current scope that doesn't end it. For example, a break statement
+        /// An exit point for the current scope that doesn't end it. For example, a break statement
         /// </summary>
         private void ExitScope(TextSpan span)
         {
@@ -136,6 +134,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 var variableSemantics = graph[assignTo.Variable].Type.ValueSemantics;
                 switch (variableSemantics)
                 {
+                    default:
+                        throw ExhaustiveMatch.Failed(variableSemantics);
                     case ValueSemantics.Own:
                         // They are both own, no problems
                         break;
@@ -150,18 +150,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     case ValueSemantics.Empty:
                     case ValueSemantics.Copy:
                         throw new NotImplementedException();
-                    default:
-                        throw ExhaustiveMatch.Failed(variableSemantics);
                 }
             }
 
-            currentBlock.AddAssignment(place, value, span, CurrentScope);
+            currentBlock!.AddAssignment(place, value, span, CurrentScope);
         }
 
         private VariableReference AssignToTemp(DataType type, IValue value)
         {
             var tempVariable = graph.Let(type.AssertKnown(), CurrentScope);
-            currentBlock.AddAssignment(tempVariable.LValueReference(value.Span), value, value.Span,
+            currentBlock!.AddAssignment(tempVariable.LValueReference(value.Span), value, value.Span,
                 CurrentScope);
             return tempVariable.Reference(value.Span);
         }
@@ -170,11 +168,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         {
             switch (statement)
             {
+                default:
+                    throw ExhaustiveMatch.Failed(statement);
                 case IVariableDeclarationStatementSyntax variableDeclaration:
                 {
                     var variable = graph.AddVariable(variableDeclaration.IsMutableBinding,
-                        variableDeclaration.Type, CurrentScope,
-                        variableDeclaration.Name.UnqualifiedName);
+                        variableDeclaration.Type ?? throw new InvalidOperationException("Variable declaration doesn't have type"),
+                        CurrentScope, variableDeclaration.Name.UnqualifiedName);
                     if (variableDeclaration.Initializer != null)
                     {
                         var value = ConvertToValue(variableDeclaration.Initializer);
@@ -207,8 +207,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
                     return;
                 }
-                default:
-                    throw NonExhaustiveMatchException.For(statement);
+                case IResultStatementSyntax _:
+                    throw new NotImplementedException();
             }
         }
 
@@ -249,6 +249,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         {
             switch (expression)
             {
+                default:
+                    throw NonExhaustiveMatchException.For(expression);
                 case IUnaryOperatorExpressionSyntax _:
                 case IBinaryOperatorExpressionSyntax _:
                     throw new NotImplementedException();
@@ -472,8 +474,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 //    ConvertExpressionToStatement(resultExpression.Expression);
                 //    ExitScope(resultExpression.Span.AtEnd());
                 //    return;
-                default:
-                    throw NonExhaustiveMatchException.For(expression);
             }
         }
 
@@ -565,20 +565,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     var operand = ConvertToOperand(implicitImmutabilityConversion.Expression);
                     switch (operand)
                     {
+                        default:
+                            throw NonExhaustiveMatchException.For(expression);
                         //case BooleanConstant _:
                         //case Utf8BytesConstant _:
                         //case IntegerConstant _:
                         //    return operand;
-                        case Dereference _:
-                            throw new NotImplementedException();
                         case VariableReference varReference:
                             if (implicitImmutabilityConversion.Type.ValueSemantics
                                 == ValueSemantics.Own)
                                 return varReference.AsOwn(implicitImmutabilityConversion.Span);
                             else
                                 return varReference.AsAlias();
-                        default:
-                            throw NonExhaustiveMatchException.For(expression);
                     }
                 }
                 case ISelfExpressionSyntax selfExpression:

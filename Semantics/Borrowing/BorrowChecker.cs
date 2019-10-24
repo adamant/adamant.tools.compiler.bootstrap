@@ -386,6 +386,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         {
             switch (operand)
             {
+                default:
+                    throw ExhaustiveMatch.Failed(operand);
                 case VariableReference varRef:
                 {
                     var lifetimeReferenced = outstandingClaims.LifetimeOf(varRef.Variable);
@@ -394,6 +396,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     var lifetime = lifetimeReferenced.Value;
                     switch (varRef.ValueSemantics)
                     {
+                        default:
+                            throw ExhaustiveMatch.Failed(varRef.ValueSemantics);
                         case ValueSemantics.Borrow:
                         {
                             if (outstandingClaims.IsAliased(lifetime))
@@ -448,18 +452,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                         case ValueSemantics.Move:
                         case ValueSemantics.Copy:
                             throw new NotImplementedException();
-                        default:
-                            throw ExhaustiveMatch.Failed(varRef.ValueSemantics);
+
                     }
                 }
                 break;
-                case IPlace _:
-                    throw new NotImplementedException();
                 case Constant _:
                     // no claims to acquire
                     break;
-                default:
-                    throw NonExhaustiveMatchException.For(operand);
+                case Dereference _:
+                    throw new NotImplementedException();
             }
         }
 

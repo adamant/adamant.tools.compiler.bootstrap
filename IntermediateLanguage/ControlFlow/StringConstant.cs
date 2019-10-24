@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     {
         public static readonly Encoding Encoding = new UTF8Encoding(false);
 
-        public readonly string Value;
+        public string Value { get; }
 
         public StringConstant(string value, TextSpan span, DataType type)
             : base(type, span)

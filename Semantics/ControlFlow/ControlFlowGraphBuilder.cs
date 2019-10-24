@@ -25,11 +25,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             this.file = file;
         }
 
-        public ControlFlowGraphBuilder(FixedList<VariableDeclaration> variables)
-        {
-            this.variables = variables.ToList();
-        }
-
         public VariableDeclaration AddVariable(bool mutableBinding, DataType type, Scope scope, SimpleName? name = null)
         {
             var variable = new VariableDeclaration(false, mutableBinding, type, new Variable(variables.Count), scope, name);

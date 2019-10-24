@@ -4,7 +4,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public struct Variable : IClaimHolder
     {
-        public readonly int Number;
+        public int Number { get; }
         public string Name => Number == 0 ? "result" : Number.ToString();
 
         public Variable(int number)

@@ -18,7 +18,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         typeof(ConstructorCall),
         typeof(VirtualFunctionCall),
         typeof(DeclaredValue),
-        typeof(Dereference),
         typeof(UnaryOperation),
         typeof(VariableReference))]
     public abstract class Value : IValue

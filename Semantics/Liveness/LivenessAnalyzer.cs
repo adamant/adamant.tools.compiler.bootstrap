@@ -6,6 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
 {
@@ -104,6 +105,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
         {
             switch (lvalue)
             {
+                default:
+                    throw ExhaustiveMatch.Failed(lvalue);
                 case Dereference dereference:
                     KillVariables(variables, dereference.DereferencedValue);
                     break;
@@ -113,8 +116,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
                 case FieldAccess fieldAccess:
                     EnlivenVariables(variables, fieldAccess.Expression);
                     break;
-                default:
-                    throw NonExhaustiveMatchException.For(lvalue);
             }
         }
         private static void EnlivenVariables(BitArray variables, IValue value)
