@@ -42,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         public VariableDeclaration AddSelfParameter(DataType type)
         {
             Requires.That("variableNumber", variables.Count == 0, "Self parameter must have variable number 0");
-            var variable = new VariableDeclaration(true, false, type, new Variable(variables.Count), null, SpecialName.Self);
+            var variable = new VariableDeclaration(true, false, type, Variable.Result, null, SpecialName.Self);
             variables.Add(variable);
             return variable;
         }
@@ -50,7 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         public VariableDeclaration AddReturnVariable(DataType type)
         {
             Requires.That("variableNumber", variables.Count == 0, "Return variable must have variable number 0");
-            var variable = new VariableDeclaration(false, false, type, new Variable(variables.Count), null);
+            var variable = new VariableDeclaration(false, false, type, Variable.Result, null);
             variables.Add(variable);
             return variable;
         }
