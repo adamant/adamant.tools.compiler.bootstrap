@@ -21,9 +21,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         DataType IBindingSymbol.Type => Type.Fulfilled();
-        [DebuggerHidden]
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        SymbolSet ISymbol.ChildSymbols => SymbolSet.Empty;
 
         protected ParameterSyntax(TextSpan span, bool isMutableBinding, Name fullName)
             : base(span)

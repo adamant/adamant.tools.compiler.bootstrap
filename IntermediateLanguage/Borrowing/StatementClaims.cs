@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
     /// </summary>
     public class StatementClaims
     {
-        public readonly Claims ParameterClaims;
+        public Claims ParameterClaims { get; }
         private readonly Dictionary<Statement, Claims> claimsAfter = new Dictionary<Statement, Claims>();
 
         public StatementClaims(Claims parameterClaims)

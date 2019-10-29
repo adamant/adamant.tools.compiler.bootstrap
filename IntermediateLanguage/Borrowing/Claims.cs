@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
@@ -9,6 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
     /// <summary>
     /// A list of claims outstanding
     /// </summary>
+    [SuppressMessage("Naming", "CA1724:Type names should not match namespaces", Justification = "Obscure system namespace")]
     public class Claims
     {
         private readonly List<Claim> claimsList = new List<Claim>();

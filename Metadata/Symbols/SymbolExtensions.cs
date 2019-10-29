@@ -1,5 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
 {
@@ -15,10 +16,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
         public static FixedList<ISymbol> Lookup(this ISymbol symbol, SimpleName name)
         {
             if (symbol == UnknownSymbol.Instance) return UnknownSymbolList;
-
-            return symbol.ChildSymbols.TryGetValue(name, out var childSymbols)
-                    ? childSymbols
-                    : FixedList<ISymbol>.Empty;
+            switch (symbol)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(symbol);
+                case IParentSymbol parentSymbol:
+                    return parentSymbol.ChildSymbols.TryGetValue(name, out var childSymbols)
+                        ? childSymbols
+                        : FixedList<ISymbol>.Empty;
+                case IBindingSymbol _:
+                    return FixedList<ISymbol>.Empty;
+            }
         }
     }
 }

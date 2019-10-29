@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         typeof(BooleanConstant))]
     public abstract class Constant : Value, IOperand
     {
-        public readonly DataType Type;
+        public DataType Type { get; }
 
         protected Constant(DataType type, TextSpan span)
             : base(span)

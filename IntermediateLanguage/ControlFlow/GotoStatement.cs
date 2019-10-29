@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class GotoStatement : BlockTerminatorStatement
     {
-        public readonly BasicBlockName GotoBlock;
+        public BasicBlockName GotoBlock { get; }
 
         public GotoStatement(BasicBlockName gotoBlock, TextSpan span, Scope scope)
             : base(span, scope)

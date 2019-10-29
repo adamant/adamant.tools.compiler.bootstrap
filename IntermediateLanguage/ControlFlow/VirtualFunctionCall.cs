@@ -7,9 +7,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class VirtualFunctionCall : Value
     {
-        public readonly SimpleName FunctionName;
-        public readonly IOperand Self;
-        public readonly FixedList<IOperand> Arguments;
+        public SimpleName FunctionName { get; }
+        public IOperand Self { get; }
+        public FixedList<IOperand> Arguments { get; }
 
         public VirtualFunctionCall(
             TextSpan span,

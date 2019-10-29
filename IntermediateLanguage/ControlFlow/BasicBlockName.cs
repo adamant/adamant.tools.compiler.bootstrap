@@ -1,8 +1,10 @@
+using System;
+
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
-    public struct BasicBlockName
+    public struct BasicBlockName : IEquatable<BasicBlockName>
     {
-        public readonly int Number;
+        public int Number { get; }
 
         public BasicBlockName(int number)
         {
@@ -16,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 
         public override bool Equals(object? obj)
         {
-            return obj is BasicBlockName other && Equals(other);
+            return obj is BasicBlockName other && Number == other.Number;
         }
 
         public static bool operator ==(BasicBlockName a, BasicBlockName b)

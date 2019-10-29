@@ -6,7 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class IntegerConstant : Constant
     {
-        public readonly BigInteger Value;
+        public BigInteger Value { get; }
 
         public IntegerConstant(BigInteger value, DataType type, TextSpan span)
             : base(type, span)

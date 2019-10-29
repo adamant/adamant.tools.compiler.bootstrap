@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public VariableDeclaration ReturnVariable => VariableDeclarations[0];
         public DataType ReturnType => ReturnVariable.Type;
         public FixedList<BasicBlock> BasicBlocks { get; }
-        public BasicBlock EntryBlock => BasicBlocks.First();
+        public BasicBlock EntryBlock => BasicBlocks[0];
         public IEnumerable<BasicBlock> ExitBlocks => BasicBlocks.Where(b => b.Terminator is ReturnStatement);
         public Edges Edges { get; }
 

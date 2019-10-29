@@ -1,10 +1,12 @@
+using System;
+
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
-    public struct Scope
+    public struct Scope : IEquatable<Scope>
     {
         private readonly int number;
 
-        public static Scope Outer = new Scope(0);
+        public static readonly Scope Outer = new Scope(0);
 
         private Scope(int number)
         {
@@ -33,10 +35,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             return number.GetHashCode();
         }
 
+        public bool Equals(Scope other)
+        {
+            return this.number == other.number;
+        }
+
         public override bool Equals(object? obj)
         {
-            var other = obj as Scope?;
-            return this == other;
+            return obj is Scope other && this.number == other.number;
         }
     }
 }

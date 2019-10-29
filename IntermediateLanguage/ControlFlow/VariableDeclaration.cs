@@ -9,22 +9,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         /// <summary>
         /// Which IL variable is being declared
         /// </summary>
-        public readonly Variable Variable;
+        public Variable Variable { get; }
 
         /// <summary>
         /// What scope is this variable in. The %result or self parameter of a
         /// constructor don't have scopes.
         /// </summary>
-        public readonly Scope? Scope;
+        public Scope? Scope { get; }
 
         /// <summary>
         /// If this declaration corresponds to an argument or local variable,
         /// what it was named. Not guaranteed unique
         /// </summary>
-        public readonly SimpleName? Name;
-        public readonly bool IsParameter;
-        public readonly bool IsMutableBinding;
-        public readonly DataType Type;
+        public SimpleName? Name { get; }
+        public bool IsParameter { get; }
+        public bool IsMutableBinding { get; }
+        public DataType Type { get; }
         public bool TypeIsNotEmpty => !Type.IsEmpty;
 
         // TODO does this make sense? shouldn't the default reference kind always be Share?

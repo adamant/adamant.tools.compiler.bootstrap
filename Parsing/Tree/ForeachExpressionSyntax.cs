@@ -38,10 +38,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public IBlockExpressionSyntax Block { get; }
 
-        [DebuggerHidden]
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        SymbolSet ISymbol.ChildSymbols => SymbolSet.Empty;
-
         public ForeachExpressionSyntax(
             TextSpan span,
             bool isMutableBinding,

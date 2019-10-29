@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class NoneConstant : Constant
     {
-        public new readonly OptionalType Type;
+        public new OptionalType Type { get; }
 
         public NoneConstant(OptionalType type, TextSpan span)
             : base(type, span)

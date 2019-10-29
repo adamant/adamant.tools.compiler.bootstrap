@@ -1,3 +1,4 @@
+using System;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -10,9 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public Name Name { get; }
         public DataType Type { get; internal set; }
 
-        Name ISymbol.FullName => throw new System.NotImplementedException();
-
-        SymbolSet ISymbol.ChildSymbols => SymbolSet.Empty;
+        Name ISymbol.FullName => throw new NotImplementedException();
 
         public Parameter(
             bool isMutableBinding,

@@ -6,8 +6,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class VariableReference : Value, IPlace, IOperand
     {
-        public readonly Variable Variable;
-        public readonly ValueSemantics ValueSemantics;
+        public Variable Variable { get; }
+        public ValueSemantics ValueSemantics { get; }
 
         public VariableReference(Variable variable, ValueSemantics valueSemantics, TextSpan span)
             : base(span)
@@ -21,6 +21,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             string mutability;
             switch (ValueSemantics)
             {
+                default:
+#pragma warning disable CA1065 // Do not raise exceptions in unexpected locations
+                    throw ExhaustiveMatch.Failed(ValueSemantics);
+#pragma warning restore CA1065 // Do not raise exceptions in unexpected locations
                 case ValueSemantics.LValue:
                     mutability = "";
                     break;
@@ -42,8 +46,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
                 case ValueSemantics.Alias:
                     mutability = "alias ";
                     break;
-                default:
-                    throw ExhaustiveMatch.Failed(ValueSemantics);
             }
             return mutability + Variable;
         }

@@ -37,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Scopes
                     return Lookup(simpleName);
                 case QualifiedName qualifiedName:
                     var containingSymbols = LookupQualified(qualifiedName.Qualifier);
-                    return containingSymbols
+                    return containingSymbols.OfType<IParentSymbol>()
                         .SelectMany(s => s.ChildSymbols[qualifiedName.UnqualifiedName])
                         .ToFixedList();
             }

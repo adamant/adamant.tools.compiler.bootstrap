@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     public class BasicBlock
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public readonly BasicBlockName Name;
+        public BasicBlockName Name { get; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public FixedList<ExpressionStatement> ExpressionStatements { get; }

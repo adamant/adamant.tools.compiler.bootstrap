@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
         public virtual bool Equals(Claim? other)
         {
             return !(other is null) &&
-                   Holder == other.Holder &&
+                   Holder.Equals(other.Holder) &&
                    Lifetime == other.Lifetime;
         }
 

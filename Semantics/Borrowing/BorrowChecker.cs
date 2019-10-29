@@ -459,8 +459,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                 case Constant _:
                     // no claims to acquire
                     break;
-                case Dereference _:
-                    throw new NotImplementedException();
             }
         }
 

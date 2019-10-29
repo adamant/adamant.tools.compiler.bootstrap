@@ -1,11 +1,15 @@
+using System;
+using System.Diagnostics.CodeAnalysis;
+
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
 {
     /// <summary>
     /// The "name" of a lifetime of an object or function call.
     /// </summary>
-    public struct Lifetime : IClaimHolder
+    [SuppressMessage("Naming", "CA1724:Type names should not match namespaces", Justification = "Obscure system namespace")]
+    public struct Lifetime : IClaimHolder, IEquatable<Lifetime>
     {
-        public readonly int Number;
+        public int Number { get; }
 
         public Lifetime(int number)
         {
@@ -32,10 +36,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
             return Number.GetHashCode();
         }
 
+        public bool Equals(Lifetime other)
+        {
+            return Number == other.Number;
+        }
+
         public override bool Equals(object? obj)
         {
-            var other = obj as Lifetime?;
-            return this == other;
+            return obj is Lifetime other && Number == other.Number;
         }
     }
 }

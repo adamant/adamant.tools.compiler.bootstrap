@@ -39,10 +39,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         [DisallowNull]
         public ref IExpressionSyntax? Initializer => ref initializer;
 
-        [DebuggerHidden]
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        SymbolSet ISymbol.ChildSymbols => SymbolSet.Empty;
-
         public VariableDeclarationStatementSyntax(
             TextSpan span,
             bool isMutableBinding,

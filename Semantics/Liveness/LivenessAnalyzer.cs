@@ -101,15 +101,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
             return liveVariables;
         }
 
-        private static void KillVariables(BitArray variables, IPlace lvalue)
+        private static void KillVariables(BitArray variables, IPlace place)
         {
-            switch (lvalue)
+            switch (place)
             {
                 default:
-                    throw ExhaustiveMatch.Failed(lvalue);
-                case Dereference dereference:
-                    KillVariables(variables, dereference.DereferencedValue);
-                    break;
+                    throw ExhaustiveMatch.Failed(place);
                 case VariableReference variableReference:
                     variables[variableReference.Variable.Number] = false;
                     break;
