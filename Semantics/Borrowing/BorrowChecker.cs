@@ -269,6 +269,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         {
             switch (value)
             {
+                default:
+                    throw ExhaustiveMatch.Failed(value);
                 case ConstructorCall constructorCall:
                     foreach (var argument in constructorCall.Arguments)
                         AcquireClaim(assignToPlace?.CoreVariable(), argument, claimsAfterStatement, claimsAfterStatement);
@@ -335,8 +337,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     AcquireClaim(assignToPlace?.CoreVariable(), constructSome.Value, claimsAfterStatement, claimsAfterStatement);
                 }
                 break;
-                default:
-                    throw NonExhaustiveMatchException.For(value);
+                case DeclaredValue _:
+                    throw new NotImplementedException();
+                case Conversion conversion:
+                    AcquireClaim(assignToPlace?.CoreVariable(), conversion.Operand, claimsAfterStatement, claimsAfterStatement);
+                    break;
             }
         }
 
@@ -447,12 +452,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             }
                         }
                         break;
+                        case ValueSemantics.Copy:
+                            // No claims to acquire, the value is copied and still usable
+                            break;
                         case ValueSemantics.LValue:
                         case ValueSemantics.Empty:
                         case ValueSemantics.Move:
-                        case ValueSemantics.Copy:
                             throw new NotImplementedException();
-
                     }
                 }
                 break;

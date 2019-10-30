@@ -119,6 +119,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
         {
             switch (value)
             {
+                default:
+                    throw ExhaustiveMatch.Failed(value);
                 case ConstructorCall constructorCall:
                     foreach (var argument in constructorCall.Arguments)
                         EnlivenVariables(variables, argument);
@@ -150,8 +152,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
                 case Constant _:
                     // No variables
                     break;
-                default:
-                    throw NonExhaustiveMatchException.For(value);
+                case DeclaredValue _:
+                    throw new NotImplementedException();
+                case Conversion conversion:
+                    EnlivenVariables(variables, conversion.Operand);
+                    break;
             }
         }
     }

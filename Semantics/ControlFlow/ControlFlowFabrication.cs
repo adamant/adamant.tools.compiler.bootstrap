@@ -25,8 +25,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private readonly ControlFlowGraphBuilder graph;
 
         /// <summary>
-        /// The block we are currently adding statements to. Thus after control flow statements this
-        /// is the block the control flow exits to.
+        /// The block we are currently adding statements to. Thus, after control flow statements this
+        /// is the block the control flow exits (to/from?).
         /// </summary>
         private BlockBuilder? currentBlock;
 
@@ -63,7 +63,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     returnType = method.ReturnType.Known();
                     break;
                 case IConstructorDeclarationSyntax constructor:
-                    selfType = constructor.SelfParameterType ?? throw new InvalidOperationException("Constructor doesn't have self parameter type");
+                    selfType = constructor.SelfParameterType.Fulfilled();
                     returnType = DataType.Void; // the body should `return;`
                     break;
                 case IFunctionDeclarationSyntax function:
@@ -173,7 +173,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case IVariableDeclarationStatementSyntax variableDeclaration:
                 {
                     var variable = graph.AddVariable(variableDeclaration.IsMutableBinding,
-                        variableDeclaration.Type ?? throw new InvalidOperationException("Variable declaration doesn't have type"),
+                        variableDeclaration.Type.Fulfilled(),
                         CurrentScope, variableDeclaration.Name.UnqualifiedName);
                     if (variableDeclaration.Initializer != null)
                     {
@@ -189,21 +189,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 {
                     // Skip expressions with unknown type
                     var expression = expressionStatement.Expression;
-                    if (!expression.Type.IsKnown)
+                    if (!expression.Type.Fulfilled().IsKnown)
                         return;
 
-                    if (expression.Type is VoidType || expression.Type is NeverType)
+                    if (expression.Type is EmptyType)
                         ConvertExpressionToStatement(expression);
                     else
-                    {
-                        //var tempVariable = graph.Let(expression.Type.AssertKnown(), CurrentScope);
-                        var value = ConvertToValue(expression);
-                        //currentBlock.AddAssignment(
-                        //    tempVariable.LValueReference(expression.Span),
-                        //    value, expression.Span,
-                        //    CurrentScope);
-                        AssignToTemp(expression.Type, value);
-                    }
+                        AssignToTemp(expression.Type.Fulfilled(), ConvertToValue(expression));
 
                     return;
                 }
@@ -241,6 +233,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     break;
             }
         }
+
+        // TODO combine ConvertExpressionToStatement and ConvertToValue
 
         /// <summary>
         /// Converts an expression of type `void` or `never` to a statement
@@ -514,20 +508,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     throw new InvalidOperationException(
                         "Integer literals should have an implicit conversion around them");
                 case IStringLiteralExpressionSyntax stringLiteral:
-                    return new StringConstant(stringLiteral.Value, stringLiteral.Span, stringLiteral.Type.AssertKnown());
+                    return new StringConstant(stringLiteral.Value, stringLiteral.Span, stringLiteral.Type.Fulfilled().AssertKnown());
                 case IBoolLiteralExpressionSyntax boolLiteral:
                     return new BooleanConstant(boolLiteral.Value, boolLiteral.Span);
                 case INoneLiteralExpressionSyntax _:
                     throw new InvalidOperationException(
                         "None literals should have an implicit conversion around them");
                 case IImplicitNumericConversionExpression implicitNumericConversion:
-                    if (implicitNumericConversion.Expression.Type.AssertKnown() is
+                    if (implicitNumericConversion.Expression.Type.Fulfilled().AssertKnown() is
                         IntegerConstantType constantType)
                         return new IntegerConstant(constantType.Value,
                             implicitNumericConversion.Type.AssertKnown(),
                             implicitNumericConversion.Span);
                     else
-                        throw new NotImplementedException();
+                    {
+                        var valueOperand = ConvertToOperand(implicitNumericConversion.Expression);
+                        return new Conversion(
+                            valueOperand,
+                            (NumericType)implicitNumericConversion.Expression.Type.Fulfilled(),
+                            (NumericType)implicitNumericConversion.Type.Fulfilled(),
+                            implicitNumericConversion.Span);
+                    }
                 case IImplicitOptionalConversionExpression implicitOptionalConversionExpression:
                 {
                     var value = ConvertToOperand(implicitOptionalConversionExpression.Expression);
@@ -599,7 +600,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private IOperand ConvertToOperand(IExpressionSyntax expression)
         {
             var value = ConvertToValue(expression);
-            return ConvertToOperand(value, expression.Type);
+            return ConvertToOperand(value, expression.Type.Fulfilled());
         }
 
         private IOperand ConvertToOperand(IValue value, DataType type)

@@ -60,6 +60,9 @@ typedef struct { intptr_t _value; } _offset;
 
 INTEGER_OPERATIONS(_offset)
 
+// conversions
+inline _int _convert___byte___int(_byte value) { return (_int) {value._value}; }
+
 // `String` type
 // Note: For now, strings are intrinsic
 typedef struct
@@ -78,3 +81,16 @@ _bool String___op_equals__2(String left, String right);
 void print_string__1(String text);
 String read_string__0();
 String _uint__to_display_string__0(_uint value);
+
+// Intrinsic Functions
+_size intrinsics__mem_allocate__1(_size length);
+void intrinsics__mem_deallocate__1(_size ptr);
+void intrinsics__mem_copy__3(_size from_ptr, _size to_ptr, _size length);
+inline void intrinsics__mem_set_byte__2(_size ptr, _byte byte)
+{
+    *((uint8_t*)ptr._value) = byte._value;
+}
+inline _byte intrinsics__mem_get_byte__1(_size ptr)
+{
+  return (_byte) { *((uint8_t*)ptr._value) };
+}

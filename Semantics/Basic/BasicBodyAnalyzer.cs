@@ -14,6 +14,7 @@ using Adamant.Tools.Compiler.Bootstrap.Primitives;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using ExhaustiveMatching;
+using UnaryOperator = Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.UnaryOperator;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 {

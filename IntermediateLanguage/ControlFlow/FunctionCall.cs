@@ -43,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             var arguments = string.Join(", ", Arguments);
             return Self != null
                 // For method invocation, we need to know what self
-                ? $"call method {FunctionName}({string.Join(", ", Self, arguments)})"
+                ? $"call method {Self}.{FunctionName}({arguments})"
                 : $"call fn {FunctionName}({arguments})";
         }
     }

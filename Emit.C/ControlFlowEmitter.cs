@@ -237,10 +237,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                         var typeName = nameMangler.Mangle(constructSome.Type.Referent);
                         return $"_opt__{typeName}__Some({someValue})";
                     }
-                    throw new NotImplementedException();
                 }
                 case UnaryOperation _:
                     throw new NotImplementedException();
+                case Conversion conversion:
+                {
+                    var valueToConvert = ConvertValue(conversion.Operand);
+                    var fromType = nameMangler.Mangle(conversion.FromType);
+                    var toType = nameMangler.Mangle(conversion.ToType);
+                    return $"_convert__{fromType}__{toType}({valueToConvert})";
+                }
             }
         }
 
@@ -248,12 +254,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             switch (type)
             {
+                default:
+                    throw NonExhaustiveMatchException.For(type);
                 case UserObjectType objectType:
                     return nameMangler.Mangle(objectType);
                 case SimpleType simpleType:
                     return nameMangler.Mangle(simpleType.Name);
-                default:
-                    throw NonExhaustiveMatchException.For(type);
             }
         }
     }

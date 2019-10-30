@@ -19,7 +19,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         typeof(VirtualFunctionCall),
         typeof(DeclaredValue),
         typeof(UnaryOperation),
-        typeof(VariableReference))]
+        typeof(VariableReference),
+        typeof(Conversion))]
     public abstract class Value : IValue
     {
         public TextSpan Span { get; }

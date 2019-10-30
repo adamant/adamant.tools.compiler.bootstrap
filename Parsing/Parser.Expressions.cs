@@ -8,6 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Parsing.Tree;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using ExhaustiveMatching;
+using UnaryOperator = Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.UnaryOperator;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {

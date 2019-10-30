@@ -45,6 +45,9 @@ EXTERN_INTEGER_OPERATIONS(_size)
 // `offset` type
 EXTERN_INTEGER_OPERATIONS(_offset)
 
+// conversion functions
+extern inline _int _convert___byte___int(_byte value);
+
 // `String` type
 extern String String___new__2(_size count, _byte* bytes);
 _bool String___op_equals__2(String left, String right)
@@ -76,6 +79,23 @@ String _uint__to_display_string__0(_uint value)
     snprintf(str, length + 1, "%u", value._value);
     return (String) { (_size) { length }, (_byte*)str };
 }
+
+// Intrinsic Functions
+_size intrinsics__mem_allocate__1(_size length)
+{
+    void* mem = malloc(length._value);
+    return (_size) { (uintptr_t)mem };
+}
+void intrinsics__mem_deallocate__1(_size ptr)
+{
+    free((void*)ptr._value);
+}
+void intrinsics__mem_copy__3(_size from_ptr, _size to_ptr, _size length)
+{
+    memcpy((void*)to_ptr._value, (void*)from_ptr._value, length._value);
+}
+extern inline void intrinsics__mem_set_byte__2(_size ptr, _byte byte);
+extern inline _byte intrinsics__mem_get_byte__1(_size ptr);
 
 // Test of calling windows memory allocation functions, rather than including
 // windows.h, we directly declare the functions. This demonstrates that external
