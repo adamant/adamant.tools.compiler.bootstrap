@@ -94,3 +94,4 @@ inline _byte intrinsics__mem_get_byte__1(_size ptr)
 {
   return (_byte) { *((uint8_t*)ptr._value) };
 }
+void intrinsics__print_utf8_bytes__2(_size ptr, _size length);

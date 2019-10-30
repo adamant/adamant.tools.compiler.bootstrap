@@ -96,6 +96,10 @@ void intrinsics__mem_copy__3(_size from_ptr, _size to_ptr, _size length)
 }
 extern inline void intrinsics__mem_set_byte__2(_size ptr, _byte byte);
 extern inline _byte intrinsics__mem_get_byte__1(_size ptr);
+void intrinsics__print_utf8_bytes__2(_size ptr, _size length)
+{
+    printf("%.*s", (int)length._value, (char*)ptr._value);
+}
 
 // Test of calling windows memory allocation functions, rather than including
 // windows.h, we directly declare the functions. This demonstrates that external
