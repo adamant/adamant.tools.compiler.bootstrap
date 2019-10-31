@@ -63,25 +63,6 @@ INTEGER_OPERATIONS(_offset)
 // conversions
 inline _int _convert___byte___int(_byte value) { return (_int) {value._value}; }
 
-// `String` type
-// Note: For now, strings are intrinsic
-typedef struct
-{
-    _size byte_count;
-    _byte* bytes;
-} String;
-
-inline String _String_new(size_t byte_count, char* bytes)
-{
-    return (String) {(_size){byte_count}, (_byte*)bytes };
-}
-_bool String___op_equals__2(String left, String right);
-
-// Direct support through the runtime for now
-void print_string__1(String text);
-String read_string__0();
-String _uint__to_display_string__0(_uint value);
-
 // Intrinsic Functions
 _size intrinsics__mem_allocate__1(_size length);
 void intrinsics__mem_deallocate__1(_size ptr);
@@ -94,4 +75,5 @@ inline _byte intrinsics__mem_get_byte__1(_size ptr)
 {
   return (_byte) { *((uint8_t*)ptr._value) };
 }
-void intrinsics__print_utf8_bytes__2(_size ptr, _size length);
+void intrinsics__print_utf8__2(_size ptr, _size length);
+_size intrinsics__read_utf8_line__2(_size ptr, _size length);

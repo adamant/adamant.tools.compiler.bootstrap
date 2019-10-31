@@ -1,16 +1,13 @@
 using System;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
 {
     /// <summary>
-    /// A claim that a particular variable is the owner of an object
+    /// A claim that a particular claim holder is the owner of an object
     /// </summary>
     public class Owns : Claim, IEquatable<Owns>, IExclusiveClaim
     {
-        public new Variable Holder => (Variable)base.Holder;
-
-        public Owns(Variable holder, Lifetime lifetime)
+        public Owns(IClaimHolder holder, Lifetime lifetime)
            : base(holder, lifetime)
         {
         }

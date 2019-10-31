@@ -48,37 +48,14 @@ EXTERN_INTEGER_OPERATIONS(_offset)
 // conversion functions
 extern inline _int _convert___byte___int(_byte value);
 
-// `String` type
-extern String String___new__2(_size count, _byte* bytes);
-_bool String___op_equals__2(String left, String right)
-{
-    if(left.byte_count._value != right.byte_count._value)
-        return (_bool) { 0 };
-
-    int cmp = strncmp((char*)left.bytes, (char*)right.bytes, left.byte_count._value);
-    return (_bool) { cmp==0 };
-}
-
 // Direct support for console IO through the runtime for now
-void print_string__1(String text)
-{
-    printf("%.*s", (int)text.byte_count._value, (char*)text.bytes);
-}
-
-String read_string__0()
-{
-    char *str = malloc(1024);
-    gets_s(str, 1024);
-    return (String) { (_size) { strnlen_s(str,1024) }, (_byte *)str };
-}
-
-String _uint__to_display_string__0(_uint value)
-{
-    int length = snprintf(NULL, 0, "%u", value._value);
-    char* str = malloc(length + 1);
-    snprintf(str, length + 1, "%u", value._value);
-    return (String) { (_size) { length }, (_byte*)str };
-}
+// String _uint__to_display_string__0(_uint value)
+// {
+//     int length = snprintf(NULL, 0, "%u", value._value);
+//     char* str = malloc(length + 1);
+//     snprintf(str, length + 1, "%u", value._value);
+//     return (String) { (_size) { length }, (_byte*)str };
+// }
 
 // Intrinsic Functions
 _size intrinsics__mem_allocate__1(_size length)
@@ -96,9 +73,14 @@ void intrinsics__mem_copy__3(_size from_ptr, _size to_ptr, _size length)
 }
 extern inline void intrinsics__mem_set_byte__2(_size ptr, _byte byte);
 extern inline _byte intrinsics__mem_get_byte__1(_size ptr);
-void intrinsics__print_utf8_bytes__2(_size ptr, _size length)
+void intrinsics__print_utf8__2(_size ptr, _size length)
 {
     printf("%.*s", (int)length._value, (char*)ptr._value);
+}
+_size intrinsics__read_utf8_line__2(_size ptr, _size length)
+{
+    gets_s((char*)ptr._value, length._value);
+    return (_size) { strnlen_s((char*)ptr._value, 1024) };
 }
 
 // Test of calling windows memory allocation functions, rather than including

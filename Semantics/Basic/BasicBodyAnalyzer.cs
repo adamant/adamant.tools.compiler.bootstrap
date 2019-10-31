@@ -4,7 +4,6 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
@@ -29,6 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
     public class BasicBodyAnalyzer
     {
         private readonly CodeFile file;
+        private readonly ITypeSymbol? stringSymbol;
         private readonly Diagnostics diagnostics;
         private readonly DataType? selfType;
         private readonly DataType? returnType;
@@ -36,11 +36,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         public BasicBodyAnalyzer(
             CodeFile file,
+            ITypeSymbol? stringSymbol,
             Diagnostics diagnostics,
             DataType? selfType = null,
             DataType? returnType = null)
         {
             this.file = file;
+            this.stringSymbol = stringSymbol;
             this.diagnostics = diagnostics;
             this.returnType = returnType;
             this.selfType = selfType;
@@ -293,7 +295,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IIntegerLiteralExpressionSyntax integerLiteral:
                     return integerLiteral.Type = new IntegerConstantType(integerLiteral.Value);
                 case IStringLiteralExpressionSyntax stringLiteral:
-                    return stringLiteral.Type = PrimitiveSymbols.StringSymbol.DeclaresType;
+                    return stringLiteral.Type = stringSymbol?.DeclaresType ?? DataType.Unknown;
                 case IBoolLiteralExpressionSyntax boolLiteral:
                     return boolLiteral.Type = DataType.Bool;
                 case IBinaryOperatorExpressionSyntax binaryOperatorExpression:

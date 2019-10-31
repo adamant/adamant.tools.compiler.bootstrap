@@ -120,9 +120,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 case IntegerConstant integer:
                     return $"({ConvertType(integer.Type)}){{{integer.Value}}}";
                 case StringConstant stringConstant:
-
+                {
                     var constantLength = StringConstant.Encoding.GetByteCount(stringConstant.Value);
-                    return $"_String_new({constantLength}, u8\"{stringConstant.Value.Escape()}\")";
+                    const string selfArgument = "(String){&String___vtable, malloc(sizeof(String___Self))}";
+                    return $"String___new__3({selfArgument}, (_size){{{constantLength}}}, (_size){{(uintptr_t)u8\"{stringConstant.Value.Escape()}\"}})";
+                }
                 case BooleanConstant boolean:
                     var booleanValue = boolean.Value ? 1 : 0;
                     return $"({ConvertType(boolean.Type)}){{{booleanValue}}}";

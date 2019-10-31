@@ -3,6 +3,8 @@ using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing;
@@ -10,6 +12,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Builders;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Moves;
@@ -42,12 +45,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // If there are errors from the lex and parse phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
 
-            BuildLexicalScopes(packageSyntax, references, diagnostics);
+            var stringSymbol = BuildLexicalScopes(packageSyntax, references, diagnostics);
 
             // Make a list of all the entity declarations (i.e. not namespaces)
             var entities = GetEntityDeclarations(packageSyntax);
 
-            CheckSemantics(entities, diagnostics);
+            CheckSemantics(entities, stringSymbol, diagnostics);
 
             // If there are errors from the semantics phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
@@ -71,13 +74,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             return new Package(packageSyntax.Name, diagnostics.Build(), references, declarations, entryPoint);
         }
 
-        private static void BuildLexicalScopes(
+        private static ITypeSymbol? BuildLexicalScopes(
             PackageSyntax packageSyntax,
             FixedDictionary<string, Package> references,
             Diagnostics diagnostics)
         {
             var scopesBuilder = new PackageLexicalScopesBuilder(diagnostics, packageSyntax, references);
             scopesBuilder.BuildScopesFor(packageSyntax);
+            var stringSymbol = scopesBuilder.GlobalScope.LookupGlobal(new SimpleName("String"))
+                                            .OfType<ITypeSymbol>().FirstOrDefault();
+            if (stringSymbol == null)
+                diagnostics.Add(SemanticError.NoStringTypeDefined(packageSyntax.CompilationUnits.First().CodeFile));
+            return stringSymbol;
         }
 
         private static FixedList<IEntityDeclarationSyntax> GetEntityDeclarations(
@@ -90,10 +98,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
         private static void CheckSemantics(
             FixedList<IEntityDeclarationSyntax> entities,
+            ITypeSymbol? stringSymbol,
             Diagnostics diagnostics)
         {
             // Basic Analysis includes: Name Binding, Type Checking, Constant Folding
-            new BasicAnalyzer(diagnostics).Check(entities);
+            new BasicAnalyzer(stringSymbol, diagnostics).Check(entities);
 
             // If there are errors from the basic analysis phase, don't continue on
             diagnostics.ThrowIfFatalErrors();

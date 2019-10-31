@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 
         private readonly Diagnostics diagnostics;
         private readonly FixedList<ISymbol> nonMemberEntitySymbols;
-        private readonly GlobalScope globalScope;
+        public GlobalScope GlobalScope { get; }
 
         public PackageLexicalScopesBuilder(
              Diagnostics diagnostics,
@@ -30,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         {
             this.diagnostics = diagnostics;
             nonMemberEntitySymbols = GetNonMemberEntitySymbols(packageSyntax, references);
-            globalScope = new GlobalScope(GetGlobalSymbols(nonMemberEntitySymbols), nonMemberEntitySymbols);
+            GlobalScope = new GlobalScope(GetGlobalSymbols(nonMemberEntitySymbols), nonMemberEntitySymbols);
         }
 
         private static FixedList<ISymbol> GetNonMemberEntitySymbols(
@@ -70,9 +70,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 
         public void BuildScopesFor(PackageSyntax package)
         {
-            var lexicalScopesWalker = new SyntaxLexicalScopesBuilder(nonMemberEntitySymbols, globalScope);
+            var lexicalScopesWalker = new SyntaxLexicalScopesBuilder(nonMemberEntitySymbols, GlobalScope);
             foreach (var compilationUnit in package.CompilationUnits)
-                lexicalScopesWalker.Walk(compilationUnit, globalScope);
+                lexicalScopesWalker.Walk(compilationUnit, GlobalScope);
         }
     }
 }

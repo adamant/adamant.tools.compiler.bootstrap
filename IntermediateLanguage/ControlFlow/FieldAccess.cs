@@ -5,10 +5,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
     public class FieldAccess : Value, IPlace
     {
-        public IOperand Expression { get; }
+        public IPlace Expression { get; }
         public Name Field { get; }
 
-        public FieldAccess(IOperand expression, Name field, TextSpan span)
+        public FieldAccess(IPlace expression, Name field, TextSpan span)
             : base(span)
         {
             Expression = expression;
@@ -17,8 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 
         public Variable CoreVariable()
         {
-            if (Expression is IPlace place) return place.CoreVariable();
-            return new Variable(-1); // There is no variable
+            return Expression.CoreVariable();
         }
 
         public override string ToString()

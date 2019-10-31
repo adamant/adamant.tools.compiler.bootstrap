@@ -547,7 +547,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     return ConvertInvocationToValue(invocation);
                 case IMemberAccessExpressionSyntax memberAccess:
                 {
-                    var value = ConvertToOperand(memberAccess.Expression);
+                    var value = ConvertToPlace(memberAccess.Expression);
                     var symbol = memberAccess.ReferencedSymbol;
                     //if (symbol is IAccessorSymbol accessor)
                     //    return new VirtualFunctionCall(memberAccess.Span, accessor.PropertyName.UnqualifiedName, value);
@@ -734,14 +734,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         {
             switch (value)
             {
+                default:
+                    // TODO maybe we need some kind if ILValueExpression interface
+                    throw NonExhaustiveMatchException.For(value);
+                case ISelfExpressionSyntax selfExpression:
+                    return graph.VariableFor(SpecialName.Self).LValueReference(selfExpression.Span);
                 case INameExpressionSyntax identifier:
                     // TODO what if this isn't just a variable?
-                    return graph.VariableFor(identifier.ReferencedSymbol.FullName.UnqualifiedName).LValueReference(value.Span);
+                    return graph.VariableFor(identifier.ReferencedSymbol.FullName.UnqualifiedName)
+                                .LValueReference(identifier.Span);
                 case IMemberAccessExpressionSyntax memberAccessExpression:
-                    var expressionValue = ConvertToOperand(memberAccessExpression.Expression);
+                    var expressionValue = ConvertToPlace(memberAccessExpression.Expression);
                     return new FieldAccess(expressionValue, memberAccessExpression.Member.Name, memberAccessExpression.Span);
-                default:
-                    throw NonExhaustiveMatchException.For(value);
             }
         }
     }

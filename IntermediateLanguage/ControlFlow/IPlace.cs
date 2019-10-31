@@ -1,3 +1,4 @@
+using System;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
@@ -10,6 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         typeof(VariableReference))]
     public interface IPlace : IValue
     {
+        [Obsolete("Core variable doesn't exactly make sense for complex places")]
         Variable CoreVariable();
     }
 }

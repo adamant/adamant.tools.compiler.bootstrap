@@ -4,6 +4,7 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
@@ -29,10 +30,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
     /// </summary>
     public class BasicAnalyzer
     {
+        private readonly ITypeSymbol? stringSymbol;
         private readonly Diagnostics diagnostics;
 
-        public BasicAnalyzer(Diagnostics diagnostics)
+        public BasicAnalyzer(ITypeSymbol? stringSymbol, Diagnostics diagnostics)
         {
+            this.stringSymbol = stringSymbol;
             this.diagnostics = diagnostics;
         }
 
@@ -153,7 +156,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                 diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan,
                                     field.Name))))
                             {
-                                var resolver = new BasicBodyAnalyzer(field.File, diagnostics);
+                                var resolver = new BasicBodyAnalyzer(field.File, stringSymbol, diagnostics);
                                 field.Type.BeginFulfilling();
                                 var type = resolver.EvaluateType(field.TypeSyntax);
                                 field.Type.Fulfill(type);
@@ -192,13 +195,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     throw ExhaustiveMatch.Failed(declaration);
                 case IFunctionDeclarationSyntax function:
                 {
-                    var resolver = new BasicBodyAnalyzer(function.File, diagnostics, null, function.ReturnType.Fulfilled());
+                    var resolver = new BasicBodyAnalyzer(function.File, stringSymbol, diagnostics, null, function.ReturnType.Fulfilled());
                     resolver.ResolveTypes(function.Body);
                     break;
                 }
                 case IConcreteMethodDeclarationSyntax method:
                 {
-                    var resolver = new BasicBodyAnalyzer(method.File, diagnostics, method.SelfParameterType, method.ReturnType.Fulfilled());
+                    var resolver = new BasicBodyAnalyzer(method.File, stringSymbol, diagnostics, method.SelfParameterType, method.ReturnType.Fulfilled());
                     resolver.ResolveTypes(method.Body);
                     break;
                 }
@@ -208,13 +211,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IFieldDeclarationSyntax field:
                     if (field.Initializer != null)
                     {
-                        var resolver = new BasicBodyAnalyzer(field.File, diagnostics);
+                        var resolver = new BasicBodyAnalyzer(field.File, stringSymbol, diagnostics);
                         resolver.CheckType(ref field.Initializer, field.Type.Fulfilled());
                     }
                     break;
                 case IConstructorDeclarationSyntax constructor:
                 {
-                    var resolver = new BasicBodyAnalyzer(constructor.File, diagnostics, constructor.SelfParameterType, constructor.SelfParameterType);
+                    var resolver = new BasicBodyAnalyzer(constructor.File, stringSymbol, diagnostics, constructor.SelfParameterType, constructor.SelfParameterType);
                     resolver.ResolveTypes(constructor.Body);
                     break;
                 }

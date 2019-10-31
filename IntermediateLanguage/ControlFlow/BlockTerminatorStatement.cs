@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
@@ -7,6 +8,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     /// A statement that can end a block. These are statements that exit the block
     /// either to one or more other blocks or by returning from the function.
     /// </summary>
+    [Closed(
+        typeof(GotoStatement),
+        typeof(IfStatement),
+        typeof(ReturnStatement))]
     public abstract class BlockTerminatorStatement : Statement
     {
         protected BlockTerminatorStatement(TextSpan span, Scope scope)

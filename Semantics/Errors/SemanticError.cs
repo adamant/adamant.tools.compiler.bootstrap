@@ -62,5 +62,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6008,
                 $"Can't use `self` outside of a method");
         }
+
+        public static Diagnostic NoStringTypeDefined(CodeFile file)
+        {
+            return new Diagnostic(file, new TextSpan(0, 0), DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6009,
+                $"Could not find a `String` type. A `String` type must be defined in the global namespace.");
+        }
     }
 }

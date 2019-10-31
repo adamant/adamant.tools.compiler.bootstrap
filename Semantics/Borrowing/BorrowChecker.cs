@@ -92,7 +92,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 
         private static void Check(IFieldDeclarationSyntax _field)
         {
-            // Currently nothing to check
+            if (_field.Initializer != null)
+                throw new NotImplementedException("Borrow checking of field initializers not implemented");
         }
 
         private void Check(ICallableDeclaration callable, ControlFlowGraph controlFlow)
@@ -119,6 +120,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     // Create/drop any claims modified by the statement
                     switch (statement)
                     {
+                        default:
+                            throw ExhaustiveMatch.Failed(statement);
                         case AssignmentStatement assignmentStatement:
                             CheckStatement(assignmentStatement.Place, assignmentStatement.Value, claimsBeforeStatement, claimsAfterStatement, variables);
                             break;
@@ -145,7 +148,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                                 .ToList();
                             var lifetimesOwnedByVariablesInScope = variablesInScope
                                 .Select(v => claimsAfterStatement.OwnedBy(v))
-                                .Where(o => o != null).Select(o => o.Lifetime)
+                                .Where(o => !(o is null)).Select(o => o!.Lifetime)
                                 .ToList();
                             claimsAfterStatement.Release(variablesInScope);
                             var erroredLifetimes = lifetimesOwnedByVariablesInScope
@@ -160,8 +163,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                                 ReportDiagnostic(BorrowError.SharedValueDoesNotLiveLongEnough(file, exitScopeStatement.Span, declaration.Name));
                             }
                             break;
-                        default:
-                            throw NonExhaustiveMatchException.For(statement);
                     }
 
                     var deletedVariables = ReleaseDeadClaims(claimsAfterStatement, liveVariables.After(statement));
@@ -177,6 +178,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     claimsAfterBlock.AddRange(claimsBeforeStatement);
                     switch (block.Terminator)
                     {
+                        default:
+                            throw ExhaustiveMatch.Failed(block.Terminator);
                         case IfStatement ifStatement:
                             blocks.Enqueue(controlFlow[ifStatement.ThenBlock]);
                             blocks.Enqueue(controlFlow[ifStatement.ElseBlock]);
@@ -186,8 +189,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             break;
                         case ReturnStatement _:
                             break;
-                        default:
-                            throw NonExhaustiveMatchException.For(block.Terminator);
                     }
                 }
             }
@@ -197,7 +198,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                 controlFlow.BorrowClaims = claims;
         }
 
-        private Claims GetClaimsBeforeBlock(
+        private static Claims GetClaimsBeforeBlock(
             ControlFlowGraph controlFlow,
             BasicBlock block,
             StatementClaims claims)
@@ -221,20 +222,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             var deadVariablesOwnership = deadVariables.ToDictionary(v => v, claimsAfterStatement.OwnedBy);
 
             // First release dead variables that don't own their value
-            var deadVariableShares = deadVariablesOwnership.Where(e => e.Value == null)
+            var deadVariableShares = deadVariablesOwnership.Where(e => e.Value is null)
                 .Select(e => e.Key);
             claimsAfterStatement.Release(deadVariableShares);
 
             // Now that any shares have been released, release ownership claims. This must be done
             // second because it depends on what shares are outstanding.
             var deadVariableOwns = deadVariablesOwnership
-                .Where(e => e.Value != null && !claimsAfterStatement.IsShared(e.Value.Lifetime))
+                .Where(e => !(e.Value is null) && !claimsAfterStatement.IsShared(e.Value.Lifetime))
                 .Select(e => e.Key).ToList();
             claimsAfterStatement.Release(deadVariableOwns);
             return deadVariableOwns;
         }
 
-        private void InsertDeletes(
+        private static void InsertDeletes(
             ExpressionStatement statement,
             FixedList<VariableDeclaration> variables,
             List<Variable> deletedVariables,
@@ -261,36 +262,39 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         }
 
         private void CheckStatement(
-            IPlace assignToPlace,
+            IPlace? assignToPlace,
             IValue value,
             Claims claimsBeforeStatement,
             Claims claimsAfterStatement,
             FixedList<VariableDeclaration> variables)
         {
+            var assignToPlaceClaimHolder = ClaimHolder(assignToPlace);
             switch (value)
             {
                 default:
                     throw ExhaustiveMatch.Failed(value);
                 case ConstructorCall constructorCall:
+                {
                     foreach (var argument in constructorCall.Arguments)
-                        AcquireClaim(assignToPlace?.CoreVariable(), argument, claimsAfterStatement, claimsAfterStatement);
+                        AcquireClaim(assignToPlaceClaimHolder, argument, claimsAfterStatement, claimsAfterStatement);
                     // We have made a new object, assign it a new id
                     var objectId = NewLifetime();
                     // Variable acquires title on any new objects
-                    AcquireOwnership(assignToPlace.CoreVariable(), objectId, claimsAfterStatement);
+                    AcquireOwnership(assignToPlaceClaimHolder, objectId, claimsAfterStatement);
                     break;
+                }
                 case UnaryOperation unaryOperation:
-                    AcquireClaim(assignToPlace?.CoreVariable(), unaryOperation.Operand, claimsAfterStatement, claimsAfterStatement);
+                    AcquireClaim(assignToPlaceClaimHolder, unaryOperation.Operand, claimsAfterStatement, claimsAfterStatement);
                     break;
                 case BinaryOperation binaryOperation:
-                    AcquireClaim(assignToPlace?.CoreVariable(), binaryOperation.LeftOperand, claimsAfterStatement, claimsAfterStatement);
-                    AcquireClaim(assignToPlace?.CoreVariable(), binaryOperation.RightOperand, claimsAfterStatement, claimsAfterStatement);
+                    AcquireClaim(assignToPlaceClaimHolder, binaryOperation.LeftOperand, claimsAfterStatement, claimsAfterStatement);
+                    AcquireClaim(assignToPlaceClaimHolder, binaryOperation.RightOperand, claimsAfterStatement, claimsAfterStatement);
                     break;
                 case IntegerConstant _:
                     // no claims to acquire
                     break;
                 case IOperand operand:
-                    AcquireClaim(assignToPlace?.CoreVariable(), operand, claimsAfterStatement, claimsAfterStatement);
+                    AcquireClaim(assignToPlaceClaimHolder, operand, claimsAfterStatement, claimsAfterStatement);
                     break;
                 case FunctionCall functionCall:
                 {
@@ -328,20 +332,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     // TODO this should be based on the field type
                     AcquireAlias(instanceLifetime, fieldLifetime, outstandingClaims);
                     // TODO this should be based on the access mode
-                    AcquireAlias(assignToPlace?.CoreVariable(), fieldLifetime, outstandingClaims);
+                    AcquireAlias(assignToPlaceClaimHolder, fieldLifetime, outstandingClaims);
                     claimsAfterStatement.AddRange(outstandingClaims);
                 }
                 break;
                 case ConstructSome constructSome:
-                {
-                    AcquireClaim(assignToPlace?.CoreVariable(), constructSome.Value, claimsAfterStatement, claimsAfterStatement);
-                }
-                break;
+                    AcquireClaim(assignToPlaceClaimHolder, constructSome.Value, claimsAfterStatement, claimsAfterStatement);
+                    break;
                 case DeclaredValue _:
                     throw new NotImplementedException();
                 case Conversion conversion:
-                    AcquireClaim(assignToPlace?.CoreVariable(), conversion.Operand, claimsAfterStatement, claimsAfterStatement);
+                    AcquireClaim(assignToPlaceClaimHolder, conversion.Operand, claimsAfterStatement, claimsAfterStatement);
                     break;
+            }
+        }
+
+        private IClaimHolder? ClaimHolder(IPlace? place)
+        {
+            switch (place)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(place);
+                case null:
+                    return null;
+                case VariableReference variableReference:
+                    return variableReference.Variable;
+                case FieldAccess fieldAccess:
+                    if (fieldAccess.Expression is VariableReference target) return target.Variable;
+                    throw new NotImplementedException("Assigning into chained field access not implemented");
             }
         }
 
@@ -355,6 +373,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             return claimsBeforeStatement;
         }
 
+        /// <summary>
+        /// Acquire claims related to the return from a call/constructor
+        /// </summary>
         private static void AcquireReturnClaim(
             IPlace? assignToPlace,
             Lifetime callLifetime,
@@ -384,11 +405,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         }
 
         private void AcquireClaim(
-            IClaimHolder claimHolder,
+            IClaimHolder? claimHolder,
             IOperand operand,
             Claims outstandingClaims,
             Claims claimsAfterStatement)
         {
+            if (claimHolder is null) return;
+
             switch (operand)
             {
                 default:
@@ -429,7 +452,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             // don't report an error, because that should already be reported by
                             // the type checker. We don't change claims, because ownership hasn't been
                             // changed.
-                            if (currentOwner?.Holder != varRef.Variable)
+                            if (!currentOwner?.Holder.Equals(varRef.Variable) ?? false)
                                 break;
                             outstandingClaims.Remove(currentOwner);
                             // Because claims are melded from multiple passes, the claims after statement
@@ -462,33 +485,54 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     }
                 }
                 break;
-                case Constant _:
-                    // no claims to acquire
+                case Constant constant:
+                    switch (constant.Type.ValueSemantics)
+                    {
+                        default:
+                            throw ExhaustiveMatch.Failed(constant.Type.ValueSemantics);
+                        case ValueSemantics.Borrow:
+                            outstandingClaims.Add(new Borrows(claimHolder, NewLifetime()));
+                            break;
+                        case ValueSemantics.Alias:
+                            outstandingClaims.Add(new Aliases(claimHolder, NewLifetime()));
+                            break;
+                        case ValueSemantics.Copy:
+                            // No claims to acquire, the value is copied and still usable
+                            break;
+                        case ValueSemantics.LValue:
+                        case ValueSemantics.Empty:
+                        case ValueSemantics.Move:
+                        case ValueSemantics.Own: // Own should be impossible
+                            throw new NotImplementedException();
+                    }
                     break;
             }
         }
 
         private static void AcquireOwnership(
-            Variable claimHolder,
+            IClaimHolder? claimHolder,
             Lifetime lifetime,
             Claims outstandingClaims)
         {
+            if (claimHolder is null) return;
             outstandingClaims.Add(new Owns(claimHolder, lifetime));
         }
 
         private static void AcquireBorrow(
-            IClaimHolder claimHolder,
+            IClaimHolder? claimHolder,
             Lifetime lifetime,
             Claims outstandingClaims)
         {
+            if (claimHolder is null) return;
             outstandingClaims.Add(new Borrows(claimHolder, lifetime));
         }
 
         private static void AcquireAlias(
-            IClaimHolder claimHolder,
+            IClaimHolder? claimHolder,
             Lifetime lifetime,
             Claims outstandingClaims)
         {
+            if (claimHolder is null) return;
             outstandingClaims.Add(new Aliases(claimHolder, lifetime));
         }
 

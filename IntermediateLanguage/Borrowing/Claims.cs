@@ -55,7 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
 
         public Owns? OwnedBy(Variable variable)
         {
-            return claimsList.OfType<Owns>().SingleOrDefault(o => o.Holder == variable);
+            return claimsList.OfType<Owns>().SingleOrDefault(o => o.Holder.Equals(variable));
         }
 
         public Owns? OwnerOf(Lifetime lifetime)
