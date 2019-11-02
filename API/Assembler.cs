@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
@@ -50,9 +51,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             }
         }
 
-        public void Disassemble(FunctionDeclaration function, AssemblyBuilder builder)
+        private static void Disassemble(FunctionDeclaration function, AssemblyBuilder builder)
         {
-            var functionControlFlow = function.ControlFlow;
             var parameters = FormatParameters(function.Parameters);
             builder.BeginLine("fn ");
             builder.Append(function.FullName.ToString());
@@ -63,9 +63,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.BeginLine(builder.IndentCharacters);
             builder.Append("-> ");
             builder.EndLine(function.ReturnType.ToString());
-            builder.BeginBlock();
-            Disassemble(function.ControlFlow, builder);
-            builder.EndBlock();
+            if (function.ControlFlow != null)
+            {
+                builder.BeginBlock();
+                Disassemble(function.ControlFlow, builder);
+                builder.EndBlock();
+            }
         }
 
         private static string FormatParameters(IEnumerable<Parameter> parameters)
@@ -77,10 +80,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         private static string FormatParameter(Parameter parameter)
         {
             var format = parameter.IsMutableBinding ? "var {0}: {1}" : "{0}: {1}";
-            return string.Format(format, parameter.Name, parameter.Type);
+            return string.Format(CultureInfo.InvariantCulture, format, parameter.Name, parameter.Type);
         }
 
-        public void Disassemble(ConstructorDeclaration constructor, AssemblyBuilder builder)
+        private static void Disassemble(ConstructorDeclaration constructor, AssemblyBuilder builder)
         {
             var parameters = FormatParameters(constructor.Parameters);
             builder.BeginLine("fn ");
@@ -97,7 +100,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.EndBlock();
         }
 
-        public void Disassemble(ClassDeclaration @class, AssemblyBuilder builder)
+        private void Disassemble(ClassDeclaration @class, AssemblyBuilder builder)
         {
             builder.BeginLine("type ");
             builder.Append(@class.FullName.ToString());
@@ -111,7 +114,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.EndBlock();
         }
 
-        private void Disassemble(ControlFlowGraph graph, AssemblyBuilder builder)
+        private static void Disassemble(ControlFlowGraph graph, AssemblyBuilder builder)
         {
             if (graph == null)
             {
@@ -132,14 +135,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                 Disassemble(graph, block, builder);
         }
 
-        private void Disassemble(VariableDeclaration declaration, AssemblyBuilder builder)
+        private static void Disassemble(VariableDeclaration declaration, AssemblyBuilder builder)
         {
             if (declaration.TypeIsNotEmpty)
                 builder.AppendLine(declaration.ToStatementString().PadRight(StandardStatementWidth)
                                    + declaration.ContextCommentString());
         }
 
-        private void Disassemble(ControlFlowGraph graph, BasicBlock block, AssemblyBuilder builder)
+        private static void Disassemble(ControlFlowGraph graph, BasicBlock block, AssemblyBuilder builder)
         {
             var labelIndent = Math.Max(builder.CurrentIndentDepth - 1, 0);
             builder.Append(string.Concat(Enumerable.Repeat(builder.IndentCharacters, labelIndent)));
@@ -150,14 +153,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                 Disassemble(graph, graph.LiveVariables?.Before(statement), builder);
                 builder.AppendLine(statement.ToStatementString().PadRight(StandardStatementWidth)
                                    + statement.ContextCommentString());
-                Disassemble(graph.InsertedDeletes.After(statement), builder);
+                var insertedDeletes = graph.InsertedDeletes ?? throw new InvalidOperationException("Inserted deletes is null");
+                Disassemble(insertedDeletes.After(statement), builder);
                 Disassemble(graph.BorrowClaims?.After(statement), builder);
             }
         }
 
-        private void Disassemble(
+        private static void Disassemble(
             ControlFlowGraph graph,
-            BitArray liveVariables,
+            BitArray? liveVariables,
             AssemblyBuilder builder)
         {
             if (liveVariables == null || liveVariables.Cast<bool>().All(x => x == false)) return;
@@ -168,14 +172,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.EndLine(variables);
         }
 
-        private string FormatVariableName(VariableDeclaration declaration)
+        private static string FormatVariableName(VariableDeclaration declaration)
         {
             return declaration.Name != null
                 ? $"{declaration.Variable}({declaration.Name})"
                 : declaration.Variable.ToString();
         }
 
-        private void Disassemble(
+        private static void Disassemble(
             IReadOnlyList<DeleteStatement> deletes,
             AssemblyBuilder builder)
         {
@@ -184,7 +188,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                                    + delete.ContextCommentString());
         }
 
-        private bool Disassemble(Claims claims, AssemblyBuilder builder)
+        private static bool Disassemble(Claims? claims, AssemblyBuilder builder)
         {
             if (claims == null) return false;
 
@@ -197,7 +201,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             return claims.Any();
         }
 
-        public void Disassemble(FieldDeclaration field, AssemblyBuilder builder)
+        private static void Disassemble(FieldDeclaration field, AssemblyBuilder builder)
         {
             var binding = field.IsMutableBinding ? "var" : "let";
             builder.AppendLine($"{binding} {field.Name}: {field.Type};");

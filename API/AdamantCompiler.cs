@@ -18,26 +18,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         /// Whether to store the liveness analysis for each function and method.
         /// Default Value: false
         /// </summary>
-        public bool SaveLivenessAnalysis = false;
+        public bool SaveLivenessAnalysis { get; set; } = false;
 
         /// <summary>
         /// Whether to store the borrow checker claims for each function and method.
         /// Default Value: false
         /// </summary>
-        public bool SaveBorrowClaims = false;
+        public bool SaveBorrowClaims { get; set; } = false;
 
         public Task<Package> CompilePackageAsync(
             string name,
             IEnumerable<ICodeFileSource> files,
-            FixedDictionary<string, Task<Package>> references)
+            FixedDictionary<string, Task<Package>> referenceTasks)
         {
-            return CompilePackageAsync(name, files, references, TaskScheduler.Default);
+            return CompilePackageAsync(name, files, referenceTasks, TaskScheduler.Default);
         }
 
-        public Task<Package> CompilePackageAsync(
+        public async Task<Package> CompilePackageAsync(
             string name,
             IEnumerable<ICodeFileSource> fileSources,
-            FixedDictionary<string, Task<Package>> references,
+            FixedDictionary<string, Task<Package>> referenceTasks,
             TaskScheduler taskScheduler)
         {
             var lexer = new Lexer();
@@ -45,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             var parseBlock = new TransformBlock<ICodeFileSource, ICompilationUnitSyntax>(
                 async (fileSource) =>
                 {
-                    var file = await fileSource.LoadAsync();
+                    var file = await fileSource.LoadAsync().ConfigureAwait(false);
                     var context = new ParseContext(file, new Diagnostics());
                     var tokens = lexer.Lex(context).WhereNotTrivia();
                     return parser.Parse(tokens);
@@ -60,7 +60,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
 
             parseBlock.Complete();
 
-            throw new NotImplementedException();
+            await parseBlock.Completion.ConfigureAwait(false);
+
+            if (!parseBlock.TryReceiveAll(out var compilationUnits))
+                throw new Exception("Not all compilation units are ready");
+
+            var packageSyntax = new PackageSyntax(name, compilationUnits.ToFixedList());
+
+            var analyzer = new SemanticAnalyzer()
+            {
+                SaveLivenessAnalysis = SaveLivenessAnalysis,
+                SaveBorrowClaims = SaveBorrowClaims,
+            };
+
+            var referencePairs = await Task.WhenAll(referenceTasks
+                                    .Select(async kv => (alias: kv.Key, package: await kv.Value.ConfigureAwait(false))))
+                                    .ConfigureAwait(false);
+            var references = referencePairs.ToFixedDictionary(r => r.alias, r => r.package);
+            return analyzer.Check(packageSyntax, references);
         }
 
         public Package CompilePackage(
