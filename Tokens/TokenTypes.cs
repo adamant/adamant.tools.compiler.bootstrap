@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -9,14 +10,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     public static partial class TokenTypes
     {
 
-        public static readonly FixedDictionary<string, Func<TextSpan, IKeywordToken>> KeywordFactories;
+        public static readonly FixedDictionary<string, Func<TextSpan, IKeywordToken>> KeywordFactories =
+            BuildKeywordFactories();
 
         private static readonly int KeywordTokenLength = "KeywordToken".Length;
-
-        static TokenTypes()
-        {
-            KeywordFactories = BuildKeywordFactories();
-        }
 
         private static FixedDictionary<string, Func<TextSpan, IKeywordToken>> BuildKeywordFactories()
         {
@@ -48,9 +45,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
                         keyword = "_";
                         break;
                     default:
+#pragma warning disable CA1308 // Normalize strings to uppercase. Reason: this is not a normalization
                         keyword = tokenTypeName
                             .Substring(0, tokenTypeName.Length - KeywordTokenLength)
-                            .ToLower();
+                            .ToLower(CultureInfo.InvariantCulture);
+#pragma warning restore CA1308 // Normalize strings to uppercase
                         break;
                 }
                 var factory = CompileFactory<IKeywordToken>(tokenType);

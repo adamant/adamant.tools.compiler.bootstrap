@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Numerics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 
@@ -15,10 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 
         // Helpful for debugging
 
-        public override string ToString()
-        {
-            return Value.ToString();
-        }
+        public override string ToString() => Value.ToString(CultureInfo.InvariantCulture);
     }
 
     public static partial class TokenFactory
