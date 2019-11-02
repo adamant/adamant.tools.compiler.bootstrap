@@ -15,17 +15,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 
         static PrimitiveSymbols()
         {
+            var stringType = UserObjectType.Declaration(Name.From("String"), false);
             Instance = new List<ISymbol>
             {
                 // Simple Types
                 BuildBoolSymbol(),
 
-                BuildIntegerTypeSymbol(DataType.Byte),
-                BuildIntegerTypeSymbol(DataType.Int),
-                BuildIntegerTypeSymbol(DataType.UInt),
+                BuildIntegerTypeSymbol(DataType.Byte, stringType),
+                BuildIntegerTypeSymbol(DataType.Int, stringType),
+                BuildIntegerTypeSymbol(DataType.UInt, stringType),
 
-                BuildIntegerTypeSymbol(DataType.Size),
-                BuildIntegerTypeSymbol(DataType.Offset),
+                BuildIntegerTypeSymbol(DataType.Size, stringType),
+                BuildIntegerTypeSymbol(DataType.Offset, stringType),
 
                 PrimitiveTypeSymbol.NewEmptyType(DataType.Void),
                 PrimitiveTypeSymbol.NewEmptyType(DataType.Never),
@@ -59,13 +60,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             return PrimitiveTypeSymbol.NewSimpleType(DataType.Bool);
         }
 
-        private static ISymbol BuildIntegerTypeSymbol(IntegerType integerType)
+        private static ISymbol BuildIntegerTypeSymbol(IntegerType integerType, DataType stringType)
         {
             var typeName = integerType.Name;
             var symbols = new List<ISymbol>
             {
                 PrimitiveFunctionSymbol.New(typeName.Qualify("remainder"), integerType, ("self",integerType), ("divisor", integerType)),
-                //PrimitiveFunctionSymbol.New(typeName.Qualify("to_display_string"), stringType, ("self", integerType)),
+                PrimitiveFunctionSymbol.New(typeName.Qualify("to_display_string"), stringType, ("self", integerType)),
             };
             return PrimitiveTypeSymbol.NewSimpleType(integerType, symbols);
         }

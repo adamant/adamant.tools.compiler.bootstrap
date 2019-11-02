@@ -9,7 +9,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using Adamant.Tools.Compiler.Bootstrap.Primitives;
+using Adamant.Tools.Compiler.Bootstrap.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using ExhaustiveMatching;
@@ -400,7 +400,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         return newObjectExpression.Type  = DataType.Unknown;
                     }
                     var constructedType = (UserObjectType)constructingType;
-                    var typeSymbol = GetSymbolForType(constructedType);
+                    var typeSymbol = GetSymbolForType(newObjectExpression.TypeSyntax.ContainingScope, constructedType);
                     var constructors = typeSymbol.ChildSymbols[SpecialName.New].OfType<IFunctionSymbol>().ToFixedList();
                     constructors = ResolveOverload(constructors, null, argumentTypes);
                     switch (constructors.Count)
@@ -469,7 +469,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     // TODO improve function lookup and include the possibility that the symbol isn't a function
                     //diagnostics.Add(TypeError.MustBeCallable(file, methodInvocation.Target));
                     //return methodInvocation.Type = DataType.Unknown;
-                    var typeSymbol = GetSymbolForType(targetType);
+                    var typeSymbol = GetSymbolForType(methodInvocation.MethodNameSyntax.ContainingScope, targetType);
                     typeSymbol.ChildSymbols.TryGetValue(methodInvocation.MethodNameSyntax.Name, out var childSymbols);
                     var methodSymbols = (childSymbols ?? FixedList<ISymbol>.Empty)
                         .OfType<IFunctionSymbol>().ToFixedList();
@@ -553,7 +553,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     else
                         targetType = InferType(ref memberAccess.Expression);
 
-                    var symbol = GetSymbolForType(targetType);
+                    var symbol = GetSymbolForType(memberAccess.Member.ContainingScope, targetType);
                     var member = memberAccess.Member;
                     var memberSymbols = symbol.Lookup(member.Name).OfType<IBindingSymbol>().ToFixedList();
                     var type = AssignReferencedSymbolAndType(member, memberSymbols);
@@ -757,18 +757,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             return false;
         }
 
-        private static ITypeSymbol GetSymbolForType(DataType type)
+        private static ITypeSymbol GetSymbolForType(LexicalScope containingScope, DataType type)
         {
             switch (type)
             {
                 case UnknownType _:
                     return UnknownSymbol.Instance;
                 case UserObjectType objectType:
-                    return objectType.Symbol;
+                    return containingScope.LookupQualified(objectType.Name).OfType<ITypeSymbol>().Single();
                 case SizedIntegerType integerType:
-                    return PrimitiveSymbols.Instance.OfType<ITypeSymbol>().Single(p => p.FullName == integerType.Name);
+                    return containingScope.LookupQualified(integerType.Name).OfType<ITypeSymbol>().Single();
                 case UnsizedIntegerType integerType:
-                    return PrimitiveSymbols.Instance.OfType<ITypeSymbol>().Single(p => p.FullName == integerType.Name);
+                    return containingScope.LookupQualified(integerType.Name).OfType<ITypeSymbol>().Single();
                 default:
                     throw new NotImplementedException();
             }

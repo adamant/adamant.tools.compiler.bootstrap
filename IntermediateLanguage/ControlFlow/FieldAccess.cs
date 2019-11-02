@@ -17,7 +17,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 
         public Variable CoreVariable()
         {
+#pragma warning disable 618
             return Expression.CoreVariable();
+#pragma warning restore 618
         }
 
         public override string ToString()
