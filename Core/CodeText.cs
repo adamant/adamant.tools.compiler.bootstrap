@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
@@ -6,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
     public class CodeText
     {
 
-        public readonly string Text;
+        public string Text { get; }
 
         public int Length => Text.Length;
 
@@ -14,6 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
 
         private readonly Lazy<TextLines> lines;
 
+        [SuppressMessage("Design", "CA1043:Use Integral Or String Argument For Indexers", Justification = "TextSpan is a struct and represents an index range")]
         public string this[TextSpan span] => Text.Substring(span.Start, span.Length);
         public char this[int index] => Text[index];
 

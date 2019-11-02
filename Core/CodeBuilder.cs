@@ -8,8 +8,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
     {
         private readonly StringBuilder code = new StringBuilder();
         public string Code => code.ToString();
-        public readonly string IndentCharacters;
-        public readonly string LineTerminator;
+        public string IndentCharacters { get; }
+        public string LineTerminator { get; }
         public int CurrentIndentDepth { get; private set; }
         public string CurrentIndent => IndentCharacters.Repeat(CurrentIndentDepth);
 

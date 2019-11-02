@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
     /// A CodeReference to a file on disk referenced by its path.
     public class CodePath : CodeReference, ICodeFileSource
     {
-        public readonly string Path;
+        public string Path { get; }
 
         public CodePath(string path)
             : this(path, FixedList<string>.Empty)
@@ -34,7 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
 
         public async Task<CodeFile> LoadAsync()
         {
-            var text = await File.ReadAllTextAsync(Path, CodeFile.Encoding);
+            var text = await File.ReadAllTextAsync(Path, CodeFile.Encoding).ConfigureAwait(false);
             return new CodeFile(this, new CodeText(text));
         }
     }

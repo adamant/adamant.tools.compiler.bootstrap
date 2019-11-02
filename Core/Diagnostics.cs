@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 
@@ -8,6 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
     [DebuggerDisplay("Count = {items.Count}")]
     [DebuggerTypeProxy(typeof(CollectionDebugView<>))]
+    [SuppressMessage("Naming", "CA1724:Type names should not match namespaces", Justification = "Core to compiler domain")]
     public class Diagnostics : IEnumerable<Diagnostic>
     {
         private readonly List<Diagnostic> items = new List<Diagnostic>();

@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
     /// template file the code was generated from.
     public abstract class CodeReference
     {
-        public readonly FixedList<string> Namespace;
+        public FixedList<string> Namespace { get; }
 
         protected CodeReference(FixedList<string> @namespace)
         {

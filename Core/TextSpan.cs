@@ -6,11 +6,11 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
     [DebuggerDisplay("positions {Start} to {End}")]
-    public readonly struct TextSpan : IEquatable<TextSpan>, IComparable<TextSpan>
+    public readonly struct TextSpan : IEquatable<TextSpan>
     {
-        public readonly int Start;
+        public int Start { get; }
         public int End => Start + Length;
-        public readonly int Length;
+        public int Length { get; }
         public bool IsEmpty => Length == 0;
 
         public TextSpan(int start, int length)
@@ -103,10 +103,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
             return $"TextSpan({Start},{Length})";
         }
 
-        public int CompareTo(TextSpan other)
-        {
-            var comparison = Start.CompareTo(other.Start);
-            return comparison != 0 ? comparison : Length.CompareTo(other.Length);
-        }
+        //public int CompareTo(TextSpan other)
+        //{
+        //    var comparison = Start.CompareTo(other.Start);
+        //    return comparison != 0 ? comparison : Length.CompareTo(other.Length);
+        //}
     }
 }

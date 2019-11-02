@@ -3,16 +3,16 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Core
 {
-    public class Diagnostic : IComparable<Diagnostic>
+    public class Diagnostic
     {
-        public readonly CodeFile File;
-        public readonly TextSpan Span;
-        public readonly TextPosition StartPosition;
-        public readonly TextPosition EndPosition;
-        public readonly DiagnosticLevel Level;
-        public readonly DiagnosticPhase Phase;
-        public readonly int ErrorCode;
-        public readonly string Message;
+        public CodeFile File { get; }
+        public TextSpan Span { get; }
+        public TextPosition StartPosition { get; }
+        public TextPosition EndPosition { get; }
+        public DiagnosticLevel Level { get; }
+        public DiagnosticPhase Phase { get; }
+        public int ErrorCode { get; }
+        public string Message { get; }
 
         public Diagnostic(
             CodeFile file,
@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
             string message)
         {
             if (string.IsNullOrWhiteSpace(message))
-                throw new ArgumentException("message", nameof(message));
+                throw new ArgumentException("Can't be null or whitespace", nameof(message));
 
             Requires.ValidEnum(nameof(level), level);
             Requires.ValidEnum(nameof(phase), phase);
@@ -40,20 +40,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
 
         public bool IsFatal => Level == DiagnosticLevel.FatalCompilationError;
 
-        public int CompareTo(Diagnostic other)
-        {
-            if (ReferenceEquals(this, other))
-                return 0;
-            if (ReferenceEquals(null, other))
-                return 1;
-            var startPositionComparison = StartPosition.CompareTo(other.StartPosition);
-            if (startPositionComparison != 0)
-                return startPositionComparison;
-            var endPositionComparison = EndPosition.CompareTo(other.EndPosition);
-            if (endPositionComparison != 0)
-                return endPositionComparison;
-            return ErrorCode.CompareTo(other.ErrorCode);
-        }
+        //public int CompareTo(Diagnostic other)
+        //{
+        //    if (ReferenceEquals(this, other))
+        //        return 0;
+        //    if (ReferenceEquals(null, other))
+        //        return 1;
+        //    var startPositionComparison = StartPosition.CompareTo(other.StartPosition);
+        //    if (startPositionComparison != 0)
+        //        return startPositionComparison;
+        //    var endPositionComparison = EndPosition.CompareTo(other.EndPosition);
+        //    if (endPositionComparison != 0)
+        //        return endPositionComparison;
+        //    return ErrorCode.CompareTo(other.ErrorCode);
+        //}
 
         public override string ToString()
         {
