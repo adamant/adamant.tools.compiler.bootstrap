@@ -9,11 +9,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
     public static partial class TokenTypes
     {
+        // Must be before KeywordFactories because it is used in the construction of it
+        private static readonly int KeywordTokenLength = "KeywordToken".Length;
 
         public static readonly FixedDictionary<string, Func<TextSpan, IKeywordToken>> KeywordFactories =
             BuildKeywordFactories();
-
-        private static readonly int KeywordTokenLength = "KeywordToken".Length;
 
         private static FixedDictionary<string, Func<TextSpan, IKeywordToken>> BuildKeywordFactories()
         {
