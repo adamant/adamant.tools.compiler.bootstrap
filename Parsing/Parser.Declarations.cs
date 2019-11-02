@@ -206,7 +206,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             FixedList<IModiferToken> modifiers)
         {
             // We should only be called when there is a binding keyword
-            var binding = Tokens.Expect<IBindingToken>();
+            var binding = Tokens.Required<IBindingToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(identifier.Value);
             Tokens.Expect<IColonToken>();
