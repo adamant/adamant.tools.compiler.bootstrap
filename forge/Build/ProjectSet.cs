@@ -90,7 +90,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             Task<FixedDictionary<Project, Task<Package>>> projectBuildsTask,
             object consoleLock)
         {
-            var projectBuilds = await projectBuildsTask;
+            var projectBuilds = await projectBuildsTask.ConfigureAwait(false);
             var sourceDir = Path.Combine(project.Path, "src");
             var sourcePaths = Directory.EnumerateFiles(sourceDir, "*.ad", SearchOption.AllDirectories);
             // Wait for the references, unfortunately, this requires an ugly loop.

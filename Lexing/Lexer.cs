@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -10,6 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
 {
     public class Lexer
     {
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Unit testability")]
         public ITokenIterator<IToken> Lex(ParseContext context)
         {
             return new TokenIterator<IToken>(context, Lex(context.File, context.Diagnostics));
@@ -289,7 +292,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                             tokenEnd += 1;
 
                         var span = TokenSpan();
-                        var value = BigInteger.Parse(code[span]);
+                        var value = BigInteger.Parse(code[span], CultureInfo.InvariantCulture);
                         yield return TokenFactory.IntegerLiteral(span, value);
                         break;
                     }
@@ -369,11 +372,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                 return index < text.Length ? text[index] : default;
             }
 
-            char? CharAt(int offset)
-            {
-                var index = tokenStart + offset;
-                return index < text.Length ? text[index] : default;
-            }
+            //char? CharAt(int offset)
+            //{
+            //    var index = tokenStart + offset;
+            //    return index < text.Length ? text[index] : default;
+            //}
 
             bool NextCharIs(char c)
             {
