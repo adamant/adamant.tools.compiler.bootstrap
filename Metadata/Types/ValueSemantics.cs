@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     /// <summary>
@@ -6,12 +8,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// Value Types:
     /// Move - the value is moved
     /// Copy - the value is copied, either memcopy or using copy initializer
-    /// 
+    ///
     /// Reference Types:
     /// MoveOwner - move an owned reference
     /// Borrow - copy the reference, borrow the object
     /// Alias - copy the reference, alias the object
     /// </summary>
+    [SuppressMessage("Naming", "CA1717:Only FlagsAttribute enums should have plural names", Justification = "Name not plural")]
     public enum ValueSemantics
     {
         /// <summary>

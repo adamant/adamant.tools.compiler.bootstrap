@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Numerics;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
@@ -8,11 +9,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// </summary>
     public class IntegerConstantType : IntegerType
     {
-        public readonly BigInteger Value;
+        public BigInteger Value { get; }
         public override bool IsKnown => true;
 
         public IntegerConstantType(BigInteger value)
-            : base(value.ToString())
+            : base(value.ToString(CultureInfo.InvariantCulture))
         {
             Value = value;
         }

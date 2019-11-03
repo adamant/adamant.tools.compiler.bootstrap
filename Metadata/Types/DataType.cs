@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using ExhaustiveMatching;
 
@@ -24,8 +25,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public static readonly BoolType Bool = BoolType.Instance;
         public static readonly AnyType Any = AnyType.ImmutableInstance;
         public static readonly SizedIntegerType Byte = SizedIntegerType.Byte;
+#pragma warning disable CA1720
         public static readonly SizedIntegerType Int = SizedIntegerType.Int;
         public static readonly SizedIntegerType UInt = SizedIntegerType.UInt;
+#pragma warning restore CA1720
         public static readonly UnsizedIntegerType Size = UnsizedIntegerType.Size;
         public static readonly UnsizedIntegerType Offset = UnsizedIntegerType.Offset;
 
@@ -81,6 +84,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         public abstract override string ToString();
 
+        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Return self idiom")]
         public static implicit operator Self(DataType type)
         {
             return new Self(type);

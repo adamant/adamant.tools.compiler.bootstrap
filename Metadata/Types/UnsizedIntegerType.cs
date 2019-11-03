@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         internal new static readonly UnsizedIntegerType Size = new UnsizedIntegerType("size", false);
         internal new static readonly UnsizedIntegerType Offset = new UnsizedIntegerType("offset", true);
 
-        public readonly bool IsSigned;
+        public bool IsSigned { get; }
         public override bool IsKnown => true;
 
         private UnsizedIntegerType(string name, bool signed)

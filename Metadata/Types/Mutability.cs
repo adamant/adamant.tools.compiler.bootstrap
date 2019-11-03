@@ -12,24 +12,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     }
 
     [DebuggerDisplay("{" + nameof(Name) + ",nq}")]
-    public struct Mutability
+    public struct Mutability : IEquatable<Mutability>
     {
-        public static Mutability Mutable = new Mutability(true, Upgradable.None);
+        public static readonly Mutability Mutable = new Mutability(true, Upgradable.None);
 
         /// <summary>
         /// An immutable reference that could be made mutable with an explicit `mut` expression.
         /// For example, a simple variable reference `x` to a variable declared with a mutable type.
         /// </summary>
-        public static Mutability ExplicitlyUpgradable = new Mutability(false, Upgradable.Explicitly);
+        public static readonly Mutability ExplicitlyUpgradable = new Mutability(false, Upgradable.Explicitly);
 
         /// <summary>
         /// A immutable reference that can be upgraded to an mutable one implicitly. This
         /// occurs with expressions returning ownership (i.e. `new`, `move` and
         /// functions returning `$owned`)
         /// </summary>
-        public static Mutability ImplicitlyUpgradable = new Mutability(false, Upgradable.Implicitly);
+        public static readonly Mutability ImplicitlyUpgradable = new Mutability(false, Upgradable.Implicitly);
 
-        public static Mutability Immutable = new Mutability(false, Upgradable.None);
+        public static readonly Mutability Immutable = new Mutability(false, Upgradable.None);
 
         /// <summary>
         /// Whether the reference itself is mutable
@@ -64,24 +64,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
             switch (upgradable)
             {
+                default:
+#pragma warning disable CA1065 // Do not raise exceptions in unexpected locations
+                    throw ExhaustiveMatch.Failed(upgradable);
+#pragma warning restore CA1065 // Do not raise exceptions in unexpected locations
                 case Upgradable.None:
                     return "";
                 case Upgradable.Implicitly:
                 case Upgradable.Explicitly:
                     return "(mut) ";
-                default:
-                    throw ExhaustiveMatch.Failed(upgradable);
             }
         }
 
         public static bool operator ==(Mutability left, Mutability right)
         {
-            return left.mutable == right.mutable && left.upgradable == right.upgradable;
+            return left.Equals(right);
         }
 
         public static bool operator !=(Mutability left, Mutability right)
         {
-            return !(left == right);
+            return !left.Equals(right);
         }
 
         public override int GetHashCode()
@@ -91,8 +93,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         public override bool Equals(object? obj)
         {
-            var right = obj as Mutability?;
-            return this == right;
+            if (obj is Mutability other) return Equals(other);
+            return false;
+        }
+
+        public bool Equals(Mutability other)
+        {
+            return mutable == other.mutable && upgradable == other.upgradable;
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]

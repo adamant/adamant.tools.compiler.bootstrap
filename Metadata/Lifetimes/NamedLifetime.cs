@@ -2,7 +2,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes
 {
     public class NamedLifetime : Lifetime
     {
-        public readonly string Name;
+        public string Name { get; }
 
         public NamedLifetime(string name)
         {

@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// </summary>
     public class OptionalType : ValueType, IEquatable<OptionalType>
     {
-        public readonly DataType Referent;
+        public DataType Referent { get; }
 
         public override bool IsKnown { get; }
 
