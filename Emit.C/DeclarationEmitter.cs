@@ -107,13 +107,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             var typeName = nameMangler.MangleName(@class);
 
-            // Struct Declarations
+            // Struct Forward Declarations
             var selfType = $"{typeName}___Self";
             var vtableType = $"{typeName}___VTable";
             var types = code.TypeDeclarations;
             types.AppendLine($"typedef struct {selfType} {selfType};");
             types.AppendLine($"typedef struct {vtableType} {vtableType};");
-            types.AppendLine($"typedef struct {{ {vtableType} const* restrict _vtable; {selfType}* restrict _self; }} {typeName};");
+            types.AppendLine($"typedef struct {typeName} {typeName};");
 
             var structs = code.StructDeclarations;
             structs.AppendLine($"struct {selfType}");
@@ -146,6 +146,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 globals.AppendLine($".{fieldName} = {functionName},");
             }
             globals.EndBlockWithSemicolon();
+
+            structs.AppendLine($"struct {typeName}");
+            structs.BeginBlock();
+            structs.AppendLine($"{vtableType} const* restrict _vtable;");
+            structs.AppendLine($"{selfType}* restrict _self;");
+            structs.EndBlockWithSemicolon();
         }
     }
 }

@@ -63,7 +63,11 @@ INTEGER_OPERATIONS(_offset)
 // conversions
 inline _int _convert___byte___int(_byte value) { return (_int) {value._value}; }
 
+// Forward declare String that is in std lib for use by intrinsics
+typedef struct String String;
+
 // Intrinsic Functions
+String _uint__to_display_string__0(_uint value);
 _size intrinsics__mem_allocate__1(_size length);
 void intrinsics__mem_deallocate__1(_size ptr);
 void intrinsics__mem_copy__3(_size from_ptr, _size to_ptr, _size length);
