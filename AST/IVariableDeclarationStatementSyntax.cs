@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public interface IVariableDeclarationStatementSyntax : IStatementSyntax, IBindingSymbol
+    public interface IVariableDeclarationStatementSyntax : IBodyStatementSyntax, IBindingSymbol
     {
         TextSpan NameSpan { get; }
         SimpleName Name { get; }

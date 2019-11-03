@@ -62,8 +62,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     case IExpressionStatementSyntax expressionStatement:
                         InferType(ref expressionStatement.Expression);
                         break;
-                    case IResultStatementSyntax _:
-                        throw new InvalidOperationException("Result statement in body");
                 }
         }
 

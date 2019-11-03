@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -165,9 +166,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         {
             var openBrace = Tokens.Expect<IOpenBraceToken>();
             var statements = ParseMany<IStatementSyntax, ICloseBraceToken>(ParseStatement);
+            foreach (var resultStatement in statements.OfType<IResultStatementSyntax>())
+                Add(ParseError.ResultStatementInBody(File, resultStatement.Span));
             var closeBrace = Tokens.Expect<ICloseBraceToken>();
             var span = TextSpan.Covering(openBrace, closeBrace);
-            return new BodySyntax(span, statements);
+            return new BodySyntax(span, statements.OfType<IBodyStatementSyntax>().ToFixedList());
         }
         #endregion
 

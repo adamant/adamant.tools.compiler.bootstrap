@@ -46,5 +46,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3006,
                 "Can't move out of expression. Can only move out of variable.");
         }
+
+        public static Diagnostic ResultStatementInBody(CodeFile file, TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3007,
+                "Result statements can't appear directly in function or method bodies. Must be in block expression.");
+        }
     }
 }

@@ -41,11 +41,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         public void Check(FixedList<IEntityDeclarationSyntax> entities)
         {
-            // Process all types first because they may be referenced by functions etc.
+            // Process all classes first because they may be referenced by functions etc.
             foreach (var @class in entities.OfType<IClassDeclarationSyntax>())
                 ResolveSignatureTypes(@class);
 
-            // Now resolve all other types (class declarations will already have types and won't be processed again)
+            // Now resolve all other signature types (class declarations will already have types and won't be processed again)
             foreach (var entity in entities)
                 ResolveSignatureTypes(entity);
 
