@@ -15,8 +15,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         public static readonly SimpleName Bool = SimpleName.Special("bool");
         public static readonly SimpleName Any = SimpleName.Special("Any");
         public static readonly SimpleName Byte = SimpleName.Special("byte");
+#pragma warning disable CA1720
         public static readonly SimpleName Int = SimpleName.Special("int");
         public static readonly SimpleName UInt = SimpleName.Special("uint");
+#pragma warning restore CA1720
         public static readonly SimpleName Size = SimpleName.Special("size");
         public static readonly SimpleName Offset = SimpleName.Special("offset");
 
