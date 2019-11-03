@@ -22,6 +22,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
             return new FixedDictionary<TKey, TValue>(source.ToDictionary(keySelector, valueSelector));
         }
 
+        public static FixedDictionary<TKey, TValue> ToFixedDictionary<TKey, TValue>(
+            this IEnumerable<(TKey Key, TValue Value)> source)
+            where TKey : notnull
+        {
+            return new FixedDictionary<TKey, TValue>(source.ToDictionary(s => s.Key, s => s.Value));
+        }
+
         public static FixedDictionary<TKey, TSource> ToFixedDictionary<TSource, TKey>(
             this IEnumerable<TSource> source,
             Func<TSource, TKey> keySelector)

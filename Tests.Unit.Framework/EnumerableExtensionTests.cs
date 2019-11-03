@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Xunit;
@@ -16,17 +15,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Framework
             var items2 = new[] { "1", "2", "3" };
             var expected = new[]
             {
-                Tuple.Create(1, "1"),
-                Tuple.Create(1, "2"),
-                Tuple.Create(1, "3"),
-                Tuple.Create(2, "1"),
-                Tuple.Create(2, "2"),
-                Tuple.Create(2, "3"),
-                Tuple.Create(3, "1"),
-                Tuple.Create(3, "2"),
-                Tuple.Create(3, "3"),
+                (1, "1"),
+                (1, "2"),
+                (1, "3"),
+                (2, "1"),
+                (2, "2"),
+                (2, "3"),
+                (3, "1"),
+                (3, "2"),
+                (3, "3"),
             }.ToHashSet();
-            Assert.Equal(expected, items1.CrossJoin(items2, Tuple.Create).ToHashSet());
+            Assert.Equal(expected, items1.CrossJoin(items2).ToHashSet());
         }
     }
 }

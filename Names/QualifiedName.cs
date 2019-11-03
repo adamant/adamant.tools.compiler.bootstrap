@@ -26,6 +26,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public override IEnumerable<SimpleName> Segments => Qualifier.Segments.Append(UnqualifiedName);
 
+        public override IEnumerable<Name> NestedInNames()
+        {
+            return Qualifier.NestedInNames().Append(Qualifier);
+        }
+
+        public override IEnumerable<Name> NamespaceNames()
+        {
+            return Qualifier.NamespaceNames().Append(this);
+        }
+
         public override bool HasQualifier(Name name)
         {
             return Qualifier.Equals(name);

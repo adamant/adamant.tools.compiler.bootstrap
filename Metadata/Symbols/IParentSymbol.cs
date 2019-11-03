@@ -7,7 +7,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
     /// </summary>
     [Closed(
         typeof(ITypeSymbol),
-        typeof(IFunctionSymbol))]
+        typeof(IFunctionSymbol),
+        typeof(INamespaceSymbol))]
     public interface IParentSymbol : ISymbol
     {
         SymbolSet ChildSymbols { get; }

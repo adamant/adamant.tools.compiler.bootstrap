@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
@@ -14,8 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
 
         public VariableFlags(IConcreteCallableDeclarationSyntax callable, bool defaultValue)
         {
-            symbolMap = callable.ChildSymbols.Values.SelectMany(l => l).Enumerate()
-                .ToFixedDictionary(t => t.Item1, t => t.Item2);
+            symbolMap = callable.ChildSymbols.Enumerate<ISymbol>().ToFixedDictionary();
             flags = new BitArray(symbolMap.Count, defaultValue);
         }
 

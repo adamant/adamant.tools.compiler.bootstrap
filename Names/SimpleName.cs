@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 
@@ -42,6 +43,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public override IEnumerable<SimpleName> Segments => this.Yield();
+
+        public override IEnumerable<Name> NestedInNames()
+        {
+            return Enumerable.Empty<Name>();
+        }
+
+        public override IEnumerable<Name> NamespaceNames()
+        {
+            return this.Yield();
+        }
 
         public override bool HasQualifier(Name name)
         {

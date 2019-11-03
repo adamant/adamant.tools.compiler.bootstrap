@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
                 return;
 
             var constructor = new DefaultConstructor((UserObjectType)DeclaresType.Fulfilled());
-            ChildSymbols = new SymbolSet(ChildSymbols.Values.SelectMany(s => s).Append(constructor));
+            ChildSymbols = new SymbolSet(ChildSymbols.Append<ISymbol>(constructor));
         }
 
         public override string ToString()

@@ -21,6 +21,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
             return name;
         }
 
+        public override IEnumerable<Name> NestedInNames()
+        {
+            return Enumerable.Empty<Name>();
+        }
+
+        public override IEnumerable<Name> NamespaceNames()
+        {
+            return Enumerable.Empty<Name>();
+        }
+
         public override string ToString()
         {
             return "::";

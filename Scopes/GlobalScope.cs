@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Scopes
     public class GlobalScope : LexicalScope
     {
         public GlobalScope(IEnumerable<ISymbol> symbols, IEnumerable<ISymbol> nestedSymbols)
-            : base(symbols, nestedSymbols)
+            : base(new SymbolSet(symbols), new SymbolSet(nestedSymbols))
         {
         }
 

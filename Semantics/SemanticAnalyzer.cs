@@ -79,12 +79,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             FixedDictionary<string, Package> references,
             Diagnostics diagnostics)
         {
-            var scopesBuilder = new PackageLexicalScopesBuilder(diagnostics, packageSyntax, references);
+            var scopesBuilder = new PackageLexicalScopesBuilder(packageSyntax, references, diagnostics);
             scopesBuilder.BuildScopesFor(packageSyntax);
             var stringSymbol = scopesBuilder.GlobalScope.LookupGlobal(new SimpleName("String"))
                                             .OfType<ITypeSymbol>().FirstOrDefault();
             if (stringSymbol == null)
-                diagnostics.Add(SemanticError.NoStringTypeDefined(packageSyntax.CompilationUnits.First().CodeFile));
+                // TODO we are assuming there is a compilation unit. This should be generated against the package itself
+                diagnostics.Add(SemanticError.NoStringTypeDefined(packageSyntax.CompilationUnits[0].CodeFile));
             return stringSymbol;
         }
 

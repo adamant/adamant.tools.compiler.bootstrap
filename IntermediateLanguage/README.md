@@ -37,3 +37,7 @@ If desired a more flexible assembly language can be provided for human use. This
 * Declarations of variables at any point on the code
 * Assignment of initial values as part of declaration statements;
 * Comments introduced with double slash
+
+## Namespaces
+
+Like the CIL, the Adamant IL doesn't contain namespaces. Rather, each entity name is its fully qualified name. This means that a package can never expose an empty namespace.

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
@@ -25,6 +26,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             References = new Dictionary<string, Package>(references).ToFixedDictionary();
             EntryPoint = entryPoint;
             Declarations = declarations.ToFixedList();
+        }
+
+        public IEnumerable<Declaration> GetNonMemberDeclarations()
+        {
+            return Declarations.Where(d => !d.IsMember);
         }
     }
 }

@@ -103,7 +103,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
 
         private Declaration BuildDefaultConstructor(IClassDeclarationSyntax classDeclaration)
         {
-            var symbol = classDeclaration.ChildSymbols.Values.SelectMany(l => l)
+            var symbol = classDeclaration.ChildSymbols.ImplicitCast<ISymbol>()
                             .OfType<DefaultConstructor>().Single();
             if (declarations.TryGetValue(symbol, out var declaration))
                 return declaration;
@@ -113,7 +113,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
             var selfName = className.Qualify(SpecialName.Self);
             var selfParameter = new Parameter(false, selfName, selfType);
             var parameters = selfParameter.Yield().ToFixedList();
-            //var constructorType = new FunctionType(selfType.Yield(), selfType);
 
             var graph = new ControlFlowGraphBuilder(classDeclaration.File);
             graph.AddSelfParameter(selfType);
@@ -122,7 +121,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
 
             var defaultConstructor = new ConstructorDeclaration(
                                             symbol.FullName,
-                                            //constructorType,
                                             parameters,
                                             selfType,
                                             graph.Build());

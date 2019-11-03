@@ -5,8 +5,10 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
 {
-    // A set of symbols that are indexed by name
-    public class SymbolSet : FixedDictionary<SimpleName, FixedList<ISymbol>>
+    /// <summary>
+    /// An immutable set of symbols that are indexed by their unqualified name
+    /// </summary>
+    public class SymbolSet : FixedDictionary<SimpleName, FixedList<ISymbol>>, IEnumerable<ISymbol>
     {
         public new static readonly SymbolSet Empty = new SymbolSet(Enumerable.Empty<ISymbol>());
 
@@ -25,6 +27,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
         private static SimpleName LookupByName(ISymbol symbol)
         {
             return symbol.FullName.UnqualifiedName.WithoutNumber();
+        }
+
+        IEnumerator<ISymbol> IEnumerable<ISymbol>.GetEnumerator()
+        {
+            return Values.SelectMany().GetEnumerator();
         }
     }
 }

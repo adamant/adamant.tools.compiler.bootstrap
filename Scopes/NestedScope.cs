@@ -12,12 +12,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Scopes
 
         public NestedScope(
             LexicalScope containingScope,
-            IEnumerable<ISymbol> symbols,
-            IEnumerable<ISymbol> nestedSymbols)
-            : base(symbols, nestedSymbols)
+            SymbolSet symbols,
+            SymbolSet? nestedSymbols = null)
+            : base(symbols, nestedSymbols ?? SymbolSet.Empty)
         {
             ContainingScope = containingScope;
         }
+
+        public NestedScope(LexicalScope containingScope, IEnumerable<ISymbol> symbols)
+            : this(containingScope, new SymbolSet(symbols), SymbolSet.Empty)
+        { }
+
+        public NestedScope(LexicalScope containingScope, ISymbol symbol)
+            : this(containingScope, new SymbolSet(symbol.Yield()), SymbolSet.Empty)
+        { }
+
 
         public override FixedList<ISymbol> Lookup(SimpleName name)
         {

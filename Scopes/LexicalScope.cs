@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
@@ -12,10 +11,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Scopes
         private readonly SymbolSet symbols;
         private readonly SymbolSet nestedSymbols;
 
-        protected LexicalScope(IEnumerable<ISymbol> symbols, IEnumerable<ISymbol> nestedSymbols)
+        protected LexicalScope(SymbolSet symbols, SymbolSet nestedSymbols)
         {
-            this.symbols = new SymbolSet(symbols);
-            this.nestedSymbols = new SymbolSet(nestedSymbols);
+            this.symbols = symbols;
+            this.nestedSymbols = nestedSymbols;
         }
 
         public virtual FixedList<ISymbol> Lookup(SimpleName name)

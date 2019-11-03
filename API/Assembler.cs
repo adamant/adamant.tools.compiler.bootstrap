@@ -34,6 +34,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         {
             switch (declaration)
             {
+                default:
+                    throw ExhaustiveMatch.Failed(declaration);
                 case FunctionDeclaration function:
                     Disassemble(function, builder);
                     break;
@@ -46,8 +48,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                 case FieldDeclaration field:
                     Disassemble(field, builder);
                     break;
-                default:
-                    throw ExhaustiveMatch.Failed(declaration);
             }
         }
 
@@ -102,7 +102,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
 
         private void Disassemble(ClassDeclaration @class, AssemblyBuilder builder)
         {
-            builder.BeginLine("type ");
+            builder.BeginLine("class ");
             builder.Append(@class.FullName.ToString());
             builder.EndLine();
             builder.BeginBlock();

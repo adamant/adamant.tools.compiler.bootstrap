@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
 {
@@ -33,38 +34,44 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
 
         public static Diagnostic CouldNotBindConstructor(CodeFile file, TextSpan span)
         {
-            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5001,
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5004,
                 $"Type doesn't have a constructor with this name and number of arguments.");
         }
 
         public static Diagnostic AmbiguousConstructorCall(CodeFile file, TextSpan span)
         {
-            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5002,
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5005,
                 $"Constructor call is ambiguous.");
         }
 
         public static Diagnostic CouldNotBindFunction(CodeFile file, TextSpan span)
         {
-            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5001,
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5006,
                 $"Could not find function with this name and number of arguments.");
         }
 
         public static Diagnostic AmbiguousFunctionCall(CodeFile file, TextSpan span)
         {
-            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5002,
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5007,
                 $"Function call is ambiguous.");
         }
 
         public static Diagnostic CouldNotBindMethod(CodeFile file, TextSpan span)
         {
-            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5001,
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5008,
                 $"Could not find method with this name and number of arguments.");
         }
 
         public static Diagnostic AmbiguousMethodCall(CodeFile file, TextSpan span)
         {
-            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5002,
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 5009,
                 $"Method call is ambiguous.");
+        }
+
+        public static Diagnostic UsingNonExistentNamespace(CodeFile file, TextSpan span, Name ns)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Analysis, 5010,
+                $"Using directive refers to namespace `{ns}` which does not exist");
         }
     }
 }

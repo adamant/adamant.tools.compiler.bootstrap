@@ -2,23 +2,33 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.AST.Walkers;
+using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 {
     internal class SyntaxLexicalScopesBuilder : SyntaxWalker<LexicalScope>
     {
-        private readonly FixedList<ISymbol> nonMemberEntitySymbols;
+        private readonly CodeFile file;
         private readonly GlobalScope globalScope;
+        private readonly FixedList<Namespace> namespaces;
+        private readonly Diagnostics diagnostics;
 
-        public SyntaxLexicalScopesBuilder(FixedList<ISymbol> nonMemberEntitySymbols, GlobalScope globalScope)
+        public SyntaxLexicalScopesBuilder(
+            CodeFile file,
+            GlobalScope globalScope,
+            FixedList<Namespace> namespaces,
+            Diagnostics diagnostics)
         {
-            this.nonMemberEntitySymbols = nonMemberEntitySymbols;
+            this.file = file;
             this.globalScope = globalScope;
+            this.namespaces = namespaces;
+            this.diagnostics = diagnostics;
         }
 
         protected override void WalkNonNull(ISyntax syntax, LexicalScope containingScope)
@@ -31,7 +41,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     break;
                 case INamespaceDeclarationSyntax ns:
                     if (ns.IsGlobalQualified) containingScope = globalScope;
-
                     containingScope = BuildNamespaceScopes(ns.Name, containingScope);
                     containingScope = BuildUsingDirectivesScope(ns.UsingDirectives, containingScope);
                     break;
@@ -61,7 +70,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                 case IForeachExpressionSyntax foreachExpression:
                     Walk(foreachExpression.TypeSyntax, containingScope);
                     Walk(foreachExpression.InExpression, containingScope);
-                    containingScope = new NestedScope(containingScope, foreachExpression.Yield(), Enumerable.Empty<ISymbol>());
+                    containingScope = new NestedScope(containingScope, foreachExpression);
                     Walk(foreachExpression.Block, containingScope);
                     return;
                 case IBodyOrBlockSyntax bodyOrBlock:
@@ -71,10 +80,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                         // Each variable declaration effectively starts a new scope after it, this
                         // ensures a lookup returns the last declaration
                         if (statement is IVariableDeclarationStatementSyntax variableDeclaration)
-                            containingScope = new NestedScope(
-                                                containingScope,
-                                                variableDeclaration.Yield(),
-                                                Enumerable.Empty<ISymbol>());
+                            containingScope = new NestedScope(containingScope, variableDeclaration);
                     }
                     return;
             }
@@ -82,17 +88,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             WalkChildren(syntax, containingScope);
         }
 
-        private LexicalScope BuildNamespaceScopes(RootName ns, LexicalScope containingScope)
+        private LexicalScope BuildNamespaceScopes(RootName nsName, LexicalScope containingScope)
         {
             Name name;
-            switch (ns)
+            switch (nsName)
             {
                 default:
-                    throw ExhaustiveMatch.Failed(ns);
+                    throw ExhaustiveMatch.Failed(nsName);
                 case GlobalNamespaceName _:
-                    // TODO is this correct for namespace declarations that are global qualified (i.e. `::.`)?
-                    // Perhaps it is because it could be nested inside other using statements
-                    return containingScope;
+                    // Compilation units can have the global namespace as their namespace name
+                    return globalScope;
                 case QualifiedName qualifiedName:
                     containingScope = BuildNamespaceScopes(qualifiedName.Qualifier, containingScope);
                     name = qualifiedName;
@@ -102,9 +107,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     break;
             }
 
-            var symbolsInNamespace = nonMemberEntitySymbols.Where(s => s.FullName.HasQualifier(name));
-            var symbolsNestedInNamespace = nonMemberEntitySymbols.Where(s => s.FullName.IsNestedIn(name));
-            return new NestedScope(containingScope, symbolsInNamespace, symbolsNestedInNamespace);
+            var @namespace = namespaces.Single(ns => ns.FullName.Equals(name));
+            return new NestedScope(containingScope, @namespace.ChildSymbols, @namespace.NestedSymbols);
         }
 
         private LexicalScope BuildUsingDirectivesScope(
@@ -113,14 +117,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         {
             if (!usingDirectives.Any()) return containingScope;
 
-            var importedSymbols =
-                usingDirectives.SelectMany(d => nonMemberEntitySymbols.Where(s => s.FullName.HasQualifier(d.Name)));
-            return new NestedScope(containingScope, importedSymbols, Enumerable.Empty<ISymbol>());
+            var importedSymbols = Enumerable.Empty<ISymbol>();
+            foreach (var usingDirective in usingDirectives)
+            {
+                var @namespace = namespaces.SingleOrDefault(ns => ns.FullName.Equals(usingDirective.Name));
+                if (@namespace == null)
+                {
+                    diagnostics.Add(NameBindingError.UsingNonExistentNamespace(file, usingDirective.Span, usingDirective.Name));
+                    continue;
+                }
+
+                importedSymbols = importedSymbols.Concat(@namespace.ChildSymbols);
+            }
+
+            return new NestedScope(containingScope, importedSymbols);
         }
 
         private static LexicalScope BuildBodyScope(IEnumerable<IParameterSyntax> parameters, LexicalScope containingScope)
         {
-            return new NestedScope(containingScope, parameters, Enumerable.Empty<ISymbol>());
+            return new NestedScope(containingScope, parameters);
         }
     }
 }

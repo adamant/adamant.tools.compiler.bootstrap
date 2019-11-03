@@ -29,6 +29,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
             CompilationUnits = compilationUnits;
         }
 
+        public IEnumerable<IDeclarationSyntax> GetDeclarations()
+        {
+            var declarations = new Queue<IDeclarationSyntax>();
+            declarations.EnqueueRange(CompilationUnits.SelectMany(cu => cu.Declarations));
+            while (declarations.TryDequeue(out var declaration))
+            {
+                yield return declaration;
+                if (declaration is INamespaceDeclarationSyntax ns)
+                    declarations.EnqueueRange(ns.Declarations);
+            }
+        }
+
         public override string ToString()
         {
             return $"package {Name}: {CompilationUnits.Count} Compilation Units";
