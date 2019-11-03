@@ -2,13 +2,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
     public class Code
     {
-        public readonly CCodeBuilder Includes = new CCodeBuilder();
-        public readonly CCodeBuilder TypeIdDeclaration = new CCodeBuilder();
-        public readonly CCodeBuilder TypeDeclarations = new CCodeBuilder();
-        public readonly CCodeBuilder FunctionDeclarations = new CCodeBuilder();
-        public readonly CCodeBuilder StructDeclarations = new CCodeBuilder();
-        public readonly CCodeBuilder GlobalDefinitions = new CCodeBuilder();
-        public readonly CCodeBuilder Definitions = new CCodeBuilder();
+        public CCodeBuilder Includes { get; } = new CCodeBuilder();
+        public CCodeBuilder TypeIdDeclaration { get; } = new CCodeBuilder();
+        public CCodeBuilder TypeDeclarations { get; } = new CCodeBuilder();
+        public CCodeBuilder FunctionDeclarations { get; } = new CCodeBuilder();
+        public CCodeBuilder StructDeclarations { get; } = new CCodeBuilder();
+        public CCodeBuilder GlobalDefinitions { get; } = new CCodeBuilder();
+        public CCodeBuilder Definitions { get; } = new CCodeBuilder();
 
         public override string ToString()
         {

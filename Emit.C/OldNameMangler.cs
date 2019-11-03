@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -195,7 +196,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 }
 
                 builder.Append('µ');
-                builder.Append(codePoint.ToString("X")); // Supposedly faster than using AppendFormat()
+                builder.Append(codePoint.ToString("X", CultureInfo.InvariantCulture)); // Supposedly faster than using AppendFormat()
                 builder.Append('ǂ');
             }
         }
