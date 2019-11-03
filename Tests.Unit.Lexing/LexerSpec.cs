@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
     [Category("Lex")]
     public class LexerSpec
     {
-        private LexResult Lex(string text)
+        private static LexResult Lex(string text)
         {
             var lexer = new Lexer();
             var context = FakeParseContext.For(text);
@@ -144,13 +144,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
             var result = Lex(literal);
             var token = result.AssertSingleToken();
             token.AssertStringLiteral(0, literal.Length, expectedValue);
-            var completeString = literal.EndsWith("\"");
+            var completeString = literal.EndsWith("\"", StringComparison.Ordinal);
             var expectedDiagnosticCount = completeString ? 1 : 2;
             result.AssertDiagnostics(expectedDiagnosticCount);
             var diagnostics = result.Diagnostics;
 
             var expectedLength = literal.Length;
-            if (literal.Contains('|')) expectedLength -= 1;
+            if (literal.Contains('|', StringComparison.Ordinal)) expectedLength -= 1;
             if (completeString)
                 diagnostics[0].AssertError(1003, 1, expectedLength - 2);
             else
@@ -174,7 +174,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
             result.Tokens[2].AssertIs<IWhitespaceToken>(2, 1);
             var diagnostic = result.AssertSingleDiagnostic();
             diagnostic.AssertError(1005, 1, 1);
-            Assert.True(diagnostic.Message.Contains(text[1]), "Doesn't contain character");
+            Assert.True(diagnostic.Message.Contains(text[1], StringComparison.Ordinal), "Doesn't contain character");
         }
 
         [Property(MaxTest = 10_000)]

@@ -102,11 +102,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
         {
             return $"TextSpan({Start},{Length})";
         }
-
-        //public int CompareTo(TextSpan other)
-        //{
-        //    var comparison = Start.CompareTo(other.Start);
-        //    return comparison != 0 ? comparison : Length.CompareTo(other.Length);
-        //}
     }
 }

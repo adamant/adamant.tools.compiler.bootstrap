@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
 
         public FixedList<Diagnostic> Build()
         {
-            items.Sort();
+            items.Sort((d1, d2) => d1.StartPosition.CompareTo(d2.StartPosition));
             return items.ToFixedList();
         }
 
