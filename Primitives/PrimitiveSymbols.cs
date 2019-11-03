@@ -13,6 +13,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
     {
         public static readonly FixedList<ISymbol> Instance;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance",
+            "CA1810:Initialize reference type static fields inline",
+            Justification = "Common context easier to read in static constructor")]
         static PrimitiveSymbols()
         {
             var stringType = UserObjectType.Declaration(Name.From("String"), false);
