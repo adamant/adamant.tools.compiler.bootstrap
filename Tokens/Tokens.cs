@@ -224,7 +224,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         typeof(IQuestionDotToken),
         typeof(ILessThanColonToken),
         typeof(IEqualsGreaterThanToken))]
-    public partial interface IToken { }
+    public partial interface IEssentialToken { }
 
 
     public partial interface IEndOfFileToken : IEssentialToken { }

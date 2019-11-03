@@ -2,7 +2,6 @@ using System;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Parsing.Tree;
@@ -415,6 +414,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IColonColonDotToken _:
                 case ILessThanColonToken _:
                 case ICommaToken _:
+                case IRightArrowToken _:
                 case IQuestionToken _:
                 case IKeywordToken _:
                 case IEndOfFileToken _:

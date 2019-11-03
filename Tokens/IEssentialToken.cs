@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         typeof(IBinaryOperatorToken),
         typeof(IPunctuationToken),
         typeof(IEndOfFileToken))]
-    public interface IEssentialToken : IToken
+    public partial interface IEssentialToken : IToken
     {
     }
 }

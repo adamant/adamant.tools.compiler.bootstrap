@@ -73,7 +73,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 <# for (int i = 0; i < tokens.Count; i++) {#>
         typeof(I<#=tokens[i]#>Token)<# if(i == tokens.Count-1) {#>)]<#} else {#>,<#}#>
 
-<#}#>    public partial interface IToken { }
+<#}#>    public partial interface IEssentialToken { }
 
 <# foreach(var token in tokens) {#>
 
