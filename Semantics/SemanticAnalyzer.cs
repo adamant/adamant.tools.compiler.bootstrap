@@ -81,7 +81,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         {
             var scopesBuilder = new PackageLexicalScopesBuilder(packageSyntax, references, diagnostics);
             scopesBuilder.BuildScopesFor(packageSyntax);
-            var stringSymbol = scopesBuilder.GlobalScope.LookupGlobal(new SimpleName("String"))
+            var stringSymbol = scopesBuilder.GlobalScope.LookupInGlobalScope(new SimpleName("String"))
                                             .OfType<ITypeSymbol>().FirstOrDefault();
             if (stringSymbol == null)
                 // TODO we are assuming there is a compilation unit. This should be generated against the package itself

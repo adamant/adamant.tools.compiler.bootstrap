@@ -12,9 +12,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Scopes
         {
         }
 
-        public override FixedList<ISymbol> LookupGlobal(SimpleName name)
+        public override FixedList<ISymbol> LookupInGlobalScope(Name name)
         {
-            return Lookup(name);
+            // Don't include nested scopes, it must be in the global scope because it is global qualified
+            return Lookup(name, includeNested: false);
         }
     }
 }

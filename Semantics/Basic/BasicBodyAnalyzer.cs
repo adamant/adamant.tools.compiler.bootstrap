@@ -65,7 +65,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
         }
 
-        public void ResolveTypes(IStatementSyntax statement)
+        private void ResolveTypes(IStatementSyntax statement)
         {
             switch (statement)
             {
@@ -173,8 +173,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 else
                 {
                     // If needed, convert the type to the referent type of the optional type
-                    InsertImplicitConversionIfNeeded(ref expression, optionalType.Referent);
-                    if (IsAssignableFrom(optionalType.Referent, expression.Type))
+                    var type = InsertImplicitConversionIfNeeded(ref expression, optionalType.Referent);
+                    if (IsAssignableFrom(optionalType.Referent, type))
                         expression = new ImplicitOptionalConversionExpression(expression, optionalType);
                 }
 
@@ -228,7 +228,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             return expression.Type!;
         }
 
-        private DataType InferType([NotNull] ref IExpressionSyntax expression)
+        private DataType InferType([NotNull] ref IExpressionSyntax? expression)
         {
             switch (expression)
             {
@@ -298,11 +298,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return boolLiteral.Type = DataType.Bool;
                 case IBinaryOperatorExpressionSyntax binaryOperatorExpression:
                 {
-                    InferType(ref binaryOperatorExpression.LeftOperand);
-                    var leftType = binaryOperatorExpression.LeftOperand.Type;
+                    var leftType = InferType(ref binaryOperatorExpression.LeftOperand);
                     var @operator = binaryOperatorExpression.Operator;
-                    InferType(ref binaryOperatorExpression.RightOperand);
-                    var rightType = binaryOperatorExpression.RightOperand.Type;
+                    var rightType = InferType(ref binaryOperatorExpression.RightOperand);
 
                     // If either is unknown, then we can't know whether there is a a problem.
                     // Note that the operator could be overloaded
@@ -342,9 +340,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     }
                     if (!compatible)
                         diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandsOfType(file,
-                            binaryOperatorExpression.Span, @operator,
-                            binaryOperatorExpression.LeftOperand.Type,
-                            binaryOperatorExpression.RightOperand.Type));
+                            binaryOperatorExpression.Span, @operator, leftType, rightType));
 
                     return binaryOperatorExpression.Type;
                 }
@@ -398,7 +394,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         return newObjectExpression.Type  = DataType.Unknown;
                     }
                     var constructedType = (UserObjectType)constructingType;
-                    var typeSymbol = GetSymbolForType(newObjectExpression.TypeSyntax.ContainingScope, constructedType);
+                    var typeSymbol = GetSymbolForType(newObjectExpression.TypeSyntax.ContainingScope.Assigned(), constructedType);
                     var constructors = typeSymbol.ChildSymbols[SpecialName.New].OfType<IFunctionSymbol>().ToFixedList();
                     constructors = ResolveOverload(constructors, null, argumentTypes);
                     switch (constructors.Count)
@@ -432,9 +428,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IForeachExpressionSyntax foreachExpression:
                 {
                     var declaredType = typeAnalyzer.Evaluate(foreachExpression.TypeSyntax);
-                    CheckForeachInType(declaredType, ref foreachExpression.InExpression);
-                    foreachExpression.VariableType =
-                        declaredType ?? foreachExpression.InExpression.Type;
+                    var expressionType = CheckForeachInType(declaredType, ref foreachExpression.InExpression);
+                    foreachExpression.VariableType =  declaredType ?? expressionType;
                     // TODO check the break types
                     InferBlockType(foreachExpression.Block);
                     // TODO assign correct type to the expression
@@ -467,7 +462,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     // TODO improve function lookup and include the possibility that the symbol isn't a function
                     //diagnostics.Add(TypeError.MustBeCallable(file, methodInvocation.Target));
                     //return methodInvocation.Type = DataType.Unknown;
-                    var typeSymbol = GetSymbolForType(methodInvocation.MethodNameSyntax.ContainingScope, targetType);
+                    var typeSymbol = GetSymbolForType(methodInvocation.MethodNameSyntax.ContainingScope.Assigned(), targetType);
                     typeSymbol.ChildSymbols.TryGetValue(methodInvocation.MethodNameSyntax.Name, out var childSymbols);
                     var methodSymbols = (childSymbols ?? FixedList<ISymbol>.Empty)
                         .OfType<IFunctionSymbol>().ToFixedList();
@@ -484,9 +479,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             var functionSymbol = methodSymbols.Single();
                             methodInvocation.MethodNameSyntax.ReferencedSymbol = functionSymbol;
 
-                            var selfType = functionSymbol.Parameters.First().Type;
-                            InsertImplicitConversionIfNeeded(ref methodInvocation.Target, selfType);
-                            CheckArgumentTypeCompatibility(selfType, methodInvocation.Target, true);
+                            var selfParamType = functionSymbol.Parameters.First().Type;
+                            InsertImplicitConversionIfNeeded(ref methodInvocation.Target, selfParamType);
+                            CheckArgumentTypeCompatibility(selfParamType, methodInvocation.Target, true);
 
                             // Skip the self parameter
                             foreach (var (arg, type) in methodInvocation.Arguments.Zip(functionSymbol
@@ -551,7 +546,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     else
                         targetType = InferType(ref memberAccess.Expression);
 
-                    var symbol = GetSymbolForType(memberAccess.Member.ContainingScope, targetType);
+                    var symbol = GetSymbolForType(memberAccess.Member.ContainingScope.Assigned(), targetType);
                     var member = memberAccess.Member;
                     var memberSymbols = symbol.Lookup(member.Name).OfType<IBindingSymbol>().ToFixedList();
                     var type = AssignReferencedSymbolAndType(member, memberSymbols);
@@ -705,19 +700,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         /// check handles range expressions in the specific case of `foreach` only. It marks them
         /// as having the same type as the range endpoints.
         /// </summary>
-        private DataType CheckForeachInType(DataType declaredType, ref IExpressionSyntax inExpression)
+        private DataType CheckForeachInType(DataType? declaredType, ref IExpressionSyntax inExpression)
         {
             switch (inExpression)
             {
                 case IBinaryOperatorExpressionSyntax binaryExpression when binaryExpression.Operator == BinaryOperator.DotDot:
-                    InferType(ref binaryExpression.LeftOperand);
+                    var leftType = InferType(ref binaryExpression.LeftOperand);
                     InferType(ref binaryExpression.RightOperand);
                     if (declaredType != null)
                     {
-                        InsertImplicitConversionIfNeeded(ref binaryExpression.LeftOperand, declaredType);
+                        leftType = InsertImplicitConversionIfNeeded(ref binaryExpression.LeftOperand, declaredType);
                         InsertImplicitConversionIfNeeded(ref binaryExpression.RightOperand, declaredType);
                     }
-                    return inExpression.Type = binaryExpression.LeftOperand.Type;
+                    return inExpression.Type = leftType;
                 default:
                     return InferType(ref inExpression);
             }
@@ -762,11 +757,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case UnknownType _:
                     return UnknownSymbol.Instance;
                 case UserObjectType objectType:
-                    return containingScope.LookupQualified(objectType.Name).OfType<ITypeSymbol>().Single();
+                    return containingScope.LookupInGlobalScope(objectType.Name).OfType<ITypeSymbol>().Single();
                 case SizedIntegerType integerType:
-                    return containingScope.LookupQualified(integerType.Name).OfType<ITypeSymbol>().Single();
+                    return containingScope.LookupInGlobalScope(integerType.Name).OfType<ITypeSymbol>().Single();
                 case UnsizedIntegerType integerType:
-                    return containingScope.LookupQualified(integerType.Name).OfType<ITypeSymbol>().Single();
+                    return containingScope.LookupInGlobalScope(integerType.Name).OfType<ITypeSymbol>().Single();
                 default:
                     throw new NotImplementedException();
             }
@@ -793,7 +788,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
         }
 
-        private bool NumericOperatorTypesAreCompatible(
+        private static bool NumericOperatorTypesAreCompatible(
             ref IExpressionSyntax leftOperand,
             ref IExpressionSyntax rightOperand)
         {
@@ -878,9 +873,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         //    }
         //}
 
-        private FixedList<IFunctionSymbol> ResolveOverload(
+        private static FixedList<IFunctionSymbol> ResolveOverload(
             FixedList<IFunctionSymbol> symbols,
-            DataType selfType,
+            DataType? selfType,
             FixedList<DataType> argumentTypes)
         {
             var expectedArgumentCount = argumentTypes.Count + (selfType != null ? 1 : 0);

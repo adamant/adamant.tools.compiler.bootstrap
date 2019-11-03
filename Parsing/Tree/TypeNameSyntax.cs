@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public FixedList<ISymbol> LookupInContainingScope()
         {
             if (ContainingScope != null)
-                return ContainingScope.LookupQualified(Name);
+                return ContainingScope.Lookup(Name);
 
             throw new InvalidOperationException("Can't lookup type name without containing scope");
         }

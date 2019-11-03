@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -26,12 +27,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             this.diagnostics = diagnostics;
         }
 
-        public DataType Evaluate(ITypeSyntax typeSyntax)
+        [return: NotNullIfNotNull("typeSyntax")]
+        public DataType? Evaluate(ITypeSyntax? typeSyntax)
         {
             switch (typeSyntax)
             {
                 default:
                     throw ExhaustiveMatch.Failed(typeSyntax);
+                case null:
+                    return null;
                 case ITypeNameSyntax typeName:
                 {
                     var symbols = typeName.LookupInContainingScope().OfType<ITypeSymbol>().ToFixedList();

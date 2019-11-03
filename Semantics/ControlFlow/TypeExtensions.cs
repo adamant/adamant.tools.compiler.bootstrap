@@ -5,9 +5,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 {
     internal static class TypeExtensions
     {
-        public static DataType Fulfilled(this DataType? type)
+        public static DataType Assigned(this DataType? type)
         {
-            return type ?? throw new InvalidOperationException("Type not fulfilled");
+            return type ?? throw new InvalidOperationException("Type not assigned");
         }
     }
 }

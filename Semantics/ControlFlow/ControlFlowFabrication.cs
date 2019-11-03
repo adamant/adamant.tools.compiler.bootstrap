@@ -63,7 +63,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     returnType = method.ReturnType.Known();
                     break;
                 case IConstructorDeclarationSyntax constructor:
-                    selfType = constructor.SelfParameterType.Fulfilled();
+                    selfType = constructor.SelfParameterType.Assigned();
                     returnType = DataType.Void; // the body should `return;`
                     break;
                 case IFunctionDeclarationSyntax function:
@@ -173,7 +173,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 case IVariableDeclarationStatementSyntax variableDeclaration:
                 {
                     var variable = graph.AddVariable(variableDeclaration.IsMutableBinding,
-                        variableDeclaration.Type.Fulfilled(),
+                        variableDeclaration.Type.Assigned(),
                         CurrentScope, variableDeclaration.Name.UnqualifiedName);
                     if (variableDeclaration.Initializer != null)
                     {
@@ -189,13 +189,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 {
                     // Skip expressions with unknown type
                     var expression = expressionStatement.Expression;
-                    if (!expression.Type.Fulfilled().IsKnown)
+                    if (!expression.Type.Assigned().IsKnown)
                         return;
 
                     if (expression.Type is EmptyType)
                         ConvertExpressionToStatement(expression);
                     else
-                        AssignToTemp(expression.Type.Fulfilled(), ConvertToValue(expression));
+                        AssignToTemp(expression.Type.Assigned(), ConvertToValue(expression));
 
                     return;
                 }
@@ -508,14 +508,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     throw new InvalidOperationException(
                         "Integer literals should have an implicit conversion around them");
                 case IStringLiteralExpressionSyntax stringLiteral:
-                    return new StringConstant(stringLiteral.Value, stringLiteral.Span, stringLiteral.Type.Fulfilled().AssertKnown());
+                    return new StringConstant(stringLiteral.Value, stringLiteral.Span, stringLiteral.Type.Assigned().AssertKnown());
                 case IBoolLiteralExpressionSyntax boolLiteral:
                     return new BooleanConstant(boolLiteral.Value, boolLiteral.Span);
                 case INoneLiteralExpressionSyntax _:
                     throw new InvalidOperationException(
                         "None literals should have an implicit conversion around them");
                 case IImplicitNumericConversionExpression implicitNumericConversion:
-                    if (implicitNumericConversion.Expression.Type.Fulfilled().AssertKnown() is
+                    if (implicitNumericConversion.Expression.Type.Assigned().AssertKnown() is
                         IntegerConstantType constantType)
                         return new IntegerConstant(constantType.Value,
                             implicitNumericConversion.Type.AssertKnown(),
@@ -525,8 +525,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         var valueOperand = ConvertToOperand(implicitNumericConversion.Expression);
                         return new Conversion(
                             valueOperand,
-                            (NumericType)implicitNumericConversion.Expression.Type.Fulfilled(),
-                            (NumericType)implicitNumericConversion.Type.Fulfilled(),
+                            (NumericType)implicitNumericConversion.Expression.Type.Assigned(),
+                            (NumericType)implicitNumericConversion.Type.Assigned(),
                             implicitNumericConversion.Span);
                     }
                 case IImplicitOptionalConversionExpression implicitOptionalConversionExpression:
@@ -600,7 +600,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private IOperand ConvertToOperand(IExpressionSyntax expression)
         {
             var value = ConvertToValue(expression);
-            return ConvertToOperand(value, expression.Type.Fulfilled());
+            return ConvertToOperand(value, expression.Type.Assigned());
         }
 
         private IOperand ConvertToOperand(IValue value, DataType type)
