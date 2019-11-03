@@ -70,12 +70,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                 case IConstructorDeclarationSyntax constructor:
                 {
                     var controlFlowGraph = controlFlowGraphFactory.CreateGraph(constructor);
-                    //var constructorType = (FunctionType)constructorDeclaration.Type.Known();
                     var parameters = BuildConstructorParameters(constructor);
-                    //constructorType = new FunctionType(parameters.Select(p => p.Type),
-                    //    constructorType.ReturnType);
                     declaration = new ConstructorDeclaration(constructor.FullName,
-                        /*constructorType,*/ parameters, constructor.SelfParameterType, controlFlowGraph);
+                       parameters, constructor.SelfParameterType, controlFlowGraph);
                     break;
                 }
                 case IFieldDeclarationSyntax fieldDeclaration:

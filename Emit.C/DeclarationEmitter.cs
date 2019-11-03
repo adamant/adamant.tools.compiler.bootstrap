@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
@@ -30,6 +30,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             switch (declaration)
             {
+                default:
+                    throw ExhaustiveMatch.Failed(declaration);
                 case FunctionDeclaration function:
                     if (function.IsExternal)
                         EmitExternalFunctionSignature(function, code);
@@ -45,8 +47,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 case FieldDeclaration _:
                     // fields are emitted as part of the type
                     break;
-                default:
-                    throw NonExhaustiveMatchException.For(declaration);
             }
         }
 

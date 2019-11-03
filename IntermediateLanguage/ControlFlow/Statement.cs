@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
@@ -7,6 +8,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     /// A statement in a block
     /// </summary>
     [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
+    [Closed(
+        typeof(ExpressionStatement),
+        typeof(BlockTerminatorStatement))]
     public abstract class Statement
     {
         public BasicBlockName Block { get; internal set; }

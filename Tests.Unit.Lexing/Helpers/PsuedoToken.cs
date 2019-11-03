@@ -10,13 +10,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
 {
     public class PsuedoToken
     {
+        public Type TokenType { get; }
 
-        public readonly Type TokenType;
+        public string Text { get; }
+        public object? Value { get; }
 
-        public readonly string Text;
-        public readonly object Value;
-
-        public PsuedoToken(Type tokenType, string text, object value = null)
+        public PsuedoToken(Type tokenType, string text, object? value = null)
         {
             TokenType = tokenType;
             Text = text;
@@ -39,14 +38,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
                     return new PsuedoToken(tokenType, token.Text(code), stringLiteral.Value);
                 case IIntegerLiteralToken integerLiteral:
                     return new PsuedoToken(tokenType, token.Text(code), integerLiteral.Value);
-                case IToken _:
-                    return new PsuedoToken(tokenType, token.Text(code));
                 default:
-                    throw NonExhaustiveMatchException.For(token);
+                    return new PsuedoToken(tokenType, token.Text(code));
             }
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is PsuedoToken token &&
                 (TokenType == token.TokenType

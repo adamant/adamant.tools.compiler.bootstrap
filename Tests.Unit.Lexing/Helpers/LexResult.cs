@@ -11,9 +11,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
 {
     public class LexResult
     {
-        public readonly CodeFile File;
-        public readonly FixedList<IToken> Tokens;
-        public readonly FixedList<Diagnostic> Diagnostics;
+        public CodeFile File { get; }
+        public FixedList<IToken> Tokens { get; }
+        public FixedList<Diagnostic> Diagnostics { get; }
 
         public LexResult(ITokenIterator<IToken> iterator)
         {
@@ -31,8 +31,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
         public IToken AssertSingleToken()
         {
             Assert.True(2 == Tokens.Count, $"Expected token count {1}, was {Tokens.Count - 1} (excluding EOF)");
-            var eof = Tokens.Last().AssertOfType<IEndOfFileToken>();
-            Assert.Equal(new TextSpan(Tokens[Tokens.Count - 2].Span.End, 0), eof.Span);
+            var eof = Tokens[^1].AssertOfType<IEndOfFileToken>();
+            Assert.Equal(new TextSpan(Tokens[^2].Span.End, 0), eof.Span);
             return Tokens[0];
         }
 

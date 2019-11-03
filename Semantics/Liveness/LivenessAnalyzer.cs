@@ -47,11 +47,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
 
             while (blocks.TryDequeue(out var block))
             {
-                var liveBeforeBlock = new BitArray(liveVariables.Before(block.Statements.First()));
+                var liveBeforeBlock = new BitArray(liveVariables.Before(block.Statements[0]));
 
                 var liveAfterBlock = new BitArray(numberOfVariables);
                 foreach (var successor in controlFlow.Edges.From(block))
-                    liveAfterBlock.Or(liveVariables.Before(successor.Statements.First()));
+                    liveAfterBlock.Or(liveVariables.Before(successor.Statements[0]));
 
                 if (block.Terminator is ReturnStatement && controlFlow.ReturnVariable.TypeIsNotEmpty)
                     liveAfterBlock[0] = true; // the return value is live after a block that returns
@@ -64,6 +64,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
                     liveSet.Or(liveAfterStatement);
                     switch (statement)
                     {
+                        default:
+                            throw ExhaustiveMatch.Failed(statement);
                         case AssignmentStatement assignment:
                             KillVariables(liveSet, assignment.Place);
                             EnlivenVariables(liveSet, assignment.Value);
@@ -85,8 +87,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
                         case ExitScopeStatement _:
                             // TODO use end scope statement to track liminal state
                             break;
-                        default:
-                            throw NonExhaustiveMatchException.For(statement);
                     }
 
                     // For the next statement

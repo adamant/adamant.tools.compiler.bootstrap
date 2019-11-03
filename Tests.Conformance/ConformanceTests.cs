@@ -252,7 +252,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             string testCasePath)
         {
             // First check if there is a file for the expected output
-            var match = Regex.Match(code, string.Format(ExpectedOutputFileFormat, channel));
+            var match = Regex.Match(code, string.Format(CultureInfo.InvariantCulture, ExpectedOutputFileFormat, channel));
             var path = match.Groups["file"]?.Captures.SingleOrDefault()?.Value;
             if (path != null)
             {
@@ -261,7 +261,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             }
 
             // Then look for inline expected output
-            match = Regex.Match(code, string.Format(ExpectedOutputFormat, channel));
+            match = Regex.Match(code, string.Format(CultureInfo.InvariantCulture, ExpectedOutputFormat, channel));
             return match.Groups["output"]?.Captures.SingleOrDefault()?.Value ?? "";
         }
 

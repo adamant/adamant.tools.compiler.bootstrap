@@ -318,7 +318,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         case BinaryOperator.Minus:
                         case BinaryOperator.Asterisk:
                         case BinaryOperator.Slash:
-                            compatible = NumericOperatorTypesAreCompatible(ref binaryOperatorExpression.LeftOperand, ref binaryOperatorExpression.RightOperand, null);
+                            compatible = NumericOperatorTypesAreCompatible(ref binaryOperatorExpression.LeftOperand, ref binaryOperatorExpression.RightOperand);
                             binaryOperatorExpression.Type = compatible ? leftType : DataType.Unknown;
                             break;
                         case BinaryOperator.EqualsEquals:
@@ -328,7 +328,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         case BinaryOperator.GreaterThan:
                         case BinaryOperator.GreaterThanOrEqual:
                             compatible = (leftType == DataType.Bool && rightType == DataType.Bool)
-                                         || NumericOperatorTypesAreCompatible(ref binaryOperatorExpression.LeftOperand, ref binaryOperatorExpression.RightOperand, null)
+                                         || NumericOperatorTypesAreCompatible(ref binaryOperatorExpression.LeftOperand, ref binaryOperatorExpression.RightOperand)
                                          /*|| OperatorOverloadDefined(@operator, binaryOperatorExpression.LeftOperand, ref binaryOperatorExpression.RightOperand)*/;
                             binaryOperatorExpression.Type = DataType.Bool;
                             break;
@@ -797,8 +797,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private bool NumericOperatorTypesAreCompatible(
             ref IExpressionSyntax leftOperand,
-            ref IExpressionSyntax rightOperand,
-            DataType resultType)
+            ref IExpressionSyntax rightOperand)
         {
             var leftType = leftOperand.Type;
             switch (leftType)

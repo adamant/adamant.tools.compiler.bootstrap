@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -10,7 +11,7 @@ using FsCheck;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
 {
-    public class Arbitrary
+    public static class Arbitrary
     {
         public static Arbitrary<PsuedoToken> PsuedoToken()
         {
@@ -167,7 +168,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
         private static Gen<PsuedoToken> GenIntegerLiteral()
         {
             return GenRegex(@"0|[1-9][0-9]*")
-                .Select(s => new PsuedoToken(typeof(IIntegerLiteralToken), s, BigInteger.Parse(s)));
+                .Select(s => new PsuedoToken(typeof(IIntegerLiteralToken), s, BigInteger.Parse(s, CultureInfo.InvariantCulture)));
         }
 
         private static Gen<PsuedoToken> GenStringLiteral()
@@ -176,22 +177,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             return GenRegex(@"\""([^\\""]|\\(r|n|0|t|\'|\""))*\""")
                 .Select(s =>
                 {
-                    var value = s
-                        .Substring(1, s.Length - 2)
-                        .Replace(@"\\", @"\b") // Swap out backslash escape to not mess up others
-                        .Replace(@"\r", "\r")
-                        .Replace(@"\n", "\n")
-                        .Replace(@"\0", "\0")
-                        .Replace(@"\t", "\t")
-                        .Replace(@"\'", "\'")
-                        .Replace(@"\""", "\"")
-                        .Replace(@"\b", "\\");
+                    var value = s[1..^1]
+                        .Replace(@"\\", @"\b", StringComparison.Ordinal) // Swap out backslash escape to not mess up others
+                        .Replace(@"\r", "\r", StringComparison.Ordinal)
+                        .Replace(@"\n", "\n", StringComparison.Ordinal)
+                        .Replace(@"\0", "\0", StringComparison.Ordinal)
+                        .Replace(@"\t", "\t", StringComparison.Ordinal)
+                        .Replace(@"\'", "\'", StringComparison.Ordinal)
+                        .Replace(@"\""", "\"", StringComparison.Ordinal)
+                        .Replace(@"\b", "\\", StringComparison.Ordinal);
 
                     return new PsuedoToken(typeof(IStringLiteralToken), s, value);
                 });
         }
 
-        public static FixedDictionary<string, Type> Symbols = new Dictionary<string, Type>()
+        public static readonly FixedDictionary<string, Type> Symbols = new Dictionary<string, Type>()
         {
             { "{", typeof(IOpenBraceToken) },
             { "}", typeof(ICloseBraceToken) },
