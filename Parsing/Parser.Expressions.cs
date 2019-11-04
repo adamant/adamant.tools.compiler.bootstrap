@@ -272,8 +272,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     binaryOperator = BinaryOperator.DotDot;
                     break;
                 case ILessThanDotDotToken _:
+                    binaryOperator = BinaryOperator.LessThanDotDot;
+                    break;
                 case IDotDotLessThanToken _:
+                    binaryOperator = BinaryOperator.DotDotLessThan;
+                    break;
                 case ILessThanDotDotLessThanToken _:
+                    binaryOperator = BinaryOperator.LessThanDotDotLessThan;
+                    break;
                 case IQuestionQuestionToken _:
                 case IDollarToken _:
                     throw new NotImplementedException();

@@ -335,7 +335,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             binaryOperatorExpression.Type = DataType.Bool;
                             break;
                         case BinaryOperator.DotDot:
-                            throw new NotImplementedException("Type of `..` operator");
+                        case BinaryOperator.LessThanDotDot:
+                        case BinaryOperator.DotDotLessThan:
+                        case BinaryOperator.LessThanDotDotLessThan:
+                            throw new NotImplementedException("Type of range operator");
                         default:
                             throw ExhaustiveMatch.Failed(@operator);
                     }
@@ -747,7 +750,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         {
             switch (inExpression)
             {
-                case IBinaryOperatorExpressionSyntax binaryExpression when binaryExpression.Operator == BinaryOperator.DotDot:
+                case IBinaryOperatorExpressionSyntax binaryExpression
+                    when binaryExpression.Operator == BinaryOperator.DotDot
+                    || binaryExpression.Operator == BinaryOperator.LessThanDotDot
+                    || binaryExpression.Operator == BinaryOperator.DotDotLessThan
+                    || binaryExpression.Operator == BinaryOperator.LessThanDotDotLessThan:
                     var leftType = InferType(ref binaryExpression.LeftOperand);
                     InferType(ref binaryExpression.RightOperand);
                     if (declaredType != null)

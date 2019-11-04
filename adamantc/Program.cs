@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AdamantC
     {
         public static int Main(string[] args)
         {
-            var app = new CommandLineApplication();
+            using var app = new CommandLineApplication();
 
             app.HelpOption();
 

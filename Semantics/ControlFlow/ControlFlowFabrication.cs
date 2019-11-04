@@ -290,19 +290,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     //     if x > temp => break;
                     // }
                     if (!(foreachExpression.InExpression is IBinaryOperatorExpressionSyntax inExpression)
-                        || inExpression.Operator != BinaryOperator.DotDot)
+                        || (inExpression.Operator != BinaryOperator.DotDot
+                            && inExpression.Operator != BinaryOperator.LessThanDotDot
+                            && inExpression.Operator != BinaryOperator.DotDotLessThan
+                            && inExpression.Operator != BinaryOperator.LessThanDotDotLessThan))
                         throw new NotImplementedException(
                             "`foreach` in non-range expression not implemented");
                     var startExpression = inExpression.LeftOperand;
                     var endExpression = inExpression.RightOperand;
 
-                    var variableType = (SimpleType)foreachExpression.VariableType;
+                    var variableType = (SimpleType)foreachExpression.VariableType.Assigned();
                     var loopVariable = graph.AddVariable(foreachExpression.IsMutableBinding,
                         variableType, CurrentScope, foreachExpression.VariableName);
                     var loopVariableLValue = loopVariable.LValueReference(foreachExpression.Span);
                     var loopVariableReference = loopVariable.Reference(foreachExpression.Span);
 
+                    var includeStart = inExpression.Operator == BinaryOperator.DotDot
+                                       || inExpression.Operator == BinaryOperator.DotDotLessThan;
+                    var includeEnd = inExpression.Operator == BinaryOperator.DotDot
+                                       || inExpression.Operator == BinaryOperator.LessThanDotDot;
+
                     var startValue = ConvertToValue(startExpression);
+                    var one = new IntegerConstant(1, variableType, foreachExpression.Span);
+                    if (!includeStart)
+                    {
+                        var operand = ConvertToOperand(startValue, variableType);
+                        startValue = new BinaryOperation(operand, BinaryOperator.Plus, one,
+                            variableType);
+                    }
                     AssignToPlace(loopVariableLValue, startValue, startExpression.Span);
                     var endValue = ConvertToOperand(endExpression);
                     var loopEntry = graph.NewEntryBlock(currentBlock,
@@ -315,12 +330,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     currentBlock?.AddGoto(conditionBlock, foreachExpression.Block.Span.AtEnd(),
                         CurrentScope);
                     currentBlock = conditionBlock;
-                    var one = new IntegerConstant(1, variableType, foreachExpression.Span);
-                    var addOneValue = new BinaryOperation(loopVariableReference,
+                    var valuePlusOne = new BinaryOperation(loopVariableReference,
                         BinaryOperator.Plus, one, variableType);
-                    AssignToPlace(loopVariableLValue, addOneValue, startExpression.Span);
+                    AssignToPlace(loopVariableLValue, valuePlusOne, startExpression.Span);
+                    var breakOperator = includeEnd ? BinaryOperator.GreaterThan : BinaryOperator.GreaterThanOrEqual;
                     var breakCondition = new BinaryOperation(loopVariableReference,
-                        BinaryOperator.GreaterThan, endValue, variableType);
+                                            breakOperator, endValue, variableType);
                     currentBlock.AddIf(ConvertToOperand(breakCondition, DataType.Bool),
                         breakToBlock, loopEntry, foreachExpression.Span, CurrentScope);
                     currentBlock = loopExit;
@@ -672,7 +687,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         (SimpleType)operatorExpression.Type);
                 }
                 case BinaryOperator.DotDot:
-                    throw new NotImplementedException("Conversion of `..` for binary operators");
+                case BinaryOperator.LessThanDotDot:
+                case BinaryOperator.DotDotLessThan:
+                case BinaryOperator.LessThanDotDotLessThan:
+                    throw new NotImplementedException("Conversion of range for binary operators");
                 default:
                     throw ExhaustiveMatch.Failed(operatorExpression.Operator);
             }

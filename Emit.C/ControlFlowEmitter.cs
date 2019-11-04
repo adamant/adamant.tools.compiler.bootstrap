@@ -164,7 +164,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     string @operator;
                     switch (binaryOperation.Operator)
                     {
-                        // If a binary operator was emitting for a boolean operation,
+                        default:
+                            throw ExhaustiveMatch.Failed(binaryOperation.Operator);
+                        // If a binary operator was emitted for a boolean operation,
                         // then it doesn't short circuit, we just call the function
                         case BinaryOperator.And:
                             @operator = "and";
@@ -205,8 +207,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                         case BinaryOperator.DotDot:
                             @operator = "dotdot";
                             break;
-                        default:
-                            throw ExhaustiveMatch.Failed(binaryOperation.Operator);
+                        case BinaryOperator.LessThanDotDot:
+                            @operator = "ltdotdot";
+                            break;
+                        case BinaryOperator.DotDotLessThan:
+                            @operator = "dotdotlt";
+                            break;
+                        case BinaryOperator.LessThanDotDotLessThan:
+                            @operator = "ltdotdotlt";
+                            break;
                     }
                     return $"{operationType}__{@operator}({left}, {right})";
                 }

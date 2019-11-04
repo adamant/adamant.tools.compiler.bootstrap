@@ -17,6 +17,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         And,
         Or,
         DotDot,
+        LessThanDotDot,
+        DotDotLessThan,
+        LessThanDotDotLessThan
     }
 
     public static class BinaryOperatorExtensions
@@ -25,6 +28,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         {
             switch (@operator)
             {
+                default:
+                    throw ExhaustiveMatch.Failed(@operator);
                 case BinaryOperator.Plus:
                     return "+";
                 case BinaryOperator.Minus:
@@ -51,8 +56,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
                     return "or";
                 case BinaryOperator.DotDot:
                     return "..";
-                default:
-                    throw ExhaustiveMatch.Failed(@operator);
+                case BinaryOperator.LessThanDotDot:
+                    return "<..";
+                case BinaryOperator.DotDotLessThan:
+                    return "..<";
+                case BinaryOperator.LessThanDotDotLessThan:
+                    return "<..<";
             }
         }
     }
