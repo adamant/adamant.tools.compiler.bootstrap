@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
                     throw ExhaustiveMatch.Failed(ValueSemantics);
 #pragma warning restore CA1065 // Do not raise exceptions in unexpected locations
                 case ValueSemantics.LValue:
-                    mutability = "";
+                    mutability = "set ";
                     break;
                 case ValueSemantics.Empty:
                     mutability = "void ";

@@ -38,7 +38,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
     public class BorrowChecker
     {
         private readonly CodeFile file;
-        private readonly FixedDictionary<ICallableDeclaration, LiveVariables> liveness;
         private readonly Diagnostics diagnostics;
         private readonly HashSet<TextSpan> reportedDiagnosticSpans = new HashSet<TextSpan>();
         private readonly bool saveBorrowClaims;
@@ -51,14 +50,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             return new Lifetime(lifetimeNumber);
         }
 
-        private BorrowChecker(
-            CodeFile file,
-            FixedDictionary<ICallableDeclaration, LiveVariables> liveness,
-            Diagnostics diagnostics,
-            bool saveBorrowClaims)
+        private BorrowChecker(CodeFile file, Diagnostics diagnostics, bool saveBorrowClaims)
         {
             this.file = file;
-            this.liveness = liveness;
             this.diagnostics = diagnostics;
             this.saveBorrowClaims = saveBorrowClaims;
         }
@@ -71,36 +65,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         {
             foreach (var callable in callables)
             {
-                var borrowChecker = new BorrowChecker(callable.ControlFlow.File, liveness, diagnostics, saveBorrowClaims);
-                borrowChecker.Check(callable);
+                var controlFlow = callable.ControlFlow;
+                if (controlFlow == null) continue;
+                var borrowChecker = new BorrowChecker(controlFlow.File, diagnostics, saveBorrowClaims);
+                borrowChecker.Check(controlFlow, liveness[callable]);
             }
         }
 
-        public void Check(ICallableDeclaration callable)
+        private static void Check(IFieldDeclarationSyntax field)
         {
-            switch (callable)
-            {
-                default:
-                    throw ExhaustiveMatch.Failed(callable);
-                case FunctionDeclaration function:
-                    Check(function, function.ControlFlow);
-                    break;
-                case ConstructorDeclaration constructor:
-                    Check(constructor, constructor.ControlFlow);
-                    break;
-            }
-        }
-
-        private static void Check(IFieldDeclarationSyntax _field)
-        {
-            if (_field.Initializer != null)
+            if (field.Initializer != null)
                 throw new NotImplementedException("Borrow checking of field initializers not implemented");
         }
 
-        private void Check(ICallableDeclaration callable, ControlFlowGraph controlFlow)
+        private void Check(ControlFlowGraph controlFlow, LiveVariables liveVariables)
         {
             var variables = controlFlow.VariableDeclarations;
-            var liveVariables = liveness[callable];
             // Do borrow checking with claims
             var blocks = new Queue<BasicBlock>();
             blocks.Enqueue(controlFlow.EntryBlock);
@@ -139,7 +119,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             //    claimsAfterStatement.Remove(title);
                             //}
                             //break;
-                            throw new NotSupportedException("There should be no delete statements in the IL at this phase");
+                            throw new InvalidOperationException("There should be no delete statements in the IL at this phase");
                         }
                         case ExitScopeStatement exitScopeStatement:
                             // Any claims held by variables in this scope are released
@@ -291,9 +271,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     AcquireClaim(assignToPlaceClaimHolder, binaryOperation.LeftOperand, claimsAfterStatement, claimsAfterStatement);
                     AcquireClaim(assignToPlaceClaimHolder, binaryOperation.RightOperand, claimsAfterStatement, claimsAfterStatement);
                     break;
-                case IntegerConstant _:
-                    // no claims to acquire
-                    break;
                 case IOperand operand:
                     AcquireClaim(assignToPlaceClaimHolder, operand, claimsAfterStatement, claimsAfterStatement);
                     break;
@@ -331,7 +308,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     var outstandingClaims = new Claims();
                     outstandingClaims.AddRange(claimsBeforeStatement);
                     // TODO this should be based on the field type
-                    AcquireAlias(instanceLifetime, fieldLifetime, outstandingClaims);
+                    AcquireOwnership(instanceLifetime, fieldLifetime, outstandingClaims);
                     // TODO this should be based on the access mode
                     AcquireAlias(assignToPlaceClaimHolder, fieldLifetime, outstandingClaims);
                     claimsAfterStatement.AddRange(outstandingClaims);
@@ -348,7 +325,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             }
         }
 
-        private IClaimHolder? ClaimHolder(IPlace? place)
+        private static IClaimHolder? ClaimHolder(IPlace? place)
         {
             switch (place)
             {
@@ -419,10 +396,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     throw ExhaustiveMatch.Failed(operand);
                 case VariableReference varRef:
                 {
-                    var lifetimeReferenced = outstandingClaims.LifetimeOf(varRef.Variable);
-                    if (lifetimeReferenced == null)
+                    if (!(outstandingClaims.LifetimeOf(varRef.Variable) is Lifetime lifetime))
                         break; // TODO this actually happens with things that should be copy etc. Handle correctly
-                    var lifetime = lifetimeReferenced.Value;
                     switch (varRef.ValueSemantics)
                     {
                         default:
