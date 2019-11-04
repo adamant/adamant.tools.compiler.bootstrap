@@ -725,8 +725,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     throw ExhaustiveMatch.Failed(invocationExpression);
                 case IMethodInvocationExpressionSyntax methodInvocation:
                     return ConvertInvocationToValue(methodInvocation);
-                case IAssociatedFunctionInvocationExpressionSyntax _:
-                    throw new NotImplementedException();
                 case IFunctionInvocationExpressionSyntax functionInvocation:
                     return ConvertInvocationToValue(functionInvocation);
             }
@@ -736,7 +734,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         {
             var self = ConvertToOperand(invocationExpression.Target);
             var arguments = invocationExpression.Arguments.Select(a => ConvertToOperand(a.Expression)).ToList();
-            var symbol = (IFunctionSymbol)invocationExpression.MethodNameSyntax.ReferencedSymbol;
+            var symbol = invocationExpression.MethodNameSyntax.ReferencedSymbol;
             switch (invocationExpression.Target.Type)
             {
                 case SimpleType _:
@@ -751,7 +749,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
         private Value ConvertInvocationToValue(IFunctionInvocationExpressionSyntax invocationExpression)
         {
-            var functionSymbol = (IFunctionSymbol)invocationExpression.FunctionNameSyntax.ReferencedSymbol;
+            var functionSymbol = invocationExpression.FunctionNameSyntax.ReferencedSymbol;
             var arguments = invocationExpression.Arguments.Select(a => ConvertToOperand(a.Expression)).ToList();
             return new FunctionCall(functionSymbol.FullName, arguments, invocationExpression.Span);
         }

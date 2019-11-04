@@ -6,8 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     [Closed(
         typeof(IMethodInvocationExpressionSyntax),
-        typeof(IFunctionInvocationExpressionSyntax),
-        typeof(IAssociatedFunctionInvocationExpressionSyntax))]
+        typeof(IFunctionInvocationExpressionSyntax))]
     public interface IInvocationExpressionSyntax : IExpressionSyntax
     {
         Name FullName { get; }

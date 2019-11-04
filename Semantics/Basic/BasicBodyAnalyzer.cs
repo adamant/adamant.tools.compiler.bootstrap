@@ -452,8 +452,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return loopExpression.Type = DataType.Void;
                 case IMethodInvocationExpressionSyntax methodInvocation:
                     return InferMethodInvocationType(methodInvocation, ref expression);
-                case IAssociatedFunctionInvocationExpressionSyntax _:
-                    throw new NotImplementedException();
                 case IFunctionInvocationExpressionSyntax functionInvocation:
                     return InferFunctionInvocationType(functionInvocation);
                 case IUnsafeExpressionSyntax unsafeExpression:

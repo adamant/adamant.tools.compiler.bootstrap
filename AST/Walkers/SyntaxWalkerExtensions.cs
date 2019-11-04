@@ -117,11 +117,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                     foreach (var argument in functionInvocationExpression.Arguments)
                         walker.Walk(argument, arg);
                     break;
-                case IAssociatedFunctionInvocationExpressionSyntax associatedFunctionInvocation:
-                    walker.Walk(associatedFunctionInvocation.FunctionNameSyntax, arg);
-                    foreach (var argument in associatedFunctionInvocation.Arguments)
-                        walker.Walk(argument, arg);
-                    break;
                 case IReturnExpressionSyntax returnExpression:
                     walker.Walk(returnExpression.ReturnValue, arg);
                     break;
