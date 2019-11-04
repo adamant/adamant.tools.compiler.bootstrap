@@ -56,7 +56,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             switch (Tokens.Current)
             {
                 case IFunctionKeywordToken _:
-                    return ParseMethod(classDeclaration, modifiers);
+                    return ParseMemberFunction(classDeclaration, modifiers);
                 case INewKeywordToken _:
                     return ParseConstructor(classDeclaration, modifiers);
                 case ILetKeywordToken _:
@@ -224,7 +224,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 identifier.Span, type, initializer);
         }
 
-        internal MethodDeclarationSyntax ParseMethod(
+        internal IMemberDeclarationSyntax ParseMemberFunction(
             IClassDeclarationSyntax declaringType,
             FixedList<IModiferToken> modifiers)
         {
@@ -238,6 +238,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (Tokens.Accept<IRightArrowToken>())
                 returnType = ParseType();
 
+            // if no self parameter, it is an associated function
+            if (!parameters.OfType<ISelfParameterSyntax>().Any())
+            {
+                var namedParameters = parameters.OfType<INamedParameterSyntax>().ToFixedList();
+                var body = bodyParser.ParseFunctionBody();
+                var span = TextSpan.Covering(fn, body.Span);
+                return new AssociatedFunctionDeclarationSyntax(declaringType, span, File, modifiers,
+                    name, identifier.Span, namedParameters, lifetimeBounds, returnType, body);
+            }
+
+            if (!(parameters[0] is ISelfParameterSyntax))
+                Add(ParseError.FirstParameterMustBeSelf(File, parameters[0].Span));
+
+            foreach (var selfParameter in parameters.Skip(1).OfType<ISelfParameterSyntax>())
+                Add(ParseError.SelfParameterMustBeFirst(File, selfParameter.Span));
+
+            // It is a method that may or may not have a body
             if (Tokens.Current is IOpenBraceToken)
             {
                 var body = bodyParser.ParseFunctionBody();

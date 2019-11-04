@@ -52,5 +52,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3007,
                 "Result statements can't appear directly in function or method bodies. Must be in block expression.");
         }
+
+        public static Diagnostic FirstParameterMustBeSelf(CodeFile file, TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3008,
+                "First parameter of method declaration must be `self` parameter.");
+        }
+
+        public static Diagnostic SelfParameterMustBeFirst(CodeFile file, in TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3009,
+                "Self parameter must be the first parameter.");
+        }
     }
 }

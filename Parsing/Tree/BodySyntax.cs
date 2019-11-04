@@ -6,8 +6,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class BodySyntax : Syntax, IBodySyntax
     {
-        private readonly FixedList<IStatementSyntax> statements;
         public FixedList<IBodyStatementSyntax> Statements { get; }
+        private readonly FixedList<IStatementSyntax> statements;
+        FixedList<IStatementSyntax> IBodyOrBlockSyntax.Statements => statements;
+
         public BodySyntax(TextSpan span, FixedList<IBodyStatementSyntax> statements)
             : base(span)
         {
@@ -19,7 +21,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         {
             return "{ … }";
         }
-
-        FixedList<IStatementSyntax> IBodyOrBlockSyntax.Statements => statements;
     }
 }

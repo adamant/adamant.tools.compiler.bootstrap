@@ -66,6 +66,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     selfType = constructor.SelfParameterType.Assigned();
                     returnType = DataType.Void; // the body should `return;`
                     break;
+                case IAssociatedFunctionDeclaration associatedFunction:
+                    returnType = associatedFunction.ReturnType.Known();
+                    break;
                 case IFunctionDeclarationSyntax function:
                     returnType = function.ReturnType.Known();
                     break;

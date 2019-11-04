@@ -11,6 +11,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using ExhaustiveMatching;
 using UnaryOperator = Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.UnaryOperator;
@@ -447,7 +448,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     // TODO assign correct type to the expression
                     return loopExpression.Type = DataType.Void;
                 case IMethodInvocationExpressionSyntax methodInvocation:
-                    return InferMethodInvocationType(methodInvocation);
+                    return InferMethodInvocationType(methodInvocation, ref expression);
                 case IAssociatedFunctionInvocationExpressionSyntax _:
                     throw new NotImplementedException();
                 case IFunctionInvocationExpressionSyntax functionInvocation:
@@ -526,23 +527,45 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
         }
 
-        private DataType InferMethodInvocationType(IMethodInvocationExpressionSyntax methodInvocation)
+        private DataType InferMethodInvocationType(
+            IMethodInvocationExpressionSyntax methodInvocation,
+            ref IExpressionSyntax expression)
         {
-            // This could:
-            // * Invoke a stand alone function
-            // * Invoke a static function
-            // * Invoke a method
-            // * Invoke a function pointer
+            // This could actually be any of the following since the parser can't distinguish them:
+            // * Associated function invocation
+            // * Namespaced function invocation
+            // * Method invocation
+            // First we need to distinguish those.
+            var targetName = TargetAsName(methodInvocation.Target);
+            if (targetName != null)
+            {
+                var scope = methodInvocation.MethodNameSyntax.ContainingScope.Assigned();
+
+                var functionName = targetName.Qualify(methodInvocation.MethodNameSyntax.Name);
+                // This will find both namespaced function calls and associated function calls
+                if (scope.Lookup(functionName).OfType<IFunctionSymbol>().Any())
+                {
+                    // It is a namespaced or associated function invocation, modify the tree
+                    var nameSpan = TextSpan.Covering(methodInvocation.Target.Span, methodInvocation.MethodNameSyntax.Span);
+                    var nameSyntax = new CallableNameSyntax(nameSpan, functionName, scope);
+                    var functionInvocation = new FunctionInvocationExpressionSyntax(
+                        methodInvocation.Span,
+                        nameSyntax,
+                        functionName,
+                        methodInvocation.Arguments);
+
+                    expression = functionInvocation;
+                    return InferFunctionInvocationType(functionInvocation);
+                }
+            }
+
             var argumentTypes = methodInvocation.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
             var targetType = InferType(ref methodInvocation.Target);
             // If it is unknown, we already reported an error
             if (targetType == DataType.Unknown) return methodInvocation.Type = DataType.Unknown;
 
-            // TODO improve function lookup and include the possibility that the symbol isn't a function
-            //diagnostics.Add(TypeError.MustBeCallable(file, methodInvocation.Target));
-            //return methodInvocation.Type = DataType.Unknown;
             var typeSymbol = GetSymbolForType(methodInvocation.MethodNameSyntax.ContainingScope.Assigned(), targetType);
-            typeSymbol.ChildSymbols.TryGetValue(methodInvocation.MethodNameSyntax.Name, out var childSymbols);
+            typeSymbol.ChildSymbols.TryGetValue((SimpleName)methodInvocation.MethodNameSyntax.Name, out var childSymbols);
             var methodSymbols = (childSymbols ?? FixedList<ISymbol>.Empty).OfType<IFunctionSymbol>().ToFixedList();
             methodSymbols = ResolveOverload(methodSymbols, targetType, argumentTypes);
             switch (methodSymbols.Count)
@@ -580,10 +603,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             return methodInvocation.Type;
         }
 
+        /// <summary>
+        /// Used on the target of a method invocation to see if it is really the name of a namespace or class
+        /// </summary>
+        /// <returns>A name if the expression is a qualified name, otherwise null</returns>
+        private static Name? TargetAsName(IExpressionSyntax expression)
+        {
+            switch (expression)
+            {
+                case IMemberAccessExpressionSyntax memberAccess:
+                    // Tf implicit self
+                    return memberAccess.Expression is null
+                        ? null
+                        : TargetAsName(memberAccess.Expression)?.Qualify(memberAccess.Member.Name);
+                case INameExpressionSyntax nameExpression:
+                    return nameExpression.Name;
+                default:
+                    return null;
+            }
+        }
+
         private DataType InferFunctionInvocationType(IFunctionInvocationExpressionSyntax functionInvocationExpression)
         {
             var argumentTypes = functionInvocationExpression.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
-            var functionSymbols = functionInvocationExpression.FunctionNameSyntax.LookupInContainingScope()
+            var scope = functionInvocationExpression.FunctionNameSyntax.ContainingScope.Assigned();
+            var functionSymbols = scope.Lookup(functionInvocationExpression.FullName)
                 .OfType<IFunctionSymbol>().ToFixedList();
             functionSymbols = ResolveOverload(functionSymbols, null, argumentTypes);
             switch (functionSymbols.Count)

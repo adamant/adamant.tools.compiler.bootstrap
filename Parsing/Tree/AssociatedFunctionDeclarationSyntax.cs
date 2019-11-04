@@ -9,35 +9,42 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal abstract class MethodDeclarationSyntax : CallableDeclarationSyntax, IMethodDeclarationSyntax
+    internal class AssociatedFunctionDeclarationSyntax : ConcreteCallableDeclarationSyntax, IAssociatedFunctionDeclaration
     {
         public IClassDeclarationSyntax DeclaringClass { get; }
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SimpleName Name => FullName.UnqualifiedName;
-        public new FixedList<IMethodParameterSyntax> Parameters { get; }
+
+        public new FixedList<INamedParameterSyntax> Parameters { get; }
         public ILifetimeBoundSyntax? LifetimeBounds { get; }
         public ITypeSyntax? ReturnTypeSyntax { get; }
         DataType IFunctionSymbol.ReturnType => ReturnType.Fulfilled();
 
-        protected MethodDeclarationSyntax(
+        public AssociatedFunctionDeclarationSyntax(
             IClassDeclarationSyntax declaringClass,
             TextSpan span,
             CodeFile file,
             FixedList<IModiferToken> modifiers,
             Name fullName,
             TextSpan nameSpan,
-            FixedList<IMethodParameterSyntax> parameters,
+            FixedList<INamedParameterSyntax> parameters,
             ILifetimeBoundSyntax? lifetimeBounds,
             ITypeSyntax? returnTypeSyntax,
-            SymbolSet childSymbols)
-            : base(span, file, modifiers, fullName, nameSpan, parameters.ToFixedList<IParameterSyntax>(), childSymbols)
+            IBodySyntax body)
+            : base(span, file, modifiers, fullName, nameSpan, parameters.ToFixedList<IParameterSyntax>(), body)
         {
             DeclaringClass = declaringClass;
             Parameters = parameters;
             LifetimeBounds = lifetimeBounds;
             ReturnTypeSyntax = returnTypeSyntax;
+        }
+
+        public override string ToString()
+        {
+            var returnType = ReturnTypeSyntax != null ? " -> " + ReturnTypeSyntax : "";
+            return $"fn {FullName}({string.Join(", ", Parameters)}){returnType} {Body}";
         }
     }
 }

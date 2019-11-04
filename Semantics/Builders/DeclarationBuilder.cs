@@ -52,17 +52,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                         function.ReturnType.Known(), controlFlowGraph);
                     break;
                 }
+                case IAssociatedFunctionDeclaration associatedFunction:
+                {
+                    var controlFlowGraph = controlFlowGraphFactory.CreateGraph(associatedFunction);
+                    declaration = new FunctionDeclaration(false, true,
+                        associatedFunction.FullName, BuildParameters(associatedFunction.Parameters),
+                        associatedFunction.ReturnType.Known(), controlFlowGraph);
+                    break;
+                }
                 case IConcreteMethodDeclarationSyntax method:
                 {
                     var controlFlowGraph = controlFlowGraphFactory.CreateGraph(method);
-                    declaration = new FunctionDeclaration(false, method.DeclaringClass != null,
+                    declaration = new FunctionDeclaration(false, true,
                         method.FullName, BuildParameters(method.Parameters),
                         method.ReturnType.Known(), controlFlowGraph);
                     break;
                 }
                 case IAbstractMethodDeclarationSyntax method:
                 {
-                    declaration = new FunctionDeclaration(false, method.DeclaringClass != null,
+                    declaration = new FunctionDeclaration(false, true,
                         method.FullName, BuildParameters(method.Parameters),
                         method.ReturnType.Known(), null);
                     break;

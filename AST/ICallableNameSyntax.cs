@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
@@ -10,8 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     /// </summary>
     public interface ICallableNameSyntax : ISyntax, IHasContainingScope
     {
-        SimpleName Name { get; }
+        Name Name { get; }
         [DisallowNull] IFunctionSymbol? ReferencedSymbol { get; set; }
-        FixedList<ISymbol> LookupInContainingScope();
     }
 }

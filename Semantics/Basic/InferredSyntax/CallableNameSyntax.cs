@@ -6,10 +6,11 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax
 {
-    internal class CallableNameSyntax : Syntax, ICallableNameSyntax
+    internal class CallableNameSyntax : ICallableNameSyntax
     {
+        public TextSpan Span { get; }
         public Name Name { get; }
 
         private IFunctionSymbol? referencedSymbol;
@@ -26,24 +27,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             }
         }
 
-        private LexicalScope? containingScope;
+        private readonly LexicalScope containingScope;
 
         [DisallowNull]
         public LexicalScope? ContainingScope
         {
             get => containingScope;
-            set
-            {
-                if (containingScope != null)
-                    throw new InvalidOperationException("Can't set containing scope repeatedly");
-                containingScope = value ?? throw new ArgumentNullException(nameof(value));
-            }
+            set => throw new InvalidOperationException("Can't set containing scope repeatedly");
         }
 
-        public CallableNameSyntax(TextSpan span, SimpleName name)
-            : base(span)
+        public CallableNameSyntax(TextSpan span, Name name, LexicalScope containingScope)
         {
+            Span = span;
             Name = name;
+            this.containingScope = containingScope;
         }
 
         public override string ToString()

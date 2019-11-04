@@ -81,6 +81,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     ResolveTypesInParameters(analyzer, @class.Parameters, @class.DeclaringClass);
                     break;
                 }
+                case IAssociatedFunctionDeclaration associatedFunction:
+                {
+                    var analyzer = new BasicTypeAnalyzer(associatedFunction.File, diagnostics);
+                    ResolveTypesInParameters(analyzer, associatedFunction.Parameters, null);
+                    ResolveReturnType(associatedFunction.ReturnType, associatedFunction.ReturnTypeSyntax, analyzer);
+                    break;
+                }
                 case IFieldDeclarationSyntax field:
                     if (field.Type.TryBeginFulfilling(() =>
                         diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan, field.Name))))
@@ -197,6 +204,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 {
                     var resolver = new BasicBodyAnalyzer(function.File, stringSymbol, diagnostics, null, function.ReturnType.Fulfilled());
                     resolver.ResolveTypes(function.Body);
+                    break;
+                }
+                case IAssociatedFunctionDeclaration associatedFunction:
+                {
+                    var resolver = new BasicBodyAnalyzer(associatedFunction.File, stringSymbol, diagnostics, null,
+                        associatedFunction.ReturnType.Fulfilled());
+                    resolver.ResolveTypes(associatedFunction.Body);
                     break;
                 }
                 case IConcreteMethodDeclarationSyntax method:

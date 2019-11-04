@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public override string ToString()
         {
             var returnType = ReturnTypeSyntax != null ? " -> " + ReturnTypeSyntax : "";
-            return $"fn {FullName}({string.Join(", ", Parameters)}){returnType} {{ … }}";
+            return $"fn {FullName}({string.Join(", ", Parameters)}){returnType} {Body}";
         }
     }
 }

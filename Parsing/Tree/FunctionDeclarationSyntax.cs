@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IModiferToken> modifiers,
             Name fullName,
             TextSpan nameSpan,
-            FixedList<INamedParameterSyntax> parameters, // For now we will not support pure meta functions
+            FixedList<INamedParameterSyntax> parameters,
             ILifetimeBoundSyntax? lifetimeBounds,
             ITypeSyntax? returnTypeSyntax,
             IBodySyntax body)
@@ -38,8 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public override string ToString()
         {
             var returnType = ReturnTypeSyntax != null ? " -> " + ReturnTypeSyntax : "";
-            var body = Body != null ? " {{ … }}" : ";";
-            return $"fn {FullName}({string.Join(", ", Parameters)}){returnType}{body}";
+            return $"fn {FullName}({string.Join(", ", Parameters)}){returnType} {Body}";
         }
     }
 }
