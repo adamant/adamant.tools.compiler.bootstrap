@@ -22,12 +22,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
             var analyses = new Dictionary<ICallableDeclaration, LiveVariables>();
             foreach (var function in functions)
             {
-                var liveness = ComputeLiveness(function);
+                var controlFlow = function.ControlFlow;
+                if (controlFlow == null) continue;
+                var liveness = ComputeLiveness(controlFlow);
                 if (liveness != null)
                 {
                     analyses.Add(function, liveness);
                     if (saveLivenessAnalysis)
-                        function.ControlFlow.LiveVariables = liveness;
+                        controlFlow.LiveVariables = liveness;
                 }
             }
 
@@ -37,24 +39,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
         /// <summary>
         /// Perform a backwards data flow analysis to determine where each variable is live or dead
         /// </summary>
-        private static LiveVariables ComputeLiveness(ICallableDeclaration function)
+        private static LiveVariables ComputeLiveness(ControlFlowGraph controlFlow)
         {
-            var controlFlow = function.ControlFlow;
-            var blocks = new Queue<BasicBlock>();
-            blocks.EnqueueRange(controlFlow.ExitBlocks);
+            var blocksQueue = new Queue<BasicBlock>();
+            // Not just exit blocks because sometimes the exit blocks don't change vars and don't pull in other blocks
+            blocksQueue.EnqueueRange(controlFlow.BasicBlocks);
             var liveVariables = new LiveVariables(controlFlow);
             var numberOfVariables = controlFlow.VariableDeclarations.Count;
 
-            while (blocks.TryDequeue(out var block))
+            while (blocksQueue.TryDequeue(out var block))
             {
-                var liveBeforeBlock = new BitArray(liveVariables.Before(block.Statements[0]));
+                var oldLiveBeforeBlock = new BitArray(liveVariables.Before(block.Statements[0]));
 
                 var liveAfterBlock = new BitArray(numberOfVariables);
                 foreach (var successor in controlFlow.Edges.From(block))
                     liveAfterBlock.Or(liveVariables.Before(successor.Statements[0]));
-
-                if (block.Terminator is ReturnStatement && controlFlow.ReturnVariable.TypeIsNotEmpty)
-                    liveAfterBlock[0] = true; // the return value is live after a block that returns
 
                 var liveAfterStatement = liveAfterBlock;
 
@@ -81,11 +80,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
                             // We already or'ed together the live variables from successor blocks
                             break;
                         case ReturnStatement _:
-                            // No effect on variables?
-                            // TODO should we check the liveSet is empty?
+                            // As a sanity check, no variables should be live after return
+                            if (liveAfterStatement.Bits().AnyTrue())
+                                throw new InvalidOperationException("Variables live after return statement");
+                            // But the result variable might be live before it
+                            if (controlFlow.ReturnVariable.TypeIsNotEmpty)
+                                liveSet[Variable.Result.Number] = true;
                             break;
                         case ExitScopeStatement _:
-                            // TODO use end scope statement to track liminal state
+                            // TODO use end scope statement to track liminal state (see  BorrowChecker)
                             break;
                     }
 
@@ -93,10 +96,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
                     liveAfterStatement = liveSet;
                 }
 
-                if (!liveBeforeBlock.ValuesEqual(liveVariables.Before(block.Statements.First())))
+                if (!oldLiveBeforeBlock.ValuesEqual(liveVariables.Before(block.Statements[0])))
                     foreach (var basicBlock in controlFlow.Edges.To(block)
-                        .Where(fromBlock => !blocks.Contains(fromBlock)).ToList())
-                        blocks.Enqueue(basicBlock);
+                        .Where(fromBlock => !blocksQueue.Contains(fromBlock)).ToList())
+                        blocksQueue.Enqueue(basicBlock);
             }
             return liveVariables;
         }

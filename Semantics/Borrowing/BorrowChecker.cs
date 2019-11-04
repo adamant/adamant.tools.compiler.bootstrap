@@ -18,14 +18,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
     /// Check for borrow errors
     /// </summary>
     ///
-    // Plan for inserting deletes:
-    // ---------------------------
-    // When generating the CFG, output statements for when variables go out of scope. Then track another level
-    // of liveness between alive and dead. This would be a new state, perhaps called "liminal" or "pending", which
-    // indicated that the variable would not be used again, but may need to exist as the owner of something borrowed
-    // until all outstanding borrows are resolved. Delete statements could then be inserted after borrow checking
-    // at the point where values are no longer used. The variable leaving scope statements could then be ignored
-    // or removed.
     // TODO inserting deletes based only on liveness led to issues.
     // There are cases when a variable is no longer directly used, but another variable has borrowed the value.
     // The owner then shows as dead, so we inserted the delete. But really, we needed to wait until the
@@ -34,6 +26,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
     // beyond the scope should be an error. We had been detecting this by noticing the borrow claim extended
     // past the delete statement. That worked, because the owning variable must always be dead after the scope
     // because there are no references to it outside the scope.
+    //
+    // New Plan for inserting deletes:
+    // ---------------------------
+    // When generating the CFG, output statements for when variables go out of scope. Then track another level
+    // of liveness between alive and dead. This would be a new state, perhaps called "liminal" or "pending", which
+    // indicated that the variable would not be used again, but may need to exist as the owner of something borrowed
+    // until all outstanding borrows are resolved. Delete statements could then be inserted after borrow checking
+    // at the point where values are no longer used. The variable leaving scope statements could then be ignored
+    // or removed.
     public class BorrowChecker
     {
         private readonly CodeFile file;

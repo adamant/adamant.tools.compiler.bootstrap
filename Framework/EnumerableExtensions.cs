@@ -106,5 +106,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
                 return source.GetEnumerator();
             }
         }
+
+        [DebuggerStepThrough]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool AnyTrue(this IEnumerable<bool> values)
+        {
+            return values.Any(v => v);
+        }
     }
 }

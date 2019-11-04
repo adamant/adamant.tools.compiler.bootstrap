@@ -310,6 +310,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     var includeEnd = inExpression.Operator == BinaryOperator.DotDot
                                        || inExpression.Operator == BinaryOperator.LessThanDotDot;
 
+                    // emit var x: T = z (+1);
                     var startValue = ConvertToValue(startExpression);
                     var one = new IntegerConstant(1, variableType, foreachExpression.Span);
                     if (!includeStart)
@@ -319,7 +320,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                             variableType);
                     }
                     AssignToPlace(loopVariableLValue, startValue, startExpression.Span);
+                    // let temp = y;
                     var endValue = ConvertToOperand(endExpression);
+                    // Emit block
                     var loopEntry = graph.NewEntryBlock(currentBlock,
                         foreachExpression.Block.Span.AtStart(), CurrentScope);
                     currentBlock = loopEntry;
@@ -330,9 +333,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     currentBlock?.AddGoto(conditionBlock, foreachExpression.Block.Span.AtEnd(),
                         CurrentScope);
                     currentBlock = conditionBlock;
+                    // emit x += 1;
                     var valuePlusOne = new BinaryOperation(loopVariableReference,
                         BinaryOperator.Plus, one, variableType);
                     AssignToPlace(loopVariableLValue, valuePlusOne, startExpression.Span);
+                    // emit if x (>)|(>=) temp => break;
                     var breakOperator = includeEnd ? BinaryOperator.GreaterThan : BinaryOperator.GreaterThanOrEqual;
                     var breakCondition = new BinaryOperation(loopVariableReference,
                                             breakOperator, endValue, variableType);

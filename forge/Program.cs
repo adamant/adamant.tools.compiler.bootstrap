@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge
 
         public static int Main(string[] args)
         {
-            var app = new CommandLineApplication()
+            using var app = new CommandLineApplication()
             {
                 Name = "forge",
                 Description = "Adamant's package manager and build tool"
@@ -36,14 +36,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge
                         "Package to build", CommandOptionType.SingleValue);
                     var verboseOption = cmd.Option("-v|--verbose", "Use verbose output",
                         CommandOptionType.NoValue);
-                    cmd.OnExecute(async () =>
+                    cmd.OnExecuteAsync(async (cancellationToken) =>
                     {
                         var allowParallel = allowParallelOption.OptionalValue() ?? DefaultAllowParallel;
                         var maxConcurrency = maxConcurrencyOption.OptionalValue();
                         var verbose = verboseOption.HasValue();
                         var packagePath = packageOption.Value() ?? ".";
 
-                        await Build(packagePath, verbose, allowParallel, maxConcurrency).ConfigureAwait(false);
+                        await BuildAsync(packagePath, verbose, allowParallel, maxConcurrency).ConfigureAwait(false);
                     });
                 });
 
@@ -56,7 +56,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge
             return app.Execute(args);
         }
 
-        private static async Task Build(
+        private static Task BuildAsync(
             string packagePath,
             bool verbose,
             bool allowParallel,
@@ -69,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge
             var taskScheduler = NewTaskScheduler(
                 allowParallel,
                 maxConcurrency);
-            await projectSet.Build(taskScheduler, verbose).ConfigureAwait(false);
+            return projectSet.Build(taskScheduler, verbose);
         }
 
         private static TaskScheduler NewTaskScheduler(bool allowParallel, int? maxConcurrency)

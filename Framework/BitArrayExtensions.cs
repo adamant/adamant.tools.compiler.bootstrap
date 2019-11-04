@@ -29,5 +29,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
                 if (!array[i])
                     yield return i;
         }
+
+        public static IEnumerable<bool> Bits(this BitArray array)
+        {
+            for (var i = 0; i < array.Count; i++) yield return array[i];
+        }
     }
 }
