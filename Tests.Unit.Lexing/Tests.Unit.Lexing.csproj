@@ -18,7 +18,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ExhaustiveMatching.Analyzer" Version="0.3.2" />
+    <PackageReference Include="ExhaustiveMatching.Analyzer" Version="0.4.0" />
     <PackageReference Include="Fare" Version="2.1.1" />
     <PackageReference Include="FsCheck.Xunit" Version="2.13.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.5">
