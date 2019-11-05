@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
@@ -46,5 +47,41 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// Copy a reference, alias the referent
         /// </summary>
         Alias,
+    }
+
+    public static class ValueSemanticsExtensions
+    {
+        public static string Action(this ValueSemantics valueSemantics)
+        {
+            string mutability;
+            switch (valueSemantics)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(valueSemantics);
+                case ValueSemantics.LValue:
+                    mutability = "deref";
+                    break;
+                case ValueSemantics.Empty:
+                    mutability = "void";
+                    break;
+                case ValueSemantics.Move:
+                    mutability = "move";
+                    break;
+                case ValueSemantics.Copy:
+                    mutability = "copy";
+                    break;
+                case ValueSemantics.Own:
+                    mutability = "own";
+                    break;
+                case ValueSemantics.Borrow:
+                    mutability = "borrow";
+                    break;
+                case ValueSemantics.Alias:
+                    mutability = "alias";
+                    break;
+            }
+
+            return mutability;
+        }
     }
 }

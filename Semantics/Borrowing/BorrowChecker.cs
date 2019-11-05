@@ -228,12 +228,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                 var span = statement.Span.AtEnd();
                 // We may be in a different scope than the variable declaration.
                 // For example, the last use may be in a nested scope
-                insertedDeletes.AddDeleteAfter(
-                    statement,
-                    declaration.Reference(span).AsOwn(span),
-                    (UserObjectType)declaration.Type,
-                    span,
-                    statement.Scope);
+                // Variable may not be a reference, could be a value type owned by the variable
+                if (declaration.Type is UserObjectType type)
+                    insertedDeletes.AddDeleteAfter(
+                        statement,
+                        declaration.Reference(span).AsOwn(span),
+                        type,
+                        span,
+                        statement.Scope);
             }
         }
 
@@ -261,15 +263,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     // We have made a new object, assign it a new id
                     var objectId = NewLifetime();
                     // Variable acquires title on any new objects
-                    AcquireOwnership(assignToPlaceClaimHolder, objectId, claimsAfterStatement);
+                    AddOwnership(assignToPlaceClaimHolder, claimsAfterStatement, objectId);
                     break;
                 }
                 case UnaryOperation unaryOperation:
-                    AcquireClaim(assignToPlaceClaimHolder, unaryOperation.Operand, claimsAfterStatement, claimsAfterStatement);
+                    // All unary operations operate on copy types
+                    AssertCopy(unaryOperation.Operand);
+                    AssertCopy(assignToPlace);
+                    // Copy new value into place
+                    AddOwnership(assignToPlaceClaimHolder, claimsAfterStatement);
                     break;
                 case BinaryOperation binaryOperation:
-                    AcquireClaim(assignToPlaceClaimHolder, binaryOperation.LeftOperand, claimsAfterStatement, claimsAfterStatement);
-                    AcquireClaim(assignToPlaceClaimHolder, binaryOperation.RightOperand, claimsAfterStatement, claimsAfterStatement);
+                    // All binary operators operate on copy types, but some produce owned references (i.e. `..`)
+                    // TODO AssertCopy(binaryOperation.LeftOperand);
+                    AssertCopy(binaryOperation.RightOperand);
+                    AddOwnership(assignToPlaceClaimHolder, claimsAfterStatement);
                     break;
                 case IOperand operand:
                     AcquireClaim(assignToPlaceClaimHolder, operand, claimsAfterStatement, claimsAfterStatement);
@@ -302,15 +310,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                 break;
                 case FieldAccess fieldAccess:
                 {
+                    // TODO this is currently ignoring the value semantics of the field
+                    // Seems like we need path lifetimes to do this correctly (i.e. `a.b` has lifetime #X)
                     var instanceVariable = fieldAccess.CoreVariable();
                     var instanceLifetime = claimsBeforeStatement.ClaimBy(instanceVariable).Lifetime;
                     var fieldLifetime = NewLifetime();
                     var outstandingClaims = new Claims();
                     outstandingClaims.AddRange(claimsBeforeStatement);
                     // TODO this should be based on the field type
-                    AcquireOwnership(instanceLifetime, fieldLifetime, outstandingClaims);
+                    AddOwnership(instanceLifetime, outstandingClaims, fieldLifetime);
                     // TODO this should be based on the access mode
-                    AcquireAlias(assignToPlaceClaimHolder, fieldLifetime, outstandingClaims);
+                    AddAlias(assignToPlaceClaimHolder, outstandingClaims, fieldLifetime);
                     claimsAfterStatement.AddRange(outstandingClaims);
                 }
                 break;
@@ -323,6 +333,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     AcquireClaim(assignToPlaceClaimHolder, conversion.Operand, claimsAfterStatement, claimsAfterStatement);
                     break;
             }
+        }
+
+        private static void AssertCopy(IOperand operand)
+        {
+            if (operand.ValueSemantics != ValueSemantics.Copy)
+                throw new InvalidOperationException("Operand should be copy");
+        }
+
+        private static void AssertCopy(IPlace? place)
+        {
+            if (place?.ValueSemantics != ValueSemantics.Copy)
+                throw new InvalidOperationException("Operand should be copy");
         }
 
         private static IClaimHolder? ClaimHolder(IPlace? place)
@@ -354,7 +376,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         /// <summary>
         /// Acquire claims related to the return from a call/constructor
         /// </summary>
-        private static void AcquireReturnClaim(
+        private void AcquireReturnClaim(
             IPlace? assignToPlace,
             Lifetime callLifetime,
             Claims outstandingClaims,
@@ -369,14 +391,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             if (variableDeclaration.Type is ReferenceType objectType)
             {
                 if (objectType.IsOwned)
-                    AcquireOwnership(assignToVariable, callLifetime, claimsAfterStatement);
+                    AddOwnership(assignToVariable, claimsAfterStatement, callLifetime);
                 else if (objectType.Mutability == Mutability.Mutable)
-                    AcquireBorrow(assignToVariable, callLifetime, claimsAfterStatement);
+                    AddBorrow(assignToVariable, claimsAfterStatement, callLifetime);
                 else
-                    AcquireAlias(assignToVariable, callLifetime, claimsAfterStatement);
+                    AddAlias(assignToVariable, claimsAfterStatement, callLifetime);
             }
             else
-                AcquireAlias(assignToVariable, callLifetime, claimsAfterStatement);
+                AddAlias(assignToVariable, claimsAfterStatement, callLifetime);
 
             // TODO For now, we just add all the call claims, this should be based on the function type instead
             claimsAfterStatement.AddRange(outstandingClaims);
@@ -439,7 +461,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             switch (claimHolder)
                             {
                                 case Variable variable:
-                                    AcquireOwnership(variable, lifetime, outstandingClaims);
+                                    AddOwnership(variable, outstandingClaims, lifetime);
                                     break;
                                 case Lifetime _:
                                     // This occurs when we pass ownership as a function argument
@@ -485,31 +507,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             }
         }
 
-        private static void AcquireOwnership(
-            IClaimHolder? claimHolder,
-            Lifetime lifetime,
-            Claims outstandingClaims)
+        private void AddOwnership(IClaimHolder? claimHolder, Claims outstandingClaims, Lifetime? lifetime = null)
         {
             if (claimHolder is null) return;
-            outstandingClaims.Add(new Owns(claimHolder, lifetime));
+            outstandingClaims.Add(new Owns(claimHolder, lifetime ?? NewLifetime()));
         }
 
-        private static void AcquireBorrow(
-            IClaimHolder? claimHolder,
-            Lifetime lifetime,
-            Claims outstandingClaims)
+        private void AddBorrow(IClaimHolder? claimHolder, Claims outstandingClaims, Lifetime? lifetime = null)
         {
             if (claimHolder is null) return;
-            outstandingClaims.Add(new Borrows(claimHolder, lifetime));
+            outstandingClaims.Add(new Borrows(claimHolder, lifetime ?? NewLifetime()));
         }
 
-        private static void AcquireAlias(
-            IClaimHolder? claimHolder,
-            Lifetime lifetime,
-            Claims outstandingClaims)
+        private void AddAlias(IClaimHolder? claimHolder, Claims outstandingClaims, Lifetime? lifetime = null)
         {
             if (claimHolder is null) return;
-            outstandingClaims.Add(new Aliases(claimHolder, lifetime));
+            outstandingClaims.Add(new Aliases(claimHolder, lifetime ?? NewLifetime()));
         }
 
         private void ReportDiagnostic(Diagnostic diagnostic)

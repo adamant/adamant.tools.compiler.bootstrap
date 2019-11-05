@@ -12,6 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     public abstract class Constant : Value, IOperand
     {
         public DataType Type { get; }
+        public abstract ValueSemantics ValueSemantics { get; }
 
         protected Constant(DataType type, TextSpan span)
             : base(span)

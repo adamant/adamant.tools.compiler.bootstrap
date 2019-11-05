@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
@@ -11,5 +12,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         typeof(VariableReference))]
     public interface IOperand : IValue
     {
+        ValueSemantics ValueSemantics { get; }
     }
 }

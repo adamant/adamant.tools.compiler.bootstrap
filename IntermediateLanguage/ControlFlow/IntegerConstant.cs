@@ -7,8 +7,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     public class IntegerConstant : Constant
     {
         public BigInteger Value { get; }
+        public override ValueSemantics ValueSemantics => ValueSemantics.Copy;
 
-        public IntegerConstant(BigInteger value, DataType type, TextSpan span)
+        public IntegerConstant(BigInteger value, IntegerType type, TextSpan span)
             : base(type, span)
         {
             Value = value;

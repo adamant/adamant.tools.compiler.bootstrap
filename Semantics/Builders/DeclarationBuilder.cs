@@ -160,7 +160,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                 case ISelfParameterSyntax selfParameter:
                     return new Parameter(selfParameter.IsMutableBinding, selfParameter.Name, selfParameter.Type.Known());
                 case IFieldParameterSyntax _:
-                    throw new NotImplementedException();
+                    throw new NotImplementedException("Building field parameters not implemented");
             }
         }
     }

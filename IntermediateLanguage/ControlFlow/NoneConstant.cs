@@ -6,6 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     public class NoneConstant : Constant
     {
         public new OptionalType Type { get; }
+        public override ValueSemantics ValueSemantics => ValueSemantics.Copy;
 
         public NoneConstant(OptionalType type, TextSpan span)
             : base(type, span)

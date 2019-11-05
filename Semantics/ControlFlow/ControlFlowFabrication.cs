@@ -7,7 +7,6 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using ExhaustiveMatching;
@@ -299,7 +298,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     var startExpression = inExpression.LeftOperand;
                     var endExpression = inExpression.RightOperand;
 
-                    var variableType = (SimpleType)foreachExpression.VariableType.Assigned();
+                    var variableType = (IntegerType)foreachExpression.VariableType.Assigned();
                     var loopVariable = graph.AddVariable(foreachExpression.IsMutableBinding,
                         variableType, CurrentScope, foreachExpression.VariableName);
                     var loopVariableLValue = loopVariable.LValueReference(foreachExpression.Span);
@@ -455,7 +454,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 
                     if (assignmentExpression.Operator != AssignmentOperator.Simple)
                     {
-                        var type = (SimpleType)assignmentExpression.RightOperand.Type;
+                        var type = (SimpleType)assignmentExpression.RightOperand.Type.Assigned();
                         var rightOperand = ConvertToOperand(value, type);
                         BinaryOperator binaryOperator;
                         switch (assignmentExpression.Operator)
@@ -479,7 +478,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         }
 
                         value = new BinaryOperation(
-                            ConvertToOperand(place, assignmentExpression.LeftOperand.Type),
+                            ConvertToOperand(place, assignmentExpression.LeftOperand.Type.Assigned()),
                             binaryOperator, rightOperand, type);
                     }
 
@@ -541,7 +540,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     if (implicitNumericConversion.Expression.Type.Assigned().AssertKnown() is
                         IntegerConstantType constantType)
                         return new IntegerConstant(constantType.Value,
-                            implicitNumericConversion.Type.AssertKnown(),
+                            (IntegerType)implicitNumericConversion.Type.AssertKnown(),
                             implicitNumericConversion.Span);
                     else
                     {
@@ -572,11 +571,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 {
                     var value = ConvertToPlace(memberAccess.Expression);
                     var symbol = memberAccess.ReferencedSymbol;
-                    //if (symbol is IAccessorSymbol accessor)
-                    //    return new VirtualFunctionCall(memberAccess.Span, accessor.PropertyName.UnqualifiedName, value);
-
-                    return new FieldAccess(value, memberAccess.ReferencedSymbol.FullName,
-                        memberAccess.Span);
+                    return new FieldAccess(value, symbol.FullName, ValueSemantics.LValue, memberAccess.Span);
                 }
                 case IMutableExpressionSyntax mutableExpression:
                     // TODO shouldn't borrowing be explicit in the IR and don't we
@@ -631,9 +626,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             if (value is IOperand operand)
                 return operand;
             return AssignToTemp(type, value);
-            //var tempVariable = graph.Let(type.AssertKnown(), CurrentScope);
-            //currentBlock.AddAssignment(tempVariable.LValueReference(value.Span), value, value.Span, CurrentScope);
-            //return tempVariable.Reference(value.Span);
         }
 
         private Value ConvertBinaryExpressionToValue(IBinaryOperatorExpressionSyntax operatorExpression)
@@ -769,7 +761,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                                 .LValueReference(identifier.Span);
                 case IMemberAccessExpressionSyntax memberAccessExpression:
                     var expressionValue = ConvertToPlace(memberAccessExpression.Expression);
-                    return new FieldAccess(expressionValue, memberAccessExpression.Member.Name, memberAccessExpression.Span);
+                    return new FieldAccess(expressionValue, memberAccessExpression.Member.Name, ValueSemantics.LValue, memberAccessExpression.Span);
             }
         }
     }

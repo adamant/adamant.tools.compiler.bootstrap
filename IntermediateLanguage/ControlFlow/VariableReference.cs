@@ -1,6 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
@@ -18,36 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 
         public override string ToString()
         {
-            string mutability;
-            switch (ValueSemantics)
-            {
-                default:
-#pragma warning disable CA1065 // Do not raise exceptions in unexpected locations
-                    throw ExhaustiveMatch.Failed(ValueSemantics);
-#pragma warning restore CA1065 // Do not raise exceptions in unexpected locations
-                case ValueSemantics.LValue:
-                    mutability = "set ";
-                    break;
-                case ValueSemantics.Empty:
-                    mutability = "void ";
-                    break;
-                case ValueSemantics.Move:
-                    mutability = "move ";
-                    break;
-                case ValueSemantics.Copy:
-                    mutability = "copy ";
-                    break;
-                case ValueSemantics.Own:
-                    mutability = "own ";
-                    break;
-                case ValueSemantics.Borrow:
-                    mutability = "borrow ";
-                    break;
-                case ValueSemantics.Alias:
-                    mutability = "alias ";
-                    break;
-            }
-            return mutability + Variable;
+            return ValueSemantics.Action() + " " + Variable;
         }
 
         public Variable CoreVariable()

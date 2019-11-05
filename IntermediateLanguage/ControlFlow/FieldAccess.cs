@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
@@ -7,12 +8,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
     {
         public IPlace Expression { get; }
         public Name Field { get; }
+        public ValueSemantics ValueSemantics { get; }
 
-        public FieldAccess(IPlace expression, Name field, TextSpan span)
+        public FieldAccess(IPlace expression, Name field, ValueSemantics valueSemantics, TextSpan span)
             : base(span)
         {
             Expression = expression;
             Field = field;
+            ValueSemantics = valueSemantics;
         }
 
         public Variable CoreVariable()
@@ -24,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 
         public override string ToString()
         {
-            return $"({Expression}).{Field.UnqualifiedName}";
+            return $"{ValueSemantics.Action()} ({Expression}).{Field.UnqualifiedName}";
         }
     }
 }
