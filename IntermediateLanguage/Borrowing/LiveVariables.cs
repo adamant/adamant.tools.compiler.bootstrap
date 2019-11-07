@@ -16,10 +16,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         private readonly FixedList<List<BitArray>> values;
 
-        public LiveVariables(ControlFlowGraph graph)
+        public LiveVariables(ControlFlowGraphOld graphOld)
         {
-            VariableCount = graph.VariableDeclarations.Count;
-            values = graph.BasicBlocks.Select(block =>
+            VariableCount = graphOld.VariableDeclarations.Count;
+            values = graphOld.BasicBlocks.Select(block =>
                             block.Statements.Select(s => new BitArray(VariableCount)).ToList())
                         .ToFixedList();
         }

@@ -63,10 +63,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.BeginLine(builder.IndentCharacters);
             builder.Append("-> ");
             builder.EndLine(function.ReturnType.ToString());
-            if (function.ControlFlow != null)
+            if (function.ControlFlowOld != null)
             {
                 builder.BeginBlock();
-                Disassemble(function.ControlFlow, builder);
+                Disassemble(function.ControlFlowOld, builder);
                 builder.EndBlock();
             }
         }
@@ -96,7 +96,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.Append("-> ");
             builder.EndLine(constructor.ReturnType.ToString());
             builder.BeginBlock();
-            Disassemble(constructor.ControlFlow, builder);
+            Disassemble(constructor.ControlFlowOld, builder);
             builder.EndBlock();
         }
 
@@ -114,25 +114,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.EndBlock();
         }
 
-        private static void Disassemble(ControlFlowGraph graph, AssemblyBuilder builder)
+        private static void Disassemble(ControlFlowGraphOld graphOld, AssemblyBuilder builder)
         {
-            if (graph == null)
+            if (graphOld == null)
             {
                 builder.AppendLine("// Control Flow Graph not available");
                 return;
             }
 
-            foreach (var declaration in graph.LocalVariables)
+            foreach (var declaration in graphOld.LocalVariables)
                 Disassemble(declaration, builder);
 
-            if (graph.LocalVariables.Any(v => v.TypeIsNotEmpty))
+            if (graphOld.LocalVariables.Any(v => v.TypeIsNotEmpty))
                 builder.BlankLine();
 
-            if (Disassemble(graph.BorrowClaims?.ParameterClaims, builder))
+            if (Disassemble(graphOld.BorrowClaims?.ParameterClaims, builder))
                 builder.BlankLine();
 
-            foreach (var block in graph.BasicBlocks)
-                Disassemble(graph, block, builder);
+            foreach (var block in graphOld.BasicBlocks)
+                Disassemble(graphOld, block, builder);
         }
 
         private static void Disassemble(VariableDeclaration declaration, AssemblyBuilder builder)
@@ -142,7 +142,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                                    + declaration.ContextCommentString());
         }
 
-        private static void Disassemble(ControlFlowGraph graph, BasicBlock block, AssemblyBuilder builder)
+        private static void Disassemble(ControlFlowGraphOld graphOld, BasicBlock block, AssemblyBuilder builder)
         {
             var labelIndent = Math.Max(builder.CurrentIndentDepth - 1, 0);
             builder.Append(string.Concat(Enumerable.Repeat(builder.IndentCharacters, labelIndent)));
@@ -150,24 +150,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.EndLine(":");
             foreach (var statement in block.Statements)
             {
-                Disassemble(graph, graph.LiveVariables?.Before(statement), builder);
+                Disassemble(graphOld, graphOld.LiveVariables?.Before(statement), builder);
                 builder.AppendLine(statement.ToStatementString().PadRight(StandardStatementWidth)
                                    + statement.ContextCommentString());
-                var insertedDeletes = graph.InsertedDeletes ?? throw new InvalidOperationException("Inserted deletes is null");
+                var insertedDeletes = graphOld.InsertedDeletes ?? throw new InvalidOperationException("Inserted deletes is null");
                 Disassemble(insertedDeletes.After(statement), builder);
-                Disassemble(graph.BorrowClaims?.After(statement), builder);
+                Disassemble(graphOld.BorrowClaims?.After(statement), builder);
             }
         }
 
         private static void Disassemble(
-            ControlFlowGraph graph,
+            ControlFlowGraphOld graphOld,
             BitArray? liveVariables,
             AssemblyBuilder builder)
         {
             if (liveVariables == null || liveVariables.Cast<bool>().All(x => x == false)) return;
 
             var variables = string.Join(", ", liveVariables.TrueIndexes()
-                    .Select(i => FormatVariableName(graph.VariableDeclarations[i])));
+                    .Select(i => FormatVariableName(graphOld.VariableDeclarations[i])));
             builder.BeginLine("// live: ");
             builder.EndLine(variables);
         }

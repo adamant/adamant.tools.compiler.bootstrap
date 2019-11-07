@@ -16,11 +16,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             to = this.ToLookup(e => e.To, e => e.From);
         }
 
-        internal static Edges InGraph(ControlFlowGraph controlFlowGraph)
+        internal static Edges InGraph(ControlFlowGraphOld controlFlowGraphOld)
         {
-            var edges = controlFlowGraph.BasicBlocks.SelectMany(a =>
+            var edges = controlFlowGraphOld.BasicBlocks.SelectMany(a =>
                     a.Terminator.OutBlocks()
-                        .Select(b => new Edge(a, controlFlowGraph.BasicBlocks[b.Number])))
+                        .Select(b => new Edge(a, controlFlowGraphOld.BasicBlocks[b.Number])))
                 .ToList();
             return new Edges(edges);
         }

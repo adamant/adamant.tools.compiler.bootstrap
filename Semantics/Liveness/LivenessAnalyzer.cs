@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
             var analyses = new Dictionary<ICallableDeclaration, LiveVariables>();
             foreach (var function in functions)
             {
-                var controlFlow = function.ControlFlow;
+                var controlFlow = function.ControlFlowOld;
                 if (controlFlow == null) continue;
                 var liveness = ComputeLiveness(controlFlow);
                 if (liveness != null)
@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
         /// <summary>
         /// Perform a backwards data flow analysis to determine where each variable is live or dead
         /// </summary>
-        private static LiveVariables ComputeLiveness(ControlFlowGraph controlFlow)
+        private static LiveVariables ComputeLiveness(ControlFlowGraphOld controlFlow)
         {
             var blocksQueue = new Queue<BasicBlock>();
             // Not just exit blocks because sometimes the exit blocks don't change vars and don't pull in other blocks

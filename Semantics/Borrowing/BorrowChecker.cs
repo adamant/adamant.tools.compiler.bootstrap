@@ -65,7 +65,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         {
             foreach (var callable in callables)
             {
-                var controlFlow = callable.ControlFlow;
+                var controlFlow = callable.ControlFlowOld;
                 if (controlFlow == null) continue;
                 var borrowChecker = new BorrowChecker(controlFlow.File, diagnostics, saveBorrowClaims);
                 borrowChecker.Check(controlFlow, liveness[callable]);
@@ -78,7 +78,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                 throw new NotImplementedException("Borrow checking of field initializers not implemented");
         }
 
-        private void Check(ControlFlowGraph controlFlow, LiveVariables liveVariables)
+        private void Check(ControlFlowGraphOld controlFlow, LiveVariables liveVariables)
         {
             var variables = controlFlow.VariableDeclarations;
             // Do borrow checking with claims
@@ -180,7 +180,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         }
 
         private static Claims GetClaimsBeforeBlock(
-            ControlFlowGraph controlFlow,
+            ControlFlowGraphOld controlFlow,
             BasicBlock block,
             StatementClaims claims)
         {
@@ -363,7 +363,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             }
         }
 
-        private Claims AcquireParameterClaims(ControlFlowGraph controlFlow)
+        private Claims AcquireParameterClaims(ControlFlowGraphOld controlFlow)
         {
             var claimsBeforeStatement = new Claims();
             foreach (var parameter in controlFlow.Parameters

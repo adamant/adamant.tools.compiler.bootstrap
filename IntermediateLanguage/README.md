@@ -41,3 +41,33 @@ If desired a more flexible assembly language can be provided for human use. This
 ## Namespaces
 
 Like the CIL, the Adamant IL doesn't contain namespaces. Rather, each entity name is its fully qualified name. This means that a package can never expose an empty namespace.
+
+
+
+-----
+
+Instructions:
+  Call
+  VirtCall
+  BinOp (+, -)
+  Unary Op
+
+Block Terminator Instruction
+  Return operand
+  return void
+
+Places
+  VariablePlace
+  DiscardPlace
+  FieldPlace (operand, field name)
+
+Operand
+  VariableReference
+  FieldReference (operand, field name)
+  Constants
+
+Translation:
+  ConvertToOperand() -> Operand
+  Convert(exp, place) 
+  ConvertVoid(exp) (either treats something as a no-op or calls ConvertPlace(exp, Discard)
+Convert void is used for never too

@@ -7,7 +7,7 @@ using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
-    public class ControlFlowEmitter : IEmitter<ControlFlowGraph>
+    public class ControlFlowEmitter : IEmitter<ControlFlowGraphOld>
     {
         private readonly NameMangler nameMangler;
         private readonly IConverter<DataType> typeConverter;
@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             this.nameMangler = nameMangler;
         }
 
-        public void Emit(ControlFlowGraph cfg, Code code)
+        public void Emit(ControlFlowGraphOld cfg, Code code)
         {
             var definitions = code.Definitions;
 

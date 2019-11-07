@@ -74,7 +74,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             }
         }
 
-        public ControlFlowGraph CreateGraph()
+        public ControlFlowGraphOld CreateGraph()
         {
             // Temp Variable for return
             if (selfType != null) graph.AddSelfParameter(selfType);

@@ -12,13 +12,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         private readonly NameMangler nameMangler;
         private readonly IConverter<Parameter> parameterConverter;
         private readonly IConverter<DataType> typeConverter;
-        private readonly IEmitter<ControlFlowGraph> controlFlowEmitter;
+        private readonly IEmitter<ControlFlowGraphOld> controlFlowEmitter;
 
         public DeclarationEmitter(
             NameMangler nameMangler,
             IConverter<Parameter> parameterConverter,
             IConverter<DataType> typeConverter,
-            IEmitter<ControlFlowGraph> controlFlowEmitter)
+            IEmitter<ControlFlowGraphOld> controlFlowEmitter)
         {
             this.nameMangler = nameMangler;
             this.parameterConverter = parameterConverter;
@@ -62,7 +62,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             // Don't emit functions without control flow, they are generic
             // TODO need to handle better
-            if (function.ControlFlow == null) return;
+            if (function.ControlFlowOld == null) return;
 
             var name = nameMangler.MangleName(function);
             var parameters = Convert(function.Parameters);
@@ -74,7 +74,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.Definitions.DeclarationSeparatorLine();
             code.Definitions.AppendLine($"{returnType} {name}({parameters})");
             code.Definitions.BeginBlock();
-            controlFlowEmitter.Emit(function.ControlFlow, code);
+            controlFlowEmitter.Emit(function.ControlFlowOld, code);
             code.Definitions.EndBlock();
         }
 
@@ -82,7 +82,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             // Don't emit constructors without control flow, they are generic
             // TODO need to handle better
-            if (constructor.ControlFlow == null) return;
+            if (constructor.ControlFlowOld == null) return;
 
             var name = nameMangler.MangleName(constructor);
             var parameters = Convert(constructor.Parameters);
@@ -94,7 +94,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.Definitions.DeclarationSeparatorLine();
             code.Definitions.AppendLine($"{returnType} {name}({parameters})");
             code.Definitions.BeginBlock();
-            controlFlowEmitter.Emit(constructor.ControlFlow, code);
+            controlFlowEmitter.Emit(constructor.ControlFlowOld, code);
             code.Definitions.EndBlock();
         }
 

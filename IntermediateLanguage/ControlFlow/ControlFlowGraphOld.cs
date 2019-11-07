@@ -8,7 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 {
-    public class ControlFlowGraph
+    public class ControlFlowGraphOld
     {
         public CodeFile File { get; }
         public FixedList<VariableDeclaration> VariableDeclarations { get; }
@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 
         public InsertedDeletes? InsertedDeletes { get; set; }
 
-        public ControlFlowGraph(
+        public ControlFlowGraphOld(
             CodeFile file,
             IEnumerable<VariableDeclaration> variableDeclarations,
             IEnumerable<BasicBlock> basicBlocks)

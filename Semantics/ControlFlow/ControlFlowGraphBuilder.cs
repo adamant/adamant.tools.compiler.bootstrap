@@ -88,7 +88,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
             return entryBlock;
         }
 
-        public ControlFlowGraph Build()
+        public ControlFlowGraphOld Build()
         {
             // We assume that the first block is the entry block
             var blocks = new List<BasicBlock>();
@@ -101,7 +101,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 blocks.Add(new BasicBlock(block.BlockName, statements, terminator));
             }
 
-            return new ControlFlowGraph(file, variables, blocks);
+            return new ControlFlowGraphOld(file, variables, blocks);
         }
 
         [SuppressMessage("Design", "CA1043:Use Integral Or String Argument For Indexers", Justification = "Variable is a value type, essentially a strongly type integer")]

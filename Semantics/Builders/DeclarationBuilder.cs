@@ -130,7 +130,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                                             selfType,
                                             graph.Build());
 
-            defaultConstructor.ControlFlow.InsertedDeletes = new InsertedDeletes();
+            defaultConstructor.ControlFlowOld.InsertedDeletes = new InsertedDeletes();
             declarations.Add(symbol, defaultConstructor);
             return defaultConstructor;
         }

@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
     public class ControlFlowGraphFactory
     {
         [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Factory is passed as a dependency")]
-        public ControlFlowGraph CreateGraph(IConcreteCallableDeclarationSyntax callableDeclaration)
+        public ControlFlowGraphOld CreateGraph(IConcreteCallableDeclarationSyntax callableDeclaration)
         {
             // TODO build control flow graphs for field initializers
 
