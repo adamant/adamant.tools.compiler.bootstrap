@@ -30,9 +30,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
         private BlockBuilder? currentBlock;
 
         /// <summary>
-        /// The block that a `break` statement should go to
+        /// Actions are registered here to connect break statements to the loop exist block
         /// </summary>
-        private BlockBuilder? breakToBlock;
+        private List<Action<BlockBuilder>> addBreaks = new List<Action<BlockBuilder>>();
 
         /// <summary>
         /// The block that a `next` statement should go to
@@ -84,7 +84,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 graph.AddParameter(parameter.IsMutableBinding, parameter.Type.Fulfilled(), CurrentScope, parameter.Name.UnqualifiedName);
 
             currentBlock = graph.NewBlock();
-            breakToBlock = null;
             foreach (var statement in callable.Body.Statements)
                 ConvertToStatement(statement);
 
@@ -326,8 +325,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         foreachExpression.Block.Span.AtStart(), CurrentScope);
                     currentBlock = loopEntry;
                     var conditionBlock = continueToBlock = graph.NewBlock();
-                    var loopExit = breakToBlock = graph.NewBlock();
-                    ConvertExpressionToStatement(foreachExpression.Block);
+                    // TODO this generates the exit block too soon if the break condition is non-trivial
+                    var loopExit = ConvertLoopBody(foreachExpression.Block);
                     // If it always breaks, there isn't a current block
                     currentBlock?.AddGoto(conditionBlock, foreachExpression.Block.Span.AtEnd(),
                         CurrentScope);
@@ -341,7 +340,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     var breakCondition = new BinaryOperation(loopVariableReference,
                                             breakOperator, endValue, variableType);
                     currentBlock.AddIf(ConvertToOperand(breakCondition, DataType.Bool),
-                        breakToBlock, loopEntry, foreachExpression.Span, CurrentScope);
+                        loopExit, loopEntry, foreachExpression.Span, CurrentScope);
                     currentBlock = loopExit;
                     return;
                 }
@@ -355,15 +354,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     var condition = ConvertToOperand(whileExpression.Condition);
                     var loopEntry = graph.NewBlock();
                     continueToBlock = conditionBlock;
-                    breakToBlock = graph.NewBlock();
-                    conditionBlock.AddIf(condition, loopEntry, breakToBlock,
-                        whileExpression.Condition.Span, CurrentScope);
                     currentBlock = loopEntry;
-                    ConvertExpressionToStatement(whileExpression.Block);
+                    var loopExit = ConvertLoopBody(whileExpression.Block);
+                    // Generate if branch now that loop exit is known
+                    conditionBlock.AddIf(condition, loopEntry, loopExit, whileExpression.Condition.Span,
+                        CurrentScope);
                     // If it always breaks, there isn't a current block
                     currentBlock?.AddGoto(conditionBlock, whileExpression.Block.Span.AtEnd(),
                         CurrentScope);
-                    currentBlock = breakToBlock;
+                    currentBlock = loopExit;
                     return;
                 }
                 case ILoopExpressionSyntax loopExpression:
@@ -372,19 +371,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         loopExpression.Block.Span.AtStart(), CurrentScope);
                     currentBlock = loopEntry;
                     continueToBlock = loopEntry;
-                    breakToBlock = graph.NewBlock();
-                    ConvertExpressionToStatement(loopExpression.Block);
+                    var loopExit = ConvertLoopBody(loopExpression.Block);
                     // If it always breaks, there isn't a current block
                     currentBlock?.AddGoto(loopEntry, loopExpression.Block.Span.AtEnd(),
                         CurrentScope);
-                    currentBlock = breakToBlock;
+                    currentBlock = loopExit;
                     return;
                 }
                 case IBreakExpressionSyntax breakExpression:
                 {
                     ExitScope(breakExpression.Span.AtEnd());
-                    currentBlock.AddGoto(breakToBlock ?? throw new InvalidOperationException(),
-                        breakExpression.Span, CurrentScope);
+                    // capture the current block for use in the lambda
+                    var breakingBlock = currentBlock;
+                    addBreaks.Add(loopExit => breakingBlock.AddGoto(loopExit, breakExpression.Span, CurrentScope));
                     currentBlock = null;
                     return;
                 }
@@ -491,6 +490,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 //    ExitScope(resultExpression.Span.AtEnd());
                 //    return;
             }
+        }
+
+        private BlockBuilder ConvertLoopBody(IBlockExpressionSyntax body)
+        {
+            var oldAddBreaks = addBreaks;
+            addBreaks = new List<Action<BlockBuilder>>();
+            ConvertExpressionToStatement(body);
+            var loopExit = graph.NewBlock();
+            foreach (var addBreak in addBreaks) addBreak(loopExit);
+            addBreaks = oldAddBreaks;
+            return loopExit;
         }
 
         private Value ConvertToValue(IExpressionSyntax expression)
