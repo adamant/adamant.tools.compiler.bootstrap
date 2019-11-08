@@ -1,3 +1,5 @@
+using Adamant.Tools.Compiler.Bootstrap.Core;
+
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Places
 {
     /// <summary>
@@ -6,5 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Places
     /// </summary>
     public class DiscardPlace : Place
     {
+        public DiscardPlace(TextSpan span)
+            : base(span) { }
     }
 }

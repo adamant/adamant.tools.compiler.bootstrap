@@ -13,6 +13,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Moves;
@@ -133,7 +134,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // TODO construct IL while building control flow graphs, then analyze borrow check on that
 
             var controlFlowGraphFactory = new ControlFlowGraphFactory();
-            var declarationBuilder = new DeclarationBuilder(controlFlowGraphFactory);
+            var ilFactory = new ILFactory();
+            var declarationBuilder = new DeclarationBuilder(controlFlowGraphFactory, ilFactory);
             declarationBuilder.Build(entityDeclarations);
             return declarationBuilder.AllDeclarations.ToFixedList();
         }

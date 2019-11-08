@@ -68,6 +68,5 @@ Operand
 
 Translation:
   ConvertToOperand() -> Operand
-  Convert(exp, place) 
-  ConvertVoid(exp) (either treats something as a no-op or calls ConvertPlace(exp, Discard)
-Convert void is used for never too
+  ConvertIntoPlace(exp, place) - if place is discard, can skip some ops, like binary op, but may still need to evaluate things for side effects
+

@@ -33,8 +33,4 @@
     <ProjectReference Include="..\Names\Names.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="CFG\Operands\" />
-  </ItemGroup>
-
 </Project>

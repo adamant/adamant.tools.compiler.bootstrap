@@ -8,18 +8,22 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen;
 using ExhaustiveMatching;
+using ControlFlowGraphBuilder = Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.ControlFlowGraphBuilder;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
 {
     public class DeclarationBuilder
     {
         private readonly ControlFlowGraphFactory controlFlowGraphFactory;
+        private readonly ILFactory ilFactory;
         private readonly Dictionary<ISymbol, Declaration> declarations = new Dictionary<ISymbol, Declaration>();
 
-        public DeclarationBuilder(ControlFlowGraphFactory controlFlowGraphFactory)
+        public DeclarationBuilder(ControlFlowGraphFactory controlFlowGraphFactory, ILFactory ilFactory)
         {
             this.controlFlowGraphFactory = controlFlowGraphFactory;
+            this.ilFactory = ilFactory;
         }
 
         public IEnumerable<Declaration> AllDeclarations => declarations.Values;
@@ -47,6 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                 case IFunctionDeclarationSyntax function:
                 {
                     var controlFlowGraph = controlFlowGraphFactory.CreateGraph(function);
+                    ilFactory.CreateGraph(function);
                     declaration = new FunctionDeclaration(function.IsExternalFunction, false,
                         function.FullName, BuildParameters(function.Parameters),
                         function.ReturnType.Known(), controlFlowGraph);
@@ -55,6 +60,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                 case IAssociatedFunctionDeclaration associatedFunction:
                 {
                     var controlFlowGraph = controlFlowGraphFactory.CreateGraph(associatedFunction);
+                    ilFactory.CreateGraph(associatedFunction);
                     declaration = new FunctionDeclaration(false, true,
                         associatedFunction.FullName, BuildParameters(associatedFunction.Parameters),
                         associatedFunction.ReturnType.Known(), controlFlowGraph);
@@ -63,6 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                 case IConcreteMethodDeclarationSyntax method:
                 {
                     var controlFlowGraph = controlFlowGraphFactory.CreateGraph(method);
+                    ilFactory.CreateGraph(method);
                     declaration = new FunctionDeclaration(false, true,
                         method.FullName, BuildParameters(method.Parameters),
                         method.ReturnType.Known(), controlFlowGraph);
@@ -78,6 +85,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                 case IConstructorDeclarationSyntax constructor:
                 {
                     var controlFlowGraph = controlFlowGraphFactory.CreateGraph(constructor);
+                    ilFactory.CreateGraph(constructor);
                     var parameters = BuildConstructorParameters(constructor);
                     declaration = new ConstructorDeclaration(constructor.FullName,
                        parameters, constructor.SelfParameterType, controlFlowGraph);
