@@ -38,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
             {
                 case INameExpressionSyntax identifier:
                     return definitelyAssigned.Set(identifier.ReferencedSymbol, true);
-                case IMemberAccessExpressionSyntax _:
+                case IFieldAccessExpressionSyntax _:
                     return definitelyAssigned;
                 default:
                     throw new NotImplementedException("Complex assignments not yet implemented");

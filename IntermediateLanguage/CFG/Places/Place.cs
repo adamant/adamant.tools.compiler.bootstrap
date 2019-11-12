@@ -1,7 +1,11 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Places
 {
+    [Closed(
+        typeof(VariablePlace),
+        typeof(FieldPlace))]
     public abstract class Place
     {
         public TextSpan Span { get; }
@@ -10,5 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Places
         {
             Span = span;
         }
+
+        public abstract override string ToString();
     }
 }

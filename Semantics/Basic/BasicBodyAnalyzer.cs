@@ -477,7 +477,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     }
                     // TODO assign a type to the expression
                     return ifExpression.Type = DataType.Void;
-                case IMemberAccessExpressionSyntax memberAccess:
+                case IFieldAccessExpressionSyntax memberAccess:
                 {
                     DataType targetType;
                     if (memberAccess.Expression == null)
@@ -493,8 +493,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     else
                         targetType = InferType(ref memberAccess.Expression);
 
-                    var symbol = GetSymbolForType(memberAccess.Member.ContainingScope.Assigned(), targetType);
-                    var member = memberAccess.Member;
+                    var symbol = GetSymbolForType(memberAccess.Field.ContainingScope.Assigned(), targetType);
+                    var member = memberAccess.Field;
                     var memberSymbols = symbol.Lookup(member.Name).OfType<IBindingSymbol>().ToFixedList();
                     var type = AssignReferencedSymbolAndType(member, memberSymbols);
                     return memberAccess.Type = type;
@@ -612,11 +612,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         {
             switch (expression)
             {
-                case IMemberAccessExpressionSyntax memberAccess:
+                case IFieldAccessExpressionSyntax memberAccess:
                     // Tf implicit self
                     return memberAccess.Expression is null
                         ? null
-                        : TargetAsName(memberAccess.Expression)?.Qualify(memberAccess.Member.Name);
+                        : TargetAsName(memberAccess.Expression)?.Qualify(memberAccess.Field.Name);
                 case INameExpressionSyntax nameExpression:
                     return nameExpression.Name;
                 default:

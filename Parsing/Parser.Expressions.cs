@@ -156,7 +156,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                             if (!(Tokens.Current is IOpenParenToken))
                             {
                                 var memberAccessSpan = TextSpan.Covering(expression.Span, member.Span);
-                                expression = new MemberAccessExpressionSyntax(memberAccessSpan, expression, accessOperator, member.ToExpression());
+                                expression = new FieldAccessExpressionSyntax(memberAccessSpan, expression, accessOperator, member.ToExpression());
                             }
                             else
                             {
@@ -383,7 +383,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var member = ParseName();
                     var span = TextSpan.Covering(dot, member.Span);
                     // TODO we need to check for method call
-                    return new MemberAccessExpressionSyntax(span, null, AccessOperator.Standard, member.ToExpression());
+                    return new FieldAccessExpressionSyntax(span, null, AccessOperator.Standard, member.ToExpression());
                 }
                 case IMutableKeywordToken _:
                 {

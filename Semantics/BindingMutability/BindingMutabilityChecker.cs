@@ -43,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
                     if (!symbol.IsMutableBinding && definitelyUnassigned[symbol] == false)
                         diagnostics.Add(SemanticError.VariableMayAlreadyBeAssigned(file, identifier.Span, identifier.Name));
                     return definitelyUnassigned.Set(symbol, false);
-                case IMemberAccessExpressionSyntax _:
+                case IFieldAccessExpressionSyntax _:
                     return definitelyUnassigned;
                 default:
                     throw new NotImplementedException("Complex assignments not yet implemented");

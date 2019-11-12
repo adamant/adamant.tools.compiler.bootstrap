@@ -2,10 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Operands;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Places;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.TerminatorInstructions;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using ExhaustiveMatching;
+using BinaryOperator = Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow.BinaryOperator;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
 {
@@ -80,7 +85,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
 
             currentBlock = graph.NewBlock();
             foreach (var statement in callable.Body.Statements)
-                ConvertIntoVoid(statement);
+                Convert(statement);
 
             // Generate the implicit return statement
             //if (currentBlock != null && !currentBlock.IsTerminated)
@@ -93,7 +98,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             return graph.Build();
         }
 
-        private void ConvertIntoVoid(IBodyStatementSyntax statement)
+
+        private void Convert(IStatementSyntax statement)
         {
             switch (statement)
             {
@@ -123,16 +129,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     if (!expression.Type.Assigned().IsKnown)
                         return;
 
-                    ConvertIntoPlace(expression, new DiscardPlace(expression.Span.AtStart()));
+                    Convert(expression);
 
                     return;
                 }
-                //case IResultStatementSyntax _:
-                //    throw new NotImplementedException();
+                case IResultStatementSyntax _:
+                    throw new NotImplementedException();
             }
         }
 
-        private void ConvertIntoPlace(IExpressionSyntax expression, Place place)
+        /// <summary>
+        /// Convert an expression without expecting any result value
+        /// </summary>
+        private void Convert(IExpressionSyntax expression)
         {
             switch (expression)
             {
@@ -150,30 +159,159 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                         var tempSpan = rightOperand.Span.AtStart();
                         ConvertIntoPlace(rightOperand, tempVar.Place(tempSpan));
                         assignInto = ConvertToPlace(leftOperand);
-                        currentBlock!.AddAssignment(assignInto, tempVar.Move(tempSpan), assignmentExpression.Span, CurrentScope);
+                        Operand operand = tempVar.Move(tempSpan);
+                        currentBlock!.Add(new AssignmentInstruction(assignInto, operand, assignmentExpression.Span, CurrentScope));
                     }
                     else
                         ConvertIntoPlace(rightOperand, assignInto);
-
-                    if (!(place is DiscardPlace))
-                        currentBlock!.AddAssignment(place, assignInto.Reference(), expression.Span, CurrentScope);
                 }
                 break;
+                case IUnsafeExpressionSyntax unsafeExpression:
+                    Convert(unsafeExpression.Expression);
+                    break;
+                case IBlockExpressionSyntax blockExpression:
+                    foreach (var statement in blockExpression.Statements)
+                        Convert(statement);
+                    break;
+                case IFunctionInvocationExpressionSyntax functionInvocation:
+                {
+                    var args = functionInvocation.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
+                    currentBlock!.Add(new CallInstruction(functionInvocation.FullName, args,
+                        functionInvocation.Span, CurrentScope));
+                }
+                break;
+                case IReturnExpressionSyntax returnExpression:
+                {
+                    if (returnExpression.ReturnValue == null)
+                        currentBlock!.Add(new ReturnVoidInstruction(returnExpression.Span, CurrentScope));
+                }
+                break;
+                case INameExpressionSyntax _:
+                case IBinaryOperatorExpressionSyntax _:
+                    // These operation have no side effects, so if the result isn't needed, there is nothing to do
+                    // TODO does this mess up borrow checking?
+                    break;
+
             }
         }
 
-        private ValuePlace ConvertToPlace(IExpressionSyntax expression)
-        {
-            throw new NotImplementedException();
-        }
-
-        private ValuePlace? ConvertToPlaceWithoutSideEffects(IExpressionSyntax expression)
+        /// <summary>
+        /// Convert an expression that yields a value an assign that value into <paramref name="resultPlace"/>.
+        /// </summary>
+        private void ConvertIntoPlace(IExpressionSyntax expression, Place resultPlace)
         {
             switch (expression)
             {
                 default:
                     //throw ExhaustiveMatch.Failed(expression);
                     throw new NotImplementedException();
+                case IAssignmentExpressionSyntax assignmentExpression:
+                {
+                    var leftOperand = assignmentExpression.LeftOperand;
+                    var rightOperand = assignmentExpression.RightOperand;
+                    var assignInto = ConvertToPlaceWithoutSideEffects(leftOperand);
+                    if (assignInto == null)
+                    {
+                        var tempVar = graph.Let(leftOperand.Type.Assigned().AssertKnown(), CurrentScope);
+                        var tempSpan = rightOperand.Span.AtStart();
+                        ConvertIntoPlace(rightOperand, tempVar.Place(tempSpan));
+                        assignInto = ConvertToPlace(leftOperand);
+                        Operand operand = tempVar.Move(tempSpan);
+                        currentBlock!.Add(new AssignmentInstruction(assignInto, operand, assignmentExpression.Span, CurrentScope));
+                    }
+                    else
+                        ConvertIntoPlace(rightOperand, assignInto);
+                }
+                break;
+                case INameExpressionSyntax nameExpression:
+                {
+                    // This occurs when the source code contains a simple assignment like `x = y`
+                    var symbol = nameExpression.ReferencedSymbol.Assigned();
+                    var variable = graph.VariableFor(symbol.FullName.UnqualifiedName).Reference(nameExpression.Span);
+                    currentBlock!.Add(new AssignmentInstruction(resultPlace, variable, nameExpression.Span, CurrentScope));
+                }
+                break;
+                case IBinaryOperatorExpressionSyntax binaryOperator:
+                {
+                    var type = binaryOperator.Type.Assigned().AssertKnown();
+                    var leftOperand = ConvertToOperand(binaryOperator.LeftOperand);
+                    var rightOperand = ConvertToOperand(binaryOperator.RightOperand);
+                    switch (binaryOperator.Operator)
+                    {
+                        default:
+                            //throw ExhaustiveMatch.Failed(expression);
+                            throw new NotImplementedException();
+                        case BinaryOperator.Plus:
+                            currentBlock!.Add(new AddInstruction(resultPlace, (NumericType)type, leftOperand, rightOperand, CurrentScope));
+                            break;
+                    }
+                }
+                break;
+                case IFieldAccessExpressionSyntax fieldAccess:
+                {
+                    if (fieldAccess.Expression == null)
+                        throw new NotImplementedException("implicit self expression not implemented");
+                    var target = ConvertToOperand(fieldAccess.Expression);
+                    currentBlock!.Add(new FieldAccessInstruction(resultPlace, target, fieldAccess.Field.Name, fieldAccess.Span, CurrentScope));
+                }
+                break;
+                case IFunctionInvocationExpressionSyntax functionInvocation:
+                {
+                    var args = functionInvocation.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
+                    currentBlock!.Add(new CallInstruction(resultPlace, functionInvocation.FullName, args, functionInvocation.Span, CurrentScope));
+                }
+                break;
+            }
+        }
+
+        /// <summary>
+        /// Convert an expression that yields a value into an operand for another instruction
+        /// </summary>
+        private Operand ConvertToOperand(IExpressionSyntax expression)
+        {
+            switch (expression)
+            {
+                default:
+                    //throw ExhaustiveMatch.Failed(expression);
+                    throw new NotImplementedException();
+                case ISelfExpressionSyntax selfExpression:
+                    return graph.SelfVariable.Reference(selfExpression.Span);
+                case INameExpressionSyntax nameExpression:
+                {
+                    var symbol = nameExpression.ReferencedSymbol.Assigned();
+                    return graph.VariableFor(symbol.FullName.UnqualifiedName).Reference(nameExpression.Span);
+                }
+                case IAssignmentExpressionSyntax _:
+                case IBinaryOperatorExpressionSyntax _:
+                case IFieldAccessExpressionSyntax _:
+                    var tempVar = graph.Let(expression.Type.Assigned().AssertKnown(), CurrentScope);
+                    ConvertIntoPlace(expression, tempVar.Place(expression.Span));
+                    return tempVar.Reference(expression.Span);
+            }
+        }
+
+
+        private Place ConvertToPlace(IExpressionSyntax expression)
+        {
+            throw new NotImplementedException();
+        }
+
+        private Place? ConvertToPlaceWithoutSideEffects(IExpressionSyntax expression)
+        {
+            switch (expression)
+            {
+                default:
+                    //throw ExhaustiveMatch.Failed(expression);
+                    throw new NotImplementedException();
+                case IFieldAccessExpressionSyntax fieldAccess:
+                {
+                    if (fieldAccess.Expression == null)
+                        throw new NotImplementedException("implicit self expression not implemented");
+                    var target = ConvertToOperand(fieldAccess.Expression);
+                    return new FieldPlace(target, fieldAccess.Field.Name, fieldAccess.Span);
+                }
+                case ISelfExpressionSyntax selfExpression:
+                    return new VariablePlace(Variable.Self, selfExpression.Span);
             }
         }
 

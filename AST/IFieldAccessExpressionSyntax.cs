@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public interface IMemberAccessExpressionSyntax : IExpressionSyntax
+    public interface IFieldAccessExpressionSyntax : IExpressionSyntax
     {
         /// <summary>
         /// This expression is null for implicit member access i.e. self and enums
@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [DisallowNull]
         ref IExpressionSyntax? Expression { get; }
         AccessOperator AccessOperator { get; }
-        INameExpressionSyntax Member { get; }
+        INameExpressionSyntax Field { get; }
         [DisallowNull] IBindingSymbol? ReferencedSymbol { get; set; }
     }
 }

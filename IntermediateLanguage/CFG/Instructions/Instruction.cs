@@ -7,7 +7,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
         public TextSpan Span { get; }
         public Scope Scope { get; }
 
-
         protected Instruction(TextSpan span, Scope scope)
         {
             Span = span;

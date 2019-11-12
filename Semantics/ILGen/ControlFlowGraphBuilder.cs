@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
     {
         private readonly CodeFile file;
         private readonly List<VariableDeclaration> variables = new List<VariableDeclaration>();
-        public VariableDeclaration ReturnVariable => variables.First();
+        public VariableDeclaration SelfVariable => variables.SingleOrDefault(v => v.Variable == Variable.Self);
         private readonly List<BlockBuilder> blockBuilders = new List<BlockBuilder>();
 
         public ControlFlowGraphBuilder(CodeFile file)

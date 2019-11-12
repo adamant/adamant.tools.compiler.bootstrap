@@ -577,7 +577,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         implicitNoneConversion.Span);
                 case IInvocationExpressionSyntax invocation:
                     return ConvertInvocationToValue(invocation);
-                case IMemberAccessExpressionSyntax memberAccess:
+                case IFieldAccessExpressionSyntax memberAccess:
                 {
                     var value = ConvertToPlace(memberAccess.Expression);
                     var symbol = memberAccess.ReferencedSymbol;
@@ -769,9 +769,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     // TODO what if this isn't just a variable?
                     return graph.VariableFor(identifier.ReferencedSymbol.FullName.UnqualifiedName)
                                 .LValueReference(identifier.Span);
-                case IMemberAccessExpressionSyntax memberAccessExpression:
+                case IFieldAccessExpressionSyntax memberAccessExpression:
                     var expressionValue = ConvertToPlace(memberAccessExpression.Expression);
-                    return new FieldAccess(expressionValue, memberAccessExpression.Member.Name, ValueSemantics.LValue, memberAccessExpression.Span);
+                    return new FieldAccess(expressionValue, memberAccessExpression.Field.Name, ValueSemantics.LValue, memberAccessExpression.Span);
             }
         }
     }

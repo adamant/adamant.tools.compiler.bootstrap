@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal class MemberAccessExpressionSyntax : ExpressionSyntax, IMemberAccessExpressionSyntax
+    internal class FieldAccessExpressionSyntax : ExpressionSyntax, IFieldAccessExpressionSyntax
     {
         private IExpressionSyntax? expression;
 
@@ -14,35 +14,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public ref IExpressionSyntax? Expression => ref expression;
 
         public AccessOperator AccessOperator { get; }
-        public INameExpressionSyntax Member { get; }
+        public INameExpressionSyntax Field { get; }
 
         [DisallowNull]
         public IBindingSymbol? ReferencedSymbol
         {
-            get => Member.ReferencedSymbol;
+            get => Field.ReferencedSymbol;
             set
             {
-                if (Member.ReferencedSymbol != null)
+                if (Field.ReferencedSymbol != null)
                     throw new InvalidOperationException("Can't set ReferencedSymbol repeatedly");
-                Member.ReferencedSymbol = value ?? throw new ArgumentNullException(nameof(value));
+                Field.ReferencedSymbol = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
-        public MemberAccessExpressionSyntax(
+        public FieldAccessExpressionSyntax(
             TextSpan span,
             IExpressionSyntax? expression,
             AccessOperator accessOperator,
-            INameExpressionSyntax member)
+            INameExpressionSyntax field)
             : base(span)
         {
             this.expression = expression;
             AccessOperator = accessOperator;
-            Member = member;
+            Field = field;
         }
 
         public override string ToString()
         {
-            return $"{Expression}.{Member}";
+            return $"{Expression}.{Field}";
         }
     }
 }

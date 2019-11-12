@@ -1,10 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Operands;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Places;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.TerminatorInstructions;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
@@ -30,10 +26,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         //    instructions.Add(statement.Clone());
         //}
 
-        public void AddAssignment(Place place, Operand operand, TextSpan span, Scope scope)
+        public void Add(Instruction instruction)
         {
-            instructions.Add(new AssignmentInstruction(place, operand, span, scope));
+            instructions.Add(instruction);
         }
+
+        //public void Add(NumericType type, Place place, Operand leftOperand, Operand rightOperand, Scope scope)
+        //{
+        //    instructions.Add(new AddInstruction(type, place, leftOperand, rightOperand, scope));
+        //}
 
         //public void AddAction(Value value, TextSpan span, Scope scope)
         //{
