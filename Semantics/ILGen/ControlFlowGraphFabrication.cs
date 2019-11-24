@@ -196,7 +196,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         }
 
         /// <summary>
-        /// Convert an expression that yields a value an assign that value into <paramref name="resultPlace"/>.
+        /// Convert an expression that yields a value and assign that value into <paramref name="resultPlace"/>.
         /// </summary>
         private void ConvertIntoPlace(IExpressionSyntax expression, Place resultPlace)
         {
@@ -261,6 +261,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     currentBlock!.Add(new CallInstruction(resultPlace, functionInvocation.FullName, args, functionInvocation.Span, CurrentScope));
                 }
                 break;
+                case IStringLiteralExpressionSyntax stringLiteral:
+                    currentBlock!.Add(new LoadStringInstruction(resultPlace, stringLiteral.Value, stringLiteral.Span, CurrentScope));
+                    break;
             }
         }
 
