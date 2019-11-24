@@ -74,6 +74,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
                 // Disassemble
                 var assembler = new Assembler();
                 testOutput.WriteLine(assembler.Disassemble(package));
+                var ilAssembler = new ILAssembler();
+                testOutput.WriteLine(ilAssembler.Disassemble(package));
 
                 // We got only expected errors, but need to not go on to emit code
                 if (errorDiagnostics.Any())

@@ -51,44 +51,44 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                 case IFunctionDeclarationSyntax function:
                 {
                     var controlFlowGraph = controlFlowGraphFactory.CreateGraph(function);
-                    ilFactory.CreateGraph(function);
+                    var il = ilFactory.CreateGraph(function);
                     declaration = new FunctionDeclaration(function.IsExternalFunction, false,
                         function.FullName, BuildParameters(function.Parameters),
-                        function.ReturnType.Known(), controlFlowGraph);
+                        function.ReturnType.Known(), controlFlowGraph, il);
                     break;
                 }
                 case IAssociatedFunctionDeclaration associatedFunction:
                 {
                     var controlFlowGraph = controlFlowGraphFactory.CreateGraph(associatedFunction);
-                    ilFactory.CreateGraph(associatedFunction);
+                    var il = ilFactory.CreateGraph(associatedFunction);
                     declaration = new FunctionDeclaration(false, true,
                         associatedFunction.FullName, BuildParameters(associatedFunction.Parameters),
-                        associatedFunction.ReturnType.Known(), controlFlowGraph);
+                        associatedFunction.ReturnType.Known(), controlFlowGraph, il);
                     break;
                 }
                 case IConcreteMethodDeclarationSyntax method:
                 {
                     var controlFlowGraph = controlFlowGraphFactory.CreateGraph(method);
-                    ilFactory.CreateGraph(method);
+                    var il = ilFactory.CreateGraph(method);
                     declaration = new FunctionDeclaration(false, true,
                         method.FullName, BuildParameters(method.Parameters),
-                        method.ReturnType.Known(), controlFlowGraph);
+                        method.ReturnType.Known(), controlFlowGraph, il);
                     break;
                 }
                 case IAbstractMethodDeclarationSyntax method:
                 {
                     declaration = new FunctionDeclaration(false, true,
                         method.FullName, BuildParameters(method.Parameters),
-                        method.ReturnType.Known(), null);
+                        method.ReturnType.Known(), null, null);
                     break;
                 }
                 case IConstructorDeclarationSyntax constructor:
                 {
                     var controlFlowGraph = controlFlowGraphFactory.CreateGraph(constructor);
-                    ilFactory.CreateGraph(constructor);
+                    var il = ilFactory.CreateGraph(constructor);
                     var parameters = BuildConstructorParameters(constructor);
                     declaration = new ConstructorDeclaration(constructor.FullName,
-                       parameters, constructor.SelfParameterType, controlFlowGraph);
+                       parameters, constructor.SelfParameterType, controlFlowGraph, il);
                     break;
                 }
                 case IFieldDeclarationSyntax fieldDeclaration:
@@ -132,11 +132,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
             var block = graph.NewBlock();
             block.AddReturn(classDeclaration.NameSpan, Scope.Outer);
 
+            //var il = new ControlFlowGraphBuilder(classDeclaration.File);
+            //il.AddSelfParameter(selfType);
+            //var block = il.NewBlock();
+            //block.End(classDeclaration.NameSpan, Scope.Outer);
+
             var defaultConstructor = new ConstructorDeclaration(
                                             symbol.FullName,
                                             parameters,
                                             selfType,
-                                            graph.Build());
+                                            graph.Build(),
+                                            null); // TODO fill in
 
             defaultConstructor.ControlFlowOld.InsertedDeletes = new InsertedDeletes();
             declarations.Add(symbol, defaultConstructor);

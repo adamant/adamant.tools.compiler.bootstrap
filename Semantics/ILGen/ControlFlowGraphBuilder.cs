@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -87,7 +88,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             var blocks = new List<Block>();
             foreach (var block in blockBuilders)
             {
-                blocks.Add(new Block(block.Number, block.Instructions.ToFixedList(), block.Terminator));
+                var terminator = block.Terminator ?? throw new ArgumentNullException();
+                blocks.Add(new Block(block.Number, block.Instructions.ToFixedList(), terminator));
             }
 
             return new ControlFlowGraph(file, variables, blocks);

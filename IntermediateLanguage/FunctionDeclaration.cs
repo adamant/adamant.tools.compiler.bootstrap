@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
@@ -14,6 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         public int Arity => Parameters.Count;
         public DataType ReturnType { get; }
         public ControlFlowGraphOld? ControlFlowOld { get; }
+        public ControlFlowGraph? IL { get; }
 
         IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;
 
@@ -23,12 +25,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
             Name name,
             FixedList<Parameter> parameters,
             DataType returnType,
-            ControlFlowGraphOld? controlFlow)
+            ControlFlowGraphOld? controlFlow,
+            ControlFlowGraph? il)
             : base(isMember, name, SymbolSet.Empty)
         {
             Parameters = parameters;
             ReturnType = returnType;
             ControlFlowOld = controlFlow;
+            IL = il;
             IsExternal = isExternal;
         }
     }

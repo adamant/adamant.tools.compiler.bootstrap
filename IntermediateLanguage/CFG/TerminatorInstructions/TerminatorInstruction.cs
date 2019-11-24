@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.TerminatorInstructions
 {
-    public class TerminatorInstruction
+    public abstract class TerminatorInstruction
     {
         public TextSpan Span { get; }
         public Scope Scope { get; }
@@ -11,6 +11,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.TerminatorIn
         {
             Span = span;
             Scope = scope;
+        }
+
+        public override string ToString()
+        {
+            return ToInstructionString() + ContextCommentString();
+        }
+
+        public abstract string ToInstructionString();
+
+        public virtual string ContextCommentString()
+        {
+            return $" // at {Span} in {Scope}";
         }
     }
 }

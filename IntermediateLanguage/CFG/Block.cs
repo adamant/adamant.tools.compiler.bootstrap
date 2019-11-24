@@ -12,7 +12,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG
         public FixedList<Instruction> Instructions { get; }
         public TerminatorInstruction Terminator { get; }
 
-
         public Block(int number, FixedList<Instruction> instructions, TerminatorInstruction terminator)
         {
             Number = number;

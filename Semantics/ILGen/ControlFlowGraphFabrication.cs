@@ -88,12 +88,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 Convert(statement);
 
             // Generate the implicit return statement
-            //if (currentBlock != null && !currentBlock.IsTerminated)
-            //{
-            //    var span = callable.Span.AtEnd();
-            //    EndScope(span);
-            //    currentBlock.AddReturn(span, Scope.Outer); // We officially ended the outer scope, but this is in it
-            //}
+            if (currentBlock != null && !currentBlock.IsTerminated)
+            {
+                var span = callable.Span.AtEnd();
+                //EndScope(span);
+                //currentBlock.AddReturn(span, Scope.Outer); // We officially ended the outer scope, but this is in it
+                currentBlock.End(new ReturnVoidInstruction(span, Scope.Outer));
+            }
 
             return graph.Build();
         }

@@ -9,5 +9,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.TerminatorIn
 
         {
         }
+
+        public override string ToInstructionString()
+        {
+            return "RETURN";
+        }
     }
 }
