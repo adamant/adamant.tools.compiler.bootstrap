@@ -183,7 +183,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IReturnExpressionSyntax returnExpression:
                 {
                     if (returnExpression.ReturnValue == null)
-                        currentBlock!.Add(new ReturnVoidInstruction(returnExpression.Span, CurrentScope));
+                        currentBlock!.End(new ReturnVoidInstruction(returnExpression.Span, CurrentScope));
                 }
                 break;
                 case INameExpressionSyntax _:

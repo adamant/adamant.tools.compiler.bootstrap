@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions;
@@ -29,6 +30,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         public void Add(Instruction instruction)
         {
             instructions.Add(instruction);
+        }
+
+        public void End(TerminatorInstruction instruction)
+        {
+            if (Terminator != null)
+                throw new InvalidOperationException("Can't set terminator instruction more than once");
+            Terminator = instruction;
         }
 
         //public void Add(NumericType type, Place place, Operand leftOperand, Operand rightOperand, Scope scope)
