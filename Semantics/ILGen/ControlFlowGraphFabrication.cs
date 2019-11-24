@@ -265,12 +265,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     currentBlock!.Add(new LoadStringInstruction(resultPlace, stringLiteral.Value, stringLiteral.Span, CurrentScope));
                     break;
                 case IImplicitNumericConversionExpression implicitNumericConversion:
-                {
                     currentBlock!.Add(new ConvertInstruction(resultPlace,
                         ConvertToOperand(implicitNumericConversion.Expression),
                         (NumericType)implicitNumericConversion.Expression.Type.Assigned().AssertKnown(),
                         implicitNumericConversion.ConvertToType,
                         implicitNumericConversion.Span,
+                        CurrentScope));
+                    break;
+                case IIntegerLiteralExpressionSyntax integerLiteral:
+                {
+                    currentBlock!.Add(new LoadIntegerInstruction(resultPlace,
+                        integerLiteral.Value,
+                        (IntegerType)integerLiteral.Type.Assigned().AssertKnown(),
+                        integerLiteral.Span,
                         CurrentScope));
                 }
                 break;
@@ -298,6 +305,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IBinaryOperatorExpressionSyntax _:
                 case IFieldAccessExpressionSyntax _:
                 case IImplicitNumericConversionExpression _:
+                case IIntegerLiteralExpressionSyntax _:
                 {
                     var tempVar = graph.Let(expression.Type.Assigned().AssertKnown(), CurrentScope);
                     ConvertIntoPlace(expression, tempVar.Place(expression.Span));
