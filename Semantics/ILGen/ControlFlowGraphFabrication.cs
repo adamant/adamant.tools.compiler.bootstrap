@@ -287,6 +287,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     currentBlock!.Add(new CallInstruction(resultPlace, exp.FullName, args, exp.Span, CurrentScope));
                 }
                 break;
+                case INewObjectExpressionSyntax exp:
+                {
+                    var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
+                    currentBlock!.Add(new CallInstruction(resultPlace, exp.ConstructorSymbol!.FullName, args, exp.Span, CurrentScope));
+                }
+                break;
                 case IStringLiteralExpressionSyntax exp:
                     currentBlock!.Add(new LoadStringInstruction(resultPlace, exp.Value, exp.Span, CurrentScope));
                     break;
