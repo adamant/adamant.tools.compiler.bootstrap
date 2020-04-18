@@ -2,6 +2,9 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.TerminatorInstructions
 {
+    /// <summary>
+    /// An instruction that terminates a block
+    /// </summary>
     public abstract class TerminatorInstruction
     {
         public TextSpan Span { get; }

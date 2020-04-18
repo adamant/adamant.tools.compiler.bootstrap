@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         private BlockBuilder? currentBlock;
 
         /// <summary>
-        /// Actions are registered here to connect break statements to the loop exist block
+        /// Actions are registered here to connect break statements to the loop exit block
         /// </summary>
         private List<Action<BlockBuilder>> addBreaks = new List<Action<BlockBuilder>>();
 
@@ -141,6 +141,39 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         }
 
         /// <summary>
+        /// Convert without expecting any result value
+        /// </summary>
+        private void Convert(IBlockOrResultSyntax blockOrResult)
+        {
+            switch (blockOrResult)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(blockOrResult);
+                case IBlockExpressionSyntax exp:
+                    Convert((IExpressionSyntax)exp);
+                    break;
+                case IResultStatementSyntax statement:
+                    Convert((IStatementSyntax)statement);
+                    break;
+            }
+        }
+
+        private void Convert(IElseClauseSyntax elseClause)
+        {
+            switch (elseClause)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(elseClause);
+                case IBlockOrResultSyntax blockOrResult:
+                    Convert(blockOrResult);
+                    break;
+                case IIfExpressionSyntax exp:
+                    Convert((IExpressionSyntax)exp);
+                    break;
+            }
+        }
+
+        /// <summary>
         /// Convert an expression without expecting any result value
         /// </summary>
         private void Convert(IExpressionSyntax expression)
@@ -150,6 +183,39 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 default:
                     //throw ExhaustiveMatch.Failed(expression);
                     throw new NotImplementedException($"Convert({expression.GetType().Name}) Not Implemented.");
+                case IIfExpressionSyntax exp:
+                {
+                    var containingBlock = currentBlock!;
+                    var condition = ConvertToOperand(exp.Condition);
+                    var thenEntry = graph.NewBlock();
+                    currentBlock = thenEntry;
+                    Convert(exp.ThenBlock);
+                    var thenExit = currentBlock;
+                    BlockBuilder elseEntry;
+                    BlockBuilder exit = null;
+                    if (exp.ElseClause == null)
+                    {
+                        elseEntry = exit = graph.NewBlock();
+                        thenExit?.End(new GotoInstruction(exit.Number, exp.ThenBlock.Span.AtEnd(), CurrentScope));
+                    }
+                    else
+                    {
+                        elseEntry = graph.NewBlock();
+                        currentBlock = elseEntry;
+                        Convert(exp.ElseClause);
+                        var elseExit = currentBlock;
+                        if (thenExit != null || elseExit != null)
+                        {
+                            exit = graph.NewBlock();
+                            thenExit?.End(new GotoInstruction(exit.Number, exp.ThenBlock.Span.AtEnd(), CurrentScope));
+                            elseExit?.End(new GotoInstruction(exit.Number, exp.ElseClause.Span.AtEnd(), CurrentScope));
+                        }
+                    }
+
+                    containingBlock.End(new IfInstruction(condition, thenEntry.Number, elseEntry.Number, exp.Condition.Span, CurrentScope));
+                    currentBlock = exit;
+                }
+                break;
                 case IMethodInvocationExpressionSyntax exp:
                 {
                     var target = ConvertToOperand(exp.Target);
@@ -337,6 +403,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IBinaryOperatorExpressionSyntax _:
                 case IUnaryOperatorExpressionSyntax _:
                 case IFieldAccessExpressionSyntax _:
+                case INewObjectExpressionSyntax _:
                 case IImplicitNumericConversionExpression _:
                 case IIntegerLiteralExpressionSyntax _:
                 case IStringLiteralExpressionSyntax _:
@@ -350,16 +417,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
 
         private Place ConvertToPlace(IExpressionSyntax expression)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException($"ConvertToPlace({expression.GetType().Name}) Not Implemented.");
         }
 
+        /// <summary>
+        /// What is this function supposed to do?
+        /// </summary>
         private Place? ConvertToPlaceWithoutSideEffects(IExpressionSyntax expression)
         {
             switch (expression)
             {
                 default:
                     //throw ExhaustiveMatch.Failed(expression);
-                    throw new NotImplementedException();
+                    throw new NotImplementedException($"ConvertToPlaceWithoutSideEffects({expression.GetType().Name}) Not Implemented.");
                 case IFieldAccessExpressionSyntax exp:
                 {
                     if (exp.Expression == null)
@@ -667,42 +737,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         //            currentBlock.AddGoto(continueToBlock ?? throw new InvalidOperationException(),
         //                nextExpression.Span, CurrentScope);
         //            currentBlock = null;
-        //            return;
-        //        }
-        //        case IIfExpressionSyntax ifExpression:
-        //        {
-        //            var containingBlock = currentBlock;
-        //            var condition = ConvertToOperand(ifExpression.Condition);
-        //            var thenEntry = graph.NewBlock();
-        //            currentBlock = thenEntry;
-        //            ConvertToStatement(ifExpression.ThenBlock);
-        //            var thenExit = currentBlock;
-        //            ControlFlow.BlockBuilder elseEntry;
-        //            ControlFlow.BlockBuilder exit = null;
-        //            if (ifExpression.ElseClause == null)
-        //            {
-        //                elseEntry = exit = graph.NewBlock();
-        //                thenExit?.AddGoto(exit, ifExpression.ThenBlock.Span.AtEnd(), CurrentScope);
-        //            }
-        //            else
-        //            {
-        //                elseEntry = graph.NewBlock();
-        //                currentBlock = elseEntry;
-        //                ConvertToStatement(ifExpression.ElseClause);
-        //                var elseExit = currentBlock;
-        //                if (thenExit != null || elseExit != null)
-        //                {
-        //                    exit = graph.NewBlock();
-        //                    thenExit?.AddGoto(exit, ifExpression.ThenBlock.Span.AtEnd(),
-        //                        CurrentScope);
-        //                    elseExit?.AddGoto(exit, ifExpression.ElseClause.Span.AtEnd(),
-        //                        CurrentScope);
-        //                }
-        //            }
-
-        //            containingBlock.AddIf(condition, thenEntry, elseEntry,
-        //                ifExpression.Condition.Span, CurrentScope);
-        //            currentBlock = exit;
         //            return;
         //        }
         //        case IBlockExpressionSyntax block:
