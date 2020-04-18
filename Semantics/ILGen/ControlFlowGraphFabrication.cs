@@ -183,6 +183,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 default:
                     //throw ExhaustiveMatch.Failed(expression);
                     throw new NotImplementedException($"Convert({expression.GetType().Name}) Not Implemented.");
+                case ILoopExpressionSyntax exp:
+                {
+                    var loopEntry = graph.NewEntryBlock(currentBlock!, exp.Block.Span.AtStart(), CurrentScope);
+                    currentBlock = loopEntry;
+                    continueToBlock = loopEntry;
+                    var loopExit = ConvertLoopBody(exp.Block);
+                    // If it always breaks, there isn't a current block
+                    currentBlock?.End(new GotoInstruction(loopEntry.Number, exp.Block.Span.AtEnd(), CurrentScope));
+                    currentBlock = loopExit;
+                }
+                break;
+                case IBreakExpressionSyntax exp:
+                {
+                    // TODO Do we need `ExitScope(exp.Span.AtEnd());` ?
+                    // capture the current block for use in the lambda
+                    var breakingBlock = currentBlock!;
+                    addBreaks.Add(loopExit => breakingBlock.End(new GotoInstruction(loopExit.Number, exp.Span, CurrentScope)));
+                    currentBlock = null;
+                }
+                break;
                 case IIfExpressionSyntax exp:
                 {
                     var containingBlock = currentBlock!;
@@ -268,6 +288,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     break;
 
             }
+        }
+
+        /// <summary>
+        /// Convert the body of a loop. Ensures break statements are handled correctly.
+        /// </summary>
+        private BlockBuilder ConvertLoopBody(IBlockExpressionSyntax body)
+        {
+            var oldAddBreaks = addBreaks;
+            addBreaks = new List<Action<BlockBuilder>>();
+            Convert((IExpressionSyntax)body);
+            var loopExit = graph.NewBlock();
+            foreach (var addBreak in addBreaks) addBreak(loopExit);
+            addBreaks = oldAddBreaks;
+            return loopExit;
         }
 
         /// <summary>
@@ -549,35 +583,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         //    }
         //}
 
-        //private void ConvertToStatement(IBlockOrResultSyntax blockOrResult)
-        //{
-        //    switch (blockOrResult)
-        //    {
-        //        default:
-        //            throw ExhaustiveMatch.Failed(blockOrResult);
-        //        case IBlockExpressionSyntax block:
-        //            ConvertExpressionToStatement(block);
-        //            break;
-        //        case IResultStatementSyntax resultStatement:
-        //            ConvertExpressionToStatement(resultStatement.Expression);
-        //            break;
-        //    }
-        //}
 
-        //private void ConvertToStatement(IElseClauseSyntax elseClause)
-        //{
-        //    switch (elseClause)
-        //    {
-        //        default:
-        //            throw ExhaustiveMatch.Failed(elseClause);
-        //        case IIfExpressionSyntax ifExpression:
-        //            ConvertExpressionToStatement(ifExpression);
-        //            break;
-        //        case IBlockOrResultSyntax blockOrResult:
-        //            ConvertToStatement(blockOrResult);
-        //            break;
-        //    }
-        //}
 
         //// TODO combine ConvertExpressionToStatement and ConvertToValue
 
@@ -709,28 +715,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         //            currentBlock = loopExit;
         //            return;
         //        }
-        //        case ILoopExpressionSyntax loopExpression:
-        //        {
-        //            var loopEntry = graph.NewEntryBlock(currentBlock,
-        //                loopExpression.Block.Span.AtStart(), CurrentScope);
-        //            currentBlock = loopEntry;
-        //            continueToBlock = loopEntry;
-        //            var loopExit = ConvertLoopBody(loopExpression.Block);
-        //            // If it always breaks, there isn't a current block
-        //            currentBlock?.AddGoto(loopEntry, loopExpression.Block.Span.AtEnd(),
-        //                CurrentScope);
-        //            currentBlock = loopExit;
-        //            return;
-        //        }
-        //        case IBreakExpressionSyntax breakExpression:
-        //        {
-        //            ExitScope(breakExpression.Span.AtEnd());
-        //            // capture the current block for use in the lambda
-        //            var breakingBlock = currentBlock;
-        //            addBreaks.Add(loopExit => breakingBlock.AddGoto(loopExit, breakExpression.Span, CurrentScope));
-        //            currentBlock = null;
-        //            return;
-        //        }
         //        case INextExpressionSyntax nextExpression:
         //        {
         //            ExitScope(nextExpression.Span.AtEnd());
@@ -798,17 +782,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         //        //    ExitScope(resultExpression.Span.AtEnd());
         //        //    return;
         //    }
-        //}
-
-        //private ControlFlow.BlockBuilder ConvertLoopBody(IBlockExpressionSyntax body)
-        //{
-        //    var oldAddBreaks = addBreaks;
-        //    addBreaks = new List<Action<ControlFlow.BlockBuilder>>();
-        //    ConvertExpressionToStatement(body);
-        //    var loopExit = graph.NewBlock();
-        //    foreach (var addBreak in addBreaks) addBreak(loopExit);
-        //    addBreaks = oldAddBreaks;
-        //    return loopExit;
         //}
 
         //private Value ConvertToValue(IExpressionSyntax expression)
