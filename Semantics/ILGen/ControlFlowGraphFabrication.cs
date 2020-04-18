@@ -424,6 +424,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IStringLiteralExpressionSyntax exp:
                     currentBlock!.Add(new LoadStringInstruction(resultPlace, exp.Value, exp.Span, CurrentScope));
                     break;
+                case IBoolLiteralExpressionSyntax exp:
+                    currentBlock!.Add(new LoadBoolInstruction(resultPlace, exp.Value, exp.Span, CurrentScope));
+                    break;
                 case IImplicitNumericConversionExpression exp:
                     currentBlock!.Add(new ConvertInstruction(resultPlace,
                         ConvertToOperand(exp.Expression),
@@ -469,6 +472,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IImplicitNumericConversionExpression _:
                 case IIntegerLiteralExpressionSyntax _:
                 case IStringLiteralExpressionSyntax _:
+                case IBoolLiteralExpressionSyntax _:
                 {
                     var tempVar = graph.Let(expression.Type.Assigned().AssertKnown(), CurrentScope);
                     ConvertIntoPlace(expression, tempVar.Place(expression.Span));
