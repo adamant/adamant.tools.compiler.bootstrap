@@ -149,6 +149,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 default:
                     //throw ExhaustiveMatch.Failed(expression);
                     throw new NotImplementedException();
+                case IMethodInvocationExpressionSyntax methodInvocation:
+                {
+                    var target = ConvertToOperand(methodInvocation.Target);
+                    var args = methodInvocation.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
+                    currentBlock!.Add(new CallVirtualInstruction(target, methodInvocation.FullName, args,
+                        methodInvocation.Span, CurrentScope));
+                }
+                break;
                 case IAssignmentExpressionSyntax assignmentExpression:
                 {
                     var leftOperand = assignmentExpression.LeftOperand;
@@ -190,7 +198,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case INameExpressionSyntax _:
                 case IBinaryOperatorExpressionSyntax _:
                     // These operation have no side effects, so if the result isn't needed, there is nothing to do
-                    // TODO does this mess up borrow checking?
                     break;
 
             }
@@ -206,10 +213,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 default:
                     //throw ExhaustiveMatch.Failed(expression);
                     throw new NotImplementedException();
-                case IAssignmentExpressionSyntax assignmentExpression:
+                case IAssignmentExpressionSyntax assignment:
                 {
-                    var leftOperand = assignmentExpression.LeftOperand;
-                    var rightOperand = assignmentExpression.RightOperand;
+                    var leftOperand = assignment.LeftOperand;
+                    var rightOperand = assignment.RightOperand;
                     var assignInto = ConvertToPlaceWithoutSideEffects(leftOperand);
                     if (assignInto == null)
                     {
@@ -218,18 +225,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                         ConvertIntoPlace(rightOperand, tempVar.Place(tempSpan));
                         assignInto = ConvertToPlace(leftOperand);
                         Operand operand = tempVar.Move(tempSpan);
-                        currentBlock!.Add(new AssignmentInstruction(assignInto, operand, assignmentExpression.Span, CurrentScope));
+                        currentBlock!.Add(new AssignmentInstruction(assignInto, operand, assignment.Span, CurrentScope));
                     }
                     else
                         ConvertIntoPlace(rightOperand, assignInto);
                 }
                 break;
-                case INameExpressionSyntax nameExpression:
+                case INameExpressionSyntax name:
                 {
                     // This occurs when the source code contains a simple assignment like `x = y`
-                    var symbol = nameExpression.ReferencedSymbol.Assigned();
-                    var variable = graph.VariableFor(symbol.FullName.UnqualifiedName).Reference(nameExpression.Span);
-                    currentBlock!.Add(new AssignmentInstruction(resultPlace, variable, nameExpression.Span, CurrentScope));
+                    var symbol = name.ReferencedSymbol.Assigned();
+                    var variable = graph.VariableFor(symbol.FullName.UnqualifiedName).Reference(name.Span);
+                    currentBlock!.Add(new AssignmentInstruction(resultPlace, variable, name.Span, CurrentScope));
                 }
                 break;
                 case IBinaryOperatorExpressionSyntax binaryOperator:
@@ -307,6 +314,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IFieldAccessExpressionSyntax _:
                 case IImplicitNumericConversionExpression _:
                 case IIntegerLiteralExpressionSyntax _:
+                case IStringLiteralExpressionSyntax _:
                 {
                     var tempVar = graph.Let(expression.Type.Assigned().AssertKnown(), CurrentScope);
                     ConvertIntoPlace(expression, tempVar.Place(expression.Span));
@@ -314,7 +322,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 }
             }
         }
-
 
         private Place ConvertToPlace(IExpressionSyntax expression)
         {

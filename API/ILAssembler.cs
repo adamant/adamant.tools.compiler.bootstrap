@@ -155,7 +155,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                 //Disassemble(graph, graph.LiveVariables?.Before(instruction), builder);
                 builder.AppendLine(instruction.ToInstructionString().PadRight(StandardStatementWidth)
                                    + instruction.ContextCommentString());
-                var insertedDeletes = graph.InsertedDeletes ?? throw new InvalidOperationException("Inserted deletes is null");
+                var insertedDeletes = graph.InsertedDeletes;
+                //var insertedDeletes = graph.InsertedDeletes ?? throw new InvalidOperationException("Inserted deletes is null");
                 //Disassemble(insertedDeletes.After(instruction), builder);
                 //Disassemble(graph.BorrowClaims?.After(instruction), builder);
             }

@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
     /// determined by the data flow analysis strategy.
     ///
     /// Notes:
-    /// 
+    ///
     /// The Roslyn compiler calculates data flow by visiting through the tree in
     /// control flow order. It stores state only at labels and before loops. If
     /// it does a join on a backward edge that changes state, it makes a note of
