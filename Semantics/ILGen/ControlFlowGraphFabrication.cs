@@ -11,7 +11,8 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Places;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.TerminatorInstructions;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using ExhaustiveMatching;
-using BinaryOperator = Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow.BinaryOperator;
+using static Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions.CompareInstructionOperator;
+using BinaryOperator = Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.BinaryOperator;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
 {
@@ -136,7 +137,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     return;
                 }
                 case IResultStatementSyntax _:
-                    throw new NotImplementedException();
+                    throw new NotImplementedException("Convert(IResultStatementSyntax) not implemented.");
             }
         }
 
@@ -342,7 +343,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 break;
                 case IBinaryOperatorExpressionSyntax exp:
                 {
-                    var type = exp.Type.Assigned().AssertKnown();
+                    var resultType = exp.Type.Assigned().AssertKnown();
+                    var operandType = exp.LeftOperand.Type.Assigned().AssertKnown();
                     var leftOperand = ConvertToOperand(exp.LeftOperand);
                     var rightOperand = ConvertToOperand(exp.RightOperand);
                     switch (exp.Operator)
@@ -352,8 +354,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                             throw new NotImplementedException($"ConvertIntoPlace({expression.GetType().Name}, Place) Not Implemented for {exp.Operator}.");
 
                         case BinaryOperator.Plus:
-                            currentBlock!.Add(new AddInstruction(resultPlace, (NumericType)type, leftOperand, rightOperand, CurrentScope));
+                            currentBlock!.Add(new AddInstruction(resultPlace, (NumericType)resultType, leftOperand, rightOperand, CurrentScope));
                             break;
+                        #region Comparisons
+                        case BinaryOperator.EqualsEquals:
+                            currentBlock!.Add(new CompareInstruction(resultPlace, Equal,
+                                (NumericType)operandType, leftOperand, rightOperand, CurrentScope));
+                            break;
+                        case BinaryOperator.NotEqual:
+                            currentBlock!.Add(new CompareInstruction(resultPlace, NotEqual,
+                                (NumericType)operandType, leftOperand, rightOperand, CurrentScope));
+                            break;
+                        case BinaryOperator.LessThan:
+                            currentBlock!.Add(new CompareInstruction(resultPlace, LessThan,
+                                (NumericType)operandType, leftOperand, rightOperand, CurrentScope));
+                            break;
+                        case BinaryOperator.LessThanOrEqual:
+                            currentBlock!.Add(new CompareInstruction(resultPlace, LessThanOrEqual,
+                                (NumericType)operandType, leftOperand, rightOperand, CurrentScope));
+                            break;
+                        case BinaryOperator.GreaterThan:
+                            currentBlock!.Add(new CompareInstruction(resultPlace, GreaterThan,
+                                (NumericType)operandType, leftOperand, rightOperand, CurrentScope));
+                            break;
+                        case BinaryOperator.GreaterThanOrEqual:
+                            currentBlock!.Add(new CompareInstruction(resultPlace, GreaterThanOrEqual,
+                                (NumericType)operandType, leftOperand, rightOperand, CurrentScope));
+                            break;
+                            #endregion Comparisons
                     }
                 }
                 break;
@@ -473,6 +501,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 }
                 case ISelfExpressionSyntax exp:
                     return new VariablePlace(Variable.Self, exp.Span);
+                case INameExpressionSyntax exp:
+                {
+                    var symbol = exp.ReferencedSymbol.Assigned();
+                    return graph.VariableFor(symbol.FullName.UnqualifiedName).Place(exp.Span);
+                }
             }
         }
 

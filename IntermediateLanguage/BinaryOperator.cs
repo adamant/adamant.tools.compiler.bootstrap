@@ -1,6 +1,6 @@
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
+namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
     public enum BinaryOperator
     {
