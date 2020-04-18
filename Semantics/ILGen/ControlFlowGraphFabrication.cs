@@ -122,22 +122,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                         //    variable.LValueReference(variableDeclaration.Initializer.Span), value,
                         //    variableDeclaration.Initializer.Span);
                     }
-
-                    return;
                 }
+                break;
                 case IExpressionStatementSyntax expressionStatement:
                 {
                     // Skip expressions with unknown type
                     var expression = expressionStatement.Expression;
-                    if (!expression.Type.Assigned().IsKnown)
-                        return;
+                    if (!expression.Type.Assigned().IsKnown) return;
 
                     Convert(expression);
 
-                    return;
                 }
-                case IResultStatementSyntax _:
-                    throw new NotImplementedException("Convert(IResultStatementSyntax) not implemented.");
+                break;
+                case IResultStatementSyntax resultStatement:
+                {
+                    // Skip expressions with unknown type
+                    var expression = resultStatement.Expression;
+                    if (!expression.Type.Assigned().IsKnown) return;
+                    Convert(expression);
+                }
+                break;
             }
         }
 
@@ -195,12 +199,41 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     currentBlock = loopExit;
                 }
                 break;
+                case IWhileExpressionSyntax whileExpression:
+                {
+                    // There is a block for the condition, it then goes either to
+                    // the body or the after block.
+                    var conditionBlock = graph.NewEntryBlock(currentBlock!,
+                        whileExpression.Condition.Span.AtStart(), CurrentScope);
+                    currentBlock = conditionBlock;
+                    var condition = ConvertToOperand(whileExpression.Condition);
+                    var loopEntry = graph.NewBlock();
+                    continueToBlock = conditionBlock;
+                    currentBlock = loopEntry;
+                    var loopExit = ConvertLoopBody(whileExpression.Block);
+                    // Generate if branch now that loop exit is known
+                    conditionBlock.End(new IfInstruction(condition, loopEntry.Number, loopExit.Number,
+                        whileExpression.Condition.Span, CurrentScope));
+                    // If it always breaks, there isn't a current block
+                    currentBlock?.End(new GotoInstruction(conditionBlock.Number,
+                        whileExpression.Block.Span.AtEnd(), CurrentScope));
+                    currentBlock = loopExit;
+                    return;
+                }
                 case IBreakExpressionSyntax exp:
                 {
                     // TODO Do we need `ExitScope(exp.Span.AtEnd());` ?
                     // capture the current block for use in the lambda
                     var breakingBlock = currentBlock!;
                     addBreaks.Add(loopExit => breakingBlock.End(new GotoInstruction(loopExit.Number, exp.Span, CurrentScope)));
+                    currentBlock = null;
+                }
+                break;
+                case INextExpressionSyntax exp:
+                {
+                    // TODO Do we need `ExitScope(nextExpression.Span.AtEnd());` ?
+                    currentBlock!.End(new GotoInstruction(continueToBlock?.Number ?? throw new InvalidOperationException(),
+                        exp.Span, CurrentScope));
                     currentBlock = null;
                 }
                 break;
@@ -354,7 +387,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                             throw new NotImplementedException($"ConvertIntoPlace({expression.GetType().Name}, Place) Not Implemented for {exp.Operator}.");
 
                         case BinaryOperator.Plus:
-                            currentBlock!.Add(new AddInstruction(resultPlace, (NumericType)resultType, leftOperand, rightOperand, CurrentScope));
+                            currentBlock!.Add(new NumericInstruction(resultPlace, NumericInstructionOperator.Add,
+                                (NumericType)resultType, leftOperand, rightOperand, CurrentScope));
+                            break;
+                        case BinaryOperator.Minus:
+                            currentBlock!.Add(new NumericInstruction(resultPlace, NumericInstructionOperator.Subtract,
+                                (NumericType)resultType, leftOperand, rightOperand, CurrentScope));
+                            break;
+                        case BinaryOperator.Asterisk:
+                            currentBlock!.Add(new NumericInstruction(resultPlace, NumericInstructionOperator.Multiply,
+                                (NumericType)resultType, leftOperand, rightOperand, CurrentScope));
+                            break;
+                        case BinaryOperator.Slash:
+                            currentBlock!.Add(new NumericInstruction(resultPlace, NumericInstructionOperator.Divide,
+                                (NumericType)resultType, leftOperand, rightOperand, CurrentScope));
                             break;
                         #region Comparisons
                         case BinaryOperator.EqualsEquals:
@@ -729,35 +775,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         //            currentBlock.AddIf(ConvertToOperand(breakCondition, DataType.Bool),
         //                loopExit, loopEntry, foreachExpression.Span, CurrentScope);
         //            currentBlock = loopExit;
-        //            return;
-        //        }
-        //        case IWhileExpressionSyntax whileExpression:
-        //        {
-        //            // There is a block for the condition, it then goes either to
-        //            // the body or the after block.
-        //            var conditionBlock = graph.NewEntryBlock(currentBlock,
-        //                whileExpression.Condition.Span.AtStart(), CurrentScope);
-        //            currentBlock = conditionBlock;
-        //            var condition = ConvertToOperand(whileExpression.Condition);
-        //            var loopEntry = graph.NewBlock();
-        //            continueToBlock = conditionBlock;
-        //            currentBlock = loopEntry;
-        //            var loopExit = ConvertLoopBody(whileExpression.Block);
-        //            // Generate if branch now that loop exit is known
-        //            conditionBlock.AddIf(condition, loopEntry, loopExit, whileExpression.Condition.Span,
-        //                CurrentScope);
-        //            // If it always breaks, there isn't a current block
-        //            currentBlock?.AddGoto(conditionBlock, whileExpression.Block.Span.AtEnd(),
-        //                CurrentScope);
-        //            currentBlock = loopExit;
-        //            return;
-        //        }
-        //        case INextExpressionSyntax nextExpression:
-        //        {
-        //            ExitScope(nextExpression.Span.AtEnd());
-        //            currentBlock.AddGoto(continueToBlock ?? throw new InvalidOperationException(),
-        //                nextExpression.Span, CurrentScope);
-        //            currentBlock = null;
         //            return;
         //        }
         //        case IBlockExpressionSyntax block:

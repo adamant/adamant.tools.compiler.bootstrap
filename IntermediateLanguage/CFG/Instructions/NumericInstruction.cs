@@ -5,14 +5,17 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
 {
-    public class AddInstruction : InstructionWithResult
+    public class NumericInstruction : InstructionWithResult
     {
+        public NumericInstructionOperator Operator { get; }
+
         public Operand LeftOperand { get; }
         public Operand RightOperand { get; }
         public NumericType Type { get; }
 
-        public AddInstruction(
+        public NumericInstruction(
             Place resultPlace,
+            NumericInstructionOperator @operator,
             NumericType type,
             Operand leftOperand,
             Operand rightOperand,
@@ -21,12 +24,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
         {
             LeftOperand = leftOperand;
             RightOperand = rightOperand;
+            Operator = @operator;
             Type = type;
         }
 
         public override string ToInstructionString()
         {
-            return $"{ResultPlace} = ADD.{Type} {LeftOperand}, {RightOperand}";
+            return $"{ResultPlace} = {Operator.ToInstructionString()}.{Type} {LeftOperand}, {RightOperand}";
         }
     }
 }

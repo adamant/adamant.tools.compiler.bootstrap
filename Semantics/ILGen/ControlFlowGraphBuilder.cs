@@ -6,6 +6,7 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.TerminatorInstructions;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
@@ -78,7 +79,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         {
             if (!currentBlock.IsTerminated && !currentBlock.Instructions.Any()) return currentBlock;
             var entryBlock = NewBlock();
-            //currentBlock.AddGoto(entryBlock, span, scope);
+            currentBlock.End(new GotoInstruction(entryBlock.Number, span, scope));
             return entryBlock;
         }
 
