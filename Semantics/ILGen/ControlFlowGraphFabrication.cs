@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Operands;
@@ -148,19 +149,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             {
                 default:
                     //throw ExhaustiveMatch.Failed(expression);
-                    throw new NotImplementedException();
-                case IMethodInvocationExpressionSyntax methodInvocation:
+                    throw new NotImplementedException($"Convert({expression.GetType().Name}) Not Implemented.");
+                case IMethodInvocationExpressionSyntax exp:
                 {
-                    var target = ConvertToOperand(methodInvocation.Target);
-                    var args = methodInvocation.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
-                    currentBlock!.Add(new CallVirtualInstruction(target, methodInvocation.FullName, args,
-                        methodInvocation.Span, CurrentScope));
+                    var target = ConvertToOperand(exp.Target);
+                    var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
+                    currentBlock!.Add(new CallVirtualInstruction(target, exp.FullName, args,
+                        exp.Span, CurrentScope));
                 }
                 break;
-                case IAssignmentExpressionSyntax assignmentExpression:
+                case IAssignmentExpressionSyntax exp:
                 {
-                    var leftOperand = assignmentExpression.LeftOperand;
-                    var rightOperand = assignmentExpression.RightOperand;
+                    var leftOperand = exp.LeftOperand;
+                    var rightOperand = exp.RightOperand;
                     var assignInto = ConvertToPlaceWithoutSideEffects(leftOperand);
                     if (assignInto == null)
                     {
@@ -169,30 +170,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                         ConvertIntoPlace(rightOperand, tempVar.Place(tempSpan));
                         assignInto = ConvertToPlace(leftOperand);
                         Operand operand = tempVar.Move(tempSpan);
-                        currentBlock!.Add(new AssignmentInstruction(assignInto, operand, assignmentExpression.Span, CurrentScope));
+                        currentBlock!.Add(new AssignmentInstruction(assignInto, operand, exp.Span, CurrentScope));
                     }
                     else
                         ConvertIntoPlace(rightOperand, assignInto);
                 }
                 break;
-                case IUnsafeExpressionSyntax unsafeExpression:
-                    Convert(unsafeExpression.Expression);
+                case IUnsafeExpressionSyntax exp:
+                    Convert(exp.Expression);
                     break;
-                case IBlockExpressionSyntax blockExpression:
-                    foreach (var statement in blockExpression.Statements)
+                case IBlockExpressionSyntax exp:
+                    foreach (var statement in exp.Statements)
                         Convert(statement);
                     break;
-                case IFunctionInvocationExpressionSyntax functionInvocation:
+                case IFunctionInvocationExpressionSyntax exp:
                 {
-                    var args = functionInvocation.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
-                    currentBlock!.Add(new CallInstruction(functionInvocation.FullName, args,
-                        functionInvocation.Span, CurrentScope));
+                    var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
+                    currentBlock!.Add(new CallInstruction(exp.FullName, args,
+                        exp.Span, CurrentScope));
                 }
                 break;
-                case IReturnExpressionSyntax returnExpression:
+                case IReturnExpressionSyntax exp:
                 {
-                    if (returnExpression.ReturnValue == null)
-                        currentBlock!.End(new ReturnVoidInstruction(returnExpression.Span, CurrentScope));
+                    if (exp.ReturnValue == null)
+                        currentBlock!.End(new ReturnVoidInstruction(exp.Span, CurrentScope));
                 }
                 break;
                 case INameExpressionSyntax _:
@@ -212,11 +213,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             {
                 default:
                     //throw ExhaustiveMatch.Failed(expression);
-                    throw new NotImplementedException();
-                case IAssignmentExpressionSyntax assignment:
+                    throw new NotImplementedException($"ConvertIntoPlace({expression.GetType().Name}, Place) Not Implemented.");
+                case IAssignmentExpressionSyntax exp:
                 {
-                    var leftOperand = assignment.LeftOperand;
-                    var rightOperand = assignment.RightOperand;
+                    var leftOperand = exp.LeftOperand;
+                    var rightOperand = exp.RightOperand;
                     var assignInto = ConvertToPlaceWithoutSideEffects(leftOperand);
                     if (assignInto == null)
                     {
@@ -225,67 +226,84 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                         ConvertIntoPlace(rightOperand, tempVar.Place(tempSpan));
                         assignInto = ConvertToPlace(leftOperand);
                         Operand operand = tempVar.Move(tempSpan);
-                        currentBlock!.Add(new AssignmentInstruction(assignInto, operand, assignment.Span, CurrentScope));
+                        currentBlock!.Add(new AssignmentInstruction(assignInto, operand, exp.Span, CurrentScope));
                     }
                     else
                         ConvertIntoPlace(rightOperand, assignInto);
                 }
                 break;
-                case INameExpressionSyntax name:
+                case INameExpressionSyntax exp:
                 {
                     // This occurs when the source code contains a simple assignment like `x = y`
-                    var symbol = name.ReferencedSymbol.Assigned();
-                    var variable = graph.VariableFor(symbol.FullName.UnqualifiedName).Reference(name.Span);
-                    currentBlock!.Add(new AssignmentInstruction(resultPlace, variable, name.Span, CurrentScope));
+                    var symbol = exp.ReferencedSymbol.Assigned();
+                    var variable = graph.VariableFor(symbol.FullName.UnqualifiedName).Reference(exp.Span);
+                    currentBlock!.Add(new AssignmentInstruction(resultPlace, variable, exp.Span, CurrentScope));
                 }
                 break;
-                case IBinaryOperatorExpressionSyntax binaryOperator:
+                case IBinaryOperatorExpressionSyntax exp:
                 {
-                    var type = binaryOperator.Type.Assigned().AssertKnown();
-                    var leftOperand = ConvertToOperand(binaryOperator.LeftOperand);
-                    var rightOperand = ConvertToOperand(binaryOperator.RightOperand);
-                    switch (binaryOperator.Operator)
+                    var type = exp.Type.Assigned().AssertKnown();
+                    var leftOperand = ConvertToOperand(exp.LeftOperand);
+                    var rightOperand = ConvertToOperand(exp.RightOperand);
+                    switch (exp.Operator)
                     {
                         default:
                             //throw ExhaustiveMatch.Failed(expression);
-                            throw new NotImplementedException();
+                            throw new NotImplementedException($"ConvertIntoPlace({expression.GetType().Name}, Place) Not Implemented for {exp.Operator}.");
+
                         case BinaryOperator.Plus:
                             currentBlock!.Add(new AddInstruction(resultPlace, (NumericType)type, leftOperand, rightOperand, CurrentScope));
                             break;
                     }
                 }
                 break;
-                case IFieldAccessExpressionSyntax fieldAccess:
+                case IUnaryOperatorExpressionSyntax exp:
                 {
-                    if (fieldAccess.Expression == null)
+                    var type = exp.Type.Assigned().AssertKnown();
+                    var operand = ConvertToOperand(exp.Operand);
+                    switch (exp.Operator)
+                    {
+                        default:
+                            //throw ExhaustiveMatch.Failed(expression);
+                            throw new NotImplementedException($"ConvertToOperand({expression.GetType().Name}, Place) Not Implemented for {exp.Operator}.");
+
+                        case UnaryOperator.Minus:
+                            currentBlock!.Add(new NegateInstruction(resultPlace, (NumericType)type, operand, exp.Span, CurrentScope));
+                            break;
+                    }
+                }
+                break;
+                case IFieldAccessExpressionSyntax exp:
+                {
+                    if (exp.Expression == null)
                         throw new NotImplementedException("implicit self expression not implemented");
-                    var target = ConvertToOperand(fieldAccess.Expression);
-                    currentBlock!.Add(new FieldAccessInstruction(resultPlace, target, fieldAccess.Field.Name, fieldAccess.Span, CurrentScope));
+                    var target = ConvertToOperand(exp.Expression);
+                    currentBlock!.Add(new FieldAccessInstruction(resultPlace, target, exp.Field.Name, exp.Span, CurrentScope));
                 }
                 break;
-                case IFunctionInvocationExpressionSyntax functionInvocation:
+                case IFunctionInvocationExpressionSyntax exp:
                 {
-                    var args = functionInvocation.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
-                    currentBlock!.Add(new CallInstruction(resultPlace, functionInvocation.FullName, args, functionInvocation.Span, CurrentScope));
+                    var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
+                    currentBlock!.Add(new CallInstruction(resultPlace, exp.FullName, args, exp.Span, CurrentScope));
                 }
                 break;
-                case IStringLiteralExpressionSyntax stringLiteral:
-                    currentBlock!.Add(new LoadStringInstruction(resultPlace, stringLiteral.Value, stringLiteral.Span, CurrentScope));
+                case IStringLiteralExpressionSyntax exp:
+                    currentBlock!.Add(new LoadStringInstruction(resultPlace, exp.Value, exp.Span, CurrentScope));
                     break;
-                case IImplicitNumericConversionExpression implicitNumericConversion:
+                case IImplicitNumericConversionExpression exp:
                     currentBlock!.Add(new ConvertInstruction(resultPlace,
-                        ConvertToOperand(implicitNumericConversion.Expression),
-                        (NumericType)implicitNumericConversion.Expression.Type.Assigned().AssertKnown(),
-                        implicitNumericConversion.ConvertToType,
-                        implicitNumericConversion.Span,
+                        ConvertToOperand(exp.Expression),
+                        (NumericType)exp.Expression.Type.Assigned().AssertKnown(),
+                        exp.ConvertToType,
+                        exp.Span,
                         CurrentScope));
                     break;
-                case IIntegerLiteralExpressionSyntax integerLiteral:
+                case IIntegerLiteralExpressionSyntax exp:
                 {
                     currentBlock!.Add(new LoadIntegerInstruction(resultPlace,
-                        integerLiteral.Value,
-                        (IntegerType)integerLiteral.Type.Assigned().AssertKnown(),
-                        integerLiteral.Span,
+                        exp.Value,
+                        (IntegerType)exp.Type.Assigned().AssertKnown(),
+                        exp.Span,
                         CurrentScope));
                 }
                 break;
@@ -301,16 +319,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             {
                 default:
                     //throw ExhaustiveMatch.Failed(expression);
-                    throw new NotImplementedException();
-                case ISelfExpressionSyntax selfExpression:
-                    return graph.SelfVariable.Reference(selfExpression.Span);
-                case INameExpressionSyntax nameExpression:
+                    throw new NotImplementedException($"ConvertToOperand({expression.GetType().Name}) Not Implemented.");
+                case ISelfExpressionSyntax exp:
+                    return graph.SelfVariable.Reference(exp.Span);
+                case INameExpressionSyntax exp:
                 {
-                    var symbol = nameExpression.ReferencedSymbol.Assigned();
-                    return graph.VariableFor(symbol.FullName.UnqualifiedName).Reference(nameExpression.Span);
+                    var symbol = exp.ReferencedSymbol.Assigned();
+                    return graph.VariableFor(symbol.FullName.UnqualifiedName).Reference(exp.Span);
                 }
                 case IAssignmentExpressionSyntax _:
                 case IBinaryOperatorExpressionSyntax _:
+                case IUnaryOperatorExpressionSyntax _:
                 case IFieldAccessExpressionSyntax _:
                 case IImplicitNumericConversionExpression _:
                 case IIntegerLiteralExpressionSyntax _:
@@ -335,15 +354,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 default:
                     //throw ExhaustiveMatch.Failed(expression);
                     throw new NotImplementedException();
-                case IFieldAccessExpressionSyntax fieldAccess:
+                case IFieldAccessExpressionSyntax exp:
                 {
-                    if (fieldAccess.Expression == null)
+                    if (exp.Expression == null)
                         throw new NotImplementedException("implicit self expression not implemented");
-                    var target = ConvertToOperand(fieldAccess.Expression);
-                    return new FieldPlace(target, fieldAccess.Field.Name, fieldAccess.Span);
+                    var target = ConvertToOperand(exp.Expression);
+                    return new FieldPlace(target, exp.Field.Name, exp.Span);
                 }
-                case ISelfExpressionSyntax selfExpression:
-                    return new VariablePlace(Variable.Self, selfExpression.Span);
+                case ISelfExpressionSyntax exp:
+                    return new VariablePlace(Variable.Self, exp.Span);
             }
         }
 

@@ -8,7 +8,7 @@ The AST is designed to be as concrete as possible. Meaning that each different k
 
 ## Naming Conventions
 
-Each AST class ends in `Syntax` to distinguish them from intermediate language nodes. The category pf the node is also in the name. While including the category is more verbose, not doing so leads to inconsistencies. There are always some node types for which leaving out the category produces a confusing name. Categories are:
+Each AST class ends in `Syntax` to distinguish them from intermediate language nodes. The category of the node is also in the name. While including the category is more verbose, not doing so leads to inconsistencies. There are always some node types for which leaving out the category produces a confusing name. Categories are:
 
 * Declaration
 * * Statement
