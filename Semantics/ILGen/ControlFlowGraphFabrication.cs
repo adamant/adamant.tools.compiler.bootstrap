@@ -568,6 +568,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                         CurrentScope));
                 }
                 break;
+                case IImplicitNoneConversionExpression exp:
+                    currentBlock!.Add(new LoadNoneInstruction(resultPlace, exp.ConvertToType, exp.Span, CurrentScope));
+                    break;
             }
         }
 
@@ -598,6 +601,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IIntegerLiteralExpressionSyntax _:
                 case IStringLiteralExpressionSyntax _:
                 case IBoolLiteralExpressionSyntax _:
+                case IImplicitNoneConversionExpression _:
                 {
                     var tempVar = graph.Let(expression.Type.Assigned().AssertKnown(), CurrentScope);
                     ConvertIntoPlace(expression, tempVar.Place(expression.Span));
@@ -917,9 +921,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         //            throw new NotImplementedException();
         //        case IUnsafeExpressionSyntax unsafeExpression:
         //            return ConvertToValue(unsafeExpression.Expression);
-        //        case IImplicitNoneConversionExpression implicitNoneConversion:
-        //            return new NoneConstant(implicitNoneConversion.ConvertToType,
-        //                implicitNoneConversion.Span);
         //        case IInvocationExpressionSyntax invocation:
         //            return ConvertInvocationToValue(invocation);
         //        case IMemberAccessExpressionSyntax memberAccess:
