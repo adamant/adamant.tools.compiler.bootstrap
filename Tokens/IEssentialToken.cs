@@ -2,13 +2,15 @@ using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
+    /// <summary>
+    /// A token that isn't trivia
+    /// </summary>
     [Closed(
         typeof(IStringLiteralToken),
         typeof(IKeywordToken),
         typeof(IIdentifierOrUnderscoreToken),
         typeof(IOperatorToken),
         typeof(ILiteralToken),
-        typeof(ILifetimeNameToken),
         typeof(IPrimitiveTypeToken),
         typeof(IBinaryOperatorToken),
         typeof(IPunctuationToken),

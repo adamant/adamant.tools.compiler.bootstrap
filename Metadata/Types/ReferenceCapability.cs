@@ -36,5 +36,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                     return false;
             }
         }
+
+        public static string ToSourceString(this ReferenceCapability referenceCapability)
+        {
+            switch (referenceCapability)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(referenceCapability);
+                case ReferenceCapability.OwnedMutable:
+                    return "owned mut";
+                case ReferenceCapability.IsolatedMutable:
+                    return "iso mut";
+                case ReferenceCapability.HeldMutable:
+                    return "held mut";
+                case ReferenceCapability.Borrowed:
+                    return "mut";
+                case ReferenceCapability.Owned:
+                    return "owned";
+                case ReferenceCapability.Isolated:
+                    return "iso";
+                case ReferenceCapability.Held:
+                    return "held";
+                case ReferenceCapability.Shared:
+                    return "";
+                case ReferenceCapability.Identity:
+                    return "id";
+            }
+        }
     }
 }

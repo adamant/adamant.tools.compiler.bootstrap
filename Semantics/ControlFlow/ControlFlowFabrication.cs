@@ -512,10 +512,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 {
                     var args = newObjectExpression.Arguments.Select(a => ConvertToOperand(a.Expression))
                         .ToFixedList();
-                    var type = (UserObjectType)newObjectExpression.Type;
+                    var type = (UserObjectType)newObjectExpression.Type!.AssertKnown();
                     // lifetime is implicitly owned since we are making a new one
-                    throw new NotImplementedException();
-                    //type = type.WithLifetime(Lifetime.None);
+                    type = type.WithCapability(ReferenceCapability.Shared);
                     return new ConstructorCall(type, args, newObjectExpression.Span);
                 }
                 case INameExpressionSyntax identifier:

@@ -113,10 +113,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             return new UserObjectType(Name, DeclaredMutable, Mutability.Mutable, ReferenceCapability.Borrowed);
         }
 
-        //protected internal override Self WithLifetimeReturnsSelf(Lifetime lifetime)
-        //{
-        //    return new UserObjectType(Name, DeclaredMutable, Mutability, ReferenceCapability);
-        //}
+        protected internal override Self WithCapabilityReturnsSelf(ReferenceCapability referenceCapability)
+        {
+            return new UserObjectType(Name, DeclaredMutable, Mutability, referenceCapability);
+        }
 
         public override string ToString()
         {

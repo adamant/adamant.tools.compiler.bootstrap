@@ -57,18 +57,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     }
                     break;
                 }
-                case IReferenceLifetimeTypeSyntax referenceLifetime:
+                case IReferenceCapabilityTypeSyntax referenceCapability:
                 {
-                    var type = Evaluate(referenceLifetime.ReferentType);
+                    var type = Evaluate(referenceCapability.ReferentType);
                     if (type == DataType.Unknown)
                         return DataType.Unknown;
-                    throw new NotImplementedException();
-                    //var lifetime = EvaluateLifetime(referenceLifetime.Lifetime);
                     if (type is ReferenceType referenceType)
-                        //referenceLifetime.NamedType = referenceType.WithLifetime(lifetime);
-                        throw new NotImplementedException();
+                        referenceCapability.NamedType = referenceType.WithCapability(referenceCapability.ReferenceCapability);
                     else
-                        referenceLifetime.NamedType = DataType.Unknown;
+                        referenceCapability.NamedType = DataType.Unknown;
                     break;
                 }
                 case IOptionalTypeSyntax optionalType:
@@ -94,19 +91,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             return typeSyntax.NamedType ?? throw new InvalidOperationException();
         }
-
-        //public static Lifetime EvaluateLifetime(SimpleName lifetimeName)
-        //{
-        //    if (lifetimeName.IsSpecial)
-        //    {
-        //        if (lifetimeName == SpecialName.Owned)
-        //            return Lifetime.Owned;
-        //        if (lifetimeName == SpecialName.Forever)
-        //            return Lifetime.Forever;
-        //        throw new InvalidOperationException($"Invalid special lifetime name: {lifetimeName.Text}");
-        //    }
-
-        //    return new NamedLifetime(lifetimeName.Text);
-        //}
     }
 }

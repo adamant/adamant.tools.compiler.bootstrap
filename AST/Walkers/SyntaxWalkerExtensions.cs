@@ -77,7 +77,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                 case IOptionalTypeSyntax optionalType:
                     walker.Walk(optionalType.Referent, arg);
                     break;
-                case IReferenceLifetimeTypeSyntax referenceLifetimeType:
+                case IReferenceCapabilityTypeSyntax referenceLifetimeType:
                     walker.Walk(referenceLifetimeType.ReferentType, arg);
                     break;
                 case IBodySyntax body:

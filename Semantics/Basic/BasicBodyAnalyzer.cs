@@ -106,11 +106,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             {
                 var initializerType = variableDeclaration.Initializer.Type ?? throw new InvalidOperationException("Initializer type should be determined");
                 // If the source is an owned reference, then the declaration is implicitly owned
-                throw new NotImplementedException();
                 if (type is UserObjectType targetType && initializerType is UserObjectType sourceType
-                      //&& sourceType.Lifetime == Lifetime.Owned
-                      //&& targetType.Lifetime == Lifetime.None
-                      && IsAssignableFrom(targetType.AsOwned(), sourceType))
+                        && sourceType.IsOwned
+                        && !targetType.IsOwned
+                        && IsAssignableFrom(targetType.AsOwned(), sourceType))
                     variableDeclaration.Type = targetType.AsOwned().AsDeclared();
                 else
                 {
@@ -702,9 +701,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                 if (objectType.Mutability == Mutability.Mutable)
                                     type = objectType = objectType.AsExplicitlyUpgradable();
                                 // A bare variable reference doesn't default to owned
-                                //if (!isMove && objectType.IsOwned)
-                                //    type = objectType.WithLifetime(Lifetime.None);
-                                throw new NotImplementedException();
+                                if (!isMove && objectType.IsOwned)
+                                    type = objectType.WithCapability(ReferenceCapability.Shared);
                             }
                         }
                         break;

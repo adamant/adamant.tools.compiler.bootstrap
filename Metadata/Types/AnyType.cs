@@ -4,15 +4,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     public class AnyType : ReferenceType
     {
-        #region Singleton
-        internal static readonly AnyType ImmutableInstance = new AnyType(false);
-        internal static readonly AnyType MutableInstance = new AnyType(false);
-
-        private AnyType(bool mutable)
-            : base(mutable, mutable ? Mutability.Mutable : Mutability.Immutable,
-                mutable ? ReferenceCapability.Borrowed : ReferenceCapability.Shared)
-        { }
-        #endregion
+        private AnyType(Mutability mutability, ReferenceCapability referenceCapability)
+            : base(true, mutability, referenceCapability)
+        {
+        }
 
         public override bool IsKnown => true;
 
@@ -21,10 +16,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             throw new System.NotImplementedException();
         }
 
-        //protected internal override Self WithLifetimeReturnsSelf(Lifetime lifetime)
-        //{
-        //    throw new System.NotImplementedException();
-        //}
+        protected internal override Self WithCapabilityReturnsSelf(ReferenceCapability referenceCapability)
+        {
+            return new AnyType(Mutability, referenceCapability);
+        }
 
         public override string ToString() => Mutability == Mutability.Mutable ? "mut Any" : "Any";
     }

@@ -5,7 +5,7 @@ using ExhaustiveMatching;
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     [Closed(
-        typeof(IReferenceLifetimeTypeSyntax),
+        typeof(IReferenceCapabilityTypeSyntax),
         typeof(ITypeNameSyntax),
         typeof(IMutableTypeSyntax),
         typeof(IOptionalTypeSyntax))]

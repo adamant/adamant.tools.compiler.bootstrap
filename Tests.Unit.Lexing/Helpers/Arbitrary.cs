@@ -70,7 +70,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
                 case "<":
                     return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == "=>"
                         || t2.Text == ":" || t2.Text == "::."
-                        || t2.Text == ".." || t2.Text == "..<";
+                        || t2.Text == ".." || t2.Text == "..<"
+                        || t2.Text == "~>";
                 case "-":
                     return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == "=>"
                         || t2.Text == ">" || t2.Text == ">=";
@@ -281,7 +282,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             //{ "Self", typeof(ISelfTypeKeywordToken) },
             //{ "init", typeof(IInitKeywordToken) },
             { "owned", typeof(IOwnedKeywordToken) },
-            { "forever", typeof(IForeverKeywordToken) },
+            { "iso", typeof(IIsolatedKeywordToken) },
+            { "held", typeof(IHeldKeywordToken) },
+            { "id", typeof(IIdKeywordToken) },
             { "self", typeof(ISelfKeywordToken) },
             //{ "Type", typeof(ITypeKeywordToken) },
             { "true", typeof(ITrueKeywordToken) },

@@ -32,6 +32,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
                     case "SelfTypeKeywordToken":
                         keyword = "Self";
                         break;
+                    case "IsolatedKeywordToken":
+                        keyword = "iso";
+                        break;
                     case "MutableKeywordToken":
                         keyword = "mut";
                         break;

@@ -26,7 +26,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             typeof(FunctionKeywordToken),
             typeof(NewKeywordToken),
             typeof(OwnedKeywordToken),
-            typeof(ForeverKeywordToken),
+            typeof(IsolatedKeywordToken),
+            typeof(HeldKeywordToken),
+            typeof(IdKeywordToken),
             typeof(NamespaceKeywordToken),
             typeof(UsingKeywordToken),
             typeof(ForeachKeywordToken),
@@ -124,9 +126,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         {
             return new OwnedKeywordToken(span);
         }
-        public static IForeverKeywordToken ForeverKeyword(TextSpan span)
+        public static IIsolatedKeywordToken IsolatedKeyword(TextSpan span)
         {
-            return new ForeverKeywordToken(span);
+            return new IsolatedKeywordToken(span);
+        }
+        public static IHeldKeywordToken HeldKeyword(TextSpan span)
+        {
+            return new HeldKeywordToken(span);
+        }
+        public static IIdKeywordToken IdKeyword(TextSpan span)
+        {
+            return new IdKeywordToken(span);
         }
         public static INamespaceKeywordToken NamespaceKeyword(TextSpan span)
         {
@@ -244,7 +254,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         typeof(IFunctionKeywordToken),
         typeof(INewKeywordToken),
         typeof(IOwnedKeywordToken),
-        typeof(IForeverKeywordToken),
+        typeof(IIsolatedKeywordToken),
+        typeof(IHeldKeywordToken),
+        typeof(IIdKeywordToken),
         typeof(INamespaceKeywordToken),
         typeof(IUsingKeywordToken),
         typeof(IForeachKeywordToken),
@@ -425,10 +437,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IForeverKeywordToken : IKeywordToken { }
-    internal partial class ForeverKeywordToken : Token, IForeverKeywordToken
+    public partial interface IIsolatedKeywordToken : IKeywordToken { }
+    internal partial class IsolatedKeywordToken : Token, IIsolatedKeywordToken
     {
-        public ForeverKeywordToken(TextSpan span)
+        public IsolatedKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface IHeldKeywordToken : IKeywordToken { }
+    internal partial class HeldKeywordToken : Token, IHeldKeywordToken
+    {
+        public HeldKeywordToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface IIdKeywordToken : IKeywordToken { }
+    internal partial class IdKeywordToken : Token, IIdKeywordToken
+    {
+        public IdKeywordToken(TextSpan span)
             : base(span)
         {
         }

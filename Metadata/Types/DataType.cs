@@ -23,7 +23,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public static readonly VoidType Void = VoidType.Instance;
         public static readonly NeverType Never = NeverType.Instance;
         public static readonly BoolType Bool = BoolType.Instance;
-        public static readonly AnyType Any = AnyType.ImmutableInstance;
         public static readonly SizedIntegerType Byte = SizedIntegerType.Byte;
 #pragma warning disable CA1720
         public static readonly SizedIntegerType Int = SizedIntegerType.Int;

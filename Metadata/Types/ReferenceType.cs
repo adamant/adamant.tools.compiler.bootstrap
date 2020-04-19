@@ -44,7 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// </summary>
         protected internal abstract Self AsImmutableReturnsSelf();
 
-        //protected internal abstract Self WithLifetimeReturnsSelf(Lifetime lifetime);
+        protected internal abstract Self WithCapabilityReturnsSelf(ReferenceCapability referenceCapability);
     }
 
     public static class ReferenceTypeExtensions
@@ -55,10 +55,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             return type.AsImmutableReturnsSelf().Cast<T>();
         }
 
-        //public static T WithLifetime<T>(this T type, Lifetime lifetime)
-        //    where T : ReferenceType
-        //{
-        //    return type.WithLifetimeReturnsSelf(lifetime).Cast<T>();
-        //}
+        public static T WithCapability<T>(this T type, ReferenceCapability referenceCapability)
+            where T : ReferenceType
+        {
+            return type.WithCapabilityReturnsSelf(referenceCapability).Cast<T>();
+        }
     }
 }

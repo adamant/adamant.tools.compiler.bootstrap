@@ -8,7 +8,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         public static readonly SimpleName New = SimpleName.Special("new");
         public static readonly SimpleName Self = SimpleName.Special("self");
         public static readonly SimpleName Owned = SimpleName.Special("owned");
-        public static readonly SimpleName Forever = SimpleName.Special("forever");
 
         public static readonly SimpleName Void = SimpleName.Special("void");
         public static readonly SimpleName Never = SimpleName.Special("never");

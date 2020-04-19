@@ -1,5 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Parsing.Tree;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
@@ -32,14 +33,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var ownedKeyword = Tokens.RequiredToken<IOwnedKeywordToken>();
                     var mutableKeyword = Tokens.AcceptToken<IMutableKeywordToken>();
                     var referent = ParseBareType();
-                    if (mutableKeyword != null)
-                    {
-                        var mutableSpan = TextSpan.Covering(mutableKeyword.Span, referent.Span);
-                        referent = new MutableTypeSyntax(mutableSpan, referent);
-                    }
                     var span = TextSpan.Covering(ownedKeyword.Span, referent.Span);
-                    // TODO this should be a reference capability now
-                    return new ReferenceLifetimeTypeSyntax(referent, span, SpecialName.Owned);
+                    var capability = mutableKeyword == null
+                        ? ReferenceCapability.Owned
+                        : ReferenceCapability.OwnedMutable;
+                    return new ReferenceCapabilityTypeSyntax(capability, referent, span);
                 }
                 case IMutableKeywordToken _:
                 {
