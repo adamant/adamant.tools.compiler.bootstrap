@@ -19,6 +19,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
     /// <summary>
     /// The fabrication of a single control flow graph from a single callable AST node
     /// </summary>
+    /// <remarks>
+    /// The control flow graph can only be constructed from a completely valid AST.
+    /// That is, there must be no fatal compiler errors.
+    /// </remarks>
     public class ControlFlowGraphFabrication
     {
         private readonly IConcreteCallableDeclarationSyntax callable;
@@ -115,30 +119,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                         CurrentScope, variableDeclaration.Name.UnqualifiedName);
                     if (variableDeclaration.Initializer != null)
                     {
-
                         ConvertIntoPlace(variableDeclaration.Initializer,
                            variable.Place(variableDeclaration.Initializer.Span));
-                        //AssignToPlace(
-                        //    variable.LValueReference(variableDeclaration.Initializer.Span), value,
-                        //    variableDeclaration.Initializer.Span);
                     }
                 }
                 break;
                 case IExpressionStatementSyntax expressionStatement:
                 {
-                    // Skip expressions with unknown type
                     var expression = expressionStatement.Expression;
-                    if (!expression.Type.Assigned().IsKnown) return;
+                    if (!expression.Type.Assigned().IsKnown)
+                        throw new ArgumentException("Expression must have a known type", nameof(statement));
 
                     Convert(expression);
-
                 }
                 break;
                 case IResultStatementSyntax resultStatement:
                 {
-                    // Skip expressions with unknown type
                     var expression = resultStatement.Expression;
-                    if (!expression.Type.Assigned().IsKnown) return;
+                    if (!expression.Type.Assigned().IsKnown)
+                        throw new ArgumentException("Expression must have a known type", nameof(statement));
+
                     Convert(expression);
                 }
                 break;
@@ -186,7 +186,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             switch (expression)
             {
                 default:
-                    //throw ExhaustiveMatch.Failed(expression);
+                    throw ExhaustiveMatch.Failed(expression);
+                case IMutableExpressionSyntax _:
+                case IMoveExpressionSyntax _:
+                case INewObjectExpressionSyntax _:
+                case IImplicitNoneConversionExpression _:
+                case IImplicitConversionExpression _:
+                case IFieldAccessExpressionSyntax _:
+                case IForeachExpressionSyntax _:
                     throw new NotImplementedException($"Convert({expression.GetType().Name}) Not Implemented.");
                 case ILoopExpressionSyntax exp:
                 {
@@ -218,8 +225,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     currentBlock?.End(new GotoInstruction(conditionBlock.Number,
                         whileExpression.Block.Span.AtEnd(), CurrentScope));
                     currentBlock = loopExit;
-                    return;
                 }
+                break;
                 //case IForeachExpressionSyntax exp:
                 //{
                 //    // For now, we support only range syntax `foreach x: T in z..y` ranges
@@ -317,7 +324,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     Convert(exp.ThenBlock);
                     var thenExit = currentBlock;
                     BlockBuilder elseEntry;
-                    BlockBuilder exit = null;
+                    BlockBuilder? exit = null;
                     if (exp.ElseClause == null)
                     {
                         elseEntry = exit = graph.NewBlock();
@@ -389,6 +396,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 break;
                 case INameExpressionSyntax _:
                 case IBinaryOperatorExpressionSyntax _:
+                case IUnaryOperatorExpressionSyntax _:
+                case IBoolLiteralExpressionSyntax _:
+                case IStringLiteralExpressionSyntax _:
+                case ISelfExpressionSyntax _:
+                case INoneLiteralExpressionSyntax _:
+                case IIntegerLiteralExpressionSyntax _:
                     // These operation have no side effects, so if the result isn't needed, there is nothing to do
                     break;
 
@@ -417,7 +430,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             switch (expression)
             {
                 default:
-                    //throw ExhaustiveMatch.Failed(expression);
+                    throw ExhaustiveMatch.Failed(expression);
+                case ILoopExpressionSyntax _:
+                case IWhileExpressionSyntax _:
+                case IForeachExpressionSyntax _:
+                case IMoveExpressionSyntax _:
+                case IMutableExpressionSyntax _:
+                case IReturnExpressionSyntax _:
+                case IBreakExpressionSyntax _:
+                case INextExpressionSyntax _:
+                case ISelfExpressionSyntax _:
+                case IIfExpressionSyntax _:
+                case IUnsafeExpressionSyntax _:
+                case IImplicitImmutabilityConversionExpression _:
+                case IImplicitOptionalConversionExpression _:
+                case IBlockExpressionSyntax _:
+                case INoneLiteralExpressionSyntax _:
                     throw new NotImplementedException($"ConvertIntoPlace({expression.GetType().Name}, Place) Not Implemented.");
                 case IAssignmentExpressionSyntax exp:
                 {
@@ -454,9 +482,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     switch (exp.Operator)
                     {
                         default:
-                            //throw ExhaustiveMatch.Failed(expression);
+                            throw ExhaustiveMatch.Failed(expression);
+                        case BinaryOperator.DotDot:
+                        case BinaryOperator.LessThanDotDot:
+                        case BinaryOperator.DotDotLessThan:
+                        case BinaryOperator.LessThanDotDotLessThan:
+                        case BinaryOperator.Or:
+                        case BinaryOperator.And:
                             throw new NotImplementedException($"ConvertIntoPlace({expression.GetType().Name}, Place) Not Implemented for {exp.Operator}.");
-
                         case BinaryOperator.Plus:
                             currentBlock!.Add(new NumericInstruction(resultPlace, NumericInstructionOperator.Add,
                                 (NumericType)resultType, leftOperand, rightOperand, CurrentScope));
@@ -509,9 +542,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     switch (exp.Operator)
                     {
                         default:
-                            //throw ExhaustiveMatch.Failed(expression);
+                            throw ExhaustiveMatch.Failed(expression);
+                        case UnaryOperator.Not:
+                        case UnaryOperator.Plus:
                             throw new NotImplementedException($"ConvertToOperand({expression.GetType().Name}, Place) Not Implemented for {exp.Operator}.");
-
                         case UnaryOperator.Minus:
                             currentBlock!.Add(new NegateInstruction(resultPlace, (NumericType)type, operand, exp.Span, CurrentScope));
                             break;
@@ -521,7 +555,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IFieldAccessExpressionSyntax exp:
                 {
                     if (exp.Expression == null)
-                        throw new NotImplementedException("implicit self expression not implemented");
+                        throw new NotImplementedException("Implicit self expression not implemented");
                     var target = ConvertToOperand(exp.Expression);
                     currentBlock!.Add(new FieldAccessInstruction(resultPlace, target, exp.Field.Name, exp.Span, CurrentScope));
                 }
@@ -552,20 +586,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     currentBlock!.Add(new LoadBoolInstruction(resultPlace, exp.Value, exp.Span, CurrentScope));
                     break;
                 case IImplicitNumericConversionExpression exp:
-                    currentBlock!.Add(new ConvertInstruction(resultPlace,
-                        ConvertToOperand(exp.Expression),
-                        (NumericType)exp.Expression.Type.Assigned().AssertKnown(),
-                        exp.ConvertToType,
-                        exp.Span,
-                        CurrentScope));
-                    break;
+                {
+                    currentBlock!.Add(new ConvertInstruction(resultPlace, ConvertToOperand(exp.Expression),
+                        (NumericType)exp.Expression.Type.Assigned().AssertKnown(), exp.ConvertToType,
+                        exp.Span, CurrentScope));
+                }
+                break;
                 case IIntegerLiteralExpressionSyntax exp:
                 {
-                    currentBlock!.Add(new LoadIntegerInstruction(resultPlace,
-                        exp.Value,
+                    currentBlock!.Add(new LoadIntegerInstruction(resultPlace, exp.Value,
                         (IntegerType)exp.Type.Assigned().AssertKnown(),
-                        exp.Span,
-                        CurrentScope));
+                        exp.Span, CurrentScope));
                 }
                 break;
                 case IImplicitNoneConversionExpression exp:
@@ -582,8 +613,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             switch (expression)
             {
                 default:
-                    //throw ExhaustiveMatch.Failed(expression);
-                    throw new NotImplementedException($"ConvertToOperand({expression.GetType().Name}) Not Implemented.");
+                    throw ExhaustiveMatch.Failed(expression);
+                    //throw new NotImplementedException($"ConvertToOperand({expression.GetType().Name}) Not Implemented.");
                 case ISelfExpressionSyntax exp:
                     return graph.SelfVariable.Reference(exp.Span);
                 case INameExpressionSyntax exp:
@@ -601,7 +632,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IIntegerLiteralExpressionSyntax _:
                 case IStringLiteralExpressionSyntax _:
                 case IBoolLiteralExpressionSyntax _:
+                case INoneLiteralExpressionSyntax _:
+                case IImplicitImmutabilityConversionExpression _:
+                case IImplicitOptionalConversionExpression _:
+                case IUnsafeExpressionSyntax _:
+                case IBlockExpressionSyntax _:
                 case IImplicitNoneConversionExpression _:
+                case IBreakExpressionSyntax _:
+                case INextExpressionSyntax _:
+                case IReturnExpressionSyntax _:
+                case IMoveExpressionSyntax _:
+                case IMutableExpressionSyntax _:
+                case IIfExpressionSyntax _:
+                case IFunctionInvocationExpressionSyntax _:
+                case IForeachExpressionSyntax _:
+                case ILoopExpressionSyntax _:
+                case IWhileExpressionSyntax _:
                 {
                     var tempVar = graph.Let(expression.Type.Assigned().AssertKnown(), CurrentScope);
                     ConvertIntoPlace(expression, tempVar.Place(expression.Span));
