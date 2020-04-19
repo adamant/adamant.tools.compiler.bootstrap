@@ -17,9 +17,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name fullName,
             TextSpan nameSpan,
             FixedList<IMethodParameterSyntax> parameters,
-            ILifetimeBoundSyntax? lifetimeBounds,
             ITypeSyntax? returnTypeSyntax)
-            : base(declaringClass, span, file, modifiers, fullName, nameSpan, parameters, lifetimeBounds, returnTypeSyntax,
+            : base(declaringClass, span, file, modifiers, fullName, nameSpan, parameters, returnTypeSyntax,
                 new SymbolSet(parameters))
         {
         }

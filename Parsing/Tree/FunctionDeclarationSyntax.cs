@@ -11,7 +11,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal class FunctionDeclarationSyntax : ConcreteCallableDeclarationSyntax, IFunctionDeclarationSyntax
     {
         public bool IsExternalFunction { get; set; }
-        public ILifetimeBoundSyntax? LifetimeBounds { get; }
         public ITypeSyntax? ReturnTypeSyntax { get; }
 
         public new FixedList<INamedParameterSyntax> Parameters { get; }
@@ -25,13 +24,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name fullName,
             TextSpan nameSpan,
             FixedList<INamedParameterSyntax> parameters,
-            ILifetimeBoundSyntax? lifetimeBounds,
             ITypeSyntax? returnTypeSyntax,
             IBodySyntax body)
             : base(span, file, modifiers, fullName, nameSpan, parameters.ToFixedList<IParameterSyntax>(), body)
         {
             Parameters = parameters;
-            LifetimeBounds = lifetimeBounds;
             ReturnTypeSyntax = returnTypeSyntax;
         }
 

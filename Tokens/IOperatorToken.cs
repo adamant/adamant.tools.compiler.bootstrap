@@ -3,7 +3,6 @@ using ExhaustiveMatching;
 namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 {
     [Closed(
-        typeof(ILifetimeOperatorToken),
         typeof(IAccessOperatorToken),
         typeof(IDotToken),
         typeof(IDotDotToken),

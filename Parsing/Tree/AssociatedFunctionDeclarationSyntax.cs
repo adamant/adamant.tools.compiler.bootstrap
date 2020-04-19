@@ -18,7 +18,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public SimpleName Name => FullName.UnqualifiedName;
 
         public new FixedList<INamedParameterSyntax> Parameters { get; }
-        public ILifetimeBoundSyntax? LifetimeBounds { get; }
         public ITypeSyntax? ReturnTypeSyntax { get; }
         DataType IFunctionSymbol.ReturnType => ReturnType.Fulfilled();
 
@@ -30,14 +29,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name fullName,
             TextSpan nameSpan,
             FixedList<INamedParameterSyntax> parameters,
-            ILifetimeBoundSyntax? lifetimeBounds,
             ITypeSyntax? returnTypeSyntax,
             IBodySyntax body)
             : base(span, file, modifiers, fullName, nameSpan, parameters.ToFixedList<IParameterSyntax>(), body)
         {
             DeclaringClass = declaringClass;
             Parameters = parameters;
-            LifetimeBounds = lifetimeBounds;
             ReturnTypeSyntax = returnTypeSyntax;
         }
 

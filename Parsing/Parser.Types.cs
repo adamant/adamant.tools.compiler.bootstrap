@@ -1,6 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Parsing.Tree;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
@@ -12,10 +11,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     {
         public ITypeSyntax ParseType()
         {
-            var typeSyntax = ParseTypeWithMutability();
+            var typeSyntax = ParseTypeWithReferenceCapability();
 
             IQuestionToken? question;
-            while ((question = Tokens.AcceptToken<IQuestionToken>())!=null)
+            while ((question = Tokens.AcceptToken<IQuestionToken>()) != null)
             {
                 var span = TextSpan.Covering(typeSyntax.Span, question.Span);
                 return new OptionalTypeSyntax(span, typeSyntax);
@@ -24,61 +23,44 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return typeSyntax;
         }
 
-        private ITypeSyntax ParseTypeWithMutability()
+        private ITypeSyntax ParseTypeWithReferenceCapability()
         {
-            var mutableKeyword = Tokens.AcceptToken<IMutableKeywordToken>();
-            var referent = ParseTypeWithLifetime();
-            if (mutableKeyword == null)
-                return referent;
-
-            var span = TextSpan.Covering(mutableKeyword.Span, referent.Span);
-            return new MutableTypeSyntax(span, referent);
+            switch (Tokens.Current)
+            {
+                case IOwnedKeywordToken _:
+                {
+                    var ownedKeyword = Tokens.RequiredToken<IOwnedKeywordToken>();
+                    var mutableKeyword = Tokens.AcceptToken<IMutableKeywordToken>();
+                    var referent = ParseBareType();
+                    if (mutableKeyword != null)
+                    {
+                        var mutableSpan = TextSpan.Covering(mutableKeyword.Span, referent.Span);
+                        referent = new MutableTypeSyntax(mutableSpan, referent);
+                    }
+                    var span = TextSpan.Covering(ownedKeyword.Span, referent.Span);
+                    // TODO this should be a reference capability now
+                    return new ReferenceLifetimeTypeSyntax(referent, span, SpecialName.Owned);
+                }
+                case IMutableKeywordToken _:
+                {
+                    var mutableKeyword = Tokens.RequiredToken<IMutableKeywordToken>();
+                    var referent = ParseBareType();
+                    var span = TextSpan.Covering(mutableKeyword.Span, referent.Span);
+                    return new MutableTypeSyntax(span, referent);
+                }
+                default:
+                    return ParseBareType();
+            }
         }
 
-        private ITypeSyntax ParseTypeWithLifetime()
+        private ITypeSyntax ParseBareType()
         {
-            ITypeSyntax type;
             switch (Tokens.Current)
             {
                 case IPrimitiveTypeToken _:
-                    type = ParsePrimitiveType();
-                    if (!(type.NamedType is ReferenceType))
-                        return type;
-                    break;
+                    return ParsePrimitiveType();
                 default: // otherwise we want a type name
-                    type = ParseTypeName();
-                    break;
-            }
-
-            if (Tokens.Accept<IDollarToken>())
-            {
-                var (lifetimeSpan, lifetimeName) = ParseLifetimeName();
-                if (lifetimeName != null)
-                {
-                    var span = TextSpan.Covering(type.Span, lifetimeSpan);
-                    return new ReferenceLifetimeTypeSyntax(type, span, lifetimeName);
-                }
-            }
-
-            return type;
-        }
-
-        private (TextSpan, SimpleName?) ParseLifetimeName()
-        {
-            switch (Tokens.Current)
-            {
-                case IIdentifierToken _:
-                    var identifier = Tokens.RequiredToken<IIdentifierToken>();
-                    return (identifier.Span, new SimpleName(identifier.Value));
-                case IOwnedKeywordToken _:
-                    var ownedKeyword = Tokens.RequiredToken<IOwnedKeywordToken>();
-                    return (ownedKeyword.Span, SpecialName.Owned);
-                case IForeverKeywordToken _:
-                    var foreverKeyword = Tokens.RequiredToken<IForeverKeywordToken>();
-                    return (foreverKeyword.Span, SpecialName.Forever);
-                default:
-                    var span = Tokens.Expect<IIdentifierToken>();
-                    return (span, null);
+                    return ParseTypeName();
             }
         }
 
@@ -106,7 +88,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IBoolKeywordToken _:
                     name = SpecialName.Bool;
                     break;
-                case IAnyKeywordToken _: // TODO Any could have a lifetime
+                case IAnyKeywordToken _:
                     name = SpecialName.Any;
                     break;
                 case IByteKeywordToken _:

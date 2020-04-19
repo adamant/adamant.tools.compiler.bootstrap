@@ -117,7 +117,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var name = nameContext.Qualify(identifier.Value);
             var bodyParser = NestedParser(name);
             var parameters = bodyParser.ParseParameters(ParseFunctionParameter);
-            var lifetimeBounds = bodyParser.ParseLifetimeBounds();
             ITypeSyntax? returnType = null;
             if (Tokens.Accept<IRightArrowToken>())
                 returnType = ParseType();
@@ -126,7 +125,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var span = TextSpan.Covering(fn, body.Span);
 
             return new FunctionDeclarationSyntax(span, File, modifiers, name, identifier.Span,
-                parameters, lifetimeBounds, returnType, body);
+                parameters, returnType, body);
         }
 
         private FixedList<TParameter> ParseParameters<TParameter>(Func<TParameter> parseParameter)
@@ -136,30 +135,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var parameters = ParseMany<TParameter, ICommaToken, ICloseParenToken>(parseParameter);
             Tokens.Expect<ICloseParenToken>();
             return parameters.ToFixedList();
-        }
-
-        private ILifetimeBoundSyntax? ParseLifetimeBounds()
-        {
-            switch (Tokens.Current)
-            {
-                case IRightArrowToken _: // No Lifetime Bounds
-                case IOpenBraceToken _: // No return, starting body
-                    return null;
-                case IDollarToken _:
-                    return ParseParameterLifetimeBound();
-                default:
-                    throw new NotImplementedException();
-                    // TODO maybe lifetime bounds should be treated as distinct from expressions
-                    //return AcceptExpression();
-            }
-        }
-
-        private IParameterLifetimeBoundSyntax ParseParameterLifetimeBound()
-        {
-            var dollar = Tokens.Expect<IDollarToken>();
-            var identifier = Tokens.RequiredToken<IIdentifierToken>();
-            var span = TextSpan.Covering(dollar, identifier.Span);
-            return new ParameterLifetimeBoundSyntax(span, new SimpleName(identifier.Value));
         }
 
         private IBodySyntax ParseFunctionBody()
@@ -233,7 +208,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var name = nameContext.Qualify(identifier.Value);
             var bodyParser = NestedParser(name);
             var parameters = bodyParser.ParseParameters(ParseMethodParameter);
-            var lifetimeBounds = bodyParser.ParseLifetimeBounds();
             ITypeSyntax? returnType = null;
             if (Tokens.Accept<IRightArrowToken>())
                 returnType = ParseType();
@@ -245,7 +219,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 var body = bodyParser.ParseFunctionBody();
                 var span = TextSpan.Covering(fn, body.Span);
                 return new AssociatedFunctionDeclarationSyntax(declaringType, span, File, modifiers,
-                    name, identifier.Span, namedParameters, lifetimeBounds, returnType, body);
+                    name, identifier.Span, namedParameters, returnType, body);
             }
 
             if (!(parameters[0] is ISelfParameterSyntax))
@@ -260,14 +234,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 var body = bodyParser.ParseFunctionBody();
                 var span = TextSpan.Covering(fn, body.Span);
                 return new ConcreteMethodDeclarationSyntax(declaringType, span, File, modifiers, name,
-                    identifier.Span, parameters, lifetimeBounds, returnType, body);
+                    identifier.Span, parameters, returnType, body);
             }
             else
             {
                 var semicolon = bodyParser.Tokens.Expect<ISemicolonToken>();
                 var span = TextSpan.Covering(fn, semicolon);
                 return new AbstractMethodDeclarationSyntax(declaringType, span, File, modifiers, name,
-                    identifier.Span, parameters, lifetimeBounds, returnType);
+                    identifier.Span, parameters, returnType);
             }
         }
 

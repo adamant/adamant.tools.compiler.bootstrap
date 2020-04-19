@@ -19,10 +19,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name fullName,
             TextSpan nameSpan,
             FixedList<IMethodParameterSyntax> parameters,
-            ILifetimeBoundSyntax? lifetimeBounds,
             ITypeSyntax? returnTypeSyntax,
             IBodySyntax body)
-            : base(declaringClass, span, file, modifiers, fullName, nameSpan, parameters, lifetimeBounds, returnTypeSyntax,
+            : base(declaringClass, span, file, modifiers, fullName, nameSpan, parameters, returnTypeSyntax,
                 ConcreteCallableDeclarationSyntax.GetChildSymbols(parameters, body))
         {
             Body = body;

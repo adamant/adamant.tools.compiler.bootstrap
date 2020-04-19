@@ -281,7 +281,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     binaryOperator = BinaryOperator.LessThanDotDotLessThan;
                     break;
                 case IQuestionQuestionToken _:
-                case IDollarToken _:
                     throw new NotImplementedException();
             }
             return new BinaryOperatorExpressionSyntax(left, binaryOperator, right);

@@ -17,7 +17,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         typeof(IGreaterThanOrEqualToken),
         typeof(ILessThanToken),
         typeof(ILessThanOrEqualToken),
-        typeof(IDollarToken),
         typeof(IQuestionQuestionToken),
         typeof(IAndKeywordToken),
         typeof(IOrKeywordToken))]
@@ -39,7 +38,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     public partial interface IGreaterThanOrEqualToken : IBinaryOperatorToken { }
     public partial interface ILessThanToken : IBinaryOperatorToken { }
     public partial interface ILessThanOrEqualToken : IBinaryOperatorToken { }
-    public partial interface IDollarToken : IBinaryOperatorToken { }
     public partial interface IQuestionQuestionToken : IBinaryOperatorToken { }
     public partial interface IAndKeywordToken : IBinaryOperatorToken { }
     public partial interface IOrKeywordToken : IBinaryOperatorToken { }

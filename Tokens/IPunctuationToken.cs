@@ -10,13 +10,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         typeof(ISemicolonToken),
         typeof(IColonToken),
         typeof(IColonColonDotToken),
-        typeof(ICommaToken),
-        typeof(IDollarToken))]
+        typeof(ICommaToken))]
     public interface IPunctuationToken : IEssentialToken
     {
     }
 
-    public partial interface IDollarToken : IPunctuationToken { }
     public partial interface IOpenBraceToken : IPunctuationToken { }
     public partial interface ICloseBraceToken : IPunctuationToken { }
     public partial interface IOpenParenToken : IPunctuationToken { }
