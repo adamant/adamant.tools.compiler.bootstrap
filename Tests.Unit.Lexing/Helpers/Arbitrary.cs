@@ -87,15 +87,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
                         || t2.Text == "?" || t2.Text == "?." || t2.Text == "??";
                 case "..":
                 case "<..":
-                    return t2.Text == "<" || t2.Text == "<=" || t2.Text == "<:" || t2.Text == "<.." || t2.Text == "<..<";
+                    return t2.Text == "<" || t2.Text == "<=" || t2.Text == "<:" || t2.Text == "<.." || t2.Text == "<..<" || t2.Text == "<~";
                 case "#":
                     return t2.Text == "#" || t2.Text == "##";
                 case ":":
                     return t2.Text == ":" || t2.Text == "::."; // TODO this should really be blocking the sequence ':',':','.'
                 default:
                     if (typeof(IKeywordToken).IsAssignableFrom(t1.TokenType)
-                        || typeof(IIdentifierToken).IsAssignableFrom(t1.TokenType)
-                        )
+                        || typeof(IIdentifierToken).IsAssignableFrom(t1.TokenType))
                         return typeof(IIdentifierToken).IsAssignableFrom(t2.TokenType)
                             || typeof(IKeywordToken).IsAssignableFrom(t2.TokenType)
                             || t2.TokenType == typeof(IIntegerLiteralToken);
@@ -236,7 +235,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             { "-=", typeof(IMinusEqualsToken) },
             { "*=", typeof(IAsteriskEqualsToken) },
             { "/=", typeof(ISlashEqualsToken) },
-            { "=>", typeof(IEqualsGreaterThanToken) },
+            { "⇒", typeof(IRightDoubleArrowToken) },
+            { "=>", typeof(IRightDoubleArrowToken) },
+            { "⬿", typeof(ILeftWaveArrowToken) },
+            { "<~", typeof(ILeftWaveArrowToken) },
+            { "⤳", typeof(IRightWaveArrowToken) },
+            { "~>", typeof(IRightWaveArrowToken) },
             //{ "#", typeof(IHashToken) },
             //{ "##", typeof(IHashHashToken) },
             { "published", typeof(IPublishedKeywordToken) },

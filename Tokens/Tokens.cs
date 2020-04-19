@@ -175,9 +175,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             return new LessThanColonToken(span);
         }
 
-        public static IEqualsGreaterThanToken EqualsGreaterThan(TextSpan span)
+        public static IRightDoubleArrowToken RightDoubleArrow(TextSpan span)
         {
-            return new EqualsGreaterThanToken(span);
+            return new RightDoubleArrowToken(span);
+        }
+
+        public static ILeftWaveArrowToken LeftWaveArrow(TextSpan span)
+        {
+            return new LeftWaveArrowToken(span);
+        }
+
+        public static IRightWaveArrowToken RightWaveArrow(TextSpan span)
+        {
+            return new RightWaveArrowToken(span);
         }
 
     }
@@ -217,7 +227,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         typeof(IQuestionQuestionToken),
         typeof(IQuestionDotToken),
         typeof(ILessThanColonToken),
-        typeof(IEqualsGreaterThanToken))]
+        typeof(IRightDoubleArrowToken),
+        typeof(ILeftWaveArrowToken),
+        typeof(IRightWaveArrowToken))]
     public partial interface IEssentialToken { }
 
 
@@ -527,10 +539,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         }
     }
 
-    public partial interface IEqualsGreaterThanToken : IEssentialToken { }
-    internal partial class EqualsGreaterThanToken : Token, IEqualsGreaterThanToken
+    public partial interface IRightDoubleArrowToken : IEssentialToken { }
+    internal partial class RightDoubleArrowToken : Token, IRightDoubleArrowToken
     {
-        public EqualsGreaterThanToken(TextSpan span)
+        public RightDoubleArrowToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface ILeftWaveArrowToken : IEssentialToken { }
+    internal partial class LeftWaveArrowToken : Token, ILeftWaveArrowToken
+    {
+        public LeftWaveArrowToken(TextSpan span)
+            : base(span)
+        {
+        }
+    }
+
+    public partial interface IRightWaveArrowToken : IEssentialToken { }
+    internal partial class RightWaveArrowToken : Token, IRightWaveArrowToken
+    {
+        public RightWaveArrowToken(TextSpan span)
             : base(span)
         {
         }

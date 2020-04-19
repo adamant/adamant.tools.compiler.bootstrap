@@ -426,8 +426,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IEndOfFileToken _:
                     Add(ParseError.UnexpectedEndOfExpression(File, Tokens.Current.Span.AtStart()));
                     throw new ParseFailedException("Unexpected end of expression");
-                case IEqualsGreaterThanToken _:
-                    throw new NotImplementedException("`=>` in expression position");
+                case ILeftWaveArrowToken _:
+                case IRightWaveArrowToken _:
+                    throw new ParseFailedException("Reachability operator in expression");
+                case IRightDoubleArrowToken _:
+                    throw new NotImplementedException($"`{Tokens.Current.Text(File.Code)}` in expression position");
             }
         }
 
@@ -543,9 +546,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             if (Tokens.Current is IOpenBraceToken)
                 return ParseBlock();
 
-            var equalsGreaterThan = Tokens.Expect<IEqualsGreaterThanToken>();
+            var rightDoubleArrow = Tokens.Expect<IRightDoubleArrowToken>();
             var expression = ParseExpression();
-            var span = TextSpan.Covering(equalsGreaterThan, expression.Span);
+            var span = TextSpan.Covering(rightDoubleArrow, expression.Span);
             return new ResultStatementSyntax(span, expression);
         }
 

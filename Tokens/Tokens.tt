@@ -49,7 +49,9 @@
         "QuestionQuestion", // `??` U+003F, U+003F
         "QuestionDot", // `?.` U+003F, U+002E
         "LessThanColon" , // `<:` U+003C, U+003A
-        "EqualsGreaterThan" , // `=>` U+003D, U+003E
+        "RightDoubleArrow", // `⇒` U+21D2, `=>` U+003D, U+003E
+        "LeftWaveArrow", // `⬿` U+2B3F, `<~` U+003C, U+007E
+        "RightWaveArrow", // `⤳` U+2933, `~>` U+003C, U+007E
     }.AsReadOnly();
 #>
 using Adamant.Tools.Compiler.Bootstrap.Core;

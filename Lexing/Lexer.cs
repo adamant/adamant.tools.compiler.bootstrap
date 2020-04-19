@@ -105,6 +105,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                     case '→':
                         yield return TokenFactory.RightArrow(SymbolSpan());
                         break;
+                    case '⇒':
+                        yield return TokenFactory.RightDoubleArrow(SymbolSpan());
+                        break;
+                    case '⬿':
+                        yield return TokenFactory.LeftWaveArrow(SymbolSpan());
+                        break;
+                    case '⤳':
+                        yield return TokenFactory.RightWaveArrow(SymbolSpan());
+                        break;
                     //case '@':
                     //    yield return TokenFactory.AtSign(SymbolSpan());
                     //    break;
@@ -139,6 +148,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                                 // it is `-`
                                 yield return TokenFactory.Minus(SymbolSpan());
                                 break;
+                        }
+                        break;
+                    case '~':
+                        if (NextChar() is '>')
+                            // it is `~>`
+                            yield return TokenFactory.RightWaveArrow(SymbolSpan(2));
+                        else
+                        {
+                            // it is `~` which isn't allowed
+                            var span = SymbolSpan();
+                            diagnostics.Add(LexError.UnexpectedCharacter(file, span, currentChar));
+                            yield return TokenFactory.Unexpected(span);
                         }
                         break;
                     case '*':
@@ -204,7 +225,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                         {
                             case '>':
                                 // it is `=>`
-                                yield return TokenFactory.EqualsGreaterThan(SymbolSpan(2));
+                                yield return TokenFactory.RightDoubleArrow(SymbolSpan(2));
                                 break;
                             case '=':
                                 // it is `==`
@@ -247,6 +268,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                             case ':':
                                 // it is `<:`
                                 yield return TokenFactory.LessThanColon(SymbolSpan(2));
+                                break;
+                            case '~':
+                                // it is `<~`
+                                yield return TokenFactory.LeftWaveArrow(SymbolSpan(2));
                                 break;
                             case '.':
                                 if (CharAtIs(2, '.'))

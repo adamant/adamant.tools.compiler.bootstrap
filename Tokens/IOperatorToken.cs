@@ -25,12 +25,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         typeof(IMinusEqualsToken),
         typeof(IAsteriskEqualsToken),
         typeof(ISlashEqualsToken),
-        typeof(IDollarToken),
         typeof(IQuestionToken),
         typeof(IQuestionQuestionToken),
         typeof(IQuestionDotToken),
         typeof(ILessThanColonToken),
-        typeof(IEqualsGreaterThanToken),
+        typeof(IRightDoubleArrowToken),
+        typeof(ILeftWaveArrowToken),
+        typeof(IRightWaveArrowToken),
         typeof(IAndKeywordToken),
         typeof(IOrKeywordToken),
         typeof(INotKeywordToken),
@@ -57,12 +58,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     public partial interface IMinusEqualsToken : IOperatorToken { }
     public partial interface IAsteriskEqualsToken : IOperatorToken { }
     public partial interface ISlashEqualsToken : IOperatorToken { }
-    public partial interface IDollarToken : IOperatorToken { }
     public partial interface IQuestionToken : IOperatorToken { }
     public partial interface IQuestionQuestionToken : IOperatorToken { }
     public partial interface IQuestionDotToken : IOperatorToken { }
     public partial interface ILessThanColonToken : IOperatorToken { }
-    public partial interface IEqualsGreaterThanToken : IOperatorToken { }
+    public partial interface IRightDoubleArrowToken : IOperatorToken { }
+    public partial interface ILeftWaveArrowToken : IOperatorToken { }
+    public partial interface IRightWaveArrowToken : IOperatorToken { }
     public partial interface IAndKeywordToken : IOperatorToken { }
     public partial interface IOrKeywordToken : IOperatorToken { }
     public partial interface INotKeywordToken : IOperatorToken { }
