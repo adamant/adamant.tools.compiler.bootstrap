@@ -5,7 +5,6 @@ using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -107,9 +106,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             {
                 var initializerType = variableDeclaration.Initializer.Type ?? throw new InvalidOperationException("Initializer type should be determined");
                 // If the source is an owned reference, then the declaration is implicitly owned
+                throw new NotImplementedException();
                 if (type is UserObjectType targetType && initializerType is UserObjectType sourceType
-                      && sourceType.Lifetime == Lifetime.Owned
-                      && targetType.Lifetime == Lifetime.None
+                      //&& sourceType.Lifetime == Lifetime.Owned
+                      //&& targetType.Lifetime == Lifetime.None
                       && IsAssignableFrom(targetType.AsOwned(), sourceType))
                     variableDeclaration.Type = targetType.AsOwned().AsDeclared();
                 else
@@ -243,7 +243,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     if (type is ReferenceType referenceType && !referenceType.IsOwned)
                     {
                         diagnostics.Add(TypeError.CannotMoveBorrowedValue(file, moveExpression));
-                        type = referenceType.WithLifetime(Lifetime.Owned);
+                        //type = referenceType.WithLifetime(Lifetime.Owned);
+                        throw new NotImplementedException();
                     }
 
                     if (type is UserObjectType objectType)
@@ -701,8 +702,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                 if (objectType.Mutability == Mutability.Mutable)
                                     type = objectType = objectType.AsExplicitlyUpgradable();
                                 // A bare variable reference doesn't default to owned
-                                if (!isMove && objectType.IsOwned)
-                                    type = objectType.WithLifetime(Lifetime.None);
+                                //if (!isMove && objectType.IsOwned)
+                                //    type = objectType.WithLifetime(Lifetime.None);
+                                throw new NotImplementedException();
                             }
                         }
                         break;

@@ -4,10 +4,8 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using ExhaustiveMatching;
 
@@ -64,9 +62,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var type = Evaluate(referenceLifetime.ReferentType);
                     if (type == DataType.Unknown)
                         return DataType.Unknown;
-                    var lifetime = EvaluateLifetime(referenceLifetime.Lifetime);
+                    throw new NotImplementedException();
+                    //var lifetime = EvaluateLifetime(referenceLifetime.Lifetime);
                     if (type is ReferenceType referenceType)
-                        referenceLifetime.NamedType = referenceType.WithLifetime(lifetime);
+                        //referenceLifetime.NamedType = referenceType.WithLifetime(lifetime);
+                        throw new NotImplementedException();
                     else
                         referenceLifetime.NamedType = DataType.Unknown;
                     break;
@@ -95,18 +95,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             return typeSyntax.NamedType ?? throw new InvalidOperationException();
         }
 
-        public static Lifetime EvaluateLifetime(SimpleName lifetimeName)
-        {
-            if (lifetimeName.IsSpecial)
-            {
-                if (lifetimeName == SpecialName.Owned)
-                    return Lifetime.Owned;
-                if (lifetimeName == SpecialName.Forever)
-                    return Lifetime.Forever;
-                throw new InvalidOperationException($"Invalid special lifetime name: {lifetimeName.Text}");
-            }
+        //public static Lifetime EvaluateLifetime(SimpleName lifetimeName)
+        //{
+        //    if (lifetimeName.IsSpecial)
+        //    {
+        //        if (lifetimeName == SpecialName.Owned)
+        //            return Lifetime.Owned;
+        //        if (lifetimeName == SpecialName.Forever)
+        //            return Lifetime.Forever;
+        //        throw new InvalidOperationException($"Invalid special lifetime name: {lifetimeName.Text}");
+        //    }
 
-            return new NamedLifetime(lifetimeName.Text);
-        }
+        //    return new NamedLifetime(lifetimeName.Text);
+        //}
     }
 }

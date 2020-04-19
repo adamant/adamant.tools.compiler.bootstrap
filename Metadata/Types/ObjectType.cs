@@ -1,4 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using ExhaustiveMatching;
 
@@ -13,8 +12,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             Name name,
             bool declaredMutable,
             Mutability mutability,
-            Lifetime lifetime)
-            : base(declaredMutable, mutability, lifetime)
+            ReferenceCapability referenceCapability)
+            : base(declaredMutable, mutability, referenceCapability)
         {
             Name = name;
         }

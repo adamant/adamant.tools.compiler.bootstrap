@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
@@ -22,8 +21,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             Name fullName,
             bool declaredMutable,
             Mutability mutability,
-            Lifetime lifetime)
-            : base(fullName, declaredMutable, mutability, lifetime)
+            ReferenceCapability referenceCapability)
+            : base(fullName, declaredMutable, mutability, referenceCapability)
         {
         }
 
@@ -35,12 +34,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                 symbol.FullName,
                 mutable,
                 Mutability.Immutable,
-                Lifetime.None);
+                ReferenceCapability.Shared);
         }
 
         public static UserObjectType Declaration(Name fullName, bool mutable)
         {
-            return new UserObjectType(fullName, mutable, Mutability.Immutable, Lifetime.None);
+            return new UserObjectType(fullName, mutable, Mutability.Immutable, ReferenceCapability.Shared);
         }
 
         /// <summary>
@@ -49,7 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public UserObjectType AsMutable()
         {
             Requires.That("DeclaredMutable", DeclaredMutable, "must be declared as a mutable type to use mutably");
-            return new UserObjectType(Name, DeclaredMutable, Mutability.Mutable, Lifetime);
+            return new UserObjectType(Name, DeclaredMutable, Mutability.Mutable, ReferenceCapability);
         }
 
         /// <summary>
@@ -57,7 +56,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// </summary>
         protected internal override Self AsImmutableReturnsSelf()
         {
-            return new UserObjectType(Name, DeclaredMutable, Mutability.Immutable, Lifetime);
+            return new UserObjectType(Name, DeclaredMutable, Mutability.Immutable, ReferenceCapability);
         }
 
         /// <summary>
@@ -69,7 +68,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             if (!DeclaredMutable && Mutability == Mutability.Immutable)
                 return this; // no change
             var mutability = DeclaredMutable ? Mutability.ExplicitlyUpgradable : Mutability.Immutable;
-            return new UserObjectType(Name, DeclaredMutable, mutability, Lifetime);
+            return new UserObjectType(Name, DeclaredMutable, mutability, ReferenceCapability);
         }
 
         /// <summary>
@@ -81,7 +80,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             if (!DeclaredMutable && Mutability == Mutability.Immutable)
                 return this; // no change
             var mutability = DeclaredMutable ? Mutability.ImplicitlyUpgradable : Mutability.Immutable;
-            return new UserObjectType(Name, DeclaredMutable, mutability, Lifetime);
+            return new UserObjectType(Name, DeclaredMutable, mutability, ReferenceCapability);
         }
 
         /// <summary>
@@ -90,9 +89,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public UserObjectType AsOwnedUpgradable()
         {
             var expectedMutability = DeclaredMutable ? Mutability.ImplicitlyUpgradable : Mutability.Immutable;
-            if (Lifetime == Lifetime.Owned && Mutability == expectedMutability)
-                return this;
-            return new UserObjectType(Name, DeclaredMutable, expectedMutability, Lifetime.Owned);
+            //if (Lifetime == Lifetime.Owned && Mutability == expectedMutability)
+            //    return this;
+            return new UserObjectType(Name, DeclaredMutable, expectedMutability, ReferenceCapability.Owned);
         }
 
         /// <summary>
@@ -100,9 +99,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// </summary>
         public UserObjectType AsOwned()
         {
-            if (Lifetime == Lifetime.Owned)
-                return this;
-            return new UserObjectType(Name, DeclaredMutable, Mutability, Lifetime.Owned);
+            //if (Lifetime == Lifetime.Owned)
+            //    return this;
+            return new UserObjectType(Name, DeclaredMutable, Mutability, ReferenceCapability.Owned);
         }
 
         /// <summary>
@@ -111,19 +110,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// </summary>
         public UserObjectType ForConstructorSelf()
         {
-            return new UserObjectType(Name, DeclaredMutable, Mutability.Mutable, AnonymousLifetime.Instance);
+            return new UserObjectType(Name, DeclaredMutable, Mutability.Mutable, ReferenceCapability.Borrowed);
         }
 
-        protected internal override Self WithLifetimeReturnsSelf(Lifetime lifetime)
-        {
-            return new UserObjectType(Name, DeclaredMutable, Mutability, lifetime);
-        }
+        //protected internal override Self WithLifetimeReturnsSelf(Lifetime lifetime)
+        //{
+        //    return new UserObjectType(Name, DeclaredMutable, Mutability, ReferenceCapability);
+        //}
 
         public override string ToString()
         {
             var value = $"{Mutability}{Name}";
-            if (!(Lifetime is NoLifetime))
-                value += "$" + Lifetime;
+            //if (!(Lifetime is NoLifetime))
+            //    value += "$" + Lifetime;
             return value;
         }
 
@@ -139,12 +138,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                    && EqualityComparer<Name>.Default.Equals(Name, other.Name)
                    && DeclaredMutable == other.DeclaredMutable
                    && Mutability == other.Mutability
-                   && EqualityComparer<Lifetime>.Default.Equals(Lifetime, other.Lifetime);
+                   && ReferenceCapability == other.ReferenceCapability;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Name, DeclaredMutable, Mutability, Lifetime);
+            return HashCode.Combine(Name, DeclaredMutable, Mutability, ReferenceCapability);
         }
 
         public static bool operator ==(UserObjectType type1, UserObjectType type2)

@@ -1,5 +1,4 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
@@ -9,8 +8,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         typeof(AnyType))]
     public abstract class ReferenceType : DataType
     {
-        public Lifetime Lifetime { get; }
-        public bool IsOwned => Lifetime.IsOwned;
+        public ReferenceCapability ReferenceCapability { get; }
+        public bool IsOwned =>
+            ReferenceCapability == ReferenceCapability.Owned
+            || ReferenceCapability == ReferenceCapability.OwnedMutable;
 
         /// <summary>
         /// Whether this type was declared `mut class` or just `class`
@@ -21,9 +22,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         public override ValueSemantics ValueSemantics { get; }
 
-        protected ReferenceType(bool declaredMutable, Mutability mutability, Lifetime lifetime)
+        protected ReferenceType(bool declaredMutable, Mutability mutability, ReferenceCapability referenceCapability)
         {
-            Lifetime = lifetime;
+            ReferenceCapability = referenceCapability;
             DeclaredMutable = declaredMutable;
             Mutability = mutability;
             ValueSemantics = IsOwned
@@ -43,7 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// </summary>
         protected internal abstract Self AsImmutableReturnsSelf();
 
-        protected internal abstract Self WithLifetimeReturnsSelf(Lifetime lifetime);
+        //protected internal abstract Self WithLifetimeReturnsSelf(Lifetime lifetime);
     }
 
     public static class ReferenceTypeExtensions
@@ -54,10 +55,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             return type.AsImmutableReturnsSelf().Cast<T>();
         }
 
-        public static T WithLifetime<T>(this T type, Lifetime lifetime)
-            where T : ReferenceType
-        {
-            return type.WithLifetimeReturnsSelf(lifetime).Cast<T>();
-        }
+        //public static T WithLifetime<T>(this T type, Lifetime lifetime)
+        //    where T : ReferenceType
+        //{
+        //    return type.WithLifetimeReturnsSelf(lifetime).Cast<T>();
+        //}
     }
 }

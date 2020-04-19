@@ -6,7 +6,6 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Lifetimes;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using ExhaustiveMatching;
@@ -515,7 +514,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                         .ToFixedList();
                     var type = (UserObjectType)newObjectExpression.Type;
                     // lifetime is implicitly owned since we are making a new one
-                    type = type.WithLifetime(Lifetime.None);
+                    throw new NotImplementedException();
+                    //type = type.WithLifetime(Lifetime.None);
                     return new ConstructorCall(type, args, newObjectExpression.Span);
                 }
                 case INameExpressionSyntax identifier:
