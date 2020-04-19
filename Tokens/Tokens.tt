@@ -45,7 +45,6 @@
         "MinusEquals", // `-=` U+002D", U+003D
         "AsteriskEquals", // `*=` U+002A", U+003D
         "SlashEquals", // `/=` U+002F", U+003D
-        "Dollar", // `$` U+0024
         "Question", // `?` U+003F
         "QuestionQuestion", // `??` U+003F, U+003F
         "QuestionDot", // `?.` U+003F, U+002E

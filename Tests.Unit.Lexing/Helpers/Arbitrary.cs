@@ -236,7 +236,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             { "-=", typeof(IMinusEqualsToken) },
             { "*=", typeof(IAsteriskEqualsToken) },
             { "/=", typeof(ISlashEqualsToken) },
-            { "$", typeof(IDollarToken) },
             { "=>", typeof(IEqualsGreaterThanToken) },
             //{ "#", typeof(IHashToken) },
             //{ "##", typeof(IHashHashToken) },

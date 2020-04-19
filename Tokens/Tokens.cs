@@ -155,11 +155,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
             return new SlashEqualsToken(span);
         }
 
-        public static IDollarToken Dollar(TextSpan span)
-        {
-            return new DollarToken(span);
-        }
-
         public static IQuestionToken Question(TextSpan span)
         {
             return new QuestionToken(span);
@@ -218,7 +213,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
         typeof(IMinusEqualsToken),
         typeof(IAsteriskEqualsToken),
         typeof(ISlashEqualsToken),
-        typeof(IDollarToken),
         typeof(IQuestionToken),
         typeof(IQuestionQuestionToken),
         typeof(IQuestionDotToken),
@@ -492,15 +486,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
     internal partial class SlashEqualsToken : Token, ISlashEqualsToken
     {
         public SlashEqualsToken(TextSpan span)
-            : base(span)
-        {
-        }
-    }
-
-    public partial interface IDollarToken : IEssentialToken { }
-    internal partial class DollarToken : Token, IDollarToken
-    {
-        public DollarToken(TextSpan span)
             : base(span)
         {
         }

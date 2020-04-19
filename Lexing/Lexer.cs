@@ -102,9 +102,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                     //case '|':
                     //    yield return TokenFactory.Pipe(SymbolSpan());
                     //    break;
-                    case '$':
-                        yield return TokenFactory.Dollar(SymbolSpan());
-                        break;
                     case '→':
                         yield return TokenFactory.RightArrow(SymbolSpan());
                         break;
