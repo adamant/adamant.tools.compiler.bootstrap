@@ -134,18 +134,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                             @operator = Tokens.RequiredToken<IBinaryOperatorToken>();
                         }
                         break;
-                    //case IOpenParenToken _:
-                    //    if (minPrecedence <= OperatorPrecedence.Primary)
-                    //    {
-                    //        var callee = expression;
-                    //        Tokens.RequiredToken<IOpenParenToken>();
-                    //        var arguments = ParseArguments();
-                    //        var closeParenSpan = Tokens.Expect<ICloseParenToken>();
-                    //        var span = TextSpan.Covering(callee.Span, closeParenSpan);
-                    //        expression = new MethodInvocationSyntax(span, callee, null, arguments);
-                    //        continue;
-                    //    }
-                    //    break;
                     case IDotToken _:
                     case IQuestionDotToken _:
                         if (minPrecedence <= OperatorPrecedence.Primary)
@@ -516,7 +504,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         }
 
         /// <summary>
-        /// Parse and expression that is required to have parenthesis around it.
+        /// Parse an expression that is required to have parenthesis around it.
         /// for example `unsafe(x);`.
         /// </summary>
         /// <returns></returns>
@@ -550,31 +538,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var span = TextSpan.Covering(rightDoubleArrow, expression.Span);
             return new ResultStatementSyntax(span, expression);
         }
-
-        //public ITransferSyntax ParseTransfer()
-        //{
-        //    switch (Tokens.Current)
-        //    {
-        //        case IMoveKeywordToken _:
-        //        {
-        //            var moveKeyword = Tokens.Required<IMoveKeywordToken>();
-        //            var expression = ParseExpression();
-        //            var span = TextSpan.Covering(moveKeyword, expression.Span);
-        //            return new MoveExpressionSyntax(span, expression);
-        //        }
-        //        case IMutableKeywordToken _:
-        //        {
-        //            var mutKeyword = Tokens.Required<IMutableKeywordToken>();
-        //            var expression = ParseExpression();
-        //            var span = TextSpan.Covering(mutKeyword, expression.Span);
-        //            return new MutableExpressionSyntax(span, expression);
-        //        }
-        //        default:
-        //        {
-        //            var expression = ParseExpression();
-        //            return new ImmutableTransferSyntax(expression.Span, expression);
-        //        }
-        //    }
-        //}
     }
 }

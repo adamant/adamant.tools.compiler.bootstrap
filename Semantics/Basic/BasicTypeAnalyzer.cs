@@ -57,13 +57,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     }
                     break;
                 }
-                case IReferenceCapabilityTypeSyntax referenceCapability:
+                case ICapabilityTypeSyntax referenceCapability:
                 {
                     var type = Evaluate(referenceCapability.ReferentType);
                     if (type == DataType.Unknown)
                         return DataType.Unknown;
                     if (type is ReferenceType referenceType)
-                        referenceCapability.NamedType = referenceType.WithCapability(referenceCapability.ReferenceCapability);
+                        referenceCapability.NamedType = referenceType.WithCapability(referenceCapability.Capability);
                     else
                         referenceCapability.NamedType = DataType.Unknown;
                     break;
@@ -72,20 +72,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 {
                     var referent = Evaluate(optionalType.Referent);
                     return new OptionalType(referent);
-                }
-                case IMutableTypeSyntax mutableType:
-                {
-                    var type = Evaluate(mutableType.Referent);
-                    switch (type)
-                    {
-                        case UserObjectType objectType when objectType.DeclaredMutable:
-                            mutableType.NamedType = objectType.AsMutable();
-                            break;
-                        default:
-                            mutableType.NamedType = DataType.Unknown;
-                            break;
-                    }
-                    break;
                 }
             }
 

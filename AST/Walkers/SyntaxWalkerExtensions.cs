@@ -71,13 +71,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                 case IFieldParameterSyntax fieldParameter:
                     walker.Walk(fieldParameter.DefaultValue, arg);
                     break;
-                case IMutableTypeSyntax mutableType:
-                    walker.Walk(mutableType.Referent, arg);
-                    break;
                 case IOptionalTypeSyntax optionalType:
                     walker.Walk(optionalType.Referent, arg);
                     break;
-                case IReferenceCapabilityTypeSyntax referenceLifetimeType:
+                case ICapabilityTypeSyntax referenceLifetimeType:
                     walker.Walk(referenceLifetimeType.ReferentType, arg);
                     break;
                 case IBodySyntax body:

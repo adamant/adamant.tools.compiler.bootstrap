@@ -24,8 +24,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             IsKnown = referent.IsKnown;
         }
 
-
-
         public override string ToString()
         {
             return $"({Referent})?";

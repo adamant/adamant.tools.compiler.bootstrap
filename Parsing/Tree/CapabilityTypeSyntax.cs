@@ -4,24 +4,24 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal class ReferenceCapabilityTypeSyntax : TypeSyntax, IReferenceCapabilityTypeSyntax
+    internal class CapabilityTypeSyntax : TypeSyntax, ICapabilityTypeSyntax
     {
         public ITypeSyntax ReferentType { get; }
-        public ReferenceCapability ReferenceCapability { get; }
+        public ReferenceCapability Capability { get; }
 
-        public ReferenceCapabilityTypeSyntax(
+        public CapabilityTypeSyntax(
             ReferenceCapability referenceCapability,
             ITypeSyntax referentType,
             TextSpan span)
             : base(span)
         {
             ReferentType = referentType;
-            ReferenceCapability = referenceCapability;
+            Capability = referenceCapability;
         }
 
         public override string ToString()
         {
-            var capability = ReferenceCapability.ToSourceString();
+            var capability = Capability.ToSourceString();
             if (capability.Length == 0) return ReferentType.ToString();
 
             return $"{capability} {ReferentType}";

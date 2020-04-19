@@ -5,6 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Parsing.Tree;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using ExhaustiveMatching;
+using static Adamant.Tools.Compiler.Bootstrap.Metadata.Types.ReferenceCapability;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {
@@ -12,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     {
         public ITypeSyntax ParseType()
         {
-            var typeSyntax = ParseTypeWithReferenceCapability();
+            var typeSyntax = ParseTypeWithCapability();
 
             IQuestionToken? question;
             while ((question = Tokens.AcceptToken<IQuestionToken>()) != null)
@@ -24,31 +25,44 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return typeSyntax;
         }
 
-        private ITypeSyntax ParseTypeWithReferenceCapability()
+        private ITypeSyntax ParseTypeWithCapability()
         {
             switch (Tokens.Current)
             {
                 case IOwnedKeywordToken _:
-                {
-                    var ownedKeyword = Tokens.RequiredToken<IOwnedKeywordToken>();
-                    var mutableKeyword = Tokens.AcceptToken<IMutableKeywordToken>();
-                    var referent = ParseBareType();
-                    var span = TextSpan.Covering(ownedKeyword.Span, referent.Span);
-                    var capability = mutableKeyword == null
-                        ? ReferenceCapability.Owned
-                        : ReferenceCapability.OwnedMutable;
-                    return new ReferenceCapabilityTypeSyntax(capability, referent, span);
-                }
+                    return ParseTypeWithCapability<IOwnedKeywordToken>(Owned, OwnedMutable);
+                case IIsolatedKeywordToken _:
+                    return ParseTypeWithCapability<IIsolatedKeywordToken>(Isolated, IsolatedMutable);
+                case IHeldKeywordToken _:
+                    return ParseTypeWithCapability<IHeldKeywordToken>(Held, HeldMutable);
                 case IMutableKeywordToken _:
                 {
                     var mutableKeyword = Tokens.RequiredToken<IMutableKeywordToken>();
                     var referent = ParseBareType();
                     var span = TextSpan.Covering(mutableKeyword.Span, referent.Span);
-                    return new MutableTypeSyntax(span, referent);
+                    return new CapabilityTypeSyntax(Borrowed, referent, span);
+                }
+                case IIdKeywordToken _:
+                {
+                    var mutableKeyword = Tokens.RequiredToken<IMutableKeywordToken>();
+                    var referent = ParseBareType();
+                    var span = TextSpan.Covering(mutableKeyword.Span, referent.Span);
+                    return new CapabilityTypeSyntax(Identity, referent, span);
                 }
                 default:
                     return ParseBareType();
             }
+        }
+
+        private ITypeSyntax ParseTypeWithCapability<TCapabilityToken>(ReferenceCapability immutableCapability, ReferenceCapability mutableCapability)
+            where TCapabilityToken : ICapabilityToken
+        {
+            var primaryCapability = Tokens.RequiredToken<TCapabilityToken>();
+            var mutableKeyword = Tokens.AcceptToken<IMutableKeywordToken>();
+            var referent = ParseBareType();
+            var span = TextSpan.Covering(primaryCapability.Span, referent.Span);
+            var capability = mutableKeyword == null ? immutableCapability : mutableCapability;
+            return new CapabilityTypeSyntax(capability, referent, span);
         }
 
         private ITypeSyntax ParseBareType()
