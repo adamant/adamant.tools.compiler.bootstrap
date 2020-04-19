@@ -173,7 +173,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                 case ISelfParameterSyntax _:
                 case ICallableNameSyntax _:
                 case IUsingDirectiveSyntax _:
-                case IParameterLifetimeBoundSyntax _:
                     // No Children
                     break;
             }

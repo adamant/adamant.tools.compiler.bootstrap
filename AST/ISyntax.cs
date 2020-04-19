@@ -13,7 +13,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(IExpressionSyntax),
         typeof(IBodyOrBlockSyntax),
         typeof(ICallableNameSyntax),
-        typeof(ILifetimeBoundSyntax),
         typeof(IArgumentSyntax))]
     public interface ISyntax
     {
