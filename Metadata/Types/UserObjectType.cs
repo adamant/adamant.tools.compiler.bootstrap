@@ -93,7 +93,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         public override string ToString()
         {
-            var capability = ReferenceCapability.ToString();
+            var capability = ReferenceCapability.ToSourceString();
             if (capability.Length == 0) return Name.ToString();
             return $"{capability} {Name}";
         }

@@ -192,7 +192,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return DataType.Unknown;
                 case IMoveExpressionSyntax moveExpression:
                 {
-                    var type = InferMoveExpressionType(moveExpression.Referent);
+                    var type = InferTypeInMoveExpression(moveExpression.Referent);
                     if (type is ReferenceType referenceType && !referenceType.IsMovable)
                     {
                         diagnostics.Add(TypeError.CannotMoveValue(file, moveExpression));
@@ -202,19 +202,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
                 case IMutableExpressionSyntax mutableExpression:
                 {
-                    var expressionType = InferType(ref mutableExpression.Referent);
+                    var expressionType = InferTypeInMutableExpression(ref mutableExpression.Referent);
                     DataType type;
-                    switch (expressionType)
+
+                    if (expressionType is ReferenceType referenceType && referenceType.IsMutable)
+                        type = expressionType;
+                    else
                     {
-                        // If it is already mutable we can't redeclare it mutable (i.e. `mut mut x` is error)
-                        //case UserObjectType objectType
-                        //    when objectType.Mutability.IsUpgradable:
-                        //    type = objectType.ToMutable();
-                        //    break;
-                        default:
-                            diagnostics.Add(TypeError.ExpressionCantBeMutable(file, mutableExpression.Referent));
-                            type = expressionType;
-                            break;
+                        diagnostics.Add(TypeError.ExpressionCantBeMutable(file, mutableExpression.Referent));
+                        type = DataType.Unknown;
                     }
 
                     return mutableExpression.Type = type;
@@ -298,7 +294,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return binaryOperatorExpression.Type;
                 }
                 case INameExpressionSyntax identifierName:
-                    return InferNameType(identifierName, false);
+                    return InferNameType(identifierName);
                 case IUnaryOperatorExpressionSyntax unaryOperatorExpression:
                 {
                     var @operator = unaryOperatorExpression.Operator;
@@ -627,7 +623,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
         }
 
-        public DataType InferNameType(INameExpressionSyntax nameExpression, bool isMove)
+        public DataType InferNameType(INameExpressionSyntax nameExpression)
         {
             var symbols = nameExpression.LookupInContainingScope();
             DataType type;
@@ -667,16 +663,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             return nameExpression.Type = type;
         }
 
-        private DataType InferMoveExpressionType(IExpressionSyntax expression)
+        private DataType InferTypeInMoveExpression(IExpressionSyntax expression)
         {
             switch (expression)
             {
                 case null:
                     return DataType.Unknown;
                 case INameExpressionSyntax identifierName:
-                    return InferNameType(identifierName, true);
+                    return InferNameType(identifierName);
                 default:
                     throw new NotImplementedException("Tried to move out of expression type that isn't implemented");
+            }
+        }
+
+        private DataType InferTypeInMutableExpression(ref IExpressionSyntax expression)
+        {
+            switch (expression)
+            {
+                case IMutableExpressionSyntax _:
+                    throw new NotImplementedException("Raise error about nested mutable expression");
+                case INameExpressionSyntax identifierName:
+                    return InferNameType(identifierName);
+                default:
+                    throw new NotImplementedException("Tried mutate expression type that isn't implemented");
             }
         }
 

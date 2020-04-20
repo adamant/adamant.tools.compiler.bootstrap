@@ -11,7 +11,7 @@ The AST is designed to be as concrete as possible. Meaning that each different k
 Each AST class ends in `Syntax` to distinguish them from intermediate language nodes. The category of the node is also in the name. While including the category is more verbose, not doing so leads to inconsistencies. There are always some node types for which leaving out the category produces a confusing name. Categories are:
 
 * Declaration
-* * Statement
+* Statement
 * Expression
   * OperatorExpression
   * LiteralExpression
@@ -22,7 +22,7 @@ Each AST class ends in `Syntax` to distinguish them from intermediate language n
 
 ## Traversing the AST
 
-AST traversal is done either with a tree walker or by matching on node type. Tree walkers are similar to the listener types of ANTLR. They provide an internal traversal. That is, the nodes are walked and the methods of the walker are called as nodes are visited. Sections of the tree can be skipped by either not implementing the interface for those kind of nodes or by indicating nodes to skip over via the `ShouldSkip()` method. The other, more common way of traversing the AST is simply by matching on node type and recursing down the tree. When doing this, having more generic/broad switches can help to insulate traversals from AST changes. That is, if a traversal relies on a single large switch over all node types rather than on separate methods with separate switches for different node categories, fewer changes are required when the AST types change.
+AST traversal is done either with a tree walker or by matching on node type. Tree walkers are similar to the listener types of ANTLR. They provide an internal traversal. That is, the nodes are walked and the methods of the walker are called as nodes are visited. The other, more common way of traversing the AST is simply by matching on node type and recursing down the tree. When doing this, having more generic/broad switches can help to insulate traversals from AST changes. That is, if a traversal relies on a single large switch over all node types rather than on separate methods with separate switches for different node categories, fewer changes are required when the AST types change.
 
 It took a while to arrive at these as the traversal approach. Methods on the nodes with overrides were ruled out early since there are many traversals and they are too hard to work on if they are spread out among all the node classes. Instead, the visitor pattern was originally the preferred method of traversing the AST. This was very cumbersome though. It also made it very difficult to handle multiple node types as a single case. At one point, there was experimentation with using reflection to safely implement visitors but that was confusing to refactoring tools and spread the code out among many methods just like a visitor. Using switch statements to match on type was a near ideal syntax, but without exhaustiveness checking, it was incredibly error prone. With the creation and use of the `ExhaustiveMatching.Analyzer` package that provides the most flexible exhaustiveness checking of any language, that has changed. Now switching on type is the preferred approach in many cases.
 
