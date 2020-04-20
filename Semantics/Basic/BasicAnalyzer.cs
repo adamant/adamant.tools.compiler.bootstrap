@@ -141,7 +141,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                             ?? throw new InvalidOperationException("Self parameter outside of class declaration");
                         selfParameter.Type.BeginFulfilling();
                         selfType = (UserObjectType)declaringType;
-                        if (selfParameter.MutableSelf) selfType = selfType.AsMutable();
+                        if (selfParameter.MutableSelf) selfType = selfType.ToMutable();
                         selfParameter.Type.Fulfill(selfType);
                     }
                     break;
@@ -188,9 +188,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 ? analyzer.Evaluate(returnTypeSyntax)
                 : DataType.Void;
 
-            // If we are returning ownership, then they can make it mutable
-            if (returnType is UserObjectType objectType && objectType.IsOwned)
-                returnType = objectType.AsImplicitlyUpgradable();
             returnTypePromise.Fulfill(returnType);
         }
 
@@ -202,7 +199,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     throw ExhaustiveMatch.Failed(declaration);
                 case IFunctionDeclarationSyntax function:
                 {
-                    var resolver = new BasicBodyAnalyzer(function.File, stringSymbol, diagnostics, null, function.ReturnType.Fulfilled());
+                    var resolver = new BasicBodyAnalyzer(function.File, stringSymbol, diagnostics, null,
+                        function.ReturnType.Fulfilled());
                     resolver.ResolveTypes(function.Body);
                     break;
                 }
@@ -215,7 +213,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
                 case IConcreteMethodDeclarationSyntax method:
                 {
-                    var resolver = new BasicBodyAnalyzer(method.File, stringSymbol, diagnostics, method.SelfParameterType, method.ReturnType.Fulfilled());
+                    var resolver = new BasicBodyAnalyzer(method.File, stringSymbol, diagnostics,
+                        method.SelfParameterType, method.ReturnType.Fulfilled());
                     resolver.ResolveTypes(method.Body);
                     break;
                 }
@@ -231,7 +230,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     break;
                 case IConstructorDeclarationSyntax constructor:
                 {
-                    var resolver = new BasicBodyAnalyzer(constructor.File, stringSymbol, diagnostics, constructor.SelfParameterType, constructor.SelfParameterType);
+                    var resolver = new BasicBodyAnalyzer(constructor.File, stringSymbol, diagnostics,
+                        constructor.SelfParameterType, constructor.SelfParameterType);
                     resolver.ResolveTypes(constructor.Body);
                     break;
                 }

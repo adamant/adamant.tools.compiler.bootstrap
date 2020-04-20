@@ -390,11 +390,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             var assignToVariable = variableDeclaration.Variable;
             if (variableDeclaration.Type is ReferenceType objectType)
             {
-                if (objectType.IsOwned)
-                    AddOwnership(assignToVariable, claimsAfterStatement, callLifetime);
-                else if (objectType.Mutability == Mutability.Mutable)
-                    AddBorrow(assignToVariable, claimsAfterStatement, callLifetime);
-                else
+                //if (objectType.IsOwned)
+                //    AddOwnership(assignToVariable, claimsAfterStatement, callLifetime);
+                //else if (objectType.Mutability == Mutability.Mutable)
+                //    AddBorrow(assignToVariable, claimsAfterStatement, callLifetime);
+                //else
                     AddAlias(assignToVariable, claimsAfterStatement, callLifetime);
             }
             else
@@ -434,7 +434,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                                 outstandingClaims.Add(new Borrows(claimHolder, lifetime));
                         }
                         break;
-                        case ValueSemantics.Alias:
+                        case ValueSemantics.Share:
                         {
                             if (!outstandingClaims.IsAliased(lifetime)
                                 && !outstandingClaims.CurrentBorrower(lifetime).Equals(varRef.Variable))
@@ -491,7 +491,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                         case ValueSemantics.Borrow:
                             outstandingClaims.Add(new Borrows(claimHolder, NewLifetime()));
                             break;
-                        case ValueSemantics.Alias:
+                        case ValueSemantics.Share:
                             outstandingClaims.Add(new Aliases(claimHolder, NewLifetime()));
                             break;
                         case ValueSemantics.Copy:

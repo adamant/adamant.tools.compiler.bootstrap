@@ -32,6 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public static readonly UnsizedIntegerType Offset = UnsizedIntegerType.Offset;
 
         //public static readonly PointerType BytePointer = new PointerType(Byte);
+
         /// <summary>
         /// The value `none` has this type, which is `never?`
         /// </summary>
@@ -67,20 +68,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             return this;
         }
 
-        /// <summary>
-        /// Returns a version of this type that could be used as a declared type.
-        /// This means that upgradable mutability is converted to non-upgradable.
-        /// </summary>
-        protected internal virtual Self AsDeclaredReturnsSelf()
-        {
-            return this;
-        }
-
-        public virtual bool EqualExceptLifetime(DataType other)
-        {
-            return Equals(other);
-        }
-
         public abstract override string ToString();
 
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Return self idiom")]
@@ -88,14 +75,49 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         {
             return new Self(type);
         }
+
+        protected internal virtual Self ToReadOnlyReturnsSelf()
+        {
+            return this;
+        }
     }
 
     public static class DataTypeExtensions
     {
-        public static T AsDeclared<T>(this T type)
+        /// <summary>
+        /// Returns the same type except with any mutability removed
+        /// </summary>
+        public static T ToReadOnly<T>(this T type)
             where T : DataType
         {
-            return type.AsDeclaredReturnsSelf().Cast<T>();
+            return type.ToReadOnlyReturnsSelf().Cast<T>();
+        }
+
+        /// <summary>
+        /// Tests whether a place of the target type could be assigned a value of the source type.
+        /// This does not account for implicit conversions, but does allow for borrowing
+        /// and sharing. It also allows for isolated upgrading to mutable.
+        /// </summary>
+        public static bool IsAssignableFrom(this DataType target, DataType source)
+        {
+            switch (target, source)
+            {
+                case (_, _) when target.Equals(source):
+                case (UnknownType _, _):
+                case (_, UnknownType _):
+                    return true;
+                case (AnyType targetReference, ReferenceType sourceReference):
+                    return targetReference.ReferenceCapability.IsAssignableFrom(sourceReference.ReferenceCapability);
+                case (ReferenceType _, AnyType _):
+                    return false;
+                case (UserObjectType targetReference, UserObjectType sourceReference):
+                    return targetReference.ReferenceCapability.IsAssignableFrom(sourceReference.ReferenceCapability)
+                           && targetReference.Name.Equals(sourceReference.Name);
+                case (OptionalType targetOptional, OptionalType sourceOptional):
+                    return IsAssignableFrom(targetOptional.Referent, sourceOptional.Referent);
+                default:
+                    return false;
+            }
         }
     }
 }

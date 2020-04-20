@@ -111,7 +111,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
 #if DEBUG
             new TypeFulfillmentValidator().Walk(entities);
-            new NoUpgradableMutabilityTypesValidator().Walk(entities);
             new ReferencedSymbolValidator().Walk(entities);
 #endif
 

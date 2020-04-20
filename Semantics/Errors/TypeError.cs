@@ -1,7 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using UnaryOperator = Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.UnaryOperator;
@@ -81,10 +80,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
                 $"Expression must be of callable type to be invoked `{file.Code[expression.Span]}`");
         }
 
-        public static Diagnostic CannotMoveBorrowedValue(CodeFile file, IMoveExpressionSyntax expression)
+        public static Diagnostic CannotMoveValue(CodeFile file, IMoveExpressionSyntax expression)
         {
             return new Diagnostic(file, expression.Span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3009,
-                $"Cannot move borrowed value `{file.Code[expression.Referent.Span]}`");
+                $"Cannot move value `{file.Code[expression.Referent.Span]}`");
         }
 
         public static Diagnostic TypeDeclaredImmutable(CodeFile file, IExpressionSyntax expression)

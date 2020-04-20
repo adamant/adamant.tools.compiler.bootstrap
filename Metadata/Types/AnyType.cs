@@ -4,23 +4,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     public class AnyType : ReferenceType
     {
-        private AnyType(Mutability mutability, ReferenceCapability referenceCapability)
-            : base(true, mutability, referenceCapability)
+        public AnyType(ReferenceCapability referenceCapability)
+            : base(true, referenceCapability)
         {
         }
 
         public override bool IsKnown => true;
 
-        protected internal override Self AsImmutableReturnsSelf()
+        public override string ToString()
         {
-            throw new System.NotImplementedException();
+            var capability = ReferenceCapability.ToString();
+            if (capability.Length == 0) return "Any";
+            return $"{capability} Any";
         }
 
         protected internal override Self WithCapabilityReturnsSelf(ReferenceCapability referenceCapability)
         {
-            return new AnyType(Mutability, referenceCapability);
+            return new AnyType(referenceCapability);
         }
-
-        public override string ToString() => Mutability == Mutability.Mutable ? "mut Any" : "Any";
     }
 }

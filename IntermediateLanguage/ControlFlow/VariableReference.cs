@@ -37,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
 
         public VariableReference AsAlias()
         {
-            return ValueSemantics == ValueSemantics.Alias ? this : new VariableReference(Variable, ValueSemantics.Alias, Span);
+            return ValueSemantics == ValueSemantics.Share ? this : new VariableReference(Variable, ValueSemantics.Share, Span);
         }
     }
 }

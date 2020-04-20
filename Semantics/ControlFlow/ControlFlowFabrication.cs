@@ -139,7 +139,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     case ValueSemantics.Own:
                         // They are both own, no problems
                         break;
-                    case ValueSemantics.Alias:
+                    case ValueSemantics.Share:
                         value = assignFrom.AsAlias();
                         break;
                     case ValueSemantics.Borrow:

@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Operands
 
         public VariableReference AsAlias()
         {
-            return ValueSemantics == ValueSemantics.Alias ? this : new VariableReference(Variable, ValueSemantics.Alias, Span);
+            return ValueSemantics == ValueSemantics.Share ? this : new VariableReference(Variable, ValueSemantics.Share, Span);
         }
     }
 }

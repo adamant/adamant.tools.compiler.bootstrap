@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
         public static readonly Encoding Encoding = new UTF8Encoding(false);
 
         public string Value { get; }
-        public override ValueSemantics ValueSemantics => ValueSemantics.Alias;
+        public override ValueSemantics ValueSemantics => ValueSemantics.Share;
 
         public StringConstant(string value, TextSpan span, DataType type)
             : base(type, span)

@@ -11,9 +11,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// Copy - the value is copied, either memcopy or using copy initializer
     ///
     /// Reference Types:
-    /// MoveOwner - move an owned reference
+    /// Own - move an owned reference
     /// Borrow - copy the reference, borrow the object
-    /// Alias - copy the reference, alias the object
+    /// Share - copy the reference, share the object
     /// </summary>
     [SuppressMessage("Naming", "CA1717:Only FlagsAttribute enums should have plural names", Justification = "Name not plural")]
     public enum ValueSemantics
@@ -44,9 +44,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// </summary>
         Borrow,
         /// <summary>
-        /// Copy a reference, alias the referent
+        /// Copy a reference, share the referent
         /// </summary>
-        Alias,
+        Share,
     }
 
     public static class ValueSemanticsExtensions
@@ -76,8 +76,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                 case ValueSemantics.Borrow:
                     mutability = "borrow";
                     break;
-                case ValueSemantics.Alias:
-                    mutability = "alias";
+                case ValueSemantics.Share:
+                    mutability = "share";
                     break;
             }
 

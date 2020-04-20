@@ -45,10 +45,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
             IsMutableBinding = isMutableBinding;
             Type = type;
             if (type.ValueSemantics == ValueSemantics.Own)
-                if (type is ReferenceType referenceType && referenceType.Mutability == Mutability.Immutable)
-                    defaultSemantics = ValueSemantics.Alias;
-                else
-                    defaultSemantics = ValueSemantics.Borrow;
+                //if (type is ReferenceType referenceType && referenceType.Mutability == Mutability.Immutable)
+                //    defaultSemantics = ValueSemantics.Share;
+                //else
+                defaultSemantics = ValueSemantics.Borrow;
             else
                 defaultSemantics = type.ValueSemantics;
         }

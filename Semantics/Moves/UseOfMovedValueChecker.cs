@@ -62,7 +62,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
                     return possiblyMoved.Set(nameExpression.ReferencedSymbol, true);
                 case ValueSemantics.Copy:
                 case ValueSemantics.Borrow:
-                case ValueSemantics.Alias:
+                case ValueSemantics.Share:
                 case ValueSemantics.Empty:
                     // Not moving value
                     return possiblyMoved;

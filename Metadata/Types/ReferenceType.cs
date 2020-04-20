@@ -9,52 +9,37 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     public abstract class ReferenceType : DataType
     {
         public ReferenceCapability ReferenceCapability { get; }
-        public bool IsOwned =>
-            ReferenceCapability == ReferenceCapability.Owned
-            || ReferenceCapability == ReferenceCapability.OwnedMutable;
+        public bool IsReadOnly => !ReferenceCapability.IsMutable();
+        public bool IsMutable => ReferenceCapability.IsMutable();
+        public bool IsMovable => ReferenceCapability.IsMovable();
 
         /// <summary>
         /// Whether this type was declared `mut class` or just `class`
         /// </summary>
         public bool DeclaredMutable { get; }
 
-        public Mutability Mutability { get; }
-
         public override ValueSemantics ValueSemantics { get; }
 
-        protected ReferenceType(bool declaredMutable, Mutability mutability, ReferenceCapability referenceCapability)
+        protected ReferenceType(bool declaredMutable, ReferenceCapability referenceCapability)
         {
             ReferenceCapability = referenceCapability;
             DeclaredMutable = declaredMutable;
-            Mutability = mutability;
-            ValueSemantics = IsOwned
-                ? ValueSemantics.Own
-                : (Mutability == Mutability.Mutable ? ValueSemantics.Borrow : ValueSemantics.Alias);
+            ValueSemantics = referenceCapability.GetValueSemantics();
         }
 
-        protected internal override Self AsDeclaredReturnsSelf()
+        protected internal override Self ToReadOnlyReturnsSelf()
         {
-            if (!Mutability.IsUpgradable)
-                return this;
-            return this.AsImmutable();
+            return WithCapabilityReturnsSelf(ReferenceCapability.ToReadOnly());
         }
-
-        /// <summary>
-        /// Use this type as an immutable type.
-        /// </summary>
-        protected internal abstract Self AsImmutableReturnsSelf();
 
         protected internal abstract Self WithCapabilityReturnsSelf(ReferenceCapability referenceCapability);
     }
 
     public static class ReferenceTypeExtensions
     {
-        public static T AsImmutable<T>(this T type)
-            where T : ReferenceType
-        {
-            return type.AsImmutableReturnsSelf().Cast<T>();
-        }
-
+        /// <summary>
+        /// Return the same type except with the given reference capability
+        /// </summary>
         public static T WithCapability<T>(this T type, ReferenceCapability referenceCapability)
             where T : ReferenceType
         {

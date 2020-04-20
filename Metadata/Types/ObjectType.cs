@@ -11,9 +11,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         protected ObjectType(
             Name name,
             bool declaredMutable,
-            Mutability mutability,
             ReferenceCapability referenceCapability)
-            : base(declaredMutable, mutability, referenceCapability)
+            : base(declaredMutable, referenceCapability)
         {
             Name = name;
         }

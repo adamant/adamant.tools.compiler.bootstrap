@@ -19,12 +19,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 {
     /// <summary>
     /// Do basic analysis of bodies.
-    ///
-    /// Note: type checking doesn't concern itself with lifetimes. Lifetime compatibility
-    /// is not enforced. The only time lifetimes are dealt with is when there
-    /// are implicit lifetimes as part of a type. In that case, basic analysis will
-    /// assign it the correct type including lifetimes.
     /// </summary>
+    /// <remarks>
+    /// Type checking doesn't concern anything with reachability. It only deals
+    /// with types and reference capabilities.
+    /// </remarks>
     public class BasicBodyAnalyzer
     {
         private readonly CodeFile file;
@@ -89,12 +88,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             if (variableDeclaration.TypeSyntax != null)
             {
                 type = typeAnalyzer.Evaluate(variableDeclaration.TypeSyntax);
-                CheckType(ref variableDeclaration.Initializer, type, allowOwned: true);
+                CheckType(ref variableDeclaration.Initializer, type);
             }
             else if (variableDeclaration.Initializer != null)
-            {
-                type = InferDeclarableType(ref variableDeclaration.Initializer);
-            }
+                type = InferDeclarationType(ref variableDeclaration.Initializer);
             else
             {
                 diagnostics.Add(TypeError.NotImplemented(file, variableDeclaration.NameSpan,
@@ -105,53 +102,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             if (variableDeclaration.Initializer != null)
             {
                 var initializerType = variableDeclaration.Initializer.Type ?? throw new InvalidOperationException("Initializer type should be determined");
-                // If the source is an owned reference, then the declaration is implicitly owned
-                if (type is UserObjectType targetType && initializerType is UserObjectType sourceType
-                        && sourceType.IsOwned
-                        && !targetType.IsOwned
-                        && IsAssignableFrom(targetType.AsOwned(), sourceType))
-                    variableDeclaration.Type = targetType.AsOwned().AsDeclared();
-                else
-                {
-                    if (!IsAssignableFrom(type, initializerType))
-                        diagnostics.Add(TypeError.CannotConvert(file, variableDeclaration.Initializer, initializerType, type));
 
-                    variableDeclaration.Type = type.AsDeclared();
-                }
+                if (!type.IsAssignableFrom(initializerType))
+                    diagnostics.Add(TypeError.CannotConvert(file, variableDeclaration.Initializer, initializerType, type));
             }
-            else
-                variableDeclaration.Type = type.AsDeclared();
+
+            variableDeclaration.Type = type;
         }
 
         /// <summary>
-        /// Infer a type that can be used as the type of a variable
+        /// Infer the type of a variable declaration from an expression
         /// </summary>
-        private DataType InferDeclarableType([NotNull] ref IExpressionSyntax? expression)
+        private DataType InferDeclarationType([NotNull] ref IExpressionSyntax expression)
         {
             var type = InferType(ref expression);
-            switch (type)
-            {
-                case IntegerConstantType _:
-                    return InsertImplicitConversionIfNeeded(ref expression, DataType.Int);
-                default:
-                    return type;
-            }
+            if (type is IntegerConstantType _)
+                // TODO there should be a method that combines this with type inference
+                return InsertImplicitConversionIfNeeded(ref expression, DataType.Int);
+
+            if (expression is IMutableExpressionSyntax) return type;
+            // we assume immutability on variables unless explicitly stated
+            return type.ToReadOnly();
         }
 
-        public DataType CheckType([NotNull] ref IExpressionSyntax? expression, DataType expectedType, bool allowOwned = false)
+        public void CheckType([NotNull] ref IExpressionSyntax expression, DataType expectedType)
         {
-            if (expression == null) return DataType.Unknown;
+            if (expression == null) return;
             InferType(ref expression);
             var actualType = InsertImplicitConversionIfNeeded(ref expression, expectedType);
-            if (allowOwned && expectedType is UserObjectType expectedObjectType
-                           && actualType is UserObjectType actualObjectType
-                           && expectedObjectType.EqualExceptLifetimeAndMutability(actualObjectType))
-                return actualType;
-            // TODO check for type compatibility not equality
-            // Type checking doesn't concern itself with lifetimes
-            if (!IsAssignableFrom(expectedType, actualType))
+            if (!expectedType.IsAssignableFrom(expectedType))
                 diagnostics.Add(TypeError.CannotConvert(file, expression, actualType, expectedType));
-            return actualType;
         }
 
         /// <summary>
@@ -159,72 +139,46 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         /// </summary>
         private static DataType InsertImplicitConversionIfNeeded(
             ref IExpressionSyntax expression,
-            DataType targetType)
+            DataType expectedType)
         {
-            if (targetType is OptionalType optionalType)
+            switch (expectedExpressionType: expectedType, expression.Type)
             {
-                // We may need to do a conversion to optional or from none
-                if (expression.Type is OptionalType noneType)
-                {
-                    if (noneType.Referent is NeverType)
-                        expression = new ImplicitNoneConversionExpression(expression, optionalType);
-                    // TODO may need to lift an implicit numeric conversion
-                }
-                else
-                {
+                case (OptionalType targetType, OptionalType expressionType)
+                        when expressionType.Referent is NeverType:
+                    expression = new ImplicitNoneConversionExpression(expression, targetType);
+                    break;
+                case (OptionalType targetType, /* non-optional type */ _):
                     // If needed, convert the type to the referent type of the optional type
-                    var type = InsertImplicitConversionIfNeeded(ref expression, optionalType.Referent);
-                    if (IsAssignableFrom(optionalType.Referent, type))
-                        expression = new ImplicitOptionalConversionExpression(expression, optionalType);
-                }
-
-                return expression.Type!;
-            }
-
-            switch (expression.Type)
-            {
-                case SizedIntegerType expressionType:
-                    switch (targetType)
-                    {
-                        case SizedIntegerType expectedType:
-                            if (expectedType.Bits > expressionType.Bits
-                                && (!expressionType.IsSigned || expectedType.IsSigned))
-                                expression =
-                                    new ImplicitNumericConversionExpression(expression,
-                                        expectedType);
-                            break;
-                    }
+                    var type = InsertImplicitConversionIfNeeded(ref expression, targetType.Referent);
+                    if (targetType.Referent.IsAssignableFrom(type))
+                        expression = new ImplicitOptionalConversionExpression(expression, targetType);
                     break;
-                case IntegerConstantType expressionType:
+                case (SizedIntegerType targetType, SizedIntegerType expressionType):
+                    if (targetType.Bits > expressionType.Bits && (!expressionType.IsSigned || targetType.IsSigned))
+                        expression = new ImplicitNumericConversionExpression(expression, targetType);
+                    break;
+                case (SizedIntegerType targetType, IntegerConstantType expressionType):
+                {
                     var requireSigned = expressionType.Value < 0;
-                    switch (targetType)
-                    {
-                        case SizedIntegerType expectedType:
-                            var bits = expressionType.Value.GetByteCount() * 8;
-                            if (expectedType.Bits >= bits
-                               && (!requireSigned || expectedType.IsSigned))
-                                expression = new ImplicitNumericConversionExpression(expression, expectedType);
-                            break;
-                        case UnsizedIntegerType expectedType:
-                            if (!requireSigned || expectedType.IsSigned)
-                                expression = new ImplicitNumericConversionExpression(expression, expectedType);
-                            break;
-                    }
-                    break;
-                case UserObjectType objectType:
-                    if (targetType is UserObjectType targetObjectType
-                        && targetObjectType.Mutability == Mutability.Immutable
-                        && targetObjectType.EqualExceptLifetimeAndMutability(objectType)
-                        && objectType.Mutability != Mutability.Immutable)
-                    {
-                        // TODO if source type is explicitly mutable, issue warning about using `mut` in immutable context
-                        // Take the object type and make it immutable so that we preserve the lifetime of the type
-                        expression = new ImplicitImmutabilityConversionExpression(expression, objectType.AsImmutable());
-                    }
+                    var bits = expressionType.Value.GetByteCount() * 8;
+                    if (targetType.Bits >= bits && (!requireSigned || targetType.IsSigned))
+                        expression = new ImplicitNumericConversionExpression(expression, targetType);
+                }
+                break;
+                case (UnsizedIntegerType targetType, IntegerConstantType expressionType):
+                {
+                    var requireSigned = expressionType.Value < 0;
+                    if (!requireSigned || targetType.IsSigned)
+                        expression = new ImplicitNumericConversionExpression(expression, targetType);
+                }
+                break;
+                case (UserObjectType targetType, UserObjectType expressionType)
+                        when targetType.IsReadOnly && expressionType.IsMutable:
+                    // TODO if source type is explicitly mutable, issue warning about using `mut` in immutable context
+                    expression = new ImplicitImmutabilityConversionExpression(expression, expressionType.ToReadOnly());
                     break;
             }
 
-            // else No conversion
             return expression.Type!;
         }
 
@@ -239,15 +193,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IMoveExpressionSyntax moveExpression:
                 {
                     var type = InferMoveExpressionType(moveExpression.Referent);
-                    if (type is ReferenceType referenceType && !referenceType.IsOwned)
+                    if (type is ReferenceType referenceType && !referenceType.IsMovable)
                     {
-                        diagnostics.Add(TypeError.CannotMoveBorrowedValue(file, moveExpression));
-                        //type = referenceType.WithLifetime(Lifetime.Owned);
-                        throw new NotImplementedException();
+                        diagnostics.Add(TypeError.CannotMoveValue(file, moveExpression));
+                        type = DataType.Unknown;
                     }
-
-                    if (type is UserObjectType objectType)
-                        type = objectType.AsOwnedUpgradable();
                     return moveExpression.Type = type;
                 }
                 case IMutableExpressionSyntax mutableExpression:
@@ -257,13 +207,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     switch (expressionType)
                     {
                         // If it is already mutable we can't redeclare it mutable (i.e. `mut mut x` is error)
-                        case UserObjectType objectType
-                            when objectType.Mutability.IsUpgradable:
-                            type = objectType.AsMutable();
-                            break;
+                        //case UserObjectType objectType
+                        //    when objectType.Mutability.IsUpgradable:
+                        //    type = objectType.ToMutable();
+                        //    break;
                         default:
-                            diagnostics.Add(TypeError.ExpressionCantBeMutable(file,
-                                mutableExpression.Referent));
+                            diagnostics.Add(TypeError.ExpressionCantBeMutable(file, mutableExpression.Referent));
                             type = expressionType;
                             break;
                     }
@@ -277,10 +226,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         var returnValue = returnExpression.ReturnValue;
                         var expectedReturnType = returnType ?? throw new InvalidOperationException("Return statement in constructor");
                         // If we return ownership, there can be an implicit move
-                        if (returnExpression.ReturnValue is INameExpressionSyntax name
-                            && returnType is UserObjectType objectType
-                            && objectType.IsOwned)
-                            returnExpression.ReturnValue = new ImplicitMoveSyntax(returnValue.Span, name);
+                        //if (returnExpression.ReturnValue is INameExpressionSyntax name
+                        //    && returnType is UserObjectType objectType
+                        //    && objectType.IsOwned)
+                        //    returnExpression.ReturnValue = new ImplicitMoveSyntax(returnValue.Span, name);
 
                         CheckType(ref returnExpression.ReturnValue, expectedReturnType);
                     }
@@ -427,7 +376,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             break;
                     }
 
-                    return newObjectExpression.Type = constructedType.AsOwnedUpgradable();
+                    constructedType = constructedType.WithCapability(ReferenceCapability.Isolated);
+                    if (constructedType.DeclaredMutable)
+                        constructedType = constructedType.ToMutable();
+                    return newObjectExpression.Type = constructedType;
                 }
                 case IForeachExpressionSyntax foreachExpression:
                 {
@@ -510,7 +462,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     InferType(ref assignmentExpression.RightOperand);
                     InsertImplicitConversionIfNeeded(ref assignmentExpression.RightOperand, left);
                     var right = assignmentExpression.RightOperand.Type ?? throw new InvalidOperationException();
-                    if (!IsAssignableFrom(left, right))
+                    if (!left.IsAssignableFrom(right))
                         diagnostics.Add(TypeError.CannotConvert(file,
                             assignmentExpression.RightOperand, right, left));
                     return assignmentExpression.Type = DataType.Void;
@@ -695,15 +647,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         {
                             nameExpression.ReferencedSymbol = binding;
                             type = binding.Type;
-                            if (type is UserObjectType objectType)
-                            {
-                                // A bare variable reference doesn't default to mutable
-                                if (objectType.Mutability == Mutability.Mutable)
-                                    type = objectType = objectType.AsExplicitlyUpgradable();
-                                // A bare variable reference doesn't default to owned
-                                if (!isMove && objectType.IsOwned)
-                                    type = objectType.WithCapability(ReferenceCapability.Shared);
-                            }
                         }
                         break;
                         default:
@@ -726,11 +669,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private DataType InferMoveExpressionType(IExpressionSyntax expression)
         {
-            if (expression == null)
-                return DataType.Unknown;
-
             switch (expression)
             {
+                case null:
+                    return DataType.Unknown;
                 case INameExpressionSyntax identifierName:
                     return InferNameType(identifierName, true);
                 default:
@@ -769,33 +711,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         private void CheckArgumentTypeCompatibility(DataType type, IExpressionSyntax arg, bool selfArgument = false)
         {
             var fromType = arg.Type ?? throw new ArgumentException("argument must have a type");
-            if (!IsAssignableFrom(type, fromType, selfArgument))
+            if (!type.IsAssignableFrom(fromType))
                 diagnostics.Add(TypeError.CannotConvert(file, arg, fromType, type));
-        }
-
-        /// <summary>
-        /// Tests whether a variable of the target type could be assigned from a variable of the source type
-        /// </summary>
-        private static bool IsAssignableFrom(DataType target, DataType source, bool allowUpgrade = false)
-        {
-            if (target.Equals(source) || source is UnknownType || target is UnknownType)
-                return true;
-            if (target is UserObjectType targetReference && source is UserObjectType sourceReference)
-            {
-                if (targetReference.IsOwned && !sourceReference.IsOwned)
-                    return false;
-
-                if (!targetReference.Mutability.IsAssignableFrom(sourceReference.Mutability, allowUpgrade))
-                    return false;
-
-                // If they are equal except for lifetimes and mutability compatible, it is fine
-                return targetReference.EqualExceptLifetimeAndMutability(sourceReference);
-            }
-
-            if (target is OptionalType targetOptional && source is OptionalType sourceOptional)
-                return IsAssignableFrom(targetOptional.Referent, sourceOptional.Referent, allowUpgrade);
-
-            return false;
         }
 
         private static ITypeSymbol GetSymbolForType(LexicalScope containingScope, DataType type)
@@ -843,6 +760,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             var leftType = leftOperand.Type;
             switch (leftType)
             {
+                default:
+                    // In theory we could just make the default false, but this
+                    // way we are forced to note exactly which types this doesn't work on.
+                    throw ExhaustiveMatch.Failed(leftType);
                 case IntegerConstantType _:
                     // TODO may need to promote based on size
                     throw new NotImplementedException();
@@ -864,10 +785,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case BoolType _:
                 case VoidType _: // This might need a special error message
                     return false;
-                default:
-                    // In theory we could just return false here, but this way we are forced to note
-                    // exactly which types this doesn't work on.
-                    throw ExhaustiveMatch.Failed(leftType);
             }
         }
 

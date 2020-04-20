@@ -1,8 +1,8 @@
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     /// <summary>
-    /// i.e. `mut exp`. A mutable expression borrows mutably from a variable or
-    /// promotes an implicitly mutable expression to mutable
+    /// i.e. `mut exp`. A mutable expression marks an expression whose type
+    /// should be treated as mutable rather than defaulting to read-only.
     /// </summary>
     public interface IMutableExpressionSyntax : IExpressionSyntax
     {

@@ -1,4 +1,5 @@
 using ExhaustiveMatching;
+using static Adamant.Tools.Compiler.Bootstrap.Metadata.Types.ReferenceCapability;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
@@ -23,43 +24,158 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             {
                 default:
                     throw ExhaustiveMatch.Failed(referenceCapability);
-                case ReferenceCapability.OwnedMutable:
-                case ReferenceCapability.IsolatedMutable:
-                case ReferenceCapability.HeldMutable:
-                case ReferenceCapability.Borrowed:
+                case OwnedMutable:
+                case IsolatedMutable:
+                case HeldMutable:
+                case Borrowed:
                     return true;
-                case ReferenceCapability.Owned:
-                case ReferenceCapability.Isolated:
-                case ReferenceCapability.Held:
-                case ReferenceCapability.Shared:
-                case ReferenceCapability.Identity:
+                case Owned:
+                case Isolated:
+                case Held:
+                case Shared:
+                case Identity:
                     return false;
             }
         }
 
+        public static bool IsMovable(this ReferenceCapability referenceCapability)
+        {
+            switch (referenceCapability)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(referenceCapability);
+                case OwnedMutable:
+                case Owned:
+                case IsolatedMutable:
+                case Isolated:
+                case HeldMutable:
+                case Held:
+                    return true;
+                case Borrowed:
+                case Shared:
+                case Identity:
+                    return false;
+            }
+        }
+
+        public static bool IsAssignableFrom(this ReferenceCapability target, ReferenceCapability source)
+        {
+            switch (target, source)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed((target, source));
+                case (Identity, _):
+                case (_, _) when target == source:
+                    return true;
+                case (/* Not Identity */ _, Identity):
+                    return false;
+                case (Shared, _):
+                case (Owned, OwnedMutable):
+                case (Isolated, IsolatedMutable):
+                case (Held, HeldMutable):
+                case (Borrowed, Borrowed):
+                case (Borrowed, OwnedMutable):
+                case (Borrowed, IsolatedMutable):
+                case (Borrowed, HeldMutable):
+                    return true;
+            }
+        }
+
+        public static ValueSemantics GetValueSemantics(this ReferenceCapability referenceCapability)
+        {
+            switch (referenceCapability)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(referenceCapability);
+                case OwnedMutable:
+                case Owned:
+                case IsolatedMutable:
+                case Isolated:
+                    return Types.ValueSemantics.Own;
+                case HeldMutable:
+                case Borrowed:
+                    return ValueSemantics.Borrow;
+                case Held:
+                case Shared:
+                case Identity:
+                    return ValueSemantics.Share;
+            }
+        }
+
+        /// <summary>
+        /// Convert to the equivalent reference capability that is mutable.
+        /// </summary>
+        public static ReferenceCapability ToMutable(this ReferenceCapability referenceCapability)
+        {
+            switch (referenceCapability)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(referenceCapability);
+                case OwnedMutable:
+                case IsolatedMutable:
+                case HeldMutable:
+                case Borrowed:
+                    return referenceCapability;
+                case Owned:
+                    return OwnedMutable;
+                case Isolated:
+                    return IsolatedMutable;
+                case Held:
+                    return HeldMutable;
+                case Shared:
+                    return Borrowed;
+                case Identity:
+                    return Identity;
+            }
+        }
+        /// <summary>
+        /// Convert to the equivalent reference capability that is read-only.
+        /// </summary>
+        public static ReferenceCapability ToReadOnly(this ReferenceCapability referenceCapability)
+        {
+            switch (referenceCapability)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(referenceCapability);
+                case OwnedMutable:
+                    return Owned;
+                case IsolatedMutable:
+                    return Isolated;
+                case HeldMutable:
+                    return Held;
+                case Borrowed:
+                    return Shared;
+                case Owned:
+                case Isolated:
+                case Held:
+                case Shared:
+                case Identity:
+                    return referenceCapability;
+            }
+        }
         public static string ToSourceString(this ReferenceCapability referenceCapability)
         {
             switch (referenceCapability)
             {
                 default:
                     throw ExhaustiveMatch.Failed(referenceCapability);
-                case ReferenceCapability.OwnedMutable:
+                case OwnedMutable:
                     return "owned mut";
-                case ReferenceCapability.IsolatedMutable:
+                case IsolatedMutable:
                     return "iso mut";
-                case ReferenceCapability.HeldMutable:
+                case HeldMutable:
                     return "held mut";
-                case ReferenceCapability.Borrowed:
+                case Borrowed:
                     return "mut";
-                case ReferenceCapability.Owned:
+                case Owned:
                     return "owned";
-                case ReferenceCapability.Isolated:
+                case Isolated:
                     return "iso";
-                case ReferenceCapability.Held:
+                case Held:
                     return "held";
-                case ReferenceCapability.Shared:
+                case Shared:
                     return "";
-                case ReferenceCapability.Identity:
+                case Identity:
                     return "id";
             }
         }
