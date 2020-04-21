@@ -38,9 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 case IMutableKeywordToken _:
                 {
                     var mutableKeyword = Tokens.RequiredToken<IMutableKeywordToken>();
-                    var referent = ParseBareType();
-                    var span = TextSpan.Covering(mutableKeyword.Span, referent.Span);
-                    return new CapabilityTypeSyntax(Borrowed, referent, span);
+                    return ParseMutableType(mutableKeyword);
                 }
                 case IIdKeywordToken _:
                 {
@@ -52,6 +50,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 default:
                     return ParseBareType();
             }
+        }
+
+        /// <summary>
+        /// Parse the type after a single `mut` keyword. Requires that the mutable
+        /// keyword has already been consumed.
+        /// </summary>
+        private ITypeSyntax ParseMutableType(IMutableKeywordToken mutableKeyword)
+        {
+            var referent = ParseBareType();
+            var span = TextSpan.Covering(mutableKeyword.Span, referent.Span);
+            return new CapabilityTypeSyntax(Borrowed, referent, span);
         }
 
         private ITypeSyntax ParseTypeWithCapability<TCapabilityToken>(ReferenceCapability immutableCapability, ReferenceCapability mutableCapability)

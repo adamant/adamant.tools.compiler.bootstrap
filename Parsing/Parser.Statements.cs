@@ -58,8 +58,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(variableNumbers.VariableName(identifier.Value));
             ITypeSyntax? type = null;
+            bool inferMutableType = false;
             if (Tokens.Accept<IColonToken>())
-                type = ParseType();
+                (type, inferMutableType) = ParseVariableDeclarationType();
 
             IExpressionSyntax? initializer = null;
             if (Tokens.Accept<IEqualsToken>())
@@ -68,7 +69,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var semicolon = Tokens.Expect<ISemicolonToken>();
             var span = TextSpan.Covering(binding, semicolon);
             return new VariableDeclarationStatementSyntax(span,
-                mutableBinding, name, identifier.Span, type, initializer);
+                mutableBinding, name, identifier.Span, type, inferMutableType, initializer);
+        }
+
+        private (ITypeSyntax? Type, bool InferMutableType) ParseVariableDeclarationType()
+        {
+            var mutableKeyword = Tokens.AcceptToken<IMutableKeywordToken>();
+            if (mutableKeyword == null)
+                return (ParseType(), false);
+
+            switch (Tokens.Current)
+            {
+                case IEqualsToken _:
+                case ISemicolonToken _:
+                    return (null, true);
+                default:
+                    return (ParseMutableType(mutableKeyword), false);
+            }
         }
 
         private IExpressionStatementSyntax ParseUnsafeStatement()

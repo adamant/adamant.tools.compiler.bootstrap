@@ -91,7 +91,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 CheckType(ref variableDeclaration.Initializer, type);
             }
             else if (variableDeclaration.Initializer != null)
-                type = InferDeclarationType(ref variableDeclaration.Initializer);
+                type = InferDeclarationType(ref variableDeclaration.Initializer, variableDeclaration.InferMutableType);
             else
             {
                 diagnostics.Add(TypeError.NotImplemented(file, variableDeclaration.NameSpan,
@@ -113,16 +113,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         /// <summary>
         /// Infer the type of a variable declaration from an expression
         /// </summary>
-        private DataType InferDeclarationType([NotNull] ref IExpressionSyntax expression)
+        private DataType InferDeclarationType([NotNull] ref IExpressionSyntax expression, bool inferMutableType)
         {
             var type = InferType(ref expression);
             if (type is IntegerConstantType _)
                 // TODO there should be a method that combines this with type inference
                 return InsertImplicitConversionIfNeeded(ref expression, DataType.Int);
 
-            if (expression is IBorrowExpressionSyntax) return type;
-            // we assume immutability on variables unless explicitly stated
-            return type.ToReadOnly();
+            switch (expression)
+            {
+                case IBorrowExpressionSyntax _:
+                case IMoveExpressionSyntax _:
+                    // If we are explicitly borrowing or moving then take the actual type
+                    return type;
+                default:
+                    if (inferMutableType)
+                    {
+                        if (type is ReferenceType referenceType && !referenceType.IsMutable)
+                            throw new NotImplementedException("Compile error: can't infer a mutable type");
+
+                        return type;
+                    }
+                    // We assume immutability on variables unless explicitly stated
+                    return type.ToReadOnly();
+            }
         }
 
         public void CheckType(ref IExpressionSyntax expression, DataType expectedType)

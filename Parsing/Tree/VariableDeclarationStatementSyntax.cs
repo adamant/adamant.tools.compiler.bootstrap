@@ -19,6 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public TextSpan NameSpan { get; }
         public ITypeSyntax? TypeSyntax { get; }
+        public bool InferMutableType { get; }
         private DataType? type;
         DataType IBindingSymbol.Type => Type ?? throw new InvalidOperationException();
 
@@ -35,6 +36,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             }
         }
 
+        [SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification =
+            "Can't be readonly because a reference to it is exposed")]
         private IExpressionSyntax? initializer;
         [DisallowNull]
         public ref IExpressionSyntax? Initializer => ref initializer;
@@ -45,6 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name fullName,
             TextSpan nameSpan,
             ITypeSyntax? typeSyntax,
+            bool inferMutableType,
             IExpressionSyntax? initializer)
             : base(span)
         {
@@ -52,6 +56,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FullName = fullName;
             NameSpan = nameSpan;
             TypeSyntax = typeSyntax;
+            InferMutableType = inferMutableType;
             this.initializer = initializer;
         }
 

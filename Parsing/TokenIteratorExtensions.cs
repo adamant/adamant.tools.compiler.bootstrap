@@ -45,7 +45,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         #endregion
 
         #region Accept
-
         public static bool Accept<T>(this ITokenIterator<IToken> tokens)
             where T : class, IToken
         {
@@ -87,29 +86,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new TextSpan(tokens.Current.Span.Start, 0);
         }
 
-        public static T? ExpectToken<T>(this ITokenIterator<IToken> tokens)
+        public static (T?, TextSpan) ExpectToken<T>(this ITokenIterator<IToken> tokens)
             where T : class, IToken
         {
             if (tokens.Current is T token)
             {
                 tokens.Next();
-                return token;
+                return (token, token.Span);
             }
 
             tokens.Context.Diagnostics.Add(ParseError.MissingToken(tokens.Context.File, typeof(T), tokens.Current));
-            return null;
-        }
-
-        public static (IIdentifierToken?, TextSpan) ExpectIdentifier(this ITokenIterator<IToken> tokens)
-        {
-            if (tokens.Current is IIdentifierToken identifier)
-            {
-                tokens.Next();
-                return (identifier, identifier.Span);
-            }
-
-            tokens.Context.Diagnostics.Add(
-                ParseError.MissingToken(tokens.Context.File, typeof(IIdentifierToken), tokens.Current));
             return (null, new TextSpan(tokens.Current.Span.Start, 0));
         }
         #endregion
