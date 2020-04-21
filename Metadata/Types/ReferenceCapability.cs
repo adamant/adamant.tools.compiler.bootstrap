@@ -78,6 +78,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                 case (Borrowed, IsolatedMutable):
                 case (Borrowed, HeldMutable):
                     return true;
+                case (Borrowed, Owned):
+                case (Borrowed, Isolated):
+                case (Borrowed, Held):
+                case (Borrowed, Shared):
+                case (Owned, _):
+                case (OwnedMutable, _):
+                case (IsolatedMutable, _):
+                case (Isolated, _):
+                case (HeldMutable, _):
+                    return false;
             }
         }
 

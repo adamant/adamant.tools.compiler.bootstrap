@@ -582,10 +582,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                     var symbol = memberAccess.ReferencedSymbol;
                     return new FieldAccess(value, symbol.FullName, ValueSemantics.LValue, memberAccess.Span);
                 }
-                case IMutableExpressionSyntax mutableExpression:
+                case IShareExpressionSyntax shareExpression:
+                    return ConvertToValue(shareExpression.Referent);
+                case IBorrowExpressionSyntax borrowExpression:
                     // TODO shouldn't borrowing be explicit in the IR and don't we
                     // need to be able to check mutability on borrows?
-                    return ConvertToValue(mutableExpression.Referent);
+                    return ConvertToValue(borrowExpression.Referent);
                 case IMoveExpressionSyntax move:
                     return ConvertToOwn(move.Referent, move.Span);
                 case IImplicitImmutabilityConversionExpression implicitImmutabilityConversion:
@@ -762,6 +764,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
                 default:
                     // TODO maybe we need some kind if ILValueExpression interface
                     throw NonExhaustiveMatchException.For(value);
+                case IShareExpressionSyntax shareExpression:
+                    return ConvertToPlace(shareExpression.Referent);
                 case ISelfExpressionSyntax selfExpression:
                     return graph.VariableFor(SpecialName.Self).LValueReference(selfExpression.Span);
                 case INameExpressionSyntax identifier:

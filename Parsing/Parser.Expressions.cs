@@ -378,7 +378,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     // `mut` is like a unary operator
                     var expression = ParseExpression(OperatorPrecedence.Unary);
                     var span = TextSpan.Covering(mut, expression.Span);
-                    return new MutableExpressionSyntax(span, expression);
+                    return new BorrowExpressionSyntax(span, expression);
                 }
                 case IMoveKeywordToken _:
                 {

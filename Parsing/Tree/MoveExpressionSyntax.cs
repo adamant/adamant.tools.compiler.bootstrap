@@ -7,12 +7,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     [SuppressMessage("Performance", "CA1812:Class Never Instantiated")]
     internal class MoveExpressionSyntax : ExpressionSyntax, IMoveExpressionSyntax
     {
-        public INameExpressionSyntax Referent { get; }
+        [SuppressMessage("Style", "IDE0044:Add readonly modifier",
+            Justification = "Can't be readonly because a reference to it is exposed")]
+        private IExpressionSyntax referent;
+        public ref IExpressionSyntax Referent => ref referent;
+
 
         public MoveExpressionSyntax(TextSpan span, INameExpressionSyntax referent)
             : base(span)
         {
-            Referent = referent;
+            this.referent = referent;
         }
 
         public override string ToString()

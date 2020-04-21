@@ -187,7 +187,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             {
                 default:
                     throw ExhaustiveMatch.Failed(expression);
-                case IMutableExpressionSyntax _:
+                case IBorrowExpressionSyntax _:
+                case IShareExpressionSyntax _:
                 case IMoveExpressionSyntax _:
                 case INewObjectExpressionSyntax _:
                 case IImplicitNoneConversionExpression _:
@@ -435,7 +436,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IWhileExpressionSyntax _:
                 case IForeachExpressionSyntax _:
                 case IMoveExpressionSyntax _:
-                case IMutableExpressionSyntax _:
+                case IBorrowExpressionSyntax _:
                 case IReturnExpressionSyntax _:
                 case IBreakExpressionSyntax _:
                 case INextExpressionSyntax _:
@@ -473,6 +474,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     currentBlock!.Add(new AssignmentInstruction(resultPlace, variable, exp.Span, CurrentScope));
                 }
                 break;
+                case IShareExpressionSyntax exp:
+                    ConvertIntoPlace(exp.Referent, resultPlace);
+                    break;
                 case IBinaryOperatorExpressionSyntax exp:
                 {
                     var resultType = exp.Type.Assigned().AssertKnown();
@@ -614,7 +618,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             {
                 default:
                     throw ExhaustiveMatch.Failed(expression);
-                    //throw new NotImplementedException($"ConvertToOperand({expression.GetType().Name}) Not Implemented.");
+                //throw new NotImplementedException($"ConvertToOperand({expression.GetType().Name}) Not Implemented.");
                 case ISelfExpressionSyntax exp:
                     return graph.SelfVariable.Reference(exp.Span);
                 case INameExpressionSyntax exp:
@@ -642,7 +646,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case INextExpressionSyntax _:
                 case IReturnExpressionSyntax _:
                 case IMoveExpressionSyntax _:
-                case IMutableExpressionSyntax _:
+                case IBorrowExpressionSyntax _:
+                case IShareExpressionSyntax _:
                 case IIfExpressionSyntax _:
                 case IFunctionInvocationExpressionSyntax _:
                 case IForeachExpressionSyntax _:

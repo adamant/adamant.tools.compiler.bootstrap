@@ -5,6 +5,9 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
+    /// <summary>
+    /// An expression that is a single unqualified name
+    /// </summary>
     public interface INameExpressionSyntax : IExpressionSyntax, IHasContainingScope
     {
         SimpleName Name { get; }

@@ -25,7 +25,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(ISelfExpressionSyntax),
         typeof(INameExpressionSyntax),
         typeof(IMoveExpressionSyntax),
-        typeof(IMutableExpressionSyntax))]
+        typeof(IBorrowExpressionSyntax),
+        typeof(IShareExpressionSyntax))]
     public interface IExpressionSyntax : ISyntax
     {
         [DisallowNull] DataType? Type { get; set; }

@@ -6,10 +6,15 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
 {
-    internal class ImplicitMoveSyntax : IMoveExpressionSyntax
+    internal class ImplicitMoveExpressionSyntax : IMoveExpressionSyntax
     {
         public TextSpan Span { get; }
-        public INameExpressionSyntax Referent { get; }
+
+        [SuppressMessage("Style", "IDE0044:Add readonly modifier",
+            Justification = "Can't be readonly because a reference to it is exposed")]
+        private IExpressionSyntax referent;
+        public ref IExpressionSyntax Referent => ref referent;
+
 
         [DisallowNull]
         public DataType? Type
@@ -23,10 +28,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
         }
 
         private DataType? type;
-        public ImplicitMoveSyntax(TextSpan span, INameExpressionSyntax expression)
+        public ImplicitMoveExpressionSyntax(TextSpan span, INameExpressionSyntax referent)
         {
             Span = span;
-            Referent = expression;
+            this.referent = referent;
         }
 
         public override string ToString()

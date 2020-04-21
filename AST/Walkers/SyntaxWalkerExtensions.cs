@@ -91,11 +91,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                 case IResultStatementSyntax resultStatement:
                     walker.Walk(resultStatement.Expression, arg);
                     break;
-                case IMutableExpressionSyntax mutableTransfer:
-                    walker.Walk(mutableTransfer.Referent, arg);
+                case IShareExpressionSyntax shareExpression:
+                    walker.Walk(shareExpression.Referent, arg);
                     break;
-                case IMoveExpressionSyntax moveTransfer:
-                    walker.Walk(moveTransfer.Referent, arg);
+                case IBorrowExpressionSyntax borrowExpression:
+                    walker.Walk(borrowExpression.Referent, arg);
+                    break;
+                case IMoveExpressionSyntax moveExpression:
+                    walker.Walk(moveExpression.Referent, arg);
                     break;
                 case IIfExpressionSyntax ifExpression:
                     walker.Walk(ifExpression.Condition, arg);

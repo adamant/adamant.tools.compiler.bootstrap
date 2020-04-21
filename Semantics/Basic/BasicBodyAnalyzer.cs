@@ -120,12 +120,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 // TODO there should be a method that combines this with type inference
                 return InsertImplicitConversionIfNeeded(ref expression, DataType.Int);
 
-            if (expression is IMutableExpressionSyntax) return type;
+            if (expression is IBorrowExpressionSyntax) return type;
             // we assume immutability on variables unless explicitly stated
             return type.ToReadOnly();
         }
 
-        public void CheckType([NotNull] ref IExpressionSyntax expression, DataType expectedType)
+        public void CheckType(ref IExpressionSyntax expression, DataType expectedType)
         {
             if (expression == null) return;
             InferType(ref expression);
@@ -182,7 +182,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             return expression.Type!;
         }
 
-        private DataType InferType([NotNull] ref IExpressionSyntax? expression)
+        /// <summary>
+        /// Infer the type of an expression and assign that type to the expression.
+        /// </summary>
+        /// <param name="expression">A reference to the repression. This is a reference so that the
+        /// expression can be replaced because the parser can't always correctly determine
+        /// what kind of expression it is without type information.</param>
+        /// <param name="implicitShare">Whether implicit share expressions should be inserted around
+        /// bare variable references.</param>
+        private DataType InferType([NotNull] ref IExpressionSyntax? expression, bool implicitShare = true)
         {
             switch (expression)
             {
@@ -190,31 +198,66 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     throw ExhaustiveMatch.Failed(expression);
                 case null:
                     return DataType.Unknown;
+                case IShareExpressionSyntax _:
+                    throw new InvalidOperationException("Share expressions should not be in the AST during basic analysis");
                 case IMoveExpressionSyntax moveExpression:
-                {
-                    var type = InferTypeInMoveExpression(moveExpression.Referent);
-                    if (type is ReferenceType referenceType && !referenceType.IsMovable)
+                    switch (moveExpression.Referent)
                     {
-                        diagnostics.Add(TypeError.CannotMoveValue(file, moveExpression));
-                        type = DataType.Unknown;
-                    }
-                    return moveExpression.Type = type;
-                }
-                case IMutableExpressionSyntax mutableExpression:
-                {
-                    var expressionType = InferTypeInMutableExpression(ref mutableExpression.Referent);
-                    DataType type;
+                        case INameExpressionSyntax _:
+                            var type = InferType(ref moveExpression.Referent, false);
+                            switch (type)
+                            {
+                                case ReferenceType referenceType:
+                                    if (!referenceType.IsMovable)
+                                    {
+                                        diagnostics.Add(TypeError.CannotMoveValue(file, moveExpression));
+                                        type = DataType.Unknown;
+                                    }
+                                    break;
+                                default:
+                                    throw new NotImplementedException("Non-moveable type can't be moved");
+                            }
 
-                    if (expressionType is ReferenceType referenceType && referenceType.IsMutable)
-                        type = expressionType;
-                    else
+                            return moveExpression.Type = type;
+                        case IBorrowExpressionSyntax _:
+                            throw new NotImplementedException("Raise error about `move mut` expression");
+                        case IMoveExpressionSyntax _:
+                            throw new NotImplementedException("Raise error about `move move` expression");
+                        default:
+                            throw new NotImplementedException("Tried to move out of expression type that isn't implemented");
+                    }
+                case IBorrowExpressionSyntax borrowExpression:
+                    switch (borrowExpression.Referent)
                     {
-                        diagnostics.Add(TypeError.ExpressionCantBeMutable(file, mutableExpression.Referent));
-                        type = DataType.Unknown;
-                    }
+                        case INameExpressionSyntax _:
+                        {
+                            var type = InferType(ref borrowExpression.Referent, false);
+                            switch (type)
+                            {
+                                case ReferenceType referenceType:
+                                    if (!referenceType.IsMutable)
+                                    {
+                                        diagnostics.Add(
+                                            TypeError.ExpressionCantBeMutable(file, borrowExpression.Referent));
+                                        type = DataType.Unknown;
+                                    }
+                                    else
+                                        type = referenceType.WithCapability(ReferenceCapability.Borrowed);
 
-                    return mutableExpression.Type = type;
-                }
+                                    break;
+                                default:
+                                    throw new NotImplementedException("Non-mutable type can't be borrowed mutably");
+                            }
+
+                            return borrowExpression.Type = type;
+                        }
+                        case IBorrowExpressionSyntax _:
+                            throw new NotImplementedException("Raise error about `mut mut` expression");
+                        case IMoveExpressionSyntax _:
+                            throw new NotImplementedException("Raise error about `mut move` expression");
+                        default:
+                            throw new NotImplementedException("Tried mutate expression type that isn't implemented");
+                    }
                 case IReturnExpressionSyntax returnExpression:
                 {
                     if (returnExpression.ReturnValue != null)
@@ -294,7 +337,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return binaryOperatorExpression.Type;
                 }
                 case INameExpressionSyntax identifierName:
-                    return InferNameType(identifierName);
+                {
+                    var type = InferNameType(identifierName);
+                    // In many contexts, variable names are implicitly shared
+                    if (implicitShare)
+                    {
+                        expression = new ImplicitShareExpressionSyntax(identifierName.Span, identifierName);
+                        type = type.ToReadOnly();
+                        // currently, all other types are read-only
+                        if (type is ReferenceType referenceType
+                            && referenceType.ReferenceCapability != ReferenceCapability.Identity)
+                            type = referenceType.WithCapability(ReferenceCapability.Shared);
+                        expression.Type = type;
+                    }
+                    return type;
+                }
                 case IUnaryOperatorExpressionSyntax unaryOperatorExpression:
                 {
                     var @operator = unaryOperatorExpression.Operator;
@@ -454,7 +511,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return nextExpression.Type = DataType.Never;
                 case IAssignmentExpressionSyntax assignmentExpression:
                 {
-                    var left = InferType(ref assignmentExpression.LeftOperand);
+                    var left = InferType(ref assignmentExpression.LeftOperand, false);
                     InferType(ref assignmentExpression.RightOperand);
                     InsertImplicitConversionIfNeeded(ref assignmentExpression.RightOperand, left);
                     var right = assignmentExpression.RightOperand.Type ?? throw new InvalidOperationException();
@@ -509,7 +566,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
 
             var argumentTypes = methodInvocation.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
-            var targetType = InferType(ref methodInvocation.Target);
+            var targetType = InferType(ref methodInvocation.Target, false);
             // If it is unknown, we already reported an error
             if (targetType == DataType.Unknown) return methodInvocation.Type = DataType.Unknown;
 
@@ -530,7 +587,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
                     var selfParamType = functionSymbol.Parameters.First().Type;
                     InsertImplicitConversionIfNeeded(ref methodInvocation.Target, selfParamType);
-                    CheckArgumentTypeCompatibility(selfParamType, methodInvocation.Target, true);
+                    CheckArgumentTypeCompatibility(selfParamType, methodInvocation.Target);
 
                     // Skip the self parameter
                     foreach (var (arg, type) in methodInvocation.Arguments.Zip(functionSymbol
@@ -663,32 +720,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             return nameExpression.Type = type;
         }
 
-        private DataType InferTypeInMoveExpression(IExpressionSyntax expression)
-        {
-            switch (expression)
-            {
-                case null:
-                    return DataType.Unknown;
-                case INameExpressionSyntax identifierName:
-                    return InferNameType(identifierName);
-                default:
-                    throw new NotImplementedException("Tried to move out of expression type that isn't implemented");
-            }
-        }
-
-        private DataType InferTypeInMutableExpression(ref IExpressionSyntax expression)
-        {
-            switch (expression)
-            {
-                case IMutableExpressionSyntax _:
-                    throw new NotImplementedException("Raise error about nested mutable expression");
-                case INameExpressionSyntax identifierName:
-                    return InferNameType(identifierName);
-                default:
-                    throw new NotImplementedException("Tried mutate expression type that isn't implemented");
-            }
-        }
-
         /// <summary>
         /// Eventually, a `foreach` `in` expression will just be a regular expression. However, at the
         /// moment, there isn't enough of the language to implement range expressions. So this
@@ -717,7 +748,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
         }
 
-        private void CheckArgumentTypeCompatibility(DataType type, IExpressionSyntax arg, bool selfArgument = false)
+        private void CheckArgumentTypeCompatibility(DataType type, IExpressionSyntax arg)
         {
             var fromType = arg.Type ?? throw new ArgumentException("argument must have a type");
             if (!type.IsAssignableFrom(fromType))
