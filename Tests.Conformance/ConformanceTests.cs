@@ -72,8 +72,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
                 var errorDiagnostics = CheckErrorsExpected(testCase, codeFile, code, diagnostics);
 
                 // Disassemble
-                var assembler = new Assembler();
-                testOutput.WriteLine(assembler.Disassemble(package));
                 var ilAssembler = new ILAssembler();
                 testOutput.WriteLine(ilAssembler.Disassemble(package));
 

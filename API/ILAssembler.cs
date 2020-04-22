@@ -7,10 +7,8 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
 using ExhaustiveMatching;
-using VariableDeclaration = Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.VariableDeclaration;
 
 namespace Adamant.Tools.Compiler.Bootstrap.API
 {
@@ -21,7 +19,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         public string Disassemble(Package package)
         {
             var builder = new AssemblyBuilder();
-            var typeMembers = package.Declarations.OfType<ClassDeclaration>().SelectMany(t => t.Members).ToList();
+            var typeMembers = package.Declarations.OfType<ClassDeclaration>()
+                .SelectMany(t => t.Members).ToList();
             foreach (var declaration in package.Declarations.Except(typeMembers))
             {
                 Disassemble(declaration, builder);
@@ -115,25 +114,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.EndBlock();
         }
 
-        private static void Disassemble(ControlFlowGraph graph, AssemblyBuilder builder)
+        private static void Disassemble(ControlFlowGraph cfg, AssemblyBuilder builder)
         {
-            if (graph == null)
+            if (cfg == null)
             {
                 builder.AppendLine("// Control Flow Graph not available");
                 return;
             }
 
-            foreach (var declaration in graph.LocalVariables)
+            foreach (var declaration in cfg.LocalVariables)
                 Disassemble(declaration, builder);
 
-            if (graph.LocalVariables.Any(v => v.TypeIsNotEmpty))
+            if (cfg.LocalVariables.Any(v => v.TypeIsNotEmpty))
                 builder.BlankLine();
 
-            if (Disassemble(graph.BorrowClaims?.ParameterClaims, builder))
+            if (Disassemble(cfg.BorrowClaims?.ParameterClaims, builder))
                 builder.BlankLine();
 
-            foreach (var block in graph.Blocks)
-                Disassemble(graph, block, builder);
+            foreach (var block in cfg.Blocks)
+                Disassemble(cfg, block, builder);
         }
 
         private static void Disassemble(VariableDeclaration declaration, AssemblyBuilder builder)
@@ -143,7 +142,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                                    + declaration.ContextCommentString());
         }
 
-        private static void Disassemble(ControlFlowGraph graph, Block block, AssemblyBuilder builder)
+        private static void Disassemble(ControlFlowGraph cfg, Block block, AssemblyBuilder builder)
         {
             var labelIndent = Math.Max(builder.CurrentIndentDepth - 1, 0);
             builder.Append(string.Concat(Enumerable.Repeat(builder.IndentCharacters, labelIndent)));
@@ -152,13 +151,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.EndLine(":");
             foreach (var instruction in block.Instructions)
             {
-                //Disassemble(graph, graph.LiveVariables?.Before(instruction), builder);
+                //Disassemble(cfg, cfg.LiveVariables?.Before(instruction), builder);
                 builder.AppendLine(instruction.ToInstructionString().PadRight(StandardStatementWidth)
                                    + instruction.ContextCommentString());
-                var insertedDeletes = graph.InsertedDeletes;
-                //var insertedDeletes = graph.InsertedDeletes ?? throw new InvalidOperationException("Inserted deletes is null");
+                var insertedDeletes = cfg.InsertedDeletes;
+                //var insertedDeletes = cfg.InsertedDeletes ?? throw new InvalidOperationException("Inserted deletes is null");
                 //Disassemble(insertedDeletes.After(instruction), builder);
-                //Disassemble(graph.BorrowClaims?.After(instruction), builder);
+                //Disassemble(cfg.BorrowClaims?.After(instruction), builder);
             }
 
             var terminator = block.Terminator;
@@ -166,14 +165,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         }
 
         private static void Disassemble(
-            ControlFlowGraph graph,
+            ControlFlowGraph cfg,
             BitArray? liveVariables,
             AssemblyBuilder builder)
         {
             if (liveVariables == null || liveVariables.Cast<bool>().All(x => x == false)) return;
 
             var variables = string.Join(", ", liveVariables.TrueIndexes()
-                    .Select(i => FormatVariableName(graph.VariableDeclarations[i])));
+                    .Select(i => FormatVariableName(cfg.VariableDeclarations[i])));
             builder.BeginLine("// live: ");
             builder.EndLine(variables);
         }
@@ -185,14 +184,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                 : declaration.Variable.ToString();
         }
 
-        private static void Disassemble(
-            IReadOnlyList<DeleteStatement> deletes,
-            AssemblyBuilder builder)
-        {
-            foreach (var delete in deletes)
-                builder.AppendLine(delete.ToStatementString().PadRight(StandardStatementWidth)
-                                   + delete.ContextCommentString());
-        }
+        //private static void Disassemble(
+        //    IReadOnlyList<DeleteStatement> deletes,
+        //    AssemblyBuilder builder)
+        //{
+        //    foreach (var delete in deletes)
+        //        builder.AppendLine(delete.ToStatementString().PadRight(StandardStatementWidth)
+        //                           + delete.ContextCommentString());
+        //}
 
         private static bool Disassemble(Claims? claims, AssemblyBuilder builder)
         {
