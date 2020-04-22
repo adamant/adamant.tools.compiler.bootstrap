@@ -12,770 +12,770 @@ using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 {
-    /// <summary>
-    /// The fabrication of a single control flow graph from a single callable AST node
-    /// </summary>
-    public class ControlFlowFabrication
-    {
-        private readonly IConcreteCallableDeclarationSyntax callable;
-        private readonly DataType? selfType;
-        private readonly DataType returnType;
-        private readonly ControlFlowGraphBuilder graph;
+    ///// <summary>
+    ///// The fabrication of a single control flow graph from a single callable AST node
+    ///// </summary>
+    //public class ControlFlowFabrication
+    //{
+    //    private readonly IConcreteCallableDeclarationSyntax callable;
+    //    private readonly DataType? selfType;
+    //    private readonly DataType returnType;
+    //    private readonly ControlFlowGraphBuilder graph;
 
-        /// <summary>
-        /// The block we are currently adding statements to. Thus, after control flow statements this
-        /// is the block the control flow exits (to/from?).
-        /// </summary>
-        private BlockBuilder? currentBlock;
+    //    /// <summary>
+    //    /// The block we are currently adding statements to. Thus, after control flow statements this
+    //    /// is the block the control flow exits (to/from?).
+    //    /// </summary>
+    //    private BlockBuilder? currentBlock;
 
-        /// <summary>
-        /// Actions are registered here to connect break statements to the loop exist block
-        /// </summary>
-        private List<Action<BlockBuilder>> addBreaks = new List<Action<BlockBuilder>>();
+    //    /// <summary>
+    //    /// Actions are registered here to connect break statements to the loop exist block
+    //    /// </summary>
+    //    private List<Action<BlockBuilder>> addBreaks = new List<Action<BlockBuilder>>();
 
-        /// <summary>
-        /// The block that a `next` statement should go to
-        /// </summary>
-        private BlockBuilder? continueToBlock;
+    //    /// <summary>
+    //    /// The block that a `next` statement should go to
+    //    /// </summary>
+    //    private BlockBuilder? continueToBlock;
 
-        /// <summary>
-        /// The next available scope number
-        /// </summary>
-        private Scope nextScope;
-        private readonly Stack<Scope> scopes = new Stack<Scope>();
-        private Scope CurrentScope => scopes.Peek();
+    //    /// <summary>
+    //    /// The next available scope number
+    //    /// </summary>
+    //    private Scope nextScope;
+    //    private readonly Stack<Scope> scopes = new Stack<Scope>();
+    //    private Scope CurrentScope => scopes.Peek();
 
-        public ControlFlowFabrication(IConcreteCallableDeclarationSyntax callable)
-        {
-            this.callable = callable;
-            graph = new ControlFlowGraphBuilder(callable.File);
-            // We start in the outer scope and need that on the stack
-            var scope = Scope.Outer;
-            scopes.Push(scope);
-            nextScope = scope.Next();
-            switch (callable)
-            {
-                default:
-                    throw ExhaustiveMatch.Failed(callable);
-                case IConcreteMethodDeclarationSyntax method:
-                    returnType = method.ReturnType.Known();
-                    break;
-                case IConstructorDeclarationSyntax constructor:
-                    selfType = constructor.SelfParameterType.Assigned();
-                    returnType = DataType.Void; // the body should `return;`
-                    break;
-                case IAssociatedFunctionDeclaration associatedFunction:
-                    returnType = associatedFunction.ReturnType.Known();
-                    break;
-                case IFunctionDeclarationSyntax function:
-                    returnType = function.ReturnType.Known();
-                    break;
-            }
-        }
+    //    public ControlFlowFabrication(IConcreteCallableDeclarationSyntax callable)
+    //    {
+    //        this.callable = callable;
+    //        graph = new ControlFlowGraphBuilder(callable.File);
+    //        // We start in the outer scope and need that on the stack
+    //        var scope = Scope.Outer;
+    //        scopes.Push(scope);
+    //        nextScope = scope.Next();
+    //        switch (callable)
+    //        {
+    //            default:
+    //                throw ExhaustiveMatch.Failed(callable);
+    //            case IConcreteMethodDeclarationSyntax method:
+    //                returnType = method.ReturnType.Known();
+    //                break;
+    //            case IConstructorDeclarationSyntax constructor:
+    //                selfType = constructor.SelfParameterType.Assigned();
+    //                returnType = DataType.Void; // the body should `return;`
+    //                break;
+    //            case IAssociatedFunctionDeclaration associatedFunction:
+    //                returnType = associatedFunction.ReturnType.Known();
+    //                break;
+    //            case IFunctionDeclarationSyntax function:
+    //                returnType = function.ReturnType.Known();
+    //                break;
+    //        }
+    //    }
 
-        public ControlFlowGraphOld CreateGraph()
-        {
-            // Temp Variable for return
-            if (selfType != null) graph.AddSelfParameter(selfType);
-            else graph.AddReturnVariable(returnType);
+    //    public ControlFlowGraphOld CreateGraph()
+    //    {
+    //        // Temp Variable for return
+    //        if (selfType != null) graph.AddSelfParameter(selfType);
+    //        else graph.AddReturnVariable(returnType);
 
-            foreach (var parameter in callable.Parameters.Where(p => !p.Unused))
-                graph.AddParameter(parameter.IsMutableBinding, parameter.Type.Fulfilled(), CurrentScope, parameter.Name.UnqualifiedName);
+    //        foreach (var parameter in callable.Parameters.Where(p => !p.Unused))
+    //            graph.AddParameter(parameter.IsMutableBinding, parameter.Type.Fulfilled(), CurrentScope, parameter.Name.UnqualifiedName);
 
-            currentBlock = graph.NewBlock();
-            foreach (var statement in callable.Body.Statements)
-                ConvertToStatement(statement);
+    //        currentBlock = graph.NewBlock();
+    //        foreach (var statement in callable.Body.Statements)
+    //            ConvertToStatement(statement);
 
-            // Generate the implicit return statement
-            if (currentBlock != null && !currentBlock.IsTerminated)
-            {
-                var span = callable.Span.AtEnd();
-                EndScope(span);
-                currentBlock.AddReturn(span, Scope.Outer); // We officially ended the outer scope, but this is in it
-            }
+    //        // Generate the implicit return statement
+    //        if (currentBlock != null && !currentBlock.IsTerminated)
+    //        {
+    //            var span = callable.Span.AtEnd();
+    //            EndScope(span);
+    //            currentBlock.AddReturn(span, Scope.Outer); // We officially ended the outer scope, but this is in it
+    //        }
 
-            return graph.Build();
-        }
+    //        return graph.Build();
+    //    }
 
-        private void EnterNewScope()
-        {
-            scopes.Push(nextScope);
-            nextScope = nextScope.Next();
-        }
+    //    private void EnterNewScope()
+    //    {
+    //        scopes.Push(nextScope);
+    //        nextScope = nextScope.Next();
+    //    }
 
-        /// <summary>
-        /// An exit point for the current scope that doesn't end it. For example, a break statement
-        /// </summary>
-        private void ExitScope(TextSpan span)
-        {
-            currentBlock?.AddExitScope(span, CurrentScope);
-        }
+    //    /// <summary>
+    //    /// An exit point for the current scope that doesn't end it. For example, a break statement
+    //    /// </summary>
+    //    private void ExitScope(TextSpan span)
+    //    {
+    //        currentBlock?.AddExitScope(span, CurrentScope);
+    //    }
 
-        private void EndScope(TextSpan span)
-        {
-            // In some cases we will have left the current block by a terminator,
-            // so we don't need to emit an exit statement.
-            currentBlock?.AddExitScope(span, CurrentScope);
-            scopes.Pop();
-        }
+    //    private void EndScope(TextSpan span)
+    //    {
+    //        // In some cases we will have left the current block by a terminator,
+    //        // so we don't need to emit an exit statement.
+    //        currentBlock?.AddExitScope(span, CurrentScope);
+    //        scopes.Pop();
+    //    }
 
-        /// <summary>
-        /// Assign a value into a place while making sure to correctly handle
-        /// value semantics.
-        /// </summary>
-        private void AssignToPlace(IPlace place, Value value, TextSpan span)
-        {
-            if (value is VariableReference assignFrom
-                && assignFrom.ValueSemantics == ValueSemantics.Own
-                && place is VariableReference assignTo)
-            {
-                // There is a chance we are assigning into something that doesn't
-                // accept ownership. In that case, we demote to a borrow or alias
-                var variableSemantics = graph[assignTo.Variable].Type.ValueSemantics;
-                switch (variableSemantics)
-                {
-                    default:
-                        throw ExhaustiveMatch.Failed(variableSemantics);
-                    case ValueSemantics.Own:
-                        // They are both own, no problems
-                        break;
-                    case ValueSemantics.Share:
-                        value = assignFrom.AsAlias();
-                        break;
-                    case ValueSemantics.Borrow:
-                        value = assignFrom.AsBorrow();
-                        break;
-                    case ValueSemantics.LValue:
-                    case ValueSemantics.Move:
-                    case ValueSemantics.Empty:
-                    case ValueSemantics.Copy:
-                        throw new NotImplementedException();
-                }
-            }
+    //    /// <summary>
+    //    /// Assign a value into a place while making sure to correctly handle
+    //    /// value semantics.
+    //    /// </summary>
+    //    private void AssignToPlace(IPlace place, Value value, TextSpan span)
+    //    {
+    //        if (value is VariableReference assignFrom
+    //            && assignFrom.ValueSemantics == ValueSemantics.Own
+    //            && place is VariableReference assignTo)
+    //        {
+    //            // There is a chance we are assigning into something that doesn't
+    //            // accept ownership. In that case, we demote to a borrow or alias
+    //            var variableSemantics = graph[assignTo.Variable].Type.ValueSemantics;
+    //            switch (variableSemantics)
+    //            {
+    //                default:
+    //                    throw ExhaustiveMatch.Failed(variableSemantics);
+    //                case ValueSemantics.Own:
+    //                    // They are both own, no problems
+    //                    break;
+    //                case ValueSemantics.Share:
+    //                    value = assignFrom.AsAlias();
+    //                    break;
+    //                case ValueSemantics.Borrow:
+    //                    value = assignFrom.AsBorrow();
+    //                    break;
+    //                case ValueSemantics.LValue:
+    //                case ValueSemantics.Move:
+    //                case ValueSemantics.Empty:
+    //                case ValueSemantics.Copy:
+    //                    throw new NotImplementedException();
+    //            }
+    //        }
 
-            currentBlock!.AddAssignment(place, value, span, CurrentScope);
-        }
+    //        currentBlock!.AddAssignment(place, value, span, CurrentScope);
+    //    }
 
-        private VariableReference AssignToTemp(DataType type, IValue value)
-        {
-            var tempVariable = graph.Let(type.AssertKnown(), CurrentScope);
-            currentBlock!.AddAssignment(tempVariable.LValueReference(value.Span), value, value.Span,
-                CurrentScope);
-            return tempVariable.Reference(value.Span);
-        }
+    //    private VariableReference AssignToTemp(DataType type, IValue value)
+    //    {
+    //        var tempVariable = graph.Let(type.AssertKnown(), CurrentScope);
+    //        currentBlock!.AddAssignment(tempVariable.LValueReference(value.Span), value, value.Span,
+    //            CurrentScope);
+    //        return tempVariable.Reference(value.Span);
+    //    }
 
-        private void ConvertToStatement(IStatementSyntax statement)
-        {
-            switch (statement)
-            {
-                default:
-                    throw ExhaustiveMatch.Failed(statement);
-                case IVariableDeclarationStatementSyntax variableDeclaration:
-                {
-                    var variable = graph.AddVariable(variableDeclaration.IsMutableBinding,
-                        variableDeclaration.Type.Assigned(),
-                        CurrentScope, variableDeclaration.Name.UnqualifiedName);
-                    if (variableDeclaration.Initializer != null)
-                    {
-                        var value = ConvertToValue(variableDeclaration.Initializer);
-                        AssignToPlace(
-                            variable.LValueReference(variableDeclaration.Initializer.Span), value,
-                            variableDeclaration.Initializer.Span);
-                    }
+    //    private void ConvertToStatement(IStatementSyntax statement)
+    //    {
+    //        switch (statement)
+    //        {
+    //            default:
+    //                throw ExhaustiveMatch.Failed(statement);
+    //            case IVariableDeclarationStatementSyntax variableDeclaration:
+    //            {
+    //                var variable = graph.AddVariable(variableDeclaration.IsMutableBinding,
+    //                    variableDeclaration.Type.Assigned(),
+    //                    CurrentScope, variableDeclaration.Name.UnqualifiedName);
+    //                if (variableDeclaration.Initializer != null)
+    //                {
+    //                    var value = ConvertToValue(variableDeclaration.Initializer);
+    //                    AssignToPlace(
+    //                        variable.LValueReference(variableDeclaration.Initializer.Span), value,
+    //                        variableDeclaration.Initializer.Span);
+    //                }
 
-                    return;
-                }
-                case IExpressionStatementSyntax expressionStatement:
-                {
-                    // Skip expressions with unknown type
-                    var expression = expressionStatement.Expression;
-                    if (!expression.Type.Assigned().IsKnown)
-                        return;
+    //                return;
+    //            }
+    //            case IExpressionStatementSyntax expressionStatement:
+    //            {
+    //                // Skip expressions with unknown type
+    //                var expression = expressionStatement.Expression;
+    //                if (!expression.Type.Assigned().IsKnown)
+    //                    return;
 
-                    if (expression.Type is EmptyType)
-                        ConvertExpressionToStatement(expression);
-                    else
-                        AssignToTemp(expression.Type.Assigned(), ConvertToValue(expression));
+    //                if (expression.Type is EmptyType)
+    //                    ConvertExpressionToStatement(expression);
+    //                else
+    //                    AssignToTemp(expression.Type.Assigned(), ConvertToValue(expression));
 
-                    return;
-                }
-                case IResultStatementSyntax _:
-                    throw new NotImplementedException();
-            }
-        }
+    //                return;
+    //            }
+    //            case IResultStatementSyntax _:
+    //                throw new NotImplementedException();
+    //        }
+    //    }
 
-        private void ConvertToStatement(IBlockOrResultSyntax blockOrResult)
-        {
-            switch (blockOrResult)
-            {
-                default:
-                    throw ExhaustiveMatch.Failed(blockOrResult);
-                case IBlockExpressionSyntax block:
-                    ConvertExpressionToStatement(block);
-                    break;
-                case IResultStatementSyntax resultStatement:
-                    ConvertExpressionToStatement(resultStatement.Expression);
-                    break;
-            }
-        }
+    //    private void ConvertToStatement(IBlockOrResultSyntax blockOrResult)
+    //    {
+    //        switch (blockOrResult)
+    //        {
+    //            default:
+    //                throw ExhaustiveMatch.Failed(blockOrResult);
+    //            case IBlockExpressionSyntax block:
+    //                ConvertExpressionToStatement(block);
+    //                break;
+    //            case IResultStatementSyntax resultStatement:
+    //                ConvertExpressionToStatement(resultStatement.Expression);
+    //                break;
+    //        }
+    //    }
 
-        private void ConvertToStatement(IElseClauseSyntax elseClause)
-        {
-            switch (elseClause)
-            {
-                default:
-                    throw ExhaustiveMatch.Failed(elseClause);
-                case IIfExpressionSyntax ifExpression:
-                    ConvertExpressionToStatement(ifExpression);
-                    break;
-                case IBlockOrResultSyntax blockOrResult:
-                    ConvertToStatement(blockOrResult);
-                    break;
-            }
-        }
+    //    private void ConvertToStatement(IElseClauseSyntax elseClause)
+    //    {
+    //        switch (elseClause)
+    //        {
+    //            default:
+    //                throw ExhaustiveMatch.Failed(elseClause);
+    //            case IIfExpressionSyntax ifExpression:
+    //                ConvertExpressionToStatement(ifExpression);
+    //                break;
+    //            case IBlockOrResultSyntax blockOrResult:
+    //                ConvertToStatement(blockOrResult);
+    //                break;
+    //        }
+    //    }
 
-        // TODO combine ConvertExpressionToStatement and ConvertToValue
+    //    // TODO combine ConvertExpressionToStatement and ConvertToValue
 
-        /// <summary>
-        /// Converts an expression of type `void` or `never` to a statement
-        /// </summary>
-        private void ConvertExpressionToStatement(IExpressionSyntax expression)
-        {
-            switch (expression)
-            {
-                default:
-                    throw NonExhaustiveMatchException.For(expression);
-                case IUnaryOperatorExpressionSyntax _:
-                case IBinaryOperatorExpressionSyntax _:
-                    throw new NotImplementedException();
-                case IInvocationExpressionSyntax invocation:
-                    currentBlock.AddAction(ConvertInvocationToValue(invocation), invocation.Span,
-                        CurrentScope);
-                    return;
-                case IReturnExpressionSyntax returnExpression:
-                {
-                    if (returnExpression.ReturnValue != null)
-                    {
-                        var isOwn = returnType.ValueSemantics == ValueSemantics.Own;
-                        var value = isOwn
-                            ? ConvertToOwn(returnExpression.ReturnValue, returnExpression.Span)
-                            // TODO avoid getting a move from this just because it is a new object expression
-                            : ConvertToValue(returnExpression.ReturnValue);
-                        AssignToPlace(
-                            graph.ReturnVariable.LValueReference(returnExpression.ReturnValue.Span),
-                            value, returnExpression.ReturnValue.Span);
-                    }
+    //    /// <summary>
+    //    /// Converts an expression of type `void` or `never` to a statement
+    //    /// </summary>
+    //    private void ConvertExpressionToStatement(IExpressionSyntax expression)
+    //    {
+    //        switch (expression)
+    //        {
+    //            default:
+    //                throw NonExhaustiveMatchException.For(expression);
+    //            case IUnaryOperatorExpressionSyntax _:
+    //            case IBinaryOperatorExpressionSyntax _:
+    //                throw new NotImplementedException();
+    //            case IInvocationExpressionSyntax invocation:
+    //                currentBlock.AddAction(ConvertInvocationToValue(invocation), invocation.Span,
+    //                    CurrentScope);
+    //                return;
+    //            case IReturnExpressionSyntax returnExpression:
+    //            {
+    //                if (returnExpression.ReturnValue != null)
+    //                {
+    //                    var isOwn = returnType.ValueSemantics == ValueSemantics.Own;
+    //                    var value = isOwn
+    //                        ? ConvertToOwn(returnExpression.ReturnValue, returnExpression.Span)
+    //                        // TODO avoid getting a move from this just because it is a new object expression
+    //                        : ConvertToValue(returnExpression.ReturnValue);
+    //                    AssignToPlace(
+    //                        graph.ReturnVariable.LValueReference(returnExpression.ReturnValue.Span),
+    //                        value, returnExpression.ReturnValue.Span);
+    //                }
 
-                    ExitScope(returnExpression.Span.AtEnd());
-                    currentBlock.AddReturn(returnExpression.Span, CurrentScope);
+    //                ExitScope(returnExpression.Span.AtEnd());
+    //                currentBlock.AddReturn(returnExpression.Span, CurrentScope);
 
-                    // There is no exit from a return block, hence null for exit block
-                    currentBlock = null;
-                    return;
-                }
-                case IForeachExpressionSyntax foreachExpression:
-                {
-                    // For now, we support only range syntax `foreach x: T in z..y` ranges
-                    // aren't yet supported by the rest of the language, so they must be directly
-                    // translated here. The for each loop is basically desugared into:
-                    // var x: T = z;
-                    // let temp = y;
-                    // loop
-                    // {
-                    //     <loop body>
-                    //     x += 1;
-                    //     if x > temp => break;
-                    // }
-                    if (!(foreachExpression.InExpression is IBinaryOperatorExpressionSyntax inExpression)
-                        || (inExpression.Operator != BinaryOperator.DotDot
-                            && inExpression.Operator != BinaryOperator.LessThanDotDot
-                            && inExpression.Operator != BinaryOperator.DotDotLessThan
-                            && inExpression.Operator != BinaryOperator.LessThanDotDotLessThan))
-                        throw new NotImplementedException(
-                            "`foreach` in non-range expression not implemented");
-                    var startExpression = inExpression.LeftOperand;
-                    var endExpression = inExpression.RightOperand;
+    //                // There is no exit from a return block, hence null for exit block
+    //                currentBlock = null;
+    //                return;
+    //            }
+    //            case IForeachExpressionSyntax foreachExpression:
+    //            {
+    //                // For now, we support only range syntax `foreach x: T in z..y` ranges
+    //                // aren't yet supported by the rest of the language, so they must be directly
+    //                // translated here. The for each loop is basically desugared into:
+    //                // var x: T = z;
+    //                // let temp = y;
+    //                // loop
+    //                // {
+    //                //     <loop body>
+    //                //     x += 1;
+    //                //     if x > temp => break;
+    //                // }
+    //                if (!(foreachExpression.InExpression is IBinaryOperatorExpressionSyntax inExpression)
+    //                    || (inExpression.Operator != BinaryOperator.DotDot
+    //                        && inExpression.Operator != BinaryOperator.LessThanDotDot
+    //                        && inExpression.Operator != BinaryOperator.DotDotLessThan
+    //                        && inExpression.Operator != BinaryOperator.LessThanDotDotLessThan))
+    //                    throw new NotImplementedException(
+    //                        "`foreach` in non-range expression not implemented");
+    //                var startExpression = inExpression.LeftOperand;
+    //                var endExpression = inExpression.RightOperand;
 
-                    var variableType = (IntegerType)foreachExpression.VariableType.Assigned();
-                    var loopVariable = graph.AddVariable(foreachExpression.IsMutableBinding,
-                        variableType, CurrentScope, foreachExpression.VariableName);
-                    var loopVariableLValue = loopVariable.LValueReference(foreachExpression.Span);
-                    var loopVariableReference = loopVariable.Reference(foreachExpression.Span);
+    //                var variableType = (IntegerType)foreachExpression.VariableType.Assigned();
+    //                var loopVariable = graph.AddVariable(foreachExpression.IsMutableBinding,
+    //                    variableType, CurrentScope, foreachExpression.VariableName);
+    //                var loopVariableLValue = loopVariable.LValueReference(foreachExpression.Span);
+    //                var loopVariableReference = loopVariable.Reference(foreachExpression.Span);
 
-                    var includeStart = inExpression.Operator == BinaryOperator.DotDot
-                                       || inExpression.Operator == BinaryOperator.DotDotLessThan;
-                    var includeEnd = inExpression.Operator == BinaryOperator.DotDot
-                                       || inExpression.Operator == BinaryOperator.LessThanDotDot;
+    //                var includeStart = inExpression.Operator == BinaryOperator.DotDot
+    //                                   || inExpression.Operator == BinaryOperator.DotDotLessThan;
+    //                var includeEnd = inExpression.Operator == BinaryOperator.DotDot
+    //                                   || inExpression.Operator == BinaryOperator.LessThanDotDot;
 
-                    // emit var x: T = z (+1);
-                    var startValue = ConvertToValue(startExpression);
-                    var one = new IntegerConstant(1, variableType, foreachExpression.Span);
-                    if (!includeStart)
-                    {
-                        var operand = ConvertToOperand(startValue, variableType);
-                        startValue = new BinaryOperation(operand, BinaryOperator.Plus, one,
-                            variableType);
-                    }
-                    AssignToPlace(loopVariableLValue, startValue, startExpression.Span);
-                    // let temp = y;
-                    var endValue = ConvertToOperand(endExpression);
-                    // Emit block
-                    var loopEntry = graph.NewEntryBlock(currentBlock,
-                        foreachExpression.Block.Span.AtStart(), CurrentScope);
-                    currentBlock = loopEntry;
-                    var conditionBlock = continueToBlock = graph.NewBlock();
-                    // TODO this generates the exit block too soon if the break condition is non-trivial
-                    var loopExit = ConvertLoopBody(foreachExpression.Block);
-                    // If it always breaks, there isn't a current block
-                    currentBlock?.AddGoto(conditionBlock, foreachExpression.Block.Span.AtEnd(),
-                        CurrentScope);
-                    currentBlock = conditionBlock;
-                    // emit x += 1;
-                    var valuePlusOne = new BinaryOperation(loopVariableReference,
-                        BinaryOperator.Plus, one, variableType);
-                    AssignToPlace(loopVariableLValue, valuePlusOne, startExpression.Span);
-                    // emit if x (>)|(>=) temp => break;
-                    var breakOperator = includeEnd ? BinaryOperator.GreaterThan : BinaryOperator.GreaterThanOrEqual;
-                    var breakCondition = new BinaryOperation(loopVariableReference,
-                                            breakOperator, endValue, variableType);
-                    currentBlock.AddIf(ConvertToOperand(breakCondition, DataType.Bool),
-                        loopExit, loopEntry, foreachExpression.Span, CurrentScope);
-                    currentBlock = loopExit;
-                    return;
-                }
-                case IWhileExpressionSyntax whileExpression:
-                {
-                    // There is a block for the condition, it then goes either to
-                    // the body or the after block.
-                    var conditionBlock = graph.NewEntryBlock(currentBlock,
-                        whileExpression.Condition.Span.AtStart(), CurrentScope);
-                    currentBlock = conditionBlock;
-                    var condition = ConvertToOperand(whileExpression.Condition);
-                    var loopEntry = graph.NewBlock();
-                    continueToBlock = conditionBlock;
-                    currentBlock = loopEntry;
-                    var loopExit = ConvertLoopBody(whileExpression.Block);
-                    // Generate if branch now that loop exit is known
-                    conditionBlock.AddIf(condition, loopEntry, loopExit, whileExpression.Condition.Span,
-                        CurrentScope);
-                    // If it always breaks, there isn't a current block
-                    currentBlock?.AddGoto(conditionBlock, whileExpression.Block.Span.AtEnd(),
-                        CurrentScope);
-                    currentBlock = loopExit;
-                    return;
-                }
-                case ILoopExpressionSyntax loopExpression:
-                {
-                    var loopEntry = graph.NewEntryBlock(currentBlock,
-                        loopExpression.Block.Span.AtStart(), CurrentScope);
-                    currentBlock = loopEntry;
-                    continueToBlock = loopEntry;
-                    var loopExit = ConvertLoopBody(loopExpression.Block);
-                    // If it always breaks, there isn't a current block
-                    currentBlock?.AddGoto(loopEntry, loopExpression.Block.Span.AtEnd(),
-                        CurrentScope);
-                    currentBlock = loopExit;
-                    return;
-                }
-                case IBreakExpressionSyntax breakExpression:
-                {
-                    ExitScope(breakExpression.Span.AtEnd());
-                    // capture the current block for use in the lambda
-                    var breakingBlock = currentBlock;
-                    addBreaks.Add(loopExit => breakingBlock.AddGoto(loopExit, breakExpression.Span, CurrentScope));
-                    currentBlock = null;
-                    return;
-                }
-                case INextExpressionSyntax nextExpression:
-                {
-                    ExitScope(nextExpression.Span.AtEnd());
-                    currentBlock.AddGoto(continueToBlock ?? throw new InvalidOperationException(),
-                        nextExpression.Span, CurrentScope);
-                    currentBlock = null;
-                    return;
-                }
-                case IIfExpressionSyntax ifExpression:
-                {
-                    var containingBlock = currentBlock;
-                    var condition = ConvertToOperand(ifExpression.Condition);
-                    var thenEntry = graph.NewBlock();
-                    currentBlock = thenEntry;
-                    ConvertToStatement(ifExpression.ThenBlock);
-                    var thenExit = currentBlock;
-                    BlockBuilder elseEntry;
-                    BlockBuilder exit = null;
-                    if (ifExpression.ElseClause == null)
-                    {
-                        elseEntry = exit = graph.NewBlock();
-                        thenExit?.AddGoto(exit, ifExpression.ThenBlock.Span.AtEnd(), CurrentScope);
-                    }
-                    else
-                    {
-                        elseEntry = graph.NewBlock();
-                        currentBlock = elseEntry;
-                        ConvertToStatement(ifExpression.ElseClause);
-                        var elseExit = currentBlock;
-                        if (thenExit != null || elseExit != null)
-                        {
-                            exit = graph.NewBlock();
-                            thenExit?.AddGoto(exit, ifExpression.ThenBlock.Span.AtEnd(),
-                                CurrentScope);
-                            elseExit?.AddGoto(exit, ifExpression.ElseClause.Span.AtEnd(),
-                                CurrentScope);
-                        }
-                    }
+    //                // emit var x: T = z (+1);
+    //                var startValue = ConvertToValue(startExpression);
+    //                var one = new IntegerConstant(1, variableType, foreachExpression.Span);
+    //                if (!includeStart)
+    //                {
+    //                    var operand = ConvertToOperand(startValue, variableType);
+    //                    startValue = new BinaryOperation(operand, BinaryOperator.Plus, one,
+    //                        variableType);
+    //                }
+    //                AssignToPlace(loopVariableLValue, startValue, startExpression.Span);
+    //                // let temp = y;
+    //                var endValue = ConvertToOperand(endExpression);
+    //                // Emit block
+    //                var loopEntry = graph.NewEntryBlock(currentBlock,
+    //                    foreachExpression.Block.Span.AtStart(), CurrentScope);
+    //                currentBlock = loopEntry;
+    //                var conditionBlock = continueToBlock = graph.NewBlock();
+    //                // TODO this generates the exit block too soon if the break condition is non-trivial
+    //                var loopExit = ConvertLoopBody(foreachExpression.Block);
+    //                // If it always breaks, there isn't a current block
+    //                currentBlock?.AddGoto(conditionBlock, foreachExpression.Block.Span.AtEnd(),
+    //                    CurrentScope);
+    //                currentBlock = conditionBlock;
+    //                // emit x += 1;
+    //                var valuePlusOne = new BinaryOperation(loopVariableReference,
+    //                    BinaryOperator.Plus, one, variableType);
+    //                AssignToPlace(loopVariableLValue, valuePlusOne, startExpression.Span);
+    //                // emit if x (>)|(>=) temp => break;
+    //                var breakOperator = includeEnd ? BinaryOperator.GreaterThan : BinaryOperator.GreaterThanOrEqual;
+    //                var breakCondition = new BinaryOperation(loopVariableReference,
+    //                                        breakOperator, endValue, variableType);
+    //                currentBlock.AddIf(ConvertToOperand(breakCondition, DataType.Bool),
+    //                    loopExit, loopEntry, foreachExpression.Span, CurrentScope);
+    //                currentBlock = loopExit;
+    //                return;
+    //            }
+    //            case IWhileExpressionSyntax whileExpression:
+    //            {
+    //                // There is a block for the condition, it then goes either to
+    //                // the body or the after block.
+    //                var conditionBlock = graph.NewEntryBlock(currentBlock,
+    //                    whileExpression.Condition.Span.AtStart(), CurrentScope);
+    //                currentBlock = conditionBlock;
+    //                var condition = ConvertToOperand(whileExpression.Condition);
+    //                var loopEntry = graph.NewBlock();
+    //                continueToBlock = conditionBlock;
+    //                currentBlock = loopEntry;
+    //                var loopExit = ConvertLoopBody(whileExpression.Block);
+    //                // Generate if branch now that loop exit is known
+    //                conditionBlock.AddIf(condition, loopEntry, loopExit, whileExpression.Condition.Span,
+    //                    CurrentScope);
+    //                // If it always breaks, there isn't a current block
+    //                currentBlock?.AddGoto(conditionBlock, whileExpression.Block.Span.AtEnd(),
+    //                    CurrentScope);
+    //                currentBlock = loopExit;
+    //                return;
+    //            }
+    //            case ILoopExpressionSyntax loopExpression:
+    //            {
+    //                var loopEntry = graph.NewEntryBlock(currentBlock,
+    //                    loopExpression.Block.Span.AtStart(), CurrentScope);
+    //                currentBlock = loopEntry;
+    //                continueToBlock = loopEntry;
+    //                var loopExit = ConvertLoopBody(loopExpression.Block);
+    //                // If it always breaks, there isn't a current block
+    //                currentBlock?.AddGoto(loopEntry, loopExpression.Block.Span.AtEnd(),
+    //                    CurrentScope);
+    //                currentBlock = loopExit;
+    //                return;
+    //            }
+    //            case IBreakExpressionSyntax breakExpression:
+    //            {
+    //                ExitScope(breakExpression.Span.AtEnd());
+    //                // capture the current block for use in the lambda
+    //                var breakingBlock = currentBlock;
+    //                addBreaks.Add(loopExit => breakingBlock.AddGoto(loopExit, breakExpression.Span, CurrentScope));
+    //                currentBlock = null;
+    //                return;
+    //            }
+    //            case INextExpressionSyntax nextExpression:
+    //            {
+    //                ExitScope(nextExpression.Span.AtEnd());
+    //                currentBlock.AddGoto(continueToBlock ?? throw new InvalidOperationException(),
+    //                    nextExpression.Span, CurrentScope);
+    //                currentBlock = null;
+    //                return;
+    //            }
+    //            case IIfExpressionSyntax ifExpression:
+    //            {
+    //                var containingBlock = currentBlock;
+    //                var condition = ConvertToOperand(ifExpression.Condition);
+    //                var thenEntry = graph.NewBlock();
+    //                currentBlock = thenEntry;
+    //                ConvertToStatement(ifExpression.ThenBlock);
+    //                var thenExit = currentBlock;
+    //                BlockBuilder elseEntry;
+    //                BlockBuilder exit = null;
+    //                if (ifExpression.ElseClause == null)
+    //                {
+    //                    elseEntry = exit = graph.NewBlock();
+    //                    thenExit?.AddGoto(exit, ifExpression.ThenBlock.Span.AtEnd(), CurrentScope);
+    //                }
+    //                else
+    //                {
+    //                    elseEntry = graph.NewBlock();
+    //                    currentBlock = elseEntry;
+    //                    ConvertToStatement(ifExpression.ElseClause);
+    //                    var elseExit = currentBlock;
+    //                    if (thenExit != null || elseExit != null)
+    //                    {
+    //                        exit = graph.NewBlock();
+    //                        thenExit?.AddGoto(exit, ifExpression.ThenBlock.Span.AtEnd(),
+    //                            CurrentScope);
+    //                        elseExit?.AddGoto(exit, ifExpression.ElseClause.Span.AtEnd(),
+    //                            CurrentScope);
+    //                    }
+    //                }
 
-                    containingBlock.AddIf(condition, thenEntry, elseEntry,
-                        ifExpression.Condition.Span, CurrentScope);
-                    currentBlock = exit;
-                    return;
-                }
-                case IBlockExpressionSyntax block:
-                {
-                    // Starting a new nested scope
-                    EnterNewScope();
+    //                containingBlock.AddIf(condition, thenEntry, elseEntry,
+    //                    ifExpression.Condition.Span, CurrentScope);
+    //                currentBlock = exit;
+    //                return;
+    //            }
+    //            case IBlockExpressionSyntax block:
+    //            {
+    //                // Starting a new nested scope
+    //                EnterNewScope();
 
-                    foreach (var statementInBlock in block.Statements)
-                        ConvertToStatement(statementInBlock);
+    //                foreach (var statementInBlock in block.Statements)
+    //                    ConvertToStatement(statementInBlock);
 
-                    // Ending that scope
-                    EndScope(block.Span.AtEnd());
-                    return;
-                }
-                case IUnsafeExpressionSyntax unsafeExpression:
-                    ConvertExpressionToStatement(unsafeExpression.Expression);
-                    return;
-                case IAssignmentExpressionSyntax assignmentExpression:
-                {
-                    var value = ConvertToValue(assignmentExpression.RightOperand);
-                    var place = ConvertToPlace(assignmentExpression.LeftOperand);
+    //                // Ending that scope
+    //                EndScope(block.Span.AtEnd());
+    //                return;
+    //            }
+    //            case IUnsafeExpressionSyntax unsafeExpression:
+    //                ConvertExpressionToStatement(unsafeExpression.Expression);
+    //                return;
+    //            case IAssignmentExpressionSyntax assignmentExpression:
+    //            {
+    //                var value = ConvertToValue(assignmentExpression.RightOperand);
+    //                var place = ConvertToPlace(assignmentExpression.LeftOperand);
 
-                    if (assignmentExpression.Operator != AssignmentOperator.Simple)
-                    {
-                        var type = (SimpleType)assignmentExpression.RightOperand.Type.Assigned();
-                        var rightOperand = ConvertToOperand(value, type);
-                        BinaryOperator binaryOperator;
-                        switch (assignmentExpression.Operator)
-                        {
-                            case AssignmentOperator.Simple:
-                                throw new UnreachableCodeException("Case excluded by if statement");
-                            case AssignmentOperator.Plus:
-                                binaryOperator = BinaryOperator.Plus;
-                                break;
-                            case AssignmentOperator.Minus:
-                                binaryOperator = BinaryOperator.Minus;
-                                break;
-                            case AssignmentOperator.Asterisk:
-                                binaryOperator = BinaryOperator.Asterisk;
-                                break;
-                            case AssignmentOperator.Slash:
-                                binaryOperator = BinaryOperator.Slash;
-                                break;
-                            default:
-                                throw ExhaustiveMatch.Failed(assignmentExpression.Operator);
-                        }
+    //                if (assignmentExpression.Operator != AssignmentOperator.Simple)
+    //                {
+    //                    var type = (SimpleType)assignmentExpression.RightOperand.Type.Assigned();
+    //                    var rightOperand = ConvertToOperand(value, type);
+    //                    BinaryOperator binaryOperator;
+    //                    switch (assignmentExpression.Operator)
+    //                    {
+    //                        case AssignmentOperator.Simple:
+    //                            throw new UnreachableCodeException("Case excluded by if statement");
+    //                        case AssignmentOperator.Plus:
+    //                            binaryOperator = BinaryOperator.Plus;
+    //                            break;
+    //                        case AssignmentOperator.Minus:
+    //                            binaryOperator = BinaryOperator.Minus;
+    //                            break;
+    //                        case AssignmentOperator.Asterisk:
+    //                            binaryOperator = BinaryOperator.Asterisk;
+    //                            break;
+    //                        case AssignmentOperator.Slash:
+    //                            binaryOperator = BinaryOperator.Slash;
+    //                            break;
+    //                        default:
+    //                            throw ExhaustiveMatch.Failed(assignmentExpression.Operator);
+    //                    }
 
-                        value = new BinaryOperation(
-                            ConvertToOperand(place, assignmentExpression.LeftOperand.Type.Assigned()),
-                            binaryOperator, rightOperand, type);
-                    }
+    //                    value = new BinaryOperation(
+    //                        ConvertToOperand(place, assignmentExpression.LeftOperand.Type.Assigned()),
+    //                        binaryOperator, rightOperand, type);
+    //                }
 
-                    AssignToPlace(place, value, assignmentExpression.Span);
-                    return;
-                }
-                //case ResultStatementSyntax resultExpression:
-                //    // Must be an expression of type `never`
-                //    ConvertExpressionToStatement(resultExpression.Expression);
-                //    ExitScope(resultExpression.Span.AtEnd());
-                //    return;
-            }
-        }
+    //                AssignToPlace(place, value, assignmentExpression.Span);
+    //                return;
+    //            }
+    //            //case ResultStatementSyntax resultExpression:
+    //            //    // Must be an expression of type `never`
+    //            //    ConvertExpressionToStatement(resultExpression.Expression);
+    //            //    ExitScope(resultExpression.Span.AtEnd());
+    //            //    return;
+    //        }
+    //    }
 
-        private BlockBuilder ConvertLoopBody(IBlockExpressionSyntax body)
-        {
-            var oldAddBreaks = addBreaks;
-            addBreaks = new List<Action<BlockBuilder>>();
-            ConvertExpressionToStatement(body);
-            var loopExit = graph.NewBlock();
-            foreach (var addBreak in addBreaks) addBreak(loopExit);
-            addBreaks = oldAddBreaks;
-            return loopExit;
-        }
+    //    private BlockBuilder ConvertLoopBody(IBlockExpressionSyntax body)
+    //    {
+    //        var oldAddBreaks = addBreaks;
+    //        addBreaks = new List<Action<BlockBuilder>>();
+    //        ConvertExpressionToStatement(body);
+    //        var loopExit = graph.NewBlock();
+    //        foreach (var addBreak in addBreaks) addBreak(loopExit);
+    //        addBreaks = oldAddBreaks;
+    //        return loopExit;
+    //    }
 
-        private Value ConvertToValue(IExpressionSyntax expression)
-        {
-            switch (expression)
-            {
-                default:
-                    throw NonExhaustiveMatchException.For(expression);
-                case INewObjectExpressionSyntax newObjectExpression:
-                {
-                    var args = newObjectExpression.Arguments.Select(a => ConvertToOperand(a.Expression))
-                        .ToFixedList();
-                    var type = (UserObjectType)newObjectExpression.Type!.AssertKnown();
-                    // lifetime is implicitly owned since we are making a new one
-                    type = type.WithCapability(ReferenceCapability.Shared);
-                    return new ConstructorCall(type, args, newObjectExpression.Span);
-                }
-                case INameExpressionSyntax identifier:
-                {
-                    var symbol = identifier.ReferencedSymbol;
-                    switch (symbol)
-                    {
-                        case IVariableDeclarationStatementSyntax _:
-                        case IParameterSyntax _:
-                        case IForeachExpressionSyntax _:
-                            return graph.VariableFor(symbol.FullName.UnqualifiedName)
-                                .Reference(identifier.Span);
-                        default:
-                            return new DeclaredValue(symbol.FullName, identifier.Span);
-                    }
-                }
-                case IUnaryOperatorExpressionSyntax unaryExpression:
-                    return ConvertUnaryExpressionToValue(unaryExpression);
-                case IBinaryOperatorExpressionSyntax binaryExpression:
-                    return ConvertBinaryExpressionToValue(binaryExpression);
-                case IIntegerLiteralExpressionSyntax _:
-                    throw new InvalidOperationException(
-                        "Integer literals should have an implicit conversion around them");
-                case IStringLiteralExpressionSyntax stringLiteral:
-                    return new StringConstant(stringLiteral.Value, stringLiteral.Span, stringLiteral.Type.Assigned().AssertKnown());
-                case IBoolLiteralExpressionSyntax boolLiteral:
-                    return new BooleanConstant(boolLiteral.Value, boolLiteral.Span);
-                case INoneLiteralExpressionSyntax _:
-                    throw new InvalidOperationException(
-                        "None literals should have an implicit conversion around them");
-                case IImplicitNumericConversionExpression implicitNumericConversion:
-                    if (implicitNumericConversion.Expression.Type.Assigned().AssertKnown() is
-                        IntegerConstantType constantType)
-                        return new IntegerConstant(constantType.Value,
-                            (IntegerType)implicitNumericConversion.Type.AssertKnown(),
-                            implicitNumericConversion.Span);
-                    else
-                    {
-                        var valueOperand = ConvertToOperand(implicitNumericConversion.Expression);
-                        return new Conversion(
-                            valueOperand,
-                            (NumericType)implicitNumericConversion.Expression.Type.Assigned(),
-                            (NumericType)implicitNumericConversion.Type.Assigned(),
-                            implicitNumericConversion.Span);
-                    }
-                case IImplicitOptionalConversionExpression implicitOptionalConversionExpression:
-                {
-                    var value = ConvertToOperand(implicitOptionalConversionExpression.Expression);
-                    return new ConstructSome(implicitOptionalConversionExpression.ConvertToType,
-                        value, implicitOptionalConversionExpression.Span);
-                }
-                case IIfExpressionSyntax ifExpression:
-                    // TODO deal with the value of the if expression
-                    throw new NotImplementedException();
-                case IUnsafeExpressionSyntax unsafeExpression:
-                    return ConvertToValue(unsafeExpression.Expression);
-                case IImplicitNoneConversionExpression implicitNoneConversion:
-                    return new NoneConstant(implicitNoneConversion.ConvertToType,
-                        implicitNoneConversion.Span);
-                case IInvocationExpressionSyntax invocation:
-                    return ConvertInvocationToValue(invocation);
-                case IFieldAccessExpressionSyntax memberAccess:
-                {
-                    var value = ConvertToPlace(memberAccess.Expression);
-                    var symbol = memberAccess.ReferencedSymbol;
-                    return new FieldAccess(value, symbol.FullName, ValueSemantics.LValue, memberAccess.Span);
-                }
-                case IShareExpressionSyntax shareExpression:
-                    return ConvertToValue(shareExpression.Referent);
-                case IBorrowExpressionSyntax borrowExpression:
-                    // TODO shouldn't borrowing be explicit in the IR and don't we
-                    // need to be able to check mutability on borrows?
-                    return ConvertToValue(borrowExpression.Referent);
-                case IMoveExpressionSyntax move:
-                    return ConvertToOwn(move.Referent, move.Span);
-                case IImplicitImmutabilityConversionExpression implicitImmutabilityConversion:
-                {
-                    var operand = ConvertToOperand(implicitImmutabilityConversion.Expression);
-                    switch (operand)
-                    {
-                        default:
-                            throw NonExhaustiveMatchException.For(expression);
-                        //case BooleanConstant _:
-                        //case Utf8BytesConstant _:
-                        //case IntegerConstant _:
-                        //    return operand;
-                        case VariableReference varReference:
-                            if (implicitImmutabilityConversion.Type.ValueSemantics
-                                == ValueSemantics.Own)
-                                return varReference.AsOwn(implicitImmutabilityConversion.Span);
-                            else
-                                return varReference.AsAlias();
-                    }
-                }
-                case ISelfExpressionSyntax selfExpression:
-                    return graph.VariableFor(SpecialName.Self).Reference(selfExpression.Span);
-            }
-        }
+    //    private Value ConvertToValue(IExpressionSyntax expression)
+    //    {
+    //        switch (expression)
+    //        {
+    //            default:
+    //                throw NonExhaustiveMatchException.For(expression);
+    //            case INewObjectExpressionSyntax newObjectExpression:
+    //            {
+    //                var args = newObjectExpression.Arguments.Select(a => ConvertToOperand(a.Expression))
+    //                    .ToFixedList();
+    //                var type = (UserObjectType)newObjectExpression.Type!.AssertKnown();
+    //                // lifetime is implicitly owned since we are making a new one
+    //                type = type.WithCapability(ReferenceCapability.Shared);
+    //                return new ConstructorCall(type, args, newObjectExpression.Span);
+    //            }
+    //            case INameExpressionSyntax identifier:
+    //            {
+    //                var symbol = identifier.ReferencedSymbol;
+    //                switch (symbol)
+    //                {
+    //                    case IVariableDeclarationStatementSyntax _:
+    //                    case IParameterSyntax _:
+    //                    case IForeachExpressionSyntax _:
+    //                        return graph.VariableFor(symbol.FullName.UnqualifiedName)
+    //                            .Reference(identifier.Span);
+    //                    default:
+    //                        return new DeclaredValue(symbol.FullName, identifier.Span);
+    //                }
+    //            }
+    //            case IUnaryOperatorExpressionSyntax unaryExpression:
+    //                return ConvertUnaryExpressionToValue(unaryExpression);
+    //            case IBinaryOperatorExpressionSyntax binaryExpression:
+    //                return ConvertBinaryExpressionToValue(binaryExpression);
+    //            case IIntegerLiteralExpressionSyntax _:
+    //                throw new InvalidOperationException(
+    //                    "Integer literals should have an implicit conversion around them");
+    //            case IStringLiteralExpressionSyntax stringLiteral:
+    //                return new StringConstant(stringLiteral.Value, stringLiteral.Span, stringLiteral.Type.Assigned().AssertKnown());
+    //            case IBoolLiteralExpressionSyntax boolLiteral:
+    //                return new BooleanConstant(boolLiteral.Value, boolLiteral.Span);
+    //            case INoneLiteralExpressionSyntax _:
+    //                throw new InvalidOperationException(
+    //                    "None literals should have an implicit conversion around them");
+    //            case IImplicitNumericConversionExpression implicitNumericConversion:
+    //                if (implicitNumericConversion.Expression.Type.Assigned().AssertKnown() is
+    //                    IntegerConstantType constantType)
+    //                    return new IntegerConstant(constantType.Value,
+    //                        (IntegerType)implicitNumericConversion.Type.AssertKnown(),
+    //                        implicitNumericConversion.Span);
+    //                else
+    //                {
+    //                    var valueOperand = ConvertToOperand(implicitNumericConversion.Expression);
+    //                    return new Conversion(
+    //                        valueOperand,
+    //                        (NumericType)implicitNumericConversion.Expression.Type.Assigned(),
+    //                        (NumericType)implicitNumericConversion.Type.Assigned(),
+    //                        implicitNumericConversion.Span);
+    //                }
+    //            case IImplicitOptionalConversionExpression implicitOptionalConversionExpression:
+    //            {
+    //                var value = ConvertToOperand(implicitOptionalConversionExpression.Expression);
+    //                return new ConstructSome(implicitOptionalConversionExpression.ConvertToType,
+    //                    value, implicitOptionalConversionExpression.Span);
+    //            }
+    //            case IIfExpressionSyntax ifExpression:
+    //                // TODO deal with the value of the if expression
+    //                throw new NotImplementedException();
+    //            case IUnsafeExpressionSyntax unsafeExpression:
+    //                return ConvertToValue(unsafeExpression.Expression);
+    //            case IImplicitNoneConversionExpression implicitNoneConversion:
+    //                return new NoneConstant(implicitNoneConversion.ConvertToType,
+    //                    implicitNoneConversion.Span);
+    //            case IInvocationExpressionSyntax invocation:
+    //                return ConvertInvocationToValue(invocation);
+    //            case IFieldAccessExpressionSyntax memberAccess:
+    //            {
+    //                var value = ConvertToPlace(memberAccess.Expression);
+    //                var symbol = memberAccess.ReferencedSymbol;
+    //                return new FieldAccess(value, symbol.FullName, ValueSemantics.LValue, memberAccess.Span);
+    //            }
+    //            case IShareExpressionSyntax shareExpression:
+    //                return ConvertToValue(shareExpression.Referent);
+    //            case IBorrowExpressionSyntax borrowExpression:
+    //                // TODO shouldn't borrowing be explicit in the IR and don't we
+    //                // need to be able to check mutability on borrows?
+    //                return ConvertToValue(borrowExpression.Referent);
+    //            case IMoveExpressionSyntax move:
+    //                return ConvertToOwn(move.Referent, move.Span);
+    //            case IImplicitImmutabilityConversionExpression implicitImmutabilityConversion:
+    //            {
+    //                var operand = ConvertToOperand(implicitImmutabilityConversion.Expression);
+    //                switch (operand)
+    //                {
+    //                    default:
+    //                        throw NonExhaustiveMatchException.For(expression);
+    //                    //case BooleanConstant _:
+    //                    //case Utf8BytesConstant _:
+    //                    //case IntegerConstant _:
+    //                    //    return operand;
+    //                    case VariableReference varReference:
+    //                        if (implicitImmutabilityConversion.Type.ValueSemantics
+    //                            == ValueSemantics.Own)
+    //                            return varReference.AsOwn(implicitImmutabilityConversion.Span);
+    //                        else
+    //                            return varReference.AsAlias();
+    //                }
+    //            }
+    //            case ISelfExpressionSyntax selfExpression:
+    //                return graph.VariableFor(SpecialName.Self).Reference(selfExpression.Span);
+    //        }
+    //    }
 
-        private Value ConvertToOwn(IExpressionSyntax expression, TextSpan moveSpan)
-        {
-            var operand = ConvertToOperand(expression);
-            switch (operand)
-            {
-                case VariableReference variableReference:
-                    return variableReference.AsOwn(moveSpan);
-                default:
-                    throw new NotImplementedException();
-            }
-        }
+    //    private Value ConvertToOwn(IExpressionSyntax expression, TextSpan moveSpan)
+    //    {
+    //        var operand = ConvertToOperand(expression);
+    //        switch (operand)
+    //        {
+    //            case VariableReference variableReference:
+    //                return variableReference.AsOwn(moveSpan);
+    //            default:
+    //                throw new NotImplementedException();
+    //        }
+    //    }
 
-        private IOperand ConvertToOperand(IExpressionSyntax expression)
-        {
-            var value = ConvertToValue(expression);
-            return ConvertToOperand(value, expression.Type.Assigned());
-        }
+    //    private IOperand ConvertToOperand(IExpressionSyntax expression)
+    //    {
+    //        var value = ConvertToValue(expression);
+    //        return ConvertToOperand(value, expression.Type.Assigned());
+    //    }
 
-        private IOperand ConvertToOperand(IValue value, DataType type)
-        {
-            if (value is IOperand operand)
-                return operand;
-            return AssignToTemp(type, value);
-        }
+    //    private IOperand ConvertToOperand(IValue value, DataType type)
+    //    {
+    //        if (value is IOperand operand)
+    //            return operand;
+    //        return AssignToTemp(type, value);
+    //    }
 
-        private Value ConvertBinaryExpressionToValue(IBinaryOperatorExpressionSyntax operatorExpression)
-        {
-            switch (operatorExpression.Operator)
-            {
-                case BinaryOperator.Plus:
-                case BinaryOperator.Minus:
-                case BinaryOperator.Asterisk:
-                case BinaryOperator.Slash:
-                case BinaryOperator.EqualsEquals:
-                case BinaryOperator.NotEqual:
-                case BinaryOperator.LessThan:
-                case BinaryOperator.LessThanOrEqual:
-                case BinaryOperator.GreaterThan:
-                case BinaryOperator.GreaterThanOrEqual:
-                {
-                    // TODO handle calls to overloaded operators
-                    var leftOperand = ConvertToOperand(operatorExpression.LeftOperand);
-                    var rightOperand = ConvertToOperand(operatorExpression.RightOperand);
-                    switch (operatorExpression.LeftOperand.Type)
-                    {
-                        case SimpleType operandType:
-                        {
-                            // What matters is the type we are operating on, for comparisons, that is different than the result type which is bool
-                            return new BinaryOperation(leftOperand, operatorExpression.Operator,
-                                rightOperand, operandType);
-                        }
-                        case UserObjectType _:
-                        {
-                            if (operatorExpression.Operator != BinaryOperator.EqualsEquals)
-                                throw new NotImplementedException();
-                            //var equalityOperators = operandType.Symbol.Lookup(SpecialName.OperatorEquals);
-                            //if (equalityOperators.Count == 1)
-                            //{
-                            //    var equalityOperator = equalityOperators.Single();
-                            //    return new FunctionCall(equalityOperator.FullName,
-                            //                //(FunctionType)equalityOperator.Type,
-                            //                new[] { leftOperand, rightOperand },
-                            //                expression.Span);
-                            //}
-                            throw new NotImplementedException();
-                        }
-                        default:
-                            throw NonExhaustiveMatchException.For(operatorExpression.LeftOperand.Type);
-                    }
-                }
-                case BinaryOperator.And:
-                case BinaryOperator.Or:
-                {
-                    // TODO handle calls to overloaded operators
-                    // TODO handle short circuiting if needed
-                    var leftOperand = ConvertToOperand(operatorExpression.LeftOperand);
-                    var rightOperand = ConvertToOperand(operatorExpression.RightOperand);
-                    return new BinaryOperation(leftOperand, operatorExpression.Operator, rightOperand,
-                        (SimpleType)operatorExpression.Type);
-                }
-                case BinaryOperator.DotDot:
-                case BinaryOperator.LessThanDotDot:
-                case BinaryOperator.DotDotLessThan:
-                case BinaryOperator.LessThanDotDotLessThan:
-                    throw new NotImplementedException("Conversion of range for binary operators");
-                default:
-                    throw ExhaustiveMatch.Failed(operatorExpression.Operator);
-            }
-        }
+    //    private Value ConvertBinaryExpressionToValue(IBinaryOperatorExpressionSyntax operatorExpression)
+    //    {
+    //        switch (operatorExpression.Operator)
+    //        {
+    //            case BinaryOperator.Plus:
+    //            case BinaryOperator.Minus:
+    //            case BinaryOperator.Asterisk:
+    //            case BinaryOperator.Slash:
+    //            case BinaryOperator.EqualsEquals:
+    //            case BinaryOperator.NotEqual:
+    //            case BinaryOperator.LessThan:
+    //            case BinaryOperator.LessThanOrEqual:
+    //            case BinaryOperator.GreaterThan:
+    //            case BinaryOperator.GreaterThanOrEqual:
+    //            {
+    //                // TODO handle calls to overloaded operators
+    //                var leftOperand = ConvertToOperand(operatorExpression.LeftOperand);
+    //                var rightOperand = ConvertToOperand(operatorExpression.RightOperand);
+    //                switch (operatorExpression.LeftOperand.Type)
+    //                {
+    //                    case SimpleType operandType:
+    //                    {
+    //                        // What matters is the type we are operating on, for comparisons, that is different than the result type which is bool
+    //                        return new BinaryOperation(leftOperand, operatorExpression.Operator,
+    //                            rightOperand, operandType);
+    //                    }
+    //                    case UserObjectType _:
+    //                    {
+    //                        if (operatorExpression.Operator != BinaryOperator.EqualsEquals)
+    //                            throw new NotImplementedException();
+    //                        //var equalityOperators = operandType.Symbol.Lookup(SpecialName.OperatorEquals);
+    //                        //if (equalityOperators.Count == 1)
+    //                        //{
+    //                        //    var equalityOperator = equalityOperators.Single();
+    //                        //    return new FunctionCall(equalityOperator.FullName,
+    //                        //                //(FunctionType)equalityOperator.Type,
+    //                        //                new[] { leftOperand, rightOperand },
+    //                        //                expression.Span);
+    //                        //}
+    //                        throw new NotImplementedException();
+    //                    }
+    //                    default:
+    //                        throw NonExhaustiveMatchException.For(operatorExpression.LeftOperand.Type);
+    //                }
+    //            }
+    //            case BinaryOperator.And:
+    //            case BinaryOperator.Or:
+    //            {
+    //                // TODO handle calls to overloaded operators
+    //                // TODO handle short circuiting if needed
+    //                var leftOperand = ConvertToOperand(operatorExpression.LeftOperand);
+    //                var rightOperand = ConvertToOperand(operatorExpression.RightOperand);
+    //                return new BinaryOperation(leftOperand, operatorExpression.Operator, rightOperand,
+    //                    (SimpleType)operatorExpression.Type);
+    //            }
+    //            case BinaryOperator.DotDot:
+    //            case BinaryOperator.LessThanDotDot:
+    //            case BinaryOperator.DotDotLessThan:
+    //            case BinaryOperator.LessThanDotDotLessThan:
+    //                throw new NotImplementedException("Conversion of range for binary operators");
+    //            default:
+    //                throw ExhaustiveMatch.Failed(operatorExpression.Operator);
+    //        }
+    //    }
 
-        private Value ConvertUnaryExpressionToValue(IUnaryOperatorExpressionSyntax operatorExpression)
-        {
-            switch (operatorExpression.Operator)
-            {
-                case UnaryOperator.Not:
-                case UnaryOperator.Minus:
-                    var operand = ConvertToOperand(operatorExpression.Operand);
-                    return new UnaryOperation(operatorExpression.Operator, operand, operatorExpression.Span);
-                case UnaryOperator.Plus:
-                    // This is a no-op
-                    return ConvertToValue(operatorExpression.Operand);
-                default:
-                    throw ExhaustiveMatch.Failed(operatorExpression.Operator);
-            }
-        }
+    //    private Value ConvertUnaryExpressionToValue(IUnaryOperatorExpressionSyntax operatorExpression)
+    //    {
+    //        switch (operatorExpression.Operator)
+    //        {
+    //            case UnaryOperator.Not:
+    //            case UnaryOperator.Minus:
+    //                var operand = ConvertToOperand(operatorExpression.Operand);
+    //                return new UnaryOperation(operatorExpression.Operator, operand, operatorExpression.Span);
+    //            case UnaryOperator.Plus:
+    //                // This is a no-op
+    //                return ConvertToValue(operatorExpression.Operand);
+    //            default:
+    //                throw ExhaustiveMatch.Failed(operatorExpression.Operator);
+    //        }
+    //    }
 
-        private Value ConvertInvocationToValue(IInvocationExpressionSyntax invocationExpression)
-        {
-            switch (invocationExpression)
-            {
-                default:
-                    throw ExhaustiveMatch.Failed(invocationExpression);
-                case IMethodInvocationExpressionSyntax methodInvocation:
-                    return ConvertInvocationToValue(methodInvocation);
-                case IFunctionInvocationExpressionSyntax functionInvocation:
-                    return ConvertInvocationToValue(functionInvocation);
-            }
-        }
+    //    private Value ConvertInvocationToValue(IInvocationExpressionSyntax invocationExpression)
+    //    {
+    //        switch (invocationExpression)
+    //        {
+    //            default:
+    //                throw ExhaustiveMatch.Failed(invocationExpression);
+    //            case IMethodInvocationExpressionSyntax methodInvocation:
+    //                return ConvertInvocationToValue(methodInvocation);
+    //            case IFunctionInvocationExpressionSyntax functionInvocation:
+    //                return ConvertInvocationToValue(functionInvocation);
+    //        }
+    //    }
 
-        private Value ConvertInvocationToValue(IMethodInvocationExpressionSyntax invocationExpression)
-        {
-            var self = ConvertToOperand(invocationExpression.Target);
-            var arguments = invocationExpression.Arguments.Select(a => ConvertToOperand(a.Expression)).ToList();
-            var symbol = invocationExpression.MethodNameSyntax.ReferencedSymbol;
-            switch (invocationExpression.Target.Type)
-            {
-                case SimpleType _:
-                    // Full name because this isn't a member
-                    return new FunctionCall(symbol.FullName,
-                        self, arguments, invocationExpression.Span);
-                default:
-                    return new VirtualFunctionCall(invocationExpression.Span,
-                        symbol.FullName.UnqualifiedName, self, arguments);
-            }
-        }
+    //    private Value ConvertInvocationToValue(IMethodInvocationExpressionSyntax invocationExpression)
+    //    {
+    //        var self = ConvertToOperand(invocationExpression.Target);
+    //        var arguments = invocationExpression.Arguments.Select(a => ConvertToOperand(a.Expression)).ToList();
+    //        var symbol = invocationExpression.MethodNameSyntax.ReferencedSymbol;
+    //        switch (invocationExpression.Target.Type)
+    //        {
+    //            case SimpleType _:
+    //                // Full name because this isn't a member
+    //                return new FunctionCall(symbol.FullName,
+    //                    self, arguments, invocationExpression.Span);
+    //            default:
+    //                return new VirtualFunctionCall(invocationExpression.Span,
+    //                    symbol.FullName.UnqualifiedName, self, arguments);
+    //        }
+    //    }
 
-        private Value ConvertInvocationToValue(IFunctionInvocationExpressionSyntax invocationExpression)
-        {
-            var functionSymbol = invocationExpression.FunctionNameSyntax.ReferencedSymbol;
-            var arguments = invocationExpression.Arguments.Select(a => ConvertToOperand(a.Expression)).ToList();
-            return new FunctionCall(functionSymbol.FullName, arguments, invocationExpression.Span);
-        }
+    //    private Value ConvertInvocationToValue(IFunctionInvocationExpressionSyntax invocationExpression)
+    //    {
+    //        var functionSymbol = invocationExpression.FunctionNameSyntax.ReferencedSymbol;
+    //        var arguments = invocationExpression.Arguments.Select(a => ConvertToOperand(a.Expression)).ToList();
+    //        return new FunctionCall(functionSymbol.FullName, arguments, invocationExpression.Span);
+    //    }
 
-        private IPlace ConvertToPlace(IExpressionSyntax value)
-        {
-            switch (value)
-            {
-                default:
-                    // TODO maybe we need some kind if ILValueExpression interface
-                    throw NonExhaustiveMatchException.For(value);
-                case IShareExpressionSyntax shareExpression:
-                    return ConvertToPlace(shareExpression.Referent);
-                case ISelfExpressionSyntax selfExpression:
-                    return graph.VariableFor(SpecialName.Self).LValueReference(selfExpression.Span);
-                case INameExpressionSyntax identifier:
-                    // TODO what if this isn't just a variable?
-                    return graph.VariableFor(identifier.ReferencedSymbol.FullName.UnqualifiedName)
-                                .LValueReference(identifier.Span);
-                case IFieldAccessExpressionSyntax memberAccessExpression:
-                    var expressionValue = ConvertToPlace(memberAccessExpression.Expression);
-                    return new FieldAccess(expressionValue, memberAccessExpression.Field.Name, ValueSemantics.LValue, memberAccessExpression.Span);
-            }
-        }
-    }
+    //    private IPlace ConvertToPlace(IExpressionSyntax value)
+    //    {
+    //        switch (value)
+    //        {
+    //            default:
+    //                // TODO maybe we need some kind if ILValueExpression interface
+    //                throw NonExhaustiveMatchException.For(value);
+    //            case IShareExpressionSyntax shareExpression:
+    //                return ConvertToPlace(shareExpression.Referent);
+    //            case ISelfExpressionSyntax selfExpression:
+    //                return graph.VariableFor(SpecialName.Self).LValueReference(selfExpression.Span);
+    //            case INameExpressionSyntax identifier:
+    //                // TODO what if this isn't just a variable?
+    //                return graph.VariableFor(identifier.ReferencedSymbol.FullName.UnqualifiedName)
+    //                            .LValueReference(identifier.Span);
+    //            case IFieldAccessExpressionSyntax memberAccessExpression:
+    //                var expressionValue = ConvertToPlace(memberAccessExpression.Expression);
+    //                return new FieldAccess(expressionValue, memberAccessExpression.Field.Name, ValueSemantics.LValue, memberAccessExpression.Span);
+    //        }
+    //    }
+    //}
 }
