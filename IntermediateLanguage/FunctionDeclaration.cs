@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
@@ -10,6 +11,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
     public class FunctionDeclaration : Declaration, ICallableDeclaration, IFunctionSymbol
     {
         public bool IsExternal { get; }
+
+        [SuppressMessage("Design", "CA1033:Interface methods should be callable by child types", Justification = "NA")]
+        bool ICallableDeclaration.IsConstructor => false;
+
         public FixedList<Parameter> Parameters { get; }
         public int Arity => Parameters.Count;
         public DataType ReturnType { get; }

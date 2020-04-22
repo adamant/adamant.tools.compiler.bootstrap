@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using ExhaustiveMatching;
 
@@ -12,13 +11,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         private readonly NameMangler nameMangler;
         private readonly IConverter<Parameter> parameterConverter;
         private readonly IConverter<DataType> typeConverter;
-        private readonly IEmitter<ControlFlowGraph> controlFlowEmitter;
+        private readonly IEmitter<ICallableDeclaration> controlFlowEmitter;
 
         public DeclarationEmitter(
             NameMangler nameMangler,
             IConverter<Parameter> parameterConverter,
             IConverter<DataType> typeConverter,
-            IEmitter<ControlFlowGraph> controlFlowEmitter)
+            IEmitter<ICallableDeclaration> controlFlowEmitter)
         {
             this.nameMangler = nameMangler;
             this.parameterConverter = parameterConverter;
@@ -74,7 +73,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.Definitions.DeclarationSeparatorLine();
             code.Definitions.AppendLine($"{returnType} {name}({parameters})");
             code.Definitions.BeginBlock();
-            controlFlowEmitter.Emit(function.IL, code);
+            controlFlowEmitter.Emit(function, code);
             code.Definitions.EndBlock();
         }
 
@@ -94,7 +93,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.Definitions.DeclarationSeparatorLine();
             code.Definitions.AppendLine($"{returnType} {name}({parameters})");
             code.Definitions.BeginBlock();
-            controlFlowEmitter.Emit(constructor.IL, code);
+            controlFlowEmitter.Emit(constructor, code);
             code.Definitions.EndBlock();
         }
 

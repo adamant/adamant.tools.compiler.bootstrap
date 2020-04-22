@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Operands;
@@ -13,7 +14,7 @@ using static Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructi
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
-    public class ControlFlowEmitter : IEmitter<ControlFlowGraph>
+    public class ControlFlowEmitter : IEmitter<ICallableDeclaration>
     {
         private readonly NameMangler nameMangler;
         private readonly IConverter<DataType> typeConverter;
@@ -26,8 +27,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             this.nameMangler = nameMangler;
         }
 
-        public void Emit(ControlFlowGraph cfg, Code code)
+        public void Emit(ICallableDeclaration callable, Code code)
         {
+            var cfg = callable.IL!;
             var definitions = code.Definitions;
 
             foreach (var declaration in cfg.VariableDeclarations.Where(v => v.TypeIsNotEmpty))
@@ -37,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 definitions.BlankLine();
 
             foreach (var block in cfg.Blocks)
-                EmitBlock(block, definitions);
+                EmitBlock(block, callable.IsConstructor, definitions);
         }
 
         private void EmitVariable(VariableDeclaration declaration, CCodeBuilder code)
@@ -47,15 +49,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.AppendLine($"{typeConverter.Convert(declaration.Type)} _{declaration.Variable.Name}{initializer}; // {declaration}");
         }
 
-        private void EmitBlock(Block block, CCodeBuilder code)
+        private void EmitBlock(Block block, bool isConstructor, CCodeBuilder code)
         {
             code.AppendLine($"bb{block.Number}:");
             code.BeginBlock();
             foreach (var instruction in block.Instructions)
-            {
                 EmitInstruction(instruction, code);
-            }
-            EmitInstruction(block.Terminator, code);
+
+            EmitInstruction(block.Terminator, isConstructor, code);
             code.EndBlock();
         }
 
@@ -310,7 +311,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             }
         }
 
-        private static void EmitInstruction(TerminatorInstruction instruction, CCodeBuilder code)
+        private static void EmitInstruction(TerminatorInstruction instruction, bool isConstructor, CCodeBuilder code)
         {
             code.AppendLine("// " + instruction);
             switch (instruction)
@@ -326,11 +327,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 case ReturnValueInstruction ins:
                     code.AppendLine($"return {ConvertOperand(ins.Value)};");
                     break;
-                case ReturnVoidInstruction ins:
-                    code.AppendLine("return;");
+                case ReturnVoidInstruction _:
+                    code.AppendLine(isConstructor ? "return _0;" : "return;");
                     break;
             }
         }
+
         private string ConvertPlace(Place place)
         {
             switch (place)
