@@ -150,11 +150,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.EndLine(":");
             foreach (var instruction in block.Instructions)
             {
-                _ = cfg;
-                throw new NotImplementedException();
+                _ = cfg; // To get rid of error about unused parameter
                 //Disassemble(cfg, cfg.LiveVariables?.Before(instruction), builder);
-                //builder.AppendLine(instruction.ToStatementString().PadRight(StandardStatementWidth)
-                //                   + instruction.ContextCommentString());
+                builder.AppendLine(instruction.ToInstructionString().PadRight(StandardStatementWidth)
+                                   + instruction.ContextCommentString());
                 //var insertedDeletes = cfg.InsertedDeletes ?? throw new InvalidOperationException("Inserted deletes is null");
                 //Disassemble(insertedDeletes.After(instruction), builder);
                 //Disassemble(cfg.BorrowClaims?.After(instruction), builder);

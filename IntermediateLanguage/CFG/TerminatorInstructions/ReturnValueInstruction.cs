@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.TerminatorIn
     {
         public Operand Value { get; }
 
-        protected ReturnValueInstruction(Operand value, TextSpan span, Scope scope)
+        public ReturnValueInstruction(Operand value, TextSpan span, Scope scope)
             : base(span, scope)
         {
             Value = value;

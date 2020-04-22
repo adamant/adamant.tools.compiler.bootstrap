@@ -392,6 +392,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 {
                     if (exp.ReturnValue == null)
                         currentBlock!.End(new ReturnVoidInstruction(exp.Span, CurrentScope));
+                    else
+                    {
+                        var returnValue = ConvertToOperand(exp.ReturnValue);
+                        currentBlock!.End(new ReturnValueInstruction(returnValue, exp.Span, CurrentScope));
+                    }
                 }
                 break;
                 case INameExpressionSyntax _:
@@ -595,7 +600,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 {
                     if (exp.Expression.Type.Assigned().AssertKnown() is IntegerConstantType constantType)
                         currentBlock!.Add(new LoadIntegerInstruction(resultPlace, constantType.Value,
-                            (IntegerType) exp.Type.Assigned().AssertKnown(),
+                            (IntegerType)exp.Type.Assigned().AssertKnown(),
                             exp.Span, CurrentScope));
                     else
                         currentBlock!.Add(new ConvertInstruction(resultPlace, ConvertToOperand(exp.Expression),
