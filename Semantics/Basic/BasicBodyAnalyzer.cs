@@ -141,7 +141,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         public void CheckType(ref IExpressionSyntax expression, DataType expectedType)
         {
-            if (expression == null) return;
+            if (expression is null) return;
             InferType(ref expression);
             var actualType = InsertImplicitConversionIfNeeded(ref expression, expectedType);
             if (!expectedType.IsAssignableFrom(expectedType))
@@ -500,9 +500,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IFieldAccessExpressionSyntax memberAccess:
                 {
                     DataType targetType;
-                    if (memberAccess.Expression == null)
+                    if (memberAccess.Expression is null)
                     {
-                        if (selfType == null)
+                        if (selfType is null)
                         {
                             diagnostics.Add(SemanticError.ImplicitSelfOutsideMethod(file, memberAccess.Span.AtStart()));
                             targetType = DataType.Unknown;
@@ -536,7 +536,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return assignmentExpression.Type = DataType.Void;
                 }
                 case ISelfExpressionSyntax selfExpression:
-                    if (selfType == null)
+                    if (selfType is null)
                         diagnostics.Add(SemanticError.SelfOutsideMethod(file, selfExpression.Span));
                     return selfExpression.Type = selfType ?? DataType.Unknown;
                 case INoneLiteralExpressionSyntax noneLiteralExpression:

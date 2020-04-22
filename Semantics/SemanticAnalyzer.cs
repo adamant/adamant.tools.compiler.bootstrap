@@ -81,7 +81,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             scopesBuilder.BuildScopesFor(packageSyntax);
             var stringSymbol = scopesBuilder.GlobalScope.LookupInGlobalScope(new SimpleName("String"))
                                             .OfType<ITypeSymbol>().FirstOrDefault();
-            if (stringSymbol == null)
+            if (stringSymbol is null)
                 // TODO we are assuming there is a compilation unit. This should be generated against the package itself
                 diagnostics.Add(SemanticError.NoStringTypeDefined(packageSyntax.CompilationUnits[0].CodeFile));
             return stringSymbol;

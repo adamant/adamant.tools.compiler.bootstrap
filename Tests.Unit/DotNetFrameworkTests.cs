@@ -122,7 +122,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
         public static Ref<T> HasValue<T>(this Ref<T?> value)
             where T : class
         {
-            if (value.Value == null)
+            if (value.Value is null)
                 throw new InvalidOperationException();
             return value!;
         }

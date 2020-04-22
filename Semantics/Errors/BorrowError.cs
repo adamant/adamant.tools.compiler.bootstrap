@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
             TextSpan span,
             SimpleName variable)
         {
-            var msg = variable == null ? "Shared value does not live long enough"
+            var msg = variable is null ? "Shared value does not live long enough"
                 : $"Value shared by `{variable}` does not live long enough";
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 4001, msg);
         }

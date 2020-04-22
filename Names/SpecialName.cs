@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
 
         public static SimpleName Constructor(string? name = null)
         {
-            return name == null ? New : SimpleName.Special("new_" + name);
+            return name is null ? New : SimpleName.Special("new_" + name);
         }
     }
 }

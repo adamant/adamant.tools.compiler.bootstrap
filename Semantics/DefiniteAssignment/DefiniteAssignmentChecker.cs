@@ -60,7 +60,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
             IVariableDeclarationStatementSyntax variableDeclaration,
             VariableFlags definitelyAssigned)
         {
-            if (variableDeclaration.Initializer == null)
+            if (variableDeclaration.Initializer is null)
                 return definitelyAssigned;
             return definitelyAssigned.Set(variableDeclaration, true);
         }

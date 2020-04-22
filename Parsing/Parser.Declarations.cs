@@ -100,7 +100,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 var (nameSegment, segmentSpan) = Tokens.ExpectToken<IIdentifierToken>();
                 // We need the span to cover a trailing dot
                 span = TextSpan.Covering(span, segmentSpan);
-                if (nameSegment == null)
+                if (nameSegment is null)
                     break;
                 name = name.Qualify(nameSegment.Value);
             }

@@ -66,7 +66,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             foreach (var callable in callables)
             {
                 //var controlFlow = callable.ControlFlowOld;
-                //if (controlFlow == null) continue;
+                //if (controlFlow is null) continue;
                 //var borrowChecker = new BorrowChecker(controlFlow.File, diagnostics, saveBorrowClaims);
                 //borrowChecker.Check(controlFlow, liveness[callable]);
                 throw new NotImplementedException();
@@ -384,7 +384,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             Claims claimsAfterStatement,
             FixedList<VariableDeclaration> variables)
         {
-            if (assignToPlace == null)
+            if (assignToPlace is null)
                 return;
 
             var variableDeclaration = GetVariableDeclaration(assignToPlace, variables);

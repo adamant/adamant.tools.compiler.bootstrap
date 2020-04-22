@@ -116,7 +116,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
 
         private static void Disassemble(ControlFlowGraph cfg, AssemblyBuilder builder)
         {
-            if (cfg == null)
+            if (cfg is null)
             {
                 builder.AppendLine("// Control Flow Graph not available");
                 return;
@@ -169,7 +169,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             BitArray? liveVariables,
             AssemblyBuilder builder)
         {
-            if (liveVariables == null || liveVariables.Cast<bool>().All(x => x == false)) return;
+            if (liveVariables is null || liveVariables.Cast<bool>().All(x => x == false)) return;
 
             var variables = string.Join(", ", liveVariables.TrueIndexes()
                     .Select(i => FormatVariableName(cfg.VariableDeclarations[i])));
@@ -195,7 +195,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
 
         private static bool Disassemble(Claims? claims, AssemblyBuilder builder)
         {
-            if (claims == null) return false;
+            if (claims is null) return false;
 
             foreach (var claim in claims.AsEnumerable())
             {

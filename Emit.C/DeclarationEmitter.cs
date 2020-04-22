@@ -61,7 +61,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             // Don't emit functions without control flow, they are generic
             // TODO need to handle better
-            if (function.IL == null) return;
+            if (function.IL is null) return;
 
             var name = nameMangler.MangleName(function);
             var parameters = Convert(function.Parameters);
@@ -81,7 +81,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             // Don't emit constructors without control flow, they are generic
             // TODO need to handle better
-            if (constructor.IL == null) return;
+            if (constructor.IL is null) return;
 
             var name = nameMangler.MangleName(constructor);
             var parameters = Convert(constructor.Parameters);

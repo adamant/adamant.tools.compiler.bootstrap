@@ -75,7 +75,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private (ITypeSyntax? Type, bool InferMutableType) ParseVariableDeclarationType()
         {
             var mutableKeyword = Tokens.AcceptToken<IMutableKeywordToken>();
-            if (mutableKeyword == null)
+            if (mutableKeyword is null)
                 return (ParseType(), false);
 
             switch (Tokens.Current)

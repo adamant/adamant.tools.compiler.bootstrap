@@ -59,7 +59,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
             IVariableDeclarationStatementSyntax variableDeclaration,
             VariableFlags definitelyUnassigned)
         {
-            if (variableDeclaration.Initializer == null)
+            if (variableDeclaration.Initializer is null)
                 return definitelyUnassigned;
             return definitelyUnassigned.Set(variableDeclaration, false);
         }

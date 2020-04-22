@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge
         /// * "" returns null
         public static bool? OptionalValue(this CommandOption<bool> option)
         {
-            return option.HasValue() ? (option.Value() == null || option.ParsedValue) : default(bool?);
+            return option.HasValue() ? (option.Value() is null || option.ParsedValue) : default(bool?);
         }
     }
 }

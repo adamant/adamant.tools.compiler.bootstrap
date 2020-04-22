@@ -52,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
         public void EmitEntryPointAdapter(FunctionDeclaration entryPoint, Code code)
         {
-            if (entryPoint == null) return;
+            if (entryPoint is null) return;
 
             code.Definitions.DeclarationSeparatorLine();
             code.Definitions.AppendLine("// Entry Point Adapter");

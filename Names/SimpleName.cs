@@ -68,7 +68,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
 
         public SimpleName WithoutNumber()
         {
-            if (Number == null)
+            if (Number is null)
                 return this;
             return new SimpleName(Text, IsSpecial, null);
         }

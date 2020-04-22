@@ -48,7 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             where TSeparator : class, IToken
         {
             var item = acceptItem();
-            if (item == null)
+            if (item is null)
                 throw new ParseFailedException();
             var items = new List<T>();
             while (item != null)

@@ -1,15 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.AST;
-using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using Adamant.Tools.Compiler.Bootstrap.Names;
-using ExhaustiveMatching;
-
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 {
     ///// <summary>
@@ -404,7 +392,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
     //                var thenExit = currentBlock;
     //                BlockBuilder elseEntry;
     //                BlockBuilder exit = null;
-    //                if (ifExpression.ElseClause == null)
+    //                if (ifExpression.ElseClause is null)
     //                {
     //                    elseEntry = exit = graph.NewBlock();
     //                    thenExit?.AddGoto(exit, ifExpression.ThenBlock.Span.AtEnd(), CurrentScope);

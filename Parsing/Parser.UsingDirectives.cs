@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public IUsingDirectiveSyntax? AcceptUsingDirective()
         {
             var accept = Tokens.AcceptToken<IUsingKeywordToken>();
-            if (accept == null)
+            if (accept is null)
                 return null;
             var identifiers = AcceptOneOrMore<IIdentifierToken, IDotToken>(
                 () => Tokens.AcceptToken<IIdentifierToken>());

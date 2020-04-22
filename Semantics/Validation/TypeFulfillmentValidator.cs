@@ -22,12 +22,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
             switch (syntax)
             {
                 case IClassDeclarationSyntax classDeclaration:
-                    classDeclaration?.DeclaresType.Fulfilled();
+                    classDeclaration.DeclaresType.Fulfilled();
                     // Don't recur into body, we will see those as separate members
                     return;
                 case IConstructorDeclarationSyntax constructorDeclaration:
                     WalkChildren(constructorDeclaration);
-                    if (constructorDeclaration.SelfParameterType == null)
+                    if (constructorDeclaration.SelfParameterType is null)
                         throw new Exception("Constructor self parameter doesn't have type");
                     return;
                 case IMethodDeclarationSyntax methodDeclaration:
@@ -40,12 +40,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     return;
                 case IVariableDeclarationStatementSyntax variableDeclaration:
                     WalkChildren(variableDeclaration);
-                    if (variableDeclaration.Type == null)
+                    if (variableDeclaration.Type is null)
                         throw new Exception("Variable declaration doesn't have type");
                     return;
                 case IExpressionSyntax expression:
                     WalkChildren(expression);
-                    if (expression.Type == null)
+                    if (expression.Type is null)
                         throw new Exception("Expression doesn't have type");
                     return;
             }

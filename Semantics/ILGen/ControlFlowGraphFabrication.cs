@@ -324,7 +324,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     var thenExit = currentBlock;
                     BlockBuilder elseEntry;
                     BlockBuilder? exit = null;
-                    if (exp.ElseClause == null)
+                    if (exp.ElseClause is null)
                     {
                         elseEntry = exit = graph.NewBlock();
                         thenExit?.End(new GotoInstruction(exit.Number, exp.ThenBlock.Span.AtEnd(), CurrentScope));
@@ -360,7 +360,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     var leftOperand = exp.LeftOperand;
                     var rightOperand = exp.RightOperand;
                     var assignInto = ConvertToPlaceWithoutSideEffects(leftOperand);
-                    if (assignInto == null)
+                    if (assignInto is null)
                     {
                         var tempVar = graph.Let(leftOperand.Type.Assigned().AssertKnown(), CurrentScope);
                         var tempSpan = rightOperand.Span.AtStart();
@@ -389,7 +389,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 break;
                 case IReturnExpressionSyntax exp:
                 {
-                    if (exp.ReturnValue == null)
+                    if (exp.ReturnValue is null)
                         currentBlock!.End(new ReturnVoidInstruction(exp.Span, CurrentScope));
                     else
                     {
@@ -464,7 +464,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     var leftOperand = exp.LeftOperand;
                     var rightOperand = exp.RightOperand;
                     var assignInto = ConvertToPlaceWithoutSideEffects(leftOperand);
-                    if (assignInto == null)
+                    if (assignInto is null)
                     {
                         var tempVar = graph.Let(leftOperand.Type.Assigned().AssertKnown(), CurrentScope);
                         var tempSpan = rightOperand.Span.AtStart();
@@ -569,7 +569,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 break;
                 case IFieldAccessExpressionSyntax exp:
                 {
-                    if (exp.Expression == null)
+                    if (exp.Expression is null)
                         throw new NotImplementedException("Implicit self expression not implemented");
                     var target = ConvertToOperand(exp.Expression);
                     currentBlock!.Add(new FieldAccessInstruction(resultPlace, target, exp.Field.Name, exp.Span, CurrentScope));
@@ -697,7 +697,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     throw new NotImplementedException($"ConvertToPlaceWithoutSideEffects({expression.GetType().Name}) Not Implemented.");
                 case IFieldAccessExpressionSyntax exp:
                 {
-                    if (exp.Expression == null)
+                    if (exp.Expression is null)
                         throw new NotImplementedException("implicit self expression not implemented");
                     var target = ConvertToOperand(exp.Expression);
                     return new FieldPlace(target, exp.Field.Name, exp.Span);

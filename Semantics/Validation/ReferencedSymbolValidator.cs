@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
             ISyntax syntax,
             ISymbol? referencedSymbol)
         {
-            if (referencedSymbol == null)
+            if (referencedSymbol is null)
                 throw new Exception($"Expression doesn't have referenced symbol `{syntax}`");
         }
 

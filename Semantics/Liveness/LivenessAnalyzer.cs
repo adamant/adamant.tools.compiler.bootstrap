@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
             //foreach (var function in functions)
             //{
             //    var controlFlow = function.ControlFlowOld;
-            //    if (controlFlow == null) continue;
+            //    if (controlFlow is null) continue;
             //    var liveness = ComputeLiveness(controlFlow);
             //    if (liveness != null)
             //    {

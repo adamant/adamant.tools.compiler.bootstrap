@@ -70,7 +70,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var mutableKeyword = Tokens.AcceptToken<IMutableKeywordToken>();
             var referent = ParseBareType();
             var span = TextSpan.Covering(primaryCapability.Span, referent.Span);
-            var capability = mutableKeyword == null ? immutableCapability : mutableCapability;
+            var capability = mutableKeyword is null ? immutableCapability : mutableCapability;
             return new CapabilityTypeSyntax(capability, referent, span);
         }
 

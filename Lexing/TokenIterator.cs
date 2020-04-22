@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
 
         public bool Next()
         {
-            if (tokens == null)
+            if (tokens is null)
                 return false;
             if (!tokens.MoveNext())
                 tokens = null;

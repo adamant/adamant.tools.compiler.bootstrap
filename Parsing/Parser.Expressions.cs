@@ -481,7 +481,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var elseClause = AcceptElse(parseAs);
             var span = TextSpan.Covering(@if, thenBlock.Span, elseClause?.Span);
             if (parseAs == ParseAs.Statement
-                && elseClause == null
+                && elseClause is null
                 && thenBlock is IResultStatementSyntax)
             {
                 var semicolon = Tokens.Expect<ISemicolonToken>();
@@ -524,7 +524,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         private IArgumentSyntax? AcceptArgument()
         {
             var expression = AcceptExpression();
-            if (expression == null) return null;
+            if (expression is null) return null;
             return new ArgumentSyntax(expression);
         }
 

@@ -152,7 +152,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         var field = (declaringClass?? throw new InvalidOperationException("Field parameter outside of class declaration"))
                                     .Members.OfType<IFieldDeclarationSyntax>()
                                     .SingleOrDefault(f => f.Name == fieldParameter.FieldName);
-                        if (field == null)
+                        if (field is null)
                         {
                             parameter.Type.Fulfill(DataType.Unknown);
                             // TODO report an error

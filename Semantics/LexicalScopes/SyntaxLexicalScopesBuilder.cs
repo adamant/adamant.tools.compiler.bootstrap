@@ -121,7 +121,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             foreach (var usingDirective in usingDirectives)
             {
                 var @namespace = namespaces.SingleOrDefault(ns => ns.FullName.Equals(usingDirective.Name));
-                if (@namespace == null)
+                if (@namespace is null)
                 {
                     diagnostics.Add(NameBindingError.UsingNonExistentNamespace(file, usingDirective.Span, usingDirective.Name));
                     continue;

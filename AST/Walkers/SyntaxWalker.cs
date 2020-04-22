@@ -6,13 +6,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
     {
         public void Walk(ISyntax? syntax)
         {
-            if (syntax == null) return;
+            if (syntax is null) return;
             WalkNonNull(syntax);
         }
 
         void ISyntaxWalker<Void>.Walk(ISyntax? syntax, Void arg)
         {
-            if (syntax == null) return;
+            if (syntax is null) return;
             WalkNonNull(syntax);
         }
 
@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
     {
         public void Walk(ISyntax? syntax, T arg)
         {
-            if (syntax == null) return;
+            if (syntax is null) return;
             WalkNonNull(syntax, arg);
         }
 
