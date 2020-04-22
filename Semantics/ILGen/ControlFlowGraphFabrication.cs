@@ -419,14 +419,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         /// <summary>
         /// Convert the body of a loop. Ensures break statements are handled correctly.
         /// </summary>
-        private BlockBuilder ConvertLoopBody(IBlockExpressionSyntax body)
+        private BlockBuilder? ConvertLoopBody(IBlockExpressionSyntax body)
         {
             var oldAddBreaks = addBreaks;
             addBreaks = new List<Action<BlockBuilder>>();
             Convert((IExpressionSyntax)body);
-            var loopExit = graph.NewBlock();
-            foreach (var addBreak in addBreaks) addBreak(loopExit);
-            addBreaks = oldAddBreaks;
+            BlockBuilder? loopExit = null;
+            // Only if there is a loop exit do we need an exit block
+            if (addBreaks.Any())
+            {
+                loopExit = graph.NewBlock();
+                foreach (var addBreak in addBreaks) addBreak(loopExit);
+                addBreaks = oldAddBreaks;
+            }
             return loopExit;
         }
 
