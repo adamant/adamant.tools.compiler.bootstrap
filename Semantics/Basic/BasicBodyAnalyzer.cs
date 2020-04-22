@@ -356,13 +356,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     // In many contexts, variable names are implicitly shared
                     if (implicitShare)
                     {
-                        expression = new ImplicitShareExpressionSyntax(identifierName.Span, identifierName);
                         type = type.ToReadOnly();
                         // currently, all other types are read-only
                         if (type is ReferenceType referenceType
                             && referenceType.ReferenceCapability != ReferenceCapability.Identity)
                             type = referenceType.WithCapability(ReferenceCapability.Shared);
-                        expression.Type = type;
+
+                        expression = new ImplicitShareExpressionSyntax(identifierName, type);
                     }
                     return type;
                 }
@@ -600,6 +600,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     methodInvocation.MethodNameSyntax.ReferencedSymbol = functionSymbol;
 
                     var selfParamType = functionSymbol.Parameters.First().Type;
+                    if (selfParamType is ReferenceType paramType
+                        && targetType is ReferenceType argType)
+                    {
+                        if (paramType.IsReadOnly && !argType.IsReadOnly)
+                        {
+                            methodInvocation.Target = new ImplicitShareExpressionSyntax(methodInvocation.Target, argType.ToReadOnly());
+                        }
+                        // TODO insert move and borrow expressions as needed
+                    }
                     InsertImplicitConversionIfNeeded(ref methodInvocation.Target, selfParamType);
                     CheckArgumentTypeCompatibility(selfParamType, methodInvocation.Target);
 

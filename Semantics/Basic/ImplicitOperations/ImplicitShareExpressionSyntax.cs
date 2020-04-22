@@ -20,19 +20,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
         public DataType? Type
         {
             get => type;
-            set
-            {
-                if (type != null) throw new InvalidOperationException("Can't set type repeatedly");
-                type = value ?? throw new ArgumentNullException(nameof(Type), "Can't set type to null");
-            }
+            // Type is always set by the constructor, so it can't be set agains
+            set => throw new InvalidOperationException("Can't set type repeatedly");
         }
 
-        private DataType? type;
+        private readonly DataType type;
 
-        public ImplicitShareExpressionSyntax(TextSpan span, INameExpressionSyntax referent)
+        public ImplicitShareExpressionSyntax(IExpressionSyntax referent, DataType type)
         {
-            Span = span;
+            Span = referent.Span;
             this.referent = referent;
+            this.type = type ?? throw new ArgumentNullException(nameof(type));
         }
 
         public override string ToString()
