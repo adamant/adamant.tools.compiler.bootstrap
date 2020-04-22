@@ -397,6 +397,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                         var returnValue = ConvertToOperand(exp.ReturnValue);
                         currentBlock!.End(new ReturnValueInstruction(returnValue, exp.Span, CurrentScope));
                     }
+
+                    // There is no exit from a return block, hence null for exit block
+                    currentBlock = null;
                 }
                 break;
                 case INameExpressionSyntax _:
