@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
@@ -29,6 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             EmitEntryPointAdapter(package.EntryPoint, code);
         }
 
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "OO")]
         public void EmitPreamble(Code code)
         {
             // Setup the beginning of each section
@@ -81,6 +83,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.Definitions.EndBlock();
         }
 
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "OO")]
         public void EmitPostamble(Code code)
         {
             // Close the Type_ID enum

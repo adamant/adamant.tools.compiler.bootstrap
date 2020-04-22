@@ -1,10 +1,11 @@
+using System;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
@@ -76,12 +77,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             switch (type)
             {
+                default:
+                    throw new NotImplementedException();
+                //throw ExhaustiveMatch.Failed(type);
                 case SimpleType simpleType:
                     return Mangle(simpleType);
                 case UserObjectType userObjectType:
                     return Mangle(userObjectType);
-                default:
-                    throw NonExhaustiveMatchException.For(type);
             }
         }
 
@@ -114,13 +116,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             switch (name)
             {
+                default:
+                    throw ExhaustiveMatch.Failed(name);
                 case QualifiedName qualifiedName:
                     return EstimateSize(qualifiedName.Qualifier) + 2 +
                            EstimateSize(qualifiedName.UnqualifiedName);
                 case SimpleName simpleName:
                     return simpleName.Text.Length;
-                default:
-                    throw NonExhaustiveMatchException.For(name);
             }
         }
 
@@ -128,6 +130,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             switch (name)
             {
+                default:
+                    throw ExhaustiveMatch.Failed(name);
                 case SimpleName simpleName:
                     if (simpleName.IsSpecial)
                         builder.Append('_');
@@ -138,8 +142,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     builder.Append("__");
                     Mangle(qualifiedName.UnqualifiedName, builder);
                     break;
-                default:
-                    throw NonExhaustiveMatchException.For(name);
             }
         }
 

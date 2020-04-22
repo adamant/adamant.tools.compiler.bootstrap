@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
+using System;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
@@ -16,6 +16,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             switch (type)
             {
+                default:
+                    throw new NotImplementedException();
+                //throw ExhaustiveMatch.Failed(type);
                 case VoidType _:
                 case NeverType _:
                     return "void";
@@ -37,8 +40,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
                     return "_opt__" + Convert(optionalType.Referent);
                 }
-                default:
-                    throw NonExhaustiveMatchException.For(type);
             }
         }
     }

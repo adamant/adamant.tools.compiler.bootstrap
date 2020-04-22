@@ -98,7 +98,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             {
                 var span = callable.Span.AtEnd();
                 //EndScope(span);
-                //currentBlock.AddReturn(span, Scope.Outer); // We officially ended the outer scope, but this is in it
                 currentBlock.End(new ReturnVoidInstruction(span, Scope.Outer));
             }
 

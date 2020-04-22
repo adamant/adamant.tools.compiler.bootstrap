@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG
 
         /// <summary>
         /// If this declaration corresponds to an argument or local variable,
-        /// what it was named. Not guaranteed unique
+        /// what it was named. Not guaranteed unique.
         /// </summary>
         public SimpleName? Name { get; }
         public bool IsParameter { get; }

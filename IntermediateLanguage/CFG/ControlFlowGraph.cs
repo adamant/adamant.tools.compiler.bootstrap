@@ -5,7 +5,6 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG
 {
@@ -15,8 +14,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG
         public FixedList<VariableDeclaration> VariableDeclarations { get; }
         public IEnumerable<VariableDeclaration> Parameters => VariableDeclarations.Where(v => v.IsParameter);
         public IEnumerable<VariableDeclaration> LocalVariables => VariableDeclarations.Where(v => !v.IsParameter);
-        public VariableDeclaration ReturnVariable => VariableDeclarations[0];
-        public DataType ReturnType => ReturnVariable.Type;
+        //public VariableDeclaration ReturnVariable => VariableDeclarations[0];
+        //public DataType ReturnType => ReturnVariable.Type;
         public FixedList<Block> Blocks { get; }
         public Block EntryBlock => Blocks[0];
         //public IEnumerable<Block> ExitBlocks => Blocks.Where(b => b.Terminator is ReturnStatement);
@@ -45,8 +44,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG
             //Edges = Edges.InGraph(this);
         }
 
-        [SuppressMessage("Design", "CA1043:Use Integral Or String Argument For Indexers", Justification =
-            "BackBlockName is a value type")]
+        [SuppressMessage("Design", "CA1043:Use Integral Or String Argument For Indexers",
+            Justification = "BasicBlockName is a value type")]
         public Block this[BasicBlockName block] => Blocks[block.Number];
     }
 }

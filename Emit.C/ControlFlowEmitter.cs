@@ -34,64 +34,65 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             if (cfg.VariableDeclarations.Any(v => v.TypeIsNotEmpty))
                 definitions.BlankLine();
 
-            var voidReturn = cfg.ReturnType == DataType.Void;
             foreach (var block in cfg.Blocks)
-                EmitBlock(block, voidReturn, definitions);
+                EmitBlock(block, definitions);
         }
 
         private void EmitVariable(VariableDeclaration declaration, CCodeBuilder code)
         {
             Requires.That(nameof(declaration), declaration.TypeIsNotEmpty, "tried to look up variable that does not exist");
-            var initializer = declaration.IsParameter ? $" = {nameMangler.Mangle(declaration.Name)}" : "";
+            var initializer = declaration.IsParameter ? $" = {nameMangler.Mangle(declaration.Name!)}" : "";
             code.AppendLine($"{typeConverter.Convert(declaration.Type)} _{declaration.Variable.Name}{initializer}; // {declaration}");
         }
 
-        private void EmitBlock(Block block, bool voidReturn, CCodeBuilder code)
+        private void EmitBlock(Block block, CCodeBuilder code)
         {
             code.AppendLine($"bb{block.Number}:");
             code.BeginBlock();
             foreach (var instruction in block.Instructions)
             {
-                EmitStatement(instruction, voidReturn, code);
+                EmitStatement(instruction, code);
             }
             code.EndBlock();
         }
 
-        private void EmitStatement(Instruction instruction, bool voidReturn, CCodeBuilder code)
+        private static void EmitStatement(Instruction instruction, CCodeBuilder code)
         {
             code.AppendLine("// " + instruction);
             switch (instruction)
             {
-                //case IfStatement ifStatement:
-                //    code.AppendLine($"if({ConvertValue(ifStatement.Condition)}._value) goto {ifStatement.ThenBlock}; else goto {ifStatement.ElseBlock};");
-                //    break;
-                //case GotoStatement gotoStatement:
-                //    code.AppendLine($"goto {gotoStatement.GotoBlock};");
-                //    break;
-                //case ReturnStatement _:
-                //    code.AppendLine(voidReturn ? "return;" : "return _result;");
-                //    break;
-                //case AssignmentStatement assignment:
-                //    code.AppendLine(
-                //        $"{ConvertPlace(assignment.Place)} = {ConvertValue(assignment.Value)};");
-                //    break;
-                //case ActionStatement action:
-                //    code.AppendLine(ConvertValue(action.Value) + ";");
-                //    break;
-                //case DeleteStatement deleteStatement:
-                //{
-                //    var self = ConvertValue(deleteStatement.Place);
-                //    var typeName = nameMangler.Mangle(deleteStatement.Type);
-                //    // TODO once deletes are implemented, call them
-                //    //code.AppendLine($"{self}._vtable->{typeName}___delete__1({self});");
-                //    code.AppendLine($"free({self}._self);");
-                //    break;
-                //}
-                //case ExitScopeStatement _:
-                //    // End scope isn't emitted, it is just a marker
-                //    break;
                 default:
-                    throw NonExhaustiveMatchException.For(instruction);
+                    throw new NotImplementedException();
+                    //throw ExhaustiveMatch.Failed(instruction);
+
+                    //case IfStatement ifStatement:
+                    //    code.AppendLine($"if({ConvertValue(ifStatement.Condition)}._value) goto {ifStatement.ThenBlock}; else goto {ifStatement.ElseBlock};");
+                    //    break;
+                    //case GotoStatement gotoStatement:
+                    //    code.AppendLine($"goto {gotoStatement.GotoBlock};");
+                    //    break;
+                    //case ReturnStatement _:
+                    //    code.AppendLine(voidReturn ? "return;" : "return _result;");
+                    //    break;
+                    //case AssignmentStatement assignment:
+                    //    code.AppendLine(
+                    //        $"{ConvertPlace(assignment.Place)} = {ConvertValue(assignment.Value)};");
+                    //    break;
+                    //case ActionStatement action:
+                    //    code.AppendLine(ConvertValue(action.Value) + ";");
+                    //    break;
+                    //case DeleteStatement deleteStatement:
+                    //{
+                    //    var self = ConvertValue(deleteStatement.Place);
+                    //    var typeName = nameMangler.Mangle(deleteStatement.Type);
+                    //    // TODO once deletes are implemented, call them
+                    //    //code.AppendLine($"{self}._vtable->{typeName}___delete__1({self});");
+                    //    code.AppendLine($"free({self}._self);");
+                    //    break;
+                    //}
+                    //case ExitScopeStatement _:
+                    //    // End scope isn't emitted, it is just a marker
+                    //    break;
             }
         }
 
@@ -99,23 +100,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             switch (place)
             {
+                default:
+                    throw ExhaustiveMatch.Failed(place);
                 case VariablePlace reference:
                     return "_" + reference.Variable.Name;
                 case FieldPlace fieldAccess:
                     var fieldName = nameMangler.Mangle(fieldAccess.Field.UnqualifiedName);
                     return $"{ConvertValue(fieldAccess.Target)}._self->{fieldName}";
-                default:
-                    throw NonExhaustiveMatchException.For(place);
             }
         }
 
-        private string ConvertValue(Operand value)
+        private static string ConvertValue(Operand value)
         {
             switch (value)
             {
                 default:
                     throw new NotImplementedException();
-                    throw ExhaustiveMatch.Failed(value);
+                    //throw ExhaustiveMatch.Failed(value);
+
                     //case IntegerConstant integer:
                     //    return $"({ConvertType(integer.Type)}){{{integer.Value}}}";
                     //case StringConstant stringConstant:
@@ -265,7 +267,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             switch (type)
             {
                 default:
-                    throw NonExhaustiveMatchException.For(type);
+                    throw new NotImplementedException();
+                //throw ExhaustiveMatch.Failed(type);
                 case UserObjectType objectType:
                     return nameMangler.Mangle(objectType);
                 case SimpleType simpleType:

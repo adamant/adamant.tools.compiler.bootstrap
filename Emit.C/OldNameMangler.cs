@@ -1,19 +1,10 @@
-using System.Globalization;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Text.RegularExpressions;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using Adamant.Tools.Compiler.Bootstrap.Names;
-
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 {
     /// <summary>
     /// The below scheme was used for a while, but was very annoying because the
     /// unicode symbols were not output to the console by clang. Thus the switch
     /// to the new scheme that doesn't guarantee uniqueness, but is very readable
-    /// and can be replaced later esp when moving to LLVM.
+    /// and can be replaced later esp. when moving to LLVM.
     ///
     /// LLVM supports placing any character in an identifier. This means that
     /// fully qualified names can be used directly as identifiers and an escape
@@ -56,206 +47,207 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
     {
         // Note, we don't have to worry about whether the identifier starts with
         // a number because it will end up prefixed anyway.
-        private static readonly Regex StandardIdentifierPattern = new Regex(@"^[_0-9a-zA-Z]+$", RegexOptions.Compiled);
+        //private static readonly Regex StandardIdentifierPattern = new Regex(@"^[_0-9a-zA-Z]+$", RegexOptions.Compiled);
 
-        public string MangleName(FunctionDeclaration function)
-        {
-            // builder with room for the characters we are likely to add
-            var builder = new StringBuilder(EstimateSize(function.FullName) + 5);
-            Mangle(function.FullName, builder);
-            builder.Append('´');
-            builder.Append(function.Arity);
-            return builder.ToString();
-        }
+        //public string MangleName(FunctionDeclaration function)
+        //{
+        //    // builder with room for the characters we are likely to add
+        //    var builder = new StringBuilder(EstimateSize(function.FullName) + 5);
+        //    Mangle(function.FullName, builder);
+        //    builder.Append('´');
+        //    builder.Append(function.Arity);
+        //    return builder.ToString();
+        //}
 
-        public string MangleName(ConstructorDeclaration constructor)
-        {
-            // builder with room for the characters we are likely to add
-            var builder = new StringBuilder(EstimateSize(constructor.FullName) + 5);
-            Mangle(constructor.FullName, builder);
-            builder.Append('´');
-            builder.Append(constructor.Arity);
-            return builder.ToString();
-        }
+        //public string MangleName(ConstructorDeclaration constructor)
+        //{
+        //    // builder with room for the characters we are likely to add
+        //    var builder = new StringBuilder(EstimateSize(constructor.FullName) + 5);
+        //    Mangle(constructor.FullName, builder);
+        //    builder.Append('´');
+        //    builder.Append(constructor.Arity);
+        //    return builder.ToString();
+        //}
 
-        public string MangleName(ClassDeclaration @class)
-        {
-            // builder with room for the characters we are likely to add
-            var builder = new StringBuilder(EstimateSize(@class.FullName) + 2);
-            Mangle(@class.FullName, builder);
-            //if (type.IsGeneric)
-            //{
-            //    builder.Append('´');
-            //    builder.Append(type.GenericArity);
-            //}
-            return builder.ToString();
-        }
-
-        public string Mangle(UserObjectType type)
-        {
-            // builder with room for the characters we are likely to add
-            var extraSize = 0; // Room for
-            var builder = new StringBuilder(EstimateSize(type.Name) + extraSize);
-            Mangle(type.Name, builder);
-            return builder.ToString();
-        }
-
-        public string Mangle(Name name)
-        {
-            var builder = new StringBuilder(EstimateSize(name));
-            Mangle(name, builder);
-            return builder.ToString();
-        }
+        //public string MangleName(ClassDeclaration @class)
+        //{
+        //    // builder with room for the characters we are likely to add
+        //    var builder = new StringBuilder(EstimateSize(@class.FullName) + 2);
+        //    Mangle(@class.FullName, builder);
+        //    //if (type.IsGeneric)
+        //    //{
+        //    //    builder.Append('´');
+        //    //    builder.Append(type.GenericArity);
+        //    //}
+        //    return builder.ToString();
+        //}
 
 
-        public string Mangle(string name)
-        {
-            return Mangle(new SimpleName(name));
-        }
+        //public string Mangle(UserObjectType type)
+        //{
+        //    // builder with room for the characters we are likely to add
+        //    var extraSize = 0; // Room for
+        //    var builder = new StringBuilder(EstimateSize(type.Name) + extraSize);
+        //    Mangle(type.Name, builder);
+        //    return builder.ToString();
+        //}
 
-        private static int EstimateSize(Name name)
-        {
-            switch (name)
-            {
-                case QualifiedName qualifiedName:
-                    return EstimateSize(qualifiedName.Qualifier) + 1 +
-                           EstimateSize(qualifiedName.UnqualifiedName);
-                case SimpleName simpleName:
-                    return 1 + simpleName.Text.Length;
-                default:
-                    throw NonExhaustiveMatchException.For(name);
-            }
-        }
+        //public string Mangle(Name name)
+        //{
+        //    var builder = new StringBuilder(EstimateSize(name));
+        //    Mangle(name, builder);
+        //    return builder.ToString();
+        //}
 
-        private static void Mangle(Name name, StringBuilder builder)
-        {
-            switch (name)
-            {
-                case SimpleName simpleName:
-                    builder.Append(simpleName.IsSpecial ? 'ₐ' : 'ᵢ');
-                    ManglePart(simpleName.Text, builder);
-                    break;
-                case QualifiedName qualifiedName:
-                    Mangle(qualifiedName.Qualifier, builder);
-                    builder.Append('·');
-                    Mangle(qualifiedName.UnqualifiedName, builder);
-                    break;
-                default:
-                    throw NonExhaustiveMatchException.For(name);
-            }
-        }
+
+        //public string Mangle(string name)
+        //{
+        //    return Mangle(new SimpleName(name));
+        //}
+
+        //private static int EstimateSize(Name name)
+        //{
+        //    switch (name)
+        //    {
+        //        default:
+        //            throw ExhaustiveMatch.Failed(name);
+        //        case QualifiedName qualifiedName:
+        //            return EstimateSize(qualifiedName.Qualifier) + 1 +
+        //                   EstimateSize(qualifiedName.UnqualifiedName);
+        //        case SimpleName simpleName:
+        //            return 1 + simpleName.Text.Length;
+        //    }
+        //}
+
+        //private static void Mangle(Name name, StringBuilder builder)
+        //{
+        //    switch (name)
+        //    {
+        //        default:
+        //            throw ExhaustiveMatch.Failed(name);
+        //        case SimpleName simpleName:
+        //            builder.Append(simpleName.IsSpecial ? 'ₐ' : 'ᵢ');
+        //            ManglePart(simpleName.Text, builder);
+        //            break;
+        //        case QualifiedName qualifiedName:
+        //            Mangle(qualifiedName.Qualifier, builder);
+        //            builder.Append('·');
+        //            Mangle(qualifiedName.UnqualifiedName, builder);
+        //            break;
+        //    }
+        //}
 
         /// <summary>
         /// Mangle an individual part of a name.
         /// </summary>
 
-        internal static void ManglePart(string name, StringBuilder builder)
-        {
-            // Fast path no need to escape anything
-            if (StandardIdentifierPattern.IsMatch(name))
-            {
-                builder.Append(name);
-                return;
-            }
+        //internal static void ManglePart(string name, StringBuilder builder)
+        //{
+        //    // Fast path no need to escape anything
+        //    if (StandardIdentifierPattern.IsMatch(name))
+        //    {
+        //        builder.Append(name);
+        //        return;
+        //    }
 
-            // We separate the handling of characters in the Basic Multilingual
-            // Plan (BMP) from those outside it
-            for (var i = 0; i < name.Length; i++)
-            {
-                var c = name[i];
-                int codePoint;
-                // If a high surrogate ends the string, we just encode it
-                if (char.IsHighSurrogate(c) && i + 1 < name.Length)
-                {
-                    i += 1; // we move on to the low surrogate
-                    var high = c;
-                    var low = name[i];
-                    codePoint = char.ConvertToUtf32(high, low);
-                    if (IsValidSupplementaryPlaneIdentifierCharacter(codePoint))
-                    {
-                        builder.Append(high);
-                        builder.Append(low);
-                        continue;
-                    }
-                }
-                else
-                {
-                    if (c == ' ')
-                    {
-                        builder.Append('˽');
-                        continue;
-                    }
-                    if (IsValidBasicMultilingualPlaneIdentifierCharacter(c)
-                        && !IsEscapeCharacter(c))
-                    {
-                        builder.Append(c);
-                        continue;
-                    }
+        //    // We separate the handling of characters in the Basic Multilingual
+        //    // Plan (BMP) from those outside it
+        //    for (var i = 0; i < name.Length; i++)
+        //    {
+        //        var c = name[i];
+        //        int codePoint;
+        //        // If a high surrogate ends the string, we just encode it
+        //        if (char.IsHighSurrogate(c) && i + 1 < name.Length)
+        //        {
+        //            i += 1; // we move on to the low surrogate
+        //            var high = c;
+        //            var low = name[i];
+        //            codePoint = char.ConvertToUtf32(high, low);
+        //            if (IsValidSupplementaryPlaneIdentifierCharacter(codePoint))
+        //            {
+        //                builder.Append(high);
+        //                builder.Append(low);
+        //                continue;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (c == ' ')
+        //            {
+        //                builder.Append('˽');
+        //                continue;
+        //            }
+        //            if (IsValidBasicMultilingualPlaneIdentifierCharacter(c)
+        //                && !IsEscapeCharacter(c))
+        //            {
+        //                builder.Append(c);
+        //                continue;
+        //            }
 
-                    codePoint = c;
-                }
+        //            codePoint = c;
+        //        }
 
-                builder.Append('µ');
-                builder.Append(codePoint.ToString("X", CultureInfo.InvariantCulture)); // Supposedly faster than using AppendFormat()
-                builder.Append('ǂ');
-            }
-        }
+        //        builder.Append('µ');
+        //        builder.Append(codePoint.ToString("X", CultureInfo.InvariantCulture)); // Supposedly faster than using AppendFormat()
+        //        builder.Append('ǂ');
+        //    }
+        //}
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool IsValidBasicMultilingualPlaneIdentifierCharacter(char c)
-        {
-            return c == '_'
-                || (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
-                // C Spec Annex D
-                // Line 1
-                || c == 0xA8 || c == 0xAA || c == 0xAD || c == 0xAF || (c >= 0xB2 && c <= 0xB5)
-                || (c >= 0xB7 && c <= 0xBA) || (c >= 0xBC && c <= 0xBE) || (c >= 0xC0 && c <= 0xD6)
-                || (c >= 0xD8 && c <= 0xF6) || (c >= 0xF8 && c <= 0xFF)
-                // Line 2
-                || (c >= 0x0100 && c <= 0x167F) || (c >= 0x1681 && c <= 0x180D) || (c >= 0x180F && c <= 0x1FFF)
-                // Line 3
-                || (c >= 0x200B && c <= 0x200D) || (c >= 0x202A && c <= 0x202E) || (c >= 0x203F && c <= 0x2040)
-                || c == 0x2054 || (c >= 0x2060 && c <= 0x206F)
-                // Line 4
-                || (c >= 0x2070 && c <= 0x218F) || (c >= 0x2460 && c <= 0x24FF) || (c >= 0x2776 && c <= 0x2793)
-                || (c >= 0x2C00 && c <= 0x2DFF) || (c >= 0x2E80 && c <= 0x2FFF)
-                // Line 5
-                || (c >= 0x3004 && c <= 0x3007) || (c >= 0x3021 && c <= 0x302F) || (c >= 0x3031 && c <= 0x303F)
-                // Line 6
-                || (c >= 0x3040 && c <= 0xD7FF)
-                // Line 7
-                || (c >= 0xF900 && c <= 0xFD3D) || (c >= 0xFD40 && c <= 0xFDCF) || (c >= 0xFDF0 && c <= 0xFE44)
-                || (c >= 0xFE47 && c <= 0xFFFD)
-                ;
-        }
+        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        //private static bool IsValidBasicMultilingualPlaneIdentifierCharacter(char c)
+        //{
+        //    return c == '_'
+        //        || (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
+        //        // C Spec Annex D
+        //        // Line 1
+        //        || c == 0xA8 || c == 0xAA || c == 0xAD || c == 0xAF || (c >= 0xB2 && c <= 0xB5)
+        //        || (c >= 0xB7 && c <= 0xBA) || (c >= 0xBC && c <= 0xBE) || (c >= 0xC0 && c <= 0xD6)
+        //        || (c >= 0xD8 && c <= 0xF6) || (c >= 0xF8 && c <= 0xFF)
+        //        // Line 2
+        //        || (c >= 0x0100 && c <= 0x167F) || (c >= 0x1681 && c <= 0x180D) || (c >= 0x180F && c <= 0x1FFF)
+        //        // Line 3
+        //        || (c >= 0x200B && c <= 0x200D) || (c >= 0x202A && c <= 0x202E) || (c >= 0x203F && c <= 0x2040)
+        //        || c == 0x2054 || (c >= 0x2060 && c <= 0x206F)
+        //        // Line 4
+        //        || (c >= 0x2070 && c <= 0x218F) || (c >= 0x2460 && c <= 0x24FF) || (c >= 0x2776 && c <= 0x2793)
+        //        || (c >= 0x2C00 && c <= 0x2DFF) || (c >= 0x2E80 && c <= 0x2FFF)
+        //        // Line 5
+        //        || (c >= 0x3004 && c <= 0x3007) || (c >= 0x3021 && c <= 0x302F) || (c >= 0x3031 && c <= 0x303F)
+        //        // Line 6
+        //        || (c >= 0x3040 && c <= 0xD7FF)
+        //        // Line 7
+        //        || (c >= 0xF900 && c <= 0xFD3D) || (c >= 0xFD40 && c <= 0xFDCF) || (c >= 0xFDF0 && c <= 0xFE44)
+        //        || (c >= 0xFE47 && c <= 0xFFFD)
+        //        ;
+        //}
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool IsEscapeCharacter(char c)
-        {
-            return c == 'ᵢ' || c == 'ₐ' || c == '˽' || c == '·' || c == '´' || c == 'µ' || c == 'ǂ';
-        }
+        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        //private static bool IsEscapeCharacter(char c)
+        //{
+        //    return c == 'ᵢ' || c == 'ₐ' || c == '˽' || c == '·' || c == '´' || c == 'µ' || c == 'ǂ';
+        //}
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool IsValidSupplementaryPlaneIdentifierCharacter(int c)
-        {
-            return
-                // C Spec Annex D
-                // Line 8
-                (c >= 0x10000 && c <= 0x1FFFD)
-                || (c >= 0x20000 && c <= 0x2FFFD)
-                || (c >= 0x30000 && c <= 0x3FFFD)
-                || (c >= 0x40000 && c <= 0x4FFFD)
-                || (c >= 0x50000 && c <= 0x5FFFD)
-                || (c >= 0x60000 && c <= 0x6FFFD)
-                || (c >= 0x70000 && c <= 0x7FFFD)
-                || (c >= 0x80000 && c <= 0x8FFFD)
-                || (c >= 0x90000 && c <= 0x9FFFD)
-                || (c >= 0xA0000 && c <= 0xAFFFD)
-                || (c >= 0xB0000 && c <= 0xBFFFD)
-                || (c >= 0xC0000 && c <= 0xCFFFD)
-                || (c >= 0xD0000 && c <= 0xDFFFD)
-                || (c >= 0xE0000 && c <= 0xEFFFD)
-                ;
-        }
+        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        //private static bool IsValidSupplementaryPlaneIdentifierCharacter(int c)
+        //{
+        //    return
+        //        // C Spec Annex D
+        //        // Line 8
+        //        (c >= 0x10000 && c <= 0x1FFFD)
+        //        || (c >= 0x20000 && c <= 0x2FFFD)
+        //        || (c >= 0x30000 && c <= 0x3FFFD)
+        //        || (c >= 0x40000 && c <= 0x4FFFD)
+        //        || (c >= 0x50000 && c <= 0x5FFFD)
+        //        || (c >= 0x60000 && c <= 0x6FFFD)
+        //        || (c >= 0x70000 && c <= 0x7FFFD)
+        //        || (c >= 0x80000 && c <= 0x8FFFD)
+        //        || (c >= 0x90000 && c <= 0x9FFFD)
+        //        || (c >= 0xA0000 && c <= 0xAFFFD)
+        //        || (c >= 0xB0000 && c <= 0xBFFFD)
+        //        || (c >= 0xC0000 && c <= 0xCFFFD)
+        //        || (c >= 0xD0000 && c <= 0xDFFFD)
+        //        || (c >= 0xE0000 && c <= 0xEFFFD)
+        //        ;
+        //}
     }
 }
