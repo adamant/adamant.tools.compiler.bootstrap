@@ -90,7 +90,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                         code.BeginLine("");
 
                     var self = ConvertOperand(ins.Self);
-                    var mangledName = nameMangler.Mangle(ins.Function);
+                    var mangledName = nameMangler.Mangle(ins.Function.UnqualifiedName);
                     var arity = ins.Arity + 1;
                     var arguments = ins.Arguments.Select(ConvertOperand).Prepend(self);
                     code.EndLine($"{self}._vtable->{mangledName}__{arity}({string.Join(", ", arguments)});");
@@ -296,13 +296,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 //    //code.AppendLine($"{self}._vtable->{typeName}___delete__1({self});");
                 //    code.AppendLine($"free({self}._self);");
                 //    break;
-                //}
-                //case ConstructorCall constructorCall:
-                //{
-                //    var typeName = nameMangler.Mangle(constructorCall.Type);
-                //    var selfArgument = $"({typeName}){{&{typeName}___vtable, malloc(sizeof({typeName}___Self))}}";
-                //    var arguments = selfArgument.YieldValue().Concat(constructorCall.Arguments.Select(ConvertValue));
-                //    return $"{typeName}___new__{constructorCall.Arity}({string.Join(", ", arguments)})";
                 //}
                 //case DeclaredValue declaredValue:
                 //    return nameMangler.Mangle(declaredValue.Name);
