@@ -6,7 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG
     public struct Variable : /*IClaimHolder,*/ IEquatable<Variable>
     {
         public int Number { get; }
-        public string Name => Number == 0 ? "self" : Number.ToString(CultureInfo.InvariantCulture);
+        public string Name => Number.ToString(CultureInfo.InvariantCulture);
 
         public Variable(int number)
         {

@@ -71,22 +71,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 {
                     if (!(call.ResultPlace is null))
                         EmitResultPlace(call.ResultPlace, code);
+                    else
+                        code.BeginLine("");
 
                     var mangledName = nameMangler.Mangle(call.Function);
                     var arguments = call.Arguments.Select(ConvertValue);
-                    code.AppendLine($"{mangledName}__{call.Arity}({string.Join(", ", arguments)});");
+                    code.EndLine($"{mangledName}__{call.Arity}({string.Join(", ", arguments)});");
                 }
                 break;
                 case CallVirtualInstruction callVirtual:
                 {
                     if (!(callVirtual.ResultPlace is null))
                         EmitResultPlace(callVirtual.ResultPlace, code);
+                    else
+                        code.BeginLine("");
 
                     var self = ConvertValue(callVirtual.Self);
                     var mangledName = nameMangler.Mangle(callVirtual.Function);
                     var arity = callVirtual.Arity + 1;
                     var arguments = callVirtual.Arguments.Select(ConvertValue).Prepend(self);
-                    code.AppendLine($"{self}._vtable->{mangledName}__{arity}({string.Join(", ", arguments)});");
+                    code.EndLine($"{self}._vtable->{mangledName}__{arity}({string.Join(", ", arguments)});");
                 }
                 break;
             }
@@ -94,7 +98,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
         private void EmitResultPlace(Place resultPlace, CCodeBuilder code)
         {
-            code.Append($"{ConvertPlace(resultPlace)} = ");
+            code.BeginLine($"{ConvertPlace(resultPlace)} = ");
         }
 
         private void EmitInstructionWithResult(InstructionWithResult instruction, CCodeBuilder code)
@@ -105,7 +109,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 default:
                     throw ExhaustiveMatch.Failed(instruction);
                 case AssignmentInstruction assignment:
-                    code.AppendLine($"{ConvertValue(assignment.Operand)};");
+                    code.EndLine($"{ConvertValue(assignment.Operand)};");
                     break;
                 case CompareInstruction compare:
                 {
@@ -137,7 +141,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                             break;
                     }
 
-                    code.AppendLine($"{operationType}__{@operator}({left}, {right});");
+                    code.EndLine($"{operationType}__{@operator}({left}, {right});");
                 }
                 break;
                 case NumericInstruction numericInstruction:
@@ -164,16 +168,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                             break;
                     }
 
-                    code.AppendLine($"{operationType}__{@operator}({left}, {right});");
+                    code.EndLine($"{operationType}__{@operator}({left}, {right});");
                 }
                 break;
                 case LoadIntegerInstruction loadInteger:
-                    code.AppendLine($"({ConvertSimpleType(loadInteger.Type)}){{{loadInteger.Value}}};");
+                    code.EndLine($"({ConvertSimpleType(loadInteger.Type)}){{{loadInteger.Value}}};");
                     break;
                 case LoadBoolInstruction loadBool:
                 {
                     var booleanValue = loadBool.Value ? 1 : 0;
-                    code.AppendLine($"({ConvertSimpleType(DataType.Bool)}){{{booleanValue}}};");
+                    code.EndLine($"({ConvertSimpleType(DataType.Bool)}){{{booleanValue}}};");
                 }
                 break;
                 case LoadStringInstruction loadString:
@@ -182,7 +186,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     const string selfArgument = "(String){&String___vtable, malloc(sizeof(String___Self))}";
                     var sizeArgument = $"(_size){{{constantLength}}}";
                     var bytesArgument = $"(_size){{(uintptr_t)u8\"{loadString.Value.Escape()}\"}}";
-                    code.AppendLine($"String___new__3({selfArgument}, {sizeArgument}, {bytesArgument});");
+                    code.EndLine($"String___new__3({selfArgument}, {sizeArgument}, {bytesArgument});");
                 }
                 break;
                 case LoadNoneInstruction loadNone:
@@ -197,13 +201,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                         case UserObjectType userObjectType:
                         {
                             var typeName = nameMangler.Mangle(userObjectType);
-                            code.AppendLine($"({loadNone.Type}){{&{typeName}___vtable, NULL}};");
+                            code.EndLine($"({loadNone.Type}){{&{typeName}___vtable, NULL}};");
                         }
                         break;
                         case SimpleType simpleType:
                         {
                             var typeName = ConvertSimpleType(simpleType);
-                            code.AppendLine($"_opt__{typeName}__none;");
+                            code.EndLine($"_opt__{typeName}__none;");
                         }
                         break;
                         case UnknownType _:
@@ -217,7 +221,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     var operand = ConvertValue(negate.Operand);
                     var operationType = ConvertSimpleType(negate.Type);
 
-                    code.AppendLine($"{operationType}__neg({operand});");
+                    code.EndLine($"{operationType}__neg({operand});");
                 }
                 break;
                 case ConvertInstruction convert:
@@ -225,13 +229,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     var valueToConvert = ConvertValue(convert.Operand);
                     var fromType = ConvertSimpleType(convert.FromType);
                     var toType = ConvertSimpleType(convert.ToType);
-                    code.AppendLine($"_convert__{fromType}__{toType}({valueToConvert});");
+                    code.EndLine($"_convert__{fromType}__{toType}({valueToConvert});");
                 }
                 break;
                 case FieldAccessInstruction fieldAccess:
                 {
                     var fieldName = nameMangler.Mangle(fieldAccess.FieldName);
-                    code.AppendLine($"{ConvertValue(fieldAccess.Operand)}._self->{fieldName};");
+                    code.EndLine($"{ConvertValue(fieldAccess.Operand)}._self->{fieldName};");
                 }
                 break;
 

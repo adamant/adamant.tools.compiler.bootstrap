@@ -350,10 +350,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 break;
                 case IMethodInvocationExpressionSyntax exp:
                 {
+                    var methodName = exp.MethodNameSyntax.ReferencedSymbol!.FullName;
                     var target = ConvertToOperand(exp.Target);
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
-                    currentBlock!.Add(new CallVirtualInstruction(target, exp.FullName, args,
-                        exp.Span, CurrentScope));
+                    currentBlock!.Add(new CallVirtualInstruction(target, methodName, args, exp.Span, CurrentScope));
                 }
                 break;
                 case IAssignmentExpressionSyntax exp:
@@ -383,9 +383,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     break;
                 case IFunctionInvocationExpressionSyntax exp:
                 {
+                    var functionName = exp.FunctionNameSyntax.ReferencedSymbol!.FullName;
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
-                    currentBlock!.Add(new CallInstruction(exp.FullName, args,
-                        exp.Span, CurrentScope));
+                    currentBlock!.Add(new CallInstruction(functionName, args, exp.Span, CurrentScope));
                 }
                 break;
                 case IReturnExpressionSyntax exp:
@@ -565,21 +565,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 break;
                 case IFunctionInvocationExpressionSyntax exp:
                 {
+                    var functionName = exp.FunctionNameSyntax.ReferencedSymbol!.FullName;
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
-                    currentBlock!.Add(new CallInstruction(resultPlace, exp.FullName, args, exp.Span, CurrentScope));
+                    currentBlock!.Add(new CallInstruction(resultPlace, functionName, args, exp.Span, CurrentScope));
                 }
                 break;
                 case IMethodInvocationExpressionSyntax exp:
                 {
+                    var methodName = exp.MethodNameSyntax.ReferencedSymbol!.FullName;
                     var target = ConvertToOperand(exp.Target);
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
-                    currentBlock!.Add(new CallVirtualInstruction(resultPlace, target, exp.FullName, args, exp.Span, CurrentScope));
+                    currentBlock!.Add(new CallVirtualInstruction(resultPlace, target, methodName, args, exp.Span, CurrentScope));
                 }
                 break;
                 case INewObjectExpressionSyntax exp:
                 {
+                    var constructorName = exp.ConstructorSymbol!.FullName;
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
-                    currentBlock!.Add(new CallInstruction(resultPlace, exp.ConstructorSymbol!.FullName, args, exp.Span, CurrentScope));
+                    currentBlock!.Add(new CallInstruction(resultPlace, constructorName, args, exp.Span, CurrentScope));
                 }
                 break;
                 case IStringLiteralExpressionSyntax exp:
@@ -590,18 +593,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     break;
                 case IImplicitNumericConversionExpression exp:
                 {
-                    currentBlock!.Add(new ConvertInstruction(resultPlace, ConvertToOperand(exp.Expression),
-                        (NumericType)exp.Expression.Type.Assigned().AssertKnown(), exp.ConvertToType,
-                        exp.Span, CurrentScope));
+                    if (exp.Expression.Type.Assigned().AssertKnown() is IntegerConstantType constantType)
+                        currentBlock!.Add(new LoadIntegerInstruction(resultPlace, constantType.Value,
+                            (IntegerType) exp.Type.Assigned().AssertKnown(),
+                            exp.Span, CurrentScope));
+                    else
+                        currentBlock!.Add(new ConvertInstruction(resultPlace, ConvertToOperand(exp.Expression),
+                            (NumericType)exp.Expression.Type.Assigned().AssertKnown(), exp.ConvertToType,
+                            exp.Span, CurrentScope));
                 }
                 break;
                 case IIntegerLiteralExpressionSyntax exp:
-                {
-                    currentBlock!.Add(new LoadIntegerInstruction(resultPlace, exp.Value,
-                        (IntegerType)exp.Type.Assigned().AssertKnown(),
-                        exp.Span, CurrentScope));
-                }
-                break;
+                    throw new InvalidOperationException(
+                        "Integer literals should have an implicit conversion around them");
                 case IImplicitNoneConversionExpression exp:
                     currentBlock!.Add(new LoadNoneInstruction(resultPlace, exp.ConvertToType, exp.Span, CurrentScope));
                     break;
