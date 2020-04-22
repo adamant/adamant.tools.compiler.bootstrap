@@ -56,14 +56,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.EndBlock();
         }
 
-        private static void EmitStatement(Instruction instruction, CCodeBuilder code)
+        private void EmitStatement(Instruction instruction, CCodeBuilder code)
         {
             code.AppendLine("// " + instruction);
             switch (instruction)
             {
                 default:
                     throw new NotImplementedException();
-                    //throw ExhaustiveMatch.Failed(instruction);
+                //throw ExhaustiveMatch.Failed(instruction);
+                case AssignmentInstruction assignment:
+                    code.AppendLine(
+                        $"{ConvertPlace(assignment.ResultPlace)} = {ConvertValue(assignment.Operand)};");
+                    break;
 
                     //case IfStatement ifStatement:
                     //    code.AppendLine($"if({ConvertValue(ifStatement.Condition)}._value) goto {ifStatement.ThenBlock}; else goto {ifStatement.ElseBlock};");
@@ -73,10 +77,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     //    break;
                     //case ReturnStatement _:
                     //    code.AppendLine(voidReturn ? "return;" : "return _result;");
-                    //    break;
-                    //case AssignmentStatement assignment:
-                    //    code.AppendLine(
-                    //        $"{ConvertPlace(assignment.Place)} = {ConvertValue(assignment.Value)};");
                     //    break;
                     //case ActionStatement action:
                     //    code.AppendLine(ConvertValue(action.Value) + ";");
@@ -90,9 +90,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     //    code.AppendLine($"free({self}._self);");
                     //    break;
                     //}
-                    //case ExitScopeStatement _:
-                    //    // End scope isn't emitted, it is just a marker
-                    //    break;
             }
         }
 

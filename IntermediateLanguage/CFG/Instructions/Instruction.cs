@@ -1,7 +1,12 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
 {
+    [Closed(
+        typeof(CallInstruction),
+        typeof(CallVirtualInstruction),
+        typeof(InstructionWithResult))]
     public abstract class Instruction
     {
         public TextSpan Span { get; }
