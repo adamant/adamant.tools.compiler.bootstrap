@@ -12,7 +12,6 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.TerminatorInstru
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using ExhaustiveMatching;
 using static Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions.CompareInstructionOperator;
-using BinaryOperator = Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.BinaryOperator;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
 {
@@ -385,7 +384,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 {
                     var functionName = exp.FunctionNameSyntax.ReferencedSymbol!.FullName;
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
-                    currentBlock!.Add(new CallInstruction(functionName, args, exp.Span, CurrentScope));
+                    currentBlock!.Add(CallInstruction.ForFunction(functionName, args, exp.Span, CurrentScope));
                 }
                 break;
                 case IReturnExpressionSyntax exp:
@@ -580,7 +579,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 {
                     var functionName = exp.FunctionNameSyntax.ReferencedSymbol!.FullName;
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
-                    currentBlock!.Add(new CallInstruction(resultPlace, functionName, args, exp.Span, CurrentScope));
+                    currentBlock!.Add(CallInstruction.ForFunction(resultPlace, functionName, args, exp.Span, CurrentScope));
                 }
                 break;
                 case IMethodInvocationExpressionSyntax exp:
@@ -588,7 +587,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     var methodName = exp.MethodNameSyntax.ReferencedSymbol!.FullName;
                     var target = ConvertToOperand(exp.Target);
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
-                    currentBlock!.Add(new CallVirtualInstruction(resultPlace, target, methodName, args, exp.Span, CurrentScope));
+                    if (exp.Target.Type is ReferenceType)
+                        currentBlock!.Add(new CallVirtualInstruction(resultPlace, target, methodName, args, exp.Span, CurrentScope));
+                    else
+                        currentBlock!.Add(CallInstruction.ForMethod(resultPlace, target, methodName, args, exp.Span, CurrentScope));
                 }
                 break;
                 case INewObjectExpressionSyntax exp:

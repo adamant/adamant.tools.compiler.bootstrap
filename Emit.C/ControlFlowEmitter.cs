@@ -77,8 +77,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     else
                         code.BeginLine("");
 
-                    var mangledName = nameMangler.Mangle(ins.Function);
+                    string self = "";
+                    if (ins.IsMethodCall) self = ConvertOperand(ins.Self!);
+
+                    var mangledName = nameMangler.Mangle(ins.FunctionName);
                     var arguments = ins.Arguments.Select(ConvertOperand);
+                    if (ins.IsMethodCall) arguments = arguments.Prepend(self);
                     code.EndLine($"{mangledName}__{ins.Arity}({string.Join(", ", arguments)});");
                 }
                 break;
