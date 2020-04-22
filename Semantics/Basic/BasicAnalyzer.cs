@@ -79,6 +79,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     @class.SelfParameterType = ((UserObjectType)selfType).ForConstructorSelf();
                     var analyzer = new BasicTypeAnalyzer(@class.File, diagnostics);
                     ResolveTypesInParameters(analyzer, @class.Parameters, @class.DeclaringClass);
+                    // TODO deal with return type here
                     break;
                 }
                 case IAssociatedFunctionDeclaration associatedFunction:

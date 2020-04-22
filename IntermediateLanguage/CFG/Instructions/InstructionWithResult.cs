@@ -14,6 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
         typeof(LoadStringInstruction),
         typeof(LoadNoneInstruction),
         typeof(NegateInstruction),
+        typeof(NewObjectInstruction),
         typeof(NumericInstruction))]
     public abstract class InstructionWithResult : Instruction
     {

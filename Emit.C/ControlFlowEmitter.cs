@@ -111,6 +111,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             {
                 default:
                     throw ExhaustiveMatch.Failed(instruction);
+                case NewObjectInstruction ins:
+                {
+                    var mangledName = nameMangler.Mangle(ins.Constructor);
+                    var typeName = nameMangler.Mangle(ins.ConstructedType);
+                    var selfArgument = $"({typeName}){{&{typeName}___vtable, malloc(sizeof({typeName}___Self))}}";
+                    var arguments = ins.Arguments.Select(ConvertOperand).Prepend(selfArgument);
+                    code.EndLine($"{mangledName}__{ins.Arity + 1}({string.Join(", ", arguments)});");
+                }
+                break;
                 case AssignmentInstruction ins:
                     code.EndLine($"{ConvertOperand(ins.Operand)};");
                     break;

@@ -587,7 +587,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 {
                     var constructorName = exp.ConstructorSymbol!.FullName;
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
-                    currentBlock!.Add(new CallInstruction(resultPlace, constructorName, args, exp.Span, CurrentScope));
+                    var constructedType = (UserObjectType)exp.TypeSyntax.NamedType.Assigned().AssertKnown();
+                    currentBlock!.Add(new NewObjectInstruction(resultPlace, constructorName, constructedType, args, exp.Span, CurrentScope));
                 }
                 break;
                 case IStringLiteralExpressionSyntax exp:

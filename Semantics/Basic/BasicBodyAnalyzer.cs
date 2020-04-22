@@ -427,6 +427,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         case 1:
                             var constructorSymbol = constructors.Single();
                             newObjectExpression.ConstructorSymbol = constructorSymbol;
+                            // TODO deal correctly with constructor type and implicit conversion of arguments
                             //var constructorType = constructorSymbol.Type;
                             //newObjectExpression.ConstructorType = constructorType;
                             //if (constructorType is FunctionType functionType)
