@@ -19,21 +19,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
             FixedList<ICallableDeclaration> functions,
             bool saveLivenessAnalysis)
         {
-            var analyses = new Dictionary<ICallableDeclaration, LiveVariables>();
-            foreach (var function in functions)
-            {
-                var controlFlow = function.ControlFlowOld;
-                if (controlFlow == null) continue;
-                var liveness = ComputeLiveness(controlFlow);
-                if (liveness != null)
-                {
-                    analyses.Add(function, liveness);
-                    if (saveLivenessAnalysis)
-                        controlFlow.LiveVariables = liveness;
-                }
-            }
+            throw new NotImplementedException();
+            //var analyses = new Dictionary<ICallableDeclaration, LiveVariables>();
+            //foreach (var function in functions)
+            //{
+            //    var controlFlow = function.ControlFlowOld;
+            //    if (controlFlow == null) continue;
+            //    var liveness = ComputeLiveness(controlFlow);
+            //    if (liveness != null)
+            //    {
+            //        analyses.Add(function, liveness);
+            //        if (saveLivenessAnalysis)
+            //            controlFlow.LiveVariables = liveness;
+            //    }
+            //}
 
-            return analyses.ToFixedDictionary();
+            //return analyses.ToFixedDictionary();
         }
 
         /// <summary>

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using ExhaustiveMatching;
 
@@ -12,13 +12,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         private readonly NameMangler nameMangler;
         private readonly IConverter<Parameter> parameterConverter;
         private readonly IConverter<DataType> typeConverter;
-        private readonly IEmitter<ControlFlowGraphOld> controlFlowEmitter;
+        private readonly IEmitter<ControlFlowGraph> controlFlowEmitter;
 
         public DeclarationEmitter(
             NameMangler nameMangler,
             IConverter<Parameter> parameterConverter,
             IConverter<DataType> typeConverter,
-            IEmitter<ControlFlowGraphOld> controlFlowEmitter)
+            IEmitter<ControlFlowGraph> controlFlowEmitter)
         {
             this.nameMangler = nameMangler;
             this.parameterConverter = parameterConverter;
@@ -62,7 +62,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             // Don't emit functions without control flow, they are generic
             // TODO need to handle better
-            if (function.ControlFlowOld == null) return;
+            if (function.IL == null) return;
 
             var name = nameMangler.MangleName(function);
             var parameters = Convert(function.Parameters);
@@ -74,7 +74,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.Definitions.DeclarationSeparatorLine();
             code.Definitions.AppendLine($"{returnType} {name}({parameters})");
             code.Definitions.BeginBlock();
-            controlFlowEmitter.Emit(function.ControlFlowOld, code);
+            controlFlowEmitter.Emit(function.IL, code);
             code.Definitions.EndBlock();
         }
 
@@ -82,7 +82,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             // Don't emit constructors without control flow, they are generic
             // TODO need to handle better
-            if (constructor.ControlFlowOld == null) return;
+            if (constructor.IL == null) return;
 
             var name = nameMangler.MangleName(constructor);
             var parameters = Convert(constructor.Parameters);
@@ -94,7 +94,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.Definitions.DeclarationSeparatorLine();
             code.Definitions.AppendLine($"{returnType} {name}({parameters})");
             code.Definitions.BeginBlock();
-            controlFlowEmitter.Emit(constructor.ControlFlowOld, code);
+            controlFlowEmitter.Emit(constructor.IL, code);
             code.Definitions.EndBlock();
         }
 

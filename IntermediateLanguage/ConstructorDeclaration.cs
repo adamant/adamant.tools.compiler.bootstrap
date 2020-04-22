@@ -13,7 +13,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         public FixedList<Parameter> Parameters { get; }
         public int Arity => Parameters.Count;
         public DataType ReturnType { get; }
-        public ControlFlowGraphOld ControlFlowOld { get; }
         public ControlFlowGraph IL { get; }
 
         IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;
@@ -22,12 +21,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
             Name fullName,
             FixedList<Parameter> parameters,
             DataType returnType,
-            ControlFlowGraphOld controlFlowOld,
             ControlFlowGraph il)
             : base(true, fullName, SymbolSet.Empty)
         {
             ReturnType = returnType;
-            ControlFlowOld = controlFlowOld;
             IL = il;
             Parameters = parameters;
         }

@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
@@ -8,6 +8,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         typeof(ConstructorDeclaration))]
     public interface ICallableDeclaration
     {
-        ControlFlowGraphOld? ControlFlowOld { get; }
+        ControlFlowGraph? IL { get; }
     }
 }

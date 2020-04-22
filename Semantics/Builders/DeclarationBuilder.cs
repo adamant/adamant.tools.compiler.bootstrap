@@ -4,25 +4,22 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.TerminatorInstructions;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Names;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen;
 using ExhaustiveMatching;
-using ControlFlowGraphBuilder = Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow.ControlFlowGraphBuilder;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
 {
     public class DeclarationBuilder
     {
-        private readonly ControlFlowGraphFactory controlFlowGraphFactory;
         private readonly ILFactory ilFactory;
         private readonly Dictionary<ISymbol, Declaration> declarations = new Dictionary<ISymbol, Declaration>();
 
-        public DeclarationBuilder(ControlFlowGraphFactory controlFlowGraphFactory, ILFactory ilFactory)
+        public DeclarationBuilder(ILFactory ilFactory)
         {
-            this.controlFlowGraphFactory = controlFlowGraphFactory;
             this.ilFactory = ilFactory;
         }
 
@@ -50,45 +47,41 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                     throw ExhaustiveMatch.Failed(entityDeclaration);
                 case IFunctionDeclarationSyntax function:
                 {
-                    var controlFlowGraph = controlFlowGraphFactory.CreateGraph(function);
                     var il = ilFactory.CreateGraph(function);
                     declaration = new FunctionDeclaration(function.IsExternalFunction, false,
                         function.FullName, BuildParameters(function.Parameters),
-                        function.ReturnType.Known(), controlFlowGraph, il);
+                        function.ReturnType.Known(), il);
                     break;
                 }
                 case IAssociatedFunctionDeclaration associatedFunction:
                 {
-                    var controlFlowGraph = controlFlowGraphFactory.CreateGraph(associatedFunction);
                     var il = ilFactory.CreateGraph(associatedFunction);
                     declaration = new FunctionDeclaration(false, true,
                         associatedFunction.FullName, BuildParameters(associatedFunction.Parameters),
-                        associatedFunction.ReturnType.Known(), controlFlowGraph, il);
+                        associatedFunction.ReturnType.Known(), il);
                     break;
                 }
                 case IConcreteMethodDeclarationSyntax method:
                 {
-                    var controlFlowGraph = controlFlowGraphFactory.CreateGraph(method);
                     var il = ilFactory.CreateGraph(method);
                     declaration = new FunctionDeclaration(false, true,
                         method.FullName, BuildParameters(method.Parameters),
-                        method.ReturnType.Known(), controlFlowGraph, il);
+                        method.ReturnType.Known(), il);
                     break;
                 }
                 case IAbstractMethodDeclarationSyntax method:
                 {
                     declaration = new FunctionDeclaration(false, true,
                         method.FullName, BuildParameters(method.Parameters),
-                        method.ReturnType.Known(), null, null);
+                        method.ReturnType.Known(), null);
                     break;
                 }
                 case IConstructorDeclarationSyntax constructor:
                 {
-                    var controlFlowGraph = controlFlowGraphFactory.CreateGraph(constructor);
                     var il = ilFactory.CreateGraph(constructor);
                     var parameters = BuildConstructorParameters(constructor);
                     declaration = new ConstructorDeclaration(constructor.FullName,
-                       parameters, constructor.SelfParameterType, controlFlowGraph, il);
+                       parameters, constructor.SelfParameterType, il);
                     break;
                 }
                 case IFieldDeclarationSyntax fieldDeclaration:
@@ -130,7 +123,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
             var graph = new ControlFlowGraphBuilder(classDeclaration.File);
             graph.AddSelfParameter(selfType);
             var block = graph.NewBlock();
-            block.AddReturn(classDeclaration.NameSpan, Scope.Outer);
+            block.End(new ReturnVoidInstruction(classDeclaration.NameSpan, Scope.Outer));
 
             //var il = new ControlFlowGraphBuilder(classDeclaration.File);
             //il.AddSelfParameter(selfType);
@@ -141,10 +134,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                                             symbol.FullName,
                                             parameters,
                                             selfType,
-                                            graph.Build(),
-                                            null); // TODO fill in
+                                            graph.Build());
 
-            defaultConstructor.ControlFlowOld.InsertedDeletes = new InsertedDeletes();
+            //defaultConstructor.ControlFlowOld.InsertedDeletes = new InsertedDeletes();
             declarations.Add(symbol, defaultConstructor);
             return defaultConstructor;
         }

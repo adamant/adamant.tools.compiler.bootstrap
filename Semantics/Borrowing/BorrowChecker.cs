@@ -65,10 +65,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
         {
             foreach (var callable in callables)
             {
-                var controlFlow = callable.ControlFlowOld;
-                if (controlFlow == null) continue;
-                var borrowChecker = new BorrowChecker(controlFlow.File, diagnostics, saveBorrowClaims);
-                borrowChecker.Check(controlFlow, liveness[callable]);
+                //var controlFlow = callable.ControlFlowOld;
+                //if (controlFlow == null) continue;
+                //var borrowChecker = new BorrowChecker(controlFlow.File, diagnostics, saveBorrowClaims);
+                //borrowChecker.Check(controlFlow, liveness[callable]);
+                throw new NotImplementedException();
             }
         }
 
@@ -395,7 +396,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                 //else if (objectType.Mutability == Mutability.Mutable)
                 //    AddBorrow(assignToVariable, claimsAfterStatement, callLifetime);
                 //else
-                    AddAlias(assignToVariable, claimsAfterStatement, callLifetime);
+                AddAlias(assignToVariable, claimsAfterStatement, callLifetime);
             }
             else
                 AddAlias(assignToVariable, claimsAfterStatement, callLifetime);

@@ -6,7 +6,7 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
 using ExhaustiveMatching;
 
@@ -63,10 +63,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.BeginLine(builder.IndentCharacters);
             builder.Append("-> ");
             builder.EndLine(function.ReturnType.ToString());
-            if (function.ControlFlowOld != null)
+            if (function.IL != null)
             {
                 builder.BeginBlock();
-                Disassemble(function.ControlFlowOld, builder);
+                Disassemble(function.IL, builder);
                 builder.EndBlock();
             }
         }
@@ -96,7 +96,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.Append("-> ");
             builder.EndLine(constructor.ReturnType.ToString());
             builder.BeginBlock();
-            Disassemble(constructor.ControlFlowOld, builder);
+            Disassemble(constructor.IL, builder);
             builder.EndBlock();
         }
 
@@ -114,25 +114,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.EndBlock();
         }
 
-        private static void Disassemble(ControlFlowGraphOld graphOld, AssemblyBuilder builder)
+        private static void Disassemble(ControlFlowGraph cfg, AssemblyBuilder builder)
         {
-            if (graphOld == null)
+            if (cfg == null)
             {
                 builder.AppendLine("// Control Flow Graph not available");
                 return;
             }
 
-            foreach (var declaration in graphOld.LocalVariables)
+            foreach (var declaration in cfg.LocalVariables)
                 Disassemble(declaration, builder);
 
-            if (graphOld.LocalVariables.Any(v => v.TypeIsNotEmpty))
+            if (cfg.LocalVariables.Any(v => v.TypeIsNotEmpty))
                 builder.BlankLine();
 
-            if (Disassemble(graphOld.BorrowClaims?.ParameterClaims, builder))
+            if (Disassemble(cfg.BorrowClaims?.ParameterClaims, builder))
                 builder.BlankLine();
 
-            foreach (var block in graphOld.BasicBlocks)
-                Disassemble(graphOld, block, builder);
+            foreach (var block in cfg.Blocks)
+                Disassemble(cfg, block, builder);
         }
 
         private static void Disassemble(VariableDeclaration declaration, AssemblyBuilder builder)
@@ -142,32 +142,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                                    + declaration.ContextCommentString());
         }
 
-        private static void Disassemble(ControlFlowGraphOld graphOld, BasicBlock block, AssemblyBuilder builder)
+        private static void Disassemble(ControlFlowGraph cfg, Block block, AssemblyBuilder builder)
         {
             var labelIndent = Math.Max(builder.CurrentIndentDepth - 1, 0);
             builder.Append(string.Concat(Enumerable.Repeat(builder.IndentCharacters, labelIndent)));
-            builder.Append(block.Name.ToString());
+            builder.Append($"bb{block.Number}");
             builder.EndLine(":");
-            foreach (var statement in block.Statements)
+            foreach (var instruction in block.Instructions)
             {
-                Disassemble(graphOld, graphOld.LiveVariables?.Before(statement), builder);
-                builder.AppendLine(statement.ToStatementString().PadRight(StandardStatementWidth)
-                                   + statement.ContextCommentString());
-                var insertedDeletes = graphOld.InsertedDeletes ?? throw new InvalidOperationException("Inserted deletes is null");
-                Disassemble(insertedDeletes.After(statement), builder);
-                Disassemble(graphOld.BorrowClaims?.After(statement), builder);
+                _ = cfg;
+                throw new NotImplementedException();
+                //Disassemble(cfg, cfg.LiveVariables?.Before(instruction), builder);
+                //builder.AppendLine(instruction.ToStatementString().PadRight(StandardStatementWidth)
+                //                   + instruction.ContextCommentString());
+                //var insertedDeletes = cfg.InsertedDeletes ?? throw new InvalidOperationException("Inserted deletes is null");
+                //Disassemble(insertedDeletes.After(instruction), builder);
+                //Disassemble(cfg.BorrowClaims?.After(instruction), builder);
             }
         }
 
         private static void Disassemble(
-            ControlFlowGraphOld graphOld,
+            ControlFlowGraph cfg,
             BitArray? liveVariables,
             AssemblyBuilder builder)
         {
             if (liveVariables == null || liveVariables.Cast<bool>().All(x => x == false)) return;
 
             var variables = string.Join(", ", liveVariables.TrueIndexes()
-                    .Select(i => FormatVariableName(graphOld.VariableDeclarations[i])));
+                    .Select(i => FormatVariableName(cfg.VariableDeclarations[i])));
             builder.BeginLine("// live: ");
             builder.EndLine(variables);
         }
@@ -179,14 +181,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                 : declaration.Variable.ToString();
         }
 
-        private static void Disassemble(
-            IReadOnlyList<DeleteStatement> deletes,
-            AssemblyBuilder builder)
-        {
-            foreach (var delete in deletes)
-                builder.AppendLine(delete.ToStatementString().PadRight(StandardStatementWidth)
-                                   + delete.ContextCommentString());
-        }
+        //private static void Disassemble(
+        //    IReadOnlyList<DeleteStatement> deletes,
+        //    AssemblyBuilder builder)
+        //{
+        //    foreach (var delete in deletes)
+        //        builder.AppendLine(delete.ToStatementString().PadRight(StandardStatementWidth)
+        //                           + delete.ContextCommentString());
+        //}
 
         private static bool Disassemble(Claims? claims, AssemblyBuilder builder)
         {

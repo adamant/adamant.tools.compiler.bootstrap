@@ -7,15 +7,12 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Builders;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Moves;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Validation;
@@ -63,9 +60,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             var callables = declarations.OfType<ICallableDeclaration>().ToFixedList();
 
-            var liveness = LivenessAnalyzer.Check(callables, SaveLivenessAnalysis);
+            //var liveness = LivenessAnalyzer.Check(callables, SaveLivenessAnalysis);
 
-            BorrowChecker.Check(callables, liveness, diagnostics, SaveBorrowClaims);
+            //BorrowChecker.Check(callables, liveness, diagnostics, SaveBorrowClaims);
 
             // If there are errors from the previous phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
@@ -130,11 +127,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         private static FixedList<Declaration> BuildIL(
             FixedList<IEntityDeclarationSyntax> entityDeclarations)
         {
-            // TODO construct IL while building control flow graphs, then analyze borrow check on that
-
-            var controlFlowGraphFactory = new ControlFlowGraphFactory();
             var ilFactory = new ILFactory();
-            var declarationBuilder = new DeclarationBuilder(controlFlowGraphFactory, ilFactory);
+            var declarationBuilder = new DeclarationBuilder(ilFactory);
             declarationBuilder.Build(entityDeclarations);
             return declarationBuilder.AllDeclarations.ToFixedList();
         }
