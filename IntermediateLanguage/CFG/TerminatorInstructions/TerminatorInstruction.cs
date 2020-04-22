@@ -1,10 +1,16 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.TerminatorInstructions
 {
     /// <summary>
     /// An instruction that terminates a block
     /// </summary>
+    [Closed(
+        typeof(GotoInstruction),
+        typeof(IfInstruction),
+        typeof(ReturnValueInstruction),
+        typeof(ReturnVoidInstruction))]
     public abstract class TerminatorInstruction
     {
         public TextSpan Span { get; }

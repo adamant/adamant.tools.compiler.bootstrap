@@ -5,6 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Operands;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Places;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.TerminatorInstructions;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using ExhaustiveMatching;
 using static Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions.CompareInstructionOperator;
@@ -54,6 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             {
                 EmitInstruction(instruction, code);
             }
+            EmitInstruction(block.Terminator, code);
             code.EndBlock();
         }
 
@@ -64,32 +66,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             {
                 default:
                     throw ExhaustiveMatch.Failed(instruction);
-                case InstructionWithResult instructionWithResult:
-                    EmitInstructionWithResult(instructionWithResult, code);
+                case InstructionWithResult ins:
+                    EmitInstructionWithResult(ins, code);
                     break;
-                case CallInstruction call:
+                case CallInstruction ins:
                 {
-                    if (!(call.ResultPlace is null))
-                        EmitResultPlace(call.ResultPlace, code);
+                    if (!(ins.ResultPlace is null))
+                        EmitResultPlace(ins.ResultPlace, code);
                     else
                         code.BeginLine("");
 
-                    var mangledName = nameMangler.Mangle(call.Function);
-                    var arguments = call.Arguments.Select(ConvertValue);
-                    code.EndLine($"{mangledName}__{call.Arity}({string.Join(", ", arguments)});");
+                    var mangledName = nameMangler.Mangle(ins.Function);
+                    var arguments = ins.Arguments.Select(ConvertOperand);
+                    code.EndLine($"{mangledName}__{ins.Arity}({string.Join(", ", arguments)});");
                 }
                 break;
-                case CallVirtualInstruction callVirtual:
+                case CallVirtualInstruction ins:
                 {
-                    if (!(callVirtual.ResultPlace is null))
-                        EmitResultPlace(callVirtual.ResultPlace, code);
+                    if (!(ins.ResultPlace is null))
+                        EmitResultPlace(ins.ResultPlace, code);
                     else
                         code.BeginLine("");
 
-                    var self = ConvertValue(callVirtual.Self);
-                    var mangledName = nameMangler.Mangle(callVirtual.Function);
-                    var arity = callVirtual.Arity + 1;
-                    var arguments = callVirtual.Arguments.Select(ConvertValue).Prepend(self);
+                    var self = ConvertOperand(ins.Self);
+                    var mangledName = nameMangler.Mangle(ins.Function);
+                    var arity = ins.Arity + 1;
+                    var arguments = ins.Arguments.Select(ConvertOperand).Prepend(self);
                     code.EndLine($"{self}._vtable->{mangledName}__{arity}({string.Join(", ", arguments)});");
                 }
                 break;
@@ -108,19 +110,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             {
                 default:
                     throw ExhaustiveMatch.Failed(instruction);
-                case AssignmentInstruction assignment:
-                    code.EndLine($"{ConvertValue(assignment.Operand)};");
+                case AssignmentInstruction ins:
+                    code.EndLine($"{ConvertOperand(ins.Operand)};");
                     break;
-                case CompareInstruction compare:
+                case CompareInstruction ins:
                 {
-                    var left = ConvertValue(compare.LeftOperand);
-                    var right = ConvertValue(compare.RightOperand);
-                    var operationType = ConvertSimpleType(compare.Type);
+                    var left = ConvertOperand(ins.LeftOperand);
+                    var right = ConvertOperand(ins.RightOperand);
+                    var operationType = ConvertSimpleType(ins.Type);
                     string @operator;
-                    switch (compare.Operator)
+                    switch (ins.Operator)
                     {
                         default:
-                            throw ExhaustiveMatch.Failed(compare.Operator);
+                            throw ExhaustiveMatch.Failed(ins.Operator);
                         case Equal:
                             @operator = "eq";
                             break;
@@ -144,16 +146,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     code.EndLine($"{operationType}__{@operator}({left}, {right});");
                 }
                 break;
-                case NumericInstruction numericInstruction:
+                case NumericInstruction ins:
                 {
-                    var left = ConvertValue(numericInstruction.LeftOperand);
-                    var right = ConvertValue(numericInstruction.RightOperand);
-                    var operationType = ConvertSimpleType(numericInstruction.Type);
+                    var left = ConvertOperand(ins.LeftOperand);
+                    var right = ConvertOperand(ins.RightOperand);
+                    var operationType = ConvertSimpleType(ins.Type);
                     string @operator;
-                    switch (numericInstruction.Operator)
+                    switch (ins.Operator)
                     {
                         default:
-                            throw ExhaustiveMatch.Failed(numericInstruction.Operator);
+                            throw ExhaustiveMatch.Failed(ins.Operator);
                         case Add:
                             @operator = "add";
                             break;
@@ -171,29 +173,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     code.EndLine($"{operationType}__{@operator}({left}, {right});");
                 }
                 break;
-                case LoadIntegerInstruction loadInteger:
-                    code.EndLine($"({ConvertSimpleType(loadInteger.Type)}){{{loadInteger.Value}}};");
+                case LoadIntegerInstruction ins:
+                    code.EndLine($"({ConvertSimpleType(ins.Type)}){{{ins.Value}}};");
                     break;
-                case LoadBoolInstruction loadBool:
+                case LoadBoolInstruction ins:
                 {
-                    var booleanValue = loadBool.Value ? 1 : 0;
+                    var booleanValue = ins.Value ? 1 : 0;
                     code.EndLine($"({ConvertSimpleType(DataType.Bool)}){{{booleanValue}}};");
                 }
                 break;
-                case LoadStringInstruction loadString:
+                case LoadStringInstruction ins:
                 {
-                    var constantLength = StringConstant.GetByteLength(loadString.Value);
+                    var constantLength = StringConstant.GetByteLength(ins.Value);
                     const string selfArgument = "(String){&String___vtable, malloc(sizeof(String___Self))}";
                     var sizeArgument = $"(_size){{{constantLength}}}";
-                    var bytesArgument = $"(_size){{(uintptr_t)u8\"{loadString.Value.Escape()}\"}}";
+                    var bytesArgument = $"(_size){{(uintptr_t)u8\"{ins.Value.Escape()}\"}}";
                     code.EndLine($"String___new__3({selfArgument}, {sizeArgument}, {bytesArgument});");
                 }
                 break;
-                case LoadNoneInstruction loadNone:
-                    switch (loadNone.Type.Referent)
+                case LoadNoneInstruction ins:
+                    switch (ins.Type.Referent)
                     {
                         default:
-                            throw ExhaustiveMatch.Failed(loadNone.Type.Referent);
+                            throw ExhaustiveMatch.Failed(ins.Type.Referent);
                         case NeverType _: // `never?` is always none
                         case OptionalType _: // `T??`
                         case AnyType _: // `Any?`
@@ -201,7 +203,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                         case UserObjectType userObjectType:
                         {
                             var typeName = nameMangler.Mangle(userObjectType);
-                            code.EndLine($"({loadNone.Type}){{&{typeName}___vtable, NULL}};");
+                            code.EndLine($"({ins.Type}){{&{typeName}___vtable, NULL}};");
                         }
                         break;
                         case SimpleType simpleType:
@@ -216,26 +218,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                             throw new InvalidOperationException("Instruction uses invalid type `void?` (Load None)");
                     }
                     break;
-                case NegateInstruction negate:
+                case NegateInstruction ins:
                 {
-                    var operand = ConvertValue(negate.Operand);
-                    var operationType = ConvertSimpleType(negate.Type);
+                    var operand = ConvertOperand(ins.Operand);
+                    var operationType = ConvertSimpleType(ins.Type);
 
                     code.EndLine($"{operationType}__neg({operand});");
                 }
                 break;
-                case ConvertInstruction convert:
+                case ConvertInstruction ins:
                 {
-                    var valueToConvert = ConvertValue(convert.Operand);
-                    var fromType = ConvertSimpleType(convert.FromType);
-                    var toType = ConvertSimpleType(convert.ToType);
+                    var valueToConvert = ConvertOperand(ins.Operand);
+                    var fromType = ConvertSimpleType(ins.FromType);
+                    var toType = ConvertSimpleType(ins.ToType);
                     code.EndLine($"_convert__{fromType}__{toType}({valueToConvert});");
                 }
                 break;
-                case FieldAccessInstruction fieldAccess:
+                case FieldAccessInstruction ins:
                 {
-                    var fieldName = nameMangler.Mangle(fieldAccess.FieldName);
-                    code.EndLine($"{ConvertValue(fieldAccess.Operand)}._self->{fieldName};");
+                    var fieldName = nameMangler.Mangle(ins.FieldName);
+                    code.EndLine($"{ConvertOperand(ins.Operand)}._self->{fieldName};");
                 }
                 break;
 
@@ -272,15 +274,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 //    }
                 //    return $"{operationType}__{@operator}({left}, {right})";
                 //}
-                //case IfStatement ifStatement:
-                //    code.AppendLine($"if({ConvertValue(ifStatement.Condition)}._value) goto {ifStatement.ThenBlock}; else goto {ifStatement.ElseBlock};");
-                //    break;
-                //case GotoStatement gotoStatement:
-                //    code.AppendLine($"goto {gotoStatement.GotoBlock};");
-                //    break;
-                //case ReturnStatement _:
-                //    code.AppendLine(voidReturn ? "return;" : "return _result;");
-                //    break;
+
                 //case ActionStatement action:
                 //    code.AppendLine(ConvertValue(action.Value) + ";");
                 //    break;
@@ -316,29 +310,49 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             }
         }
 
+        private static void EmitInstruction(TerminatorInstruction instruction, CCodeBuilder code)
+        {
+            code.AppendLine("// " + instruction);
+            switch (instruction)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(instruction);
+                case GotoInstruction ins:
+                    code.AppendLine($"goto bb{ins.BlockNumber};");
+                    break;
+                case IfInstruction ins:
+                    code.AppendLine($"if({ConvertOperand(ins.Condition)}._value) goto bb{ins.ThenBlockNumber}; else goto bb{ins.ElseBlockNumber};");
+                    break;
+                case ReturnValueInstruction ins:
+                    code.AppendLine($"return {ConvertOperand(ins.Value)};");
+                    break;
+                case ReturnVoidInstruction ins:
+                    code.AppendLine("return;");
+                    break;
+            }
+        }
         private string ConvertPlace(Place place)
         {
             switch (place)
             {
                 default:
                     throw ExhaustiveMatch.Failed(place);
-                case VariablePlace reference:
-                    return "_" + reference.Variable.Name;
-                case FieldPlace fieldAccess:
-                    var fieldName = nameMangler.Mangle(fieldAccess.Field.UnqualifiedName);
-                    return $"{ConvertValue(fieldAccess.Target)}._self->{fieldName}";
+                case VariablePlace p:
+                    return "_" + p.Variable.Name;
+                case FieldPlace p:
+                    var fieldName = nameMangler.Mangle(p.Field.UnqualifiedName);
+                    return $"{ConvertOperand(p.Target)}._self->{fieldName}";
             }
         }
 
-        private static string ConvertValue(Operand value)
+        private static string ConvertOperand(Operand value)
         {
             switch (value)
             {
                 default:
-                    //throw new NotImplementedException();
                     throw ExhaustiveMatch.Failed(value);
-                case VariableReference variableReference:
-                    return "_" + variableReference.Variable.Name;
+                case VariableReference op:
+                    return "_" + op.Variable.Name;
             }
         }
 
