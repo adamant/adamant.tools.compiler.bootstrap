@@ -200,7 +200,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     var loopEntry = graph.NewEntryBlock(currentBlock!, exp.Block.Span.AtStart(), CurrentScope);
                     currentBlock = loopEntry;
                     continueToBlock = loopEntry;
-                    var loopExit = ConvertLoopBody(exp.Block);
+                    var loopExit = ConvertLoopBody(exp.Block, exitRequired: false);
                     // If it always breaks, there isn't a current block
                     currentBlock?.End(new GotoInstruction(loopEntry.Number, exp.Block.Span.AtEnd(), CurrentScope));
                     currentBlock = loopExit;
@@ -220,7 +220,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     var loopExit = ConvertLoopBody(whileExpression.Block);
                     // Generate if branch now that loop exit is known
                     conditionBlock.End(new IfInstruction(condition, loopEntry.Number, loopExit.Number,
-                        whileExpression.Condition.Span, CurrentScope));
+                            whileExpression.Condition.Span, CurrentScope));
                     // If it always breaks, there isn't a current block
                     currentBlock?.End(new GotoInstruction(conditionBlock.Number,
                         whileExpression.Block.Span.AtEnd(), CurrentScope));
@@ -419,14 +419,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         /// <summary>
         /// Convert the body of a loop. Ensures break statements are handled correctly.
         /// </summary>
-        private BlockBuilder? ConvertLoopBody(IBlockExpressionSyntax body)
+        private BlockBuilder? ConvertLoopBody(IBlockExpressionSyntax body, bool exitRequired = true)
         {
             var oldAddBreaks = addBreaks;
             addBreaks = new List<Action<BlockBuilder>>();
             Convert((IExpressionSyntax)body);
             BlockBuilder? loopExit = null;
-            // Only if there is a loop exit do we need an exit block
-            if (addBreaks.Any())
+            // If this kind of loop requires an exit or if there is a break, create an exit block
+            if (exitRequired || addBreaks.Any())
             {
                 loopExit = graph.NewBlock();
                 foreach (var addBreak in addBreaks) addBreak(loopExit);
