@@ -22,21 +22,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Helpers
         [Obsolete("Required by IXunitSerializable", true)]
         public TestCase()
         {
-            code = new Lazy<string>(GetCode);
+            FullCodePath = "";
+            RelativeCodePath = "";
+            code = new Lazy<string>(LoadCode);
         }
 
         public TestCase(string fullCodePath, string relativeCodePath)
         {
             FullCodePath = fullCodePath;
             RelativeCodePath = relativeCodePath;
-            code = new Lazy<string>(GetCode);
+            code = new Lazy<string>(LoadCode);
         }
 
-        protected string GetCode() => File.ReadAllText(FullCodePath, CodeFile.Encoding);
+        protected string LoadCode() => File.ReadAllText(FullCodePath, CodeFile.Encoding);
 
         public override string ToString()
         {
-            var pathWithoutExtension = Path.Combine(Path.GetDirectoryName(RelativeCodePath), Path.GetFileNameWithoutExtension(RelativeCodePath));
+            var pathWithoutExtension = Path.ChangeExtension(RelativeCodePath, null);
             return pathWithoutExtension
                 .Replace(Path.DirectorySeparatorChar, '.')
                 .Replace(Path.AltDirectorySeparatorChar, '.');

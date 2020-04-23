@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -57,7 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             var references = new Dictionary<string, Package>();
 
             // Reference Standard Library
-            var stdLibPackage = CompileStdLib(testCase, compiler);
+            var stdLibPackage = CompileStdLib(compiler);
             references.Add("adamant.stdlib", stdLibPackage);
 
             try
@@ -107,7 +108,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             }
         }
 
-        private Package CompileStdLib(TestCase testCase, AdamantCompiler compiler)
+        private Package CompileStdLib(AdamantCompiler compiler)
         {
             try
             {
@@ -139,7 +140,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             string sourceDir,
             FixedList<string> rootNamespace)
         {
-            var relativeDirectory = Path.GetDirectoryName(Path.GetRelativePath(sourceDir, path));
+            var relativeDirectory = Path.GetDirectoryName(Path.GetRelativePath(sourceDir, path)) ?? throw new InvalidOperationException();
             var ns = rootNamespace.Concat(relativeDirectory.SplitOrEmpty(Path.DirectorySeparatorChar)).ToFixedList();
             return CodeFile.Load(path, ns);
         }
@@ -256,7 +257,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
             var path = match.Groups["file"]?.Captures.SingleOrDefault()?.Value;
             if (path != null)
             {
-                path = Path.Combine(Path.GetDirectoryName(testCasePath), path);
+                var testCaseDirectory = Path.GetDirectoryName(testCasePath) ?? throw new InvalidOperationException();
+                path = Path.Combine(testCaseDirectory, path);
                 return File.ReadAllText(path);
             }
 
