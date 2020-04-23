@@ -52,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
             task = GetValueAsync(() => task);
 
             var delayTask = Task.Delay((int)TimeSpan.FromSeconds(2).TotalMilliseconds);
-            var completedTask = await Task.WhenAny(task, delayTask);
+            var completedTask = await Task.WhenAny(task, delayTask).ConfigureAwait(false);
             Assert.Equal(delayTask, completedTask);
         }
 
@@ -65,14 +65,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
             t2 = GetValueAsync(() => t1);
 
             var delayTask = Task.Delay((int)TimeSpan.FromSeconds(2).TotalMilliseconds);
-            var completedTask = await Task.WhenAny(t1, delayTask);
+            var completedTask = await Task.WhenAny(t1, delayTask).ConfigureAwait(false);
             Assert.Equal(delayTask, completedTask);
         }
 
         private static async Task<int> GetValueAsync(Func<Task<int>> task)
         {
             await Task.Yield();
-            return await task();
+            return await task().ConfigureAwait(false);
         }
 
         private string testField = "old";

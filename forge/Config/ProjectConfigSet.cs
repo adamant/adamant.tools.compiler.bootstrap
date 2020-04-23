@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -14,12 +15,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Config
         public ProjectConfig Load(string packagePath)
         {
             var config = ProjectConfig.Load(packagePath);
-            if (configs.TryGetValue(config.FullPath, out var existingConfig))
+            if (configs.TryGetValue(config.FullPath ?? throw new InvalidOperationException(), out var existingConfig))
                 return existingConfig;
 
-            configs.Add(config.Name, config);
-            foreach (var dependency in config.Dependencies)
-                Load(dependency.Value.Path);
+            configs.Add(config.Name ?? throw new InvalidOperationException(), config);
+            foreach (var dependency in config.Dependencies ?? throw new InvalidOperationException())
+                Load(dependency.Value?.Path ?? throw new InvalidOperationException());
 
             return config;
         }

@@ -31,17 +31,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
 
         private Project GetOrAdd(ProjectConfig config, ProjectConfigSet configs)
         {
-            var projectDir = Path.GetDirectoryName(config.FullPath);
+            var projectDir = Path.GetDirectoryName(config.FullPath) ?? throw new InvalidOperationException("Null directory name");
             if (projects.TryGetValue(projectDir, out var existingProject))
                 return existingProject;
 
-            // Add a placeholder to prevent cycles
-            projects.Add(projectDir, null);
+            // Add a placeholder to prevent cycles (safe because we will replace it below
+            projects.Add(projectDir, null!);
             var dependencies = config.Dependencies.Select(d =>
             {
-                var dependencyConfig = configs[d.Key];
+                var (name, config) = d;
+                var dependencyConfig = configs[name];
                 var dependencyProject = GetOrAdd(dependencyConfig, configs);
-                return new ProjectReference(d.Key, dependencyProject, d.Value.Trusted);
+                return new ProjectReference(name, dependencyProject, config?.Trusted ?? throw new InvalidOperationException());
             }).ToList();
 
             var project = new Project(config, dependencies);
@@ -61,10 +62,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
 
         public async Task Build(TaskScheduler taskScheduler, bool verbose)
         {
+            _ = verbose; // verbose parameter will be needed in the future
             var taskFactory = new TaskFactory(taskScheduler);
-            var projectBuilds = new Dictionary<Project, Task<Package>>();
+            var projectBuilds = new Dictionary<Project, Task<Package?>>();
 
-            var projectBuildsSource = new TaskCompletionSource<FixedDictionary<Project, Task<Package>>>();
+            var projectBuildsSource = new TaskCompletionSource<FixedDictionary<Project, Task<Package?>>>();
             var projectBuildsTask = projectBuildsSource.Task;
 
             // Sort projects to detect cycles and so we can assume the tasks already exist
@@ -73,8 +75,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             var consoleLock = new object();
             foreach (var project in sortedProjects)
             {
+#pragma warning disable CA2008 // Do not create tasks without passing a TaskScheduler (created with task factory built with task scheduler)
                 var buildTask = taskFactory.StartNew(() =>
                     Build(compiler, project, projectBuildsTask, consoleLock))
+#pragma warning restore CA2008 // Do not create tasks without passing a TaskScheduler
                     .Unwrap(); // Needed because StartNew doesn't work intuitively with Async methods
                 if (!projectBuilds.TryAdd(project, buildTask))
                     throw new Exception("Project added to build set twice");
@@ -87,7 +91,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
         private static async Task<Package?> Build(
             AdamantCompiler compiler,
             Project project,
-            Task<FixedDictionary<Project, Task<Package>>> projectBuildsTask,
+            Task<FixedDictionary<Project, Task<Package?>>> projectBuildsTask,
             object consoleLock)
         {
             var projectBuilds = await projectBuildsTask.ConfigureAwait(false);
@@ -97,11 +101,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             var referenceTasks = project.References.ToDictionary(r => r.Name, r => projectBuilds[r.Project]);
             var references = new Dictionary<string, Package>();
             foreach (var referenceTask in referenceTasks)
-                references.Add(referenceTask.Key, await referenceTask.Value);
+                references.Add(referenceTask.Key, await referenceTask.Value.ConfigureAwait(false));
 
             lock (consoleLock)
             {
-                Console.WriteLine($"Compiling {project.Name} ({project.Path})...");
+                Console.WriteLine($@"Compiling {project.Name} ({project.Path})...");
             }
             var codeFiles = sourcePaths.Select(p => LoadCode(p, sourceDir, project.RootNamespace)).ToList();
             try
@@ -140,7 +144,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             string sourceDir,
             FixedList<string> rootNamespace)
         {
-            var relativeDirectory = Path.GetDirectoryName(Path.GetRelativePath(sourceDir, path));
+            var relativeDirectory = Path.GetDirectoryName(Path.GetRelativePath(sourceDir, path)) ?? throw new InvalidOperationException("Null directory name");
             var ns = rootNamespace.Concat(relativeDirectory.SplitOrEmpty(Path.DirectorySeparatorChar)).ToFixedList();
             return CodeFile.Load(path, ns);
         }

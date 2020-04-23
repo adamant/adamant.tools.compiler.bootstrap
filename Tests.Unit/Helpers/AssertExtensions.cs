@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using FsCheck;
 using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers
@@ -9,10 +10,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 
-        public static T NotNull<T>(this FsCheck.NonNull<T> value)
+        public static T NotNull<T>(this NonNull<T> value, string paramName)
             where T : class
         {
-            return (value ?? throw new ArgumentNullException()).Get;
+            return (value ?? throw new ArgumentNullException(paramName)).Get;
         }
 
         public static T AssertOfType<T>(this object value)

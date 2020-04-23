@@ -1,31 +1,34 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Newtonsoft.Json;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Forge.Config
 {
+    [SuppressMessage("Performance", "CA1812: Avoid uninstantiated internal classes",
+            Justification = "Instantiated by JSON converter")]
     internal class ProjectConfig
     {
         public const string FileName = "forge-project.vson";
 
         [JsonIgnore]
-        public string FullPath { get; set; }
+        public string? FullPath { get; set; }
 
         [JsonProperty("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [JsonProperty("root_namespace")]
-        public string RootNamespace { get; set; }
+        public string? RootNamespace { get; set; }
 
         [JsonProperty("authors")]
-        public List<string> Authors { get; set; }
+        public List<string?>? Authors { get; set; }
 
         [JsonProperty("template")]
-        public ProjectTemplate Template { get; set; }
+        public ProjectTemplate? Template { get; set; }
 
         [JsonProperty("dependencies")]
-        public Dictionary<string, ProjectDependencyConfig> Dependencies { get; set; } = new Dictionary<string, ProjectDependencyConfig>();
+        public Dictionary<string, ProjectDependencyConfig?>? Dependencies { get; set; } = new Dictionary<string, ProjectDependencyConfig?>();
 
         public static ProjectConfig Load(string path)
         {
@@ -46,13 +49,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Config
 
             projectFilePath = Path.GetFullPath(projectFilePath);
 
-            using (var file = new JsonTextReader(File.OpenText(projectFilePath)))
-            {
-                var serializer = new JsonSerializer();
-                var projectFile = serializer.Deserialize<ProjectConfig>(file);
-                projectFile.FullPath = projectFilePath;
-                return projectFile;
-            }
+            using var file = new JsonTextReader(File.OpenText(projectFilePath));
+            var serializer = new JsonSerializer();
+            var projectFile = serializer.Deserialize<ProjectConfig>(file);
+            projectFile.FullPath = projectFilePath;
+            return projectFile;
         }
     }
 }

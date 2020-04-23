@@ -182,8 +182,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
         {
             return Prop.ForAll<NonNull<string>>(input =>
             {
-                var result = Lex(input.NotNull());
-                return input.NotNull() == result.TokensToString();
+                var inputString = input.NotNull(nameof(input));
+                var result = Lex(inputString);
+                return inputString == result.TokensToString();
             });
         }
 
