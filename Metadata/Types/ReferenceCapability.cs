@@ -69,23 +69,41 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                     return true;
                 case (/* Not Identity */ _, Identity):
                     return false;
+                // Anything that isn't identity can be shared
                 case (Shared, _):
-                case (Owned, OwnedMutable):
-                case (Isolated, IsolatedMutable):
-                case (Held, HeldMutable):
-                case (Borrowed, Borrowed):
+                // Mutable things can be borrowed
                 case (Borrowed, OwnedMutable):
                 case (Borrowed, IsolatedMutable):
                 case (Borrowed, HeldMutable):
+                // Held can accept borrow/share or ownership
+                case (HeldMutable, Borrowed):
+                case (HeldMutable, OwnedMutable):
+                case (HeldMutable, IsolatedMutable):
+                case (Held, Shared):
+                case (Held, Owned):
+                case (Held, Isolated):
+                case (Held, Borrowed):
+                case (Held, OwnedMutable):
+                case (Held, IsolatedMutable):
+                // Mutable things can be weakened to read-only
+                case (Owned, OwnedMutable):
+                case (Isolated, IsolatedMutable):
+                case (Held, HeldMutable):
+                // Isolated can be weakened to owned
+                case (Owned, Isolated):
+                case (OwnedMutable, IsolatedMutable):
                     return true;
+                // Can't borrow from read-only
                 case (Borrowed, Owned):
                 case (Borrowed, Isolated):
                 case (Borrowed, Held):
                 case (Borrowed, Shared):
+                // All other conversions to ownership disallowed
                 case (Owned, _):
                 case (OwnedMutable, _):
                 case (IsolatedMutable, _):
                 case (Isolated, _):
+
                 case (HeldMutable, _):
                     return false;
             }
