@@ -422,25 +422,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         case 0:
                             diagnostics.Add(NameBindingError.CouldNotBindConstructor(file, newObjectExpression.Span));
                             newObjectExpression.ConstructorSymbol = UnknownSymbol.Instance;
-                            newObjectExpression.ConstructorType = DataType.Unknown;
                             break;
                         case 1:
                             var constructorSymbol = constructors.Single();
                             newObjectExpression.ConstructorSymbol = constructorSymbol;
-                            // TODO deal correctly with constructor type and implicit conversion of arguments
-                            //var constructorType = constructorSymbol.Type;
-                            //newObjectExpression.ConstructorType = constructorType;
-                            //if (constructorType is FunctionType functionType)
-                            //    foreach (var (arg, type) in newObjectExpression.Arguments.Zip(functionType.ParameterTypes))
-                            //    {
-                            //        InsertImplicitConversionIfNeeded(ref arg.Value, type);
-                            //        CheckArgumentTypeCompatibility(type, arg);
-                            //    }
                             break;
                         default:
                             diagnostics.Add(NameBindingError.AmbiguousConstructorCall(file, newObjectExpression.Span));
                             newObjectExpression.ConstructorSymbol = UnknownSymbol.Instance;
-                            newObjectExpression.ConstructorType = DataType.Unknown;
                             break;
                     }
 

@@ -1,6 +1,7 @@
 using System;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 
@@ -37,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
             switch (assignmentExpression.LeftOperand)
             {
                 case INameExpressionSyntax identifier:
-                    return definitelyAssigned.Set(identifier.ReferencedSymbol, true);
+                    return definitelyAssigned.Set(identifier.ReferencedSymbol.Assigned(), true);
                 case IFieldAccessExpressionSyntax _:
                     return definitelyAssigned;
                 default:
@@ -49,7 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
             INameExpressionSyntax nameExpression,
             VariableFlags definitelyAssigned)
         {
-            if (definitelyAssigned[nameExpression.ReferencedSymbol] == false)
+            if (definitelyAssigned[nameExpression.ReferencedSymbol.Assigned()] == false)
                 diagnostics.Add(SemanticError.VariableMayNotHaveBeenAssigned(file,
                     nameExpression.Span, nameExpression.Name));
 

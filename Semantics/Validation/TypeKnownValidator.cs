@@ -61,11 +61,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     foreachExpression.Type.Known();
                     foreachExpression.VariableType.Known();
                     return;
-                case INewObjectExpressionSyntax newObject:
-                    WalkChildren(newObject);
-                    newObject.Type.Known();
-                    newObject.ConstructorType.Known();
-                    return;
                 case IExpressionSyntax expression:
                     WalkChildren(expression);
                     expression.Type.Known();

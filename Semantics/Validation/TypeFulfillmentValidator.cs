@@ -62,11 +62,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     foreachExpression.Type.Assigned();
                     foreachExpression.VariableType.Assigned();
                     return;
-                case INewObjectExpressionSyntax newObject:
-                    WalkChildren(newObject);
-                    newObject.Type.Assigned();
-                    newObject.ConstructorType.Assigned();
-                    return;
                 case IExpressionSyntax expression:
                     WalkChildren(expression);
                     expression.Type.Assigned();

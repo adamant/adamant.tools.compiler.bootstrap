@@ -7,6 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.TerminatorInstructions;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen;
 using ExhaustiveMatching;
@@ -81,7 +82,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                     var il = ilFactory.CreateGraph(constructor);
                     var parameters = BuildConstructorParameters(constructor);
                     declaration = new ConstructorDeclaration(constructor.FullName,
-                       parameters, constructor.SelfParameterType, il);
+                       parameters, constructor.SelfParameterType.Known(), il);
                     break;
                 }
                 case IFieldDeclarationSyntax fieldDeclaration:
@@ -148,7 +149,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
 
         private static FixedList<Parameter> BuildConstructorParameters(IConstructorDeclarationSyntax constructorDeclaration)
         {
-            var selfType = constructorDeclaration.SelfParameterType;
+            var selfType = constructorDeclaration.SelfParameterType.Known();
             var selfName = ((QualifiedName)constructorDeclaration.FullName).Qualifier.Qualify(SpecialName.Self);
             var selfParameter = new Parameter(false, selfName, selfType);
             return selfParameter.Yield().Concat(constructorDeclaration.Parameters.Select(BuildParameter))

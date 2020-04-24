@@ -219,7 +219,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     currentBlock = loopEntry;
                     var loopExit = ConvertLoopBody(whileExpression.Block);
                     // Generate if branch now that loop exit is known
-                    conditionBlock.End(new IfInstruction(condition, loopEntry.Number, loopExit.Number,
+                    conditionBlock.End(new IfInstruction(condition, loopEntry.Number, loopExit!.Number,
                             whileExpression.Condition.Span, CurrentScope));
                     // If it always breaks, there isn't a current block
                     currentBlock?.End(new GotoInstruction(conditionBlock.Number,

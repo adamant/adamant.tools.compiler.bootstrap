@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
             this.diagnostics = diagnostics;
         }
 
-        private IDataFlowAnalysisChecker<TState> checker;
+        private IDataFlowAnalysisChecker<TState>? checker;
         private TState? currentState;
 
         protected override void WalkNonNull(ISyntax syntax, bool isLValue)
@@ -31,15 +31,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
                 case IAssignmentExpressionSyntax assignmentExpression:
                     WalkNonNull(assignmentExpression.LeftOperand, true);
                     WalkNonNull(assignmentExpression.RightOperand, false);
-                    currentState = checker.Assignment(assignmentExpression, currentState);
+                    currentState = checker!.Assignment(assignmentExpression, currentState!);
                     return;
                 case INameExpressionSyntax nameExpression:
                     if (isLValue) return; // ignore
-                    currentState = checker.IdentifierName(nameExpression, currentState);
+                    currentState = checker!.IdentifierName(nameExpression, currentState!);
                     return;
                 case IVariableDeclarationStatementSyntax variableDeclaration:
                     WalkChildren(variableDeclaration, false);
-                    currentState = checker.VariableDeclaration(variableDeclaration, currentState);
+                    currentState = checker!.VariableDeclaration(variableDeclaration, currentState!);
                     return;
                 case IDeclarationSyntax _:
                     throw new InvalidOperationException($"Analyze data flow of declaration of type {syntax.GetType().Name}");
