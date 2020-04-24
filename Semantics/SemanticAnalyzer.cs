@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -33,6 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         /// </summary>
         public bool SaveBorrowClaims { get; set; } = false;
 
+        [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "OO")]
         public Package Check(
             PackageSyntax packageSyntax,
             FixedDictionary<string, Package> references)
@@ -58,7 +60,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             var declarations = BuildIL(entities);
             // --------------------------------------------------
 
-            var callables = declarations.OfType<ICallableDeclaration>().ToFixedList();
+            //var callables = declarations.OfType<ICallableDeclaration>().ToFixedList();
 
             //var liveness = LivenessAnalyzer.Check(callables, SaveLivenessAnalysis);
 
@@ -109,6 +111,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 #if DEBUG
             new TypeFulfillmentValidator().Walk(entities);
             new ReferencedSymbolValidator().Walk(entities);
+            new TypeKnownValidator().Walk(entities);
 #endif
 
             // From this point forward, analysis focuses on callable bodies

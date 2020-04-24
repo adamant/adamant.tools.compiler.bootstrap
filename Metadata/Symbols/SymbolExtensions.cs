@@ -1,3 +1,4 @@
+using System;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using ExhaustiveMatching;
@@ -27,6 +28,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
                 case IBindingSymbol _:
                     return FixedList<ISymbol>.Empty;
             }
+        }
+
+        public static T Assigned<T>(this T? symbol)
+            where T : class, ISymbol
+        {
+            return symbol ?? throw new InvalidOperationException("Symbol not assigned");
         }
     }
 }

@@ -6,10 +6,9 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
 {
     /// <summary>
-    /// Validates that all types are fulfilled. That is that everything as an
-    /// assigned type, even if that type is Unknown.
+    /// Validates that all types are known.
     /// </summary>
-    public class TypeFulfillmentValidator : SyntaxWalker
+    public class TypeKnownValidator : SyntaxWalker
     {
         public void Walk(IEnumerable<IEntityDeclarationSyntax> entityDeclarations)
         {
@@ -22,54 +21,54 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
             switch (syntax)
             {
                 case IClassDeclarationSyntax classDeclaration:
-                    classDeclaration.DeclaresType.Fulfilled();
+                    classDeclaration.DeclaresType.Known();
                     // Don't recur into body, we will see those as separate members
                     return;
                 case IConstructorDeclarationSyntax constructorDeclaration:
                     WalkChildren(constructorDeclaration);
-                    constructorDeclaration.SelfParameterType.Assigned();
+                    constructorDeclaration.SelfParameterType.Known();
                     return;
                 case IMethodDeclarationSyntax methodDeclaration:
                     WalkChildren(methodDeclaration);
-                    methodDeclaration.ReturnType.Fulfilled();
+                    methodDeclaration.ReturnType.Known();
                     return;
                 case IFunctionDeclarationSyntax functionDeclaration:
                     WalkChildren(functionDeclaration);
-                    functionDeclaration.ReturnType.Fulfilled();
+                    functionDeclaration.ReturnType.Known();
                     return;
                 case IAssociatedFunctionDeclaration associatedFunctionDeclaration:
                     WalkChildren(associatedFunctionDeclaration);
-                    associatedFunctionDeclaration.ReturnType.Fulfilled();
+                    associatedFunctionDeclaration.ReturnType.Known();
                     return;
                 case IParameterSyntax parameter:
                     WalkChildren(parameter);
-                    parameter.Type.Fulfilled();
+                    parameter.Type.Known();
                     return;
                 case IFieldDeclarationSyntax fieldDeclaration:
                     WalkChildren(fieldDeclaration);
-                    fieldDeclaration.Type.Fulfilled();
+                    fieldDeclaration.Type.Known();
                     return;
                 case ITypeSyntax type:
                     WalkChildren(type);
-                    type.NamedType.Assigned();
+                    type.NamedType.Known();
                     return;
                 case IVariableDeclarationStatementSyntax variableDeclaration:
                     WalkChildren(variableDeclaration);
-                    variableDeclaration.Type.Assigned();
+                    variableDeclaration.Type.Known();
                     return;
                 case IForeachExpressionSyntax foreachExpression:
                     WalkChildren(foreachExpression);
-                    foreachExpression.Type.Assigned();
-                    foreachExpression.VariableType.Assigned();
+                    foreachExpression.Type.Known();
+                    foreachExpression.VariableType.Known();
                     return;
                 case INewObjectExpressionSyntax newObject:
                     WalkChildren(newObject);
-                    newObject.Type.Assigned();
-                    newObject.ConstructorType.Assigned();
+                    newObject.Type.Known();
+                    newObject.ConstructorType.Known();
                     return;
                 case IExpressionSyntax expression:
                     WalkChildren(expression);
-                    expression.Type.Assigned();
+                    expression.Type.Known();
                     return;
             }
 

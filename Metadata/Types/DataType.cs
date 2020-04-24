@@ -59,15 +59,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// </summary>
         public abstract ValueSemantics ValueSemantics { get; }
 
-        [DebuggerHidden]
-        public DataType AssertKnown()
-        {
-            if (!IsKnown)
-                throw new InvalidOperationException($"Type {this} not known");
-
-            return this;
-        }
-
         public abstract override string ToString();
 
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Return self idiom")]
@@ -118,6 +109,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                 default:
                     return false;
             }
+        }
+
+        /// <summary>
+        /// Validates that a type as been assigned.
+        /// </summary>
+        [DebuggerHidden]
+        public static DataType Assigned(this DataType? type)
+        {
+            return type ?? throw new InvalidOperationException("Type not assigned");
+        }
+
+        [DebuggerHidden]
+        public static DataType Known(this DataType? type)
+        {
+            if (!type.Assigned().IsKnown) throw new InvalidOperationException($"Type {type} not known");
+
+            return type!;
         }
     }
 }

@@ -77,7 +77,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             if (State != PromiseState.Fulfilled)
                 throw new InvalidOperationException("Promise not fulfilled");
 
-            return dataType!.AssertKnown();
+            return dataType!.Known();
         }
 
         // Useful for debugging

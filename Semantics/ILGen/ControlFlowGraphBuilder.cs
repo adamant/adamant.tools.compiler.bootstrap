@@ -89,7 +89,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             var blocks = new List<Block>();
             foreach (var block in blockBuilders)
             {
-                var terminator = block.Terminator ?? throw new ArgumentNullException();
+                var terminator = block.Terminator ?? throw new InvalidOperationException();
                 blocks.Add(new Block(block.Number, block.Instructions.ToFixedList(), terminator));
             }
 

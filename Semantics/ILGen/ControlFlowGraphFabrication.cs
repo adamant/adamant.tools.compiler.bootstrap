@@ -9,6 +9,7 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Operands;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Places;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.TerminatorInstructions;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using ExhaustiveMatching;
 using static Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions.CompareInstructionOperator;
@@ -362,7 +363,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     var assignInto = ConvertToPlaceWithoutSideEffects(leftOperand);
                     if (assignInto is null)
                     {
-                        var tempVar = graph.Let(leftOperand.Type.Assigned().AssertKnown(), CurrentScope);
+                        var tempVar = graph.Let(leftOperand.Type.Assigned().Known(), CurrentScope);
                         var tempSpan = rightOperand.Span.AtStart();
                         ConvertIntoPlace(rightOperand, tempVar.Place(tempSpan));
                         assignInto = ConvertToPlace(leftOperand);
@@ -466,7 +467,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     var assignInto = ConvertToPlaceWithoutSideEffects(leftOperand);
                     if (assignInto is null)
                     {
-                        var tempVar = graph.Let(leftOperand.Type.Assigned().AssertKnown(), CurrentScope);
+                        var tempVar = graph.Let(leftOperand.Type.Assigned().Known(), CurrentScope);
                         var tempSpan = rightOperand.Span.AtStart();
                         ConvertIntoPlace(rightOperand, tempVar.Place(tempSpan));
                         assignInto = ConvertToPlace(leftOperand);
@@ -490,8 +491,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     break;
                 case IBinaryOperatorExpressionSyntax exp:
                 {
-                    var resultType = exp.Type.Assigned().AssertKnown();
-                    var operandType = exp.LeftOperand.Type.Assigned().AssertKnown();
+                    var resultType = exp.Type.Assigned().Known();
+                    var operandType = exp.LeftOperand.Type.Assigned().Known();
                     var leftOperand = ConvertToOperand(exp.LeftOperand);
                     var rightOperand = ConvertToOperand(exp.RightOperand);
                     switch (exp.Operator)
@@ -552,7 +553,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 break;
                 case IUnaryOperatorExpressionSyntax exp:
                 {
-                    var type = exp.Type.Assigned().AssertKnown();
+                    var type = exp.Type.Assigned().Known();
                     var operand = ConvertToOperand(exp.Operand);
                     switch (exp.Operator)
                     {
@@ -597,7 +598,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 {
                     var constructorName = exp.ConstructorSymbol!.FullName;
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
-                    var constructedType = (UserObjectType)exp.TypeSyntax.NamedType.Assigned().AssertKnown();
+                    var constructedType = (UserObjectType)exp.TypeSyntax.NamedType.Assigned().Known();
                     currentBlock!.Add(new NewObjectInstruction(resultPlace, constructorName, constructedType, args, exp.Span, CurrentScope));
                 }
                 break;
@@ -609,13 +610,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     break;
                 case IImplicitNumericConversionExpression exp:
                 {
-                    if (exp.Expression.Type.Assigned().AssertKnown() is IntegerConstantType constantType)
+                    if (exp.Expression.Type.Assigned().Known() is IntegerConstantType constantType)
                         currentBlock!.Add(new LoadIntegerInstruction(resultPlace, constantType.Value,
-                            (IntegerType)exp.Type.Assigned().AssertKnown(),
+                            (IntegerType)exp.Type.Assigned().Known(),
                             exp.Span, CurrentScope));
                     else
                         currentBlock!.Add(new ConvertInstruction(resultPlace, ConvertToOperand(exp.Expression),
-                            (NumericType)exp.Expression.Type.Assigned().AssertKnown(), exp.ConvertToType,
+                            (NumericType)exp.Expression.Type.Assigned().Known(), exp.ConvertToType,
                             exp.Span, CurrentScope));
                 }
                 break;
@@ -673,7 +674,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case ILoopExpressionSyntax _:
                 case IWhileExpressionSyntax _:
                 {
-                    var tempVar = graph.Let(expression.Type.Assigned().AssertKnown(), CurrentScope);
+                    var tempVar = graph.Let(expression.Type.Assigned().Known(), CurrentScope);
                     ConvertIntoPlace(expression, tempVar.Place(expression.Span));
                     return tempVar.Reference(expression.Span);
                 }
