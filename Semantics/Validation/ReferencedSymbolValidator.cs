@@ -42,6 +42,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     WalkChildren(typeName);
                     AssertHasReferencedSymbol(typeName, typeName.ReferencedSymbol);
                     return;
+                case IMoveExpressionSyntax move:
+                    WalkChildren(move);
+                    AssertHasReferencedSymbol(move, move.MovedSymbol);
+                    return;
+                case IBorrowExpressionSyntax borrow:
+                    WalkChildren(borrow);
+                    AssertHasReferencedSymbol(borrow, borrow.BorrowedSymbol);
+                    return;
+                case IShareExpressionSyntax share:
+                    WalkChildren(share);
+                    AssertHasReferencedSymbol(share, share.SharedSymbol);
+                    return;
             }
 
             WalkChildren(syntax);

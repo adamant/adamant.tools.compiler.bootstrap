@@ -1,3 +1,6 @@
+using System.Diagnostics.CodeAnalysis;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
+
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     /// <summary>
@@ -8,5 +11,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public interface IBorrowExpressionSyntax : IExpressionSyntax
     {
         ref IExpressionSyntax Referent { get; }
+        [DisallowNull] IBindingSymbol? BorrowedSymbol { get; set; }
     }
 }
