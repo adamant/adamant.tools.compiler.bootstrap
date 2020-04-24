@@ -119,7 +119,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                 case Owned:
                 case IsolatedMutable:
                 case Isolated:
-                    return Types.ValueSemantics.Own;
+                    return ValueSemantics.Own;
                 case HeldMutable:
                 case Borrowed:
                     return ValueSemantics.Borrow;

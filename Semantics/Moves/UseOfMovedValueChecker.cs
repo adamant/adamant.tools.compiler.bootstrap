@@ -4,6 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
@@ -41,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
             {
                 case INameExpressionSyntax identifierName:
                     // We are assigning into this variable so it definitely has a value now
-                    var symbol = identifierName.ReferencedSymbol;
+                    var symbol = identifierName.ReferencedSymbol.Assigned();
                     return possiblyMoved.Set(symbol, false);
                 case IFieldAccessExpressionSyntax _:
                     return possiblyMoved;
@@ -52,14 +53,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
 
         public VariableFlags IdentifierName(INameExpressionSyntax nameExpression, VariableFlags possiblyMoved)
         {
-            if (possiblyMoved[nameExpression.ReferencedSymbol] == true)
+            var symbol = nameExpression.ReferencedSymbol.Assigned();
+            if (possiblyMoved[symbol] == true)
                 diagnostics.Add(SemanticError.UseOfPossiblyMovedValue(file, nameExpression.Span));
 
-            switch (nameExpression.Type.ValueSemantics)
+            var valueSemantics = nameExpression.Type.Assigned().ValueSemantics;
+            switch (valueSemantics)
             {
                 case ValueSemantics.Move:
                 case ValueSemantics.Own:
-                    return possiblyMoved.Set(nameExpression.ReferencedSymbol, true);
+                    return possiblyMoved.Set(symbol, true);
                 case ValueSemantics.Copy:
                 case ValueSemantics.Borrow:
                 case ValueSemantics.Share:
@@ -69,7 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
                 case ValueSemantics.LValue:
                     throw new NotImplementedException();
                 default:
-                    throw ExhaustiveMatch.Failed(nameExpression.Type.ValueSemantics);
+                    throw ExhaustiveMatch.Failed(valueSemantics);
             }
         }
 
