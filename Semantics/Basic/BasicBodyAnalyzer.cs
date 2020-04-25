@@ -117,6 +117,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         private DataType InferDeclarationType([NotNull] ref IExpressionSyntax expression, bool inferMutableType)
         {
             var type = InferType(ref expression);
+            if (!type.IsKnown) return DataType.Unknown;
             if (type is IntegerConstantType _)
                 // TODO there should be a method that combines this with type inference
                 return InsertImplicitConversionIfNeeded(ref expression, DataType.Int);
@@ -276,7 +277,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                     throw new NotImplementedException("Non-mutable type can't be borrowed mutably");
                             }
 
-                            borrowExpression.BorrowedSymbol = nameExpression.ReferencedSymbol;
+                            borrowExpression.BorrowedSymbol = nameExpression.ReferencedSymbol!;
                             return borrowExpression.Type = type;
                         }
                         case IBorrowExpressionSyntax _:

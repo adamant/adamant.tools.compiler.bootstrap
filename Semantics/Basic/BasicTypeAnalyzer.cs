@@ -71,7 +71,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IOptionalTypeSyntax optionalType:
                 {
                     var referent = Evaluate(optionalType.Referent);
-                    return new OptionalType(referent);
+                    return optionalType.NamedType = new OptionalType(referent);
                 }
             }
 
