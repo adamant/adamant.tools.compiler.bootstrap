@@ -612,7 +612,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     {
                         if (paramType.IsReadOnly && !argType.IsReadOnly)
                         {
-                            methodInvocation.Target = new ImplicitShareExpressionSyntax(methodInvocation.Target, argType.ToReadOnly());
+                            var target = methodInvocation.Target as INameExpressionSyntax
+                                         ?? throw new InvalidOperationException("Error can't share non-name expression");
+                            methodInvocation.Target = new ImplicitShareExpressionSyntax(target, argType.ToReadOnly())
+                            {
+                                SharedSymbol = target.ReferencedSymbol
+                            };
                         }
                         // TODO insert move and borrow expressions as needed
                     }

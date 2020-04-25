@@ -56,7 +56,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// </summary>
         protected internal override Self ToReadOnlyReturnsSelf()
         {
-            return new UserObjectType(Name, DeclaredMutable, ReferenceCapability);
+            return new UserObjectType(Name, DeclaredMutable, ReferenceCapability.ToReadOnly());
         }
 
         /// <summary>
