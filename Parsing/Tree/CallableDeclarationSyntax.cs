@@ -32,6 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;
         public TypePromise ReturnType { get; } = new TypePromise();
         DataType IFunctionSymbol.ReturnType => ReturnType.Fulfilled();
+        public FixedList<IReachabilityAnnotationSyntax> ReachabilityAnnotations { get; }
 
         public SymbolSet ChildSymbols { get; protected set; }
 
@@ -42,12 +43,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name fullName,
             TextSpan nameSpan,
             FixedList<IParameterSyntax> parameters,
+            FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             SymbolSet childSymbols)
             : base(span, file, nameSpan)
         {
             FullName = fullName;
             Modifiers = modifiers;
             Parameters = parameters;
+            ReachabilityAnnotations = reachabilityAnnotations;
             ChildSymbols = childSymbols;
         }
     }

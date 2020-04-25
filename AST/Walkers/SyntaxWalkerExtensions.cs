@@ -74,6 +74,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                 case IOptionalTypeSyntax optionalType:
                     walker.Walk(optionalType.Referent, arg);
                     break;
+                case IReachableFromAnnotationSyntax reachableFrom:
+                    foreach (var parameter in reachableFrom.ReachableFrom)
+                        walker.Walk(parameter, arg);
+                    break;
+                case ICanReachAnnotationSyntax canReach:
+                    foreach (var parameter in canReach.CanReach)
+                        walker.Walk(parameter, arg);
+                    break;
                 case ICapabilityTypeSyntax referenceLifetimeType:
                     walker.Walk(referenceLifetimeType.ReferentType, arg);
                     break;

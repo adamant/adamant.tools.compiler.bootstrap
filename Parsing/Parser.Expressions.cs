@@ -518,7 +518,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         public FixedList<IArgumentSyntax> ParseArguments()
         {
-            return AcceptSeparatedList<IArgumentSyntax, ICommaToken>(AcceptArgument);
+            return AcceptManySeparated<IArgumentSyntax, ICommaToken>(AcceptArgument);
         }
 
         private IArgumentSyntax? AcceptArgument()

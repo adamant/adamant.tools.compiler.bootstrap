@@ -13,7 +13,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(IExpressionSyntax),
         typeof(IBodyOrBlockSyntax),
         typeof(ICallableNameSyntax),
-        typeof(IArgumentSyntax))]
+        typeof(IArgumentSyntax),
+        typeof(IReachabilityAnnotationSyntax))]
     public interface ISyntax
     {
         TextSpan Span { get; }

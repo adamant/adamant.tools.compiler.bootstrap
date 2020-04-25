@@ -30,8 +30,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan nameSpan,
             FixedList<INamedParameterSyntax> parameters,
             ITypeSyntax? returnTypeSyntax,
+            FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             IBodySyntax body)
-            : base(span, file, modifiers, fullName, nameSpan, parameters.ToFixedList<IParameterSyntax>(), body)
+            : base(span, file, modifiers, fullName, nameSpan, parameters.ToFixedList<IParameterSyntax>(),
+                reachabilityAnnotations, body)
         {
             DeclaringClass = declaringClass;
             Parameters = parameters;

@@ -110,29 +110,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         #endregion
 
         #region Parse Functions
-        public IFunctionDeclarationSyntax ParseFunction(FixedList<IModiferToken> modifiers)
+        internal IFunctionDeclarationSyntax ParseFunction(FixedList<IModiferToken> modifiers)
         {
             var fn = Tokens.Expect<IFunctionKeywordToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(identifier.Value);
             var bodyParser = NestedParser(name);
             var parameters = bodyParser.ParseParameters(ParseFunctionParameter);
-            ITypeSyntax? returnType = null;
-            if (Tokens.Accept<IRightArrowToken>())
-                returnType = ParseType();
-
+            var (returnType, reachabilityAnnotations) = ParseReturn();
             var body = bodyParser.ParseFunctionBody();
             var span = TextSpan.Covering(fn, body.Span);
 
             return new FunctionDeclarationSyntax(span, File, modifiers, name, identifier.Span,
-                parameters, returnType, body);
+                parameters, returnType, reachabilityAnnotations, body);
         }
 
         private FixedList<TParameter> ParseParameters<TParameter>(Func<TParameter> parseParameter)
             where TParameter : class, IParameterSyntax
         {
             Tokens.Expect<IOpenParenToken>();
-            var parameters = ParseMany<TParameter, ICommaToken, ICloseParenToken>(parseParameter);
+            var parameters = ParseManySeparated<TParameter, ICommaToken, ICloseParenToken>(parseParameter);
             Tokens.Expect<ICloseParenToken>();
             return parameters.ToFixedList();
         }
@@ -146,6 +143,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var closeBrace = Tokens.Expect<ICloseBraceToken>();
             var span = TextSpan.Covering(openBrace, closeBrace);
             return new BodySyntax(span, statements.OfType<IBodyStatementSyntax>().ToFixedList());
+        }
+
+        private (ITypeSyntax?, FixedList<IReachabilityAnnotationSyntax>) ParseReturn()
+        {
+            if (Tokens.Accept<IRightArrowToken>())
+                return (ParseType(), ParseReachabilityAnnotations());
+
+            return (null, FixedList<IReachabilityAnnotationSyntax>.Empty);
         }
         #endregion
 
@@ -208,9 +213,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var name = nameContext.Qualify(identifier.Value);
             var bodyParser = NestedParser(name);
             var parameters = bodyParser.ParseParameters(ParseMethodParameter);
-            ITypeSyntax? returnType = null;
-            if (Tokens.Accept<IRightArrowToken>())
-                returnType = ParseType();
+            var (returnType, reachabilityAnnotations) = ParseReturn();
 
             // if no self parameter, it is an associated function
             if (!parameters.OfType<ISelfParameterSyntax>().Any())
@@ -219,7 +222,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 var body = bodyParser.ParseFunctionBody();
                 var span = TextSpan.Covering(fn, body.Span);
                 return new AssociatedFunctionDeclarationSyntax(declaringType, span, File, modifiers,
-                    name, identifier.Span, namedParameters, returnType, body);
+                    name, identifier.Span, namedParameters, returnType, reachabilityAnnotations, body);
             }
 
             if (!(parameters[0] is ISelfParameterSyntax))
@@ -234,14 +237,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 var body = bodyParser.ParseFunctionBody();
                 var span = TextSpan.Covering(fn, body.Span);
                 return new ConcreteMethodDeclarationSyntax(declaringType, span, File, modifiers, name,
-                    identifier.Span, parameters, returnType, body);
+                    identifier.Span, parameters, returnType, reachabilityAnnotations, body);
             }
             else
             {
                 var semicolon = bodyParser.Tokens.Expect<ISemicolonToken>();
                 var span = TextSpan.Covering(fn, semicolon);
                 return new AbstractMethodDeclarationSyntax(declaringType, span, File, modifiers, name,
-                    identifier.Span, parameters, returnType);
+                    identifier.Span, parameters, returnType, reachabilityAnnotations);
             }
         }
 
@@ -255,9 +258,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var bodyParser = NestedParser(name);
             var parameters = bodyParser.ParseParameters(ParseConstructorParameter);
             var body = bodyParser.ParseFunctionBody();
+            // For now, just say constructors have no annotations
+            var reachabilityAnnotations = FixedList<IReachabilityAnnotationSyntax>.Empty;
             var span = TextSpan.Covering(newKeywordSpan, body.Span);
             return new ConstructorDeclarationSyntax(declaringType, span, File, modifiers, name,
-                TextSpan.Covering(newKeywordSpan, identifier?.Span), parameters, body);
+                TextSpan.Covering(newKeywordSpan, identifier?.Span), parameters, reachabilityAnnotations, body);
         }
         #endregion
     }

@@ -33,7 +33,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
 
         [DebuggerStepThrough]
         public static FixedList<T> ToFixedList<T>(this IEnumerable<T> values)
-            where T : class?
         {
             return new FixedList<T>(values);
         }

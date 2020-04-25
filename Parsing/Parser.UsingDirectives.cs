@@ -19,11 +19,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var accept = Tokens.AcceptToken<IUsingKeywordToken>();
             if (accept is null)
                 return null;
-            var identifiers = AcceptOneOrMore<IIdentifierToken, IDotToken>(
-                () => Tokens.AcceptToken<IIdentifierToken>());
+            var identifiers = ParseManySeparated<(IIdentifierToken?, TextSpan), IDotToken>(
+                () => Tokens.ExpectToken<IIdentifierToken>());
             RootName name = GlobalNamespaceName.Instance;
-            foreach (var identifier in identifiers)
-                name = name.Qualify(identifier.Value);
+            foreach (var (identifier, _) in identifiers)
+                if (!(identifier is null))
+                    name = name.Qualify(identifier.Value);
             var semicolon = Tokens.Expect<ISemicolonToken>();
             var span = TextSpan.Covering(accept.Span, semicolon);
             return new UsingDirectiveSyntax(span, (Name)name);

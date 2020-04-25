@@ -13,5 +13,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public interface ICallableDeclarationSyntax : IEntityDeclarationSyntax, IFunctionSymbol
     {
         new FixedList<IParameterSyntax> Parameters { get; }
+        FixedList<IReachabilityAnnotationSyntax> ReachabilityAnnotations { get; }
     }
 }

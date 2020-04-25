@@ -21,8 +21,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name fullName,
             TextSpan nameSpan,
             FixedList<IParameterSyntax> parameters,
+            FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             IBodySyntax body)
-            : base(span, file, modifiers, fullName, nameSpan, parameters,
+            : base(span, file, modifiers, fullName, nameSpan, parameters, reachabilityAnnotations,
                 GetChildSymbols(parameters, body))
         {
             Body = body;
