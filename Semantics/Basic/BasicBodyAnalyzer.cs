@@ -152,7 +152,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
         }
 
-        public void CheckType(ref IExpressionSyntax expression, DataType expectedType)
+        public void CheckType([NotNull] ref IExpressionSyntax? expression, DataType expectedType)
         {
             if (expression is null) return;
             InferType(ref expression);

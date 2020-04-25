@@ -145,7 +145,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
                 .ToList();
 
             // TODO warn on and remove main functions that don't have correct parameters or types
-
+            _ = diagnostics;
             // TODO compiler error on multiple main functions
 
             return mainFunctions.SingleOrDefault();

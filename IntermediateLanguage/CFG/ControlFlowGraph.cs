@@ -3,7 +3,6 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG
 {
@@ -30,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG
         /// </summary>
         public StatementClaims? BorrowClaims { get; set; }
 
-        public InsertedDeletes? InsertedDeletes { get; set; }
+        //public InsertedDeletes? InsertedDeletes { get; set; }
 
         public ControlFlowGraph(
             CodeFile file,

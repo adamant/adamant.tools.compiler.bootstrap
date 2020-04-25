@@ -63,6 +63,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
             Diagnostics diagnostics,
             bool saveBorrowClaims)
         {
+            _ = liveness;
+            _ = diagnostics;
+            _ = saveBorrowClaims;
             foreach (var callable in callables)
             {
                 //var controlFlow = callable.ControlFlowOld;
@@ -142,7 +145,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             {
                                 var declaration = controlFlow.VariableDeclarations
                                                             .Single(d => d.Variable == variable);
-                                ReportDiagnostic(BorrowError.SharedValueDoesNotLiveLongEnough(file, exitScopeStatement.Span, declaration.Name));
+                                ReportDiagnostic(BorrowError.SharedValueDoesNotLiveLongEnough(file, exitScopeStatement.Span, declaration.Name!));
                             }
                             break;
                     }
@@ -242,7 +245,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 
         private static VariableDeclaration GetVariableDeclaration(IPlace assignToPlace, FixedList<VariableDeclaration> variables)
         {
-            return variables.Single(v => v.Variable == assignToPlace.CoreVariable());
+            _ = assignToPlace;
+            _ = variables;
+            throw new NotImplementedException();
+            //return variables.Single(v => v.Variable == assignToPlace.CoreVariable());
         }
 
         private void CheckStatement(
@@ -314,7 +320,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                     // TODO this is currently ignoring the value semantics of the field
                     // Seems like we need path lifetimes to do this correctly (i.e. `a.b` has lifetime #X)
                     var instanceVariable = fieldAccess.CoreVariable();
-                    var instanceLifetime = claimsBeforeStatement.ClaimBy(instanceVariable).Lifetime;
+                    var instanceLifetime = claimsBeforeStatement.ClaimBy(instanceVariable)!.Lifetime;
                     var fieldLifetime = NewLifetime();
                     var outstandingClaims = new Claims();
                     outstandingClaims.AddRange(claimsBeforeStatement);
@@ -453,12 +459,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                             // changed.
                             if (!currentOwner?.Holder.Equals(varRef.Variable) ?? false)
                                 break;
-                            outstandingClaims.Remove(currentOwner);
+                            outstandingClaims.Remove(currentOwner!);
                             // Because claims are melded from multiple passes, the claims after statement
                             // would still contain this claim even though we removed it from outstanding
                             // claims. Thus we must remove it from claimsAfterStatement because this
                             // statement always takes ownership of the value.
-                            claimsAfterStatement.Remove(currentOwner);
+                            claimsAfterStatement.Remove(currentOwner!);
                             switch (claimHolder)
                             {
                                 case Variable variable:
