@@ -13,6 +13,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using ExhaustiveMatching;
+using DataType = Adamant.Tools.Compiler.Bootstrap.Metadata.Types.DataType;
 using UnaryOperator = Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.UnaryOperator;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
@@ -122,20 +123,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             switch (expression)
             {
-                case IBorrowExpressionSyntax _:
                 case IMoveExpressionSyntax _:
-                    // If we are explicitly borrowing or moving then take the actual type
+                    // If we are explicitly moving then take the actual type
                     return type;
+                case IBorrowExpressionSyntax _:
+                {
+                    // If we are explicitly borrowing or moving then take the actual type
+                    if (!(type is ReferenceType referenceType))
+                        throw new NotImplementedException("Compile error: can't borrow non reference type");
+
+                    return referenceType.WithCapability(ReferenceCapability.Borrowed);
+                }
                 default:
-                    if (inferMutableType)
+                {
+                    // We assume immutability on variables unless explicitly stated
+                    if (!inferMutableType) return type.ToReadOnly();
+                    if (type is ReferenceType referenceType)
                     {
-                        if (type is ReferenceType referenceType && !referenceType.IsMutable)
+                        if (!referenceType.IsMutable)
                             throw new NotImplementedException("Compile error: can't infer a mutable type");
 
                         return type;
                     }
-                    // We assume immutability on variables unless explicitly stated
-                    return type.ToReadOnly();
+
+                    throw new NotImplementedException("Compile error: can't infer mutability for non reference type");
+                }
             }
         }
 
@@ -217,7 +229,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IMoveExpressionSyntax moveExpression:
                     switch (moveExpression.Referent)
                     {
-                        case INameExpressionSyntax _:
+                        case INameExpressionSyntax nameExpression:
                             var type = InferType(ref moveExpression.Referent, false);
                             switch (type)
                             {
@@ -232,6 +244,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                     throw new NotImplementedException("Non-moveable type can't be moved");
                             }
 
+                            moveExpression.MovedSymbol = nameExpression.ReferencedSymbol!;
                             return moveExpression.Type = type;
                         case IBorrowExpressionSyntax _:
                             throw new NotImplementedException("Raise error about `move mut` expression");
@@ -243,7 +256,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IBorrowExpressionSyntax borrowExpression:
                     switch (borrowExpression.Referent)
                     {
-                        case INameExpressionSyntax _:
+                        case INameExpressionSyntax nameExpression:
                         {
                             var type = InferType(ref borrowExpression.Referent, false);
                             switch (type)
@@ -263,6 +276,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                     throw new NotImplementedException("Non-mutable type can't be borrowed mutably");
                             }
 
+                            borrowExpression.BorrowedSymbol = nameExpression.ReferencedSymbol;
                             return borrowExpression.Type = type;
                         }
                         case IBorrowExpressionSyntax _:
@@ -362,7 +376,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             && referenceType.ReferenceCapability != ReferenceCapability.Identity)
                             type = referenceType.WithCapability(ReferenceCapability.Shared);
 
-                        expression = new ImplicitShareExpressionSyntax(identifierName, type);
+                        expression = new ImplicitShareExpressionSyntax(identifierName, type)
+                        {
+                            SharedSymbol = identifierName.ReferencedSymbol,
+                        };
                     }
                     return type;
                 }
