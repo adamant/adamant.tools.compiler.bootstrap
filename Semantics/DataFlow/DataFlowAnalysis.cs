@@ -38,5 +38,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
             foreach (var callableDeclaration in callableDeclarations)
                 dataFlowAnalyzer.Walk(callableDeclaration, false);
         }
+
+        public static void Check<TState>(
+            IBackwardDataFlowAnalyzer<TState> strategy,
+            FixedList<IConcreteCallableDeclarationSyntax> callableDeclarations,
+            Diagnostics diagnostics)
+            where TState : class
+        {
+            var dataFlowAnalyzer = new BackwardDataFlowAnalyzer<TState>(strategy, diagnostics);
+            foreach (var callableDeclaration in callableDeclarations) dataFlowAnalyzer.Walk(callableDeclaration, false);
+        }
     }
 }
