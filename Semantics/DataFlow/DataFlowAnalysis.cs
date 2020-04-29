@@ -46,7 +46,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
             where TState : class
         {
             var dataFlowAnalyzer = new BackwardDataFlowAnalyzer<TState>(strategy, diagnostics);
-            foreach (var callableDeclaration in callableDeclarations) dataFlowAnalyzer.Walk(callableDeclaration, false);
+            foreach (var callableDeclaration in callableDeclarations)
+                dataFlowAnalyzer.Walk(callableDeclaration, false);
         }
     }
 }

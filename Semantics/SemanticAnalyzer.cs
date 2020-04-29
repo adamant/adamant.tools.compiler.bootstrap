@@ -118,13 +118,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             var callables = entities.OfType<IConcreteCallableDeclarationSyntax>().ToFixedList();
             ShadowChecker.Check(callables, diagnostics);
 
-            // TODO use DataFlowAnalysis to check for unused variables and report use of variables starting with `_`
-
             DataFlowAnalysis.Check(DefiniteAssignmentAnalyzer.Instance, callables, diagnostics);
 
             DataFlowAnalysis.Check(BindingMutabilityAnalyzer.Instance, callables, diagnostics);
 
             DataFlowAnalysis.Check(UseOfMovedValueAnalyzer.Instance, callables, diagnostics);
+
+            // TODO use DataFlowAnalysis to check for unused variables and report use of variables starting with `_`
+
+            // TODO stop compilation if there are errors?
+            // diagnostics.ThrowIfFatalErrors();
+
+            // TODO get reachability analyzer working
+            // ReachabilityAnalyzer.Check(callables, diagnostics);
         }
 
         private static FixedList<Declaration> BuildIL(
