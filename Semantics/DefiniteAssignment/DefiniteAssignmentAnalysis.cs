@@ -8,13 +8,13 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
 {
     // TODO check definite assignment of fields in constructors
-    public class DefiniteAssignmentChecker : IDataFlowAnalysisChecker<VariableFlags>
+    internal class DefiniteAssignmentAnalysis : IForwardDataFlowAnalysis<VariableFlags>
     {
         private readonly IConcreteCallableDeclarationSyntax callable;
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
 
-        public DefiniteAssignmentChecker(
+        public DefiniteAssignmentAnalysis(
             IConcreteCallableDeclarationSyntax callable,
             Diagnostics diagnostics)
         {

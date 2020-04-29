@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.AST;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
 {
-    public interface IDataFlowAnalysisChecker<TState>
+    public interface IForwardDataFlowAnalysis<TState>
     {
         TState StartState();
         TState Assignment(IAssignmentExpressionSyntax assignmentExpression, TState state);

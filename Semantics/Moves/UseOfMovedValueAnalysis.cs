@@ -18,13 +18,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
     /// its value moved. Variables not yet declared or assigned vacuously haven't
     /// been moved from.
     /// </summary>
-    public class UseOfMovedValueChecker : IDataFlowAnalysisChecker<VariableFlags>
+    public class UseOfMovedValueAnalysis : IForwardDataFlowAnalysis<VariableFlags>
     {
         private readonly IConcreteCallableDeclarationSyntax callable;
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
 
-        public UseOfMovedValueChecker(IConcreteCallableDeclarationSyntax callable, Diagnostics diagnostics)
+        public UseOfMovedValueAnalysis(IConcreteCallableDeclarationSyntax callable, Diagnostics diagnostics)
         {
             this.callable = callable;
             file = callable.File;

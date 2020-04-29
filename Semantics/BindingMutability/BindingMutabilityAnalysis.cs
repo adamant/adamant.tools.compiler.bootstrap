@@ -10,13 +10,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
     /// Uses a data flow analysis of variables that are definitely unassigned to
     /// determine if binding mutability is violated.
     /// </summary>
-    public class BindingMutabilityChecker : IDataFlowAnalysisChecker<VariableFlags>
+    public class BindingMutabilityAnalysis : IForwardDataFlowAnalysis<VariableFlags>
     {
         private readonly IConcreteCallableDeclarationSyntax callable;
         private readonly CodeFile file;
         private readonly Diagnostics diagnostics;
 
-        public BindingMutabilityChecker(IConcreteCallableDeclarationSyntax callable, Diagnostics diagnostics)
+        public BindingMutabilityAnalysis(IConcreteCallableDeclarationSyntax callable, Diagnostics diagnostics)
         {
             this.callable = callable;
             file = callable.File;

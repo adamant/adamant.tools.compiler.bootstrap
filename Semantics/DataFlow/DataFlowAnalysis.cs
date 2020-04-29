@@ -29,12 +29,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
     public static class DataFlowAnalysis
     {
         public static void Check<TState>(
-            IDataFlowAnalysisStrategy<TState> strategy,
+            IForwardDataFlowAnalyzer<TState> strategy,
             FixedList<IConcreteCallableDeclarationSyntax> callableDeclarations,
             Diagnostics diagnostics)
             where TState : class
         {
-            var dataFlowAnalyzer = new DataFlowAnalyzer<TState>(strategy, diagnostics);
+            var dataFlowAnalyzer = new ForwardDataFlowAnalyzer<TState>(strategy, diagnostics);
             foreach (var callableDeclaration in callableDeclarations)
                 dataFlowAnalyzer.Walk(callableDeclaration, false);
         }

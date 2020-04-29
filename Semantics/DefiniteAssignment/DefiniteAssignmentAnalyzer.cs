@@ -4,19 +4,19 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
 {
-    public class DefiniteAssignmentStrategy : IDataFlowAnalysisStrategy<VariableFlags>
+    public class DefiniteAssignmentAnalyzer : IForwardDataFlowAnalyzer<VariableFlags>
     {
         #region Singleton
-        public static readonly DefiniteAssignmentStrategy Instance = new DefiniteAssignmentStrategy();
+        public static readonly DefiniteAssignmentAnalyzer Instance = new DefiniteAssignmentAnalyzer();
 
-        private DefiniteAssignmentStrategy() { }
+        private DefiniteAssignmentAnalyzer() { }
         #endregion
 
-        public IDataFlowAnalysisChecker<VariableFlags> CheckerFor(
+        public IForwardDataFlowAnalysis<VariableFlags> BeginAnalysis(
             IConcreteCallableDeclarationSyntax callable,
             Diagnostics diagnostics)
         {
-            return new DefiniteAssignmentChecker(callable, diagnostics);
+            return new DefiniteAssignmentAnalysis(callable, diagnostics);
         }
     }
 }

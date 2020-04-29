@@ -5,19 +5,19 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
 {
-    public class DataFlowAnalyzer<TState> : SyntaxWalker<bool>
+    internal class ForwardDataFlowAnalyzer<TState> : SyntaxWalker<bool>
         where TState : class
     {
-        private readonly IDataFlowAnalysisStrategy<TState> strategy;
+        private readonly IForwardDataFlowAnalyzer<TState> strategy;
         private readonly Diagnostics diagnostics;
 
-        public DataFlowAnalyzer(IDataFlowAnalysisStrategy<TState> strategy, Diagnostics diagnostics)
+        public ForwardDataFlowAnalyzer(IForwardDataFlowAnalyzer<TState> strategy, Diagnostics diagnostics)
         {
             this.strategy = strategy;
             this.diagnostics = diagnostics;
         }
 
-        private IDataFlowAnalysisChecker<TState>? checker;
+        private IForwardDataFlowAnalysis<TState>? checker;
         private TState? currentState;
 
         protected override void WalkNonNull(ISyntax syntax, bool isLValue)
@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
             switch (syntax)
             {
                 case IConcreteCallableDeclarationSyntax callableDeclaration:
-                    checker = strategy.CheckerFor(callableDeclaration, diagnostics);
+                    checker = strategy.BeginAnalysis(callableDeclaration, diagnostics);
                     currentState = checker.StartState();
                     break;
                 case IAssignmentExpressionSyntax assignmentExpression:

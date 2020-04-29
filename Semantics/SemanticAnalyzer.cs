@@ -120,11 +120,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             // TODO use DataFlowAnalysis to check for unused variables and report use of variables starting with `_`
 
-            DataFlowAnalysis.Check(DefiniteAssignmentStrategy.Instance, callables, diagnostics);
+            DataFlowAnalysis.Check(DefiniteAssignmentAnalyzer.Instance, callables, diagnostics);
 
-            DataFlowAnalysis.Check(BindingMutabilityStrategy.Instance, callables, diagnostics);
+            DataFlowAnalysis.Check(BindingMutabilityAnalyzer.Instance, callables, diagnostics);
 
-            DataFlowAnalysis.Check(UseOfMovedValueStrategy.Instance, callables, diagnostics);
+            DataFlowAnalysis.Check(UseOfMovedValueAnalyzer.Instance, callables, diagnostics);
         }
 
         private static FixedList<Declaration> BuildIL(
