@@ -30,5 +30,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public interface IExpressionSyntax : ISyntax
     {
         [DisallowNull] DataType? Type { get; set; }
+        string ToGroupedString();
     }
 }

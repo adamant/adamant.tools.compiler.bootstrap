@@ -8,10 +8,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class FieldAccessExpressionSyntax : ExpressionSyntax, IFieldAccessExpressionSyntax
     {
-        private IExpressionSyntax? expression;
-
-        [DisallowNull]
-        public ref IExpressionSyntax? Expression => ref expression;
+        private IExpressionSyntax expression;
+        public ref IExpressionSyntax Expression => ref expression;
 
         public AccessOperator AccessOperator { get; }
         public INameExpressionSyntax Field { get; }
@@ -30,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public FieldAccessExpressionSyntax(
             TextSpan span,
-            IExpressionSyntax? expression,
+            IExpressionSyntax expression,
             AccessOperator accessOperator,
             INameExpressionSyntax field)
             : base(span)

@@ -23,6 +23,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
             // Type is always set by the constructor, so it can't be set agains
             set => throw new InvalidOperationException("Can't set type repeatedly");
         }
+
+
+
         private readonly DataType type;
 
         // TODO maybe set from constructor and disallow all changes
@@ -47,7 +50,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
 
         public override string ToString()
         {
-            return $"(share {Referent})";
+            return $"⟦share⟧({Referent})";
+        }
+
+        public string ToGroupedString()
+        {
+            return ToString();
         }
     }
 }

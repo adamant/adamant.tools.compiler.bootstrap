@@ -44,5 +44,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax
         {
             return $"{FullName}({string.Join(", ", Arguments)})";
         }
+
+        public string ToGroupedString()
+        {
+            return ToString();
+        }
     }
 }

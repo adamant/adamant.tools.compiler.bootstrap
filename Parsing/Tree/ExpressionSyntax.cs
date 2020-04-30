@@ -41,5 +41,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         // Useful for debugging
         public abstract override string ToString();
+
+        public virtual string ToGroupedString()
+        {
+            return $"({this})";
+        }
     }
 }

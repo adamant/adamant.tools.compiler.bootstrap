@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
 
         public override string ToString()
         {
-            return $"({Expression}) (as) {ConvertToType}";
+            return $"{Expression.ToGroupedString()} ⟦as {ConvertToType}⟧";
         }
     }
 }

@@ -5,14 +5,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class SelfExpressionSyntax : ExpressionSyntax, ISelfExpressionSyntax
     {
-        public SelfExpressionSyntax(TextSpan span)
+        public bool IsImplicit { get; }
+
+        public SelfExpressionSyntax(TextSpan span, bool isImplicit)
             : base(span)
         {
+            IsImplicit = isImplicit;
         }
 
         public override string ToString()
         {
-            return "self";
+            return IsImplicit ? "⟦self⟧" : "self";
         }
     }
 }

@@ -283,7 +283,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     throw ExhaustiveMatch.Failed(Tokens.Current);
                 case ISelfKeywordToken _:
                     var selfKeyword = Tokens.Expect<ISelfKeywordToken>();
-                    return new SelfExpressionSyntax(selfKeyword);
+                    return new SelfExpressionSyntax(selfKeyword, false);
                 case INewKeywordToken _:
                 {
                     var newKeyword = Tokens.Expect<INewKeywordToken>();
@@ -367,10 +367,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 {
                     // implicit self etc.
                     var dot = Tokens.Required<IDotToken>();
+                    var self = new SelfExpressionSyntax(dot.AtStart(), true);
                     var member = ParseName();
                     var span = TextSpan.Covering(dot, member.Span);
                     // TODO we need to check for method call
-                    return new FieldAccessExpressionSyntax(span, null, AccessOperator.Standard, member.ToExpression());
+                    return new FieldAccessExpressionSyntax(span, self, AccessOperator.Standard, member.ToExpression());
                 }
                 case IMutableKeywordToken _:
                 {
@@ -507,7 +508,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         /// Parse an expression that is required to have parenthesis around it.
         /// for example `unsafe(x);`.
         /// </summary>
-        /// <returns></returns>
         private IExpressionSyntax ParseParenthesizedExpression()
         {
             Tokens.Expect<IOpenParenToken>();

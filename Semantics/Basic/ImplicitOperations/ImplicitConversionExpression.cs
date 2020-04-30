@@ -29,5 +29,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
         }
 
         public abstract override string ToString();
+
+        public string ToGroupedString()
+        {
+            return ToString();
+        }
     }
 }

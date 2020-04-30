@@ -506,20 +506,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return ifExpression.Type = DataType.Void;
                 case IFieldAccessExpressionSyntax memberAccess:
                 {
-                    DataType targetType;
-                    if (memberAccess.Expression is null)
-                    {
-                        if (selfType is null)
-                        {
-                            diagnostics.Add(SemanticError.ImplicitSelfOutsideMethod(file, memberAccess.Span.AtStart()));
-                            targetType = DataType.Unknown;
-                        }
-                        else
-                            targetType = selfType;
-                    }
-                    else
-                        targetType = InferType(ref memberAccess.Expression);
-
+                    var targetType = InferType(ref memberAccess.Expression);
                     var symbol = GetSymbolForType(memberAccess.Field.ContainingScope.Assigned(), targetType);
                     var member = memberAccess.Field;
                     var memberSymbols = symbol.Lookup(member.Name).OfType<IBindingSymbol>().ToFixedList();
@@ -544,7 +531,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
                 case ISelfExpressionSyntax selfExpression:
                     if (selfType is null)
-                        diagnostics.Add(SemanticError.SelfOutsideMethod(file, selfExpression.Span));
+                        diagnostics.Add(selfExpression.IsImplicit
+                            ? SemanticError.ImplicitSelfOutsideMethod(file, selfExpression.Span)
+                            : SemanticError.SelfOutsideMethod(file, selfExpression.Span));
                     return selfExpression.Type = selfType ?? DataType.Unknown;
                 case INoneLiteralExpressionSyntax noneLiteralExpression:
                     return noneLiteralExpression.Type = DataType.None;

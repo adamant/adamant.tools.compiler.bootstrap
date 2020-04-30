@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
 
         public override string ToString()
         {
-            return $"({Expression}) (as immutable)";
+            return $"{Expression.ToGroupedString()} ⟦as ⟦immutable⟧⟧";
         }
     }
 }

@@ -72,7 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     // TODO analyze left operand
                     var leftPlace = AnalyzeAssignmentPlace(exp.LeftOperand, graph);
                     var rightPlace = Analyze(exp.RightOperand, graph);
-                    throw new NotImplementedException();
+                    throw new NotImplementedException($"{nameof(Analyze)}(expression) not implemented for {expression.GetType().Name}");
                 }
             }
         }
