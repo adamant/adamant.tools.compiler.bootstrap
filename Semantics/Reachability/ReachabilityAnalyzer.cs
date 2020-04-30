@@ -3,7 +3,6 @@ using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using Adamant.Tools.Compiler.Bootstrap.Names;
 using ExhaustiveMatching;
 using static Adamant.Tools.Compiler.Bootstrap.Metadata.Types.ReferenceCapability;
 
@@ -13,6 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
     {
         private readonly IConcreteCallableDeclarationSyntax callableDeclaration;
         private readonly Diagnostics diagnostics;
+        private readonly PlaceList places = new PlaceList();
 
         private ReachabilityAnalyzer(IConcreteCallableDeclarationSyntax callableDeclaration, Diagnostics diagnostics)
         {
@@ -20,19 +20,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             this.diagnostics = diagnostics;
         }
 
-        public static void Check(FixedList<IConcreteCallableDeclarationSyntax> callableDeclarations, Diagnostics diagnostics)
+        public static void Analyze(FixedList<IConcreteCallableDeclarationSyntax> callableDeclarations, Diagnostics diagnostics)
         {
             foreach (var callableDeclaration in callableDeclarations)
-                new ReachabilityAnalyzer(callableDeclaration, diagnostics).Check();
+                new ReachabilityAnalyzer(callableDeclaration, diagnostics).Analyze();
         }
 
-        private void Check()
+        private void Analyze()
         {
-            var parameterScope = CreateParameterScope();
+            var graph = CreateParameterScope();
             foreach (var statement in callableDeclaration.Body.Statements)
-            {
-                Check(statement, parameterScope);
-            }
+                Analyze(statement, graph);
+
             // In control flow order:
             //    Create new variable scopes
             //    Update reachability graph based on expressions/statements
@@ -41,9 +40,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             throw new NotImplementedException();
         }
 
-        private static void Check(IStatementSyntax statement, VariableScope scope)
+        private static void Analyze(IStatementSyntax statement, ReachabilityGraph graph)
         {
-            _ = scope;
+            _ = graph;
             switch (statement)
             {
                 default:
@@ -51,27 +50,33 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 case IVariableDeclarationStatementSyntax stmt:
                     throw new NotImplementedException();
                 case IExpressionStatementSyntax stmt:
-                    throw new NotImplementedException();
+                    Analyze(stmt.Expression, graph);
+                    break;
                 case IResultStatementSyntax stmt:
                     throw new NotImplementedException();
             }
+        }
+
+        private static void Analyze(IExpressionSyntax expression, ReachabilityGraph graph)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Create both the caller and parameter scope with the correct relationships
         /// between the parameters and the callers.
         /// </summary>
-        private VariableScope CreateParameterScope()
+        private ReachabilityGraph CreateParameterScope()
         {
-            var callerScope = new VariableScope(null);
-            var parameterScope = new VariableScope(callerScope);
+            var callerScope = new CallerPlaceScope(places);
+            var parameterScope = new VariablePlaceScope(places, callerScope);
+            var graph = new ReachabilityGraph(places, parameterScope);
             foreach (var parameter in callableDeclaration.Parameters)
             {
-                var parameterVariable = parameterScope.AddVariable(parameter.Name);
+                var parameterVariable = graph.VariableDeclared(parameter.Name);
                 // Non-reference types don't participate in reachability (yet)
                 if (parameter.Type.Known() is ReferenceType referenceType)
                 {
-
                     switch (referenceType.ReferenceCapability)
                     {
                         default:
@@ -80,43 +85,43 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                         case Isolated:
                         {
                             // Isolated parameters are fully independent of the caller
-                            var referencedObject = new ObjectPlace();
+                            var referencedObject = graph.ObjectFor(parameter);
                             parameterVariable.Owns(referencedObject);
                         }
                         break;
                         case Owned:
                         case OwnedMutable:
                         {
-                            var referencedObject = new ObjectPlace();
+                            var referencedObject = graph.ObjectFor(parameter);
                             parameterVariable.Owns(referencedObject);
-                            var callerObject = NewCallerOwnedObject(callerScope, parameter);
+                            var callerObject = graph.CallerOwnedObjectFor(parameter);
                             referencedObject.Shares(callerObject);
                         }
                         break;
                         case Held:
                         case HeldMutable:
                         {
-                            var referencedObject = new ObjectPlace();
+                            var referencedObject = graph.ObjectFor(parameter);
                             parameterVariable.PotentiallyOwns(referencedObject);
-                            var callerObject = NewCallerOwnedObject(callerScope, parameter);
+                            var callerObject = graph.CallerOwnedObjectFor(parameter);
                             referencedObject.Shares(callerObject);
                         }
                         break;
                         case Borrowed:
                         {
-                            var callerObject = NewCallerOwnedObject(callerScope, parameter);
+                            var callerObject = graph.CallerOwnedObjectFor(parameter);
                             parameterVariable.Borrows(callerObject);
                         }
                         break;
                         case Shared:
                         {
-                            var callerObject = NewCallerOwnedObject(callerScope, parameter);
+                            var callerObject = graph.CallerOwnedObjectFor(parameter);
                             parameterVariable.Shares(callerObject);
                         }
                         break;
                         case Identity:
                         {
-                            var callerObject = NewCallerOwnedObject(callerScope, parameter);
+                            var callerObject = graph.CallerOwnedObjectFor(parameter);
                             parameterVariable.Identifies(callerObject);
                         }
                         break;
@@ -124,15 +129,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 }
             }
 
-            return callerScope;
-        }
-
-        private static ObjectPlace NewCallerOwnedObject(VariableScope callerScope, IParameterSyntax parameter)
-        {
-            var callerVariable = callerScope.AddVariable(SpecialName.CallerBound(parameter.Name));
-            var callerObject = new ObjectPlace();
-            callerVariable.Owns(callerObject);
-            return callerObject;
+            return graph;
         }
     }
 }
