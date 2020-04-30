@@ -3,6 +3,9 @@ using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Identifiers;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Scopes;
 using ExhaustiveMatching;
 using static Adamant.Tools.Compiler.Bootstrap.Metadata.Types.ReferenceCapability;
 
@@ -12,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
     {
         private readonly IConcreteCallableDeclarationSyntax callableDeclaration;
         private readonly Diagnostics diagnostics;
-        private readonly PlaceList places = new PlaceList();
+        private readonly PlaceIdentifierList places = new PlaceIdentifierList();
 
         private ReachabilityAnalyzer(IConcreteCallableDeclarationSyntax callableDeclaration, Diagnostics diagnostics)
         {
@@ -57,9 +60,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             }
         }
 
-        private static void Analyze(IExpressionSyntax expression, ReachabilityGraph graph)
+        private static Place Analyze(IExpressionSyntax expression, ReachabilityGraph graph)
         {
-            throw new NotImplementedException();
+            switch (expression)
+            {
+                default:
+                    throw new NotImplementedException($"{nameof(Analyze)}(expression) not implemented for {expression.GetType().Name}");
+                //throw ExhaustiveMatch.Failed(expression);
+                case IAssignmentExpressionSyntax exp:
+                {
+                    // TODO analyze left operand
+                    var leftPlace = AnalyzeAssignmentPlace(exp.LeftOperand, graph);
+                    var rightPlace = Analyze(exp.RightOperand, graph);
+                    throw new NotImplementedException();
+                }
+            }
+        }
+
+        private static Place AnalyzeAssignmentPlace(IExpressionSyntax expression, ReachabilityGraph graph)
+        {
+            _ = graph;
+            switch (expression)
+            {
+                default:
+                    throw new NotImplementedException($"{nameof(AnalyzeAssignmentPlace)}(expression) not implemented for {expression.GetType().Name}");
+            }
         }
 
         /// <summary>
@@ -68,8 +93,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
         /// </summary>
         private ReachabilityGraph CreateParameterScope()
         {
-            var callerScope = new CallerPlaceScope(places);
-            var parameterScope = new VariablePlaceScope(places, callerScope);
+            var callerScope = new CallerVariableScope(places);
+            var parameterScope = new LexicalVariableScope(places, callerScope);
             var graph = new ReachabilityGraph(places, parameterScope);
             foreach (var parameter in callableDeclaration.Parameters)
             {

@@ -15,6 +15,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Moves;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Validation;
 
@@ -130,7 +131,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // diagnostics.ThrowIfFatalErrors();
 
             // TODO get reachability analyzer working
-            // ReachabilityAnalyzer.Check(callables, diagnostics);
+            ReachabilityAnalyzer.Analyze(callables, diagnostics);
         }
 
         private static FixedList<Declaration> BuildIL(
