@@ -63,7 +63,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                         {
                             var assignmentOperator = BuildAssignmentOperator(Tokens.RequiredToken<IAssignmentToken>());
                             var rightOperand = ParseExpression();
-                            expression = new AssignmentExpressionSyntax(expression, assignmentOperator, rightOperand);
+                            if (expression is IAssignableExpressionSyntax assignableExpression)
+                                expression = new AssignmentExpressionSyntax(assignableExpression, assignmentOperator, rightOperand);
+                            else
+                                // Don't assign expression, so it is just the right hand side of the assignment
+                                Add(ParseError.CantAssignIntoExpression(File, expression.Span));
                             continue;
                         }
                         break;

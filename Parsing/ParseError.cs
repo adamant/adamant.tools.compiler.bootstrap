@@ -64,5 +64,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3009,
                 "Self parameter must be the first parameter.");
         }
+
+        public static Diagnostic CantAssignIntoExpression(CodeFile file, in TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 3010,
+                "Expression can not appear on the left hand side of an assignment.");
+        }
     }
 }

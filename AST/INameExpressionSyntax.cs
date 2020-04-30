@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     /// <summary>
     /// An expression that is a single unqualified name
     /// </summary>
-    public interface INameExpressionSyntax : IExpressionSyntax, IHasContainingScope
+    public interface INameExpressionSyntax : IAssignableExpressionSyntax, IHasContainingScope
     {
         SimpleName Name { get; }
         [DisallowNull] IBindingSymbol? ReferencedSymbol { get; set; }

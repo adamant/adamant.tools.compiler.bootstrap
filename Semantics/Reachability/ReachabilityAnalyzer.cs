@@ -77,7 +77,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             }
         }
 
-        private static Place AnalyzeAssignmentPlace(IExpressionSyntax expression, ReachabilityGraph graph)
+        private static Place AnalyzeAssignmentPlace(IAssignableExpressionSyntax expression, ReachabilityGraph graph)
         {
             _ = graph;
             switch (expression)

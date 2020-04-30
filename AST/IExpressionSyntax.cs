@@ -12,7 +12,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(INextExpressionSyntax),
         typeof(IReturnExpressionSyntax),
         typeof(IWhileExpressionSyntax),
-        typeof(IFieldAccessExpressionSyntax),
         typeof(ILoopExpressionSyntax),
         typeof(IBlockExpressionSyntax),
         typeof(IInvocationExpressionSyntax),
@@ -23,10 +22,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(IBreakExpressionSyntax),
         typeof(IBinaryOperatorExpressionSyntax),
         typeof(ISelfExpressionSyntax),
-        typeof(INameExpressionSyntax),
         typeof(IMoveExpressionSyntax),
         typeof(IBorrowExpressionSyntax),
-        typeof(IShareExpressionSyntax))]
+        typeof(IShareExpressionSyntax),
+        typeof(IAssignableExpressionSyntax))]
     public interface IExpressionSyntax : ISyntax
     {
         [DisallowNull] DataType? Type { get; set; }

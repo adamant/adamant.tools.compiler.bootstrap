@@ -5,15 +5,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class AssignmentExpressionSyntax : ExpressionSyntax, IAssignmentExpressionSyntax
     {
-        private IExpressionSyntax leftOperand;
-        public ref IExpressionSyntax LeftOperand => ref leftOperand;
+        private IAssignableExpressionSyntax leftOperand;
+        public ref IAssignableExpressionSyntax LeftOperand => ref leftOperand;
 
         public AssignmentOperator Operator { get; }
         private IExpressionSyntax rightOperand;
         public ref IExpressionSyntax RightOperand => ref rightOperand;
 
         public AssignmentExpressionSyntax(
-            IExpressionSyntax leftOperand,
+            IAssignableExpressionSyntax leftOperand,
             AssignmentOperator @operator,
             IExpressionSyntax rightOperand)
             : base(TextSpan.Covering(leftOperand.Span, rightOperand.Span))

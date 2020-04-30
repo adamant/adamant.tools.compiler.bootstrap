@@ -520,7 +520,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return nextExpression.Type = DataType.Never;
                 case IAssignmentExpressionSyntax assignmentExpression:
                 {
-                    var left = InferType(ref assignmentExpression.LeftOperand, false);
+                    var left = InferAssignmentTargetType(ref assignmentExpression.LeftOperand);
                     InferType(ref assignmentExpression.RightOperand);
                     InsertImplicitConversionIfNeeded(ref assignmentExpression.RightOperand, left);
                     var right = assignmentExpression.RightOperand.Type ?? throw new InvalidOperationException();
@@ -541,6 +541,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     throw new Exception("ImplicitConversionExpressions are inserted by BasicExpressionAnalyzer. They should not be present in the AST yet.");
                 case IBlockExpressionSyntax blockSyntax:
                     return InferBlockType(blockSyntax);
+            }
+        }
+
+        private DataType InferAssignmentTargetType([NotNull] ref IAssignableExpressionSyntax expression)
+        {
+            switch (expression)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(expression);
+                case IFieldAccessExpressionSyntax exp:
+                    var targetType = InferType(ref exp.Expression);
+                    var symbol = GetSymbolForType(exp.Field.ContainingScope.Assigned(), targetType);
+                    var member = exp.Field;
+                    var memberSymbols = symbol.Lookup(member.Name).OfType<IBindingSymbol>().ToFixedList();
+                    var type = AssignReferencedSymbolAndType(member, memberSymbols);
+                    return exp.Type = type;
+                case INameExpressionSyntax exp:
+                    return InferNameType(exp);
             }
         }
 
