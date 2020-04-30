@@ -159,7 +159,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                     walker.Walk(whileExpression.Block, arg);
                     break;
                 case IFieldAccessExpressionSyntax memberAccessExpression:
-                    walker.Walk(memberAccessExpression.Expression, arg);
+                    walker.Walk(memberAccessExpression.ContextExpression, arg);
                     walker.Walk(memberAccessExpression.Field, arg);
                     break;
                 case IBreakExpressionSyntax breakExpression:

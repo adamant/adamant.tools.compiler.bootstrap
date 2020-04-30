@@ -8,8 +8,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class FieldAccessExpressionSyntax : ExpressionSyntax, IFieldAccessExpressionSyntax
     {
-        private IExpressionSyntax expression;
-        public ref IExpressionSyntax Expression => ref expression;
+        private IExpressionSyntax contextExpression;
+        public ref IExpressionSyntax ContextExpression => ref contextExpression;
 
         public AccessOperator AccessOperator { get; }
         public INameExpressionSyntax Field { get; }
@@ -28,19 +28,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public FieldAccessExpressionSyntax(
             TextSpan span,
-            IExpressionSyntax expression,
+            IExpressionSyntax contextExpression,
             AccessOperator accessOperator,
             INameExpressionSyntax field)
             : base(span)
         {
-            this.expression = expression;
+            this.contextExpression = contextExpression;
             AccessOperator = accessOperator;
             Field = field;
         }
 
         public override string ToString()
         {
-            return $"{Expression}.{Field}";
+            return $"{ContextExpression}.{Field}";
         }
     }
 }

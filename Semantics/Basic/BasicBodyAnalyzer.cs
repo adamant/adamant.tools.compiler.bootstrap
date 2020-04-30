@@ -506,10 +506,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return ifExpression.Type = DataType.Void;
                 case IFieldAccessExpressionSyntax memberAccess:
                 {
-                    var targetType = InferType(ref memberAccess.Expression);
-                    var symbol = GetSymbolForType(memberAccess.Field.ContainingScope.Assigned(), targetType);
+                    var contextType = InferType(ref memberAccess.ContextExpression);
+                    var contextSymbol = GetSymbolForType(memberAccess.Field.ContainingScope.Assigned(), contextType);
                     var member = memberAccess.Field;
-                    var memberSymbols = symbol.Lookup(member.Name).OfType<IBindingSymbol>().ToFixedList();
+                    var memberSymbols = contextSymbol.Lookup(member.Name).OfType<IBindingSymbol>().ToFixedList();
                     var type = AssignReferencedSymbolAndType(member, memberSymbols);
                     return memberAccess.Type = type;
                 }
@@ -551,10 +551,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 default:
                     throw ExhaustiveMatch.Failed(expression);
                 case IFieldAccessExpressionSyntax exp:
-                    var targetType = InferType(ref exp.Expression);
-                    var symbol = GetSymbolForType(exp.Field.ContainingScope.Assigned(), targetType);
+                    var contextType = InferType(ref exp.ContextExpression);
+                    var contextSymbol = GetSymbolForType(exp.Field.ContainingScope.Assigned(), contextType);
                     var member = exp.Field;
-                    var memberSymbols = symbol.Lookup(member.Name).OfType<IBindingSymbol>().ToFixedList();
+                    var memberSymbols = contextSymbol.Lookup(member.Name).OfType<IBindingSymbol>().ToFixedList();
                     var type = AssignReferencedSymbolAndType(member, memberSymbols);
                     return exp.Type = type;
                 case INameExpressionSyntax exp:
@@ -571,7 +571,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             // * Namespaced function invocation
             // * Method invocation
             // First we need to distinguish those.
-            var targetName = TargetAsName(methodInvocation.Target);
+            var targetName = MethodContextAsName(methodInvocation.Target);
             if (targetName != null)
             {
                 var scope = methodInvocation.MethodNameSyntax.ContainingScope.Assigned();
@@ -656,15 +656,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         /// Used on the target of a method invocation to see if it is really the name of a namespace or class
         /// </summary>
         /// <returns>A name if the expression is a qualified name, otherwise null</returns>
-        private static Name? TargetAsName(IExpressionSyntax expression)
+        private static Name? MethodContextAsName(IExpressionSyntax expression)
         {
             switch (expression)
             {
                 case IFieldAccessExpressionSyntax memberAccess:
                     // Tf implicit self
-                    return memberAccess.Expression is null
+                    return memberAccess.ContextExpression is null
                         ? null
-                        : TargetAsName(memberAccess.Expression)?.Qualify(memberAccess.Field.Name);
+                        : MethodContextAsName(memberAccess.ContextExpression)?.Qualify(memberAccess.Field.Name);
                 case INameExpressionSyntax nameExpression:
                     return nameExpression.Name;
                 default:

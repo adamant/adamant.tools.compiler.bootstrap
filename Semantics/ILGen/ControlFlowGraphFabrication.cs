@@ -570,10 +570,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 break;
                 case IFieldAccessExpressionSyntax exp:
                 {
-                    if (exp.Expression is null)
-                        throw new NotImplementedException("Implicit self expression not implemented");
-                    var target = ConvertToOperand(exp.Expression);
-                    currentBlock!.Add(new FieldAccessInstruction(resultPlace, target, exp.Field.Name, exp.Span, CurrentScope));
+                    var context = ConvertToOperand(exp.ContextExpression);
+                    currentBlock!.Add(new FieldAccessInstruction(resultPlace, context, exp.Field.Name, exp.Span, CurrentScope));
                 }
                 break;
                 case IFunctionInvocationExpressionSyntax exp:
@@ -698,10 +696,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     throw new NotImplementedException($"ConvertToPlaceWithoutSideEffects({expression.GetType().Name}) Not Implemented.");
                 case IFieldAccessExpressionSyntax exp:
                 {
-                    if (exp.Expression is null)
-                        throw new NotImplementedException("implicit self expression not implemented");
-                    var target = ConvertToOperand(exp.Expression);
-                    return new FieldPlace(target, exp.Field.Name, exp.Span);
+                    var context = ConvertToOperand(exp.ContextExpression);
+                    return new FieldPlace(context, exp.Field.Name, exp.Span);
                 }
                 case ISelfExpressionSyntax exp:
                     return new VariablePlace(Variable.Self, exp.Span);

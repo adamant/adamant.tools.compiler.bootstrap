@@ -84,6 +84,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             {
                 default:
                     throw new NotImplementedException($"{nameof(AnalyzeAssignmentPlace)}(expression) not implemented for {expression.GetType().Name}");
+                case IFieldAccessExpressionSyntax exp:
+                {
+                    var contextPlace = Analyze(exp.ContextExpression, graph);
+                    throw new NotImplementedException(
+                        $"{nameof(AnalyzeAssignmentPlace)}(expression) not implemented for {expression.GetType().Name}");
+                }
             }
         }
 

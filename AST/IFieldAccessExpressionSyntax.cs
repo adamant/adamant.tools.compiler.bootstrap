@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public interface IFieldAccessExpressionSyntax : IAssignableExpressionSyntax
     {
-        ref IExpressionSyntax Expression { get; }
+        ref IExpressionSyntax ContextExpression { get; }
         AccessOperator AccessOperator { get; }
         INameExpressionSyntax Field { get; }
         [DisallowNull] IBindingSymbol? ReferencedSymbol { get; set; }
