@@ -15,6 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         private readonly PlaceIdentifierList identifiers;
         private readonly LexicalVariableScope currentScope;
         private readonly PlaceDictionary<VariablePlace> variables = new PlaceDictionary<VariablePlace>();
+        private readonly PlaceDictionary<FieldPlace> fields = new PlaceDictionary<FieldPlace>();
         private readonly PlaceDictionary<ObjectPlace> objects = new PlaceDictionary<ObjectPlace>();
 
         public ReachabilityGraph(PlaceIdentifierList identifiers, LexicalVariableScope currentScope)
@@ -23,12 +24,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             this.currentScope = currentScope;
         }
 
-        public Place CallerOwnedObjectFor(IParameterSyntax parameter)
+        public ObjectPlace CallerOwnedObjectFor(IParameterSyntax parameter)
         {
             var variableIdentifier = currentScope.CallerScope.VariableDeclared(SpecialName.CallerBound(parameter.Name));
             var callerVariable = PlaceFor(variableIdentifier);
             var callerObject = PlaceFor(identifiers.ObjectIdentifierFor(parameter));
-            callerVariable.Owns(callerObject);
+            callerVariable.OwningIdentifies(callerObject);
             return callerObject;
         }
 
@@ -38,31 +39,58 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return PlaceFor(variable);
         }
 
+        public VariablePlace VariableFor(SimpleName name)
+        {
+            var variable = identifiers.VariableIdentifierFor(name);
+            return PlaceFor(variable);
+        }
+
+        public FieldPlace FieldFor(SimpleName name)
+        {
+            var variable = identifiers.FieldIdentifierFor(name);
+            return PlaceFor(variable);
+        }
+
         public ObjectPlace ObjectFor(IParameterSyntax parameter)
         {
             var @object = identifiers.ObjectIdentifierFor(parameter);
             return PlaceFor(@object);
         }
+        public ObjectPlace ObjectFor(IExpressionSyntax expression)
+        {
+            var @object = identifiers.ObjectIdentifierFor(expression);
+            return PlaceFor(@object);
+        }
 
         private VariablePlace PlaceFor(VariablePlaceIdentifier variable)
         {
-            if (!variables.TryGetValue(variable, out var node))
+            if (!variables.TryGetValue(variable, out var place))
             {
-                node = new VariablePlace(variable);
-                variables.Add(node);
+                place = new VariablePlace(variable);
+                variables.Add(place);
             }
 
-            return node;
+            return place;
+        }
+        private FieldPlace PlaceFor(FieldPlaceIdentifier field)
+        {
+            if (!fields.TryGetValue(field, out var place))
+            {
+                place = new FieldPlace(field);
+                fields.Add(place);
+            }
+
+            return place;
         }
         private ObjectPlace PlaceFor(ObjectPlaceIdentifier @object)
         {
-            if (!objects.TryGetValue(@object, out var node))
+            if (!objects.TryGetValue(@object, out var place))
             {
-                node = new ObjectPlace(@object);
-                objects.Add(node);
+                place = new ObjectPlace(@object);
+                objects.Add(place);
             }
 
-            return node;
+            return place;
         }
 
         private class PlaceDictionary<TPlace> : KeyedCollection<PlaceIdentifier, TPlace>

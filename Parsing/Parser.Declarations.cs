@@ -116,7 +116,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(identifier.Value);
             var bodyParser = NestedParser(name);
-            var parameters = bodyParser.ParseParameters(ParseFunctionParameter);
+            var parameters = bodyParser.ParseParameters(bodyParser.ParseFunctionParameter);
             var (returnType, reachabilityAnnotations) = ParseReturn();
             var body = bodyParser.ParseFunctionBody();
             var span = TextSpan.Covering(fn, body.Span);
@@ -212,7 +212,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(identifier.Value);
             var bodyParser = NestedParser(name);
-            var parameters = bodyParser.ParseParameters(ParseMethodParameter);
+            var parameters = bodyParser.ParseParameters(bodyParser.ParseMethodParameter);
             var (returnType, reachabilityAnnotations) = ParseReturn();
 
             // if no self parameter, it is an associated function
@@ -256,7 +256,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var identifier = Tokens.AcceptToken<IIdentifierToken>();
             var name = nameContext.Qualify(SpecialName.Constructor(identifier?.Value));
             var bodyParser = NestedParser(name);
-            var parameters = bodyParser.ParseParameters(ParseConstructorParameter);
+            var parameters = bodyParser.ParseParameters(bodyParser.ParseConstructorParameter);
             var body = bodyParser.ParseFunctionBody();
             // For now, just say constructors have no annotations
             var reachabilityAnnotations = FixedList<IReachabilityAnnotationSyntax>.Empty;

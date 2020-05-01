@@ -2,11 +2,11 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Identifiers;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
-    internal class VariablePlace : AssignablePlace
+    internal class FieldPlace : AssignablePlace
     {
-        public new VariablePlaceIdentifier Identifier { get; }
+        public new FieldPlaceIdentifier Identifier { get; }
 
-        public VariablePlace(VariablePlaceIdentifier identifier)
+        public FieldPlace(FieldPlaceIdentifier identifier)
             : base(identifier)
         {
             Identifier = identifier;

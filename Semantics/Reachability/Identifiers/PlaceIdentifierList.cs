@@ -10,7 +10,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Identifiers
     internal class PlaceIdentifierList
     {
         private readonly Dictionary<SimpleName, VariablePlaceIdentifier> variableIdentifiers = new Dictionary<SimpleName, VariablePlaceIdentifier>();
-        private readonly Dictionary<ISyntax, ObjectPlaceIdentifier> objects = new Dictionary<ISyntax, ObjectPlaceIdentifier>();
+        private readonly Dictionary<SimpleName, FieldPlaceIdentifier> fieldIdentifiers = new Dictionary<SimpleName, FieldPlaceIdentifier>();
+        private readonly Dictionary<ISyntax, ObjectPlaceIdentifier> objectIdentifiers = new Dictionary<ISyntax, ObjectPlaceIdentifier>();
 
         /// <summary>
         /// Get or create a place for the named variable
@@ -26,15 +27,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Identifiers
             return variable;
         }
 
+        public FieldPlaceIdentifier FieldIdentifierFor(SimpleName fieldName)
+        {
+            if (!fieldIdentifiers.TryGetValue(fieldName, out var variable))
+            {
+                variable = new FieldPlaceIdentifier(fieldName);
+                fieldIdentifiers.Add(fieldName, variable);
+            }
+
+            return variable;
+        }
+
         /// <summary>
         /// Get or create a place for the object passed into a parameter
         /// </summary>
         public ObjectPlaceIdentifier ObjectIdentifierFor(IParameterSyntax parameter)
         {
-            if (!objects.TryGetValue(parameter, out var @object))
+            if (!objectIdentifiers.TryGetValue(parameter, out var @object))
             {
                 @object = new ObjectPlaceIdentifier(parameter);
-                objects.Add(parameter, @object);
+                objectIdentifiers.Add(parameter, @object);
             }
 
             return @object;
@@ -45,10 +57,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Identifiers
         /// </summary>
         public ObjectPlaceIdentifier ObjectIdentifierFor(IExpressionSyntax expression)
         {
-            if (!objects.TryGetValue(expression, out var @object))
+            if (!objectIdentifiers.TryGetValue(expression, out var @object))
             {
                 @object = new ObjectPlaceIdentifier(expression);
-                objects.Add(expression, @object);
+                objectIdentifiers.Add(expression, @object);
             }
 
             return @object;

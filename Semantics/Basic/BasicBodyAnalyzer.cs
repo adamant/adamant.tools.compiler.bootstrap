@@ -571,7 +571,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             // * Namespaced function invocation
             // * Method invocation
             // First we need to distinguish those.
-            var targetName = MethodContextAsName(methodInvocation.Target);
+            var targetName = MethodContextAsName(methodInvocation.ContextExpression);
             if (targetName != null)
             {
                 var scope = methodInvocation.MethodNameSyntax.ContainingScope.Assigned();
@@ -581,7 +581,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 if (scope.Lookup(functionName).OfType<IFunctionSymbol>().Any())
                 {
                     // It is a namespaced or associated function invocation, modify the tree
-                    var nameSpan = TextSpan.Covering(methodInvocation.Target.Span, methodInvocation.MethodNameSyntax.Span);
+                    var nameSpan = TextSpan.Covering(methodInvocation.ContextExpression.Span, methodInvocation.MethodNameSyntax.Span);
                     var nameSyntax = new CallableNameSyntax(nameSpan, functionName, scope);
                     var functionInvocation = new FunctionInvocationExpressionSyntax(
                         methodInvocation.Span,
@@ -595,7 +595,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
 
             var argumentTypes = methodInvocation.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
-            var targetType = InferType(ref methodInvocation.Target, false);
+            var targetType = InferType(ref methodInvocation.ContextExpression, false);
             // If it is unknown, we already reported an error
             if (targetType == DataType.Unknown) return methodInvocation.Type = DataType.Unknown;
 
@@ -620,17 +620,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     {
                         if (paramType.IsReadOnly && !argType.IsReadOnly)
                         {
-                            var target = methodInvocation.Target as INameExpressionSyntax
+                            var context = methodInvocation.ContextExpression as INameExpressionSyntax
                                          ?? throw new InvalidOperationException("Error can't share non-name expression");
-                            methodInvocation.Target = new ImplicitShareExpressionSyntax(target, argType.ToReadOnly())
+                            methodInvocation.ContextExpression = new ImplicitShareExpressionSyntax(context, argType.ToReadOnly())
                             {
-                                SharedSymbol = target.ReferencedSymbol
+                                SharedSymbol = context.ReferencedSymbol
                             };
                         }
                         // TODO insert move and borrow expressions as needed
                     }
-                    InsertImplicitConversionIfNeeded(ref methodInvocation.Target, selfParamType);
-                    CheckArgumentTypeCompatibility(selfParamType, methodInvocation.Target);
+                    InsertImplicitConversionIfNeeded(ref methodInvocation.ContextExpression, selfParamType);
+                    CheckArgumentTypeCompatibility(selfParamType, methodInvocation.ContextExpression);
 
                     // Skip the self parameter
                     foreach (var (arg, type) in methodInvocation.Arguments.Zip(functionSymbol

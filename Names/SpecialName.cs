@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Names
 {
@@ -30,8 +31,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
 
         public static SimpleName CallerBound(SimpleName name)
         {
-            if (!(name.Number is null))
-                throw new ArgumentException($"Caller bound name must not have a number `{name}", nameof(name));
+            if (name.Number != 0 && name != Self)
+            {
+                var nameNumber = name.Number?.ToString(CultureInfo.InvariantCulture) ?? "null";
+                throw new ArgumentException($"Caller bound name `{name}` should have number 0, has {nameNumber}", nameof(name));
+            }
+
             return SimpleName.Special(name + "_caller_bound");
         }
     }

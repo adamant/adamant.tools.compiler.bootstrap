@@ -1,39 +1,44 @@
+using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Identifiers;
+using static Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph.Access;
+using static Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph.Ownership;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
     internal abstract class Place
     {
         public PlaceIdentifier Identifier { get; }
+        private readonly List<Reference> references = new List<Reference>();
+        public IReadOnlyList<Reference> References => references.AsReadOnly();
 
         protected Place(PlaceIdentifier identifier)
         {
             Identifier = identifier;
         }
 
-        public void Owns(Place place)
+        public void Owns(ObjectPlace @object, bool mutable)
+        {
+            references.Add(new Reference(@object, Ownership.Owns, mutable ? Mutable : ReadOnly));
+        }
+
+        public void Shares(ObjectPlace @object)
+        {
+            references.Add(new Reference(@object, None, ReadOnly));
+        }
+
+        public void PotentiallyOwns(ObjectPlace @object)
         {
             throw new System.NotImplementedException();
         }
 
-        public void Shares(Place place)
+        public void Borrows(ObjectPlace @object)
         {
-            throw new System.NotImplementedException();
+            references.Add(new Reference(@object, None, Mutable));
         }
 
-        public void PotentiallyOwns(Place place)
+        public void OwningIdentifies(ObjectPlace @object)
         {
-            throw new System.NotImplementedException();
-        }
-
-        public void Borrows(Place place)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void Identifies(Place place)
-        {
-            throw new System.NotImplementedException();
+            references.Add(new Reference(@object, Ownership.Owns, Identity));
         }
     }
 }

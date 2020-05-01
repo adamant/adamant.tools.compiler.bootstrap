@@ -131,7 +131,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // diagnostics.ThrowIfFatalErrors();
 
             // TODO get reachability analyzer working
-            //ReachabilityAnalyzer.Analyze(callables, diagnostics);
+            ReachabilityAnalyzer.Analyze(callables, diagnostics);
         }
 
         private static FixedList<Declaration> BuildIL(

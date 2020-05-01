@@ -2,7 +2,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public interface IMethodInvocationExpressionSyntax : IInvocationExpressionSyntax
     {
-        ref IExpressionSyntax Target { get; }
+        ref IExpressionSyntax ContextExpression { get; }
         ICallableNameSyntax MethodNameSyntax { get; }
     }
 }

@@ -20,12 +20,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
         public DataType? Type
         {
             get => type;
-            // Type is always set by the constructor, so it can't be set agains
+            // Type is always set by the constructor, so it can't be set again
             set => throw new InvalidOperationException("Can't set type repeatedly");
         }
-
-
-
         private readonly DataType type;
 
         // TODO maybe set from constructor and disallow all changes

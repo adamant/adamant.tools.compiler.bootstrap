@@ -129,7 +129,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                     walker.Walk(returnExpression.ReturnValue, arg);
                     break;
                 case IMethodInvocationExpressionSyntax methodInvocationExpression:
-                    walker.Walk(methodInvocationExpression.Target, arg);
+                    walker.Walk(methodInvocationExpression.ContextExpression, arg);
                     walker.Walk(methodInvocationExpression.MethodNameSyntax, arg);
                     foreach (var argument in methodInvocationExpression.Arguments)
                         walker.Walk(argument, arg);

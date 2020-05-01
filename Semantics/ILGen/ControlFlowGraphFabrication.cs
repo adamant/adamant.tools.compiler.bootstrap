@@ -351,7 +351,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IMethodInvocationExpressionSyntax exp:
                 {
                     var methodName = exp.MethodNameSyntax.ReferencedSymbol!.FullName;
-                    var target = ConvertToOperand(exp.Target);
+                    var target = ConvertToOperand(exp.ContextExpression);
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
                     currentBlock!.Add(new CallVirtualInstruction(target, methodName, args, exp.Span, CurrentScope));
                 }
@@ -584,9 +584,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IMethodInvocationExpressionSyntax exp:
                 {
                     var methodName = exp.MethodNameSyntax.ReferencedSymbol!.FullName;
-                    var target = ConvertToOperand(exp.Target);
+                    var target = ConvertToOperand(exp.ContextExpression);
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
-                    if (exp.Target.Type is ReferenceType)
+                    if (exp.ContextExpression.Type is ReferenceType)
                         currentBlock!.Add(new CallVirtualInstruction(resultPlace, target, methodName, args, exp.Span, CurrentScope));
                     else
                         currentBlock!.Add(CallInstruction.ForMethod(resultPlace, target, methodName, args, exp.Span, CurrentScope));

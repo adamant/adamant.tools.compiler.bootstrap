@@ -6,25 +6,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class MethodInvocationExpressionSyntax : InvocationExpressionSyntax, IMethodInvocationExpressionSyntax
     {
-        private IExpressionSyntax target;
-        public ref IExpressionSyntax Target => ref target;
+        private IExpressionSyntax contextExpression;
+        public ref IExpressionSyntax ContextExpression => ref contextExpression;
 
         public ICallableNameSyntax MethodNameSyntax { get; }
 
         public MethodInvocationExpressionSyntax(
             TextSpan span,
-            IExpressionSyntax target,
+            IExpressionSyntax contextExpression,
             ICallableNameSyntax methodNameSyntax,
             FixedList<IArgumentSyntax> arguments)
             : base(span, methodNameSyntax.Name, arguments)
         {
-            this.target = target;
+            this.contextExpression = contextExpression;
             MethodNameSyntax = methodNameSyntax;
         }
 
         public override string ToString()
         {
-            return $"{Target}.{FullName}({string.Join(", ", Arguments)})";
+            return $"{ContextExpression}.{FullName}({string.Join(", ", Arguments)})";
         }
     }
 }

@@ -3,6 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Identifiers;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Scopes;
@@ -35,12 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             foreach (var statement in callableDeclaration.Body.Statements)
                 Analyze(statement, graph);
 
-            // In control flow order:
-            //    Create new variable scopes
-            //    Update reachability graph based on expressions/statements
-            //    Join graphs for control flow
-            //    At end of scope for variable drops
-            throw new NotImplementedException();
+            // TODO handle implicit return at end
         }
 
         private static void Analyze(IStatementSyntax statement, ReachabilityGraph graph)
@@ -51,7 +47,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 default:
                     throw ExhaustiveMatch.Failed(statement);
                 case IVariableDeclarationStatementSyntax stmt:
-                    throw new NotImplementedException();
+                {
+                    var initializer = Analyze(stmt.Initializer, graph);
+                    var variable = graph.VariableDeclared(stmt.Name);
+                    if (initializer != null)
+                        variable.Assign(initializer, stmt.Type.Known());
+                }
+                break;
                 case IExpressionStatementSyntax stmt:
                     Analyze(stmt.Expression, graph);
                     break;
@@ -60,24 +62,62 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             }
         }
 
-        private static Place Analyze(IExpressionSyntax expression, ReachabilityGraph graph)
+        /// <summary>
+        /// Analyze an expression to apply its effects reachability graph.
+        /// </summary>
+        /// <returns>The place of the object resulting from evaluating this expression or null
+        /// if the there is no result or the result is not an object reference.</returns>
+        private static ObjectPlace? Analyze(IExpressionSyntax? expression, ReachabilityGraph graph)
         {
             switch (expression)
             {
                 default:
-                    throw new NotImplementedException($"{nameof(Analyze)}(expression) not implemented for {expression.GetType().Name}");
+                    // TODO implement this for all expression types
+                    return null;
+                //   throw new NotImplementedException($"{nameof(Analyze)}(expression) not implemented for {expression.GetType().Name}");
                 //throw ExhaustiveMatch.Failed(expression);
+                case null:
+                    return null;
                 case IAssignmentExpressionSyntax exp:
                 {
                     // TODO analyze left operand
                     var leftPlace = AnalyzeAssignmentPlace(exp.LeftOperand, graph);
-                    var rightPlace = Analyze(exp.RightOperand, graph);
-                    throw new NotImplementedException($"{nameof(Analyze)}(expression) not implemented for {expression.GetType().Name}");
+                    var rightPlace = Analyze(exp.RightOperand, graph)!;
+                    leftPlace.Assign(rightPlace, exp.RightOperand.Type.Known());
+                    return null;
+                }
+                case ISelfExpressionSyntax _:
+                {
+                    var selfPlace = graph.VariableFor(SpecialName.Self);
+                    return selfPlace.Referent;
+                }
+                case IShareExpressionSyntax exp:
+                    return Analyze(exp.Referent, graph);
+                case INameExpressionSyntax name:
+                {
+                    var variablePlace = graph.VariableFor(name.Name);
+                    return variablePlace.Referent;
+                }
+                case IBinaryOperatorExpressionSyntax exp:
+                {
+                    Analyze(exp.LeftOperand, graph);
+                    Analyze(exp.RightOperand, graph);
+                    // All binary operators result in value types
+                    return null;
+                }
+                case IFieldAccessExpressionSyntax exp:
+                {
+                    // Treat this like a method call to a getter
+                    var context = Analyze(exp.ContextExpression, graph);
+                    var @object = graph.ObjectFor(exp);
+                    // TODO base the reference on the property type
+                    context?.Owns(@object, true);
+                    return @object;
                 }
             }
         }
 
-        private static Place AnalyzeAssignmentPlace(IAssignableExpressionSyntax expression, ReachabilityGraph graph)
+        private static AssignablePlace AnalyzeAssignmentPlace(IAssignableExpressionSyntax expression, ReachabilityGraph graph)
         {
             _ = graph;
             switch (expression)
@@ -86,9 +126,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     throw new NotImplementedException($"{nameof(AnalyzeAssignmentPlace)}(expression) not implemented for {expression.GetType().Name}");
                 case IFieldAccessExpressionSyntax exp:
                 {
+                    if (exp.ContextExpression is ISelfExpressionSyntax)
+                    {
+                        return graph.FieldFor(exp.Field.Name);
+                    }
+
                     var contextPlace = Analyze(exp.ContextExpression, graph);
                     throw new NotImplementedException(
-                        $"{nameof(AnalyzeAssignmentPlace)}(expression) not implemented for {expression.GetType().Name}");
+                        $"{nameof(AnalyzeAssignmentPlace)}(expression) not implemented for {expression.GetType().Name} other than `self`");
+                }
+                case INameExpressionSyntax exp:
+                {
+                    return graph.VariableFor(exp.Name);
                 }
             }
         }
@@ -108,23 +157,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 // Non-reference types don't participate in reachability (yet)
                 if (parameter.Type.Known() is ReferenceType referenceType)
                 {
-                    switch (referenceType.ReferenceCapability)
+                    var capability = referenceType.ReferenceCapability;
+                    switch (capability)
                     {
                         default:
-                            throw ExhaustiveMatch.Failed(referenceType.ReferenceCapability);
+                            throw ExhaustiveMatch.Failed(capability);
                         case IsolatedMutable:
                         case Isolated:
                         {
                             // Isolated parameters are fully independent of the caller
                             var referencedObject = graph.ObjectFor(parameter);
-                            parameterVariable.Owns(referencedObject);
+                            parameterVariable.Owns(referencedObject, capability.IsMutable());
                         }
                         break;
                         case Owned:
                         case OwnedMutable:
                         {
                             var referencedObject = graph.ObjectFor(parameter);
-                            parameterVariable.Owns(referencedObject);
+                            parameterVariable.Owns(referencedObject, capability.IsMutable());
                             var callerObject = graph.CallerOwnedObjectFor(parameter);
                             referencedObject.Shares(callerObject);
                         }
@@ -153,7 +203,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                         case Identity:
                         {
                             var callerObject = graph.CallerOwnedObjectFor(parameter);
-                            parameterVariable.Identifies(callerObject);
+                            parameterVariable.OwningIdentifies(callerObject);
                         }
                         break;
                     }
