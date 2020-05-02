@@ -27,17 +27,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                         walker.Walk(member, arg);
                     break;
                 case IConstructorDeclarationSyntax constructorDeclaration:
+                    walker.Walk(constructorDeclaration.ImplicitSelfParameter, arg);
                     foreach (var parameter in constructorDeclaration.Parameters)
                         walker.Walk(parameter, arg);
                     walker.Walk(constructorDeclaration.Body, arg);
                     break;
                 case IConcreteMethodDeclarationSyntax concreteMethodDeclaration:
+                    walker.Walk(concreteMethodDeclaration.SelfParameter, arg);
                     foreach (var parameter in concreteMethodDeclaration.Parameters)
                         walker.Walk(parameter, arg);
                     walker.Walk(concreteMethodDeclaration.ReturnTypeSyntax, arg);
                     walker.Walk(concreteMethodDeclaration.Body, arg);
                     break;
                 case IAbstractMethodDeclarationSyntax abstractMethodDeclaration:
+                    walker.Walk(abstractMethodDeclaration.SelfParameter, arg);
                     foreach (var parameter in abstractMethodDeclaration.Parameters)
                         walker.Walk(parameter, arg);
                     walker.Walk(abstractMethodDeclaration.ReturnTypeSyntax, arg);

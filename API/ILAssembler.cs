@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -188,25 +187,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.AppendLine(terminator.ToInstructionString().PadRight(StandardStatementWidth));
         }
 
-        private static void Disassemble(
-            ControlFlowGraph cfg,
-            BitArray? liveVariables,
-            AssemblyBuilder builder)
-        {
-            if (liveVariables is null || liveVariables.Cast<bool>().All(x => x == false)) return;
+        //private static void Disassemble(
+        //    ControlFlowGraph cfg,
+        //    BitArray? liveVariables,
+        //    AssemblyBuilder builder)
+        //{
+        //    if (liveVariables is null || liveVariables.Cast<bool>().All(x => x == false)) return;
 
-            var variables = string.Join(", ", liveVariables.TrueIndexes()
-                    .Select(i => FormatVariableName(cfg.VariableDeclarations[i])));
-            builder.BeginLine("// live: ");
-            builder.EndLine(variables);
-        }
+        //    var variables = string.Join(", ", liveVariables.TrueIndexes()
+        //            .Select(i => FormatVariableName(cfg.VariableDeclarations[i])));
+        //    builder.BeginLine("// live: ");
+        //    builder.EndLine(variables);
+        //}
 
-        private static string FormatVariableName(VariableDeclaration declaration)
-        {
-            return declaration.Name != null
-                ? $"{declaration.Variable}({declaration.Name})"
-                : declaration.Variable.ToString();
-        }
+        //private static string FormatVariableName(VariableDeclaration declaration)
+        //{
+        //    return declaration.Name != null
+        //        ? $"{declaration.Variable}({declaration.Name})"
+        //        : declaration.Variable.ToString();
+        //}
 
         //private static void Disassemble(
         //    IReadOnlyList<DeleteStatement> deletes,

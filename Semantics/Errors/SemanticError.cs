@@ -54,13 +54,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
         public static Diagnostic ImplicitSelfOutsideMethod(CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6007,
-                "Can't use implicit self reference outside of a method");
+                "Can't use implicit self reference outside of a method or constructor");
         }
 
         public static Diagnostic SelfOutsideMethod(CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6008,
-                "Can't use `self` outside of a method");
+                "Can't use `self` outside of a method or constructor");
         }
 
         public static Diagnostic NoStringTypeDefined(CodeFile file)

@@ -30,7 +30,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         private readonly CodeFile file;
         private readonly ITypeSymbol? stringSymbol;
         private readonly Diagnostics diagnostics;
-        private readonly DataType? selfType;
         private readonly DataType? returnType;
         private readonly BasicTypeAnalyzer typeAnalyzer;
 
@@ -38,14 +37,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             CodeFile file,
             ITypeSymbol? stringSymbol,
             Diagnostics diagnostics,
-            DataType? selfType = null,
             DataType? returnType = null)
         {
             this.file = file;
             this.stringSymbol = stringSymbol;
             this.diagnostics = diagnostics;
             this.returnType = returnType;
-            this.selfType = selfType;
             typeAnalyzer = new BasicTypeAnalyzer(file, diagnostics);
         }
 
@@ -530,11 +527,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return assignmentExpression.Type = DataType.Void;
                 }
                 case ISelfExpressionSyntax selfExpression:
-                    if (selfType is null)
-                        diagnostics.Add(selfExpression.IsImplicit
-                            ? SemanticError.ImplicitSelfOutsideMethod(file, selfExpression.Span)
-                            : SemanticError.SelfOutsideMethod(file, selfExpression.Span));
-                    return selfExpression.Type = selfType ?? DataType.Unknown;
+                    return InferSelfType(selfExpression);
                 case INoneLiteralExpressionSyntax noneLiteralExpression:
                     return noneLiteralExpression.Type = DataType.None;
                 case IImplicitConversionExpression _:
@@ -760,6 +753,49 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
 
             return nameExpression.Type = type;
+        }
+
+        private DataType InferSelfType(ISelfExpressionSyntax selfExpression)
+        {
+            var symbols = selfExpression.LookupInContainingScope();
+            DataType type;
+            switch (symbols.Count)
+            {
+                case 0:
+                    diagnostics.Add(selfExpression.IsImplicit
+                        ? SemanticError.ImplicitSelfOutsideMethod(file, selfExpression.Span)
+                        : SemanticError.SelfOutsideMethod(file, selfExpression.Span));
+                    selfExpression.ReferencedSymbol = UnknownSymbol.Instance;
+                    type = DataType.Unknown;
+                    break;
+                case 1:
+                {
+                    var symbol = symbols.Single();
+                    switch (symbol)
+                    {
+                        case IBindingSymbol binding:
+                        {
+                            selfExpression.ReferencedSymbol = binding;
+                            type = binding.Type;
+                        }
+                        break;
+                        default:
+                            diagnostics.Add(NameBindingError.CouldNotBindName(file, selfExpression.Span));
+                            selfExpression.ReferencedSymbol = UnknownSymbol.Instance;
+                            type = DataType.Unknown;
+                            break;
+                    }
+
+                    break;
+                }
+                default:
+                    diagnostics.Add(NameBindingError.AmbiguousName(file, selfExpression.Span));
+                    selfExpression.ReferencedSymbol = UnknownSymbol.Instance;
+                    type = DataType.Unknown;
+                    break;
+            }
+
+            return selfExpression.Type = type;
         }
 
         /// <summary>

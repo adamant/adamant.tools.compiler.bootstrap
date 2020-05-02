@@ -53,15 +53,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     containingScope = BuildBodyScope(function.Parameters, containingScope);
                     Walk(function.Body, containingScope);
                     return;
+                case IAssociatedFunctionDeclaration function:
+                    foreach (var parameter in function.Parameters) Walk(parameter, containingScope);
+                    Walk(function.ReturnTypeSyntax, containingScope);
+                    containingScope = BuildBodyScope(function.Parameters, containingScope);
+                    Walk(function.Body, containingScope);
+                    return;
                 case IConcreteMethodDeclarationSyntax concreteMethod:
+                    Walk(concreteMethod.SelfParameter, containingScope);
                     foreach (var parameter in concreteMethod.Parameters) Walk(parameter, containingScope);
                     Walk(concreteMethod.ReturnTypeSyntax, containingScope);
-                    containingScope = BuildBodyScope(concreteMethod.Parameters, containingScope);
+                    containingScope = BuildBodyScope(concreteMethod.SelfParameter, concreteMethod.Parameters, containingScope);
                     Walk(concreteMethod.Body, containingScope);
                     return;
                 case IConstructorDeclarationSyntax constructor:
+                    Walk(constructor.ImplicitSelfParameter, containingScope);
                     foreach (var parameter in constructor.Parameters) Walk(parameter, containingScope);
-                    containingScope = BuildBodyScope(constructor.Parameters, containingScope);
+                    containingScope = BuildBodyScope(constructor.ImplicitSelfParameter, constructor.Parameters, containingScope);
                     Walk(constructor.Body, containingScope);
                     return;
                 case IHasContainingScope hasContainingScope:
@@ -133,9 +141,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             return new NestedScope(containingScope, importedSymbols);
         }
 
-        private static LexicalScope BuildBodyScope(IEnumerable<IParameterSyntax> parameters, LexicalScope containingScope)
+        private static LexicalScope BuildBodyScope(
+            IEnumerable<IParameterSyntax> parameters,
+            LexicalScope containingScope)
         {
             return new NestedScope(containingScope, parameters);
+        }
+
+        private static LexicalScope BuildBodyScope(
+            ISelfParameterSyntax selfParameter,
+            IEnumerable<IParameterSyntax> parameters,
+            LexicalScope containingScope)
+        {
+            return new NestedScope(containingScope, parameters.Prepend(selfParameter));
         }
     }
 }

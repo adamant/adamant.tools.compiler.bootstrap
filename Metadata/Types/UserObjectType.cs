@@ -60,29 +60,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         }
 
         /// <summary>
-        /// Use this type with indeterminate mutability. Note that if it is declared immutable, then
-        /// there can be no indeterminate mutability and this function returns an immutable type.
-        /// </summary>
-        //public UserObjectType AsExplicitlyUpgradable()
-        //{
-        //    //if (!DeclaredMutable && Mutability == Mutability.Immutable)
-        //    //    return this; // no change
-        //    //var mutability = DeclaredMutable ? Mutability.ExplicitlyUpgradable : Mutability.Immutable;
-        //    return new UserObjectType(Name, DeclaredMutable, ReferenceCapability);
-        //}
-
-        /// <summary>
-        /// Changes the lifetime to owned and if possible changes the mutability to implicitly upgradable
-        /// </summary>
-        //public UserObjectType AsOwnedUpgradable()
-        //{
-        //    //var expectedMutability = DeclaredMutable ? Mutability.ImplicitlyUpgradable : Mutability.Immutable;
-        //    //if (Lifetime == Lifetime.Owned && Mutability == expectedMutability)
-        //    //    return this;
-        //    return new UserObjectType(Name, DeclaredMutable, ReferenceCapability.Owned);
-        //}
-
-        /// <summary>
         /// Make a mutable version of this type regardless of whether it was declared
         /// mutable for use as the constructor parameter.
         /// </summary>
@@ -127,20 +104,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             return !(type1 == type2);
         }
         #endregion
-
-        //public bool EqualExceptLifetimeAndMutability(UserObjectType other)
-        //{
-        //    return EqualityComparer<Name>.Default.Equals(Name, other.Name)
-        //           && DeclaredMutable == other.DeclaredMutable;
-        //}
-
-        //public override bool EqualExceptLifetime(DataType other)
-        //{
-        //    return other is UserObjectType otherUserType
-        //            && EqualityComparer<Name>.Default.Equals(Name, otherUserType.Name)
-        //            && DeclaredMutable == otherUserType.DeclaredMutable
-        //            && Mutability == otherUserType.Mutability;
-        //}
 
         protected internal override Self WithCapabilityReturnsSelf(ReferenceCapability referenceCapability)
         {
