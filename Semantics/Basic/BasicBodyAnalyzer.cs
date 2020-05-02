@@ -434,7 +434,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var constructedType = (UserObjectType)constructingType;
                     var typeSymbol = newObjectExpression.TypeSyntax.ContainingScope.Assigned().GetSymbolForType(constructedType);
                     var constructors = typeSymbol.ChildSymbols[SpecialName.New].OfType<IFunctionSymbol>().ToFixedList();
-                    constructors = ResolveOverload(constructors, null, argumentTypes);
+                    constructors = ResolveOverload(constructors, argumentTypes);
                     switch (constructors.Count)
                     {
                         case 0:
@@ -595,14 +595,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
 
             var argumentTypes = methodInvocation.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
-            var targetType = InferType(ref methodInvocation.ContextExpression, false);
+            var contextType = InferType(ref methodInvocation.ContextExpression, false);
             // If it is unknown, we already reported an error
-            if (targetType == DataType.Unknown) return methodInvocation.Type = DataType.Unknown;
+            if (contextType == DataType.Unknown) return methodInvocation.Type = DataType.Unknown;
 
-            var typeSymbol = methodInvocation.MethodNameSyntax.ContainingScope.Assigned().GetSymbolForType(targetType);
-            typeSymbol.ChildSymbols.TryGetValue((SimpleName)methodInvocation.MethodNameSyntax.Name, out var childSymbols);
-            var methodSymbols = (childSymbols ?? FixedList<ISymbol>.Empty).OfType<IFunctionSymbol>().ToFixedList();
-            methodSymbols = ResolveOverload(methodSymbols, targetType, argumentTypes);
+            var contextTypeSymbol = methodInvocation.MethodNameSyntax.ContainingScope.Assigned().GetSymbolForType(contextType);
+            contextTypeSymbol.ChildSymbols.TryGetValue((SimpleName)methodInvocation.MethodNameSyntax.Name, out var childSymbols);
+            var methodSymbols = (childSymbols ?? FixedList<ISymbol>.Empty).OfType<IMethodSymbol>().ToFixedList();
+            methodSymbols = ResolveOverload(contextType, methodSymbols, argumentTypes);
             switch (methodSymbols.Count)
             {
                 case 0:
@@ -611,12 +611,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     methodInvocation.Type = DataType.Unknown;
                     break;
                 case 1:
-                    var functionSymbol = methodSymbols.Single();
-                    methodInvocation.MethodNameSyntax.ReferencedSymbol = functionSymbol;
+                    var methodSymbol = methodSymbols.Single();
+                    methodInvocation.MethodNameSyntax.ReferencedSymbol = methodSymbol;
 
-                    var selfParamType = functionSymbol.Parameters.First().Type;
+                    var selfParamType = methodSymbol.SelfParameterSymbol.Type;
                     if (selfParamType is ReferenceType paramType
-                        && targetType is ReferenceType argType)
+                        && contextType is ReferenceType argType)
                     {
                         if (paramType.IsReadOnly && !argType.IsReadOnly)
                         {
@@ -627,20 +627,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                 SharedSymbol = context.ReferencedSymbol
                             };
                         }
-                        // TODO insert move and borrow expressions as needed
+                        // TODO insert move and borrow expressions as needed?
                     }
                     InsertImplicitConversionIfNeeded(ref methodInvocation.ContextExpression, selfParamType);
                     CheckArgumentTypeCompatibility(selfParamType, methodInvocation.ContextExpression);
 
-                    // Skip the self parameter
-                    foreach (var (arg, type) in methodInvocation.Arguments.Zip(functionSymbol
-                                                                               .Parameters.Skip(1).Select(p => p.Type)))
+                    foreach (var (arg, type) in methodInvocation.Arguments.Zip(methodSymbol
+                                                                               .Parameters.Select(p => p.Type)))
                     {
                         InsertImplicitConversionIfNeeded(ref arg.Expression, type);
                         CheckArgumentTypeCompatibility(type, arg.Expression);
                     }
 
-                    methodInvocation.Type = functionSymbol.ReturnType;
+                    methodInvocation.Type = methodSymbol.ReturnType;
                     break;
                 default:
                     diagnostics.Add(NameBindingError.AmbiguousMethodCall(file, methodInvocation.Span));
@@ -678,7 +677,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             var scope = functionInvocationExpression.FunctionNameSyntax.ContainingScope.Assigned();
             var functionSymbols = scope.Lookup(functionInvocationExpression.FullName)
                 .OfType<IFunctionSymbol>().ToFixedList();
-            functionSymbols = ResolveOverload(functionSymbols, null, argumentTypes);
+            functionSymbols = ResolveOverload(functionSymbols, argumentTypes);
             switch (functionSymbols.Count)
             {
                 case 0:
@@ -906,16 +905,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private static FixedList<IFunctionSymbol> ResolveOverload(
             FixedList<IFunctionSymbol> symbols,
-            DataType? selfType,
             FixedList<DataType> argumentTypes)
         {
-            var expectedArgumentCount = argumentTypes.Count + (selfType != null ? 1 : 0);
             // Filter down to symbols that could possible match
             symbols = symbols.Where(f =>
             {
-                if (f.Arity() != expectedArgumentCount)
+                if (f.Arity() != argumentTypes.Count) return false;
+                // TODO check compatibility over argument types
+                return true;
+            }).ToFixedList();
+            // TODO Select most specific match
+            return symbols;
+        }
+
+        private static FixedList<IMethodSymbol> ResolveOverload(
+            DataType selfType,
+            FixedList<IMethodSymbol> symbols,
+            FixedList<DataType> argumentTypes)
+        {
+            // Filter down to symbols that could possible match
+            symbols = symbols.Where(f =>
+            {
+                if (f.Arity() != argumentTypes.Count)
                     return false;
                 // TODO check compatibility of self type
+                _ = selfType;
                 // TODO check compatibility over argument types
 
                 return true;

@@ -7,7 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal class ConstructorDeclarationSyntax : ConcreteCallableDeclarationSyntax, IConstructorDeclarationSyntax
+    internal class ConstructorDeclarationSyntax : CallableDeclarationSyntax, IConstructorDeclarationSyntax
     {
         public IClassDeclarationSyntax DeclaringClass { get; }
 
@@ -15,7 +15,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SimpleName Name => FullName.UnqualifiedName;
 
+        public ISelfParameterSyntax ImplicitSelfParameter { get; }
         public new FixedList<IConstructorParameterSyntax> Parameters { get; }
+
+        public virtual IBodySyntax Body { get; }
 
         public ConstructorDeclarationSyntax(
             IClassDeclarationSyntax declaringType,
@@ -24,14 +27,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IModiferToken> modifiers,
             Name fullName,
             TextSpan nameSpan,
+            ISelfParameterSyntax implicitSelfParameter,
             FixedList<IConstructorParameterSyntax> parameters,
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             IBodySyntax body)
-            : base(span, file, modifiers, fullName, nameSpan, parameters.ToFixedList<IParameterSyntax>(),
-                reachabilityAnnotations, body)
+            : base(span, file, modifiers, fullName, nameSpan, parameters, reachabilityAnnotations,
+                GetChildSymbols(implicitSelfParameter, parameters, body))
         {
             DeclaringClass = declaringType;
+            ImplicitSelfParameter = implicitSelfParameter;
             Parameters = parameters;
+            Body = body;
         }
 
         public override string ToString()

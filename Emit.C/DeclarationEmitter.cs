@@ -37,6 +37,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     else
                         EmitFunction(function, code);
                     break;
+                case MethodDeclaration method:
+                    EmitMethod(method, code);
+                    break;
                 case ConstructorDeclaration constructor:
                     EmitConstructor(constructor, code);
                     break;
@@ -59,10 +62,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
         private void EmitFunction(FunctionDeclaration function, Code code)
         {
-            // Don't emit functions without control flow, they are generic
-            // TODO need to handle better
-            if (function.IL is null) return;
-
             var name = nameMangler.MangleName(function);
             var parameters = Convert(function.Parameters);
             var returnType = typeConverter.Convert(function.ReturnType.Known());
@@ -74,6 +73,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             code.Definitions.AppendLine($"{returnType} {name}({parameters})");
             code.Definitions.BeginBlock();
             controlFlowEmitter.Emit(function, code);
+            code.Definitions.EndBlock();
+        }
+
+        private void EmitMethod(MethodDeclaration method, Code code)
+        {
+            if (method.IL is null) return;
+
+            var name = nameMangler.MangleName(method);
+            var parameters = Convert(method.Parameters.Prepend(method.SelfParameter));
+            var returnType = typeConverter.Convert(method.ReturnType.Known());
+
+            // Write out the function declaration for C so we can call functions defined after others
+            code.FunctionDeclarations.AppendLine($"{returnType} {name}({parameters});");
+
+            code.Definitions.DeclarationSeparatorLine();
+            code.Definitions.AppendLine($"{returnType} {name}({parameters})");
+            code.Definitions.BeginBlock();
+            controlFlowEmitter.Emit(method, code);
             code.Definitions.EndBlock();
         }
 
@@ -126,11 +143,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             structs.EndBlockWithSemicolon();
             structs.AppendLine($"struct {vtableType}");
             structs.BeginBlock();
-            foreach (var function in @class.Members.OfType<FunctionDeclaration>())
+            foreach (var method in @class.Members.OfType<MethodDeclaration>())
             {
-                var name = nameMangler.MangleUnqualifiedName(function);
-                var parameters = Convert(function.Parameters);
-                var returnType = typeConverter.Convert(function.ReturnType.Known());
+                var name = nameMangler.MangleUnqualifiedName(method);
+                var parameters = Convert(method.Parameters.Prepend(method.SelfParameter));
+                var returnType = typeConverter.Convert(method.ReturnType.Known());
                 structs.AppendLine($"{returnType} (*{name})({parameters});");
             }
             structs.EndBlockWithSemicolon();
@@ -138,10 +155,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             var globals = code.StructDeclarations;
             globals.AppendLine($"const {vtableType} {typeName}___vtable = ({vtableType})");
             globals.BeginBlock();
-            foreach (var function in @class.Members.OfType<FunctionDeclaration>())
+            foreach (var method in @class.Members.OfType<MethodDeclaration>())
             {
-                var fieldName = nameMangler.MangleUnqualifiedName(function);
-                var functionName = nameMangler.MangleName(function);
+                var fieldName = nameMangler.MangleUnqualifiedName(method);
+                var functionName = nameMangler.MangleName(method);
                 globals.AppendLine($".{fieldName} = {functionName},");
             }
             globals.EndBlockWithSemicolon();

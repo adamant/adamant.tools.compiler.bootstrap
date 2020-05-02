@@ -9,6 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
     [Closed(
         typeof(ClassDeclaration),
         typeof(FunctionDeclaration),
+        typeof(MethodDeclaration),
         typeof(FieldDeclaration),
         typeof(ConstructorDeclaration))]
     public abstract class Declaration : ISymbol

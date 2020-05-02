@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -17,6 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SimpleName Name => FullName.UnqualifiedName;
         public ISelfParameterSyntax SelfParameter { get; }
+        public IBindingSymbol SelfParameterSymbol => SelfParameter;
         public new FixedList<INamedParameterSyntax> Parameters { get; }
         public ITypeSyntax? ReturnTypeSyntax { get; }
         DataType IFunctionSymbol.ReturnType => ReturnType.Fulfilled();
@@ -34,8 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             SymbolSet childSymbols)
             : base(span, file, modifiers, fullName, nameSpan,
-                parameters.ImplicitCast<IParameterSyntax>().Prepend(selfParameter).ToFixedList(),
-                reachabilityAnnotations, childSymbols)
+                parameters, reachabilityAnnotations, childSymbols)
         {
             DeclaringClass = declaringClass;
             SelfParameter = selfParameter;

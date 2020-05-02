@@ -259,13 +259,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var identifier = Tokens.AcceptToken<IIdentifierToken>();
             var name = nameContext.Qualify(SpecialName.Constructor(identifier?.Value));
             var bodyParser = NestedParser(name);
+            // Implicit self parameter is taken to be after the current token which is expected to be `(`
+            var selfParameter = new SelfParameterSyntax(Tokens.Current.Span.AtEnd(), name.Qualify(SpecialName.Self), true);
             var parameters = bodyParser.ParseParameters(bodyParser.ParseConstructorParameter);
             var body = bodyParser.ParseFunctionBody();
             // For now, just say constructors have no annotations
             var reachabilityAnnotations = FixedList<IReachabilityAnnotationSyntax>.Empty;
             var span = TextSpan.Covering(newKeywordSpan, body.Span);
             return new ConstructorDeclarationSyntax(declaringType, span, File, modifiers, name,
-                TextSpan.Covering(newKeywordSpan, identifier?.Span), parameters, reachabilityAnnotations, body);
+                TextSpan.Covering(newKeywordSpan, identifier?.Span), selfParameter, parameters, reachabilityAnnotations, body);
         }
         #endregion
     }

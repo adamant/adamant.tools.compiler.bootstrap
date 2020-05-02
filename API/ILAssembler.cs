@@ -39,6 +39,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                 case FunctionDeclaration function:
                     Disassemble(function, builder);
                     break;
+                case MethodDeclaration method:
+                    Disassemble(method, builder);
+                    break;
                 case ConstructorDeclaration constructor:
                     Disassemble(constructor, builder);
                     break;
@@ -81,6 +84,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         {
             var format = parameter.IsMutableBinding ? "var {0}: {1}" : "{0}: {1}";
             return string.Format(CultureInfo.InvariantCulture, format, parameter.Name, parameter.Type);
+        }
+
+        private static void Disassemble(MethodDeclaration method, AssemblyBuilder builder)
+        {
+            var parameters = FormatParameters(method.Parameters.Prepend(method.SelfParameter));
+            builder.BeginLine("fn ");
+            builder.Append(method.FullName.ToString());
+            builder.Append("(");
+            builder.Append(parameters);
+            builder.Append(")");
+            builder.EndLine();
+            builder.BeginLine(builder.IndentCharacters);
+            builder.Append("-> ");
+            builder.EndLine(method.ReturnType.ToString());
+            if (method.IL != null)
+            {
+                builder.BeginBlock();
+                Disassemble(method.IL, builder);
+                builder.EndBlock();
+            }
         }
 
         private static void Disassemble(ConstructorDeclaration constructor, AssemblyBuilder builder)

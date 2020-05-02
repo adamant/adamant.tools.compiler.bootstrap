@@ -8,33 +8,36 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
-    public class FunctionDeclaration : Declaration, ICallableDeclaration, IFunctionSymbol
+    public class MethodDeclaration : Declaration, ICallableDeclaration, IMethodSymbol
     {
-        public bool IsExternal { get; }
-
-        [SuppressMessage("Design", "CA1033:Interface methods should be callable by child types", Justification = "NA")]
+        public bool IsExternal => false;
+        [SuppressMessage("Design", "CA1033:Interface methods should be callable by child types",
+            Justification = "NA")]
         bool ICallableDeclaration.IsConstructor => false;
+        public Parameter SelfParameter { get; }
 
+        [SuppressMessage("Design", "CA1033:Interface methods should be callable by child types",
+            Justification = "NA")]
+        IBindingSymbol IMethodSymbol.SelfParameterSymbol => SelfParameter;
         public FixedList<Parameter> Parameters { get; }
         public int Arity => Parameters.Count;
         public DataType ReturnType { get; }
-        public ControlFlowGraph IL { get; }
+        public ControlFlowGraph? IL { get; }
 
         IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;
 
-        public FunctionDeclaration(
-            bool isExternal,
-            bool isMember,
+        public MethodDeclaration(
             Name name,
+            Parameter selfParameter,
             FixedList<Parameter> parameters,
             DataType returnType,
-            ControlFlowGraph il)
-            : base(isMember, name, SymbolSet.Empty)
+            ControlFlowGraph? il)
+            : base(true, name, SymbolSet.Empty)
         {
+            SelfParameter = selfParameter;
             Parameters = parameters;
             ReturnType = returnType;
             IL = il;
-            IsExternal = isExternal;
         }
     }
 }

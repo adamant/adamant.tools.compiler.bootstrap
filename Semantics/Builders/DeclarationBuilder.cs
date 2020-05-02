@@ -65,15 +65,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                 case IConcreteMethodDeclarationSyntax method:
                 {
                     var il = ilFactory.CreateGraph(method);
-                    declaration = new FunctionDeclaration(false, true,
-                        method.FullName, BuildParameters(method.Parameters),
+                    declaration = new MethodDeclaration(method.FullName, BuildParameter(method.SelfParameter), BuildParameters(method.Parameters),
                         method.ReturnType.Known(), il);
                     break;
                 }
                 case IAbstractMethodDeclarationSyntax method:
                 {
-                    declaration = new FunctionDeclaration(false, true,
-                        method.FullName, BuildParameters(method.Parameters),
+                    declaration = new MethodDeclaration(method.FullName, BuildParameter(method.SelfParameter), BuildParameters(method.Parameters),
                         method.ReturnType.Known(), null);
                     break;
                 }

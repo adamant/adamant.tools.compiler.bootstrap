@@ -7,6 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
     [Closed(
         typeof(FunctionDeclaration),
+        typeof(MethodDeclaration),
         typeof(ConstructorDeclaration))]
     public interface ICallableDeclaration
     {

@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             IBodySyntax body)
             : base(declaringClass, span, file, modifiers, fullName, nameSpan, selfParameter,
                 parameters, returnTypeSyntax, reachabilityAnnotations,
-                ConcreteCallableDeclarationSyntax.GetChildSymbols(parameters.ImplicitCast<IParameterSyntax>().Prepend(selfParameter), body))
+                GetChildSymbols(selfParameter, parameters, body))
         {
             Body = body;
         }
@@ -34,7 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public override string ToString()
         {
             var returnType = ReturnTypeSyntax != null ? " -> " + ReturnTypeSyntax : "";
-            return $"fn {FullName}({string.Join(", ", Parameters)}){returnType} {Body}";
+            return $"fn {FullName}({string.Join(", ", Parameters.Prepend<IParameterSyntax>(SelfParameter))}){returnType} {Body}";
         }
     }
 }

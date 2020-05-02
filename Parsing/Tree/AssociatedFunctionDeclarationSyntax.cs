@@ -9,7 +9,7 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal class AssociatedFunctionDeclarationSyntax : ConcreteCallableDeclarationSyntax, IAssociatedFunctionDeclaration
+    internal class AssociatedFunctionDeclarationSyntax : CallableDeclarationSyntax, IAssociatedFunctionDeclaration
     {
         public IClassDeclarationSyntax DeclaringClass { get; }
 
@@ -20,6 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public new FixedList<INamedParameterSyntax> Parameters { get; }
         public ITypeSyntax? ReturnTypeSyntax { get; }
         DataType IFunctionSymbol.ReturnType => ReturnType.Fulfilled();
+        public IBodySyntax Body { get; }
 
         public AssociatedFunctionDeclarationSyntax(
             IClassDeclarationSyntax declaringClass,
@@ -32,12 +33,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             ITypeSyntax? returnTypeSyntax,
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             IBodySyntax body)
-            : base(span, file, modifiers, fullName, nameSpan, parameters.ToFixedList<IParameterSyntax>(),
-                reachabilityAnnotations, body)
+            : base(span, file, modifiers, fullName, nameSpan, parameters,
+                reachabilityAnnotations, GetChildSymbols(null, parameters, body))
         {
             DeclaringClass = declaringClass;
             Parameters = parameters;
             ReturnTypeSyntax = returnTypeSyntax;
+            Body = body;
         }
 
         public override string ToString()

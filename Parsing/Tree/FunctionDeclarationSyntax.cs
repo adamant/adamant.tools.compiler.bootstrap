@@ -8,14 +8,13 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
-    internal class FunctionDeclarationSyntax : ConcreteCallableDeclarationSyntax, IFunctionDeclarationSyntax
+    internal class FunctionDeclarationSyntax : CallableDeclarationSyntax, IFunctionDeclarationSyntax
     {
         public bool IsExternalFunction { get; set; }
         public ITypeSyntax? ReturnTypeSyntax { get; }
-
         public new FixedList<INamedParameterSyntax> Parameters { get; }
-
         DataType IFunctionSymbol.ReturnType => ReturnType.Fulfilled();
+        public IBodySyntax Body { get; }
 
         public FunctionDeclarationSyntax(
             TextSpan span,
@@ -27,11 +26,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             ITypeSyntax? returnTypeSyntax,
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             IBodySyntax body)
-            : base(span, file, modifiers, fullName, nameSpan, parameters.ToFixedList<IParameterSyntax>(),
-                reachabilityAnnotations, body)
+            : base(span, file, modifiers, fullName, nameSpan, parameters,
+                reachabilityAnnotations, GetChildSymbols(null, parameters, body))
         {
             Parameters = parameters;
             ReturnTypeSyntax = returnTypeSyntax;
+            Body = body;
         }
 
         public override string ToString()
@@ -39,5 +39,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             var returnType = ReturnTypeSyntax != null ? " -> " + ReturnTypeSyntax : "";
             return $"fn {FullName}({string.Join(", ", Parameters)}){returnType} {Body}";
         }
+
     }
 }

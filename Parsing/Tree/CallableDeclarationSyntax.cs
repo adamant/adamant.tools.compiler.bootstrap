@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
+using Adamant.Tools.Compiler.Bootstrap.AST.Walkers;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
@@ -42,16 +44,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IModiferToken> modifiers,
             Name fullName,
             TextSpan nameSpan,
-            FixedList<IParameterSyntax> parameters,
+            IEnumerable<IParameterSyntax> parameters,
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             SymbolSet childSymbols)
             : base(span, file, nameSpan)
         {
             FullName = fullName;
             Modifiers = modifiers;
-            Parameters = parameters;
+            Parameters = parameters.ToFixedList();
             ReachabilityAnnotations = reachabilityAnnotations;
             ChildSymbols = childSymbols;
+        }
+
+        protected static SymbolSet GetChildSymbols(
+            ISelfParameterSyntax? selfParameter,
+            IEnumerable<IParameterSyntax> parameters,
+            IBodySyntax? body)
+        {
+            if (!(selfParameter is null))
+                parameters = parameters.Prepend(selfParameter);
+
+            var variableDeclarations = body?.GetAllVariableDeclarations()
+                                       ?? Enumerable.Empty<IVariableDeclarationStatementSyntax>();
+            var childSymbols = parameters.Cast<ISymbol>().Concat(variableDeclarations);
+            return new SymbolSet(childSymbols);
         }
     }
 }

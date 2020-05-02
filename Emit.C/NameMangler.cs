@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
     public class NameMangler
     {
         // try https://github.com/atifaziz/Nunycode
-        readonly IdnMapping mapping = new IdnMapping();
+        private readonly IdnMapping mapping = new IdnMapping();
 
         // Note, we don't have to worry about whether the identifier starts with
         // a number because it will end up prefixed anyway.
@@ -40,13 +40,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             builder.Append(function.Arity);
             return mapping.GetAscii(builder.ToString());
         }
-        public string MangleUnqualifiedName(FunctionDeclaration function)
+
+        public string MangleName(MethodDeclaration method)
         {
             // builder with room for the characters we are likely to add
-            var builder = new StringBuilder(EstimateSize(function.FullName.UnqualifiedName) + 5);
-            Mangle(function.FullName.UnqualifiedName, builder);
+            var builder = new StringBuilder(EstimateSize(method.FullName) + 5);
+            Mangle(method.FullName, builder);
             builder.Append("__");
-            builder.Append(function.Arity);
+            builder.Append(method.Arity + 1); // add one for self parameter
+            return mapping.GetAscii(builder.ToString());
+        }
+        public string MangleUnqualifiedName(MethodDeclaration method)
+        {
+            // builder with room for the characters we are likely to add
+            var builder = new StringBuilder(EstimateSize(method.FullName.UnqualifiedName) + 5);
+            Mangle(method.FullName.UnqualifiedName, builder);
+            builder.Append("__");
+            builder.Append(method.Arity + 1); // add one for self parameter
             return mapping.GetAscii(builder.ToString());
         }
 
@@ -65,11 +75,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             // builder with room for the characters we are likely to add
             var builder = new StringBuilder(EstimateSize(@class.FullName) + 5);
             Mangle(@class.FullName, builder);
-            //if (type.IsGeneric)
-            //{
-            //    builder.Append("__");
-            //    builder.Append(type.GenericArity);
-            //}
             return mapping.GetAscii(builder.ToString());
         }
 
