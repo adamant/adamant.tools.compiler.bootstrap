@@ -16,17 +16,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             Identifier = identifier;
         }
 
+        protected void ClearReferences() => references.Clear();
+
         public void Owns(ObjectPlace @object, bool mutable)
         {
             references.Add(new Reference(@object, Ownership.Owns, mutable ? Mutable : ReadOnly));
         }
 
-        public void Shares(ObjectPlace @object)
-        {
-            references.Add(new Reference(@object, None, ReadOnly));
-        }
-
-        public void PotentiallyOwns(ObjectPlace @object)
+        public void PotentiallyOwns(ObjectPlace @object, bool b)
         {
             throw new System.NotImplementedException();
         }
@@ -34,6 +31,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         public void Borrows(ObjectPlace @object)
         {
             references.Add(new Reference(@object, None, Mutable));
+        }
+
+        public void Shares(ObjectPlace @object)
+        {
+            references.Add(new Reference(@object, None, ReadOnly));
+        }
+
+        public void Identifies(ObjectPlace @object)
+        {
+            references.Add(new Reference(@object, Ownership.None, Identity));
         }
 
         public void OwningIdentifies(ObjectPlace @object)

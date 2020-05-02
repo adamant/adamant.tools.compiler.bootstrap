@@ -1,8 +1,10 @@
 using System.Collections.ObjectModel;
 using Adamant.Tools.Compiler.Bootstrap.AST;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Identifiers;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Scopes;
+using static Adamant.Tools.Compiler.Bootstrap.Metadata.Types.ReferenceCapability;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
@@ -24,69 +26,90 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             this.currentScope = currentScope;
         }
 
-        public ObjectPlace CallerOwnedObjectFor(IParameterSyntax parameter)
+        public ObjectPlace CallerObjectFor(IParameterSyntax parameter, ReferenceType? type = null)
         {
-            var variableIdentifier = currentScope.CallerScope.VariableDeclared(SpecialName.CallerBound(parameter.Name));
-            var callerVariable = PlaceFor(variableIdentifier);
-            var callerObject = PlaceFor(identifiers.ObjectIdentifierFor(parameter));
-            callerVariable.OwningIdentifies(callerObject);
-            return callerObject;
+            var identifier = currentScope.CallerScope.VariableDeclared(SpecialName.CallerBound(parameter.Name));
+            type = type?.WithCapability(Identity) ?? new AnyType(Identity);
+            var place = new VariablePlace(identifier, type);
+            var objectPlace = PlaceFor(identifiers.ObjectIdentifierFor(parameter));
+            place.Assign(objectPlace);
+            return objectPlace;
         }
 
-        public VariablePlace VariableDeclared(SimpleName name)
+        public ObjectPlace CallerObjectForSelf(IConstructorDeclarationSyntax constructor, ReferenceType selfType)
         {
-            var variable = currentScope.VariableDeclared(name);
-            return PlaceFor(variable);
+            var identifier = currentScope.CallerScope.VariableDeclared(SpecialName.CallerBound(SpecialName.Self));
+            selfType = selfType.WithCapability(Identity);
+            var place = new VariablePlace(identifier, selfType);
+            var objectPlace = PlaceFor(identifiers.ObjectIdentifierFor(constructor));
+            place.Assign(objectPlace);
+            return objectPlace;
         }
 
+        public VariablePlace VariableDeclared(SimpleName name, ReferenceType type)
+        {
+            var identifier = currentScope.VariableDeclared(name);
+            var place = new VariablePlace(identifier, type);
+            variables.Add(place);
+            return place;
+        }
         public VariablePlace VariableFor(SimpleName name)
         {
-            var variable = identifiers.VariableIdentifierFor(name);
-            return PlaceFor(variable);
+            var identifier = identifiers.VariableIdentifierFor(name);
+            // Variable needs to have already been declared
+            return variables[identifier];
         }
 
+        public FieldPlace FieldDeclared(SimpleName name, ReferenceType type)
+        {
+            var identifier = identifiers.FieldIdentifierFor(name);
+            var place = new FieldPlace(identifier, type);
+            fields.Add(place);
+            return place;
+        }
         public FieldPlace FieldFor(SimpleName name)
         {
-            var variable = identifiers.FieldIdentifierFor(name);
-            return PlaceFor(variable);
+            var identifier = identifiers.FieldIdentifierFor(name);
+            // Field needs to have already been declared
+            return fields[identifier];
         }
 
         public ObjectPlace ObjectFor(IParameterSyntax parameter)
         {
-            var @object = identifiers.ObjectIdentifierFor(parameter);
-            return PlaceFor(@object);
+            var identifier = identifiers.ObjectIdentifierFor(parameter);
+            return PlaceFor(identifier);
         }
         public ObjectPlace ObjectFor(IExpressionSyntax expression)
         {
-            var @object = identifiers.ObjectIdentifierFor(expression);
-            return PlaceFor(@object);
+            var identifier = identifiers.ObjectIdentifierFor(expression);
+            return PlaceFor(identifier);
         }
 
-        private VariablePlace PlaceFor(VariablePlaceIdentifier variable)
-        {
-            if (!variables.TryGetValue(variable, out var place))
-            {
-                place = new VariablePlace(variable);
-                variables.Add(place);
-            }
+        //private VariablePlace PlaceFor(VariablePlaceIdentifier variable)
+        //{
+        //    if (!variables.TryGetValue(variable, out var place))
+        //    {
+        //        place = new VariablePlace(variable);
+        //        variables.Add(place);
+        //    }
 
-            return place;
-        }
-        private FieldPlace PlaceFor(FieldPlaceIdentifier field)
-        {
-            if (!fields.TryGetValue(field, out var place))
-            {
-                place = new FieldPlace(field);
-                fields.Add(place);
-            }
+        //    return place;
+        //}
+        //private FieldPlace PlaceFor(FieldPlaceIdentifier field)
+        //{
+        //    if (!fields.TryGetValue(field, out var place))
+        //    {
+        //        place = new FieldPlace(field);
+        //        fields.Add(place);
+        //    }
 
-            return place;
-        }
-        private ObjectPlace PlaceFor(ObjectPlaceIdentifier @object)
+        //    return place;
+        //}
+        private ObjectPlace PlaceFor(ObjectPlaceIdentifier objectIdentifier)
         {
-            if (!objects.TryGetValue(@object, out var place))
+            if (!objects.TryGetValue(objectIdentifier, out var place))
             {
-                place = new ObjectPlace(@object);
+                place = new ObjectPlace(objectIdentifier);
                 objects.Add(place);
             }
 
@@ -103,5 +126,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
             // TODO override Contains(TPlace) to improve its performance
         }
+
+
     }
 }

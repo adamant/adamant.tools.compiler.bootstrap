@@ -73,12 +73,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     ResolveReturnType(method.ReturnType, method.ReturnTypeSyntax, analyzer);
                     break;
                 }
-                case IConstructorDeclarationSyntax @class:
+                case IConstructorDeclarationSyntax constructor:
                 {
-                    var selfType = @class.DeclaringClass.DeclaresType.Fulfilled();
-                    @class.SelfParameterType = ((UserObjectType)selfType).ForConstructorSelf();
-                    var analyzer = new BasicTypeAnalyzer(@class.File, diagnostics);
-                    ResolveTypesInParameters(analyzer, @class.Parameters, @class.DeclaringClass);
+                    var selfType = constructor.DeclaringClass.DeclaresType.Fulfilled();
+                    constructor.SelfParameterType = ((UserObjectType)selfType).ForConstructorSelf();
+                    var analyzer = new BasicTypeAnalyzer(constructor.File, diagnostics);
+                    ResolveTypesInParameters(analyzer, constructor.Parameters, constructor.DeclaringClass);
                     // TODO deal with return type here
                     break;
                 }
@@ -105,14 +105,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     ResolveReturnType(function.ReturnType, function.ReturnTypeSyntax, analyzer);
                     break;
                 }
-                case IClassDeclarationSyntax c:
-                    if (c.DeclaresType.TryBeginFulfilling(() => diagnostics.Add(
-                        TypeError.CircularDefinition(c.File, c.NameSpan, c.Name))))
+                case IClassDeclarationSyntax @class:
+                    if (@class.DeclaresType.TryBeginFulfilling(() => diagnostics.Add(
+                        TypeError.CircularDefinition(@class.File, @class.NameSpan, @class.Name))))
                     {
-                        var classType = UserObjectType.Declaration(c,
-                            c.Modifiers.Any(m => m is IMutableKeywordToken));
-                        c.DeclaresType.Fulfill(classType);
-                        c.CreateDefaultConstructor();
+                        var classType = UserObjectType.Declaration(@class,
+                            @class.Modifiers.Any(m => m is IMutableKeywordToken));
+                        @class.DeclaresType.Fulfill(classType);
+                        @class.CreateDefaultConstructor();
                     }
                     break;
             }

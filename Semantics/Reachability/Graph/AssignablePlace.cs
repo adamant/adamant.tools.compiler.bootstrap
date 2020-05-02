@@ -1,35 +1,54 @@
-using System;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Identifiers;
+using ExhaustiveMatching;
 using static Adamant.Tools.Compiler.Bootstrap.Metadata.Types.ReferenceCapability;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
     internal abstract class AssignablePlace : Place
     {
-        public ObjectPlace? Referent { get; private set; }
+        /// <summary>
+        /// The type of this variable or field. If the original type was optional
+        /// this is the underlying reference type.
+        /// </summary>
+        public ReferenceType Type { get; }
 
-        protected AssignablePlace(PlaceIdentifier identifier)
-            : base(identifier) { }
-
-        public void Assign(ObjectPlace @object, DataType type)
+        protected AssignablePlace(PlaceIdentifier identifier, ReferenceType type)
+            : base(identifier)
         {
-            Referent = null;
-            if (type is ReferenceType referenceType)
+            Type = type;
+        }
+
+        public void Assign(ObjectPlace @object)
+        {
+            ClearReferences();
+            switch (Type.ReferenceCapability)
             {
-                switch (referenceType.ReferenceCapability)
-                {
-                    default:
-                        throw new NotImplementedException(
-                            $"Assignment not implemented for {referenceType.ReferenceCapability} references");
-                    //    throw ExhaustiveMatch.Failed(referenceType.ReferenceCapability);
-                    case Borrowed:
-                        Borrows(@object);
-                        break;
-                    case Shared:
-                        Shares(@object);
-                        break;
-                }
+                default:
+                    throw ExhaustiveMatch.Failed(Type.ReferenceCapability);
+                case IsolatedMutable:
+                case OwnedMutable:
+                    Owns(@object, true);
+                    break;
+                case Isolated:
+                case Owned:
+                    Owns(@object, false);
+                    break;
+                case HeldMutable:
+                    PotentiallyOwns(@object, true);
+                    break;
+                case Held:
+                    PotentiallyOwns(@object, false);
+                    break;
+                case Borrowed:
+                    Borrows(@object);
+                    break;
+                case Shared:
+                    Shares(@object);
+                    break;
+                case Identity:
+                    Identifies(@object);
+                    break;
             }
         }
     }

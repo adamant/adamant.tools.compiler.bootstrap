@@ -116,6 +116,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 #endif
 
             // From this point forward, analysis focuses on callable bodies
+            // TODO what about field initializers?
             var callables = entities.OfType<IConcreteCallableDeclarationSyntax>().ToFixedList();
             ShadowChecker.Check(callables, diagnostics);
 

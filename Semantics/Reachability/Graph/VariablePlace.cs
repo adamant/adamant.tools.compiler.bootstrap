@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Identifiers;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
@@ -6,8 +7,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     {
         public new VariablePlaceIdentifier Identifier { get; }
 
-        public VariablePlace(VariablePlaceIdentifier identifier)
-            : base(identifier)
+        public VariablePlace(VariablePlaceIdentifier identifier, ReferenceType type)
+            : base(identifier, type)
         {
             Identifier = identifier;
         }

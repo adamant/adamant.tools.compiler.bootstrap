@@ -52,6 +52,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Identifiers
             return @object;
         }
 
+        public ObjectPlaceIdentifier ObjectIdentifierFor(IConstructorDeclarationSyntax constructor)
+        {
+            if (!objectIdentifiers.TryGetValue(constructor, out var @object))
+            {
+                @object = new ObjectPlaceIdentifier(constructor);
+                objectIdentifiers.Add(constructor, @object);
+            }
+
+            return @object;
+        }
+
         /// <summary>
         /// Get or create a place for the object produced by the expression
         /// </summary>
@@ -65,5 +76,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Identifiers
 
             return @object;
         }
+
+
     }
 }

@@ -157,7 +157,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             if (expression is null) return;
             InferType(ref expression);
             var actualType = InsertImplicitConversionIfNeeded(ref expression, expectedType);
-            if (!expectedType.IsAssignableFrom(expectedType))
+            if (!expectedType.IsAssignableFrom(actualType))
                 diagnostics.Add(TypeError.CannotConvert(file, expression, actualType, expectedType));
         }
 
@@ -432,7 +432,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         return newObjectExpression.Type  = DataType.Unknown;
                     }
                     var constructedType = (UserObjectType)constructingType;
-                    var typeSymbol = GetSymbolForType(newObjectExpression.TypeSyntax.ContainingScope.Assigned(), constructedType);
+                    var typeSymbol = newObjectExpression.TypeSyntax.ContainingScope.Assigned().GetSymbolForType(constructedType);
                     var constructors = typeSymbol.ChildSymbols[SpecialName.New].OfType<IFunctionSymbol>().ToFixedList();
                     constructors = ResolveOverload(constructors, null, argumentTypes);
                     switch (constructors.Count)
@@ -507,7 +507,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IFieldAccessExpressionSyntax memberAccess:
                 {
                     var contextType = InferType(ref memberAccess.ContextExpression);
-                    var contextSymbol = GetSymbolForType(memberAccess.Field.ContainingScope.Assigned(), contextType);
+                    var contextSymbol = memberAccess.Field.ContainingScope.Assigned().GetSymbolForType(contextType);
                     var member = memberAccess.Field;
                     var memberSymbols = contextSymbol.Lookup(member.Name).OfType<IBindingSymbol>().ToFixedList();
                     var type = AssignReferencedSymbolAndType(member, memberSymbols);
@@ -552,7 +552,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     throw ExhaustiveMatch.Failed(expression);
                 case IFieldAccessExpressionSyntax exp:
                     var contextType = InferType(ref exp.ContextExpression);
-                    var contextSymbol = GetSymbolForType(exp.Field.ContainingScope.Assigned(), contextType);
+                    var contextSymbol = exp.Field.ContainingScope.Assigned().GetSymbolForType(contextType);
                     var member = exp.Field;
                     var memberSymbols = contextSymbol.Lookup(member.Name).OfType<IBindingSymbol>().ToFixedList();
                     var type = AssignReferencedSymbolAndType(member, memberSymbols);
@@ -599,7 +599,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             // If it is unknown, we already reported an error
             if (targetType == DataType.Unknown) return methodInvocation.Type = DataType.Unknown;
 
-            var typeSymbol = GetSymbolForType(methodInvocation.MethodNameSyntax.ContainingScope.Assigned(), targetType);
+            var typeSymbol = methodInvocation.MethodNameSyntax.ContainingScope.Assigned().GetSymbolForType(targetType);
             typeSymbol.ChildSymbols.TryGetValue((SimpleName)methodInvocation.MethodNameSyntax.Name, out var childSymbols);
             var methodSymbols = (childSymbols ?? FixedList<ISymbol>.Empty).OfType<IFunctionSymbol>().ToFixedList();
             methodSymbols = ResolveOverload(methodSymbols, targetType, argumentTypes);
@@ -796,23 +796,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             var fromType = arg.Type ?? throw new ArgumentException("argument must have a type");
             if (!type.IsAssignableFrom(fromType))
                 diagnostics.Add(TypeError.CannotConvert(file, arg, fromType, type));
-        }
-
-        private static ITypeSymbol GetSymbolForType(LexicalScope containingScope, DataType type)
-        {
-            switch (type)
-            {
-                case UnknownType _:
-                    return UnknownSymbol.Instance;
-                case UserObjectType objectType:
-                    return containingScope.LookupInGlobalScope(objectType.Name).OfType<ITypeSymbol>().Single();
-                case SizedIntegerType integerType:
-                    return containingScope.LookupInGlobalScope(integerType.Name).OfType<ITypeSymbol>().Single();
-                case UnsizedIntegerType integerType:
-                    return containingScope.LookupInGlobalScope(integerType.Name).OfType<ITypeSymbol>().Single();
-                default:
-                    throw new NotImplementedException();
-            }
         }
 
         private DataType AssignReferencedSymbolAndType(

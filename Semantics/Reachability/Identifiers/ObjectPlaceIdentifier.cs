@@ -15,5 +15,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Identifiers
         {
             GeneratingSyntax = parameter;
         }
+
+        public ObjectPlaceIdentifier(IConstructorDeclarationSyntax constructor)
+        {
+            GeneratingSyntax = constructor;
+        }
     }
 }

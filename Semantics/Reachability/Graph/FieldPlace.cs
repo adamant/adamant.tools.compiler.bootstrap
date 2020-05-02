@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Identifiers;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
@@ -6,8 +7,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     {
         public new FieldPlaceIdentifier Identifier { get; }
 
-        public FieldPlace(FieldPlaceIdentifier identifier)
-            : base(identifier)
+        public FieldPlace(FieldPlaceIdentifier identifier, ReferenceType type)
+            : base(identifier, type)
         {
             Identifier = identifier;
         }
