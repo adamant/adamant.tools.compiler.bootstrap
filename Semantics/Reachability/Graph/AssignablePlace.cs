@@ -1,5 +1,6 @@
+using System;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Identifiers;
 using ExhaustiveMatching;
 using static Adamant.Tools.Compiler.Bootstrap.Metadata.Types.ReferenceCapability;
 
@@ -7,16 +8,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
     internal abstract class AssignablePlace : Place
     {
+        public IBindingSymbol Symbol { get; }
+
         /// <summary>
         /// The type of this variable or field. If the original type was optional
         /// this is the underlying reference type.
         /// </summary>
         public ReferenceType Type { get; }
 
-        protected AssignablePlace(PlaceIdentifier identifier, ReferenceType type)
-            : base(identifier)
+        protected AssignablePlace(IBindingSymbol symbol)
         {
-            Type = type;
+            Symbol = symbol;
+            Type = symbol.Type.UnderlyingReferenceType()
+                   ?? throw new ArgumentException("Must be a reference type", nameof(symbol));
         }
 
         public void Assign(ObjectPlace @object)

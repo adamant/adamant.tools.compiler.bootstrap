@@ -1,4 +1,5 @@
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Identifiers;
+using System.Collections.Generic;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Scopes
 {
@@ -9,13 +10,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Scopes
     internal class LexicalVariableScope : VariableScope
     {
         private readonly VariableScope containingScope;
+        private readonly HashSet<IBindingSymbol> variables = new HashSet<IBindingSymbol>();
 
-        public LexicalVariableScope(PlaceIdentifierList identifiers, VariableScope containingScope)
-            : base(identifiers)
+        public LexicalVariableScope(VariableScope containingScope)
         {
             this.containingScope = containingScope;
         }
 
         public override CallerVariableScope CallerScope => containingScope.CallerScope;
+
+        /// <summary>
+        /// Declare a variable in the current scope
+        /// </summary>
+        public void VariableDeclared(IBindingSymbol symbol)
+        {
+            variables.Add(symbol);
+        }
     }
 }

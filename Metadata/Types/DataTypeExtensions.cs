@@ -1,7 +1,8 @@
 using System;
 using System.Diagnostics;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types {
+namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
+{
     public static class DataTypeExtensions
     {
         /// <summary>
@@ -55,6 +56,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types {
             if (!type.Assigned().IsKnown) throw new InvalidOperationException($"Type {type} not known");
 
             return type!;
+        }
+
+        public static ReferenceType? UnderlyingReferenceType(this DataType type)
+        {
+            switch (type)
+            {
+                case ReferenceType referenceType:
+                    return referenceType;
+                case OptionalType optionalType
+                    when optionalType.Referent is ReferenceType referenceType:
+                    return referenceType;
+                default:
+                    return null;
+            }
         }
     }
 }

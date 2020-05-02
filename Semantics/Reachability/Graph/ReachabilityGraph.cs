@@ -1,10 +1,7 @@
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.AST;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using Adamant.Tools.Compiler.Bootstrap.Names;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Identifiers;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Scopes;
-using static Adamant.Tools.Compiler.Bootstrap.Metadata.Types.ReferenceCapability;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
@@ -14,119 +11,78 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     /// </summary>
     internal class ReachabilityGraph
     {
-        private readonly PlaceIdentifierList identifiers;
         private readonly LexicalVariableScope currentScope;
-        private readonly PlaceDictionary<VariablePlace> variables = new PlaceDictionary<VariablePlace>();
-        private readonly PlaceDictionary<FieldPlace> fields = new PlaceDictionary<FieldPlace>();
-        private readonly PlaceDictionary<ObjectPlace> objects = new PlaceDictionary<ObjectPlace>();
+        private readonly Dictionary<IBindingSymbol, VariablePlace> variables = new Dictionary<IBindingSymbol, VariablePlace>();
+        private readonly Dictionary<IBindingSymbol, FieldPlace> fields = new Dictionary<IBindingSymbol, FieldPlace>();
+        private readonly Dictionary<ISyntax, ObjectPlace> objects = new Dictionary<ISyntax, ObjectPlace>();
 
-        public ReachabilityGraph(PlaceIdentifierList identifiers, LexicalVariableScope currentScope)
+        public ReachabilityGraph(LexicalVariableScope currentScope)
         {
-            this.identifiers = identifiers;
             this.currentScope = currentScope;
         }
 
-        public ObjectPlace CallerObjectFor(IParameterSyntax parameter, ReferenceType? type = null)
+        public ObjectPlace CallerObjectFor(IParameterSyntax parameter)
         {
-            var identifier = currentScope.CallerScope.VariableDeclared(SpecialName.CallerBound(parameter.Name));
-            type = type?.WithCapability(Identity) ?? new AnyType(Identity);
-            var place = new VariablePlace(identifier, type);
-            var objectPlace = PlaceFor(identifiers.ObjectIdentifierFor(parameter));
-            place.Assign(objectPlace);
+            var callerVariable = currentScope.CallerScope.CallerVariable(parameter);
+            var objectPlace = ObjectFor(parameter);
+            callerVariable.Assign(objectPlace);
             return objectPlace;
         }
 
-        public ObjectPlace CallerObjectForSelf(IConstructorDeclarationSyntax constructor, ReferenceType selfType)
-        {
-            var identifier = currentScope.CallerScope.VariableDeclared(SpecialName.CallerBound(SpecialName.Self));
-            selfType = selfType.WithCapability(Identity);
-            var place = new VariablePlace(identifier, selfType);
-            var objectPlace = PlaceFor(identifiers.ObjectIdentifierFor(constructor));
-            place.Assign(objectPlace);
-            return objectPlace;
-        }
+        //public ObjectPlace CallerObjectForSelf(IConstructorDeclarationSyntax constructor, ReferenceType selfType)
+        //{
+        //    //var identifier = currentScope.CallerScope.VariableDeclared(SpecialName.CallerBound(SpecialName.Self));
+        //    //selfType = selfType.WithCapability(Identity);
+        //    //var place = new VariablePlace(identifier, selfType);
+        //    //var objectPlace = PlaceFor(identifiers.ObjectIdentifierFor(constructor));
+        //    //place.Assign(objectPlace);
+        //    //return objectPlace;
+        //    throw new NotImplementedException();
+        //}
 
-        public VariablePlace VariableDeclared(SimpleName name, ReferenceType type)
+        public VariablePlace VariableDeclared(IBindingSymbol variableSymbol)
         {
-            var identifier = currentScope.VariableDeclared(name);
-            var place = new VariablePlace(identifier, type);
-            variables.Add(place);
+            currentScope.VariableDeclared(variableSymbol);
+            var place = new VariablePlace(variableSymbol);
+            variables.Add(place.Symbol, place);
             return place;
         }
-        public VariablePlace VariableFor(SimpleName name)
+        public VariablePlace VariableFor(IBindingSymbol variableSymbol)
         {
-            var identifier = identifiers.VariableIdentifierFor(name);
             // Variable needs to have already been declared
-            return variables[identifier];
+            return variables[variableSymbol];
         }
 
-        public FieldPlace FieldDeclared(SimpleName name, ReferenceType type)
+        public FieldPlace FieldFor(IBindingSymbol fieldSymbol)
         {
-            var identifier = identifiers.FieldIdentifierFor(name);
-            var place = new FieldPlace(identifier, type);
-            fields.Add(place);
+            if (!fields.TryGetValue(fieldSymbol, out var place))
+            {
+                place = new FieldPlace(fieldSymbol);
+                fields.Add(place.Symbol, place);
+            }
+
             return place;
-        }
-        public FieldPlace FieldFor(SimpleName name)
-        {
-            var identifier = identifiers.FieldIdentifierFor(name);
-            // Field needs to have already been declared
-            return fields[identifier];
         }
 
         public ObjectPlace ObjectFor(IParameterSyntax parameter)
         {
-            var identifier = identifiers.ObjectIdentifierFor(parameter);
-            return PlaceFor(identifier);
-        }
-        public ObjectPlace ObjectFor(IExpressionSyntax expression)
-        {
-            var identifier = identifiers.ObjectIdentifierFor(expression);
-            return PlaceFor(identifier);
-        }
-
-        //private VariablePlace PlaceFor(VariablePlaceIdentifier variable)
-        //{
-        //    if (!variables.TryGetValue(variable, out var place))
-        //    {
-        //        place = new VariablePlace(variable);
-        //        variables.Add(place);
-        //    }
-
-        //    return place;
-        //}
-        //private FieldPlace PlaceFor(FieldPlaceIdentifier field)
-        //{
-        //    if (!fields.TryGetValue(field, out var place))
-        //    {
-        //        place = new FieldPlace(field);
-        //        fields.Add(place);
-        //    }
-
-        //    return place;
-        //}
-        private ObjectPlace PlaceFor(ObjectPlaceIdentifier objectIdentifier)
-        {
-            if (!objects.TryGetValue(objectIdentifier, out var place))
+            if (!objects.TryGetValue(parameter, out var place))
             {
-                place = new ObjectPlace(objectIdentifier);
-                objects.Add(place);
+                place = new ObjectPlace(parameter);
+                objects.Add(place.OriginSyntax, place);
             }
 
             return place;
         }
-
-        private class PlaceDictionary<TPlace> : KeyedCollection<PlaceIdentifier, TPlace>
-            where TPlace : Place
+        public ObjectPlace ObjectFor(IExpressionSyntax expression)
         {
-            protected override PlaceIdentifier GetKeyForItem(TPlace place)
+            if (!objects.TryGetValue(expression, out var place))
             {
-                return place.Identifier;
+                place = new ObjectPlace(expression);
+                objects.Add(place.OriginSyntax, place);
             }
 
-            // TODO override Contains(TPlace) to improve its performance
+            return place;
         }
-
-
     }
 }

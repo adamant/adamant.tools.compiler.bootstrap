@@ -1,15 +1,19 @@
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Identifiers;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
     internal class ObjectPlace : Place
     {
-        public new ObjectPlaceIdentifier Identifier { get; }
+        public ISyntax OriginSyntax { get; }
 
-        public ObjectPlace(ObjectPlaceIdentifier identifier)
-            : base(identifier)
+        public ObjectPlace(IParameterSyntax parameter)
         {
-            Identifier = identifier;
+            OriginSyntax = parameter;
+        }
+
+        public ObjectPlace(IExpressionSyntax expression)
+        {
+            OriginSyntax = expression;
         }
     }
 }

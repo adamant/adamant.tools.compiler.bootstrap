@@ -1,13 +1,11 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Identifiers;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Scopes;
 using ExhaustiveMatching;
 using static Adamant.Tools.Compiler.Bootstrap.Metadata.Types.ReferenceCapability;
@@ -27,7 +25,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
     {
         private readonly IConcreteCallableDeclarationSyntax callableDeclaration;
         private readonly Diagnostics diagnostics;
-        private readonly PlaceIdentifierList places = new PlaceIdentifierList();
 
         private ReachabilityAnalyzer(
             IConcreteCallableDeclarationSyntax callableDeclaration,
@@ -48,37 +45,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
         private void Analyze()
         {
             var graph = CreateParameterScope();
-            DeclareSelfFields(graph);
             foreach (var statement in callableDeclaration.Body.Statements)
                 Analyze(statement, graph);
 
             // TODO handle implicit return at end
-        }
-
-        private void DeclareSelfFields(ReachabilityGraph graph)
-        {
-            IClassDeclarationSyntax declaringClass;
-            switch (callableDeclaration)
-            {
-                default:
-                    throw ExhaustiveMatch.Failed(callableDeclaration);
-                case IAssociatedFunctionDeclaration _:
-                case IFunctionDeclarationSyntax _:
-                    return;
-                case IConcreteMethodDeclarationSyntax method:
-                    declaringClass = method.DeclaringClass;
-                    break;
-                case IConstructorDeclarationSyntax constructor:
-               
-                    declaringClass = constructor.DeclaringClass;
-                    break;
-            }
-
-            foreach (var fieldDeclaration in declaringClass.Members.OfType<IFieldDeclarationSyntax>())
-            {
-                if (!IsReferenceType(fieldDeclaration.Type.Known(), out var referenceType)) continue;
-                graph.FieldDeclared(fieldDeclaration.Name, referenceType);
-            }
         }
 
         private static void Analyze(IStatementSyntax statement, ReachabilityGraph graph)
@@ -88,13 +58,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 default:
                     throw ExhaustiveMatch.Failed(statement);
                 case IVariableDeclarationStatementSyntax stmt:
+                {
                     var initializer = Analyze(stmt.Initializer, graph);
-                    if (IsReferenceType(stmt.Type.Known(), out var referenceType))
-                    {
-                        var variable = graph.VariableDeclared(stmt.Name, referenceType);
-                        if (initializer != null) variable.Assign(initializer);
-                    }
-                    break;
+                    var referenceType = stmt.Type.Known().UnderlyingReferenceType();
+                    if (referenceType is null) break;
+                    var variable = graph.VariableDeclared(stmt);
+                    if (initializer != null) variable.Assign(initializer);
+                }
+                break;
                 case IExpressionStatementSyntax stmt:
                     Analyze(stmt.Expression, graph);
                     break;
@@ -112,13 +83,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
         private static ObjectPlace? Analyze(IExpressionSyntax? expression, ReachabilityGraph graph)
         {
             if (expression is null) return null;
-            var isReferenceType = IsReferenceType(expression.Type.Known(), out _);
+            var isReferenceType = !(expression.Type.Known().UnderlyingReferenceType() is null);
             switch (expression)
             {
                 default:
                     // TODO implement this for all expression types
-                    throw new NotImplementedException(
-                        $"{nameof(Analyze)}({nameof(expression)}, graph) not implemented for {expression.GetType().Name}");
+                    return null;
+                //throw new NotImplementedException(
+                //    $"{nameof(Analyze)}({nameof(expression)}, graph) not implemented for {expression.GetType().Name}");
                 //throw ExhaustiveMatch.Failed(expression);
                 case IAssignmentExpressionSyntax exp:
                 {
@@ -129,17 +101,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                         leftPlace?.Assign(rightPlace);
                     return null;
                 }
-                case ISelfExpressionSyntax _:
-                {
-                    var selfPlace = graph.VariableFor(SpecialName.Self);
-                    return selfPlace.References.Single().Referent;
-                }
+                //case ISelfExpressionSyntax exp:
+                //{
+                //    var selfPlace = graph.VariableFor(SpecialName.Self);
+                //    return selfPlace.References.Single().Referent;
+                //}
                 case IShareExpressionSyntax exp:
                     return Analyze(exp.Referent, graph);
                 case INameExpressionSyntax name:
                 {
                     if (!isReferenceType) return null;
-                    var variablePlace = graph.VariableFor(name.Name);
+                    var variablePlace = graph.VariableFor(name.ReferencedSymbol.Assigned());
                     return variablePlace.References.Single().Referent;
                 }
                 case IBinaryOperatorExpressionSyntax exp:
@@ -165,7 +137,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             IAssignableExpressionSyntax expression,
             ReachabilityGraph graph)
         {
-            var isReferenceType = IsReferenceType(expression.Type.Known(), out _);
+            var isReferenceType = !(expression.Type.Known().UnderlyingReferenceType() is null);
             switch (expression)
             {
                 default:
@@ -176,7 +148,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     var contextPlace = Analyze(exp.ContextExpression, graph);
                     if (exp.ContextExpression is ISelfExpressionSyntax)
                     {
-                        return isReferenceType ? graph.FieldFor(exp.Field.Name) : null;
+                        return isReferenceType ? graph.FieldFor(exp.ReferencedSymbol.Assigned()) : null;
                     }
 
                     throw new NotImplementedException(
@@ -184,7 +156,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 }
                 case INameExpressionSyntax exp:
                 {
-                    return isReferenceType ? graph.VariableFor(exp.Name) : null;
+                    return isReferenceType ? graph.VariableFor(exp.ReferencedSymbol.Assigned()) : null;
                 }
             }
         }
@@ -195,17 +167,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
         /// </summary>
         private ReachabilityGraph CreateParameterScope()
         {
-            var callerScope = new CallerVariableScope(places);
-            var parameterScope = new LexicalVariableScope(places, callerScope);
-            var graph = new ReachabilityGraph(places, parameterScope);
+            var callerScope = new CallerVariableScope();
+            var parameterScope = new LexicalVariableScope(callerScope);
+            var graph = new ReachabilityGraph(parameterScope);
 
-            CreateConstructorSelfParameter(graph);
             foreach (var parameter in callableDeclaration.Parameters)
             {
                 // Non-reference types don't participate in reachability (yet)
-                if (!IsReferenceType(parameter.Type.Known(), out var referenceType)) continue;
+                var referenceType = parameter.Type.Known().UnderlyingReferenceType();
+                if (referenceType is null) continue;
 
-                var parameterVariable = graph.VariableDeclared(parameter.Name, referenceType);
+                var parameterVariable = graph.VariableDeclared(parameter);
                 var capability = referenceType.ReferenceCapability;
                 switch (capability)
                 {
@@ -239,19 +211,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     break;
                     case Borrowed:
                     {
-                        var callerObject = graph.CallerObjectFor(parameter, referenceType);
+                        var callerObject = graph.CallerObjectFor(parameter);
                         parameterVariable.Borrows(callerObject);
                     }
                     break;
                     case Shared:
                     {
-                        var callerObject = graph.CallerObjectFor(parameter, referenceType);
+                        var callerObject = graph.CallerObjectFor(parameter);
                         parameterVariable.Shares(callerObject);
                     }
                     break;
                     case Identity:
                     {
-                        var callerObject = graph.CallerObjectFor(parameter, referenceType);
+                        var callerObject = graph.CallerObjectFor(parameter);
                         parameterVariable.Identifies(callerObject);
                     }
                     break;
@@ -259,32 +231,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             }
 
             return graph;
-        }
-
-        private void CreateConstructorSelfParameter(ReachabilityGraph graph)
-        {
-            if (!(callableDeclaration is IConstructorDeclarationSyntax constructor)) return;
-
-            var selfType = (ReferenceType)constructor.SelfParameterType.Known();
-            var selfVariable = graph.VariableDeclared(SpecialName.Self, selfType);
-            var callerObject = graph.CallerObjectForSelf(constructor, selfType);
-            selfVariable.Borrows(callerObject);
-        }
-
-        private static bool IsReferenceType(DataType type, [NotNullWhen(true)] out ReferenceType? referenceType)
-        {
-            switch (type)
-            {
-                case ReferenceType t:
-                    referenceType = t;
-                    return true;
-                case OptionalType optionalType when optionalType.Referent is ReferenceType t:
-                    referenceType = t;
-                    return true;
-                default:
-                    referenceType = null;
-                    return false;
-            }
         }
     }
 }
