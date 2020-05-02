@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -12,13 +13,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         [SuppressMessage("Style", "IDE0044:Add readonly modifier",
             Justification = "Can't be readonly because a reference to it is exposed")]
         private IExpressionSyntax referent;
-        public ref IExpressionSyntax Referent => ref referent;
+        public ref IExpressionSyntax Referent
+        {
+            [DebuggerStepThrough]
+            get => ref referent;
+        }
 
         private IBindingSymbol? movedSymbol;
-
         [DisallowNull]
         public IBindingSymbol? MovedSymbol
         {
+            [DebuggerStepThrough]
             get => movedSymbol;
             set
             {

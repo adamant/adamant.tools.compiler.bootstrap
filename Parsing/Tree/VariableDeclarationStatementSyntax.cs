@@ -11,21 +11,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class VariableDeclarationStatementSyntax : StatementSyntax, IVariableDeclarationStatementSyntax
     {
-        public bool IsMutableBinding { get; }
-        public Name FullName { get; }
+        public bool IsMutableBinding { [DebuggerStepThrough] get; }
+        public Name FullName { [DebuggerStepThrough] get; }
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SimpleName Name => FullName.UnqualifiedName;
 
-        public TextSpan NameSpan { get; }
-        public ITypeSyntax? TypeSyntax { get; }
-        public bool InferMutableType { get; }
+        public TextSpan NameSpan { [DebuggerStepThrough] get; }
+        public ITypeSyntax? TypeSyntax { [DebuggerStepThrough] get; }
+        public bool InferMutableType { [DebuggerStepThrough] get; }
         private DataType? type;
         DataType IBindingSymbol.Type => Type ?? throw new InvalidOperationException();
 
         [DisallowNull]
         public DataType? Type
         {
+            [DebuggerStepThrough]
             get => type;
             set
             {
@@ -40,7 +41,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             "Can't be readonly because a reference to it is exposed")]
         private IExpressionSyntax? initializer;
         [DisallowNull]
-        public ref IExpressionSyntax? Initializer => ref initializer;
+        public ref IExpressionSyntax? Initializer
+        {
+            [DebuggerStepThrough]
+            get => ref initializer;
+        }
 
         public VariableDeclarationStatementSyntax(
             TextSpan span,

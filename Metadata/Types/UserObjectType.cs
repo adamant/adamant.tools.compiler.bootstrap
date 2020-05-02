@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -17,7 +18,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     public class UserObjectType : ObjectType, IEquatable<UserObjectType>
     {
         // TODO for IsKnown, deal with the generic parameters and arguments
-        public override bool IsKnown => true;
+        public override bool IsKnown
+        {
+            [DebuggerStepThrough]
+            get => true;
+        }
 
         private UserObjectType(
             Name fullName,

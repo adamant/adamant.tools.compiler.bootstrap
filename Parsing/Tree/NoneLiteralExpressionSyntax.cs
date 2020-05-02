@@ -14,5 +14,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         {
             return "none";
         }
+
+        public override string ToGroupedString()
+        {
+            return ToString();
+        }
     }
 }

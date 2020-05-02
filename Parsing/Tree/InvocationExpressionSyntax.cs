@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -7,8 +8,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal abstract class InvocationExpressionSyntax : ExpressionSyntax, IInvocationExpressionSyntax
     {
-        public Name FullName { get; }
-        public FixedList<IArgumentSyntax> Arguments { get; }
+        public Name FullName { [DebuggerStepThrough] get; }
+        public FixedList<IArgumentSyntax> Arguments { [DebuggerStepThrough] get; }
 
         private protected InvocationExpressionSyntax(
             TextSpan span,

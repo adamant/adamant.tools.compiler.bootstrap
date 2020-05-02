@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -14,12 +15,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     /// </summary>
     internal class NameExpressionSyntax : ExpressionSyntax, INameExpressionSyntax
     {
-        public SimpleName Name { get; }
+        public SimpleName Name { [DebuggerStepThrough] get; }
 
         private IBindingSymbol? referencedSymbol;
         [DisallowNull]
         public IBindingSymbol? ReferencedSymbol
         {
+            [DebuggerStepThrough]
             get => referencedSymbol;
             set
             {
@@ -33,6 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         [DisallowNull]
         public LexicalScope? ContainingScope
         {
+            [DebuggerStepThrough]
             get => containingScope;
             set
             {
@@ -58,6 +61,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public override string ToString()
         {
             return Name.ToString();
+        }
+
+        public override string ToGroupedString()
+        {
+            return ToString();
         }
     }
 }

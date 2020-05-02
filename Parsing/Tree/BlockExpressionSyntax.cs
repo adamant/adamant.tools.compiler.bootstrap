@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -7,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class BlockExpressionSyntax : ExpressionSyntax, IBlockExpressionSyntax
     {
-        public FixedList<IStatementSyntax> Statements { get; }
+        public FixedList<IStatementSyntax> Statements { [DebuggerStepThrough] get; }
 
         public BlockExpressionSyntax(
             TextSpan span,

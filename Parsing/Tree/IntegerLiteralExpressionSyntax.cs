@@ -19,5 +19,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         {
             return Value.ToString(CultureInfo.InvariantCulture);
         }
+
+        public override string ToGroupedString()
+        {
+            return ToString();
+        }
     }
 }

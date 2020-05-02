@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -13,12 +14,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         /// and we won't report errors against it in the future. We may also
         /// skip it for some processing.
         /// </summary>
-        public bool Poisoned { get; private set; }
+        public bool Poisoned { [DebuggerStepThrough] get; private set; }
 
         private DataType? type;
         [DisallowNull]
         public DataType? Type
         {
+            [DebuggerStepThrough]
             get => type;
             set
             {
@@ -42,6 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         // Useful for debugging
         public abstract override string ToString();
 
+        // TODO replace this with something based around precedence
         public virtual string ToGroupedString()
         {
             return $"({this})";

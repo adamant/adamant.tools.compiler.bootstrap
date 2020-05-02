@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -10,11 +11,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class FunctionDeclarationSyntax : CallableDeclarationSyntax, IFunctionDeclarationSyntax
     {
-        public bool IsExternalFunction { get; set; }
-        public ITypeSyntax? ReturnTypeSyntax { get; }
-        public new FixedList<INamedParameterSyntax> Parameters { get; }
+        public bool IsExternalFunction { [DebuggerStepThrough] get; [DebuggerStepThrough] set; }
+        public ITypeSyntax? ReturnTypeSyntax { [DebuggerStepThrough] get; }
+        public new FixedList<INamedParameterSyntax> Parameters { [DebuggerStepThrough] get; }
         DataType IFunctionSymbol.ReturnType => ReturnType.Fulfilled();
-        public IBodySyntax Body { get; }
+        public IBodySyntax Body { [DebuggerStepThrough] get; }
 
         public FunctionDeclarationSyntax(
             TextSpan span,
@@ -39,6 +40,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             var returnType = ReturnTypeSyntax != null ? " -> " + ReturnTypeSyntax : "";
             return $"fn {FullName}({string.Join(", ", Parameters)}){returnType} {Body}";
         }
-
     }
 }

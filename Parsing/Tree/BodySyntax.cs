@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -6,9 +7,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class BodySyntax : Syntax, IBodySyntax
     {
-        public FixedList<IBodyStatementSyntax> Statements { get; }
+        public FixedList<IBodyStatementSyntax> Statements { [DebuggerStepThrough] get; }
         private readonly FixedList<IStatementSyntax> statements;
-        FixedList<IStatementSyntax> IBodyOrBlockSyntax.Statements => statements;
+        FixedList<IStatementSyntax> IBodyOrBlockSyntax.Statements
+        {
+            [DebuggerStepThrough]
+            get => statements;
+        }
 
         public BodySyntax(TextSpan span, FixedList<IBodyStatementSyntax> statements)
             : base(span)
