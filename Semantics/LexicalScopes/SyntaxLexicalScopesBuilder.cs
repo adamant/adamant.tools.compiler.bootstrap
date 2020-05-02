@@ -53,7 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     containingScope = BuildBodyScope(function.Parameters, containingScope);
                     Walk(function.Body, containingScope);
                     return;
-                case IAssociatedFunctionDeclaration function:
+                case IAssociatedFunctionDeclarationSyntax function:
                     foreach (var parameter in function.Parameters) Walk(parameter, containingScope);
                     Walk(function.ReturnTypeSyntax, containingScope);
                     containingScope = BuildBodyScope(function.Parameters, containingScope);

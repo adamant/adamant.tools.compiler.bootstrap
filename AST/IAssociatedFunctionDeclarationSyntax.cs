@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public interface IAssociatedFunctionDeclaration : IMemberDeclarationSyntax, IConcreteCallableDeclarationSyntax
+    public interface IAssociatedFunctionDeclarationSyntax : IMemberDeclarationSyntax, IConcreteCallableDeclarationSyntax
     {
         new FixedList<INamedParameterSyntax> Parameters { get; }
         ITypeSyntax? ReturnTypeSyntax { get; }

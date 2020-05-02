@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     WalkChildren(functionDeclaration);
                     functionDeclaration.ReturnType.Known();
                     return;
-                case IAssociatedFunctionDeclaration associatedFunctionDeclaration:
+                case IAssociatedFunctionDeclarationSyntax associatedFunctionDeclaration:
                     WalkChildren(associatedFunctionDeclaration);
                     associatedFunctionDeclaration.ReturnType.Known();
                     return;

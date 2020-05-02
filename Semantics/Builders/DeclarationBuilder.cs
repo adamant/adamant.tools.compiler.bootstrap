@@ -54,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                         function.ReturnType.Known(), il);
                     break;
                 }
-                case IAssociatedFunctionDeclaration associatedFunction:
+                case IAssociatedFunctionDeclarationSyntax associatedFunction:
                 {
                     var il = ilFactory.CreateGraph(associatedFunction);
                     declaration = new FunctionDeclaration(false, true,

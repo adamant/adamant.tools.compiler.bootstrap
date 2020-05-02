@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(IMethodDeclarationSyntax),
         typeof(IFieldDeclarationSyntax),
         typeof(IConstructorDeclarationSyntax),
-        typeof(IAssociatedFunctionDeclaration))]
+        typeof(IAssociatedFunctionDeclarationSyntax))]
     public interface IMemberDeclarationSyntax : IEntityDeclarationSyntax
     {
         IClassDeclarationSyntax DeclaringClass { get; }

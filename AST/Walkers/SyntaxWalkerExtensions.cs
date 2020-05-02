@@ -45,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
                         walker.Walk(parameter, arg);
                     walker.Walk(abstractMethodDeclaration.ReturnTypeSyntax, arg);
                     break;
-                case IAssociatedFunctionDeclaration associatedFunctionDeclaration:
+                case IAssociatedFunctionDeclarationSyntax associatedFunctionDeclaration:
                     foreach (var parameter in associatedFunctionDeclaration.Parameters)
                         walker.Walk(parameter, arg);
                     walker.Walk(associatedFunctionDeclaration.ReturnTypeSyntax, arg);

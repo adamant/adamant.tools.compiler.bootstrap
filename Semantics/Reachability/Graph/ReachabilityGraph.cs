@@ -29,17 +29,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return objectPlace;
         }
 
-        //public ObjectPlace CallerObjectForSelf(IConstructorDeclarationSyntax constructor, ReferenceType selfType)
-        //{
-        //    //var identifier = currentScope.CallerScope.VariableDeclared(SpecialName.CallerBound(SpecialName.Self));
-        //    //selfType = selfType.WithCapability(Identity);
-        //    //var place = new VariablePlace(identifier, selfType);
-        //    //var objectPlace = PlaceFor(identifiers.ObjectIdentifierFor(constructor));
-        //    //place.Assign(objectPlace);
-        //    //return objectPlace;
-        //    throw new NotImplementedException();
-        //}
-
         public VariablePlace VariableDeclared(IBindingSymbol variableSymbol)
         {
             currentScope.VariableDeclared(variableSymbol);

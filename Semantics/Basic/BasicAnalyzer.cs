@@ -82,7 +82,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     // TODO deal with return type here
                     break;
                 }
-                case IAssociatedFunctionDeclaration associatedFunction:
+                case IAssociatedFunctionDeclarationSyntax associatedFunction:
                 {
                     var analyzer = new BasicTypeAnalyzer(associatedFunction.File, diagnostics);
                     ResolveTypesInParameters(analyzer, associatedFunction.Parameters, null);
@@ -204,7 +204,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     resolver.ResolveTypes(function.Body);
                     break;
                 }
-                case IAssociatedFunctionDeclaration associatedFunction:
+                case IAssociatedFunctionDeclarationSyntax associatedFunction:
                 {
                     var resolver = new BasicBodyAnalyzer(associatedFunction.File, stringSymbol, diagnostics,
                         associatedFunction.ReturnType.Fulfilled());

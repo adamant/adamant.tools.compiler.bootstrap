@@ -88,9 +88,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             {
                 default:
                     // TODO implement this for all expression types
-                    return null;
-                //throw new NotImplementedException(
-                //    $"{nameof(Analyze)}({nameof(expression)}, graph) not implemented for {expression.GetType().Name}");
+                    //return null;
+                    throw new NotImplementedException(
+                        $"{nameof(Analyze)}({nameof(expression)}, graph) not implemented for {expression.GetType().Name}");
                 //throw ExhaustiveMatch.Failed(expression);
                 case IAssignmentExpressionSyntax exp:
                 {
@@ -101,17 +101,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                         leftPlace?.Assign(rightPlace);
                     return null;
                 }
-                //case ISelfExpressionSyntax exp:
-                //{
-                //    var selfPlace = graph.VariableFor(SpecialName.Self);
-                //    return selfPlace.References.Single().Referent;
-                //}
+                case ISelfExpressionSyntax exp:
+                {
+                    var selfPlace = graph.VariableFor(exp.ReferencedSymbol.Assigned());
+                    return selfPlace.References.Single().Referent;
+                }
                 case IShareExpressionSyntax exp:
                     return Analyze(exp.Referent, graph);
-                case INameExpressionSyntax name:
+                case INameExpressionSyntax exp:
                 {
                     if (!isReferenceType) return null;
-                    var variablePlace = graph.VariableFor(name.ReferencedSymbol.Assigned());
+                    var variablePlace = graph.VariableFor(exp.ReferencedSymbol.Assigned());
                     return variablePlace.References.Single().Referent;
                 }
                 case IBinaryOperatorExpressionSyntax exp:
@@ -171,66 +171,91 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             var parameterScope = new LexicalVariableScope(callerScope);
             var graph = new ReachabilityGraph(parameterScope);
 
+            CreateSelfParameter(graph);
             foreach (var parameter in callableDeclaration.Parameters)
-            {
-                // Non-reference types don't participate in reachability (yet)
-                var referenceType = parameter.Type.Known().UnderlyingReferenceType();
-                if (referenceType is null) continue;
-
-                var parameterVariable = graph.VariableDeclared(parameter);
-                var capability = referenceType.ReferenceCapability;
-                switch (capability)
-                {
-                    default:
-                        throw ExhaustiveMatch.Failed(capability);
-                    case IsolatedMutable:
-                    case Isolated:
-                    {
-                        // Isolated parameters are fully independent of the caller
-                        var referencedObject = graph.ObjectFor(parameter);
-                        parameterVariable.Owns(referencedObject, capability.IsMutable());
-                    }
-                    break;
-                    case Owned:
-                    case OwnedMutable:
-                    {
-                        var referencedObject = graph.ObjectFor(parameter);
-                        parameterVariable.Owns(referencedObject, capability.IsMutable());
-                        var callerObject = graph.CallerObjectFor(parameter);
-                        referencedObject.Borrows(callerObject);
-                    }
-                    break;
-                    case Held:
-                    case HeldMutable:
-                    {
-                        var referencedObject = graph.ObjectFor(parameter);
-                        parameterVariable.PotentiallyOwns(referencedObject, capability.IsMutable());
-                        var callerObject = graph.CallerObjectFor(parameter);
-                        referencedObject.Borrows(callerObject);
-                    }
-                    break;
-                    case Borrowed:
-                    {
-                        var callerObject = graph.CallerObjectFor(parameter);
-                        parameterVariable.Borrows(callerObject);
-                    }
-                    break;
-                    case Shared:
-                    {
-                        var callerObject = graph.CallerObjectFor(parameter);
-                        parameterVariable.Shares(callerObject);
-                    }
-                    break;
-                    case Identity:
-                    {
-                        var callerObject = graph.CallerObjectFor(parameter);
-                        parameterVariable.Identifies(callerObject);
-                    }
-                    break;
-                }
-            }
+                CreateParameter(parameter, graph);
 
             return graph;
+        }
+
+        private void CreateSelfParameter(ReachabilityGraph graph)
+        {
+            ISelfParameterSyntax selfParameter;
+            switch (callableDeclaration)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(callableDeclaration);
+                case IFunctionDeclarationSyntax _:
+                case IAssociatedFunctionDeclarationSyntax _:
+                    return;
+                case IConcreteMethodDeclarationSyntax method:
+                    selfParameter = method.SelfParameter;
+                    break;
+                case IConstructorDeclarationSyntax constructor:
+                    selfParameter = constructor.ImplicitSelfParameter;
+                    break;
+            }
+
+            CreateParameter(selfParameter, graph);
+        }
+
+        private static void CreateParameter(IParameterSyntax parameter, ReachabilityGraph graph)
+        {
+            // Non-reference types don't participate in reachability (yet)
+            var referenceType = parameter.Type.Known().UnderlyingReferenceType();
+            if (referenceType is null) return;
+
+            var parameterVariable = graph.VariableDeclared(parameter);
+            var capability = referenceType.ReferenceCapability;
+            switch (capability)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(capability);
+                case IsolatedMutable:
+                case Isolated:
+                {
+                    // Isolated parameters are fully independent of the caller
+                    var referencedObject = graph.ObjectFor(parameter);
+                    parameterVariable.Owns(referencedObject, capability.IsMutable());
+                }
+                break;
+                case Owned:
+                case OwnedMutable:
+                {
+                    var referencedObject = graph.ObjectFor(parameter);
+                    parameterVariable.Owns(referencedObject, capability.IsMutable());
+                    var callerObject = graph.CallerObjectFor(parameter);
+                    referencedObject.Borrows(callerObject);
+                }
+                break;
+                case Held:
+                case HeldMutable:
+                {
+                    var referencedObject = graph.ObjectFor(parameter);
+                    parameterVariable.PotentiallyOwns(referencedObject, capability.IsMutable());
+                    var callerObject = graph.CallerObjectFor(parameter);
+                    referencedObject.Borrows(callerObject);
+                }
+                break;
+                case Borrowed:
+                {
+                    var callerObject = graph.CallerObjectFor(parameter);
+                    parameterVariable.Borrows(callerObject);
+                }
+                break;
+                case Shared:
+                {
+                    var callerObject = graph.CallerObjectFor(parameter);
+                    parameterVariable.Shares(callerObject);
+                }
+                break;
+                case Identity:
+                {
+                    var callerObject = graph.CallerObjectFor(parameter);
+                    parameterVariable.Identifies(callerObject);
+                }
+                break;
+            }
         }
     }
 }

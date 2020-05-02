@@ -72,7 +72,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     selfType = constructor.SelfParameterType.Assigned();
                     returnType = DataType.Void; // the body should `return;`
                     break;
-                case IAssociatedFunctionDeclaration associatedFunction:
+                case IAssociatedFunctionDeclarationSyntax associatedFunction:
                     returnType = associatedFunction.ReturnType.Known();
                     break;
                 case IFunctionDeclarationSyntax function:
