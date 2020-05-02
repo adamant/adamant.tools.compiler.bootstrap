@@ -15,10 +15,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             Name fullName,
             DataType? declaresType,
             IEnumerable<ISymbol>? childSymbols = null)
-            : base(fullName)
+            : base(fullName, new SymbolSet(childSymbols ?? Enumerable.Empty<ISymbol>()))
         {
             this.declaresType = declaresType;
-            ChildSymbols = new SymbolSet(childSymbols ?? Enumerable.Empty<ISymbol>());
         }
 
         public DataType DeclaresType

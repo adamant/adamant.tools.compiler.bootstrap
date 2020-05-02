@@ -9,23 +9,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 {
     internal class PrimitiveFunctionSymbol : PrimitiveSymbol, IFunctionSymbol
     {
-        public FixedList<PrimitiveParameterSymbol> Parameters { get; internal set; }
+        public FixedList<PrimitiveParameterSymbol> Parameters { get; }
 
         IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;
 
-        public DataType ReturnType { get; internal set; } = DataType.Void;
+        public DataType ReturnType { get; }
 
-        private PrimitiveFunctionSymbol(Name fullName)
-            : base(fullName)
+        protected PrimitiveFunctionSymbol(Name fullName, FixedList<PrimitiveParameterSymbol> parameters, DataType returnType)
+            : base(fullName, new SymbolSet(parameters))
         {
-            Parameters = FixedList<PrimitiveParameterSymbol>.Empty;
+            Parameters = parameters;
+            ReturnType = returnType;
         }
 
-        public static PrimitiveFunctionSymbol New(Name fullName, params (string name, DataType type)[] parameters)
+        public static PrimitiveFunctionSymbol New(
+            Name fullName,
+            params (string name, DataType type)[] parameters)
         {
-            var func = new PrimitiveFunctionSymbol(fullName);
-            func.SetParameters(parameters);
-            return func;
+            return new PrimitiveFunctionSymbol(fullName, ConvertParameters(fullName, parameters), DataType.Void);
         }
 
         public static PrimitiveFunctionSymbol New(
@@ -33,17 +34,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             DataType returnType,
             params (string name, DataType type)[] parameters)
         {
-            var func = new PrimitiveFunctionSymbol(fullName);
-            func.SetParameters(parameters);
-            func.ReturnType = returnType;
-            return func;
+            return new PrimitiveFunctionSymbol(fullName, ConvertParameters(fullName, parameters), returnType);
         }
 
-        public void SetParameters(params (string name, DataType type)[] parameters)
+        protected static FixedList<PrimitiveParameterSymbol> ConvertParameters(
+            Name fullName,
+            params (string name, DataType type)[] parameters)
         {
-            Parameters = parameters.Select(p => new PrimitiveParameterSymbol(FullName.Qualify(p.name), p.type))
+            return parameters.Select(p => new PrimitiveParameterSymbol(fullName.Qualify(p.name), p.type))
                 .ToFixedList();
-            ChildSymbols = new SymbolSet(Parameters);
         }
     }
 }

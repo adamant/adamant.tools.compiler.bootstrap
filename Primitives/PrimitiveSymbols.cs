@@ -11,15 +11,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
     /// </summary>
     public static class PrimitiveSymbols
     {
-        public static readonly FixedList<ISymbol> Instance;
+        public static readonly FixedList<ISymbol> Instance = DefinePrimitiveSymbols();
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance",
-            "CA1810:Initialize reference type static fields inline",
-            Justification = "Common context easier to read in static constructor")]
-        static PrimitiveSymbols()
+        private static FixedList<ISymbol> DefinePrimitiveSymbols()
         {
             var stringType = UserObjectType.Declaration(Name.From("String"), false);
-            Instance = new List<ISymbol>
+            return new List<ISymbol>
             {
                 // Simple Types
                 BuildBoolSymbol(),
@@ -68,8 +65,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             var typeName = integerType.Name;
             var symbols = new List<ISymbol>
             {
-                PrimitiveFunctionSymbol.New(typeName.Qualify("remainder"), integerType, ("self",integerType), ("divisor", integerType)),
-                PrimitiveFunctionSymbol.New(typeName.Qualify("to_display_string"), stringType, ("self", integerType)),
+                PrimitiveMethodSymbol.New( typeName.Qualify("remainder"), integerType, integerType, ("divisor", integerType)),
+                PrimitiveMethodSymbol.New(typeName.Qualify("to_display_string"), stringType, integerType),
             };
             return PrimitiveTypeSymbol.NewSimpleType(integerType, symbols);
         }

@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         public bool IsMutableBinding => false;
 
         public PrimitiveParameterSymbol(Name fullName, DataType type)
-            : base(fullName)
+            : base(fullName, SymbolSet.Empty)
         {
             Type = type;
         }

@@ -6,11 +6,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
     internal abstract class PrimitiveSymbol : ISymbol
     {
         public Name FullName { get; }
-        public SymbolSet ChildSymbols { get; protected set; } = SymbolSet.Empty;
+        public SymbolSet ChildSymbols { get; }
 
-        protected PrimitiveSymbol(Name fullName)
+        protected PrimitiveSymbol(Name fullName, SymbolSet childSymbols)
         {
             FullName = fullName;
+            ChildSymbols = childSymbols;
         }
     }
 }
