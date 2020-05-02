@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
-    public interface ISelfParameterSyntax : IParameterSyntax, IMethodParameterSyntax
+    public interface ISelfParameterSyntax : IParameterSyntax
     {
         bool MutableSelf { get; }
     }

@@ -1,3 +1,4 @@
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -16,12 +17,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IModiferToken> modifiers,
             Name fullName,
             TextSpan nameSpan,
-            FixedList<IMethodParameterSyntax> parameters,
+            ISelfParameterSyntax selfParameter,
+            FixedList<INamedParameterSyntax> parameters,
             ITypeSyntax? returnTypeSyntax,
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations)
             : base(declaringClass, span, file, modifiers, fullName, nameSpan,
-                parameters, returnTypeSyntax, reachabilityAnnotations,
-                new SymbolSet(parameters))
+                selfParameter, parameters, returnTypeSyntax, reachabilityAnnotations,
+                new SymbolSet(parameters.ImplicitCast<IParameterSyntax>().Prepend(selfParameter)))
         {
         }
 

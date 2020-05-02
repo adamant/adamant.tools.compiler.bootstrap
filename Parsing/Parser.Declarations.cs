@@ -215,10 +215,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var parameters = bodyParser.ParseParameters(bodyParser.ParseMethodParameter);
             var (returnType, reachabilityAnnotations) = ParseReturn();
 
+            var selfParameter = parameters.OfType<ISelfParameterSyntax>().FirstOrDefault();
+            var namedParameters = parameters.Except(parameters.OfType<ISelfParameterSyntax>())
+                                            .Cast<INamedParameterSyntax>().ToFixedList();
+
             // if no self parameter, it is an associated function
-            if (!parameters.OfType<ISelfParameterSyntax>().Any())
+            if (selfParameter is null)
             {
-                var namedParameters = parameters.OfType<INamedParameterSyntax>().ToFixedList();
                 var body = bodyParser.ParseFunctionBody();
                 var span = TextSpan.Covering(fn, body.Span);
                 return new AssociatedFunctionDeclarationSyntax(declaringType, span, File, modifiers,
@@ -226,10 +229,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
 
             if (!(parameters[0] is ISelfParameterSyntax))
-                Add(ParseError.FirstParameterMustBeSelf(File, parameters[0].Span));
-
-            foreach (var selfParameter in parameters.Skip(1).OfType<ISelfParameterSyntax>())
                 Add(ParseError.SelfParameterMustBeFirst(File, selfParameter.Span));
+
+            foreach (var extraSelfParameter in parameters.OfType<ISelfParameterSyntax>().Skip(1))
+                Add(ParseError.ExtraSelfParameter(File, extraSelfParameter.Span));
 
             // It is a method that may or may not have a body
             if (Tokens.Current is IOpenBraceToken)
@@ -237,14 +240,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 var body = bodyParser.ParseFunctionBody();
                 var span = TextSpan.Covering(fn, body.Span);
                 return new ConcreteMethodDeclarationSyntax(declaringType, span, File, modifiers, name,
-                    identifier.Span, parameters, returnType, reachabilityAnnotations, body);
+                    identifier.Span, selfParameter, namedParameters, returnType, reachabilityAnnotations, body);
             }
             else
             {
                 var semicolon = bodyParser.Tokens.Expect<ISemicolonToken>();
                 var span = TextSpan.Covering(fn, semicolon);
                 return new AbstractMethodDeclarationSyntax(declaringType, span, File, modifiers, name,
-                    identifier.Span, parameters, returnType, reachabilityAnnotations);
+                    identifier.Span, selfParameter, namedParameters, returnType, reachabilityAnnotations);
             }
         }
 

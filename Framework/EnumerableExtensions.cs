@@ -73,7 +73,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         }
 
         /// <summary>
-        /// Performs and implicit cast. This is useful when C# is having trouble getting the correct type.
+        /// Performs an implicit cast. This is useful when C# is having trouble getting the correct type.
         /// </summary>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

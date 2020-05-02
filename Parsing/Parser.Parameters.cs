@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return new NamedParameterSyntax(span, mutableBinding, name, type, defaultValue);
         }
 
-        public IMethodParameterSyntax ParseMethodParameter()
+        public IParameterSyntax ParseMethodParameter()
         {
             switch (Tokens.Current)
             {

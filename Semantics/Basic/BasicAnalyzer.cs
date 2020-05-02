@@ -68,8 +68,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IMethodDeclarationSyntax method:
                 {
                     var analyzer = new BasicTypeAnalyzer(method.File, diagnostics);
-                    method.SelfParameterType = ResolveTypesInParameters(analyzer, method.Parameters, method.DeclaringClass)
-                        ?? throw new InvalidOperationException("Method doesn't have self parameter");
+                    method.SelfParameterType = ResolveTypesInParameter(method.SelfParameter, method.DeclaringClass);
+                    ResolveTypesInParameters(analyzer, method.Parameters, method.DeclaringClass);
                     ResolveReturnType(method.ReturnType, method.ReturnTypeSyntax, analyzer);
                     break;
                 }
@@ -118,12 +118,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             }
         }
 
-        private UserObjectType? ResolveTypesInParameters(
+        private void ResolveTypesInParameters(
             BasicTypeAnalyzer analyzer,
-            IEnumerable<IParameterSyntax> parameters,
+            IEnumerable<IConstructorParameterSyntax> parameters,
             IClassDeclarationSyntax? declaringClass)
         {
-            UserObjectType? selfType = null;
             foreach (var parameter in parameters)
                 switch (parameter)
                 {
@@ -134,16 +133,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         parameter.Type.BeginFulfilling();
                         var type = analyzer.Evaluate(namedParameter.TypeSyntax);
                         parameter.Type.Fulfill(type);
-                    }
-                    break;
-                    case ISelfParameterSyntax selfParameter:
-                    {
-                        var declaringType = declaringClass?.DeclaresType.Fulfilled()
-                                            ?? throw new InvalidOperationException("Self parameter outside of class declaration");
-                        selfParameter.Type.BeginFulfilling();
-                        selfType = (UserObjectType)declaringType;
-                        if (selfParameter.MutableSelf) selfType = selfType.ToMutable();
-                        selfParameter.Type.Fulfill(selfType);
                     }
                     break;
                     case IFieldParameterSyntax fieldParameter:
@@ -175,7 +164,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     }
                     break;
                 }
+        }
 
+        private static UserObjectType ResolveTypesInParameter(
+            ISelfParameterSyntax selfParameter,
+            IClassDeclarationSyntax declaringClass)
+        {
+            var declaringType = declaringClass.DeclaresType.Fulfilled();
+            selfParameter.Type.BeginFulfilling();
+            UserObjectType selfType = (UserObjectType)declaringType;
+            if (selfParameter.MutableSelf) selfType = selfType.ToMutable();
+            selfParameter.Type.Fulfill(selfType);
             return selfType;
         }
 

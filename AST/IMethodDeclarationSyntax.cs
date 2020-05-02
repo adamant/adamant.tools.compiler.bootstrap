@@ -10,9 +10,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         typeof(IConcreteMethodDeclarationSyntax))]
     public interface IMethodDeclarationSyntax : IMemberDeclarationSyntax, ICallableDeclarationSyntax
     {
+        ISelfParameterSyntax SelfParameter { get; }
         [DisallowNull] DataType? SelfParameterType { get; set; }
-        // TODO since the parser requires the first param to be self, take it out of the parameter list
-        new FixedList<IMethodParameterSyntax> Parameters { get; }
+        new FixedList<INamedParameterSyntax> Parameters { get; }
         ITypeSyntax? ReturnTypeSyntax { get; }
         new TypePromise ReturnType { get; }
     }
