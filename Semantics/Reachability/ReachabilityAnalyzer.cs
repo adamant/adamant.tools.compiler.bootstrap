@@ -69,9 +69,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 case IExpressionStatementSyntax stmt:
                     Analyze(stmt.Expression, graph);
                     break;
-                case IResultStatementSyntax _:
-                    throw new NotImplementedException(
-                        $"{nameof(Analyze)}({nameof(statement)}, graph) not implemented for {nameof(IResultStatementSyntax)}");
+                case IResultStatementSyntax exp:
+                    // TODO deal with passing the result to the block
+                    Analyze(exp.Expression, graph);
+                    break;
             }
         }
 
@@ -87,11 +88,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             switch (expression)
             {
                 default:
-                    // TODO implement this for all expression types
-                    //return null;
-                    throw new NotImplementedException(
-                        $"{nameof(Analyze)}({nameof(expression)}, graph) not implemented for {expression.GetType().Name}");
-                //throw ExhaustiveMatch.Failed(expression);
+                    throw ExhaustiveMatch.Failed(expression);
                 case IAssignmentExpressionSyntax exp:
                 {
                     // TODO analyze left operand
@@ -106,7 +103,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     var selfPlace = graph.VariableFor(exp.ReferencedSymbol.Assigned());
                     return selfPlace.References.Single().Referent;
                 }
+                case IMoveExpressionSyntax exp:
+                    // TODO deal with move if needed
+                    return Analyze(exp.Referent, graph);
+                case IBorrowExpressionSyntax exp:
+                    // TODO deal with borrowing if needed
+                    return Analyze(exp.Referent, graph);
                 case IShareExpressionSyntax exp:
+                    // TODO deal with sharing if needed
                     return Analyze(exp.Referent, graph);
                 case INameExpressionSyntax exp:
                 {
@@ -121,6 +125,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     // All binary operators result in value types
                     return null;
                 }
+                case IUnaryOperatorExpressionSyntax exp:
+                {
+                    Analyze(exp.Operand, graph);
+                    // All unary operators result in value types
+                    return null;
+                }
                 case IFieldAccessExpressionSyntax exp:
                 {
                     // Treat this like a method call to a getter
@@ -130,6 +140,116 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     context?.Owns(@object, true);
                     return @object;
                 }
+                case IFunctionInvocationExpressionSyntax exp:
+                {
+                    var arguments = exp.Arguments.Select(a => Analyze(a.Expression, graph)).ToFixedList();
+                    // TODO check arguments can be used
+                    return isReferenceType ? graph.ObjectFor(exp) : null;
+                }
+                case IMethodInvocationExpressionSyntax exp:
+                {
+                    var self = Analyze(exp.ContextExpression, graph);
+                    var arguments = exp.Arguments.Select(a => Analyze(a.Expression, graph)).ToFixedList();
+                    // TODO check self and arguments can be used
+                    return isReferenceType ? graph.ObjectFor(exp) : null;
+                }
+                case IUnsafeExpressionSyntax exp:
+                    return Analyze(exp.Expression, graph);
+                case IBlockExpressionSyntax exp:
+                    return AnalyzeBlock(exp, graph);
+                case IReturnExpressionSyntax exp:
+                    // TODO check the graph allows us to return this
+                    return Analyze(exp.ReturnValue, graph);
+                case INewObjectExpressionSyntax exp:
+                {
+                    var arguments = exp.Arguments.Select(a => Analyze(a.Expression, graph)).ToFixedList();
+                    // TODO check arguments can be used
+                    return graph.ObjectFor(exp);
+                }
+                case IStringLiteralExpressionSyntax exp:
+                    return graph.ObjectFor(exp);
+                case IImplicitNumericConversionExpression exp:
+                    return Analyze(exp.Expression, graph);
+                case IIntegerLiteralExpressionSyntax _:
+                case IBoolLiteralExpressionSyntax _:
+                case INoneLiteralExpressionSyntax _:
+                    return null;
+                case IImplicitImmutabilityConversionExpression exp:
+                    // TODO does this need to be handled specially?
+                    return Analyze(exp.Expression, graph);
+                case IIfExpressionSyntax exp:
+                {
+                    Analyze(exp.Condition, graph);
+                    AnalyzeBlock(exp.ThenBlock, graph);
+                    Analyze(exp.ElseClause, graph);
+                    // Assuming void for now
+                    return null;
+                }
+                case ILoopExpressionSyntax exp:
+                {
+                    // TODO deal with flow analysis
+                    AnalyzeBlock(exp.Block, graph);
+                    // Assuming void for now
+                    return null;
+                }
+                case IWhileExpressionSyntax exp:
+                {
+                    Analyze(exp.Condition, graph);
+                    // TODO deal with flow analysis
+                    AnalyzeBlock(exp.Block, graph);
+                    // Assuming void for now
+                    return null;
+                }
+                case IForeachExpressionSyntax exp:
+                {
+                    // TODO deal with flow analysis
+                    Analyze(exp.InExpression, graph);
+                    return AnalyzeBlock(exp.Block, graph);
+                }
+                case IBreakExpressionSyntax _:
+                case INextExpressionSyntax _:
+                    // TODO deal with control flow effects
+                    return null;
+                case IImplicitNoneConversionExpression exp:
+                    Analyze(exp.Expression, graph);
+                    // TODO Is there a chance this needs something done?
+                    return null;
+                case IImplicitOptionalConversionExpression exp:
+                    return Analyze(exp.Expression, graph);
+            }
+        }
+
+        private static ObjectPlace? Analyze(IElseClauseSyntax? clause, ReachabilityGraph graph)
+        {
+            switch (clause)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(clause);
+                case null:
+                    return null;
+                case IBlockExpressionSyntax exp:
+                    return AnalyzeBlock(exp, graph);
+                case IIfExpressionSyntax exp:
+                    return Analyze((IExpressionSyntax)exp, graph);
+                case IResultStatementSyntax exp:
+                    return Analyze(exp.Expression, graph);
+            }
+        }
+
+        private static ObjectPlace? AnalyzeBlock(IBlockOrResultSyntax blockOrResult, ReachabilityGraph graph)
+        {
+            switch (blockOrResult)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(blockOrResult);
+                case IBlockExpressionSyntax exp:
+                {
+                    foreach (var statement in exp.Statements) Analyze(statement, graph);
+                    // Assuming void return from blocks for now
+                    return null;
+                }
+                case IResultStatementSyntax exp:
+                    return Analyze(exp.Expression, graph);
             }
         }
 
@@ -141,8 +261,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             switch (expression)
             {
                 default:
-                    throw new NotImplementedException(
-                        $"{nameof(AnalyzeAssignmentPlace)}(expression) not implemented for {expression.GetType().Name}");
+                    throw ExhaustiveMatch.Failed(expression);
                 case IFieldAccessExpressionSyntax exp:
                 {
                     var contextPlace = Analyze(exp.ContextExpression, graph);
