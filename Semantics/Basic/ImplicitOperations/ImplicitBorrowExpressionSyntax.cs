@@ -8,7 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
 {
-    internal class ImplicitShareExpressionSyntax : IShareExpressionSyntax
+    internal class ImplicitBorrowExpressionSyntax : IBorrowExpressionSyntax
     {
         public TextSpan Span { [DebuggerStepThrough] get; }
 
@@ -32,20 +32,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
         }
 
         // TODO maybe set from constructor and disallow all changes
-        private IBindingSymbol? sharedSymbol;
+        private IBindingSymbol? borrowedSymbol;
         [DisallowNull]
-        public IBindingSymbol? SharedSymbol
+        public IBindingSymbol? BorrowedSymbol
         {
             [DebuggerStepThrough]
-            get => sharedSymbol;
+            get => borrowedSymbol;
             set
             {
-                if (sharedSymbol != null) throw new InvalidOperationException("Can't set referenced symbol repeatedly");
-                sharedSymbol = value ?? throw new ArgumentNullException(nameof(value));
+                if (borrowedSymbol != null) throw new InvalidOperationException("Can't set referenced symbol repeatedly");
+                borrowedSymbol = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
-        public ImplicitShareExpressionSyntax(IExpressionSyntax referent, DataType type)
+        public ImplicitBorrowExpressionSyntax(IExpressionSyntax referent, DataType type)
         {
             Span = referent.Span;
             this.referent = referent;

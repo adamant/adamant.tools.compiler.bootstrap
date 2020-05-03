@@ -448,7 +448,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IWhileExpressionSyntax _:
                 case IForeachExpressionSyntax _:
                 case IMoveExpressionSyntax _:
-                case IBorrowExpressionSyntax _:
                 case IReturnExpressionSyntax _:
                 case IBreakExpressionSyntax _:
                 case INextExpressionSyntax _:
@@ -486,6 +485,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     currentBlock!.Add(new AssignmentInstruction(resultPlace, variable, exp.Span, CurrentScope));
                 }
                 break;
+                case IBorrowExpressionSyntax exp:
+                    ConvertIntoPlace(exp.Referent, resultPlace);
+                    break;
                 case IShareExpressionSyntax exp:
                     ConvertIntoPlace(exp.Referent, resultPlace);
                     break;

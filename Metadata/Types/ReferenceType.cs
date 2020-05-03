@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             ValueSemantics = referenceCapability.GetValueSemantics();
         }
 
-        protected internal override Self ToReadOnlyReturnsSelf()
+        protected internal sealed override Self ToReadOnlyReturnsSelf()
         {
             return WithCapabilityReturnsSelf(ReferenceCapability.ToReadOnly());
         }

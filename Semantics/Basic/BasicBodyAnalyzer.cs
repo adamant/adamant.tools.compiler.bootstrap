@@ -224,17 +224,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return DataType.Unknown;
                 case IShareExpressionSyntax _:
                     throw new InvalidOperationException("Share expressions should not be in the AST during basic analysis");
-                case IMoveExpressionSyntax moveExpression:
-                    switch (moveExpression.Referent)
+                case IMoveExpressionSyntax exp:
+                    switch (exp.Referent)
                     {
                         case INameExpressionSyntax nameExpression:
-                            var type = InferType(ref moveExpression.Referent, false);
+                            var type = InferType(ref exp.Referent, false);
                             switch (type)
                             {
                                 case ReferenceType referenceType:
                                     if (!referenceType.IsMovable)
                                     {
-                                        diagnostics.Add(TypeError.CannotMoveValue(file, moveExpression));
+                                        diagnostics.Add(TypeError.CannotMoveValue(file, exp));
                                         type = DataType.Unknown;
                                     }
                                     break;
@@ -242,8 +242,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                     throw new NotImplementedException("Non-moveable type can't be moved");
                             }
 
-                            moveExpression.MovedSymbol = nameExpression.ReferencedSymbol!;
-                            return moveExpression.Type = type;
+                            exp.MovedSymbol = nameExpression.ReferencedSymbol!;
+                            return exp.Type = type;
                         case IBorrowExpressionSyntax _:
                             throw new NotImplementedException("Raise error about `move mut` expression");
                         case IMoveExpressionSyntax _:
@@ -251,19 +251,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         default:
                             throw new NotImplementedException("Tried to move out of expression type that isn't implemented");
                     }
-                case IBorrowExpressionSyntax borrowExpression:
-                    switch (borrowExpression.Referent)
+                case IBorrowExpressionSyntax exp:
+                    switch (exp.Referent)
                     {
                         case INameExpressionSyntax nameExpression:
                         {
-                            var type = InferType(ref borrowExpression.Referent, false);
+                            var type = InferType(ref exp.Referent, false);
                             switch (type)
                             {
                                 case ReferenceType referenceType:
                                     if (!referenceType.IsMutable)
                                     {
                                         diagnostics.Add(
-                                            TypeError.ExpressionCantBeMutable(file, borrowExpression.Referent));
+                                            TypeError.ExpressionCantBeMutable(file, exp.Referent));
                                         type = DataType.Unknown;
                                     }
                                     else
@@ -274,8 +274,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                     throw new NotImplementedException("Non-mutable type can't be borrowed mutably");
                             }
 
-                            borrowExpression.BorrowedSymbol = nameExpression.ReferencedSymbol!;
-                            return borrowExpression.Type = type;
+                            exp.BorrowedSymbol = nameExpression.ReferencedSymbol!;
+                            return exp.Type = type;
                         }
                         case IBorrowExpressionSyntax _:
                             throw new NotImplementedException("Raise error about `mut mut` expression");
@@ -284,11 +284,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         default:
                             throw new NotImplementedException("Tried mutate expression type that isn't implemented");
                     }
-                case IReturnExpressionSyntax returnExpression:
+                case IReturnExpressionSyntax exp:
                 {
-                    if (returnExpression.ReturnValue != null)
+                    if (exp.ReturnValue != null)
                     {
-                        var returnValue = returnExpression.ReturnValue;
+                        var returnValue = exp.ReturnValue;
                         var expectedReturnType = returnType ?? throw new InvalidOperationException("Return statement in constructor");
                         // If we return ownership, there can be an implicit move
                         //if (returnExpression.ReturnValue is INameExpressionSyntax name
@@ -296,21 +296,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         //    && objectType.IsOwned)
                         //    returnExpression.ReturnValue = new ImplicitMoveSyntax(returnValue.Span, name);
 
-                        CheckType(ref returnExpression.ReturnValue, expectedReturnType);
+                        CheckType(ref exp.ReturnValue, expectedReturnType);
                     }
                     else if (returnType == DataType.Never)
-                        diagnostics.Add(TypeError.CantReturnFromNeverFunction(file, returnExpression.Span));
+                        diagnostics.Add(TypeError.CantReturnFromNeverFunction(file, exp.Span));
                     else if (returnType != DataType.Void)
-                        diagnostics.Add(TypeError.ReturnExpressionMustHaveValue(file, returnExpression.Span, returnType ?? DataType.Unknown));
+                        diagnostics.Add(TypeError.ReturnExpressionMustHaveValue(file, exp.Span, returnType ?? DataType.Unknown));
 
-                    return returnExpression.Type = DataType.Never;
+                    return exp.Type = DataType.Never;
                 }
-                case IIntegerLiteralExpressionSyntax integerLiteral:
-                    return integerLiteral.Type = new IntegerConstantType(integerLiteral.Value);
-                case IStringLiteralExpressionSyntax stringLiteral:
-                    return stringLiteral.Type = stringSymbol?.DeclaresType ?? DataType.Unknown;
-                case IBoolLiteralExpressionSyntax boolLiteral:
-                    return boolLiteral.Type = DataType.Bool;
+                case IIntegerLiteralExpressionSyntax exp:
+                    return exp.Type = new IntegerConstantType(exp.Value);
+                case IStringLiteralExpressionSyntax exp:
+                    return exp.Type = stringSymbol?.DeclaresType ?? DataType.Unknown;
+                case IBoolLiteralExpressionSyntax exp:
+                    return exp.Type = DataType.Bool;
                 case IBinaryOperatorExpressionSyntax binaryOperatorExpression:
                 {
                     var leftType = InferType(ref binaryOperatorExpression.LeftOperand);
@@ -362,136 +362,126 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
                     return binaryOperatorExpression.Type;
                 }
-                case INameExpressionSyntax identifierName:
+                case INameExpressionSyntax exp:
                 {
-                    var type = InferNameType(identifierName);
+                    var type = InferNameType(exp);
                     // In many contexts, variable names are implicitly shared
                     if (implicitShare)
-                    {
-                        type = type.ToReadOnly();
-                        // currently, all other types are read-only
-                        if (type is ReferenceType referenceType
-                            && referenceType.ReferenceCapability != ReferenceCapability.Identity)
-                            type = referenceType.WithCapability(ReferenceCapability.Shared);
+                        type = InsertImplicitShareIfNeeded(ref expression, type);
 
-                        expression = new ImplicitShareExpressionSyntax(identifierName, type)
-                        {
-                            SharedSymbol = identifierName.ReferencedSymbol,
-                        };
-                    }
                     return type;
                 }
-                case IUnaryOperatorExpressionSyntax unaryOperatorExpression:
+                case IUnaryOperatorExpressionSyntax exp:
                 {
-                    var @operator = unaryOperatorExpression.Operator;
+                    var @operator = exp.Operator;
                     switch (@operator)
                     {
                         default:
                             throw ExhaustiveMatch.Failed(@operator);
                         case UnaryOperator.Not:
-                            CheckType(ref unaryOperatorExpression.Operand, DataType.Bool);
-                            unaryOperatorExpression.Type = DataType.Bool;
+                            CheckType(ref exp.Operand, DataType.Bool);
+                            exp.Type = DataType.Bool;
                             break;
                         case UnaryOperator.Minus:
                         case UnaryOperator.Plus:
-                            var operandType = InferType(ref unaryOperatorExpression.Operand);
+                            var operandType = InferType(ref exp.Operand);
                             switch (operandType)
                             {
                                 case IntegerConstantType integerType:
-                                    unaryOperatorExpression.Type = integerType;
+                                    exp.Type = integerType;
                                     break;
                                 case SizedIntegerType sizedIntegerType:
-                                    unaryOperatorExpression.Type = sizedIntegerType;
+                                    exp.Type = sizedIntegerType;
                                     break;
                                 case UnknownType _:
-                                    unaryOperatorExpression.Type = DataType.Unknown;
+                                    exp.Type = DataType.Unknown;
                                     break;
                                 default:
                                     diagnostics.Add(TypeError.OperatorCannotBeAppliedToOperandOfType(file,
-                                        unaryOperatorExpression.Span, @operator, operandType));
-                                    unaryOperatorExpression.Type = DataType.Unknown;
+                                        exp.Span, @operator, operandType));
+                                    exp.Type = DataType.Unknown;
                                     break;
                             }
                             break;
                     }
 
-                    return unaryOperatorExpression.Type;
+                    return exp.Type;
                 }
-                case INewObjectExpressionSyntax newObjectExpression:
+                case INewObjectExpressionSyntax exp:
                 {
-                    var argumentTypes = newObjectExpression.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
+                    var argumentTypes = exp.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
                     // TODO handle named constructors here
-                    var constructingType = typeAnalyzer.Evaluate(newObjectExpression.TypeSyntax);
+                    var constructingType = typeAnalyzer.Evaluate(exp.TypeSyntax);
                     if (!constructingType.IsKnown)
                     {
-                        diagnostics.Add(NameBindingError.CouldNotBindConstructor(file, newObjectExpression.Span));
-                        newObjectExpression.ConstructorSymbol = UnknownSymbol.Instance;
-                        return newObjectExpression.Type  = DataType.Unknown;
+                        diagnostics.Add(NameBindingError.CouldNotBindConstructor(file, exp.Span));
+                        exp.ConstructorSymbol = UnknownSymbol.Instance;
+                        return exp.Type  = DataType.Unknown;
                     }
                     var constructedType = (UserObjectType)constructingType;
-                    var typeSymbol = newObjectExpression.TypeSyntax.ContainingScope.Assigned().GetSymbolForType(constructedType);
+                    var typeSymbol = exp.TypeSyntax.ContainingScope.Assigned().GetSymbolForType(constructedType);
                     var constructors = typeSymbol.ChildSymbols[SpecialName.New].OfType<IFunctionSymbol>().ToFixedList();
                     constructors = ResolveOverload(constructors, argumentTypes);
                     switch (constructors.Count)
                     {
                         case 0:
-                            diagnostics.Add(NameBindingError.CouldNotBindConstructor(file, newObjectExpression.Span));
-                            newObjectExpression.ConstructorSymbol = UnknownSymbol.Instance;
+                            diagnostics.Add(NameBindingError.CouldNotBindConstructor(file, exp.Span));
+                            exp.ConstructorSymbol = UnknownSymbol.Instance;
                             break;
                         case 1:
                             var constructorSymbol = constructors.Single();
-                            newObjectExpression.ConstructorSymbol = constructorSymbol;
+                            exp.ConstructorSymbol = constructorSymbol;
                             break;
                         default:
-                            diagnostics.Add(NameBindingError.AmbiguousConstructorCall(file, newObjectExpression.Span));
-                            newObjectExpression.ConstructorSymbol = UnknownSymbol.Instance;
+                            diagnostics.Add(NameBindingError.AmbiguousConstructorCall(file, exp.Span));
+                            exp.ConstructorSymbol = UnknownSymbol.Instance;
                             break;
                     }
 
                     constructedType = constructedType.WithCapability(ReferenceCapability.Isolated);
                     if (constructedType.DeclaredMutable)
                         constructedType = constructedType.ToMutable();
-                    return newObjectExpression.Type = constructedType;
+                    return exp.Type = constructedType;
                 }
-                case IForeachExpressionSyntax foreachExpression:
+                case IForeachExpressionSyntax exp:
                 {
-                    var declaredType = typeAnalyzer.Evaluate(foreachExpression.TypeSyntax);
-                    var expressionType = CheckForeachInType(declaredType, ref foreachExpression.InExpression);
-                    foreachExpression.VariableType =  declaredType ?? expressionType;
+                    var declaredType = typeAnalyzer.Evaluate(exp.TypeSyntax);
+                    var expressionType = CheckForeachInType(declaredType, ref exp.InExpression);
+                    exp.VariableType =  declaredType ?? expressionType;
                     // TODO check the break types
-                    InferBlockType(foreachExpression.Block);
+                    InferBlockType(exp.Block);
                     // TODO assign correct type to the expression
-                    return foreachExpression.Type = DataType.Void;
+                    return exp.Type = DataType.Void;
                 }
-                case IWhileExpressionSyntax whileExpression:
+                case IWhileExpressionSyntax exp:
                 {
-                    CheckType(ref whileExpression.Condition, DataType.Bool);
-                    InferBlockType(whileExpression.Block);
+                    CheckType(ref exp.Condition, DataType.Bool);
+                    InferBlockType(exp.Block);
                     // TODO assign correct type to the expression
-                    return whileExpression.Type = DataType.Void;
+                    return exp.Type = DataType.Void;
                 }
-                case ILoopExpressionSyntax loopExpression:
-                    InferBlockType(loopExpression.Block);
+                case ILoopExpressionSyntax exp:
+                    InferBlockType(exp.Block);
                     // TODO assign correct type to the expression
-                    return loopExpression.Type = DataType.Void;
-                case IMethodInvocationExpressionSyntax methodInvocation:
-                    return InferMethodInvocationType(methodInvocation, ref expression);
-                case IFunctionInvocationExpressionSyntax functionInvocation:
-                    return InferFunctionInvocationType(functionInvocation);
-                case IUnsafeExpressionSyntax unsafeExpression:
-                    return unsafeExpression.Type = InferType(ref unsafeExpression.Expression);
-                case IIfExpressionSyntax ifExpression:
-                    CheckType(ref ifExpression.Condition, DataType.Bool);
-                    InferBlockType(ifExpression.ThenBlock);
-                    switch (ifExpression.ElseClause)
+                    return exp.Type = DataType.Void;
+                case IMethodInvocationExpressionSyntax exp:
+                    return InferMethodInvocationType(exp, ref expression);
+                case IFunctionInvocationExpressionSyntax exp:
+                    return InferFunctionInvocationType(exp);
+                case IUnsafeExpressionSyntax exp:
+                    return exp.Type = InferType(ref exp.Expression);
+                case IIfExpressionSyntax exp:
+                    CheckType(ref exp.Condition, DataType.Bool);
+                    InferBlockType(exp.ThenBlock);
+                    switch (exp.ElseClause)
                     {
                         default:
-                            throw ExhaustiveMatch.Failed(ifExpression.ElseClause);
+                            throw ExhaustiveMatch.Failed(exp.ElseClause);
                         case null:
                             break;
                         case IIfExpressionSyntax _:
                         case IBlockExpressionSyntax _:
-                            var elseExpression = (IExpressionSyntax)ifExpression.ElseClause;
+                            var elseExpression = (IExpressionSyntax)exp.ElseClause;
                             InferType(ref elseExpression);
                             //ifExpression.ElseClause = elseExpression;
                             break;
@@ -500,21 +490,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             break;
                     }
                     // TODO assign a type to the expression
-                    return ifExpression.Type = DataType.Void;
-                case IFieldAccessExpressionSyntax memberAccess:
+                    return exp.Type = DataType.Void;
+                case IFieldAccessExpressionSyntax exp:
                 {
-                    var contextType = InferType(ref memberAccess.ContextExpression);
-                    var contextSymbol = memberAccess.Field.ContainingScope.Assigned().GetSymbolForType(contextType);
-                    var member = memberAccess.Field;
+                    // Don't wrap the self expression in a share expression for field access
+                    var isSelfField = exp.ContextExpression is ISelfExpressionSyntax;
+                    var contextType = InferType(ref exp.ContextExpression, !isSelfField);
+                    var contextSymbol = exp.Field.ContainingScope.Assigned().GetSymbolForType(contextType);
+                    var member = exp.Field;
                     var memberSymbols = contextSymbol.Lookup(member.Name).OfType<IBindingSymbol>().ToFixedList();
                     var type = AssignReferencedSymbolAndType(member, memberSymbols);
-                    return memberAccess.Type = type;
+                    return exp.Type = type;
                 }
-                case IBreakExpressionSyntax breakExpression:
-                    InferType(ref breakExpression.Value);
-                    return breakExpression.Type = DataType.Never;
-                case INextExpressionSyntax nextExpression:
-                    return nextExpression.Type = DataType.Never;
+                case IBreakExpressionSyntax exp:
+                    InferType(ref exp.Value);
+                    return exp.Type = DataType.Never;
+                case INextExpressionSyntax exp:
+                    return exp.Type = DataType.Never;
                 case IAssignmentExpressionSyntax assignmentExpression:
                 {
                     var left = InferAssignmentTargetType(ref assignmentExpression.LeftOperand);
@@ -526,15 +518,79 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             assignmentExpression.RightOperand, right, left));
                     return assignmentExpression.Type = DataType.Void;
                 }
-                case ISelfExpressionSyntax selfExpression:
-                    return InferSelfType(selfExpression);
-                case INoneLiteralExpressionSyntax noneLiteralExpression:
-                    return noneLiteralExpression.Type = DataType.None;
+                case ISelfExpressionSyntax exp:
+                {
+                    var type = InferSelfType(exp);
+                    if (implicitShare)
+                        type = InsertImplicitShareIfNeeded(ref expression, type);
+
+                    return type;
+                }
+                case INoneLiteralExpressionSyntax exp:
+                    return exp.Type = DataType.None;
                 case IImplicitConversionExpression _:
                     throw new Exception("ImplicitConversionExpressions are inserted by BasicExpressionAnalyzer. They should not be present in the AST yet.");
                 case IBlockExpressionSyntax blockSyntax:
                     return InferBlockType(blockSyntax);
             }
+        }
+
+        private static DataType InsertImplicitShareIfNeeded([NotNull] ref IExpressionSyntax expression, DataType type)
+        {
+            // Value types aren't shared
+            if (!(type is ReferenceType referenceType)) return type;
+
+            IBindingSymbol referencedSymbol;
+            switch (expression)
+            {
+                case INameExpressionSyntax exp:
+                    referencedSymbol = exp.ReferencedSymbol.Assigned();
+                    break;
+                case ISelfExpressionSyntax exp:
+                    referencedSymbol = exp.ReferencedSymbol.Assigned();
+                    break;
+                default:
+                    // implicit share isn't needed around other expressions
+                    return type;
+            }
+
+            type = referenceType.WithCapability(ReferenceCapability.Shared);
+
+            expression = new ImplicitShareExpressionSyntax(expression, type)
+            {
+                SharedSymbol = referencedSymbol,
+            };
+
+            return type;
+        }
+
+        private static DataType InsertImplicitBorrowIfNeeded([NotNull] ref IExpressionSyntax expression, DataType type)
+        {
+            // Value types aren't shared
+            if (!(type is ReferenceType referenceType)) return type;
+
+            IBindingSymbol referencedSymbol;
+            switch (expression)
+            {
+                case INameExpressionSyntax exp:
+                    referencedSymbol = exp.ReferencedSymbol.Assigned();
+                    break;
+                case ISelfExpressionSyntax exp:
+                    referencedSymbol = exp.ReferencedSymbol.Assigned();
+                    break;
+                default:
+                    // implicit share isn't needed around other expressions
+                    return type;
+            }
+
+            type = referenceType.WithCapability(ReferenceCapability.Borrowed);
+
+            expression = new ImplicitBorrowExpressionSyntax(expression, type)
+            {
+                BorrowedSymbol = referencedSymbol,
+            };
+
+            return type;
         }
 
         private DataType InferAssignmentTargetType([NotNull] ref IAssignableExpressionSyntax expression)
@@ -544,7 +600,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 default:
                     throw ExhaustiveMatch.Failed(expression);
                 case IFieldAccessExpressionSyntax exp:
-                    var contextType = InferType(ref exp.ContextExpression);
+                    // Don't wrap the self expression in a share expression for field access
+                    var isSelfField = exp.ContextExpression is ISelfExpressionSyntax;
+                    var contextType = InferType(ref exp.ContextExpression, !isSelfField);
                     var contextSymbol = exp.Field.ContainingScope.Assigned().GetSymbolForType(contextType);
                     var member = exp.Field;
                     var memberSymbols = contextSymbol.Lookup(member.Name).OfType<IBindingSymbol>().ToFixedList();
@@ -610,18 +668,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var selfParamType = methodSymbol.SelfParameterSymbol.Type;
                     if (selfParamType is ReferenceType paramType
                         && contextType is ReferenceType argType)
-                    {
-                        if (paramType.IsReadOnly && !argType.IsReadOnly)
+                        switch (paramType.IsReadOnly, argType.IsReadOnly)
                         {
-                            var context = methodInvocation.ContextExpression as INameExpressionSyntax
-                                         ?? throw new InvalidOperationException("Error can't share non-name expression");
-                            methodInvocation.ContextExpression = new ImplicitShareExpressionSyntax(context, argType.ToReadOnly())
-                            {
-                                SharedSymbol = context.ReferencedSymbol
-                            };
+                            // TODO what about move?
+                            case (true, _):
+                                InsertImplicitShareIfNeeded(ref methodInvocation.ContextExpression, argType.ToReadOnly());
+                                break;
+                            case (false, false):
+                                InsertImplicitBorrowIfNeeded(ref methodInvocation.ContextExpression, argType);
+                                break;
                         }
-                        // TODO insert move and borrow expressions as needed?
-                    }
+
                     InsertImplicitConversionIfNeeded(ref methodInvocation.ContextExpression, selfParamType);
                     CheckArgumentTypeCompatibility(selfParamType, methodInvocation.ContextExpression);
 

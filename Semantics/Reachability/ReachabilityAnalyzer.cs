@@ -63,7 +63,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     var referenceType = stmt.Type.Known().UnderlyingReferenceType();
                     if (referenceType is null) break;
                     var variable = graph.VariableDeclared(stmt);
-                    if (initializer != null) variable.Assign(initializer);
+                    if (initializer != null)
+                        variable.Assign(initializer);
                 }
                 break;
                 case IExpressionStatementSyntax stmt:
@@ -81,10 +82,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
         /// </summary>
         /// <returns>The place of the object resulting from evaluating this expression or null
         /// if the there is no result or the result is not an object reference.</returns>
-        private static ObjectPlace? Analyze(IExpressionSyntax? expression, ReachabilityGraph graph)
+        // TODO these should instead return a reference. References are created in an "unused" state
+        // then when they are actually passed to something they become used. Borrowed references
+        // are associated to the reference they borrow from and affect how it can be used.
+        private static TempValue? Analyze(IExpressionSyntax? expression, ReachabilityGraph graph)
         {
             if (expression is null) return null;
-            var isReferenceType = !(expression.Type.Known().UnderlyingReferenceType() is null);
+            var referenceType = expression.Type.Known().UnderlyingReferenceType();
+            var isReferenceType = !(referenceType is null);
             switch (expression)
             {
                 default:
@@ -99,25 +104,58 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     return null;
                 }
                 case ISelfExpressionSyntax exp:
-                {
-                    var selfPlace = graph.VariableFor(exp.ReferencedSymbol.Assigned());
-                    return selfPlace.References.Single().Referent;
-                }
+                    throw new InvalidOperationException(
+                        $"`self` reference not wrapped in move, borrow, or share");
                 case IMoveExpressionSyntax exp:
-                    // TODO deal with move if needed
-                    return Analyze(exp.Referent, graph);
-                case IBorrowExpressionSyntax exp:
-                    // TODO deal with borrowing if needed
-                    return Analyze(exp.Referent, graph);
-                case IShareExpressionSyntax exp:
-                    // TODO deal with sharing if needed
-                    return Analyze(exp.Referent, graph);
-                case INameExpressionSyntax exp:
                 {
-                    if (!isReferenceType) return null;
-                    var variablePlace = graph.VariableFor(exp.ReferencedSymbol.Assigned());
-                    return variablePlace.References.Single().Referent;
+                    _ = referenceType ?? throw new InvalidOperationException("Can't move value type");
+
+                    // The referent should be a name or `self` so we don't need to evaluate it
+                    var variable = graph.VariableFor(exp.MovedSymbol.Assigned());
+                    var temp = graph.NewTempValue(referenceType);
+                    temp.MoveFrom(variable);
+                    return temp;
                 }
+                case IBorrowExpressionSyntax exp:
+                {
+                    _ = referenceType ?? throw new InvalidOperationException("Can't borrow value type");
+
+                    // If there is a variable, it is a simple borrow expression
+                    var variable = graph.TryVariableFor(exp.BorrowedSymbol.Assigned());
+                    if (!(variable is null))
+                    {
+                        var temp = graph.NewTempValue(referenceType);
+                        temp.BorrowFrom(variable);
+                        return temp;
+                    }
+
+                    // Can this happen?
+                    throw new NotImplementedException();
+                    //var temp = Analyze(exp.)
+                    //var temp = graph.NewTempValue(referenceType);
+                    //temp.BorrowFrom(variable);
+                    //return temp;
+                }
+                case IShareExpressionSyntax exp:
+                {
+                    _ = referenceType ?? throw new InvalidOperationException("Can't share value type");
+
+                    // The referent should be a name or `self` so we don't need to evaluate it
+                    var variable = graph.TryVariableFor(exp.SharedSymbol.Assigned());
+                    if (!(variable is null))
+                    {
+                        var temp = graph.NewTempValue(referenceType);
+                        temp.ShareFrom(variable);
+                        return temp;
+                    }
+
+                    // Can this happen?
+                    throw new NotImplementedException();
+                }
+                case INameExpressionSyntax exp:
+                    if (!isReferenceType) return null;
+                    throw new InvalidOperationException(
+                        $"Reference type name `{exp}` not wrapped in move, borrow, or share");
                 case IBinaryOperatorExpressionSyntax exp:
                 {
                     Analyze(exp.LeftOperand, graph);
@@ -133,25 +171,47 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 }
                 case IFieldAccessExpressionSyntax exp:
                 {
-                    // Treat this like a method call to a getter
+                    if (!isReferenceType && exp.ContextExpression is ISelfExpressionSyntax)
+                        return null;
+
                     var context = Analyze(exp.ContextExpression, graph);
-                    var @object = graph.ObjectFor(exp);
-                    // TODO base the reference on the property type
-                    context?.Owns(@object, true);
-                    return @object;
+                    if (!isReferenceType) return null;
+
+                    throw new NotImplementedException("Analyze(expression) for IFieldAccessExpressionSyntax");
+
+                    //// Treat this like a method call to a getter
+                    //var context = Analyze(exp.ContextExpression, graph);
+                    //var @object = graph.ObjectFor(exp);
+                    //// TODO base the reference on the property type
+                    //context?.Owns(@object, true);
+                    //var temp = graph.NewTempValue();
+                    //// TODO make temp reference the object
+                    //return temp;
                 }
                 case IFunctionInvocationExpressionSyntax exp:
                 {
                     var arguments = exp.Arguments.Select(a => Analyze(a.Expression, graph)).ToFixedList();
+                    if (!isReferenceType) return null;
                     // TODO check arguments can be used
-                    return isReferenceType ? graph.ObjectFor(exp) : null;
+                    throw new NotImplementedException("Analyze(expression) for IFunctionInvocationExpressionSyntax");
+
+                    //var obj = graph.ObjectFor(exp);
+                    //var temp = graph.NewTempValue();
+                    //temp.Owns(obj, true); // TODO apply the correct operation
+                    //return temp;
                 }
                 case IMethodInvocationExpressionSyntax exp:
                 {
                     var self = Analyze(exp.ContextExpression, graph);
                     var arguments = exp.Arguments.Select(a => Analyze(a.Expression, graph)).ToFixedList();
+                    if (!isReferenceType) return null;
                     // TODO check self and arguments can be used
-                    return isReferenceType ? graph.ObjectFor(exp) : null;
+                    throw new NotImplementedException("Analyze(expression) for IMethodInvocationExpressionSyntax");
+
+                    //var obj = graph.ObjectFor(exp);
+                    //var temp = graph.NewTempValue();
+                    //temp.Owns(obj, true); // TODO apply the correct operation
+                    //return temp;
                 }
                 case IUnsafeExpressionSyntax exp:
                     return Analyze(exp.Expression, graph);
@@ -163,11 +223,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 case INewObjectExpressionSyntax exp:
                 {
                     var arguments = exp.Arguments.Select(a => Analyze(a.Expression, graph)).ToFixedList();
+                    if (referenceType is null) return null;
                     // TODO check arguments can be used
-                    return graph.ObjectFor(exp);
+                    var obj = graph.ObjectFor(exp);
+                    var temp = graph.NewTempValue(referenceType);
+                    temp.Owns(obj, true); // TODO apply the correct operation
+                    return temp;
                 }
                 case IStringLiteralExpressionSyntax exp:
-                    return graph.ObjectFor(exp);
+                {
+                    if (referenceType is null) return null;
+                    var obj = graph.ObjectFor(exp);
+                    var temp = graph.NewTempValue(referenceType);
+                    temp.Shares(obj); // TODO apply the correct operation
+                    return temp;
+                }
                 case IImplicitNumericConversionExpression exp:
                     return Analyze(exp.Expression, graph);
                 case IIntegerLiteralExpressionSyntax _:
@@ -219,7 +289,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             }
         }
 
-        private static ObjectPlace? Analyze(IElseClauseSyntax? clause, ReachabilityGraph graph)
+        private static TempValue? Analyze(IElseClauseSyntax? clause, ReachabilityGraph graph)
         {
             switch (clause)
             {
@@ -236,7 +306,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             }
         }
 
-        private static ObjectPlace? AnalyzeBlock(IBlockOrResultSyntax blockOrResult, ReachabilityGraph graph)
+        private static TempValue? AnalyzeBlock(IBlockOrResultSyntax blockOrResult, ReachabilityGraph graph)
         {
             switch (blockOrResult)
             {
@@ -253,7 +323,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             }
         }
 
-        private static AssignablePlace? AnalyzeAssignmentPlace(
+        private static Variable? AnalyzeAssignmentPlace(
             IAssignableExpressionSyntax expression,
             ReachabilityGraph graph)
         {
@@ -264,11 +334,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     throw ExhaustiveMatch.Failed(expression);
                 case IFieldAccessExpressionSyntax exp:
                 {
-                    var contextPlace = Analyze(exp.ContextExpression, graph);
-                    if (exp.ContextExpression is ISelfExpressionSyntax)
-                    {
-                        return isReferenceType ? graph.FieldFor(exp.ReferencedSymbol.Assigned()) : null;
-                    }
+                    var variable = graph.TryVariableFor(exp.ReferencedSymbol.Assigned());
+                    if (!(variable is null))
+                        return variable;
+
+                    if (!isReferenceType && exp.ContextExpression is ISelfExpressionSyntax)
+                        return null;
+
+                    var context = Analyze(exp.ContextExpression, graph);
+                    if (!isReferenceType) return null;
 
                     throw new NotImplementedException(
                         $"{nameof(AnalyzeAssignmentPlace)}(expression) not implemented for {expression.GetType().Name} other than `self`");
@@ -299,6 +373,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
 
         private void CreateSelfParameter(ReachabilityGraph graph)
         {
+            IClassDeclarationSyntax declaringClass;
             ISelfParameterSyntax selfParameter;
             switch (callableDeclaration)
             {
@@ -308,14 +383,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 case IAssociatedFunctionDeclarationSyntax _:
                     return;
                 case IConcreteMethodDeclarationSyntax method:
+                    declaringClass = method.DeclaringClass;
                     selfParameter = method.SelfParameter;
                     break;
                 case IConstructorDeclarationSyntax constructor:
+                    declaringClass = constructor.DeclaringClass;
                     selfParameter = constructor.ImplicitSelfParameter;
                     break;
             }
 
+            CreateFields(declaringClass, graph);
             CreateParameter(selfParameter, graph);
+        }
+
+        private static void CreateFields(
+            IClassDeclarationSyntax declaringClass,
+            ReachabilityGraph graph)
+        {
+            // TODO should fields have their own scope outside of parameter scope?
+            foreach (var field in declaringClass.Members.OfType<IFieldDeclarationSyntax>())
+                if (field.Type.Known().UnderlyingReferenceType() != null)
+                    graph.VariableDeclared(field);
         }
 
         private static void CreateParameter(IParameterSyntax parameter, ReachabilityGraph graph)
@@ -343,8 +431,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 {
                     var referencedObject = graph.ObjectFor(parameter);
                     parameterVariable.Owns(referencedObject, capability.IsMutable());
-                    var callerObject = graph.CallerObjectFor(parameter);
-                    referencedObject.Borrows(callerObject);
+                    var context = graph.ContextVariableAndObjectFor(parameter);
+                    referencedObject.BorrowFrom(context);
                 }
                 break;
                 case Held:
@@ -352,26 +440,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 {
                     var referencedObject = graph.ObjectFor(parameter);
                     parameterVariable.PotentiallyOwns(referencedObject, capability.IsMutable());
-                    var callerObject = graph.CallerObjectFor(parameter);
-                    referencedObject.Borrows(callerObject);
+                    var context = graph.ContextVariableAndObjectFor(parameter);
+                    referencedObject.BorrowFrom(context);
                 }
                 break;
                 case Borrowed:
                 {
-                    var callerObject = graph.CallerObjectFor(parameter);
-                    parameterVariable.Borrows(callerObject);
+                    var context = graph.ContextVariableAndObjectFor(parameter);
+                    parameterVariable.BorrowFrom(context);
                 }
                 break;
                 case Shared:
                 {
-                    var callerObject = graph.CallerObjectFor(parameter);
-                    parameterVariable.Shares(callerObject);
+                    var context = graph.ContextVariableAndObjectFor(parameter);
+                    parameterVariable.ShareFrom(context);
                 }
                 break;
                 case Identity:
                 {
-                    var callerObject = graph.CallerObjectFor(parameter);
-                    parameterVariable.Identifies(callerObject);
+                    var context = graph.ContextVariableAndObjectFor(parameter);
+                    parameterVariable.IdentityFrom(context);
                 }
                 break;
             }

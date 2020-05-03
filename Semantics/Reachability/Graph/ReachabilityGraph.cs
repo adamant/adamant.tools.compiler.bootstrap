@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Scopes;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
@@ -12,66 +13,80 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     internal class ReachabilityGraph
     {
         private readonly LexicalVariableScope currentScope;
-        private readonly Dictionary<IBindingSymbol, VariablePlace> variables = new Dictionary<IBindingSymbol, VariablePlace>();
-        private readonly Dictionary<IBindingSymbol, FieldPlace> fields = new Dictionary<IBindingSymbol, FieldPlace>();
-        private readonly Dictionary<ISyntax, ObjectPlace> objects = new Dictionary<ISyntax, ObjectPlace>();
+        private readonly Dictionary<IParameterSyntax, ContextObject> contextObjects = new Dictionary<IParameterSyntax, ContextObject>();
+        private readonly Dictionary<IBindingSymbol, Variable> variables = new Dictionary<IBindingSymbol, Variable>();
+        private readonly Dictionary<ISyntax, Object> objects = new Dictionary<ISyntax, Object>();
+        private readonly HashSet<TempValue> tempValues = new HashSet<TempValue>();
 
         public ReachabilityGraph(LexicalVariableScope currentScope)
         {
             this.currentScope = currentScope;
         }
 
-        public ObjectPlace CallerObjectFor(IParameterSyntax parameter)
+        private ContextObject ContextObjectFor(IParameterSyntax parameter)
         {
-            var callerVariable = currentScope.CallerScope.CallerVariable(parameter);
-            var objectPlace = ObjectFor(parameter);
-            callerVariable.Assign(objectPlace);
-            return objectPlace;
+            if (!contextObjects.TryGetValue(parameter, out var place))
+            {
+                place = new ContextObject(parameter);
+                contextObjects.Add(place.ForParameter, place);
+            }
+
+            return place;
         }
 
-        public VariablePlace VariableDeclared(IBindingSymbol variableSymbol)
+        public Variable ContextVariableAndObjectFor(IParameterSyntax parameter)
+        {
+            var callerVariable = currentScope.CallerScope.CallerVariable(parameter);
+            var contextObject = ContextObjectFor(parameter);
+            callerVariable.Owns(contextObject, true);
+            return callerVariable;
+        }
+
+        public Variable VariableDeclared(IBindingSymbol variableSymbol)
         {
             currentScope.VariableDeclared(variableSymbol);
-            var place = new VariablePlace(variableSymbol);
+            var place = new Variable(variableSymbol);
             variables.Add(place.Symbol, place);
             return place;
         }
-        public VariablePlace VariableFor(IBindingSymbol variableSymbol)
+        public Variable VariableFor(IBindingSymbol variableSymbol)
         {
             // Variable needs to have already been declared
             return variables[variableSymbol];
         }
 
-        public FieldPlace FieldFor(IBindingSymbol fieldSymbol)
+        public Variable? TryVariableFor(IBindingSymbol variableSymbol)
         {
-            if (!fields.TryGetValue(fieldSymbol, out var place))
-            {
-                place = new FieldPlace(fieldSymbol);
-                fields.Add(place.Symbol, place);
-            }
-
-            return place;
+            return variables.TryGetValue(variableSymbol, out var variable)
+                ? variable : null;
         }
 
-        public ObjectPlace ObjectFor(IParameterSyntax parameter)
+        public Object ObjectFor(IParameterSyntax parameter)
         {
             if (!objects.TryGetValue(parameter, out var place))
             {
-                place = new ObjectPlace(parameter);
+                place = new Object(parameter);
                 objects.Add(place.OriginSyntax, place);
             }
 
             return place;
         }
-        public ObjectPlace ObjectFor(IExpressionSyntax expression)
+        public Object ObjectFor(IExpressionSyntax expression)
         {
             if (!objects.TryGetValue(expression, out var place))
             {
-                place = new ObjectPlace(expression);
+                place = new Object(expression);
                 objects.Add(place.OriginSyntax, place);
             }
 
             return place;
+        }
+
+        public TempValue NewTempValue(ReferenceType referenceType)
+        {
+            var temp = new TempValue(referenceType);
+            tempValues.Add(temp);
+            return temp;
         }
     }
 }

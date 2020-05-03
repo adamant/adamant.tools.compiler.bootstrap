@@ -57,14 +57,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         }
 
         /// <summary>
-        /// Use this type as an immutable type.
-        /// </summary>
-        protected internal override Self ToReadOnlyReturnsSelf()
-        {
-            return new UserObjectType(Name, DeclaredMutable, ReferenceCapability.ToReadOnly());
-        }
-
-        /// <summary>
         /// Make a mutable version of this type regardless of whether it was declared
         /// mutable for use as the constructor parameter.
         /// </summary>

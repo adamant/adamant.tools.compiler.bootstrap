@@ -7,15 +7,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Scopes
 {
     internal class CallerVariableScope : VariableScope
     {
-        private readonly Dictionary<IBindingSymbol, VariablePlace> callerVariables = new Dictionary<IBindingSymbol, VariablePlace>();
+        private readonly Dictionary<IBindingSymbol, Variable> callerVariables = new Dictionary<IBindingSymbol, Variable>();
 
         public override CallerVariableScope CallerScope => this;
 
-        public VariablePlace CallerVariable(IParameterSyntax parameter)
+        public Variable CallerVariable(IParameterSyntax parameter)
         {
             if (!callerVariables.TryGetValue(parameter, out var place))
             {
-                place = new VariablePlace(parameter);
+                place = new Variable(parameter);
                 callerVariables.Add(place.Symbol, place);
             }
 
