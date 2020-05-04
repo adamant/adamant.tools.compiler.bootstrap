@@ -23,6 +23,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return temp;
         }
 
+        public static TempValue? ForNewObject(INewObjectExpressionSyntax expression)
+        {
+            var referenceType = expression.Type.Known().UnderlyingReferenceType();
+            if (referenceType is null) return null;
+
+            var reference = Reference.ToNewObject(expression);
+            var temp = new TempValue(referenceType);
+            temp.references.Add(reference);
+            return temp;
+        }
+
         public static TempValue? For(IExpressionSyntax expression)
         {
             var referenceType = expression.Type.Known().UnderlyingReferenceType();

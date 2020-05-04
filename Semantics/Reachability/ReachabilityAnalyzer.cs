@@ -226,12 +226,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     var arguments = exp.Arguments.Select(a => Analyze(a.Expression, graph, scope)).ToFixedList();
                     if (referenceType is null) return null;
                     // TODO check arguments can be used
-                    throw new NotImplementedException("Analyze(expression) for INewObjectExpressionSyntax");
 
-                    //var obj = graph.ObjectFor(exp);
-                    //var temp = graph.NewTempValue(referenceType);
-                    //temp.Owns(obj, true); // TODO apply the correct operation
-                    //return temp;
+                    var temp = TempValue.ForNewObject(exp);
+                    // TODO tie the new object to the arguments
+                    graph.Add(temp);
+                    return temp;
                 }
                 case IStringLiteralExpressionSyntax exp:
                 {
