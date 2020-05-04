@@ -6,12 +6,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     {
         public ISyntax OriginSyntax { get; }
 
-        public Object(IParameterSyntax parameter)
+        public Object(IParameterSyntax parameter, Reference? originOfMutability)
+            : base(originOfMutability)
         {
             OriginSyntax = parameter;
         }
 
-        public Object(IExpressionSyntax expression)
+        public Object(IFieldDeclarationSyntax field, Reference? originOfMutability)
+            : base(originOfMutability)
+        {
+            OriginSyntax = field;
+        }
+
+        public Object(IExpressionSyntax expression, Reference? originOfMutability)
+            : base(originOfMutability)
         {
             OriginSyntax = expression;
         }

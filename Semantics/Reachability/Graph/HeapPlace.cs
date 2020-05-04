@@ -1,18 +1,22 @@
-using static Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph.Access;
-using static Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph.Ownership;
+using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
+    [Closed(
+        typeof(ContextObject),
+        typeof(Object))]
     internal abstract class HeapPlace : Place
     {
-        public Reference NewSharedReference()
-        {
-            return new Reference(this, None, ReadOnly);
-        }
+        /// <summary>
+        /// This is the root reference that provides mutability from which
+        /// all the others must directly or indirectly borrow.
+        /// </summary>
+        public Reference? OriginOfMutability { get; }
+        public ObjectState? State { get; set; }
 
-        public Reference NewIdentityReference()
+        protected HeapPlace(Reference? originOfMutability)
         {
-            return new Reference(this, None, Identity);
+            OriginOfMutability = originOfMutability;
         }
     }
 }

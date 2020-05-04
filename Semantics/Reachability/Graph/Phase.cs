@@ -1,9 +1,9 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
-    internal enum Access
+    public enum Phase
     {
-        Identify,
-        ReadOnly,
-        Mutable,
+        Unused,
+        Used,
+        Released,
     }
 }

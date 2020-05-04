@@ -1,13 +1,16 @@
 using System;
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+using ExhaustiveMatching;
+using static Adamant.Tools.Compiler.Bootstrap.Metadata.Types.ReferenceCapability;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
     /// <summary>
     /// A parameter, local variable, or field of `self`
     /// </summary>
-    internal class Variable : Place
+    internal class Variable : RootPlace
     {
         public IBindingSymbol Symbol { get; }
 
@@ -17,17 +20,93 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         /// </summary>
         public ReferenceType Type { get; }
 
-        public Variable(IBindingSymbol symbol)
+        private Variable(IBindingSymbol symbol)
         {
             Symbol = symbol;
             Type = symbol.Type.UnderlyingReferenceType()
                    ?? throw new ArgumentException("Must be a reference type", nameof(symbol));
         }
 
+        public static (CallerVariable?, Variable?) ForParameter(IParameterSyntax parameter)
+        {
+            // Non-reference types don't participate in reachability (yet)
+            var referenceType = parameter.Type.Known().UnderlyingReferenceType();
+            if (referenceType is null) return (null, null);
+
+            CallerVariable? callerVariable = null;
+            var parameterVariable = new Variable(parameter);
+
+            var capability = referenceType.ReferenceCapability;
+            switch (capability)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(capability);
+                case IsolatedMutable:
+                case Isolated:
+                {
+                    // Isolated parameters are fully independent of the caller
+                    var reference = Reference.ToNewParameterObject(parameter);
+                    parameterVariable.references.Add(reference);
+                }
+                break;
+                case Owned:
+                case OwnedMutable:
+                case Held:
+                case HeldMutable:
+                {
+                    var reference = Reference.ToNewParameterObject(parameter);
+                    parameterVariable.references.Add(reference);
+                    var referencedObject = reference.Referent;
+
+
+                    callerVariable = CallerVariable.ForParameterWithObject(parameter);
+                    referencedObject.BorrowFrom(callerVariable);
+                }
+                break;
+                case Borrowed:
+                {
+                    callerVariable = CallerVariable.ForParameterWithObject(parameter);
+                    parameterVariable.BorrowFrom(callerVariable);
+                }
+                break;
+                case Shared:
+                {
+                    callerVariable = CallerVariable.ForParameterWithObject(parameter);
+                    parameterVariable.ShareFrom(callerVariable);
+                }
+                break;
+                case Identity:
+                {
+                    callerVariable = CallerVariable.ForParameterWithObject(parameter);
+                    parameterVariable.IdentityFrom(callerVariable);
+                }
+                break;
+            }
+
+            return (callerVariable, parameterVariable);
+        }
+
+        public static Variable? ForField(IFieldDeclarationSyntax field)
+        {
+            // Non-reference types don't participate in reachability (yet)
+            var referenceType = field.Type.Known().UnderlyingReferenceType();
+            if (referenceType is null) return null;
+
+            var variable = new Variable(field);
+            variable.references.Add(Reference.ToNewFieldObject(field));
+
+            return variable;
+        }
+
+        public static Variable Declared(IBindingSymbol symbol)
+        {
+            return new Variable(symbol);
+        }
+
         public void Assign(TempValue temp)
         {
             _ = temp;
-            //ClearReferences();
+            ClearReferences();
             //switch (Type.ReferenceCapability)
             //{
             //    default:

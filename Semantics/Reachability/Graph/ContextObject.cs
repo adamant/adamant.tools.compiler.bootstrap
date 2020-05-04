@@ -6,7 +6,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     {
         public IParameterSyntax ForParameter { get; }
 
-        public ContextObject(IParameterSyntax forParameter)
+        public ContextObject(IParameterSyntax forParameter, Reference? originOfMutability)
+            : base(originOfMutability)
         {
             ForParameter = forParameter;
         }

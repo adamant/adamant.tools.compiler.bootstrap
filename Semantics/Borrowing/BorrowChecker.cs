@@ -434,7 +434,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                         case ValueSemantics.Borrow:
                         {
                             if (outstandingClaims.IsAliased(lifetime))
-                                ReportDiagnostic(BorrowError.CantBorrowWhileAliased(file, operand.Span));
+                                ReportDiagnostic(BorrowError.CantBorrowWhileShared(file, operand.Span));
                             else if (!outstandingClaims.CurrentBorrower(lifetime).Equals(varRef.Variable))
                                 ReportDiagnostic(BorrowError.CantBorrowWhileBorrowed(file, operand.Span));
                             else
@@ -445,7 +445,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
                         {
                             if (!outstandingClaims.IsAliased(lifetime)
                                 && !outstandingClaims.CurrentBorrower(lifetime).Equals(varRef.Variable))
-                                ReportDiagnostic(BorrowError.CantAliasWhileBorrowed(file, operand.Span));
+                                ReportDiagnostic(BorrowError.CantShareWhileBorrowed(file, operand.Span));
                             else
                                 outstandingClaims.Add(new Aliases(claimHolder, lifetime));
                         }

@@ -24,10 +24,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 4001, msg);
         }
 
-        public static Diagnostic CantBorrowWhileAliased(CodeFile file, TextSpan span)
+        public static Diagnostic CantBorrowWhileShared(CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 4002,
-                $"Can't borrow from reference while it is aliased.");
+                $"Can't borrow a reference while it is shared by other references.");
         }
 
         public static Diagnostic CantBorrowWhileBorrowed(CodeFile file, TextSpan span)
@@ -36,10 +36,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
                 $"Can't borrow from reference while it is borrowed.");
         }
 
-        public static Diagnostic CantAliasWhileBorrowed(CodeFile file, TextSpan span)
+        public static Diagnostic CantShareWhileBorrowed(CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 4004,
-                $"Can't alias reference while it is borrowed.");
+                $"Can't share a reference while it is borrowed.");
         }
 
         public static Diagnostic CantMoveIntoArgumentWhileShared(CodeFile file, TextSpan span)
