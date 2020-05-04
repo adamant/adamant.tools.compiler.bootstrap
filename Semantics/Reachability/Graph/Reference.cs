@@ -67,6 +67,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return reference;
         }
 
+        public static Reference ToNewContextObject(IExpressionSyntax expression)
+        {
+            var referenceType = expression.Type.Known().UnderlyingReferenceType()
+                                ?? throw new ArgumentException("Must be a parameter with a reference type",
+                                    nameof(expression));
+
+            var referenceCapability = referenceType.ReferenceCapability;
+            var ownership = referenceCapability.ToOwnership();
+            var access = referenceCapability.ToAccess();
+            var reference = new Reference(ownership, access);
+            var originOfMutability = access == Access.Mutable ? reference : null;
+            reference.Referent = new ContextObject(expression, originOfMutability);
+            return reference;
+        }
+
         public static Reference ToNewFieldObject(IFieldDeclarationSyntax field)
         {
             var referenceType = field.Type.Known().UnderlyingReferenceType()

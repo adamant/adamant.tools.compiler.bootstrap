@@ -98,8 +98,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return variable;
         }
 
-        public static Variable Declared(IBindingSymbol symbol)
+        public static Variable? Declared(IBindingSymbol symbol)
         {
+            var referenceType = symbol.Type.Known().UnderlyingReferenceType();
+            if (referenceType is null) return null;
+
             return new Variable(symbol);
         }
 

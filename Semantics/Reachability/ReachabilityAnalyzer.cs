@@ -81,9 +81,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
         /// </summary>
         /// <returns>The place of the object resulting from evaluating this expression or null
         /// if the there is no result or the result is not an object reference.</returns>
-        // TODO these should instead return a reference. References are created in an "unused" state
-        // then when they are actually passed to something they become used. Borrowed references
-        // are associated to the reference they borrow from and affect how it can be used.
         private TempValue? Analyze(IExpressionSyntax? expression, ReachabilityGraph graph, VariableScope scope)
         {
             if (expression is null) return null;
@@ -95,10 +92,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     throw ExhaustiveMatch.Failed(expression);
                 case IAssignmentExpressionSyntax exp:
                 {
-                    // TODO analyze left operand
                     var leftPlace = AnalyzeAssignmentPlace(exp.LeftOperand, graph, scope);
                     var rightPlace = Analyze(exp.RightOperand, graph, scope);
-                    if (rightPlace != null) leftPlace?.Assign(rightPlace);
+                    if (!(rightPlace is null)) leftPlace?.Assign(rightPlace);
                     return null;
                 }
                 case ISelfExpressionSyntax exp:
@@ -109,8 +105,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
 
                     // The referent should be a name or `self` so we don't need to evaluate it
                     var variable = graph.VariableFor(exp.MovedSymbol.Assigned());
-                    var temp = graph.NewTempValue(referenceType);
-                    temp.MoveFrom(variable);
+                    var temp = TempValue.For(exp);
+                    temp?.MoveFrom(variable);
+                    graph.Add(temp);
                     return temp;
                 }
                 case IBorrowExpressionSyntax exp:
@@ -121,8 +118,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     var variable = graph.TryVariableFor(exp.BorrowedSymbol.Assigned());
                     if (!(variable is null))
                     {
-                        var temp = graph.NewTempValue(referenceType);
-                        temp.BorrowFrom(variable);
+                        var temp = TempValue.For(exp);
+                        temp?.BorrowFrom(variable);
+                        graph.Add(temp);
                         return temp;
                     }
 
@@ -141,8 +139,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     var variable = graph.TryVariableFor(exp.SharedSymbol.Assigned());
                     if (!(variable is null))
                     {
-                        var temp = graph.NewTempValue(referenceType);
-                        temp.ShareFrom(variable);
+                        var temp = TempValue.For(exp);
+                        temp?.ShareFrom(variable);
+                        graph.Add(temp);
                         return temp;
                     }
 
@@ -237,13 +236,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 case IStringLiteralExpressionSyntax exp:
                 {
                     if (referenceType is null) return null;
-                    // TODO this is leaked read-only i.e. const
-                    throw new NotImplementedException("Analyze(expression) for IStringLiteralExpressionSyntax");
 
-                    //var obj = graph.ObjectFor(exp);
-                    //var temp = graph.NewTempValue(referenceType);
-                    //temp.Shares(obj); // TODO apply the correct operation
-                    //return temp;
+                    // Create an untethered context object that doesn't need released
+                    var temp = TempValue.ForNewContextObject(exp);
+                    graph.Add(temp);
+                    return temp;
                 }
                 case IImplicitNumericConversionExpression exp:
                     return Analyze(exp.Expression, graph, scope);

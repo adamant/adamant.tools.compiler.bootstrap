@@ -4,7 +4,6 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
@@ -16,9 +15,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     internal class ReachabilityGraph
     {
         private readonly Dictionary<IBindingSymbol, CallerVariable> callerVariables = new Dictionary<IBindingSymbol, CallerVariable>();
-        private readonly Dictionary<IParameterSyntax, ContextObject> contextObjects = new Dictionary<IParameterSyntax, ContextObject>();
         private readonly Dictionary<IBindingSymbol, Variable> variables = new Dictionary<IBindingSymbol, Variable>();
+
+        private readonly Dictionary<ISyntax, ContextObject> contextObjects = new Dictionary<ISyntax, ContextObject>();
         private readonly Dictionary<ISyntax, Object> objects = new Dictionary<ISyntax, Object>();
+
         private readonly HashSet<TempValue> tempValues = new HashSet<TempValue>();
 
         #region Add Methods
@@ -41,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 default:
                     throw ExhaustiveMatch.Failed(place);
                 case ContextObject contextObject:
-                    if (contextObjects.TryAdd(contextObject.ForParameter, contextObject))
+                    if (contextObjects.TryAdd(contextObject.OriginSyntax, contextObject))
                         AddReferences(contextObject);
                     break;
                 case Object @object:
@@ -49,6 +50,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                         AddReferences(@object);
                     break;
             }
+        }
+
+        public void Add(TempValue? temp)
+        {
+            if (temp is null) return; // for convenience
+            if (tempValues.Add(temp))
+                AddReferences(temp);
         }
 
         private void AddReferences(Place place)
@@ -127,12 +135,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         //    return place;
         //}
 
-        public TempValue NewTempValue(ReferenceType referenceType)
-        {
-            var temp = new TempValue(referenceType);
-            tempValues.Add(temp);
-            return temp;
-        }
+        //public TempValue NewTempValue(ReferenceType referenceType)
+        //{
+        //    var temp = new TempValue(referenceType);
+        //    tempValues.Add(temp);
+        //    return temp;
+        //}
 
         public void ComputeObjectStates()
         {

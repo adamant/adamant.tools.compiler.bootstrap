@@ -4,12 +4,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
     internal class ContextObject : HeapPlace
     {
-        public IParameterSyntax ForParameter { get; }
-
-        public ContextObject(IParameterSyntax forParameter, Reference? originOfMutability)
-            : base(originOfMutability)
+        public ContextObject(IParameterSyntax parameter, Reference? originOfMutability)
+            : base(parameter, originOfMutability)
         {
-            ForParameter = forParameter;
+        }
+
+        public ContextObject(IExpressionSyntax originSyntax, Reference? originOfMutability)
+            : base(originSyntax, originOfMutability)
+        {
         }
     }
 }

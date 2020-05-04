@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
@@ -7,6 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         typeof(Object))]
     internal abstract class HeapPlace : Place
     {
+        public ISyntax OriginSyntax { get; }
         /// <summary>
         /// This is the root reference that provides mutability from which
         /// all the others must directly or indirectly borrow.
@@ -14,8 +16,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         public Reference? OriginOfMutability { get; }
         public ObjectState? State { get; set; }
 
-        protected HeapPlace(Reference? originOfMutability)
+        protected HeapPlace(ISyntax originSyntax, Reference? originOfMutability)
         {
+            OriginSyntax = originSyntax;
             OriginOfMutability = originOfMutability;
         }
     }

@@ -1,3 +1,4 @@
+using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
@@ -6,9 +7,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     {
         public ReferenceType ReferenceType { get; }
 
-        public TempValue(ReferenceType referenceType)
+        private TempValue(ReferenceType referenceType)
         {
             ReferenceType = referenceType;
+        }
+
+        public static TempValue? ForNewContextObject(IExpressionSyntax expression)
+        {
+            var referenceType = expression.Type.Known().UnderlyingReferenceType();
+            if (referenceType is null) return null;
+
+            var reference = Reference.ToNewContextObject(expression);
+            var temp = new TempValue(referenceType);
+            temp.references.Add(reference);
+            return temp;
+        }
+
+        public static TempValue? For(IExpressionSyntax expression)
+        {
+            var referenceType = expression.Type.Known().UnderlyingReferenceType();
+            if (referenceType is null) return null;
+
+            return new TempValue(referenceType);
         }
     }
 }

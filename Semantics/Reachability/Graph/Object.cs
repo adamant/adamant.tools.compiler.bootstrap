@@ -4,24 +4,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
     internal class Object : HeapPlace
     {
-        public ISyntax OriginSyntax { get; }
-
         public Object(IParameterSyntax parameter, Reference? originOfMutability)
-            : base(originOfMutability)
+            : base(parameter, originOfMutability)
         {
-            OriginSyntax = parameter;
         }
 
         public Object(IFieldDeclarationSyntax field, Reference? originOfMutability)
-            : base(originOfMutability)
+            : base(field, originOfMutability)
         {
-            OriginSyntax = field;
         }
 
         public Object(IExpressionSyntax expression, Reference? originOfMutability)
-            : base(originOfMutability)
+            : base(expression, originOfMutability)
         {
-            OriginSyntax = expression;
         }
     }
 }
