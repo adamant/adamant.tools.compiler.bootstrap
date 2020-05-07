@@ -101,7 +101,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             var referenceTasks = project.References.ToDictionary(r => r.Name, r => projectBuilds[r.Project]);
             var references = new Dictionary<string, Package>();
             foreach (var referenceTask in referenceTasks)
-                references.Add(referenceTask.Key, await referenceTask.Value.ConfigureAwait(false));
+            {
+                var package = await referenceTask.Value.ConfigureAwait(false);
+                references.Add(referenceTask.Key, package!);
+            }
 
             lock (consoleLock)
             {
