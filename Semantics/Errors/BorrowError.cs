@@ -47,5 +47,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 4004,
                 $"Can't move ownership into argument while it is shared.");
         }
+
+        public static Diagnostic CantBorrowFromThisReference(CodeFile file, in TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 4004,
+                $"Can't borrow from this reference.");
+        }
     }
 }

@@ -97,7 +97,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return reference;
         }
 
-
         public static Reference ToNewFieldObject(IFieldDeclarationSyntax field)
         {
             var referenceType = field.Type.Known().UnderlyingReferenceType()
@@ -112,6 +111,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             reference.Referent = new Object(field, originOfMutability);
             return reference;
         }
+
         /// <summary>
         /// The access it has at this momemnt given borrowing and sharing. Note that this
         /// doesn't account for shares.
@@ -164,6 +164,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             });
             // And add it to ours instead
             borrowers.AddRange(newBorrowers);
+        }
+
+        public bool IsOriginFor(Reference reference)
+        {
+            PruneBorrowers();
+            return IsOriginForInternal(reference);
+        }
+
+        private bool IsOriginForInternal(Reference reference)
+        {
+            return Borrowers.Any(b => b.Equals(reference))
+                   || Borrowers.Any(b => b.IsOriginForInternal(reference));
         }
 
         public Reference Borrow()

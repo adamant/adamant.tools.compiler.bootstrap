@@ -310,7 +310,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
 
                         // And we must be a borrower from someone who has the mutable access
                         var originOfMutability = reference.Referent.OriginOfMutability;
-
+                        if (originOfMutability is null || !originOfMutability.IsOriginFor(reference))
+                            diagnostics.Add(BorrowError.CantBorrowFromThisReference(file, span));
                         break;
                     case Access.ReadOnly:
                         throw new NotImplementedException();
@@ -322,8 +323,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 // Mark as used regardless to enable correct analysis of later expressions
                 reference.Use();
             }
-
-            throw new NotImplementedException();
         }
 
         private static TempValue CaptureArguments(FixedList<TempValue?> arguments, IFunctionSymbol function)
