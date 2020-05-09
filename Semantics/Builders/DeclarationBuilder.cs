@@ -108,7 +108,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
 
         private Declaration BuildDefaultConstructor(IClassDeclarationSyntax classDeclaration)
         {
-            var symbol = classDeclaration.ChildSymbols.ImplicitCast<ISymbol>()
+            var symbol = classDeclaration.ChildSymbols.SafeCast<ISymbol>()
                             .OfType<DefaultConstructor>().Single();
             if (declarations.TryGetValue(symbol, out var declaration))
                 return declaration;

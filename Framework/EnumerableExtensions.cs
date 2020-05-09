@@ -77,7 +77,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         /// </summary>
         [DebuggerStepThrough]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<T> ImplicitCast<T>(this IEnumerable<T> source)
+        public static IEnumerable<T> SafeCast<T>(this IEnumerable<T> source)
         {
             // When the source implements multiple IEnumerable<T> and the next
             // Linq function takes IEnumerable (not generic) this shim

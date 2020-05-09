@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -90,7 +90,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             foreach (var place in heapPlaces)
                 place.State = null;
 
-            var rootPlaces = callerVariables.Values.ImplicitCast<RootPlace>()
+            var rootPlaces = callerVariables.Values.SafeCast<RootPlace>()
                                             .Concat(variables.Values)
                                             .Concat(tempValues)
                                             .ToFixedList();
@@ -107,7 +107,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         private IEnumerable<HeapPlace> AllHeapPlaces()
         {
-            return contextObjects.Values.ImplicitCast<HeapPlace>().Concat(objects.Values);
+            return contextObjects.Values.SafeCast<HeapPlace>().Concat(objects.Values);
         }
 
         private static void ComputeSharedObjects(RootPlace place)
@@ -142,11 +142,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                         throw ExhaustiveMatch.Failed(effectiveAccess);
                     case Access.ReadOnly:
                         // Should have already been marked
-                        Debug.Assert(referent.State == ObjectState.ReadOnly);
+                        if (referent.State == ObjectState.ReadOnly)
+                            throw new InvalidOperationException("Referent state should already be marked");
                         break;
                     case Access.Identify:
-                        if (referent.State is null)
-                            referent.State = ObjectState.Mutable;
+                        referent.State ??= ObjectState.Mutable;
                         break;
                     case Access.Mutable:
                         referent.State = ObjectState.Mutable;

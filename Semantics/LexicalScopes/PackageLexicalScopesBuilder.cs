@@ -66,7 +66,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             PackageSyntax packageSyntax,
             FixedDictionary<string, Package> references)
         {
-            return references.Values.SelectMany(p => p.GetNonMemberDeclarations()).ImplicitCast<ISymbol>()
+            return references.Values.SelectMany(p => p.GetNonMemberDeclarations()).SafeCast<ISymbol>()
                              .Concat(packageSyntax.GetDeclarations().OfType<INonMemberEntityDeclarationSyntax>())
                              .Concat(PrimitiveSymbols.Instance).ToFixedList();
         }
