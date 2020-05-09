@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -103,7 +102,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             get
             {
                 var declaration = variables[variable.Number];
-                Debug.Assert(declaration.Variable == variable);
+                if (declaration.Variable != variable)
+                    throw new InvalidOperationException("Declaration variable isn't this variable");
                 return declaration;
             }
         }

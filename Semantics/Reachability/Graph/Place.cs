@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             References = references.AsReadOnly();
         }
 
-        protected void ClearReferences() => references.Clear();
+        public void ClearReferences() => references.Clear();
 
         public void MoveFrom(RootPlace variable)
         {

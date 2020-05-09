@@ -21,5 +21,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             OriginSyntax = originSyntax;
             OriginOfMutability = originOfMutability;
         }
+
+        public void Capture(TempValue argument)
+        {
+            foreach (var reference in argument.References)
+                references.Add(reference);
+
+            argument.ClearReferences();
+        }
     }
 }

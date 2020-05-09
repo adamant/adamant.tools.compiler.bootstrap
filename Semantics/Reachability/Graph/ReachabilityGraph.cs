@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         private readonly HashSet<TempValue> tempValues = new HashSet<TempValue>();
 
-        #region Add Methods
+        #region Add/Remove Methods
         public void Add(CallerVariable? callerVariable)
         {
             if (callerVariable is null) return; // for convenience
@@ -64,44 +64,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             foreach (var reference in place.References)
                 Add(reference.Referent);
         }
+
+        public bool Remove(TempValue tempValue)
+        {
+            return tempValues.Remove(tempValue);
+        }
         #endregion
-
-        //private CallerVariable CallerVariableFor(IParameterSyntax parameter)
-        //{
-        //    if (!callerVariables.TryGetValue(parameter, out var place))
-        //    {
-        //        place = new CallerVariable(parameter);
-        //        callerVariables.Add(place.Symbol, place);
-        //    }
-
-        //    return place;
-        //}
-        //private ContextObject ContextObjectFor(IParameterSyntax parameter)
-        //{
-        //    if (!contextObjects.TryGetValue(parameter, out var place))
-        //    {
-        //        place = new ContextObject(parameter);
-        //        contextObjects.Add(place.ForParameter, place);
-        //    }
-
-        //    return place;
-        //}
-
-        //public CallerVariable CallerVariableAndObjectFor(IParameterSyntax parameter)
-        //{
-        //    var callerVariable = CallerVariableFor(parameter);
-        //    var contextObject = ContextObjectFor(parameter);
-        //    callerVariable.Owns(contextObject, true);
-        //    return callerVariable;
-        //}
-
-        //public Variable VariableDeclared(IBindingSymbol variableSymbol)
-        //{
-        //    currentScope.VariableDeclared(variableSymbol);
-        //    var place = new Variable(variableSymbol);
-        //    variables.Add(place.Symbol, place);
-        //    return place;
-        //}
 
         public Variable VariableFor(IBindingSymbol variableSymbol)
         {
@@ -113,34 +81,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return variables.TryGetValue(variableSymbol, out var variable)
                 ? variable : null;
         }
-
-        //public Object ObjectFor(IParameterSyntax parameter)
-        //{
-        //    if (!objects.TryGetValue(parameter, out var place))
-        //    {
-        //        place = new Object(parameter);
-        //        objects.Add(place.OriginSyntax, place);
-        //    }
-
-        //    return place;
-        //}
-        //public Object ObjectFor(IExpressionSyntax expression)
-        //{
-        //    if (!objects.TryGetValue(expression, out var place))
-        //    {
-        //        place = new Object(expression);
-        //        objects.Add(place.OriginSyntax, place);
-        //    }
-
-        //    return place;
-        //}
-
-        //public TempValue NewTempValue(ReferenceType referenceType)
-        //{
-        //    var temp = new TempValue(referenceType);
-        //    tempValues.Add(temp);
-        //    return temp;
-        //}
 
         public void ComputeObjectStates()
         {

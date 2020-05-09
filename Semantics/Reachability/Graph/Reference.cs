@@ -84,6 +84,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public static Reference ToNewObject(INewObjectExpressionSyntax expression)
         {
+            return ToExpressionObject(expression);
+        }
+
+        public static Reference ToNewInvocationReturnedObject(IInvocationExpressionSyntax expression)
+        {
+            return ToExpressionObject(expression);
+        }
+
+        private static Reference ToExpressionObject(IExpressionSyntax expression)
+        {
             var referenceType = expression.Type.Known().UnderlyingReferenceType()
                                 ?? throw new ArgumentException("Must be a parameter with a reference type",
                                     nameof(expression));

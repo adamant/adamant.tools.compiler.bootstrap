@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -199,20 +200,28 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                         UseArgument(tempValue, argumentSyntax.Span, graph);
                     }
 
-                    return referenceType is null ? null : CaptureArguments(arguments, function);
+                    return referenceType is null ? null : CaptureArguments(exp, arguments, graph);
                 }
                 case IMethodInvocationExpressionSyntax exp:
                 {
                     var self = Analyze(exp.ContextExpression, graph, scope);
                     var arguments = exp.Arguments.Select(a => Analyze(a.Expression, graph, scope)).ToFixedList();
-                    if (!isReferenceType) return null;
-                    // TODO check self and arguments can be used
-                    throw new NotImplementedException("Analyze(expression) for IMethodInvocationExpressionSyntax");
+                    var method = exp.MethodNameSyntax.ReferencedSymbol.Assigned();
+                    var parameters = method.Parameters;
+                    if (!(self is null))
+                        UseArgument(self, exp.ContextExpression.Span, graph);
+                    foreach (var ((tempValue, argumentSyntax), parameter) in arguments
+                                                                             .Zip(exp.Arguments).Zip(parameters))
+                    {
+                        if (tempValue is null) continue;
+                        if (!(parameter.Type is ReferenceType))
+                            throw new InvalidOperationException(
+                                $"Expected parameter {parameter} to be a reference type");
 
-                    //var obj = graph.ObjectFor(exp);
-                    //var temp = graph.NewTempValue();
-                    //temp.Owns(obj, true); // TODO apply the correct operation
-                    //return temp;
+                        UseArgument(tempValue, argumentSyntax.Span, graph);
+                    }
+
+                    return referenceType is null ? null : CaptureArguments(exp, arguments.Prepend(self), graph);
                 }
                 case IUnsafeExpressionSyntax exp:
                     return Analyze(exp.Expression, graph, scope);
@@ -325,9 +334,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             }
         }
 
-        private static TempValue CaptureArguments(FixedList<TempValue?> arguments, IFunctionSymbol function)
+        private static TempValue CaptureArguments(
+            IInvocationExpressionSyntax exp,
+            IEnumerable<TempValue?> arguments,
+            ReachabilityGraph graph)
         {
-            throw new NotImplementedException();
+            var referenceType = exp.Type.Known().UnderlyingReferenceType();
+            if (!(referenceType is null))
+                throw new ArgumentException($"{nameof(CaptureArguments)} only supports reference returning functions");
+
+            var temp = TempValue.ForNewInvocationReturnedObject(exp);
+            var referent = temp!.PossibleReferents.Single();
+            foreach (var argument in arguments)
+                if (!(argument is null))
+                {
+                    // TODO base this on reachability expressions instead of capturing every argument
+                    referent.Capture(argument);
+                    graph.Remove(argument);
+                }
+
+            graph.Add(temp);
+            return temp;
         }
 
         private TempValue? Analyze(IElseClauseSyntax? clause, ReachabilityGraph graph, VariableScope scope)
