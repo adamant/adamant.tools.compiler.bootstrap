@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Framework
 {
@@ -41,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         }
 
         [DebuggerStepThrough]
-        public bool TryGetValue(TKey key, out TValue value)
+        public bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue value)
         {
             return items.TryGetValue(key, out value);
         }

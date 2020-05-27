@@ -1,3 +1,4 @@
+using System;
 using ExhaustiveMatching;
 using static Adamant.Tools.Compiler.Bootstrap.Metadata.Types.ReferenceCapability;
 
@@ -63,7 +64,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             switch (target, source)
             {
                 default:
-                    throw ExhaustiveMatch.Failed((target, source));
+                    //    throw ExhaustiveMatch.Failed((target, source));
+                    throw new NotImplementedException();
                 case (Identity, _):
                 case (_, _) when target == source:
                     return true;
@@ -183,29 +185,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         }
         public static string ToSourceString(this ReferenceCapability referenceCapability)
         {
-            switch (referenceCapability)
+            return referenceCapability switch
             {
-                default:
-                    throw ExhaustiveMatch.Failed(referenceCapability);
-                case OwnedMutable:
-                    return "owned mut";
-                case IsolatedMutable:
-                    return "iso mut";
-                case HeldMutable:
-                    return "held mut";
-                case Borrowed:
-                    return "mut";
-                case Owned:
-                    return "owned";
-                case Isolated:
-                    return "iso";
-                case Held:
-                    return "held";
-                case Shared:
-                    return "";
-                case Identity:
-                    return "id";
-            }
+                OwnedMutable => "owned mut",
+                IsolatedMutable => "iso mut",
+                HeldMutable => "held mut",
+                Borrowed => "mut",
+                Owned => "owned",
+                Isolated => "iso",
+                Held => "held",
+                Shared => "",
+                Identity => "id",
+                _ => throw ExhaustiveMatch.Failed(referenceCapability)
+            };
         }
     }
 }
