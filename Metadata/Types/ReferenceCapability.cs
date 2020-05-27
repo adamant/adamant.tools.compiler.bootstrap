@@ -64,7 +64,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             switch (target, source)
             {
                 default:
-                    //    throw ExhaustiveMatch.Failed((target, source));
+                    //throw ExhaustiveMatch.Failed((target, source));
                     throw new NotImplementedException();
                 case (Identity, _):
                 case (_, _) when target == source:

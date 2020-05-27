@@ -221,6 +221,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 default:
                     throw ExhaustiveMatch.Failed(expression);
                 case null:
+                    expression = null!; // Trick compiler into allowing it to stay null
                     return DataType.Unknown;
                 case IShareExpressionSyntax _:
                     throw new InvalidOperationException("Share expressions should not be in the AST during basic analysis");
@@ -707,18 +708,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         /// <returns>A name if the expression is a qualified name, otherwise null</returns>
         private static Name? MethodContextAsName(IExpressionSyntax expression)
         {
-            switch (expression)
+            return expression switch
             {
-                case IFieldAccessExpressionSyntax memberAccess:
-                    // Tf implicit self
-                    return memberAccess.ContextExpression is null
-                        ? null
-                        : MethodContextAsName(memberAccess.ContextExpression)?.Qualify(memberAccess.Field.Name);
-                case INameExpressionSyntax nameExpression:
-                    return nameExpression.Name;
-                default:
-                    return null;
-            }
+                IFieldAccessExpressionSyntax memberAccess =>
+                // if implicit self
+                memberAccess.ContextExpression is null
+                    ? null
+                    : MethodContextAsName(memberAccess.ContextExpression)?.Qualify(memberAccess.Field.Name),
+                INameExpressionSyntax nameExpression => nameExpression.Name,
+                _ => null
+            };
         }
 
         private DataType InferFunctionInvocationType(IFunctionInvocationExpressionSyntax functionInvocationExpression)
