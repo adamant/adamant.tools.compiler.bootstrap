@@ -63,8 +63,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 {
                     var initializer = Analyze(stmt.Initializer, graph, scope);
                     var variable = VariableDeclared(stmt, graph, scope);
-                    if (variable is null || initializer is null) break;
-                    variable.Assign(initializer);
+                    if (initializer is null) break;
+                    variable?.Assign(initializer);
+                    graph.Remove(initializer);
                 }
                 break;
                 case IExpressionStatementSyntax stmt:
@@ -95,7 +96,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 {
                     var leftPlace = AnalyzeAssignmentPlace(exp.LeftOperand, graph, scope);
                     var rightPlace = Analyze(exp.RightOperand, graph, scope);
-                    if (!(rightPlace is null)) leftPlace?.Assign(rightPlace);
+                    if (!(rightPlace is null))
+                    {
+                        leftPlace?.Assign(rightPlace);
+                        graph.Remove(rightPlace);
+                    }
                     return null;
                 }
                 case ISelfExpressionSyntax exp:
@@ -350,7 +355,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             ReachabilityGraph graph)
         {
             var referenceType = exp.Type.Known().UnderlyingReferenceType();
-            if (!(referenceType is null))
+            if (referenceType is null)
                 throw new ArgumentException($"{nameof(CaptureArguments)} only supports reference returning functions");
 
             var temp = TempValue.ForNewInvocationReturnedObject(exp);

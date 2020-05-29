@@ -132,7 +132,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         private static void MarkReferencedMutablePlaces(Place place)
         {
-            foreach (var reference in place.References)
+            foreach (var reference in place.References.Where(r => r.IsUsed))
             {
                 var effectiveAccess = reference.EffectiveAccess();
                 var referent = reference.Referent;
@@ -142,14 +142,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                         throw ExhaustiveMatch.Failed(effectiveAccess);
                     case Access.ReadOnly:
                         // Should have already been marked
-                        if (referent.State == ObjectState.ReadOnly)
+                        if (referent.State != ObjectState.ReadOnly)
                             throw new InvalidOperationException("Referent state should already be marked");
                         break;
                     case Access.Identify:
                         referent.State ??= ObjectState.Mutable;
                         break;
                     case Access.Mutable:
-                        referent.State = ObjectState.Mutable;
+                        referent.State ??= ObjectState.Mutable;
                         MarkReferencedMutablePlaces(referent);
                         break;
                 }

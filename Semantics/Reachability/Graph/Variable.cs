@@ -108,36 +108,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public void Assign(TempValue temp)
         {
-            _ = temp;
+            // Steal all the temps references
             ClearReferences();
-            //switch (Type.ReferenceCapability)
-            //{
-            //    default:
-            //        throw ExhaustiveMatch.Failed(Type.ReferenceCapability);
-            //    case IsolatedMutable:
-            //    case OwnedMutable:
-            //        Owns(@object, true);
-            //        break;
-            //    case Isolated:
-            //    case Owned:
-            //        Owns(@object, false);
-            //        break;
-            //    case HeldMutable:
-            //        PotentiallyOwns(@object, true);
-            //        break;
-            //    case Held:
-            //        PotentiallyOwns(@object, false);
-            //        break;
-            //    case Borrowed:
-            //        Borrows(@object);
-            //        break;
-            //    case Shared:
-            //        Shares(@object);
-            //        break;
-            //    case Identity:
-            //        Identifies(@object);
-            //        break;
-            //}
+            references.AddRange(temp.References);
+            temp.ClearReferences();
+            foreach (var reference in references)
+                reference.Use();
         }
     }
 }
