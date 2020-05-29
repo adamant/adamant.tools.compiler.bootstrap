@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         public bool DeclaredReadable => DeclaredAccess != Access.Identify;
         public Phase Phase { get; private set; } = Phase.Unused;
         public bool IsUsed => Phase == Phase.Used;
-        private List<Reference> borrowers = new List<Reference>();
+        private readonly List<Reference> borrowers = new List<Reference>();
         public IReadOnlyList<Reference> Borrowers { get; }
 
         private Reference(HeapPlace referent, Ownership ownership, Access declaredAccess)
@@ -133,10 +133,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 default:
                     throw ExhaustiveMatch.Failed(DeclaredAccess);
                 case Access.Mutable:
-                    PruneBorrowers();
                     // If we have been borrowed from, then this is temporarily an identity reference
                     // (unless there are shares in which case this would be read only)
-                    if (Borrowers.Any(b => b.UsedForBorrow()))
+                    if (IsUsedForBorrow())
                         return Access.Identify;
 
                     return Access.Mutable;
@@ -147,10 +146,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             }
         }
 
-        private bool UsedForBorrow()
+        public bool IsUsedForBorrow()
+        {
+            PruneBorrowers();
+            return Borrowers.Any(b => b.IsUsedForBorrowInternal());
+        }
+
+        private bool IsUsedForBorrowInternal()
         {
             return Phase == Phase.Used
-                   || (Phase == Phase.Unused && Borrowers.Any(b => b.UsedForBorrow()));
+                   || (Phase == Phase.Unused && Borrowers.Any(b => b.IsUsedForBorrowInternal()));
         }
 
         /// <summary>

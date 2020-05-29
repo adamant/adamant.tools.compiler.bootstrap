@@ -580,7 +580,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     referencedSymbol = exp.ReferencedSymbol.Assigned();
                     break;
                 default:
-                    // implicit share isn't needed around other expressions
+                    // implicit borrow isn't needed around other expressions
                     return type;
             }
 

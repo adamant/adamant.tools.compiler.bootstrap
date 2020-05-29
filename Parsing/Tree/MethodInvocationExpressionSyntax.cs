@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public override string ToString()
         {
-            return $"{ContextExpression}.{FullName}({string.Join(", ", Arguments)})";
+            return $"{ContextExpression.ToGroupedString()}.{FullName}({string.Join(", ", Arguments)})";
         }
     }
 }

@@ -54,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
 
         public override string ToString()
         {
-            return $"⟦share⟧ {Referent}";
+            return $"⟦borrow⟧ {Referent}";
         }
 
         public string ToGroupedString()

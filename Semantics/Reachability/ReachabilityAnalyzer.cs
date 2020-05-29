@@ -313,17 +313,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     default:
                         throw ExhaustiveMatch.Failed(reference.DeclaredAccess);
                     case Access.Mutable:
+                    {
                         // Must be no read-only access
-                        if (reference.Referent.State == ObjectState.Mutable)
+                        if (reference.Referent.State == ObjectState.ReadOnly)
                             diagnostics.Add(BorrowError.CantBorrowWhileShared(file, span));
 
                         // And we must be a borrower from someone who has the mutable access
                         var originOfMutability = reference.Referent.OriginOfMutability;
-                        if (originOfMutability is null || !originOfMutability.IsOriginFor(reference))
+                        if (!originOfMutability?.IsOriginFor(reference) ?? true)
                             diagnostics.Add(BorrowError.CantBorrowFromThisReference(file, span));
-                        break;
+                    }
+                    break;
                     case Access.ReadOnly:
-                        throw new NotImplementedException();
+                    {
+                        if (reference.Referent.State == ObjectState.ReadOnly) break;
+
+                        // Just because it is currently mutable doesn't mean we can't make it readonly
+                        var originOfMutability = reference.Referent.OriginOfMutability;
+                        if (originOfMutability?.IsUsedForBorrow() ?? false)
+                            diagnostics.Add(BorrowError.CantShareWhileBorrowed(file, span));
+                    }
+                    break;
                     case Access.Identify:
                         // Always safe to take reference identity
                         break;
