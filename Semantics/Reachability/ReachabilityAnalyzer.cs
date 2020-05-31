@@ -61,7 +61,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     throw ExhaustiveMatch.Failed(statement);
                 case IVariableDeclarationStatementSyntax stmt:
                 {
-                    var initializer = Analyze(stmt.Initializer, graph, scope);
+                    var initializer = AnalyzeAssignmentSource(stmt.Initializer, graph, scope);
                     var variable = VariableDeclared(stmt, graph, scope);
                     if (initializer is null) break;
                     variable?.Assign(initializer);
@@ -95,7 +95,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 case IAssignmentExpressionSyntax exp:
                 {
                     var leftPlace = AnalyzeAssignmentPlace(exp.LeftOperand, graph, scope);
-                    var rightPlace = Analyze(exp.RightOperand, graph, scope);
+                    var rightPlace = AnalyzeAssignmentSource(exp.RightOperand, graph, scope);
                     if (!(rightPlace is null))
                     {
                         leftPlace?.Assign(rightPlace);
@@ -311,7 +311,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             foreach (var reference in argument.References)
             {
                 // Must recompute because our use of earlier arguments can affect later ones
-                graph.ComputeObjectStates();
+                graph.ComputeCurrentObjectAccess();
                 // Check if we are safe to use this reference
                 switch (reference.DeclaredAccess)
                 {
@@ -320,7 +320,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     case Access.Mutable:
                     {
                         // Must be no read-only access
-                        if (reference.Referent.State == ObjectState.ReadOnly)
+                        if (reference.Referent.CurrentAccess == Access.ReadOnly)
                             diagnostics.Add(BorrowError.CantBorrowWhileShared(file, span));
 
                         // And we must be a borrower from someone who has the mutable access
@@ -331,7 +331,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     break;
                     case Access.ReadOnly:
                     {
-                        if (reference.Referent.State == ObjectState.ReadOnly) break;
+                        if (reference.Referent.CurrentAccess == Access.ReadOnly) break;
 
                         // Just because it is currently mutable doesn't mean we can't make it readonly
                         var originOfMutability = reference.Referent.OriginOfMutability;
@@ -374,19 +374,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
 
         private TempValue? Analyze(IElseClauseSyntax? clause, ReachabilityGraph graph, VariableScope scope)
         {
-            switch (clause)
+            return clause switch
             {
-                default:
-                    throw ExhaustiveMatch.Failed(clause);
-                case null:
-                    return null;
-                case IBlockExpressionSyntax exp:
-                    return AnalyzeBlock(exp, graph, scope);
-                case IIfExpressionSyntax exp:
-                    return Analyze((IExpressionSyntax)exp, graph, scope);
-                case IResultStatementSyntax exp:
-                    return Analyze(exp.Expression, graph, scope);
-            }
+                null => null,
+                IBlockExpressionSyntax exp => AnalyzeBlock(exp, graph, scope),
+                IIfExpressionSyntax exp => Analyze((IExpressionSyntax)exp, graph, scope),
+                IResultStatementSyntax exp => Analyze(exp.Expression, graph, scope),
+                _ => throw ExhaustiveMatch.Failed(clause)
+            };
         }
 
         private TempValue? AnalyzeBlock(IBlockOrResultSyntax blockOrResult, ReachabilityGraph graph, VariableScope scope)
@@ -397,8 +392,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     throw ExhaustiveMatch.Failed(blockOrResult);
                 case IBlockExpressionSyntax exp:
                 {
+                    var nestedScope = new VariableScope(scope);
+
                     foreach (var statement in exp.Statements)
-                        Analyze(statement, graph, scope);
+                        Analyze(statement, graph, nestedScope);
+                    foreach (var variable in nestedScope.Variables)
+                        graph.FreeVariable(variable);
+
                     // Assuming void return from blocks for now
                     return null;
                 }
@@ -432,6 +432,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     return isReferenceType ? graph.VariableFor(exp.ReferencedSymbol.Assigned()) : null;
                 }
             }
+        }
+
+        /// <summary>
+        /// Analyze whether the expression can be used as the right hand side of
+        /// an assignment.
+        /// </summary>
+        private TempValue? AnalyzeAssignmentSource(
+            IExpressionSyntax? expression,
+            ReachabilityGraph graph,
+            VariableScope scope)
+        {
+            if (expression is null) return null;
+
+            var place = Analyze(expression, graph, scope);
+
+            // An owned value is always safe to use
+            if (place is null || place.References.All(r => r.CouldHaveOwnership))
+                return place;
+
+            // We aren't using the reference yet, but it still needs to be a reference
+            // to something that hasn't been released.
+            if (place.PossibleReferents.Any(p => !p.IsAllocated))
+                diagnostics.Add(BorrowError.SharedValueDoesNotLiveLongEnough(file, expression.Span, null));
+
+            return place;
         }
 
         /// <summary>

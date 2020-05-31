@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         {
             var reference = Reference.ToNewParameterContextObject(parameter);
             var callerVariable = new CallerVariable(parameter);
-            callerVariable.references.Add(reference);
+            callerVariable.AddReference(reference);
             return callerVariable;
         }
     }

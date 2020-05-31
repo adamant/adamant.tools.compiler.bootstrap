@@ -156,17 +156,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
 
         private static Parameter BuildParameter(IParameterSyntax parameter)
         {
-            switch (parameter)
+            return parameter switch
             {
-                default:
-                    throw ExhaustiveMatch.Failed(parameter);
-                case INamedParameterSyntax namedParameter:
-                    return new Parameter(namedParameter.IsMutableBinding, namedParameter.Name, namedParameter.Type.Known());
-                case ISelfParameterSyntax selfParameter:
-                    return new Parameter(selfParameter.IsMutableBinding, selfParameter.Name, selfParameter.Type.Known());
-                case IFieldParameterSyntax _:
-                    throw new NotImplementedException("Building field parameters not implemented");
-            }
+                INamedParameterSyntax namedParameter =>
+                    new Parameter(namedParameter.IsMutableBinding, namedParameter.Name, namedParameter.Type.Known()),
+                ISelfParameterSyntax selfParameter =>
+                    new Parameter(selfParameter.IsMutableBinding, selfParameter.Name, selfParameter.Type.Known()),
+                IFieldParameterSyntax _ => throw new NotImplementedException("Building field parameters not implemented"),
+                _ => throw ExhaustiveMatch.Failed(parameter)
+            };
         }
     }
 }

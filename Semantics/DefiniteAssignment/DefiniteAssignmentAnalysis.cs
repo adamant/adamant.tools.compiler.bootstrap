@@ -35,15 +35,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
             IAssignmentExpressionSyntax assignmentExpression,
             VariableFlags definitelyAssigned)
         {
-            switch (assignmentExpression.LeftOperand)
+            return assignmentExpression.LeftOperand switch
             {
-                case INameExpressionSyntax identifier:
-                    return definitelyAssigned.Set(identifier.ReferencedSymbol.Assigned(), true);
-                case IFieldAccessExpressionSyntax _:
-                    return definitelyAssigned;
-                default:
-                    throw new NotImplementedException("Complex assignments not yet implemented");
-            }
+                INameExpressionSyntax identifier =>
+                    definitelyAssigned.Set(identifier.ReferencedSymbol.Assigned(), true),
+                IFieldAccessExpressionSyntax _ => definitelyAssigned,
+                _ => throw new NotImplementedException("Complex assignments not yet implemented")
+            };
         }
 
         public VariableFlags IdentifierName(

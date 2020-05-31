@@ -1,22 +1,31 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
+using ExhaustiveMatching;
 using MoreLinq;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
     internal abstract class Place
     {
-        protected readonly List<Reference> references = new List<Reference>();
+        private readonly List<Reference> references = new List<Reference>();
         public IReadOnlyList<Reference> References { get; }
         public IEnumerable<HeapPlace> PossibleReferents => references.Select(r => r.Referent).Distinct();
+
+        public bool IsAllocated { get; private set; } = true;
 
         protected Place()
         {
             References = references.AsReadOnly();
         }
 
-        public void ClearReferences() => references.Clear();
+        public FixedList<Reference> StealReferences()
+        {
+            var stolenReferences = references.ToFixedList();
+            references.Clear();
+            return stolenReferences;
+        }
 
         public void MoveFrom(RootPlace variable)
         {
@@ -36,6 +45,58 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         public void IdentityFrom(RootPlace variable)
         {
             references.AddRange(variable.References.Select(r => r.Identify()).DistinctBy(r => r.Referent));
+        }
+
+        public virtual void Free()
+        {
+            if (!IsAllocated)
+                throw new Exception("Can't free memory twice");
+            IsAllocated = false;
+            ReleaseReferences();
+        }
+
+        private void ReleaseReferences()
+        {
+            foreach (var reference in references.Where(r => r.CouldHaveOwnership))
+                reference.Referent.Free();
+
+            foreach (var reference in references)
+                reference.Release();
+        }
+
+        protected void AddReference(Reference reference)
+        {
+            references.Add(reference);
+        }
+
+        protected void AddReferences(IEnumerable<Reference> reference)
+        {
+            references.AddRange(reference);
+        }
+
+        public void MarkReferencedObjects()
+        {
+            foreach (var reference in References.Where(r => r.IsUsed))
+            {
+                var effectiveAccess = reference.EffectiveAccess();
+                var referent = reference.Referent;
+                switch (effectiveAccess)
+                {
+                    default:
+                        throw ExhaustiveMatch.Failed(effectiveAccess);
+                    case Access.ReadOnly:
+                        // Should have already been marked
+                        if (referent.CurrentAccess != Access.ReadOnly)
+                            throw new InvalidOperationException("Referent state should already be marked");
+                        break;
+                    case Access.Identify:
+                        throw new NotImplementedException();
+                    //referent.State ??= ObjectState.Referenced;
+                    case Access.Mutable:
+                        referent.MarkMutable();
+                        break;
+                }
+            }
         }
     }
 }

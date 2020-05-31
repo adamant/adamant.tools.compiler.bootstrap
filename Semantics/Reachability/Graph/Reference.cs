@@ -11,6 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     {
         public HeapPlace Referent { get; private set; }
         public Ownership Ownership { get; }
+        public bool CouldHaveOwnership => Ownership == Ownership.Owns || Ownership == Ownership.PotentiallyOwns;
 
         /// <summary>
         /// The access the reference has based on the type it was created from
@@ -217,6 +218,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return identity;
         }
 
+        /// <summary>
+        /// A reference is used when it is passed out of a function. Once that
+        /// happens, we can't be sure how it will be accessed. Within the current
+        /// function, references are just being moved around. Even if one is
+        /// dereferenced, it doesn't have to be marked used, just checked to
+        /// be usable at that moment.
+        /// </summary>
         public void Use()
         {
             switch (Phase)
@@ -232,6 +240,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 case Phase.Released:
                     throw new InvalidOperationException("Can't use released reference");
             }
+        }
+
+        /// <summary>
+        /// Release this reference so that it no longer holds the referenced object
+        /// </summary>
+        public void Release()
+        {
+            Phase = Phase.Released;
         }
     }
 }

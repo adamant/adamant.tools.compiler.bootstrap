@@ -17,17 +17,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
         public static FixedList<ISymbol> Lookup(this ISymbol symbol, SimpleName name)
         {
             if (symbol == UnknownSymbol.Instance) return UnknownSymbolList;
-            switch (symbol)
+            return symbol switch
             {
-                default:
-                    throw ExhaustiveMatch.Failed(symbol);
-                case IParentSymbol parentSymbol:
-                    return parentSymbol.ChildSymbols.TryGetValue(name, out var childSymbols)
+                IParentSymbol parentSymbol =>
+                    parentSymbol.ChildSymbols.TryGetValue(name, out var childSymbols)
                         ? childSymbols
-                        : FixedList<ISymbol>.Empty;
-                case IBindingSymbol _:
-                    return FixedList<ISymbol>.Empty;
-            }
+                        : FixedList<ISymbol>.Empty,
+                IBindingSymbol _ => FixedList<ISymbol>.Empty,
+                _ => throw ExhaustiveMatch.Failed(symbol)
+            };
         }
 
         public static T Assigned<T>(this T? symbol)

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
@@ -65,8 +64,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 Add(reference.Referent);
         }
 
+        public bool FreeVariable(IBindingSymbol variable)
+        {
+            if (!variables.Remove(variable, out var place)) return false;
+            place.Free();
+            return true;
+        }
+
         public bool Remove(TempValue tempValue)
         {
+            // Make sure this is released
+            tempValue.Free();
             return tempValues.Remove(tempValue);
         }
         #endregion
@@ -82,78 +90,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 ? variable : null;
         }
 
-        public void ComputeObjectStates()
+        public void ComputeCurrentObjectAccess()
         {
             var heapPlaces = AllHeapPlaces().ToFixedList();
 
-            // Clear states
+            // Reset mutability to unknown (null)
             foreach (var place in heapPlaces)
-                place.State = null;
+                place.ResetAccess();
 
             var rootPlaces = callerVariables.Values.SafeCast<RootPlace>()
                                             .Concat(variables.Values)
                                             .Concat(tempValues)
                                             .ToFixedList();
-            foreach (var place in rootPlaces)
-                ComputeSharedObjects(place);
 
             foreach (var place in rootPlaces)
-                MarkReferencedMutablePlaces(place);
+                place.MarkReadOnlyObjects();
 
-            // Places that can't be reached have been released
-            foreach (var heapPlace in heapPlaces.Where(p => p.State is null))
-                heapPlace.State = ObjectState.Released;
+            foreach (var place in rootPlaces)
+                place.MarkReferencedObjects();
         }
 
         private IEnumerable<HeapPlace> AllHeapPlaces()
         {
             return contextObjects.Values.SafeCast<HeapPlace>().Concat(objects.Values);
-        }
-
-        private static void ComputeSharedObjects(RootPlace place)
-        {
-            var readOnlyReferences = place.References
-                                  .Where(r => r.IsUsed && r.DeclaredAccess == Access.ReadOnly);
-            foreach (var reference in readOnlyReferences)
-                MarkReadOnly(reference.Referent);
-        }
-
-        private static void MarkReadOnly(HeapPlace place)
-        {
-            if (place.State == ObjectState.ReadOnly)
-                return; // Already readonly, don't recur through it again
-
-            place.State = ObjectState.ReadOnly;
-            // Recur to all used references which can read from their objects
-            var references = place.References.Where(r => r.IsUsed  && r.DeclaredReadable);
-            foreach (var reference in references)
-                MarkReadOnly(reference.Referent);
-        }
-
-        private static void MarkReferencedMutablePlaces(Place place)
-        {
-            foreach (var reference in place.References.Where(r => r.IsUsed))
-            {
-                var effectiveAccess = reference.EffectiveAccess();
-                var referent = reference.Referent;
-                switch (effectiveAccess)
-                {
-                    default:
-                        throw ExhaustiveMatch.Failed(effectiveAccess);
-                    case Access.ReadOnly:
-                        // Should have already been marked
-                        if (referent.State != ObjectState.ReadOnly)
-                            throw new InvalidOperationException("Referent state should already be marked");
-                        break;
-                    case Access.Identify:
-                        referent.State ??= ObjectState.Mutable;
-                        break;
-                    case Access.Mutable:
-                        referent.State ??= ObjectState.Mutable;
-                        MarkReferencedMutablePlaces(referent);
-                        break;
-                }
-            }
         }
     }
 }

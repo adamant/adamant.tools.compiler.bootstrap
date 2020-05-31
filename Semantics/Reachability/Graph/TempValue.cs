@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
             var reference = Reference.ToNewContextObject(expression);
             var temp = new TempValue(referenceType);
-            temp.references.Add(reference);
+            temp.AddReference(reference);
             return temp;
         }
 
@@ -30,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
             var reference = Reference.ToNewObject(expression);
             var temp = new TempValue(referenceType);
-            temp.references.Add(reference);
+            temp.AddReference(reference);
             return temp;
         }
 
@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
             var reference = Reference.ToNewInvocationReturnedObject(expression);
             var temp = new TempValue(referenceType);
-            temp.references.Add(reference);
+            temp.AddReference(reference);
             return temp;
         }
 

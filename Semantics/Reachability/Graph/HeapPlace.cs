@@ -1,3 +1,4 @@
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using ExhaustiveMatching;
 
@@ -14,7 +15,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         /// all the others must directly or indirectly borrow.
         /// </summary>
         public Reference? OriginOfMutability { get; }
-        public ObjectState? State { get; set; }
+        /// <summary>
+        /// Whether this object is currently mutable. Null indicates access is
+        /// unknown. Deallocated places also have null access.
+        /// </summary>
+        public Access? CurrentAccess { get; private set; }
 
         protected HeapPlace(ISyntax originSyntax, Reference? originOfMutability)
         {
@@ -24,10 +29,43 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public void Capture(TempValue argument)
         {
-            foreach (var reference in argument.References)
-                references.Add(reference);
+            AddReferences(argument.StealReferences());
+        }
 
-            argument.ClearReferences();
+        public override void Free()
+        {
+            base.Free();
+            CurrentAccess = null;
+        }
+
+        public void ResetAccess()
+        {
+            CurrentAccess = null;
+        }
+
+        public void MarkReadOnly()
+        {
+            if (!IsAllocated)
+                return; // This object has actually been released
+
+            if (CurrentAccess == Access.ReadOnly)
+                return; // Already readonly, don't recur through it again
+
+            CurrentAccess = Access.ReadOnly;
+            // Recur to all used references which can read from their objects
+            var references = References.Where(r => r.IsUsed && r.DeclaredReadable);
+            foreach (var reference in references)
+                reference.Referent.MarkReadOnly();
+        }
+
+        public void MarkMutable()
+        {
+            if (CurrentAccess == Access.ReadOnly)
+                // already marked read only
+                return;
+
+            CurrentAccess = Access.Mutable;
+            MarkReferencedObjects();
         }
     }
 }

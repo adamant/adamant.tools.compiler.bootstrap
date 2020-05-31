@@ -46,7 +46,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 {
                     // Isolated parameters are fully independent of the caller
                     var reference = Reference.ToNewParameterObject(parameter);
-                    parameterVariable.references.Add(reference);
+                    parameterVariable.AddReference(reference);
                 }
                 break;
                 case Owned:
@@ -55,7 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 case HeldMutable:
                 {
                     var reference = Reference.ToNewParameterObject(parameter);
-                    parameterVariable.references.Add(reference);
+                    parameterVariable.AddReference(reference);
                     var referencedObject = reference.Referent;
 
 
@@ -93,7 +93,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             if (referenceType is null) return null;
 
             var variable = new Variable(field);
-            variable.references.Add(Reference.ToNewFieldObject(field));
+            variable.AddReference(Reference.ToNewFieldObject(field));
 
             return variable;
         }
@@ -108,12 +108,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public void Assign(TempValue temp)
         {
-            // Steal all the temps references
-            ClearReferences();
-            references.AddRange(temp.References);
-            temp.ClearReferences();
-            foreach (var reference in references)
-                reference.Use();
+            AddReferences(temp.StealReferences());
         }
     }
 }
