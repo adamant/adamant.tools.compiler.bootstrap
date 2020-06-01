@@ -194,17 +194,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     var arguments = exp.Arguments.Select(a => Analyze(a.Expression, graph, scope)).ToFixedList();
                     var function = exp.FunctionNameSyntax.ReferencedSymbol.Assigned();
                     var parameters = function.Parameters;
-                    foreach (var ((tempValue, argumentSyntax), parameter) in arguments
-                                                                             .Zip(exp.Arguments).Zip(parameters))
-                    {
-                        if (tempValue is null) continue;
-                        if (!(parameter.Type is ReferenceType parameterType))
-                            throw new InvalidOperationException(
-                                $"Expected parameter {parameter} to be a reference type");
-
-                        UseArgument(tempValue, argumentSyntax.Span, graph);
-                    }
-
+                    UseArguments(arguments, exp.Arguments, parameters, graph);
                     return referenceType is null ? null : CaptureArguments(exp, arguments, graph);
                 }
                 case IMethodInvocationExpressionSyntax exp:
@@ -215,16 +205,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     var parameters = method.Parameters;
                     if (!(self is null))
                         UseArgument(self, exp.ContextExpression.Span, graph);
-                    foreach (var ((tempValue, argumentSyntax), parameter) in arguments
-                                                                             .Zip(exp.Arguments).Zip(parameters))
-                    {
-                        if (tempValue is null) continue;
-                        if (!(parameter.Type is ReferenceType))
-                            throw new InvalidOperationException(
-                                $"Expected parameter {parameter} to be a reference type");
-
-                        UseArgument(tempValue, argumentSyntax.Span, graph);
-                    }
+                    UseArguments(arguments, exp.Arguments, parameters, graph);
 
                     return referenceType is null ? null : CaptureArguments(exp, arguments.Prepend(self), graph);
                 }
@@ -238,9 +219,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 case INewObjectExpressionSyntax exp:
                 {
                     var arguments = exp.Arguments.Select(a => Analyze(a.Expression, graph, scope)).ToFixedList();
-                    if (referenceType is null) return null;
-                    // TODO check arguments can be used
 
+                    var constructor = exp.ConstructorSymbol.Assigned();
+                    var parameters = constructor.Parameters;
+                    UseArguments(arguments, exp.Arguments, parameters, graph);
+                    if (referenceType is null) return null;
                     var temp = TempValue.ForNewObject(exp);
                     // TODO tie the new object to the arguments
                     graph.Add(temp);
@@ -303,6 +286,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     return null;
                 case IImplicitOptionalConversionExpression exp:
                     return Analyze(exp.Expression, graph, scope);
+            }
+        }
+
+        private void UseArguments(
+            FixedList<TempValue?> arguments,
+            FixedList<IArgumentSyntax> argumentSyntaxes,
+            IEnumerable<IBindingSymbol> parameters,
+            ReachabilityGraph graph)
+        {
+            foreach (var ((argument, argumentSyntax), parameter) in arguments.Zip(argumentSyntaxes).Zip(parameters))
+            {
+                if (argument is null) continue;
+                if (!(parameter.Type is ReferenceType))
+                    throw new InvalidOperationException($"Expected parameter {parameter} to be a reference type");
+
+                UseArgument(argument, argumentSyntax.Span, graph);
             }
         }
 

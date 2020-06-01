@@ -9,6 +9,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         ITypeNameSyntax TypeSyntax { get; }
         ICallableNameSyntax? ConstructorName { get; }
         FixedList<IArgumentSyntax> Arguments { get; }
-        [DisallowNull] ISymbol? ConstructorSymbol { get; set; }
+        [DisallowNull] IFunctionSymbol? ConstructorSymbol { get; set; }
     }
 }
