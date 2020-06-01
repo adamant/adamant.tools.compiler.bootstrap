@@ -150,13 +150,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         public bool IsUsedForBorrow()
         {
             PruneBorrowers();
-            return Borrowers.Any(b => b.IsUsedForBorrowInternal());
+            return Borrowers.Any(b => b.IsUsedForBorrowInternal(null));
         }
 
-        private bool IsUsedForBorrowInternal()
+        public bool IsUsedForBorrowExceptBy(Reference reference)
         {
-            return Phase == Phase.Used
-                   || (Phase == Phase.Unused && Borrowers.Any(b => b.IsUsedForBorrowInternal()));
+            PruneBorrowers();
+            return Borrowers.Any(b => b.IsUsedForBorrowInternal(reference));
+        }
+
+        private bool IsUsedForBorrowInternal(Reference? exceptBy)
+        {
+            return (Phase == Phase.Used && this != exceptBy)
+                   || (Phase == Phase.Unused && Borrowers.Any(b => b.IsUsedForBorrowInternal(exceptBy)));
         }
 
         /// <summary>

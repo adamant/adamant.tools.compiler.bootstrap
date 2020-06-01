@@ -77,6 +77,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             tempValue.Free();
             return tempValues.Remove(tempValue);
         }
+
+        public void Remove(IEnumerable<TempValue?> values)
+        {
+            foreach (var tempValue in values)
+                if (!(tempValue is null))
+                    Remove(tempValue);
+        }
         #endregion
 
         public Variable VariableFor(IBindingSymbol variableSymbol)
@@ -102,9 +109,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                                             .Concat(variables.Values)
                                             .Concat(tempValues)
                                             .ToFixedList();
-
-            foreach (var place in rootPlaces)
-                place.MarkReadOnlyObjects();
 
             foreach (var place in rootPlaces)
                 place.MarkReferencedObjects();

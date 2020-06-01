@@ -76,7 +76,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public void MarkReferencedObjects()
         {
-            foreach (var reference in References.Where(r => r.IsUsed))
+            foreach (var reference in References)
             {
                 var effectiveAccess = reference.EffectiveAccess();
                 var referent = reference.Referent;
@@ -85,13 +85,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                     default:
                         throw ExhaustiveMatch.Failed(effectiveAccess);
                     case Access.ReadOnly:
-                        // Should have already been marked
-                        if (referent.CurrentAccess != Access.ReadOnly)
-                            throw new InvalidOperationException("Referent state should already be marked");
+                        if (reference.IsUsed)
+                            referent.MarkReadOnly();
+                        else
+                            // If not used, we still need to recurse into it. We can identify it still.
+                            referent.MarkIdentifiable();
                         break;
                     case Access.Identify:
-                        throw new NotImplementedException();
-                    //referent.State ??= ObjectState.Referenced;
+                        referent.MarkIdentifiable();
+                        break;
                     case Access.Mutable:
                         referent.MarkMutable();
                         break;

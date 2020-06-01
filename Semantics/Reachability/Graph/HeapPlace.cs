@@ -67,5 +67,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             CurrentAccess = Access.Mutable;
             MarkReferencedObjects();
         }
+
+        public void MarkIdentifiable()
+        {
+            if (!(CurrentAccess is null)) return;
+            CurrentAccess = Access.Identify;
+            MarkReferencedObjects();
+        }
     }
 }

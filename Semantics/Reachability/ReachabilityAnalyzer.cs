@@ -63,6 +63,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 {
                     var initializer = AnalyzeAssignmentSource(stmt.Initializer, graph, scope);
                     var variable = VariableDeclared(stmt, graph, scope);
+                    // TODO this variable's references effectively go away when it is no longer live
+                    // TODO how does the idea of in use variables work with variables?
                     if (initializer is null) break;
                     variable?.Assign(initializer);
                     graph.Remove(initializer);
@@ -195,7 +197,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     var function = exp.FunctionNameSyntax.ReferencedSymbol.Assigned();
                     var parameters = function.Parameters;
                     UseArguments(arguments, exp.Arguments, parameters, graph);
-                    return referenceType is null ? null : CaptureArguments(exp, arguments, graph);
+                    if (!(referenceType is null))
+                        return CaptureArguments(exp, arguments, graph);
+
+                    // All the arguments are dropped because they aren't captured
+                    graph.Remove(arguments);
+                    return null;
+
                 }
                 case IMethodInvocationExpressionSyntax exp:
                 {
@@ -206,8 +214,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     if (!(self is null))
                         UseArgument(self, exp.ContextExpression.Span, graph);
                     UseArguments(arguments, exp.Arguments, parameters, graph);
+                    if (!(referenceType is null))
+                        return CaptureArguments(exp, arguments.Prepend(self), graph);
 
-                    return referenceType is null ? null : CaptureArguments(exp, arguments.Prepend(self), graph);
+                    // All the arguments are dropped because they aren't captured
+                    graph.Remove(arguments);
+                    return null;
                 }
                 case IUnsafeExpressionSyntax exp:
                     return Analyze(exp.Expression, graph, scope);
@@ -324,8 +336,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
 
                         // And we must be a borrower from someone who has the mutable access
                         var originOfMutability = reference.Referent.OriginOfMutability;
-                        if (!originOfMutability?.IsOriginFor(reference) ?? true)
+                        if (originOfMutability is null || !originOfMutability.IsOriginFor(reference))
                             diagnostics.Add(BorrowError.CantBorrowFromThisReference(file, span));
+                        // And it can't be used for borrow already
+                        else if (originOfMutability.IsUsedForBorrowExceptBy(reference))
+                            diagnostics.Add(BorrowError.CantBorrowWhileBorrowed(file, span));
                     }
                     break;
                     case Access.ReadOnly:
