@@ -5,7 +5,6 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
@@ -58,7 +57,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
             if (possiblyMoved[symbol] == true)
                 diagnostics.Add(SemanticError.UseOfPossiblyMovedValue(file, nameExpression.Span));
 
-            var valueSemantics = nameExpression.Type.Assigned().ValueSemantics;
+            var valueSemantics = nameExpression.ValueSemantics
+                // TODO this isn't correct, but for now fields don't have proper move, borrow handling
+                ?? nameExpression.Type.Assigned().ValueSemantics;
             switch (valueSemantics)
             {
                 case ValueSemantics.Move:

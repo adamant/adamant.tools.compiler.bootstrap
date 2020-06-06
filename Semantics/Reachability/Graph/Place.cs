@@ -27,24 +27,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return stolenReferences;
         }
 
-        public void MoveFrom(RootPlace variable)
+        public void MoveFrom(RootPlace place)
         {
-            throw new NotImplementedException();
+            references.AddRange(place.StealReferences());
         }
 
-        public void BorrowFrom(RootPlace variable)
+        public void BorrowFrom(RootPlace place)
         {
-            foreach (var reference in variable.References) references.Add(reference.Borrow());
+            foreach (var reference in place.References)
+                references.Add(reference.Borrow());
         }
 
-        public void ShareFrom(RootPlace variable)
+        public void ShareFrom(RootPlace place)
         {
-            references.AddRange(variable.References.Select(r => r.Share()).DistinctBy(r => r.Referent));
+            references.AddRange(place.References.Select(r => r.Share()).DistinctBy(r => r.Referent));
         }
 
-        public void IdentityFrom(RootPlace variable)
+        public void IdentityFrom(RootPlace place)
         {
-            references.AddRange(variable.References.Select(r => r.Identify()).DistinctBy(r => r.Referent));
+            references.AddRange(place.References.Select(r => r.Identify()).DistinctBy(r => r.Referent));
         }
 
         public virtual void Free()

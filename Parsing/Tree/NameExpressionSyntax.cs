@@ -5,6 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
 
@@ -42,6 +43,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
                 if (containingScope != null)
                     throw new InvalidOperationException("Can't set containing scope repeatedly");
                 containingScope = value ?? throw new ArgumentNullException(nameof(value));
+            }
+        }
+
+        private ValueSemantics? valueSemantics;
+
+        [DisallowNull]
+        public ValueSemantics? ValueSemantics
+        {
+            [DebuggerStepThrough]
+            get => valueSemantics;
+            set
+            {
+                if (valueSemantics != null)
+                    throw new InvalidOperationException("Can't set value semantics repeatedly");
+                valueSemantics = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
