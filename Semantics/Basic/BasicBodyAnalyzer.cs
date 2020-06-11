@@ -291,15 +291,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 {
                     if (exp.ReturnValue != null)
                     {
-                        var returnValue = exp.ReturnValue;
                         var expectedReturnType = returnType ?? throw new InvalidOperationException("Return statement in constructor");
-                        // If we return ownership, there can be an implicit move
-                        //if (returnExpression.ReturnValue is INameExpressionSyntax name
-                        //    && returnType is UserObjectType objectType
-                        //    && objectType.IsOwned)
-                        //    returnExpression.ReturnValue = new ImplicitMoveSyntax(returnValue.Span, name);
+                        InferType(ref exp.ReturnValue, false);
 
-                        CheckType(ref exp.ReturnValue, expectedReturnType);
+                        // If we return ownership, there can be an implicit move
+                        InsertImplicitMoveIfNeeded(ref exp.ReturnValue, expectedReturnType);
                     }
                     else if (returnType == DataType.Never)
                         diagnostics.Add(TypeError.CantReturnFromNeverFunction(file, exp.Span));
@@ -565,10 +561,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             type = referenceType.WithCapability(ReferenceCapability.Shared);
 
-            expression = new ImplicitShareExpressionSyntax(expression, type)
-            {
-                SharedSymbol = referencedSymbol,
-            };
+            expression = new ImplicitShareExpressionSyntax(expression, type, referencedSymbol);
 
             return type;
         }
@@ -595,10 +588,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
             type = referenceType.WithCapability(ReferenceCapability.Borrowed);
 
-            expression = new ImplicitBorrowExpressionSyntax(expression, type)
-            {
-                BorrowedSymbol = referencedSymbol,
-            };
+            expression = new ImplicitBorrowExpressionSyntax(expression, type, referencedSymbol);
+
+            return type;
+        }
+
+        private static DataType InsertImplicitMoveIfNeeded(
+            [NotNull] ref IExpressionSyntax expression,
+            DataType type)
+        {
+            // Value types aren't moved
+            if (!(type is ReferenceType referenceType)
+                // Neither are non-moveable types
+                || !referenceType.IsMovable) return type;
+
+            if (!(expression is INameExpressionSyntax name))
+                // Implicit move not needed
+                return type;
+
+            var referencedSymbol = name.ReferencedSymbol.Assigned();
+            expression = new ImplicitMoveSyntax(expression, type, referencedSymbol);
 
             return type;
         }

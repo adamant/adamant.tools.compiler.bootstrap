@@ -94,6 +94,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                 // Isolated can be weakened to owned
                 case (Owned, Isolated):
                 case (OwnedMutable, IsolatedMutable):
+                // Isolated allows recovering mutability
+                case (IsolatedMutable, Isolated):
                     return true;
                 // Can't borrow from read-only
                 case (Borrowed, Owned):

@@ -31,25 +31,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
             set => throw new InvalidOperationException("Can't set type repeatedly");
         }
 
-        // TODO maybe set from constructor and disallow all changes
-        private IBindingSymbol? sharedSymbol;
         [DisallowNull]
-        public IBindingSymbol? SharedSymbol
-        {
-            [DebuggerStepThrough]
-            get => sharedSymbol;
-            set
-            {
-                if (sharedSymbol != null) throw new InvalidOperationException("Can't set referenced symbol repeatedly");
-                sharedSymbol = value ?? throw new ArgumentNullException(nameof(value));
-            }
-        }
+        public IBindingSymbol SharedSymbol { [DebuggerStepThrough] get; }
 
-        public ImplicitShareExpressionSyntax(IExpressionSyntax referent, DataType type)
+        public ImplicitShareExpressionSyntax(IExpressionSyntax referent, DataType type, IBindingSymbol sharedSymbol)
         {
             Span = referent.Span;
             this.referent = referent;
             this.type = type ?? throw new ArgumentNullException(nameof(type));
+            this.SharedSymbol = sharedSymbol ?? throw new ArgumentNullException(nameof(sharedSymbol));
         }
 
         public override string ToString()

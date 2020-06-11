@@ -60,16 +60,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         public static ReferenceType? UnderlyingReferenceType(this DataType type)
         {
-            switch (type)
+            return type switch
             {
-                case ReferenceType referenceType:
-                    return referenceType;
-                case OptionalType optionalType
-                    when optionalType.Referent is ReferenceType referenceType:
-                    return referenceType;
-                default:
-                    return null;
-            }
+                ReferenceType referenceType => referenceType,
+                OptionalType optionalType when optionalType.Referent is ReferenceType referenceType => referenceType,
+                _ => null
+            };
         }
     }
 }

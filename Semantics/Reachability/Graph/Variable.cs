@@ -58,9 +58,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                     parameterVariable.AddReference(reference);
                     var referencedObject = reference.Referent;
 
-
+                    // Object to represent the bounding of the lifetime
                     callerVariable = CallerVariable.ForParameterWithObject(parameter);
-                    referencedObject.BorrowFrom(callerVariable);
+                    referencedObject.ShareFrom(callerVariable);
                 }
                 break;
                 case Borrowed:

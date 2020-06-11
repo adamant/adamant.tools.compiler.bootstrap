@@ -8,13 +8,14 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
 {
-    internal class ImplicitBorrowExpressionSyntax : IBorrowExpressionSyntax
+    internal class ImplicitMoveSyntax : IMoveExpressionSyntax
     {
         public TextSpan Span { [DebuggerStepThrough] get; }
 
-        [SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification =
-            "Can't be readonly because a reference to it is exposed")]
+        [SuppressMessage("Style", "IDE0044:Add readonly modifier",
+            Justification = "Can't be readonly because a reference to it is exposed")]
         private IExpressionSyntax referent;
+
         public ref IExpressionSyntax Referent
         {
             [DebuggerStepThrough]
@@ -31,26 +32,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
             set => throw new InvalidOperationException("Can't set type repeatedly");
         }
 
-        private readonly IBindingSymbol borrowedSymbol;
+        private readonly IBindingSymbol movedSymbol;
         [DisallowNull]
-        public IBindingSymbol? BorrowedSymbol
+        public IBindingSymbol? MovedSymbol
         {
             [DebuggerStepThrough]
-            get => borrowedSymbol;
+            get => movedSymbol;
             set => throw new InvalidOperationException("Can't set referenced symbol repeatedly");
         }
 
-        public ImplicitBorrowExpressionSyntax(IExpressionSyntax referent, DataType type, IBindingSymbol borrowedSymbol)
+        public ImplicitMoveSyntax(IExpressionSyntax referent, DataType type, IBindingSymbol movedSymbol)
         {
             Span = referent.Span;
             this.referent = referent;
             this.type = type ?? throw new ArgumentNullException(nameof(type));
-            this.borrowedSymbol = borrowedSymbol ?? throw new ArgumentNullException(nameof(borrowedSymbol));
+            this.movedSymbol = movedSymbol ?? throw new ArgumentNullException(nameof(movedSymbol));
         }
 
         public override string ToString()
         {
-            return $"⟦borrow⟧ {Referent}";
+            return $"⟦move⟧ {Referent}";
         }
 
         public string ToGroupedString()
