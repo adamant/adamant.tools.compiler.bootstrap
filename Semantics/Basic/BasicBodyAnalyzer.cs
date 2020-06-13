@@ -292,7 +292,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     if (exp.ReturnValue != null)
                     {
                         var expectedReturnType = returnType ?? throw new InvalidOperationException("Return statement in constructor");
-                        InferType(ref exp.ReturnValue, false);
+                        CheckType(ref exp.ReturnValue, expectedReturnType);
 
                         // If we return ownership, there can be an implicit move
                         InsertImplicitMoveIfNeeded(ref exp.ReturnValue, expectedReturnType);
