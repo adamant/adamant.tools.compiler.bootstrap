@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     [Closed(
         typeof(ContextObject),
         typeof(Object))]
-    internal abstract class HeapPlace : Place
+    internal abstract class HeapPlace : MemoryPlace
     {
         public ISyntax OriginSyntax { get; }
         /// <summary>

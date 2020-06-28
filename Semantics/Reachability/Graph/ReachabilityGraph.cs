@@ -58,7 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 AddReferences(temp);
         }
 
-        private void AddReferences(Place place)
+        private void AddReferences(MemoryPlace place)
         {
             foreach (var reference in place.References)
                 Add(reference.Referent);
@@ -86,12 +86,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         }
         #endregion
 
-        public Variable VariableFor(IBindingSymbol variableSymbol)
+        public Variable GetVariableFor(IBindingSymbol variableSymbol)
         {
             // Variable needs to have already been declared
             return variables[variableSymbol];
         }
-        public Variable? TryVariableFor(IBindingSymbol variableSymbol)
+        public Variable? TryGetVariableFor(IBindingSymbol variableSymbol)
         {
             return variables.TryGetValue(variableSymbol, out var variable)
                 ? variable : null;

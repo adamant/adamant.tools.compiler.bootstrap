@@ -6,7 +6,9 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
     /// <summary>
-    /// A caller variable is a variable that exists in the caller's stackframe
+    /// A caller variable is a variable that exists in the caller's stackframe.
+    /// As such, it can't be mutated and must be assumed to exist for the lifetime
+    /// of the function.
     /// </summary>
     internal class CallerVariable : StackPlace
     {
@@ -19,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                    ?? throw new ArgumentException("Must be a reference type", nameof(symbol));
         }
 
-        public static CallerVariable ForParameterWithObject(IParameterSyntax parameter)
+        public static CallerVariable CreateForParameterWithObject(IParameterSyntax parameter)
         {
             var reference = Reference.ToNewParameterContextObject(parameter);
             var callerVariable = new CallerVariable(parameter);

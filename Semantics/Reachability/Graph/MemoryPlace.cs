@@ -7,7 +7,10 @@ using MoreLinq;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
-    internal abstract class Place
+    /// <summary>
+    /// A place in memory where a value can be stored
+    /// </summary>
+    internal abstract class MemoryPlace
     {
         private readonly List<Reference> references = new List<Reference>();
         public IReadOnlyList<Reference> References { get; }
@@ -15,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public bool IsAllocated { get; private set; } = true;
 
-        protected Place()
+        protected MemoryPlace()
         {
             References = references.AsReadOnly();
         }

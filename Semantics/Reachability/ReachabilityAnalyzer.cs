@@ -112,7 +112,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     _ = referenceType ?? throw new InvalidOperationException("Can't move value type");
 
                     // The referent should be a name or `self` so we don't need to evaluate it
-                    var variable = graph.VariableFor(exp.MovedSymbol.Assigned());
+                    var variable = graph.GetVariableFor(exp.MovedSymbol.Assigned());
                     var temp = TempValue.For(exp);
                     temp?.MoveFrom(variable);
                     graph.Add(temp);
@@ -123,7 +123,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     _ = referenceType ?? throw new InvalidOperationException("Can't borrow value type");
 
                     // If there is a variable, it is a simple borrow expression
-                    var variable = graph.TryVariableFor(exp.BorrowedSymbol.Assigned());
+                    var variable = graph.TryGetVariableFor(exp.BorrowedSymbol.Assigned());
                     if (!(variable is null))
                     {
                         var temp = TempValue.For(exp);
@@ -144,7 +144,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     _ = referenceType ?? throw new InvalidOperationException("Can't share value type");
 
                     // The referent should be a name or `self` so we don't need to evaluate it
-                    var variable = graph.TryVariableFor(exp.SharedSymbol.Assigned());
+                    var variable = graph.TryGetVariableFor(exp.SharedSymbol.Assigned());
                     if (!(variable is null))
                     {
                         var temp = TempValue.For(exp);
@@ -430,7 +430,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     throw ExhaustiveMatch.Failed(expression);
                 case IFieldAccessExpressionSyntax exp:
                 {
-                    var variable = graph.TryVariableFor(exp.ReferencedSymbol.Assigned());
+                    var variable = graph.TryGetVariableFor(exp.ReferencedSymbol.Assigned());
                     if (!(variable is null)) return variable;
 
                     if (!isReferenceType && exp.ContextExpression is ISelfExpressionSyntax) return null;
@@ -443,7 +443,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 }
                 case INameExpressionSyntax exp:
                 {
-                    return isReferenceType ? graph.VariableFor(exp.ReferencedSymbol.Assigned()) : null;
+                    return isReferenceType ? graph.GetVariableFor(exp.ReferencedSymbol.Assigned()) : null;
                 }
             }
         }
