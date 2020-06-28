@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     /// <summary>
     /// A parameter, local variable, or field of `self`
     /// </summary>
-    internal class Variable : RootPlace
+    internal class Variable : StackPlace
     {
         public IBindingSymbol Symbol { get; }
 

@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
-    internal class TempValue : RootPlace
+    internal class TempValue : StackPlace
     {
         public ReferenceType ReferenceType { get; }
 

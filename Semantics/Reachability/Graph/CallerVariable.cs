@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     /// <summary>
     /// A caller variable is a variable that exists in the caller's stackframe
     /// </summary>
-    internal class CallerVariable : RootPlace
+    internal class CallerVariable : StackPlace
     {
         public IBindingSymbol Symbol { get; }
 

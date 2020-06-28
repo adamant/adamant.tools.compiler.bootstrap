@@ -105,7 +105,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             foreach (var place in heapPlaces)
                 place.ResetAccess();
 
-            var rootPlaces = callerVariables.Values.SafeCast<RootPlace>()
+            var rootPlaces = callerVariables.Values.SafeCast<StackPlace>()
                                             .Concat(variables.Values)
                                             .Concat(tempValues)
                                             .ToFixedList();
