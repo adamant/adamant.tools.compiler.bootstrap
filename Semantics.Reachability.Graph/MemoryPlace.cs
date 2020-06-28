@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     /// <summary>
     /// A place in memory where a value can be stored
     /// </summary>
-    internal abstract class MemoryPlace
+    public abstract class MemoryPlace
     {
         private readonly List<Reference> references = new List<Reference>();
         public IReadOnlyList<Reference> References { get; }

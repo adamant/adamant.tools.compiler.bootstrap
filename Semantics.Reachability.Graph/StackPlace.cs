@@ -6,7 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     /// actually be output to the stack, they conceptually stored on the stack
     /// because they have stack like storage.
     /// </summary>
-    internal abstract class StackPlace : MemoryPlace
+    public abstract class StackPlace : MemoryPlace
     {
     }
 }

@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
-    internal enum Ownership
+    public enum Ownership
     {
         None,
         PotentiallyOwns,

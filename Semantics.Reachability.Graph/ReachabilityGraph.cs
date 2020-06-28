@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     /// A graph of the possible references between places in a function. Also
     /// answers questions about the current mutability of objects etc.
     /// </summary>
-    internal class ReachabilityGraph
+    public class ReachabilityGraph
     {
         private readonly Dictionary<IBindingSymbol, CallerVariable> callerVariables = new Dictionary<IBindingSymbol, CallerVariable>();
         private readonly Dictionary<IBindingSymbol, Variable> variables = new Dictionary<IBindingSymbol, Variable>();

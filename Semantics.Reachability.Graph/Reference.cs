@@ -7,7 +7,7 @@ using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
-    internal class Reference
+    public class Reference
     {
         public HeapPlace Referent { get; private set; }
         public Ownership Ownership { get; }

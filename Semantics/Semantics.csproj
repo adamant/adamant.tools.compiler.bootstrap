@@ -35,6 +35,7 @@
     <ProjectReference Include="..\IntermediateLanguage\IntermediateLanguage.csproj" />
     <ProjectReference Include="..\Primitives\Primitives.csproj" />
     <ProjectReference Include="..\Scopes\Scopes.csproj" />
+    <ProjectReference Include="..\Semantics.Reachability.Graph\Semantics.Reachability.Graph.csproj" />
   </ItemGroup>
 
 </Project>

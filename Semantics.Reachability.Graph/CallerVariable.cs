@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     /// As such, it can't be mutated and must be assumed to exist for the lifetime
     /// of the function.
     /// </summary>
-    internal class CallerVariable : StackPlace
+    public class CallerVariable : StackPlace
     {
         public IBindingSymbol Symbol { get; }
 
