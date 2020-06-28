@@ -5,6 +5,7 @@ using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
 {
+    // TODO use xUnit assert extensions
     public static class AssertExtensions
     {
         public static void AssertIdentifier(

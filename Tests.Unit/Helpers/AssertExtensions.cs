@@ -6,6 +6,7 @@ using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers
 {
+    // TODO use xUnit assert extensions
     public static class AssertExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
