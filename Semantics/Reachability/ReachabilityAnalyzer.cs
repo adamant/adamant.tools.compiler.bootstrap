@@ -236,10 +236,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     var parameters = constructor.Parameters;
                     UseArguments(arguments, exp.Arguments, parameters, graph);
                     if (referenceType is null) return null;
-                    var temp = TempValue.ForNewObject(exp);
-                    // TODO tie the new object to the arguments
-                    graph.Add(temp);
-                    return temp;
+                    return graph.AddObject(exp); // TODO tie the new object to the arguments
                 }
                 case IStringLiteralExpressionSyntax exp:
                 {

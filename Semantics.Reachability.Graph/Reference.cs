@@ -104,7 +104,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             var access = referenceCapability.ToAccess();
             var reference = new Reference(ownership, access);
             var originOfMutability = access == Access.Mutable ? reference : null;
-            reference.Referent = new ContextObject(expression, originOfMutability);
+            reference.Referent = new Object(expression, originOfMutability);
             return reference;
         }
 

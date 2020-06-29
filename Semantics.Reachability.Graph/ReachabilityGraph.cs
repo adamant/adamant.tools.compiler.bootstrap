@@ -28,6 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         internal IReadOnlyCollection<Variable> Variables => variables.Values;
         internal IReadOnlyCollection<ContextObject> ContextObjects => contextObjects.Values;
         internal IReadOnlyCollection<Object> Objects => objects.Values;
+        internal IReadOnlyCollection<TempValue> TempValues => tempValues;
 
         #region Add/Remove Methods
         /// <returns>The added local variable for the parameter</returns>
@@ -118,6 +119,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             var variable = Variable.Declared(bindingSymbol);
             Add(variable);
             return variable;
+        }
+
+        public TempValue? AddObject(INewObjectExpressionSyntax expression)
+        {
+            var temp = TempValue.ForNewObject(expression);
+            Add(temp);
+            return temp;
         }
 
         public void Add(HeapPlace place)
@@ -229,6 +237,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         private void AppendStack(StringBuilder dot, Dictionary<MemoryPlace, string> nodes)
         {
+            if (!CallerVariables.Any() && !Variables.Any()) return;
+
             dot.AppendLine("    node [shape=plaintext];");
             dot.AppendLine("	stack [label=<");
             dot.AppendLine("        <TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\" CELLPADDING=\"4\">");
@@ -261,35 +271,49 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         private void AppendObjects(StringBuilder dot, Dictionary<MemoryPlace, string> nodes)
         {
-            dot.AppendLine("    node [shape=ellipse];");
-
-            var nextObject = 1;
-            foreach (var contextObject in ContextObjects)
+            if (ContextObjects.Any())
             {
-                var name = "ctx" + nextObject;
-                nodes.Add(contextObject, name);
-                dot.AppendLine($"    {name} [label=\"{Escape(contextObject.ToString())}\"];");
-                nextObject += 1;
+                dot.AppendLine("    node [shape=ellipse, peripheries=2];");
+
+                var nextObject = 1;
+                foreach (var contextObject in ContextObjects)
+                {
+                    var name = "ctx" + nextObject;
+                    nodes.Add(contextObject, name);
+                    dot.AppendLine($"    {name} [label=\"{Escape(contextObject.ToString())}\"];");
+                    nextObject += 1;
+                }
             }
 
-            nextObject = 1;
-            foreach (var obj in Objects)
+            if (Objects.Any())
             {
-                var name = "obj" + nextObject;
-                nodes.Add(obj, name);
-                dot.AppendLine($"    {name} [label=\"{Escape(obj.ToString())}\"];");
-                nextObject += 1;
+                dot.AppendLine("    node [shape=ellipse];");
+
+                var nextObject = 1;
+                foreach (var obj in Objects)
+                {
+                    var name = "obj" + nextObject;
+                    nodes.Add(obj, name);
+                    dot.AppendLine($"    {name} [label=\"{Escape(obj.ToString())}\"];");
+                    nextObject += 1;
+                }
             }
         }
 
         private void AppendReferences(StringBuilder dot, Dictionary<MemoryPlace, string> nodes)
         {
-            dot.AppendLine("    edge;");
+            bool firstEdge = true;
+
             var sources = CallerVariables.Concat<MemoryPlace>(Variables).Concat(ContextObjects).Concat(Objects);
             foreach (var sourceNode in sources)
             {
                 foreach (var reference in sourceNode.References)
                 {
+                    if (firstEdge)
+                    {
+                        dot.AppendLine("    edge;");
+                        firstEdge = false;
+                    }
                     dot.Append($"    {nodes[sourceNode]} -> {nodes[reference.Referent]} [");
                     switch (reference.DeclaredAccess)
                     {
