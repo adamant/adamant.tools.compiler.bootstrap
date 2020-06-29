@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             AddReferences(argument.StealReferences());
         }
 
-        public override void Free()
+        internal override void Free()
         {
             base.Free();
             CurrentAccess = null;

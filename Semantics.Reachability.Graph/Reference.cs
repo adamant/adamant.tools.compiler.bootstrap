@@ -251,7 +251,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         /// <summary>
         /// Release this reference so that it no longer holds the referenced object
         /// </summary>
-        public void Release()
+        internal void Release()
         {
             Phase = Phase.Released;
         }

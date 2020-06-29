@@ -493,11 +493,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             ReachabilityGraph graph,
             VariableScope parameterScope)
         {
-            var (callerVariable, variable) = Variable.ForParameter(parameter);
-            graph.Add(callerVariable);
-            graph.Add(variable);
-            if (!(variable is null))
-                parameterScope.VariableDeclared(parameter);
+            var localVariable = graph.AddParameter(parameter);
+            if (!(localVariable is null))
+                parameterScope.VariableDeclared(localVariable.Symbol);
         }
 
         private void CreateSelfParameter(ReachabilityGraph graph, VariableScope parameterScope)
@@ -529,11 +527,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
         {
             // TODO should fields have their own scope outside of parameter scope?
             foreach (var field in declaringClass.Members.OfType<IFieldDeclarationSyntax>())
-                if (field.Type.Known().UnderlyingReferenceType() != null)
-                {
-                    var variable = Variable.ForField(field);
-                    graph.Add(variable);
-                }
+                graph.AddField(field);
         }
 
         private static Variable? VariableDeclared(
@@ -541,12 +535,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             ReachabilityGraph graph,
             VariableScope scope)
         {
-            var referenceType = bindingSymbol.Type.Known().UnderlyingReferenceType();
-            if (referenceType is null) return null;
+            graph.AddVariable(bindingSymbol);
 
             var variable = Variable.Declared(bindingSymbol);
-            graph.Add(variable);
-            scope.VariableDeclared(bindingSymbol);
+            if (!(variable is null))
+                scope.VariableDeclared(variable.Symbol);
             return variable;
         }
     }

@@ -2,8 +2,6 @@ using System;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using ExhaustiveMatching;
-using static Adamant.Tools.Compiler.Bootstrap.Metadata.Types.ReferenceCapability;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
@@ -20,70 +18,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         /// </summary>
         public ReferenceType Type { get; }
 
-        private Variable(IBindingSymbol symbol)
+        internal Variable(IBindingSymbol symbol)
         {
             Symbol = symbol;
             Type = symbol.Type.UnderlyingReferenceType()
                    ?? throw new ArgumentException("Must be a reference type", nameof(symbol));
-        }
-
-        public static (CallerVariable?, Variable?) ForParameter(IParameterSyntax parameter)
-        {
-            // Non-reference types don't participate in reachability (yet)
-            var referenceType = parameter.Type.Known().UnderlyingReferenceType();
-            if (referenceType is null) return (null, null);
-
-            CallerVariable? callerVariable = null;
-            var parameterVariable = new Variable(parameter);
-
-            var capability = referenceType.ReferenceCapability;
-            switch (capability)
-            {
-                default:
-                    throw ExhaustiveMatch.Failed(capability);
-                case IsolatedMutable:
-                case Isolated:
-                {
-                    // Isolated parameters are fully independent of the caller
-                    var reference = Reference.ToNewParameterObject(parameter);
-                    parameterVariable.AddReference(reference);
-                }
-                break;
-                case Owned:
-                case OwnedMutable:
-                case Held:
-                case HeldMutable:
-                {
-                    var reference = Reference.ToNewParameterObject(parameter);
-                    parameterVariable.AddReference(reference);
-                    var referencedObject = reference.Referent;
-
-                    // Object to represent the bounding of the lifetime
-                    callerVariable = CallerVariable.CreateForParameterWithObject(parameter);
-                    referencedObject.ShareFrom(callerVariable);
-                }
-                break;
-                case Borrowed:
-                {
-                    callerVariable = CallerVariable.CreateForParameterWithObject(parameter);
-                    parameterVariable.BorrowFrom(callerVariable);
-                }
-                break;
-                case Shared:
-                {
-                    callerVariable = CallerVariable.CreateForParameterWithObject(parameter);
-                    parameterVariable.ShareFrom(callerVariable);
-                }
-                break;
-                case Identity:
-                {
-                    callerVariable = CallerVariable.CreateForParameterWithObject(parameter);
-                    parameterVariable.IdentityFrom(callerVariable);
-                }
-                break;
-            }
-
-            return (callerVariable, parameterVariable);
         }
 
         public static Variable? ForField(IFieldDeclarationSyntax field)

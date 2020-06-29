@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                    ?? throw new ArgumentException("Must be a reference type", nameof(symbol));
         }
 
-        public static CallerVariable CreateForParameterWithObject(IParameterSyntax parameter)
+        internal static CallerVariable CreateForParameterWithObject(IParameterSyntax parameter)
         {
             var reference = Reference.ToNewParameterContextObject(parameter);
             var callerVariable = new CallerVariable(parameter);

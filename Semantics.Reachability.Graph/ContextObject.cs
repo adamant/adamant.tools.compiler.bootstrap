@@ -8,12 +8,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     /// </summary>
     internal class ContextObject : HeapPlace
     {
-        public ContextObject(IParameterSyntax parameter, Reference? originOfMutability)
+        internal ContextObject(IParameterSyntax parameter, Reference? originOfMutability)
             : base(parameter, originOfMutability)
         {
         }
 
-        public ContextObject(IExpressionSyntax originSyntax, Reference? originOfMutability)
+        internal ContextObject(IExpressionSyntax originSyntax, Reference? originOfMutability)
             : base(originSyntax, originOfMutability)
         {
         }

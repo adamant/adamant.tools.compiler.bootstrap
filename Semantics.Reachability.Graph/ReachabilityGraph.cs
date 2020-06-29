@@ -3,6 +3,7 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
@@ -21,19 +22,100 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         private readonly HashSet<TempValue> tempValues = new HashSet<TempValue>();
 
+        internal IReadOnlyCollection<CallerVariable> CallerVariables => callerVariables.Values;
+        internal IReadOnlyCollection<Variable> Variables => variables.Values;
+
         #region Add/Remove Methods
-        public void Add(CallerVariable? callerVariable)
+        /// <returns>The added local variable for the parameter</returns>
+        public Variable? AddParameter(IParameterSyntax parameter)
         {
-            if (callerVariable is null) return; // for convenience
-            callerVariables.Add(callerVariable.Symbol, callerVariable);
-            AddReferences(callerVariable);
+            // Non-reference types don't participate in reachability (yet)
+            var referenceType = parameter.Type.Known().UnderlyingReferenceType();
+            if (referenceType is null)
+                return null;
+
+            CallerVariable? callerVariable = null;
+            var localVariable = new Variable(parameter);
+
+            var capability = referenceType.ReferenceCapability;
+            switch (capability)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(capability);
+                case ReferenceCapability.IsolatedMutable:
+                case ReferenceCapability.Isolated:
+                {
+                    // Isolated parameters are fully independent of the caller
+                    var reference = Reference.ToNewParameterObject(parameter);
+                    localVariable.AddReference(reference);
+                }
+                break;
+                case ReferenceCapability.Owned:
+                case ReferenceCapability.OwnedMutable:
+                case ReferenceCapability.Held:
+                case ReferenceCapability.HeldMutable:
+                {
+                    var reference = Reference.ToNewParameterObject(parameter);
+                    localVariable.AddReference(reference);
+                    var referencedObject = reference.Referent;
+
+                    // Object to represent the bounding of the lifetime
+                    callerVariable = CallerVariable.CreateForParameterWithObject(parameter);
+                    referencedObject.ShareFrom(callerVariable);
+                }
+                break;
+                case ReferenceCapability.Borrowed:
+                {
+                    callerVariable = CallerVariable.CreateForParameterWithObject(parameter);
+                    localVariable.BorrowFrom(callerVariable);
+                }
+                break;
+                case ReferenceCapability.Shared:
+                {
+                    callerVariable = CallerVariable.CreateForParameterWithObject(parameter);
+                    localVariable.ShareFrom(callerVariable);
+                }
+                break;
+                case ReferenceCapability.Identity:
+                {
+                    callerVariable = CallerVariable.CreateForParameterWithObject(parameter);
+                    localVariable.IdentityFrom(callerVariable);
+                }
+                break;
+            }
+
+
+            if (!(callerVariable is null))
+            {
+                callerVariables.Add(callerVariable.Symbol, callerVariable);
+                AddReferences(callerVariable);
+            }
+
+            Add(localVariable);
+
+            return localVariable;
         }
-        public void Add(Variable? variable)
+
+        public Variable? AddField(IFieldDeclarationSyntax fieldDeclaration)
         {
-            if (variable is null) return; // for convenience
-            variables.Add(variable.Symbol, variable);
-            AddReferences(variable);
+            var referenceType = fieldDeclaration.Type.Known().UnderlyingReferenceType();
+            if (referenceType is null) return null;
+
+            var variable = Variable.ForField(fieldDeclaration);
+            Add(variable);
+            return variable;
         }
+
+        public Variable? AddVariable(IBindingSymbol bindingSymbol)
+        {
+            var referenceType = bindingSymbol.Type.Known().UnderlyingReferenceType();
+            if (referenceType is null) return null;
+
+            var variable = Variable.Declared(bindingSymbol);
+            Add(variable);
+            return variable;
+        }
+
         public void Add(HeapPlace place)
         {
             switch (place)
@@ -56,6 +138,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             if (temp is null) return; // for convenience
             if (tempValues.Add(temp))
                 AddReferences(temp);
+        }
+
+        private void Add(Variable? variable)
+        {
+            if (variable is null) return; // for convenience
+            variables.Add(variable.Symbol, variable);
+            AddReferences(variable);
         }
 
         private void AddReferences(MemoryPlace place)

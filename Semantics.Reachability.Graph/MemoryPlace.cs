@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             references.AddRange(place.References.Select(r => r.Identify()).DistinctBy(r => r.Referent));
         }
 
-        public virtual void Free()
+        internal virtual void Free()
         {
             if (!IsAllocated)
                 throw new Exception("Can't free memory twice");
@@ -68,7 +68,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 reference.Release();
         }
 
-        protected void AddReference(Reference reference)
+        protected internal void AddReference(Reference reference)
         {
             references.Add(reference);
         }
@@ -78,7 +78,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             references.AddRange(reference);
         }
 
-        public void MarkReferencedObjects()
+        internal void MarkReferencedObjects()
         {
             foreach (var reference in References)
             {
