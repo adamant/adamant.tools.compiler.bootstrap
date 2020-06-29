@@ -411,7 +411,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     foreach (var statement in exp.Statements)
                         Analyze(statement, graph, nestedScope);
                     foreach (var variable in nestedScope.Variables)
-                        graph.FreeVariable(variable);
+                        graph.EndVariableScope(variable);
 
                     // Assuming void return from blocks for now
                     return null;

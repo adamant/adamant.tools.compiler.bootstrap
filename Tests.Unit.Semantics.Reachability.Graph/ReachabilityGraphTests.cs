@@ -12,16 +12,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
     public class ReachabilityGraphTests
     {
         [Fact]
-        public void AddValueTypeParameter()
+        public void AddParameterWithValueType()
         {
             var graph = new ReachabilityGraph();
             var mockParameter = new Mock<IParameterSyntax>();
             mockParameter.Setup(p => p.Type).Returns(DataType.Bool);
 
-            graph.AddParameter(mockParameter.Object);
+            var localVariable = graph.AddParameter(mockParameter.Object);
 
+            Assert.Null(localVariable);
             Assert.Empty(graph.CallerVariables);
             Assert.Empty(graph.Variables);
         }
+
+        // TODO Unit test all the other AddParameter cases
+
+        // TODO Unit test AddField
+
+        // TODO Unit test AddVariable
     }
 }

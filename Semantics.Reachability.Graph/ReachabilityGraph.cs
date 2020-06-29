@@ -153,7 +153,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 Add(reference.Referent);
         }
 
-        public bool FreeVariable(IBindingSymbol variable)
+        public bool EndVariableScope(IBindingSymbol variable)
         {
             if (!variables.Remove(variable, out var place)) return false;
             place.Free();
