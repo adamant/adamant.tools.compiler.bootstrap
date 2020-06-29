@@ -52,5 +52,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
             return new TempValue(referenceType);
         }
+
+        public override string ToString()
+        {
+            return ": " + ReferenceType;
+        }
     }
 }

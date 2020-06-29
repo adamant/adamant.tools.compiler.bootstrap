@@ -228,7 +228,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             var dot = new StringBuilder();
             var nodes = new Dictionary<MemoryPlace, string>();
             dot.AppendLine("digraph reachability {");
+            dot.AppendLine("	rankdir=LR;");
             AppendStack(dot, nodes);
+            AppendContextObjects(dot, nodes);
             AppendObjects(dot, nodes);
             AppendReferences(dot, nodes);
             dot.AppendLine("}");
@@ -237,7 +239,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         private void AppendStack(StringBuilder dot, Dictionary<MemoryPlace, string> nodes)
         {
-            if (!CallerVariables.Any() && !Variables.Any()) return;
+            var hasCallerVariables = CallerVariables.Any();
+            var hasVariables = Variables.Any();
+            var hasTempValues = TempValues.Any();
+            if (!hasCallerVariables && !hasVariables && !hasTempValues) return;
 
             dot.AppendLine("    node [shape=plaintext];");
             dot.AppendLine("	stack [label=<");
@@ -246,12 +251,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             foreach (var callerVariable in CallerVariables)
                 AppendStackItem(dot, callerVariable, "cv", nodes, ref nextNode);
 
-            if (CallerVariables.Any() && Variables.Any())
-                dot.AppendLine("            <TR><TD CELLPADDING=\"2\"></TD></TR>");
+            if (hasCallerVariables && hasVariables)
+                AppendStackSeparator(dot);
 
             nextNode = 1;
             foreach (var variable in Variables)
                 AppendStackItem(dot, variable, "v", nodes, ref nextNode);
+
+            if ((hasCallerVariables || hasVariables) && hasTempValues)
+                AppendStackSeparator(dot);
+
+            nextNode = 1;
+            foreach (var tempValue in TempValues)
+                AppendStackItem(dot, tempValue, "t", nodes, ref nextNode);
 
             dot.AppendLine("		</TABLE>>];"); // end stack
         }
@@ -264,74 +276,106 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             ref int nextNode)
         {
             var port = nodeType + nextNode;
-            nodes.Add(place, "stack:" + port);
+            nodes.Add(place, "stack:" + port + ":e");
             dot.AppendLine($"            <TR><TD PORT=\"{port}\" ALIGN=\"LEFT\">{place}</TD></TR>");
             nextNode += 1;
         }
 
+        private static void AppendStackSeparator(StringBuilder dot)
+        {
+            dot.AppendLine("            <TR><TD CELLPADDING=\"2\"></TD></TR>");
+        }
+        private void AppendContextObjects(StringBuilder dot, Dictionary<MemoryPlace, string> nodes)
+        {
+            if (!ContextObjects.Any()) return;
+
+            dot.AppendLine("    node [shape=ellipse, peripheries=2];");
+
+            var nextObject = 1;
+            foreach (var contextObject in ContextObjects)
+            {
+                var name = "ctx" + nextObject;
+                nodes.Add(contextObject, name);
+                dot.AppendLine($"    {name} [label=\"{Escape(contextObject.ToString())}\"];");
+                nextObject += 1;
+            }
+        }
+
         private void AppendObjects(StringBuilder dot, Dictionary<MemoryPlace, string> nodes)
         {
-            if (ContextObjects.Any())
+            if (!Objects.Any()) return;
+
+            dot.AppendLine("    node [shape=ellipse];");
+
+            var nextObject = 1;
+            foreach (var obj in Objects)
             {
-                dot.AppendLine("    node [shape=ellipse, peripheries=2];");
-
-                var nextObject = 1;
-                foreach (var contextObject in ContextObjects)
-                {
-                    var name = "ctx" + nextObject;
-                    nodes.Add(contextObject, name);
-                    dot.AppendLine($"    {name} [label=\"{Escape(contextObject.ToString())}\"];");
-                    nextObject += 1;
-                }
-            }
-
-            if (Objects.Any())
-            {
-                dot.AppendLine("    node [shape=ellipse];");
-
-                var nextObject = 1;
-                foreach (var obj in Objects)
-                {
-                    var name = "obj" + nextObject;
-                    nodes.Add(obj, name);
-                    dot.AppendLine($"    {name} [label=\"{Escape(obj.ToString())}\"];");
-                    nextObject += 1;
-                }
+                var name = "obj" + nextObject;
+                nodes.Add(obj, name);
+                dot.AppendLine($"    {name} [label=\"{Escape(obj.ToString())}\"];");
+                nextObject += 1;
             }
         }
 
         private void AppendReferences(StringBuilder dot, Dictionary<MemoryPlace, string> nodes)
         {
-            bool firstEdge = true;
+            //bool firstEdge = true;
 
-            var sources = CallerVariables.Concat<MemoryPlace>(Variables).Concat(ContextObjects).Concat(Objects);
+            var sources = CallerVariables
+                          .Concat<MemoryPlace>(Variables)
+                          .Concat(TempValues)
+                          .Concat(ContextObjects)
+                          .Concat(Objects);
             foreach (var sourceNode in sources)
             {
                 foreach (var reference in sourceNode.References)
                 {
-                    if (firstEdge)
-                    {
-                        dot.AppendLine("    edge;");
-                        firstEdge = false;
-                    }
-                    dot.Append($"    {nodes[sourceNode]} -> {nodes[reference.Referent]} [");
-                    switch (reference.DeclaredAccess)
-                    {
-                        default:
-                            throw ExhaustiveMatch.Failed(reference.DeclaredAccess);
-                        case Access.Identify:
-                            dot.Append("[style=\"dotted\"]");
-                            break;
-                        case Access.Mutable:
-                            dot.Append("[penwidth=\"3\"]");
-                            break;
-                        case Access.ReadOnly:
-                            // Standard
-                            break;
-                    }
-                    dot.AppendLine("];");
+                    //if (firstEdge)
+                    //{
+                    //    dot.AppendLine("    edge;");
+                    //    firstEdge = false;
+                    //}
+
+                    AppendReference(dot, sourceNode, reference, nodes);
                 }
             }
+        }
+
+        private static void AppendReference(StringBuilder dot, MemoryPlace sourceNode, Reference reference, Dictionary<MemoryPlace, string> nodes)
+        {
+            dot.Append($"    {nodes[sourceNode]} -> {nodes[reference.Referent]} [dir=both, ");
+            switch (reference.Ownership)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(reference.Ownership);
+                case Ownership.None:
+                    dot.Append("arrowtail=odiamond");
+                    break;
+                case Ownership.Owns:
+                    dot.Append("arrowtail=diamond");
+                    break;
+                case Ownership.PotentiallyOwns:
+                    dot.Append("arrowtail=odot");
+                    break;
+            }
+
+            dot.Append(", ");
+            switch (reference.DeclaredAccess)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(reference.DeclaredAccess);
+                case Access.Identify:
+                    dot.Append("arrowhead=ornormal");
+                    break;
+                case Access.Mutable:
+                    dot.Append("arrowhead=normal");
+                    break;
+                case Access.ReadOnly:
+                    dot.Append("arrowhead=onormal");
+                    break;
+            }
+
+            dot.AppendLine("];");
         }
 
         private static string Escape(string label)
