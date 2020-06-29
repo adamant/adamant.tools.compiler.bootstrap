@@ -74,5 +74,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             CurrentAccess = Access.Identify;
             MarkReferencedObjects();
         }
+
+        public override string ToString()
+        {
+            return OriginSyntax.ToString();
+        }
     }
 }

@@ -16,9 +16,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         private CallerVariable(IBindingSymbol symbol)
         {
-            Symbol = symbol;
             _ = symbol.Type.UnderlyingReferenceType()
-                   ?? throw new ArgumentException("Must be a reference type", nameof(symbol));
+                ?? throw new ArgumentException("Must be a reference type", nameof(symbol));
+            Symbol = symbol;
         }
 
         internal static CallerVariable CreateForParameterWithObject(IParameterSyntax parameter)
@@ -27,6 +27,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             var callerVariable = new CallerVariable(parameter);
             callerVariable.AddReference(reference);
             return callerVariable;
+        }
+
+        public override string ToString()
+        {
+            return $"{Symbol.FullName}: {Symbol.Type}";
         }
     }
 }

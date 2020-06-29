@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
@@ -24,6 +26,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         internal IReadOnlyCollection<CallerVariable> CallerVariables => callerVariables.Values;
         internal IReadOnlyCollection<Variable> Variables => variables.Values;
+        internal IReadOnlyCollection<ContextObject> ContextObjects => contextObjects.Values;
+        internal IReadOnlyCollection<Object> Objects => objects.Values;
 
         #region Add/Remove Methods
         /// <returns>The added local variable for the parameter</returns>
@@ -206,6 +210,110 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         private IEnumerable<HeapPlace> AllHeapPlaces()
         {
             return contextObjects.Values.SafeCast<HeapPlace>().Concat(objects.Values);
+        }
+
+        /// <summary>
+        /// Convert the graph into DOT format supported by graphviz
+        /// </summary>
+        public string ToDotFormat()
+        {
+            var dot = new StringBuilder();
+            var nodes = new Dictionary<MemoryPlace, string>();
+            dot.AppendLine("digraph reachability {");
+            AppendStack(dot, nodes);
+            AppendObjects(dot, nodes);
+            AppendReferences(dot, nodes);
+            dot.AppendLine("}");
+            return dot.ToString();
+        }
+
+        private void AppendStack(StringBuilder dot, Dictionary<MemoryPlace, string> nodes)
+        {
+            dot.AppendLine("    node [shape=plaintext];");
+            dot.AppendLine("	stack [label=<");
+            dot.AppendLine("        <TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\" CELLPADDING=\"4\">");
+            var nextNode = 1;
+            foreach (var callerVariable in CallerVariables)
+                AppendStackItem(dot, callerVariable, "cv", nodes, ref nextNode);
+
+            if (CallerVariables.Any() && Variables.Any())
+                dot.AppendLine("            <TR><TD CELLPADDING=\"2\"></TD></TR>");
+
+            nextNode = 1;
+            foreach (var variable in Variables)
+                AppendStackItem(dot, variable, "v", nodes, ref nextNode);
+
+            dot.AppendLine("		</TABLE>>];"); // end stack
+        }
+
+        private static void AppendStackItem(
+            StringBuilder dot,
+            StackPlace place,
+            string nodeType,
+            Dictionary<MemoryPlace, string> nodes,
+            ref int nextNode)
+        {
+            var port = nodeType + nextNode;
+            nodes.Add(place, "stack:" + port);
+            dot.AppendLine($"            <TR><TD PORT=\"{port}\" ALIGN=\"LEFT\">{place}</TD></TR>");
+            nextNode += 1;
+        }
+
+        private void AppendObjects(StringBuilder dot, Dictionary<MemoryPlace, string> nodes)
+        {
+            dot.AppendLine("    node [shape=ellipse];");
+
+            var nextObject = 1;
+            foreach (var contextObject in ContextObjects)
+            {
+                var name = "ctx" + nextObject;
+                nodes.Add(contextObject, name);
+                dot.AppendLine($"    {name} [label=\"{Escape(contextObject.ToString())}\"];");
+                nextObject += 1;
+            }
+
+            nextObject = 1;
+            foreach (var obj in Objects)
+            {
+                var name = "obj" + nextObject;
+                nodes.Add(obj, name);
+                dot.AppendLine($"    {name} [label=\"{Escape(obj.ToString())}\"];");
+                nextObject += 1;
+            }
+        }
+
+        private void AppendReferences(StringBuilder dot, Dictionary<MemoryPlace, string> nodes)
+        {
+            dot.AppendLine("    edge;");
+            var sources = CallerVariables.Concat<MemoryPlace>(Variables).Concat(ContextObjects).Concat(Objects);
+            foreach (var sourceNode in sources)
+            {
+                foreach (var reference in sourceNode.References)
+                {
+                    dot.Append($"    {nodes[sourceNode]} -> {nodes[reference.Referent]} [");
+                    switch (reference.DeclaredAccess)
+                    {
+                        default:
+                            throw ExhaustiveMatch.Failed(reference.DeclaredAccess);
+                        case Access.Identify:
+                            dot.Append("[style=\"dotted\"]");
+                            break;
+                        case Access.Mutable:
+                            dot.Append("[penwidth=\"3\"]");
+                            break;
+                        case Access.ReadOnly:
+                            // Standard
+                            break;
+                    }
+                    dot.AppendLine("];");
+                }
+            }
+        }
+
+        private static string Escape(string label)
+        {
+            return label.Replace("⟦", "&laquo;", StringComparison.InvariantCulture)
+                        .Replace("⟧", "&raquo;", StringComparison.InvariantCulture);
         }
     }
 }

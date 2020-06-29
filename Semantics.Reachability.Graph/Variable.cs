@@ -49,5 +49,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         {
             AddReferences(temp.StealReferences());
         }
+
+        public override string ToString()
+        {
+            return $"{Symbol.FullName}: {Symbol.Type}";
+        }
     }
 }
