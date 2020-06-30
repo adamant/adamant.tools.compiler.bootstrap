@@ -532,9 +532,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             ReachabilityGraph graph,
             VariableScope scope)
         {
-            graph.AddVariable(bindingSymbol);
-
-            var variable = Variable.Declared(bindingSymbol);
+            var variable = graph.AddVariable(bindingSymbol);
             if (!(variable is null))
                 scope.VariableDeclared(variable.Symbol);
             return variable;
