@@ -100,7 +100,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         private static void AppendReferences(ReachabilityGraph graph, StringBuilder dot, Dictionary<MemoryPlace, string> nodes)
         {
-            //bool firstEdge = true;
+            bool firstEdge = true;
 
             var sources = graph.CallerVariables
                                .Concat<MemoryPlace>(graph.Variables)
@@ -110,11 +110,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             {
                 foreach (var reference in sourceNode.References)
                 {
-                    //if (firstEdge)
-                    //{
-                    //    dot.AppendLine("    edge;");
-                    //    firstEdge = false;
-                    //}
+                    if (firstEdge)
+                    {
+                        dot.AppendLine("    edge [dir=both];");
+                        firstEdge = false;
+                    }
 
                     AppendReference(dot, sourceNode, reference, nodes);
                 }
@@ -123,7 +123,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         private static void AppendReference(StringBuilder dot, MemoryPlace sourceNode, Reference reference, Dictionary<MemoryPlace, string> nodes)
         {
-            dot.Append($"    {nodes[sourceNode]} -> {nodes[reference.Referent]} [dir=both, ");
+            dot.Append($"    {nodes[sourceNode]} -> {nodes[reference.Referent]} [");
             switch (reference.Ownership)
             {
                 default:
@@ -135,17 +135,36 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                     dot.Append("arrowtail=diamond");
                     break;
                 case Ownership.PotentiallyOwns:
-                    dot.Append("arrowtail=odot");
+                    dot.Append("arrowtail=normaloinv");
                     break;
             }
+            dot.Append(",");
 
-            dot.Append(", ");
+            var color = reference.IsUsed ? "black" : "grey";
+
             switch (reference.DeclaredAccess)
             {
                 default:
                     throw ExhaustiveMatch.Failed(reference.DeclaredAccess);
                 case Access.Identify:
-                    dot.Append("arrowhead=ornormal");
+                    dot.Append($"color={color},style=dashed");
+                    break;
+                case Access.Mutable:
+                    dot.Append($"color=\"{color}:{color}\"");
+                    break;
+                case Access.ReadOnly:
+                    dot.Append("color=" + color);
+                    break;
+            }
+
+            dot.Append(",");
+
+            switch (reference.EffectiveAccess())
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(reference.DeclaredAccess);
+                case Access.Identify:
+                    dot.Append("arrowhead=onormalicurve");
                     break;
                 case Access.Mutable:
                     dot.Append("arrowhead=normal");
