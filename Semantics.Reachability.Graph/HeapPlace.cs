@@ -38,12 +38,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             CurrentAccess = null;
         }
 
-        public void ResetAccess()
+        internal void ResetAccess()
         {
             CurrentAccess = null;
         }
 
-        public void MarkReadOnly()
+        internal void MarkReadOnly()
         {
             if (!IsAllocated)
                 return; // This object has actually been released
@@ -58,7 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 reference.Referent.MarkReadOnly();
         }
 
-        public void MarkMutable()
+        internal void MarkMutable()
         {
             if (CurrentAccess == Access.ReadOnly)
                 // already marked read only
@@ -68,7 +68,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             MarkReferencedObjects();
         }
 
-        public void MarkIdentifiable()
+        internal void MarkIdentifiable()
         {
             if (!(CurrentAccess is null)) return;
             CurrentAccess = Access.Identify;

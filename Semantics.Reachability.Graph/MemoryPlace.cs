@@ -30,6 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return stolenReferences;
         }
 
+        // TODO verify that the place is part of the correct graph
         public void MoveFrom(StackPlace place)
         {
             references.AddRange(place.StealReferences());

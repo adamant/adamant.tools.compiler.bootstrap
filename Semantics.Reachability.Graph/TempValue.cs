@@ -12,6 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             ReferenceType = referenceType;
         }
 
+        // TODO encapsulate this in the graph class
         public static TempValue? ForNewContextObject(IExpressionSyntax expression)
         {
             var referenceType = expression.Type.Known().UnderlyingReferenceType();
@@ -34,6 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return temp;
         }
 
+        // TODO encapsulate this in the graph class
         public static TempValue? ForNewInvocationReturnedObject(IInvocationExpressionSyntax expression)
         {
             var referenceType = expression.Type.Known().UnderlyingReferenceType();
@@ -45,6 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return temp;
         }
 
+        // TODO encapsulate this in the graph class
         public static TempValue? For(IExpressionSyntax expression)
         {
             var referenceType = expression.Type.Known().UnderlyingReferenceType();

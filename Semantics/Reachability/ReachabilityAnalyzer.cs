@@ -65,9 +65,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     var variable = VariableDeclared(stmt, graph, scope);
                     // TODO this variable's references effectively go away when it is no longer live
                     // TODO how does the idea of in use variables work with variables?
-                    if (initializer is null) break;
-                    variable?.Assign(initializer);
-                    graph.Remove(initializer);
+                    graph.Assign(variable, initializer);
                 }
                 break;
                 case IExpressionStatementSyntax stmt:
@@ -98,11 +96,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 {
                     var leftPlace = AnalyzeAssignmentPlace(exp.LeftOperand, graph, scope);
                     var rightPlace = AnalyzeAssignmentSource(exp.RightOperand, graph, scope);
-                    if (!(rightPlace is null))
-                    {
-                        leftPlace?.Assign(rightPlace);
-                        graph.Remove(rightPlace);
-                    }
+                    graph.Assign(leftPlace, rightPlace);
                     return null;
                 }
                 case ISelfExpressionSyntax exp:

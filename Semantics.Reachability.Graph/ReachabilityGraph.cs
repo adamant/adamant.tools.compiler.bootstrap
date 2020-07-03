@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
@@ -186,6 +184,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                     Remove(tempValue);
         }
         #endregion
+
+        /// <summary>
+        /// Assigns a temp value into a variable.
+        /// </summary>
+        /// <remarks>This is a method of the graph so that the temp value
+        /// can be removed from the graph even if there is no variable.</remarks>
+        public void Assign(Variable? variable, TempValue? value)
+        {
+            if (value == null) return;
+            variable?.Assign(value);
+            Remove(value);
+        }
 
         public Variable GetVariableFor(IBindingSymbol variableSymbol)
         {

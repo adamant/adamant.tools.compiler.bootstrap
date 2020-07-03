@@ -33,12 +33,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         private Reference(Ownership ownership, Access declaredAccess)
         {
-            Referent = null!; // Referent must be set immediatly after construction
+            Referent = null!; // Referent must be set immediately after construction
             Ownership = ownership;
             DeclaredAccess = declaredAccess;
             Borrowers = borrowers.AsReadOnly();
         }
 
+        // TODO encapsulate these in the graph class
         public static Reference ToNewParameterObject(IParameterSyntax parameter)
         {
             var referenceType = parameter.Type.Known().UnderlyingReferenceType()

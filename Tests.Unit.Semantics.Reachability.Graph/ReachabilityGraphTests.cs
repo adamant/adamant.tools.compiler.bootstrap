@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph;
@@ -65,6 +66,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
                 // TODO what else to test
             });
             Assert.Contains(temp, graph.TempValues);
+        }
+
+        [Fact]
+        public void AssignTempToVariable()
+        {
+            var graph = new ReachabilityGraph();
+            var mockExpression = new Mock<INewObjectExpressionSyntax>();
+            // TODO this type should be Isolated or Owned
+            var fakeReferenceType = UserObjectType.Declaration(Name.From("Fake"), false);
+            mockExpression.Setup(e => e.Type).Returns(fakeReferenceType);
+            var temp = graph.AddObject(mockExpression.Object);
+            var mockVariableBinding = new Mock<IBindingSymbol>();
+            mockVariableBinding.Setup(v => v.Type).Returns(fakeReferenceType);
+            var variable = graph.AddVariable(mockVariableBinding.Object);
+
+            graph.Assign(variable, temp);
+
+            Assert.DoesNotContain(temp, graph.TempValues);
         }
     }
 }

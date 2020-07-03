@@ -37,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return variable;
         }
 
-        public static Variable? Declared(IBindingSymbol symbol)
+        internal static Variable? Declared(IBindingSymbol symbol)
         {
             var referenceType = symbol.Type.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
@@ -45,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return new Variable(symbol);
         }
 
-        public void Assign(TempValue temp)
+        internal void Assign(TempValue temp)
         {
             AddReferences(temp.StealReferences());
         }
