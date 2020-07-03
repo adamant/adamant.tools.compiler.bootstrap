@@ -190,12 +190,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     var arguments = exp.Arguments.Select(a => Analyze(a.Expression, graph, scope)).ToFixedList();
                     var function = exp.FunctionNameSyntax.ReferencedSymbol.Assigned();
                     var parameters = function.Parameters;
-                    UseArguments(arguments, exp.Arguments, parameters, graph);
+                    UseArguments(arguments, exp.Arguments, parameters);
                     if (!(referenceType is null))
                         return CaptureArguments(exp, arguments, graph);
 
                     // All the arguments are dropped because they aren't captured
-                    graph.Remove(arguments);
+                    //graph.Remove(arguments);
                     return null;
 
                 }
@@ -206,13 +206,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     var method = exp.MethodNameSyntax.ReferencedSymbol.Assigned();
                     var parameters = method.Parameters;
                     if (!(self is null))
-                        UseArgument(self, exp.ContextExpression.Span, graph);
-                    UseArguments(arguments, exp.Arguments, parameters, graph);
+                        UseArgument(self, exp.ContextExpression.Span);
+                    UseArguments(arguments, exp.Arguments, parameters);
                     if (!(referenceType is null))
                         return CaptureArguments(exp, arguments.Prepend(self), graph);
 
                     // All the arguments are dropped because they aren't captured
-                    graph.Remove(arguments);
+                    //graph.Remove(arguments);
                     return null;
                 }
                 case IUnsafeExpressionSyntax exp:
@@ -228,7 +228,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
 
                     var constructor = exp.ConstructorSymbol.Assigned();
                     var parameters = constructor.Parameters;
-                    UseArguments(arguments, exp.Arguments, parameters, graph);
+                    UseArguments(arguments, exp.Arguments, parameters);
                     if (referenceType is null) return null;
                     return graph.AddObject(exp); // TODO tie the new object to the arguments
                 }
@@ -295,8 +295,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
         private void UseArguments(
             FixedList<TempValue?> arguments,
             FixedList<IArgumentSyntax> argumentSyntaxes,
-            IEnumerable<IBindingSymbol> parameters,
-            ReachabilityGraph graph)
+            IEnumerable<IBindingSymbol> parameters)
         {
             foreach (var ((argument, argumentSyntax), parameter) in arguments.Zip(argumentSyntaxes).Zip(parameters))
             {
@@ -304,16 +303,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 if (!(parameter.Type is ReferenceType))
                     throw new InvalidOperationException($"Expected parameter {parameter} to be a reference type");
 
-                UseArgument(argument, argumentSyntax.Span, graph);
+                UseArgument(argument, argumentSyntax.Span);
             }
         }
 
-        private void UseArgument(TempValue argument, TextSpan span, ReachabilityGraph graph)
+        private void UseArgument(TempValue argument, TextSpan span)
         {
             foreach (var reference in argument.References)
             {
-                // Must recompute because our use of earlier arguments can affect later ones
-                graph.ComputeCurrentObjectAccess();
                 // Check if we are safe to use this reference
                 switch (reference.DeclaredAccess)
                 {
@@ -322,7 +319,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     case Access.Mutable:
                     {
                         // Must be no read-only access
-                        if (reference.Referent.CurrentAccess == Access.ReadOnly)
+                        if (reference.Referent.GetCurrentAccess() == Access.ReadOnly)
                             diagnostics.Add(BorrowError.CantBorrowWhileShared(file, span));
 
                         // And we must be a borrower from someone who has the mutable access
@@ -336,7 +333,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     break;
                     case Access.ReadOnly:
                     {
-                        if (reference.Referent.CurrentAccess == Access.ReadOnly) break;
+                        if (reference.Referent.GetCurrentAccess() == Access.ReadOnly) break;
 
                         // Just because it is currently mutable doesn't mean we can't make it readonly
                         var originOfMutability = reference.Referent.OriginOfMutability;
@@ -370,7 +367,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 {
                     // TODO base this on reachability expressions instead of capturing every argument
                     referent.Capture(argument);
-                    graph.Remove(argument);
                 }
 
             graph.Add(temp);

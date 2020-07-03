@@ -49,6 +49,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         internal void Assign(TempValue temp)
         {
             AddReferences(temp.StealReferences());
+            Graph.Remove(temp);
         }
 
         public override string ToString()

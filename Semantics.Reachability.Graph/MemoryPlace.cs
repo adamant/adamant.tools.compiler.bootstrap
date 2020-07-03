@@ -29,10 +29,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             References = references.AsReadOnly();
         }
 
-        public FixedList<Reference> StealReferences()
+        internal FixedList<Reference> StealReferences()
         {
             var stolenReferences = references.ToFixedList();
             references.Clear();
+            Graph.Dirty();
             return stolenReferences;
         }
 
@@ -40,22 +41,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         public void MoveFrom(StackPlace place)
         {
             references.AddRange(place.StealReferences());
+            Graph.Dirty();
         }
 
         public void BorrowFrom(StackPlace place)
         {
             foreach (var reference in place.References)
                 references.Add(reference.Borrow());
+            Graph.Dirty();
         }
 
         public void ShareFrom(StackPlace place)
         {
             references.AddRange(place.References.Select(r => r.Share()).DistinctBy(r => r.Referent));
+            Graph.Dirty();
         }
 
         public void IdentityFrom(StackPlace place)
         {
             references.AddRange(place.References.Select(r => r.Identify()).DistinctBy(r => r.Referent));
+            Graph.Dirty();
         }
 
         internal virtual void Freed()

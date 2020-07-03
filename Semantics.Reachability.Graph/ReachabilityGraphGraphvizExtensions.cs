@@ -61,7 +61,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             var port = nodeType + nextNode;
             nodes.Add(place, "stack:" + port + ":e");
             var label = Escape(place.ToString()!);
-            dot.AppendLine($"            <TR><TD PORT=\"{port}\" ALIGN=\"LEFT\">{label}</TD></TR>");
+            var color = "";
+            if (!place.IsAllocated)
+            {
+                color = " COLOR=\"Red\"";
+                label = $"<S>{label}</S>";
+            }
+            dot.AppendLine($"            <TR><TD PORT=\"{port}\" ALIGN=\"LEFT\"{color}>{label}</TD></TR>");
             nextNode += 1;
         }
 
@@ -79,23 +85,37 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             var nextObject = 1;
             foreach (var contextObject in graph.Objects.Where(o => o.IsContext))
             {
-                var name = "ctx" + nextObject;
-                nodes.Add(contextObject, name);
-                var label = Escape(contextObject.ToString());
-                dot.AppendLine($"    {name} [label=\"{label}</U>\"];");
+                AppendObject(dot, contextObject, "ctx", nodes, nextObject);
                 nextObject += 1;
-            }
+            };
 
             dot.AppendLine("    node [shape=ellipse, peripheries=1];");
 
             nextObject = 1;
             foreach (var obj in graph.Objects.Where(o => !o.IsContext))
             {
-                var name = "obj" + nextObject;
-                nodes.Add(obj, name);
-                dot.AppendLine($"    {name} [label=\"{Escape(obj.ToString())}\"];");
+                AppendObject(dot, obj, "obj", nodes, nextObject);
                 nextObject += 1;
             }
+        }
+
+        private static void AppendObject(
+            StringBuilder dot,
+            Object obj,
+            string objectType,
+            Dictionary<MemoryPlace, string> nodes,
+            int id)
+        {
+            var name = objectType + id;
+            nodes.Add(obj, name);
+            var label = Escape(obj.ToString());
+            var color = "";
+            if (!obj.IsAllocated)
+            {
+                color = ",color=Red";
+                label = $"<S>{label}</S>";
+            }
+            dot.AppendLine($"    {name} [label=\"{label}\"{color}];");
         }
 
         private static void AppendReferences(ReachabilityGraph graph, StringBuilder dot, Dictionary<MemoryPlace, string> nodes)

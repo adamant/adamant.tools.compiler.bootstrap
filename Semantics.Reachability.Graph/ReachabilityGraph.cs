@@ -15,17 +15,40 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     /// </summary>
     public class ReachabilityGraph
     {
+        private bool isDirty = false;
+        private bool recomputingCurrentAccess = false;
         private readonly Dictionary<IBindingSymbol, CallerVariable> callerVariables = new Dictionary<IBindingSymbol, CallerVariable>();
         private readonly Dictionary<IBindingSymbol, Variable> variables = new Dictionary<IBindingSymbol, Variable>();
-
         private readonly Dictionary<ISyntax, Object> objects = new Dictionary<ISyntax, Object>();
-
         private readonly HashSet<TempValue> tempValues = new HashSet<TempValue>();
 
         internal IReadOnlyCollection<CallerVariable> CallerVariables => callerVariables.Values;
         internal IReadOnlyCollection<Variable> Variables => variables.Values;
         internal IReadOnlyCollection<Object> Objects => objects.Values;
         internal IReadOnlyCollection<TempValue> TempValues => tempValues;
+
+        internal void Dirty()
+        {
+            isDirty = true;
+        }
+
+        internal void EnsureCurrentAccessIsUpToDate()
+        {
+            if (recomputingCurrentAccess)
+                throw new Exception("Current access is being updated");
+            if (!isDirty) return;
+
+            try
+            {
+                recomputingCurrentAccess = true;
+                RecomputeCurrentObjectAccess();
+                isDirty = false;
+            }
+            finally
+            {
+                recomputingCurrentAccess = false;
+            }
+        }
 
         #region Add/Remove Methods
         /// <returns>The added local variable for the parameter</returns>
@@ -128,14 +151,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         private void Add(Object obj)
         {
             if (objects.TryAdd(obj.OriginSyntax, obj))
+            {
                 AddReferences(obj);
+                Dirty();
+            }
         }
 
         public void Add(TempValue? temp)
         {
             if (temp is null) return; // for convenience
             if (tempValues.Add(temp))
+            {
                 AddReferences(temp);
+                Dirty();
+            }
         }
 
         private void Add(Variable? variable)
@@ -143,6 +172,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             if (variable is null) return; // for convenience
             variables.Add(variable.Symbol, variable);
             AddReferences(variable);
+            Dirty();
         }
 
         private void AddReferences(MemoryPlace place)
@@ -157,20 +187,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 throw new Exception($"Variable '{variable.FullName.UnqualifiedName}' does not exist in the graph.");
 
             place.Freed();
+            Dirty();
         }
 
-        public bool Remove(TempValue tempValue)
+        internal void Remove(TempValue tempValue)
         {
-            // Make sure this is released
+            if (!tempValues.Remove(tempValue))
+                throw new Exception($"Temp value '{tempValue}' does not exist in the graph.");
+
             tempValue.Freed();
-            return tempValues.Remove(tempValue);
-        }
-
-        public void Remove(IEnumerable<TempValue?> values)
-        {
-            foreach (var tempValue in values)
-                if (!(tempValue is null))
-                    Remove(tempValue);
+            Dirty();
         }
 
         internal void Delete(Object obj)
@@ -179,6 +205,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 throw new Exception($"Object '{obj}' does not exist in the graph.");
 
             obj.Freed();
+            Dirty();
         }
         #endregion
 
@@ -205,7 +232,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 ? variable : null;
         }
 
-        public void ComputeCurrentObjectAccess()
+        private void RecomputeCurrentObjectAccess()
         {
             // Reset mutability to unknown (null)
             foreach (var place in Objects)
