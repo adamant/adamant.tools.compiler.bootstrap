@@ -8,5 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     /// </summary>
     public abstract class StackPlace : MemoryPlace
     {
+        protected StackPlace(ReachabilityGraph graph)
+            : base(graph) { }
     }
 }

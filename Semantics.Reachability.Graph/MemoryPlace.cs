@@ -12,14 +12,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     /// </summary>
     public abstract class MemoryPlace
     {
+        /// <summary>
+        /// The graph this node is in
+        /// </summary>
+        public ReachabilityGraph Graph { get; }
+
         private readonly List<Reference> references = new List<Reference>();
         public IReadOnlyList<Reference> References { get; }
         public IEnumerable<HeapPlace> PossibleReferents => references.Select(r => r.Referent).Distinct();
 
         public bool IsAllocated { get; private set; } = true;
 
-        protected MemoryPlace()
+        protected MemoryPlace(ReachabilityGraph graph)
         {
+            Graph = graph;
             References = references.AsReadOnly();
         }
 
@@ -52,7 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             references.AddRange(place.References.Select(r => r.Identify()).DistinctBy(r => r.Referent));
         }
 
-        internal virtual void Free()
+        internal virtual void Freed()
         {
             if (!IsAllocated)
                 throw new Exception("Can't free memory twice");
@@ -63,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         private void ReleaseReferences()
         {
             foreach (var reference in references.Where(r => r.CouldHaveOwnership))
-                reference.Referent.Free();
+                Graph.Delete(reference.Referent);
 
             foreach (var reference in references)
                 reference.Release();

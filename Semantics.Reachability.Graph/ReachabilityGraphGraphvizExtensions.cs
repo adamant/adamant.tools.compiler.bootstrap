@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             dot.AppendLine("digraph reachability {");
             dot.AppendLine("	rankdir=LR;");
             AppendStack(graph, dot, nodes);
-            AppendContextObjects(graph, dot, nodes);
+            //AppendContextObjects(graph, dot, nodes);
             AppendObjects(graph, dot, nodes);
             AppendReferences(graph, dot, nodes);
             dot.AppendLine("}");
@@ -69,33 +69,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             dot.AppendLine("            <TR><TD CELLPADDING=\"2\"></TD></TR>");
         }
 
-        private static void AppendContextObjects(
-            ReachabilityGraph graph,
-            StringBuilder dot,
-            Dictionary<MemoryPlace, string> nodes)
+        private static void AppendObjects(ReachabilityGraph graph, StringBuilder dot, Dictionary<MemoryPlace, string> nodes)
         {
-            if (!graph.ContextObjects.Any()) return;
+            if (!graph.Objects.Any()) return;
 
             dot.AppendLine("    node [shape=ellipse, peripheries=2];");
 
             var nextObject = 1;
-            foreach (var contextObject in graph.ContextObjects)
+            foreach (var contextObject in graph.Objects.Where(o => o.IsContext))
             {
                 var name = "ctx" + nextObject;
                 nodes.Add(contextObject, name);
                 dot.AppendLine($"    {name} [label=\"{Escape(contextObject.ToString())}\"];");
                 nextObject += 1;
             }
-        }
-
-        private static void AppendObjects(ReachabilityGraph graph, StringBuilder dot, Dictionary<MemoryPlace, string> nodes)
-        {
-            if (!graph.Objects.Any()) return;
 
             dot.AppendLine("    node [shape=ellipse];");
 
-            var nextObject = 1;
-            foreach (var obj in graph.Objects)
+            nextObject = 1;
+            foreach (var obj in graph.Objects.Where(o => !o.IsContext))
             {
                 var name = "obj" + nextObject;
                 nodes.Add(obj, name);
@@ -111,7 +103,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             var sources = graph.CallerVariables
                                .Concat<MemoryPlace>(graph.Variables)
                                .Concat(graph.TempValues)
-                               .Concat(graph.ContextObjects)
                                .Concat(graph.Objects);
             foreach (var sourceNode in sources)
             {

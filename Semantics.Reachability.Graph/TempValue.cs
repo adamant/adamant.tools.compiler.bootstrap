@@ -7,53 +7,54 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     {
         public ReferenceType ReferenceType { get; }
 
-        private TempValue(ReferenceType referenceType)
+        private TempValue(ReachabilityGraph graph, ReferenceType referenceType)
+            : base(graph)
         {
             ReferenceType = referenceType;
         }
 
         // TODO encapsulate this in the graph class
-        public static TempValue? ForNewContextObject(IExpressionSyntax expression)
+        public static TempValue? ForNewContextObject(ReachabilityGraph graph, IExpressionSyntax expression)
         {
             var referenceType = expression.Type.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
-            var reference = Reference.ToNewContextObject(expression);
-            var temp = new TempValue(referenceType);
+            var reference = Reference.ToNewContextObject(graph, expression);
+            var temp = new TempValue(graph, referenceType);
             temp.AddReference(reference);
             return temp;
         }
 
-        internal static TempValue? ForNewObject(INewObjectExpressionSyntax expression)
+        internal static TempValue? ForNewObject(ReachabilityGraph graph, INewObjectExpressionSyntax expression)
         {
             var referenceType = expression.Type.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
-            var reference = Reference.ToNewObject(expression);
-            var temp = new TempValue(referenceType);
-            temp.AddReference(reference);
-            return temp;
-        }
-
-        // TODO encapsulate this in the graph class
-        public static TempValue? ForNewInvocationReturnedObject(IInvocationExpressionSyntax expression)
-        {
-            var referenceType = expression.Type.Known().UnderlyingReferenceType();
-            if (referenceType is null) return null;
-
-            var reference = Reference.ToNewInvocationReturnedObject(expression);
-            var temp = new TempValue(referenceType);
+            var reference = Reference.ToNewObject(graph, expression);
+            var temp = new TempValue(graph, referenceType);
             temp.AddReference(reference);
             return temp;
         }
 
         // TODO encapsulate this in the graph class
-        public static TempValue? For(IExpressionSyntax expression)
+        public static TempValue? ForNewInvocationReturnedObject(ReachabilityGraph graph, IInvocationExpressionSyntax expression)
         {
             var referenceType = expression.Type.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
-            return new TempValue(referenceType);
+            var reference = Reference.ToNewInvocationReturnedObject(graph, expression);
+            var temp = new TempValue(graph, referenceType);
+            temp.AddReference(reference);
+            return temp;
+        }
+
+        // TODO encapsulate this in the graph class
+        public static TempValue? For(ReachabilityGraph graph, IExpressionSyntax expression)
+        {
+            var referenceType = expression.Type.Known().UnderlyingReferenceType();
+            if (referenceType is null) return null;
+
+            return new TempValue(graph, referenceType);
         }
 
         public override string ToString()

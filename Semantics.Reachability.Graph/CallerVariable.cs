@@ -14,24 +14,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     {
         public IBindingSymbol Symbol { get; }
 
-        private CallerVariable(IBindingSymbol symbol)
+        private CallerVariable(ReachabilityGraph graph, IBindingSymbol symbol)
+            : base(graph)
         {
             _ = symbol.Type.UnderlyingReferenceType()
                 ?? throw new ArgumentException("Must be a reference type", nameof(symbol));
             Symbol = symbol;
         }
 
-        internal static CallerVariable CreateForParameterWithObject(IParameterSyntax parameter)
+        internal static CallerVariable CreateForParameterWithObject(ReachabilityGraph graph, IParameterSyntax parameter)
         {
-            var reference = Reference.ToNewParameterContextObject(parameter);
-            var callerVariable = new CallerVariable(parameter);
+            var reference = Reference.ToNewParameterContextObject(graph, parameter);
+            var callerVariable = new CallerVariable(graph, parameter);
             callerVariable.AddReference(reference);
             return callerVariable;
         }
 
         public override string ToString()
         {
-            return $"{Symbol.FullName}: {Symbol.Type}";
+            return $"{Symbol.FullName.UnqualifiedName}: {Symbol.Type}";
         }
     }
 }

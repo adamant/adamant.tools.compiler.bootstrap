@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
@@ -17,14 +18,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         private readonly Dictionary<IBindingSymbol, CallerVariable> callerVariables = new Dictionary<IBindingSymbol, CallerVariable>();
         private readonly Dictionary<IBindingSymbol, Variable> variables = new Dictionary<IBindingSymbol, Variable>();
 
-        private readonly Dictionary<ISyntax, ContextObject> contextObjects = new Dictionary<ISyntax, ContextObject>();
         private readonly Dictionary<ISyntax, Object> objects = new Dictionary<ISyntax, Object>();
 
         private readonly HashSet<TempValue> tempValues = new HashSet<TempValue>();
 
         internal IReadOnlyCollection<CallerVariable> CallerVariables => callerVariables.Values;
         internal IReadOnlyCollection<Variable> Variables => variables.Values;
-        internal IReadOnlyCollection<ContextObject> ContextObjects => contextObjects.Values;
         internal IReadOnlyCollection<Object> Objects => objects.Values;
         internal IReadOnlyCollection<TempValue> TempValues => tempValues;
 
@@ -38,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 return null;
 
             CallerVariable? callerVariable = null;
-            var localVariable = new Variable(parameter);
+            var localVariable = new Variable(this, parameter);
 
             var capability = referenceType.ReferenceCapability;
             switch (capability)
@@ -49,7 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 case ReferenceCapability.Isolated:
                 {
                     // Isolated parameters are fully independent of the caller
-                    var reference = Reference.ToNewParameterObject(parameter);
+                    var reference = Reference.ToNewParameterObject(this, parameter);
                     localVariable.AddReference(reference);
                 }
                 break;
@@ -58,30 +57,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 case ReferenceCapability.Held:
                 case ReferenceCapability.HeldMutable:
                 {
-                    var reference = Reference.ToNewParameterObject(parameter);
+                    var reference = Reference.ToNewParameterObject(this, parameter);
                     localVariable.AddReference(reference);
                     var referencedObject = reference.Referent;
 
                     // Object to represent the bounding of the lifetime
-                    callerVariable = CallerVariable.CreateForParameterWithObject(parameter);
+                    callerVariable = CallerVariable.CreateForParameterWithObject(this, parameter);
                     referencedObject.ShareFrom(callerVariable);
                 }
                 break;
                 case ReferenceCapability.Borrowed:
                 {
-                    callerVariable = CallerVariable.CreateForParameterWithObject(parameter);
+                    callerVariable = CallerVariable.CreateForParameterWithObject(this, parameter);
                     localVariable.BorrowFrom(callerVariable);
                 }
                 break;
                 case ReferenceCapability.Shared:
                 {
-                    callerVariable = CallerVariable.CreateForParameterWithObject(parameter);
+                    callerVariable = CallerVariable.CreateForParameterWithObject(this, parameter);
                     localVariable.ShareFrom(callerVariable);
                 }
                 break;
                 case ReferenceCapability.Identity:
                 {
-                    callerVariable = CallerVariable.CreateForParameterWithObject(parameter);
+                    callerVariable = CallerVariable.CreateForParameterWithObject(this, parameter);
                     localVariable.IdentityFrom(callerVariable);
                 }
                 break;
@@ -104,7 +103,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             var referenceType = fieldDeclaration.Type.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
-            var variable = Variable.ForField(fieldDeclaration);
+            var variable = Variable.ForField(this, fieldDeclaration);
             Add(variable);
             return variable;
         }
@@ -114,33 +113,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             var referenceType = bindingSymbol.Type.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
-            var variable = Variable.Declared(bindingSymbol);
+            var variable = Variable.Declared(this, bindingSymbol);
             Add(variable);
             return variable;
         }
 
         public TempValue? AddObject(INewObjectExpressionSyntax expression)
         {
-            var temp = TempValue.ForNewObject(expression);
+            var temp = TempValue.ForNewObject(this, expression);
             Add(temp);
             return temp;
         }
 
-        public void Add(HeapPlace place)
+        private void Add(Object obj)
         {
-            switch (place)
-            {
-                default:
-                    throw ExhaustiveMatch.Failed(place);
-                case ContextObject contextObject:
-                    if (contextObjects.TryAdd(contextObject.OriginSyntax, contextObject))
-                        AddReferences(contextObject);
-                    break;
-                case Object @object:
-                    if (objects.TryAdd(@object.OriginSyntax, @object))
-                        AddReferences(@object);
-                    break;
-            }
+            if (objects.TryAdd(obj.OriginSyntax, obj))
+                AddReferences(obj);
         }
 
         public void Add(TempValue? temp)
@@ -163,17 +151,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 Add(reference.Referent);
         }
 
-        public bool EndVariableScope(IBindingSymbol variable)
+        public void EndVariableScope(IBindingSymbol variable)
         {
-            if (!variables.Remove(variable, out var place)) return false;
-            place.Free();
-            return true;
+            if (!variables.Remove(variable, out var place))
+                throw new Exception($"Variable '{variable.FullName.UnqualifiedName}' does not exist in the graph.");
+
+            place.Freed();
         }
 
         public bool Remove(TempValue tempValue)
         {
             // Make sure this is released
-            tempValue.Free();
+            tempValue.Freed();
             return tempValues.Remove(tempValue);
         }
 
@@ -183,10 +172,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 if (!(tempValue is null))
                     Remove(tempValue);
         }
+
+        internal void Delete(Object obj)
+        {
+            if (!objects.Remove(obj.OriginSyntax))
+                throw new Exception($"Object '{obj}' does not exist in the graph.");
+
+            obj.Freed();
+        }
         #endregion
 
         /// <summary>
-        /// Assigns a temp value into a variable.
+        /// Assigns a temp value into a variable, consuming the temp value.
         /// </summary>
         /// <remarks>This is a method of the graph so that the temp value
         /// can be removed from the graph even if there is no variable.</remarks>
@@ -210,10 +207,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public void ComputeCurrentObjectAccess()
         {
-            var heapPlaces = AllHeapPlaces().ToFixedList();
-
             // Reset mutability to unknown (null)
-            foreach (var place in heapPlaces)
+            foreach (var place in Objects)
                 place.ResetAccess();
 
             var rootPlaces = callerVariables.Values.SafeCast<StackPlace>()
@@ -223,11 +218,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
             foreach (var place in rootPlaces)
                 place.MarkReferencedObjects();
-        }
-
-        private IEnumerable<HeapPlace> AllHeapPlaces()
-        {
-            return contextObjects.Values.SafeCast<HeapPlace>().Concat(objects.Values);
         }
     }
 }

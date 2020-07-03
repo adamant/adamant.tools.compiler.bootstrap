@@ -107,7 +107,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
 
                     // The referent should be a name or `self` so we don't need to evaluate it
                     var variable = graph.GetVariableFor(exp.MovedSymbol.Assigned());
-                    var temp = TempValue.For(exp);
+                    var temp = TempValue.For(graph, exp);
                     temp?.MoveFrom(variable);
                     graph.Add(temp);
                     return temp;
@@ -120,7 +120,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     var variable = graph.TryGetVariableFor(exp.BorrowedSymbol.Assigned());
                     if (!(variable is null))
                     {
-                        var temp = TempValue.For(exp);
+                        var temp = TempValue.For(graph, exp);
                         temp?.BorrowFrom(variable);
                         graph.Add(temp);
                         return temp;
@@ -141,7 +141,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     var variable = graph.TryGetVariableFor(exp.SharedSymbol.Assigned());
                     if (!(variable is null))
                     {
-                        var temp = TempValue.For(exp);
+                        var temp = TempValue.For(graph, exp);
                         temp?.ShareFrom(variable);
                         graph.Add(temp);
                         return temp;
@@ -237,7 +237,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     if (referenceType is null) return null;
 
                     // Create an untethered context object that doesn't need released
-                    var temp = TempValue.ForNewContextObject(exp);
+                    var temp = TempValue.ForNewContextObject(graph, exp);
                     graph.Add(temp);
                     return temp;
                 }
@@ -363,7 +363,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             if (referenceType is null)
                 throw new ArgumentException($"{nameof(CaptureArguments)} only supports reference returning functions");
 
-            var temp = TempValue.ForNewInvocationReturnedObject(exp);
+            var temp = TempValue.ForNewInvocationReturnedObject(graph, exp);
             var referent = temp!.PossibleReferents.Single();
             foreach (var argument in arguments)
                 if (!(argument is null))

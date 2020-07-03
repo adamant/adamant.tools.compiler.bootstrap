@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
     public class Reference
     {
-        public HeapPlace Referent { get; private set; }
+        public Object Referent { get; private set; }
         public Ownership Ownership { get; }
         public bool CouldHaveOwnership => Ownership == Ownership.Owns || Ownership == Ownership.PotentiallyOwns;
 
@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         private readonly List<Reference> borrowers = new List<Reference>();
         public IReadOnlyList<Reference> Borrowers { get; }
 
-        private Reference(HeapPlace referent, Ownership ownership, Access declaredAccess)
+        private Reference(Object referent, Ownership ownership, Access declaredAccess)
         {
             Referent = referent;
             Ownership = ownership;
@@ -40,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         }
 
         // TODO encapsulate these in the graph class
-        public static Reference ToNewParameterObject(IParameterSyntax parameter)
+        public static Reference ToNewParameterObject(ReachabilityGraph graph, IParameterSyntax parameter)
         {
             var referenceType = parameter.Type.Known().UnderlyingReferenceType()
                                 ?? throw new ArgumentException("Must be a parameter with a reference type", nameof(parameter));
@@ -50,11 +50,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             var access = referenceCapability.ToAccess();
             var reference = new Reference(ownership, access);
             var originOfMutability = access == Access.Mutable ? reference : null;
-            reference.Referent = new Object(parameter, originOfMutability);
+            reference.Referent = new Object(graph, false, parameter, originOfMutability);
             return reference;
         }
 
-        public static Reference ToNewParameterContextObject(IParameterSyntax parameter)
+        public static Reference ToNewParameterContextObject(ReachabilityGraph graph, IParameterSyntax parameter)
         {
             var referenceType = parameter.Type.Known().UnderlyingReferenceType()
                 ?? throw new ArgumentException("Must be a parameter with a reference type",
@@ -65,11 +65,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             var access = referenceCapability.ToAccess();
             var reference = new Reference(ownership, access);
             var originOfMutability = access == Access.Mutable ? reference : null;
-            reference.Referent = new ContextObject(parameter, originOfMutability);
+            reference.Referent = new Object(graph, true, parameter, originOfMutability);
             return reference;
         }
 
-        public static Reference ToNewContextObject(IExpressionSyntax expression)
+        public static Reference ToNewContextObject(ReachabilityGraph graph, IExpressionSyntax expression)
         {
             var referenceType = expression.Type.Known().UnderlyingReferenceType()
                                 ?? throw new ArgumentException("Must be a parameter with a reference type",
@@ -80,21 +80,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             var access = referenceCapability.ToAccess();
             var reference = new Reference(ownership, access);
             var originOfMutability = access == Access.Mutable ? reference : null;
-            reference.Referent = new ContextObject(expression, originOfMutability);
+            reference.Referent = new Object(graph, true, expression, originOfMutability);
             return reference;
         }
 
-        public static Reference ToNewObject(INewObjectExpressionSyntax expression)
+        public static Reference ToNewObject(ReachabilityGraph graph, INewObjectExpressionSyntax expression)
         {
-            return ToExpressionObject(expression);
+            return ToExpressionObject(graph, expression);
         }
 
-        public static Reference ToNewInvocationReturnedObject(IInvocationExpressionSyntax expression)
+        public static Reference ToNewInvocationReturnedObject(ReachabilityGraph graph, IInvocationExpressionSyntax expression)
         {
-            return ToExpressionObject(expression);
+            return ToExpressionObject(graph, expression);
         }
 
-        private static Reference ToExpressionObject(IExpressionSyntax expression)
+        private static Reference ToExpressionObject(ReachabilityGraph graph, IExpressionSyntax expression)
         {
             var referenceType = expression.Type.Known().UnderlyingReferenceType()
                                 ?? throw new ArgumentException("Must be a parameter with a reference type",
@@ -105,11 +105,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             var access = referenceCapability.ToAccess();
             var reference = new Reference(ownership, access);
             var originOfMutability = access == Access.Mutable ? reference : null;
-            reference.Referent = new Object(expression, originOfMutability);
+            reference.Referent = new Object(graph, false, expression, originOfMutability);
             return reference;
         }
 
-        public static Reference ToNewFieldObject(IFieldDeclarationSyntax field)
+        public static Reference ToNewFieldObject(ReachabilityGraph graph, IFieldDeclarationSyntax field)
         {
             var referenceType = field.Type.Known().UnderlyingReferenceType()
                                 ?? throw new ArgumentException("Must be a parameter with a reference type",
@@ -120,7 +120,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             var access = referenceCapability.ToAccess();
             var reference = new Reference(ownership, access);
             var originOfMutability = access == Access.Mutable ? reference : null;
-            reference.Referent = new Object(field, originOfMutability);
+            reference.Referent = new Object(graph, field, originOfMutability);
             return reference;
         }
 

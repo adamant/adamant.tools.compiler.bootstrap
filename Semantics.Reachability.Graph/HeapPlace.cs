@@ -5,7 +5,6 @@ using ExhaustiveMatching;
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
     [Closed(
-        typeof(ContextObject),
         typeof(Object))]
     public abstract class HeapPlace : MemoryPlace
     {
@@ -21,7 +20,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         /// </summary>
         public Access? CurrentAccess { get; private set; }
 
-        protected HeapPlace(ISyntax originSyntax, Reference? originOfMutability)
+        protected HeapPlace(
+            ReachabilityGraph graph,
+            ISyntax originSyntax,
+            Reference? originOfMutability)
+            : base(graph)
         {
             OriginSyntax = originSyntax;
             OriginOfMutability = originOfMutability;
@@ -32,9 +35,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             AddReferences(argument.StealReferences());
         }
 
-        internal override void Free()
+        internal override void Freed()
         {
-            base.Free();
+            base.Freed();
             CurrentAccess = null;
         }
 
