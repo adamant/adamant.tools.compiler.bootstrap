@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public override string ToString()
         {
-            return $"{Symbol.FullName.UnqualifiedName}: {Symbol.Type}";
+            return $"⟦{Symbol.FullName.UnqualifiedName}⟧: {Symbol.Type}";
         }
     }
 }

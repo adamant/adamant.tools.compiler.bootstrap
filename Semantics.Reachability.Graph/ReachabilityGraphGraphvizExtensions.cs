@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             var dot = new StringBuilder();
             var nodes = new Dictionary<MemoryPlace, string>();
             dot.AppendLine("digraph reachability {");
-            dot.AppendLine("	rankdir=LR;");
+            dot.AppendLine("    rankdir=LR;");
             AppendStack(graph, dot, nodes);
             //AppendContextObjects(graph, dot, nodes);
             AppendObjects(graph, dot, nodes);
@@ -33,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             if (!hasCallerVariables && !hasVariables && !hasTempValues) return;
 
             dot.AppendLine("    node [shape=plaintext];");
-            dot.AppendLine("	stack [label=<");
+            dot.AppendLine("    stack [label=<");
             dot.AppendLine("        <TABLE BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\" CELLPADDING=\"4\">");
             var nextNode = 1;
             foreach (var callerVariable in graph.CallerVariables) AppendStackItem(dot, callerVariable, "cv", nodes, ref nextNode);
@@ -48,7 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             nextNode = 1;
             foreach (var tempValue in graph.TempValues) AppendStackItem(dot, tempValue, "t", nodes, ref nextNode);
 
-            dot.AppendLine("		</TABLE>>];"); // end stack
+            dot.AppendLine("        </TABLE>>];"); // end stack
         }
 
         private static void AppendStackItem(
@@ -60,7 +60,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         {
             var port = nodeType + nextNode;
             nodes.Add(place, "stack:" + port + ":e");
-            dot.AppendLine($"            <TR><TD PORT=\"{port}\" ALIGN=\"LEFT\">{place}</TD></TR>");
+            var label = Escape(place.ToString()!);
+            dot.AppendLine($"            <TR><TD PORT=\"{port}\" ALIGN=\"LEFT\">{label}</TD></TR>");
             nextNode += 1;
         }
 
@@ -80,11 +81,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             {
                 var name = "ctx" + nextObject;
                 nodes.Add(contextObject, name);
-                dot.AppendLine($"    {name} [label=\"{Escape(contextObject.ToString())}\"];");
+                var label = Escape(contextObject.ToString());
+                dot.AppendLine($"    {name} [label=\"{label}</U>\"];");
                 nextObject += 1;
             }
 
-            dot.AppendLine("    node [shape=ellipse];");
+            dot.AppendLine("    node [shape=ellipse, peripheries=1];");
 
             nextObject = 1;
             foreach (var obj in graph.Objects.Where(o => !o.IsContext))
