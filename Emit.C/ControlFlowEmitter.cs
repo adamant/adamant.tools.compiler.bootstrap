@@ -132,32 +132,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     var left = ConvertOperand(ins.LeftOperand);
                     var right = ConvertOperand(ins.RightOperand);
                     var operationType = ConvertSimpleType(ins.Type);
-                    string @operator;
-                    switch (ins.Operator)
+                    string op = ins.Operator switch
                     {
-                        default:
-                            throw ExhaustiveMatch.Failed(ins.Operator);
-                        case Equal:
-                            @operator = "eq";
-                            break;
-                        case NotEqual:
-                            @operator = "ne";
-                            break;
-                        case LessThan:
-                            @operator = "lt";
-                            break;
-                        case LessThanOrEqual:
-                            @operator = "lte";
-                            break;
-                        case GreaterThan:
-                            @operator = "gt";
-                            break;
-                        case GreaterThanOrEqual:
-                            @operator = "gte";
-                            break;
-                    }
+                        Equal => "eq",
+                        NotEqual => "ne",
+                        LessThan => "lt",
+                        LessThanOrEqual => "lte",
+                        GreaterThan => "gt",
+                        GreaterThanOrEqual => "gte",
+                        _ => throw ExhaustiveMatch.Failed(ins.Operator)
+                    };
 
-                    code.EndLine($"{operationType}__{@operator}({left}, {right});");
+                    code.EndLine($"{operationType}__{op}({left}, {right});");
                 }
                 break;
                 case NumericInstruction ins:
@@ -165,26 +151,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     var left = ConvertOperand(ins.LeftOperand);
                     var right = ConvertOperand(ins.RightOperand);
                     var operationType = ConvertSimpleType(ins.Type);
-                    string @operator;
-                    switch (ins.Operator)
+                    string op = ins.Operator switch
                     {
-                        default:
-                            throw ExhaustiveMatch.Failed(ins.Operator);
-                        case Add:
-                            @operator = "add";
-                            break;
-                        case Subtract:
-                            @operator = "sub";
-                            break;
-                        case Multiply:
-                            @operator = "mul";
-                            break;
-                        case Divide:
-                            @operator = "div";
-                            break;
-                    }
+                        Add => "add",
+                        Subtract => "sub",
+                        Multiply => "mul",
+                        Divide => "div",
+                        _ => throw ExhaustiveMatch.Failed(ins.Operator)
+                    };
 
-                    code.EndLine($"{operationType}__{@operator}({left}, {right});");
+                    code.EndLine($"{operationType}__{op}({left}, {right});");
                 }
                 break;
                 case LoadIntegerInstruction ins:
@@ -355,13 +331,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
         private static string ConvertOperand(Operand value)
         {
-            switch (value)
+            return value switch
             {
-                default:
-                    throw ExhaustiveMatch.Failed(value);
-                case VariableReference op:
-                    return "_" + op.Variable.Name;
-            }
+                VariableReference op => "_" + op.Variable.Name,
+                _ => throw ExhaustiveMatch.Failed(value)
+            };
         }
 
         private string ConvertSimpleType(SimpleType type)

@@ -80,16 +80,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
         public object Mangle(DataType type)
         {
-            switch (type)
+            return type switch
             {
-                default:
-                    throw new NotImplementedException();
-                //throw ExhaustiveMatch.Failed(type);
-                case SimpleType simpleType:
-                    return Mangle(simpleType);
-                case UserObjectType userObjectType:
-                    return Mangle(userObjectType);
-            }
+                SimpleType simpleType => Mangle(simpleType),
+                UserObjectType userObjectType => Mangle(userObjectType),
+                _ => throw new NotImplementedException(),
+                //throw ExhaustiveMatch.Failed(type)
+            };
         }
 
         public string Mangle(SimpleType type)
@@ -119,16 +116,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
         private static int EstimateSize(Name name)
         {
-            switch (name)
+            return name switch
             {
-                default:
-                    throw ExhaustiveMatch.Failed(name);
-                case QualifiedName qualifiedName:
-                    return EstimateSize(qualifiedName.Qualifier) + 2 +
-                           EstimateSize(qualifiedName.UnqualifiedName);
-                case SimpleName simpleName:
-                    return simpleName.Text.Length;
-            }
+                QualifiedName qualifiedName => EstimateSize(qualifiedName.Qualifier) + 2
+                                               + EstimateSize(qualifiedName.UnqualifiedName),
+                SimpleName simpleName => simpleName.Text.Length,
+                _ => throw ExhaustiveMatch.Failed(name)
+            };
         }
 
         private static void Mangle(Name name, StringBuilder builder)

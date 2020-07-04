@@ -16,23 +16,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
     {
         public static string ToInstructionString(this CompareInstructionOperator @operator)
         {
-            switch (@operator)
+            return @operator switch
             {
-                default:
-                    throw ExhaustiveMatch.Failed(@operator);
-                case CompareInstructionOperator.Equal:
-                    return "EQ";
-                case CompareInstructionOperator.NotEqual:
-                    return "NE";
-                case CompareInstructionOperator.LessThan:
-                    return "LT";
-                case CompareInstructionOperator.LessThanOrEqual:
-                    return "LTE";
-                case CompareInstructionOperator.GreaterThan:
-                    return "GT";
-                case CompareInstructionOperator.GreaterThanOrEqual:
-                    return "GTE";
-            }
+                CompareInstructionOperator.Equal => "EQ",
+                CompareInstructionOperator.NotEqual => "NE",
+                CompareInstructionOperator.LessThan => "LT",
+                CompareInstructionOperator.LessThanOrEqual => "LTE",
+                CompareInstructionOperator.GreaterThan => "GT",
+                CompareInstructionOperator.GreaterThanOrEqual => "GTE",
+                _ => throw ExhaustiveMatch.Failed(@operator)
+            };
         }
     }
 }

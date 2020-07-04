@@ -184,34 +184,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         private static AssignmentOperator BuildAssignmentOperator(IAssignmentToken assignmentToken)
         {
-            switch (assignmentToken)
+            return assignmentToken switch
             {
-                default:
-                    throw ExhaustiveMatch.Failed(assignmentToken);
-                case IEqualsToken _:
-                    return AssignmentOperator.Simple;
-                case IPlusEqualsToken _:
-                    return AssignmentOperator.Plus;
-                case IMinusEqualsToken _:
-                    return AssignmentOperator.Minus;
-                case IAsteriskEqualsToken _:
-                    return AssignmentOperator.Asterisk;
-                case ISlashEqualsToken _:
-                    return AssignmentOperator.Slash;
-            }
+                IEqualsToken _ => AssignmentOperator.Simple,
+                IPlusEqualsToken _ => AssignmentOperator.Plus,
+                IMinusEqualsToken _ => AssignmentOperator.Minus,
+                IAsteriskEqualsToken _ => AssignmentOperator.Asterisk,
+                ISlashEqualsToken _ => AssignmentOperator.Slash,
+                _ => throw ExhaustiveMatch.Failed(assignmentToken)
+            };
         }
 
         private static AccessOperator BuildAccessOperator(IAccessOperatorToken accessOperatorToken)
         {
-            switch (accessOperatorToken)
+            return accessOperatorToken switch
             {
-                default:
-                    throw ExhaustiveMatch.Failed(accessOperatorToken);
-                case IDotToken _:
-                    return AccessOperator.Standard;
-                case IQuestionDotToken _:
-                    return AccessOperator.Conditional;
-            }
+                IDotToken _ => AccessOperator.Standard,
+                IQuestionDotToken _ => AccessOperator.Conditional,
+                _ => throw ExhaustiveMatch.Failed(accessOperatorToken)
+            };
         }
 
         private static IExpressionSyntax BuildBinaryOperatorExpression(
@@ -219,62 +210,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
              IBinaryOperatorToken operatorToken,
              IExpressionSyntax right)
         {
-            BinaryOperator binaryOperator;
-            switch (operatorToken)
+            BinaryOperator binaryOperator = operatorToken switch
             {
-                default:
-                    throw ExhaustiveMatch.Failed(operatorToken);
-                case IPlusToken _:
-                    binaryOperator = BinaryOperator.Plus;
-                    break;
-                case IMinusToken _:
-                    binaryOperator = BinaryOperator.Minus;
-                    break;
-                case IAsteriskToken _:
-                    binaryOperator = BinaryOperator.Asterisk;
-                    break;
-                case ISlashToken _:
-                    binaryOperator = BinaryOperator.Slash;
-                    break;
-                case IEqualsEqualsToken _:
-                    binaryOperator = BinaryOperator.EqualsEquals;
-                    break;
-                case INotEqualToken _:
-                    binaryOperator = BinaryOperator.NotEqual;
-                    break;
-                case ILessThanToken _:
-                    binaryOperator = BinaryOperator.LessThan;
-                    break;
-                case ILessThanOrEqualToken _:
-                    binaryOperator = BinaryOperator.LessThanOrEqual;
-                    break;
-                case IGreaterThanToken _:
-                    binaryOperator = BinaryOperator.GreaterThan;
-                    break;
-                case IGreaterThanOrEqualToken _:
-                    binaryOperator = BinaryOperator.GreaterThanOrEqual;
-                    break;
-                case IAndKeywordToken _:
-                    binaryOperator = BinaryOperator.And;
-                    break;
-                case IOrKeywordToken _:
-                    binaryOperator = BinaryOperator.Or;
-                    break;
-                case IDotDotToken _:
-                    binaryOperator = BinaryOperator.DotDot;
-                    break;
-                case ILessThanDotDotToken _:
-                    binaryOperator = BinaryOperator.LessThanDotDot;
-                    break;
-                case IDotDotLessThanToken _:
-                    binaryOperator = BinaryOperator.DotDotLessThan;
-                    break;
-                case ILessThanDotDotLessThanToken _:
-                    binaryOperator = BinaryOperator.LessThanDotDotLessThan;
-                    break;
-                case IQuestionQuestionToken _:
-                    throw new NotImplementedException();
-            }
+                IPlusToken _ => BinaryOperator.Plus,
+                IMinusToken _ => BinaryOperator.Minus,
+                IAsteriskToken _ => BinaryOperator.Asterisk,
+                ISlashToken _ => BinaryOperator.Slash,
+                IEqualsEqualsToken _ => BinaryOperator.EqualsEquals,
+                INotEqualToken _ => BinaryOperator.NotEqual,
+                ILessThanToken _ => BinaryOperator.LessThan,
+                ILessThanOrEqualToken _ => BinaryOperator.LessThanOrEqual,
+                IGreaterThanToken _ => BinaryOperator.GreaterThan,
+                IGreaterThanOrEqualToken _ => BinaryOperator.GreaterThanOrEqual,
+                IAndKeywordToken _ => BinaryOperator.And,
+                IOrKeywordToken _ => BinaryOperator.Or,
+                IDotDotToken _ => BinaryOperator.DotDot,
+                ILessThanDotDotToken _ => BinaryOperator.LessThanDotDot,
+                IDotDotLessThanToken _ => BinaryOperator.DotDotLessThan,
+                ILessThanDotDotLessThanToken _ => BinaryOperator.LessThanDotDotLessThan,
+                IQuestionQuestionToken _ => throw new NotImplementedException(),
+                _ => throw ExhaustiveMatch.Failed(operatorToken)
+            };
             return new BinaryOperatorExpressionSyntax(left, binaryOperator, right);
         }
 

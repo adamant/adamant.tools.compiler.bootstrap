@@ -14,19 +14,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
     {
         public static string ToInstructionString(this NumericInstructionOperator @operator)
         {
-            switch (@operator)
+            return @operator switch
             {
-                default:
-                    throw ExhaustiveMatch.Failed(@operator);
-                case NumericInstructionOperator.Add:
-                    return "ADD";
-                case NumericInstructionOperator.Subtract:
-                    return "SUB";
-                case NumericInstructionOperator.Multiply:
-                    return "MUL";
-                case NumericInstructionOperator.Divide:
-                    return "DIV";
-            }
+                NumericInstructionOperator.Add => "ADD",
+                NumericInstructionOperator.Subtract => "SUB",
+                NumericInstructionOperator.Multiply => "MUL",
+                NumericInstructionOperator.Divide => "DIV",
+                _ => throw ExhaustiveMatch.Failed(@operator)
+            };
         }
     }
 }

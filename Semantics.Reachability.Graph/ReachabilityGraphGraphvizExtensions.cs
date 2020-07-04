@@ -292,21 +292,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         private static string ColorForPhase(Reference reference)
         {
-            string color;
-            switch (reference.Phase)
+            string color = reference.Phase switch
             {
-                default:
-                    throw ExhaustiveMatch.Failed(reference.Phase);
-                case Phase.Unused:
-                    color = "grey45";
-                    break;
-                case Phase.Used:
-                    color = "black";
-                    break;
-                case Phase.Released:
-                    color = "red";
-                    break;
-            }
+                Phase.Unused => "grey45",
+                Phase.Used => "black",
+                Phase.Released => "red",
+                _ => throw ExhaustiveMatch.Failed(reference.Phase)
+            };
 
             return color;
         }
