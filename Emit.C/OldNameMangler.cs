@@ -43,8 +43,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
     /// * https://en.wikipedia.org/wiki/Unicode_subscripts_and_superscripts
     /// * https://en.wikipedia.org/wiki/List_of_Unicode_characters
     /// </summary>
-    public class OldNameMangler
-    {
+    //public class OldNameMangler
+    //{
         // Note, we don't have to worry about whether the identifier starts with
         // a number because it will end up prefixed anyway.
         //private static readonly Regex StandardIdentifierPattern = new Regex(@"^[_0-9a-zA-Z]+$", RegexOptions.Compiled);
@@ -249,5 +249,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         //        || (c >= 0xE0000 && c <= 0xEFFFD)
         //        ;
         //}
-    }
+    //}
 }

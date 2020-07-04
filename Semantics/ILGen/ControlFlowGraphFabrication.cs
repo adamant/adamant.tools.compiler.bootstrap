@@ -447,14 +447,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case ILoopExpressionSyntax _:
                 case IWhileExpressionSyntax _:
                 case IForeachExpressionSyntax _:
-                case IMoveExpressionSyntax _:
                 case IReturnExpressionSyntax _:
                 case IBreakExpressionSyntax _:
                 case INextExpressionSyntax _:
                 case ISelfExpressionSyntax _:
                 case IIfExpressionSyntax _:
                 case IUnsafeExpressionSyntax _:
-                case IImplicitImmutabilityConversionExpression _:
                 case IBlockExpressionSyntax _:
                 case INoneLiteralExpressionSyntax _:
                     throw new NotImplementedException($"ConvertIntoPlace({expression.GetType().Name}, Place) Not Implemented.");
@@ -495,6 +493,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     break;
                 case IShareExpressionSyntax exp:
                     ConvertIntoPlace(exp.Referent, resultPlace);
+                    break;
+                case IMoveExpressionSyntax exp:
+                    ConvertIntoPlace(exp.Referent, resultPlace);
+                    break;
+                case IImplicitImmutabilityConversionExpression exp:
+                    ConvertIntoPlace(exp.Expression, resultPlace);
                     break;
                 case IBinaryOperatorExpressionSyntax exp:
                 {
