@@ -73,8 +73,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         private void ReleaseReferences()
         {
-            foreach (var reference in references.Where(r => r.CouldHaveOwnership))
-                Graph.Delete(reference.Referent);
+            foreach (var reference in references)
+                if (reference.CouldHaveOwnership
+                    || reference.Referent.GetCurrentAccess() is null) // not reachable
+                    Graph.Delete(reference.Referent);
 
             foreach (var reference in references)
                 reference.Release();
