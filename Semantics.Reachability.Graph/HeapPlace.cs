@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         public void Capture(TempValue argument)
         {
             AddReferences(argument.StealReferences());
-            Graph.Remove(argument);
+            Graph.Drop(argument);
         }
 
         internal override void Freed()

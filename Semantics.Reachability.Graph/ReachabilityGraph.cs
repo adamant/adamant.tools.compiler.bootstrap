@@ -141,9 +141,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return variable;
         }
 
-        public TempValue? AddObject(INewObjectExpressionSyntax expression)
+        public TempValue? AddObject(INewObjectExpressionSyntax exp)
         {
-            var temp = TempValue.ForNewObject(this, expression);
+            var temp = TempValue.ForNewObject(this, exp);
+            Add(temp);
+            return temp;
+        }
+
+        public TempValue? AddFunctionCall(IInvocationExpressionSyntax exp)
+        {
+            var temp = TempValue.ForNewInvocationReturnedObject(this, exp);
             Add(temp);
             return temp;
         }
@@ -190,13 +197,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             Dirty();
         }
 
-        internal void Remove(TempValue tempValue)
+        public void Drop(TempValue? temp)
         {
-            if (!tempValues.Remove(tempValue))
-                throw new Exception($"Temp value '{tempValue}' does not exist in the graph.");
+            if (temp is null) return;
+            if (!tempValues.Remove(temp))
+                throw new Exception($"Temp value '{temp}' does not exist in the graph.");
 
-            tempValue.Freed();
+            temp.Freed();
             Dirty();
+        }
+
+        public void Drop(IEnumerable<TempValue?> temps)
+        {
+            foreach (var tempValue in temps) Drop(tempValue);
         }
 
         internal void Delete(Object obj)
@@ -218,7 +231,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         {
             if (value == null) return;
             variable?.Assign(value);
-            Remove(value);
+            Drop(value);
         }
 
         public Variable GetVariableFor(IBindingSymbol variableSymbol)

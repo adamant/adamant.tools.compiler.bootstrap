@@ -37,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         }
 
         // TODO encapsulate this in the graph class
-        public static TempValue? ForNewInvocationReturnedObject(ReachabilityGraph graph, IInvocationExpressionSyntax expression)
+        internal static TempValue? ForNewInvocationReturnedObject(ReachabilityGraph graph, IInvocationExpressionSyntax expression)
         {
             var referenceType = expression.Type.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;

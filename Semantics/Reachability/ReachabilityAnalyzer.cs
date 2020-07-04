@@ -187,7 +187,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 }
                 case IFunctionInvocationExpressionSyntax exp:
                 {
-                    var arguments = exp.Arguments.Select(a => Analyze(a.Expression, graph, scope)).ToFixedList();
+                    var arguments = exp.Arguments
+                                       .Select(a => Analyze(a.Expression, graph, scope))
+                                       .ToFixedList();
                     var function = exp.FunctionNameSyntax.ReferencedSymbol.Assigned();
                     var parameters = function.Parameters;
                     UseArguments(arguments, exp.Arguments, parameters);
@@ -195,24 +197,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                         return CaptureArguments(exp, arguments, graph);
 
                     // All the arguments are dropped because they aren't captured
-                    //graph.Remove(arguments);
+                    graph.Drop(arguments);
                     return null;
-
                 }
                 case IMethodInvocationExpressionSyntax exp:
                 {
-                    var self = Analyze(exp.ContextExpression, graph, scope);
+                    var selfArgument = Analyze(exp.ContextExpression, graph, scope);
                     var arguments = exp.Arguments.Select(a => Analyze(a.Expression, graph, scope)).ToFixedList();
                     var method = exp.MethodNameSyntax.ReferencedSymbol.Assigned();
                     var parameters = method.Parameters;
-                    if (!(self is null))
-                        UseArgument(self, exp.ContextExpression.Span);
+                    if (!(selfArgument is null))
+                        UseArgument(selfArgument, exp.ContextExpression.Span);
                     UseArguments(arguments, exp.Arguments, parameters);
                     if (!(referenceType is null))
-                        return CaptureArguments(exp, arguments.Prepend(self), graph);
+                        return CaptureArguments(exp, arguments.Prepend(selfArgument), graph);
 
                     // All the arguments are dropped because they aren't captured
-                    //graph.Remove(arguments);
+                    graph.Drop(selfArgument);
+                    graph.Drop(arguments);
                     return null;
                 }
                 case IUnsafeExpressionSyntax exp:
@@ -230,7 +232,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     var parameters = constructor.Parameters;
                     UseArguments(arguments, exp.Arguments, parameters);
                     if (referenceType is null) return null;
-                    return graph.AddObject(exp); // TODO tie the new object to the arguments
+                    var obj = graph.AddObject(exp)!;
+                    CaptureArguments(arguments, obj);
+                    return obj;
                 }
                 case IStringLiteralExpressionSyntax exp:
                 {
@@ -360,7 +364,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             if (referenceType is null)
                 throw new ArgumentException($"{nameof(CaptureArguments)} only supports reference returning functions");
 
-            var temp = TempValue.ForNewInvocationReturnedObject(graph, exp);
+            var temp = graph.AddFunctionCall(exp)!;
+            CaptureArguments(arguments, temp);
+            return temp;
+        }
+
+        private static void CaptureArguments(IEnumerable<TempValue?> arguments, TempValue temp)
+        {
             var referent = temp!.PossibleReferents.Single();
             foreach (var argument in arguments)
                 if (!(argument is null))
@@ -368,9 +378,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     // TODO base this on reachability expressions instead of capturing every argument
                     referent.Capture(argument);
                 }
-
-            graph.Add(temp);
-            return temp;
         }
 
         private TempValue? Analyze(IElseClauseSyntax? clause, ReachabilityGraph graph, VariableScope scope)
