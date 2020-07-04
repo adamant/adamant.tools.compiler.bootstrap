@@ -5,29 +5,24 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
 {
-    public class ConvertInstruction : InstructionWithResult
+    /// <summary>
+    /// Constructs a value of an optional type from the non-optional value
+    /// </summary>
+    public class SomeInstruction : InstructionWithResult
     {
         public Operand Operand { get; }
-        public NumericType FromType { get; }
-        public NumericType ToType { get; }
+        public OptionalType Type { get; }
 
-        public ConvertInstruction(
-            Place resultPlace,
-            Operand operand,
-            NumericType fromType,
-            NumericType toType,
-            TextSpan span,
-            Scope scope)
+        public SomeInstruction(Place resultPlace, OptionalType type, Operand operand, TextSpan span, Scope scope)
             : base(resultPlace, span, scope)
         {
+            Type = type;
             Operand = operand;
-            FromType = fromType;
-            ToType = toType;
         }
 
         public override string ToInstructionString()
         {
-            return $"{ResultPlace} = CONVERT[{FromType},{ToType}] {Operand}";
+            return $"{ResultPlace} = SOME[{Type}] {Operand}";
         }
     }
 }

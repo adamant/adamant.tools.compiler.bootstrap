@@ -254,7 +254,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     code.EndLine($"{ConvertOperand(ins.Operand)}._self->{fieldName};");
                 }
                 break;
-
+                case SomeInstruction ins:
+                {
+                    var someValue = ConvertOperand(ins.Operand);
+                    if (ins.Type.Referent is ReferenceType)
+                        code.EndLine(someValue);
+                    else
+                    {
+                        var typeName = nameMangler.Mangle(ins.Type.Referent);
+                        code.EndLine($"_opt__{typeName}__Some({someValue});");
+                    }
+                }
+                break;
                 //case BinaryOperation binaryOperation:
                 //{
                 //    var left = ConvertValue(binaryOperation.LeftOperand);
@@ -303,17 +314,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 //}
                 //case DeclaredValue declaredValue:
                 //    return nameMangler.Mangle(declaredValue.Name);
-                //case ConstructSome constructSome:
-                //{
-                //    var someValue = ConvertValue(constructSome.Value);
-                //    if (constructSome.Type.Referent is ReferenceType)
-                //        return someValue;
-                //    else
-                //    {
-                //        var typeName = nameMangler.Mangle(constructSome.Type.Referent);
-                //        return $"_opt__{typeName}__Some({someValue})";
-                //    }
-                //}
             }
         }
 

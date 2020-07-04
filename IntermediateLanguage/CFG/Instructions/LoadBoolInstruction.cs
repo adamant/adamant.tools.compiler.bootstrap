@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
 
         public override string ToInstructionString()
         {
-            return $"{ResultPlace} = LOAD.{DataType.Bool} {Value}";
+            return $"{ResultPlace} = LOAD[{DataType.Bool}] {Value}";
         }
     }
 }

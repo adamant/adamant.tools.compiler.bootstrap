@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
 
         public override string ToInstructionString()
         {
-            return $"{ResultPlace} = LOAD.{Type} none";
+            return $"{ResultPlace} = LOAD[{Type}] none";
         }
     }
 }

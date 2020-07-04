@@ -455,10 +455,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IIfExpressionSyntax _:
                 case IUnsafeExpressionSyntax _:
                 case IImplicitImmutabilityConversionExpression _:
-                case IImplicitOptionalConversionExpression _:
                 case IBlockExpressionSyntax _:
                 case INoneLiteralExpressionSyntax _:
                     throw new NotImplementedException($"ConvertIntoPlace({expression.GetType().Name}, Place) Not Implemented.");
+                case IImplicitOptionalConversionExpression exp:
+                {
+                    var operand = ConvertToOperand(exp.Expression);
+                    currentBlock!.Add(new SomeInstruction(resultPlace, exp.ConvertToType, operand, exp.Span, CurrentScope));
+                }
+                break;
                 case IAssignmentExpressionSyntax exp:
                 {
                     var leftOperand = exp.LeftOperand;

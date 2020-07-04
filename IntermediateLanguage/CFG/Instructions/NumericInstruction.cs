@@ -30,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
 
         public override string ToInstructionString()
         {
-            return $"{ResultPlace} = {Operator.ToInstructionString()}.{Type} {LeftOperand}, {RightOperand}";
+            return $"{ResultPlace} = {Operator.ToInstructionString()}[{Type}] {LeftOperand}, {RightOperand}";
         }
     }
 }
