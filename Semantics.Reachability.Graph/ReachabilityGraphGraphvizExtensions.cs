@@ -18,7 +18,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             dot.AppendLine("digraph reachability {");
             dot.AppendLine("    rankdir=LR;");
             AppendStack(graph, dot, nodes);
-            //AppendContextObjects(graph, dot, nodes);
             AppendObjects(graph, dot, nodes);
             AppendReferences(graph, dot, nodes);
             dot.AppendLine("}");
@@ -120,43 +119,76 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         private static void AppendReferences(ReachabilityGraph graph, StringBuilder dot, Dictionary<MemoryPlace, string> nodes)
         {
-            bool firstEdge = true;
+            var places = graph.CallerVariables
+                              .Concat<MemoryPlace>(graph.Variables)
+                              .Concat(graph.TempValues)
+                              .Concat(graph.Objects)
+                              .ToList();
 
-            var pairs = graph.CallerVariables
-                               .Concat<MemoryPlace>(graph.Variables)
-                               .Concat(graph.TempValues)
-                               .Concat(graph.Objects)
-                               .SelectMany(source => source.References.Select(reference => (source, reference)))
-                               .ToList();
             var referenceNames = new Dictionary<Reference, string>();
-            foreach (var (sourceNode, reference) in pairs)
-            {
-                if (firstEdge)
-                {
-                    dot.AppendLine("    node [shape=circle,width=0.05,label=\"\"];");
-                    dot.AppendLine("    edge [dir=both];");
-                    firstEdge = false;
-                }
 
-                AppendReference(dot, sourceNode, reference, nodes, referenceNames);
+            AppendBorrows(dot, places, referenceNames);
+            AppendReferences(dot, nodes, places, referenceNames);
+        }
+
+        private static void AppendBorrows(
+            StringBuilder dot,
+            IReadOnlyList<MemoryPlace> places,
+            Dictionary<Reference, string> referenceNames)
+        {
+            var borrowedReferences = places.SelectMany(n => n.References)
+                                           .Where(r => r.Borrowers.Any()).ToList();
+
+            if (borrowedReferences.Any())
+            {
+                dot.AppendLine("    node [shape=circle,width=0.05,label=\"\"];");
+                dot.AppendLine("    edge [dir=forward,style=dashed];");
             }
 
-            var borrowedReferences = pairs.Select(p => p.reference).Where(r => r.Borrowers.Any());
-            firstEdge = true;
             foreach (var borrowed in borrowedReferences)
             {
-                if (firstEdge)
-                {
-                    dot.AppendLine("    edge [dir=forward,arrowhead=normal,style=dashed];");
-                }
-
-                var borrowedEdgeName = referenceNames[borrowed];
+                var borrowedName = AppendBorrowPoint(dot, borrowed, referenceNames);
                 foreach (var borrower in borrowed.Borrowers)
                 {
+                    var borrowerName = AppendBorrowPoint(dot, borrower, referenceNames);
                     var color = ColorForPhase(borrower);
-                    dot.AppendLine($"    {borrowedEdgeName} -> {referenceNames[borrower]} [color=\"{color}:{color}\"];");
+                    dot.AppendLine($"    {borrowedName} -> {borrowerName} [color=\"{color}:{color}\"];");
                 }
             }
+        }
+
+        private static string AppendBorrowPoint(
+            StringBuilder dot,
+            Reference reference,
+            Dictionary<Reference, string> referenceNames)
+        {
+            if (referenceNames.TryGetValue(reference, out var name)) return name;
+
+            name = "r" + (referenceNames.Count + 1);
+            referenceNames.Add(reference, name);
+            var color = ColorForPhase(reference);
+            dot.AppendLine($"    {name} [color={color}];");
+            return name;
+        }
+
+        private static void AppendReferences(
+            StringBuilder dot,
+            Dictionary<MemoryPlace, string> nodes,
+            List<MemoryPlace> places,
+            Dictionary<Reference, string> referenceNames)
+        {
+            bool firstEdge = true;
+            foreach (var sourceNode in places)
+                foreach (var reference in sourceNode.References)
+                {
+                    if (firstEdge)
+                    {
+                        dot.AppendLine("    edge [dir=both,style=solid];");
+                        firstEdge = false;
+                    }
+
+                    AppendReference(dot, sourceNode, reference, nodes, referenceNames);
+                }
         }
 
         private static void AppendReference(
@@ -166,27 +198,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             Dictionary<MemoryPlace, string> nodes,
             Dictionary<Reference, string> referenceNames)
         {
-            var involvedInBorrowing = reference.IsUsedForBorrow() || (reference.DeclaredAccess == Access.Mutable && !reference.CouldHaveOwnership);
-
-            if (involvedInBorrowing)
+            if (referenceNames.TryGetValue(reference, out var borrowPointName))
             {
-                // Declare a "middle" node
-                var name = "r" + (referenceNames.Count + 1);
-                referenceNames.Add(reference, name);
-                dot.Append($"    {name} [");
-                AppendDeclaredAccess(dot, reference);
-                dot.AppendLine("];");
-
                 // Start to Middle
-                dot.Append($"    {nodes[sourceNode]} -> {name} [dir=back,");
+                dot.Append($"    {nodes[sourceNode]} -> {borrowPointName} [dir=back,");
                 AppendOwnership(dot, reference);
                 dot.Append(",");
                 AppendDeclaredAccess(dot, reference);
                 dot.AppendLine("];");
 
                 // Middle to End
-                dot.Append($"    {name} -> {nodes[reference.Referent]} [dir=forward,");
-                AppendDeclaredAccess(dot, reference);
+                dot.Append($"    {borrowPointName} -> {nodes[reference.Referent]} [dir=forward,");
+                if (reference.IsUsedForBorrow())
+                {
+                    var color = ColorForPhase(reference);
+                    dot.Append($"color={color},style=dashed");
+                }
+                else
+                    AppendDeclaredAccess(dot, reference);
                 dot.Append(",");
                 AppendEffectiveAccess(dot, reference);
                 dot.AppendLine("];");
