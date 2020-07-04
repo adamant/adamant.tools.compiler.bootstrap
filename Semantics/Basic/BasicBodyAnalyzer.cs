@@ -292,6 +292,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     if (exp.ReturnValue != null)
                     {
                         var expectedReturnType = returnType ?? throw new InvalidOperationException("Return statement in constructor");
+                        // TODO this is inserting an implicit share when it isn't wanted
                         CheckType(ref exp.ReturnValue, expectedReturnType);
 
                         // If we return ownership, there can be an implicit move
