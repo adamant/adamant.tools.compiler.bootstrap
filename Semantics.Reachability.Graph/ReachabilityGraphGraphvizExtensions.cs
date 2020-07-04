@@ -64,7 +64,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             var color = "";
             if (!place.IsAllocated)
             {
-                color = " COLOR=\"Red\"";
+                color = " COLOR=\"red\"";
                 label = $"<S>{label}</S>";
             }
             dot.AppendLine($"            <TR><TD PORT=\"{port}\" ALIGN=\"LEFT\"{color}>{label}</TD></TR>");
@@ -73,7 +73,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         private static void AppendStackSeparator(StringBuilder dot)
         {
-            dot.AppendLine("            <TR><TD CELLPADDING=\"2\"></TD></TR>");
+            dot.AppendLine("            <TR><TD CELLPADDING=\"0\" BGCOLOR=\"black\"></TD></TR>");
         }
 
         private static void AppendObjects(ReachabilityGraph graph, StringBuilder dot, Dictionary<MemoryPlace, string> nodes)
@@ -122,28 +122,89 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         {
             bool firstEdge = true;
 
-            var sources = graph.CallerVariables
+            var pairs = graph.CallerVariables
                                .Concat<MemoryPlace>(graph.Variables)
                                .Concat(graph.TempValues)
-                               .Concat(graph.Objects);
-            foreach (var sourceNode in sources)
+                               .Concat(graph.Objects)
+                               .SelectMany(source => source.References.Select(reference => (source, reference)))
+                               .ToList();
+            var referenceNames = new Dictionary<Reference, string>();
+            foreach (var (sourceNode, reference) in pairs)
             {
-                foreach (var reference in sourceNode.References)
+                if (firstEdge)
                 {
-                    if (firstEdge)
-                    {
-                        dot.AppendLine("    edge [dir=both];");
-                        firstEdge = false;
-                    }
+                    dot.AppendLine("    node [shape=circle,width=0.05,label=\"\"];");
+                    dot.AppendLine("    edge [dir=both];");
+                    firstEdge = false;
+                }
 
-                    AppendReference(dot, sourceNode, reference, nodes);
+                AppendReference(dot, sourceNode, reference, nodes, referenceNames);
+            }
+
+            var borrowedReferences = pairs.Select(p => p.reference).Where(r => r.Borrowers.Any());
+            firstEdge = true;
+            foreach (var borrowed in borrowedReferences)
+            {
+                if (firstEdge)
+                {
+                    dot.AppendLine("    edge [dir=forward,arrowhead=normal,style=dashed];");
+                }
+
+                var borrowedEdgeName = referenceNames[borrowed];
+                foreach (var borrower in borrowed.Borrowers)
+                {
+                    var color = ColorForPhase(borrower);
+                    dot.AppendLine($"    {borrowedEdgeName} -> {referenceNames[borrower]} [color=\"{color}:{color}\"];");
                 }
             }
         }
 
-        private static void AppendReference(StringBuilder dot, MemoryPlace sourceNode, Reference reference, Dictionary<MemoryPlace, string> nodes)
+        private static void AppendReference(
+            StringBuilder dot,
+            MemoryPlace sourceNode,
+            Reference reference,
+            Dictionary<MemoryPlace, string> nodes,
+            Dictionary<Reference, string> referenceNames)
         {
-            dot.Append($"    {nodes[sourceNode]} -> {nodes[reference.Referent]} [");
+            var involvedInBorrowing = reference.IsUsedForBorrow() || (reference.DeclaredAccess == Access.Mutable && !reference.CouldHaveOwnership);
+
+            if (involvedInBorrowing)
+            {
+                // Declare a "middle" node
+                var name = "r" + (referenceNames.Count + 1);
+                referenceNames.Add(reference, name);
+                dot.Append($"    {name} [");
+                AppendDeclaredAccess(dot, reference);
+                dot.AppendLine("];");
+
+                // Start to Middle
+                dot.Append($"    {nodes[sourceNode]} -> {name} [dir=back,");
+                AppendOwnership(dot, reference);
+                dot.Append(",");
+                AppendDeclaredAccess(dot, reference);
+                dot.AppendLine("];");
+
+                // Middle to End
+                dot.Append($"    {name} -> {nodes[reference.Referent]} [dir=forward,");
+                AppendDeclaredAccess(dot, reference);
+                dot.Append(",");
+                AppendEffectiveAccess(dot, reference);
+                dot.AppendLine("];");
+            }
+            else
+            {
+                dot.Append($"    {nodes[sourceNode]} -> {nodes[reference.Referent]} [");
+                AppendOwnership(dot, reference);
+                dot.Append(",");
+                AppendDeclaredAccess(dot, reference);
+                dot.Append(",");
+                AppendEffectiveAccess(dot, reference);
+                dot.AppendLine("];");
+            }
+        }
+
+        private static void AppendOwnership(StringBuilder dot, Reference reference)
+        {
             switch (reference.Ownership)
             {
                 default:
@@ -158,9 +219,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                     dot.Append("arrowtail=normaloinv");
                     break;
             }
-            dot.Append(",");
+        }
 
-            var color = reference.IsUsed ? "black" : "grey";
+        private static void AppendDeclaredAccess(StringBuilder dot, Reference reference)
+        {
+            var color = ColorForPhase(reference);
 
             switch (reference.DeclaredAccess)
             {
@@ -176,9 +239,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                     dot.Append("color=" + color);
                     break;
             }
+        }
 
-            dot.Append(",");
+        private static string ColorForPhase(Reference reference)
+        {
+            string color;
+            switch (reference.Phase)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(reference.Phase);
+                case Phase.Unused:
+                    color = "grey40";
+                    break;
+                case Phase.Used:
+                    color = "black";
+                    break;
+                case Phase.Released:
+                    color = "red";
+                    break;
+            }
 
+            return color;
+        }
+
+        private static void AppendEffectiveAccess(StringBuilder dot, Reference reference)
+        {
             switch (reference.EffectiveAccess())
             {
                 default:
@@ -193,14 +278,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                     dot.Append("arrowhead=onormal");
                     break;
             }
-
-            dot.AppendLine("];");
         }
 
         private static string Escape(string label)
         {
             return label.Replace("⟦", "&laquo;", StringComparison.InvariantCulture)
-                        .Replace("⟧", "&raquo;", StringComparison.InvariantCulture);
+                        .Replace("⟧", "&raquo;", StringComparison.InvariantCulture)
+                        .Replace("\\", "\\\\", StringComparison.Ordinal)
+                        .Replace("\"", "\\\"", StringComparison.Ordinal);
         }
     }
 }

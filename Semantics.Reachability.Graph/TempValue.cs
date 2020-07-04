@@ -59,7 +59,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public override string ToString()
         {
-            return ": " + ReferenceType;
+            return "⟦ ⟧: " + ReferenceType;
         }
     }
 }
