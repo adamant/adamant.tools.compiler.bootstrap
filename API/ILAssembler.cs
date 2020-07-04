@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
 using ExhaustiveMatching;
@@ -150,8 +148,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             if (cfg.LocalVariables.Any(v => v.TypeIsNotEmpty))
                 builder.BlankLine();
 
-            if (Disassemble(cfg.BorrowClaims?.ParameterClaims, builder))
-                builder.BlankLine();
+            //if (Disassemble(cfg.BorrowClaims?.ParameterClaims, builder))
+            //    builder.BlankLine();
 
             foreach (var block in cfg.Blocks)
                 Disassemble(cfg, block, builder);
@@ -216,18 +214,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         //                           + delete.ContextCommentString());
         //}
 
-        private static bool Disassemble(Claims? claims, AssemblyBuilder builder)
-        {
-            if (claims is null) return false;
+        //private static bool Disassemble(Claims? claims, AssemblyBuilder builder)
+        //{
+        //    if (claims is null) return false;
 
-            foreach (var claim in claims.AsEnumerable())
-            {
-                builder.BeginLine("// ");
-                builder.EndLine(claim.ToString());
-            }
+        //    foreach (var claim in claims.AsEnumerable())
+        //    {
+        //        builder.BeginLine("// ");
+        //        builder.EndLine(claim.ToString());
+        //    }
 
-            return claims.Any();
-        }
+        //    return claims.Any();
+        //}
 
         private static void Disassemble(FieldDeclaration field, AssemblyBuilder builder)
         {

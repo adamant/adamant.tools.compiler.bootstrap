@@ -1,16 +1,16 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.AST;
-using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
-using ExhaustiveMatching;
+//using System;
+//using System.Collections;
+//using System.Collections.Generic;
+//using System.Linq;
+//using Adamant.Tools.Compiler.Bootstrap.AST;
+//using Adamant.Tools.Compiler.Bootstrap.Core;
+//using Adamant.Tools.Compiler.Bootstrap.Framework;
+//using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
+//using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing;
+//using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
+//using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+//using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
+//using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Borrowing
 {

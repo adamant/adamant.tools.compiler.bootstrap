@@ -1,51 +1,51 @@
-using System;
-using System.Collections.Generic;
-using ExhaustiveMatching;
+//using System;
+//using System.Collections.Generic;
+//using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
-{
-    [Closed(
-        typeof(Aliases),
-        typeof(Borrows),
-        typeof(Owns))]
-    public abstract class Claim : IEquatable<Claim>
-    {
-        public IClaimHolder Holder { get; }
-        public Lifetime Lifetime { get; }
+//namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing
+//{
+//    [Closed(
+//        typeof(Aliases),
+//        typeof(Borrows),
+//        typeof(Owns))]
+//    public abstract class Claim : IEquatable<Claim>
+//    {
+//        public IClaimHolder Holder { get; }
+//        public Lifetime Lifetime { get; }
 
-        protected Claim(IClaimHolder holder, Lifetime lifetime)
-        {
-            Holder = holder;
-            Lifetime = lifetime;
-        }
+//        protected Claim(IClaimHolder holder, Lifetime lifetime)
+//        {
+//            Holder = holder;
+//            Lifetime = lifetime;
+//        }
 
-        public abstract override string ToString();
+//        public abstract override string ToString();
 
-        public override bool Equals(object? obj)
-        {
-            return Equals(obj as Claim);
-        }
+//        public override bool Equals(object? obj)
+//        {
+//            return Equals(obj as Claim);
+//        }
 
-        public virtual bool Equals(Claim? other)
-        {
-            return !(other is null) &&
-                   Holder.Equals(other.Holder) &&
-                   Lifetime == other.Lifetime;
-        }
+//        public virtual bool Equals(Claim? other)
+//        {
+//            return !(other is null) &&
+//                   Holder.Equals(other.Holder) &&
+//                   Lifetime == other.Lifetime;
+//        }
 
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Holder, Lifetime);
-        }
+//        public override int GetHashCode()
+//        {
+//            return HashCode.Combine(Holder, Lifetime);
+//        }
 
-        public static bool operator ==(Claim claim1, Claim claim2)
-        {
-            return EqualityComparer<Claim>.Default.Equals(claim1, claim2);
-        }
+//        public static bool operator ==(Claim claim1, Claim claim2)
+//        {
+//            return EqualityComparer<Claim>.Default.Equals(claim1, claim2);
+//        }
 
-        public static bool operator !=(Claim claim1, Claim claim2)
-        {
-            return !(claim1 == claim2);
-        }
-    }
-}
+//        public static bool operator !=(Claim claim1, Claim claim2)
+//        {
+//            return !(claim1 == claim2);
+//        }
+//    }
+//}

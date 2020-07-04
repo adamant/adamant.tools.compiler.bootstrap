@@ -1,8 +1,8 @@
-using System.Collections.Generic;
-using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+//using System.Collections.Generic;
+//using System.Linq;
+//using Adamant.Tools.Compiler.Bootstrap.Core;
+//using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow;
+//using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ControlFlow
 {

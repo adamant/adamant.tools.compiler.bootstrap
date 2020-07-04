@@ -1,23 +1,23 @@
-using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
-using ExhaustiveMatching;
+//using Adamant.Tools.Compiler.Bootstrap.Core;
+//using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+//using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
-{
-    [Closed(
-        typeof(NoneConstant),
-        typeof(StringConstant),
-        typeof(IntegerConstant),
-        typeof(BooleanConstant))]
-    public abstract class Constant : Value, IOperand
-    {
-        public DataType Type { get; }
-        public abstract ValueSemantics ValueSemantics { get; }
+//namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
+//{
+//    [Closed(
+//        typeof(NoneConstant),
+//        typeof(StringConstant),
+//        typeof(IntegerConstant),
+//        typeof(BooleanConstant))]
+//    public abstract class Constant : Value, IOperand
+//    {
+//        public DataType Type { get; }
+//        public abstract ValueSemantics ValueSemantics { get; }
 
-        protected Constant(DataType type, TextSpan span)
-            : base(span)
-        {
-            Type = type;
-        }
-    }
-}
+//        protected Constant(DataType type, TextSpan span)
+//            : base(span)
+//        {
+//            Type = type;
+//        }
+//    }
+//}

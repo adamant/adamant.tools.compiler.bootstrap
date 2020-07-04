@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.Borrowing;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG
 {
@@ -27,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG
         /// <summary>
         /// If requested, the semantic analyzer will store the borrow claims here
         /// </summary>
-        public StatementClaims? BorrowClaims { get; set; }
+        //public StatementClaims? BorrowClaims { get; set; }
 
         //public InsertedDeletes? InsertedDeletes { get; set; }
 

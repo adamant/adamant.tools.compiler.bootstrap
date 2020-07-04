@@ -1,27 +1,27 @@
-using System.Text;
-using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+//using System.Text;
+//using Adamant.Tools.Compiler.Bootstrap.Core;
+//using Adamant.Tools.Compiler.Bootstrap.Framework;
+//using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
-namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
-{
-    public class StringConstant : Constant
-    {
-        public static readonly Encoding Encoding = new UTF8Encoding(false);
+//namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.ControlFlow
+//{
+//    public class StringConstant : Constant
+//    {
+//        public static readonly Encoding Encoding = new UTF8Encoding(false);
 
-        public string Value { get; }
-        public override ValueSemantics ValueSemantics => ValueSemantics.Share;
+//        public string Value { get; }
+//        public override ValueSemantics ValueSemantics => ValueSemantics.Share;
 
-        public StringConstant(string value, TextSpan span, DataType type)
-            : base(type, span)
-        {
-            Value = value;
-        }
+//        public StringConstant(string value, TextSpan span, DataType type)
+//            : base(type, span)
+//        {
+//            Value = value;
+//        }
 
-        // Useful for debugging
-        public override string ToString()
-        {
-            return "\"" + Value.Escape() + "\"";
-        }
-    }
-}
+//        // Useful for debugging
+//        public override string ToString()
+//        {
+//            return "\"" + Value.Escape() + "\"";
+//        }
+//    }
+//}
