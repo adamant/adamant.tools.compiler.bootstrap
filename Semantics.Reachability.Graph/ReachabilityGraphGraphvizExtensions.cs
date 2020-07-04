@@ -79,7 +79,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         {
             if (!graph.Objects.Any()) return;
 
-            dot.AppendLine("    node [shape=ellipse, peripheries=2];");
+            dot.AppendLine("    node [shape=ellipse,style=diagonals];");
 
             var nextObject = 1;
             foreach (var contextObject in graph.Objects.Where(o => o.IsContext))
@@ -88,7 +88,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 nextObject += 1;
             };
 
-            dot.AppendLine("    node [shape=ellipse, peripheries=1];");
+            dot.AppendLine("    node [shape=ellipse];");
 
             nextObject = 1;
             foreach (var obj in graph.Objects.Where(o => !o.IsContext))
@@ -125,7 +125,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                     // solid is the default
                     break;
                 case Access.Mutable:
-                    style = ",style=bold";
+                    style = ",peripheries=2";
                     break;
                 case Access.Identify:
                     style = ",style=dashed";
