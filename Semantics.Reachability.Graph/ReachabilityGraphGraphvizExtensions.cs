@@ -88,7 +88,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 nextObject += 1;
             };
 
-            dot.AppendLine("    node [shape=ellipse];");
+            dot.AppendLine("    node [shape=ellipse,style=solid];");
 
             nextObject = 1;
             foreach (var obj in graph.Objects.Where(o => !o.IsContext))
@@ -298,7 +298,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 default:
                     throw ExhaustiveMatch.Failed(reference.Phase);
                 case Phase.Unused:
-                    color = "grey40";
+                    color = "grey45";
                     break;
                 case Phase.Used:
                     color = "black";
