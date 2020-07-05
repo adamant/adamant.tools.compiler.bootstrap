@@ -436,6 +436,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         case 1:
                             var constructorSymbol = constructors.Single();
                             exp.ConstructorSymbol = constructorSymbol;
+                            foreach (var (arg, parameter) in exp.Arguments.Zip(constructorSymbol.Parameters))
+                            {
+                                InsertImplicitConversionIfNeeded(ref arg.Expression, parameter.Type);
+                                CheckArgumentTypeCompatibility(parameter.Type, arg.Expression);
+                            }
                             break;
                         default:
                             diagnostics.Add(NameBindingError.AmbiguousConstructorCall(file, exp.Span));
