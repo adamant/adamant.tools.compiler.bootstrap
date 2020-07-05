@@ -79,8 +79,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
 
         private static string FormatParameter(Parameter parameter)
         {
+            const string fieldPrefix = "field_";
+            var name = parameter.Name.Text;
+
+            if (parameter.Name.IsSpecial && name.StartsWith(fieldPrefix, StringComparison.OrdinalIgnoreCase))
+                name = "." + name.Substring(fieldPrefix.Length);
+
             var format = parameter.IsMutableBinding ? "var {0}: {1}" : "{0}: {1}";
-            return string.Format(CultureInfo.InvariantCulture, format, parameter.Name, parameter.Type);
+            return string.Format(CultureInfo.InvariantCulture, format, name, parameter.Type);
         }
 
         private static void Disassemble(MethodDeclaration method, AssemblyBuilder builder)

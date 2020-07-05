@@ -32,6 +32,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             var cfg = callable.IL!;
             var definitions = code.Definitions;
 
+            if (callable is ConstructorDeclaration constructor)
+            {
+                foreach (var fieldInitialization in constructor.FieldInitializations)
+                    EmitFieldInitialization(fieldInitialization, definitions);
+                if (constructor.FieldInitializations.Any()) definitions.BlankLine();
+            }
+
             foreach (var declaration in cfg.VariableDeclarations.Where(v => v.TypeIsNotEmpty))
                 EmitVariable(declaration, definitions);
 
@@ -40,6 +47,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
             foreach (var block in cfg.Blocks)
                 EmitBlock(block, callable.IsConstructor, definitions);
+        }
+
+        private void EmitFieldInitialization(FieldInitialization fieldInitialization, CCodeBuilder code)
+        {
+            var fieldName = nameMangler.Mangle(fieldInitialization.FieldName);
+            var parameterName = nameMangler.Mangle(fieldInitialization.ParameterName);
+            // Emit direct access to avoid any issues about whether corresponding variables exist
+            code.AppendLine($"_self._self->{fieldName} = {parameterName};");
         }
 
         private void EmitVariable(VariableDeclaration declaration, CCodeBuilder code)

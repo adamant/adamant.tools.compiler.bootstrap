@@ -8,14 +8,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
     public class Parameter : IBindingSymbol
     {
         public bool IsMutableBinding { get; }
-        public Name Name { get; }
+        public SimpleName Name { get; }
         public DataType Type { get; internal set; }
 
         Name ISymbol.FullName => throw new NotImplementedException();
 
         public Parameter(
             bool isMutableBinding,
-            Name name,
+            SimpleName name,
             DataType type)
         {
             IsMutableBinding = isMutableBinding;
