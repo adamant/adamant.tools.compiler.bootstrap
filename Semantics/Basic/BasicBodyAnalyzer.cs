@@ -292,11 +292,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     if (exp.ReturnValue != null)
                     {
                         var expectedReturnType = returnType ?? throw new InvalidOperationException("Return statement in constructor");
-                        // TODO this is inserting an implicit share when it isn't wanted
-                        CheckType(ref exp.ReturnValue, expectedReturnType);
-
+                        InferType(ref exp.ReturnValue, false);
                         // If we return ownership, there can be an implicit move
-                        InsertImplicitMoveIfNeeded(ref exp.ReturnValue, expectedReturnType);
+                        // otherwise there could be an implicit share or borrow
+                        InsertImplicitActionIfNeeded(ref exp.ReturnValue, expectedReturnType, implicitBorrowAllowed: false);
+                        var actualType = InsertImplicitConversionIfNeeded(ref exp.ReturnValue, expectedReturnType);
+                        if (!expectedReturnType.IsAssignableFrom(actualType))
+                            diagnostics.Add(TypeError.CannotConvert(file, exp.ReturnValue, actualType, expectedReturnType));
                     }
                     else if (returnType == DataType.Never)
                         diagnostics.Add(TypeError.CantReturnFromNeverFunction(file, exp.Span));
@@ -572,10 +574,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             return type;
         }
 
-        private static DataType InsertImplicitBorrowIfNeeded([NotNull] ref IExpressionSyntax expression, DataType type)
+        private static void InsertImplicitBorrowIfNeeded([NotNull] ref IExpressionSyntax expression, DataType type)
         {
             // Value types aren't shared
-            if (!(type is ReferenceType referenceType)) return type;
+            if (!(type is ReferenceType referenceType)) return;
 
             IBindingSymbol referencedSymbol;
             switch (expression)
@@ -589,33 +591,41 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     break;
                 default:
                     // implicit borrow isn't needed around other expressions
-                    return type;
+                    return;
             }
 
             type = referenceType.WithCapability(ReferenceCapability.Borrowed);
 
             expression = new ImplicitBorrowExpressionSyntax(expression, type, referencedSymbol);
-
-            return type;
         }
 
-        private static DataType InsertImplicitMoveIfNeeded(
-            [NotNull] ref IExpressionSyntax expression,
-            DataType type)
+        private static void InsertImplicitMoveIfNeeded([NotNull] ref IExpressionSyntax expression, DataType type)
         {
             // Value types aren't moved
             if (!(type is ReferenceType referenceType)
                 // Neither are non-moveable types
-                || !referenceType.IsMovable) return type;
+                || !referenceType.IsMovable)
+                return;
 
             if (!(expression is INameExpressionSyntax name))
                 // Implicit move not needed
-                return type;
+                return;
 
             var referencedSymbol = name.ReferencedSymbol.Assigned();
             expression = new ImplicitMoveSyntax(expression, type, referencedSymbol);
+        }
 
-            return type;
+        private static void InsertImplicitActionIfNeeded([NotNull] ref IExpressionSyntax expression, DataType toType, bool implicitBorrowAllowed)
+        {
+            var fromType = expression.Type.Known();
+            if (!(fromType is ReferenceType from) || !(toType is ReferenceType to)) return;
+
+            if (@from.IsMovable && to.IsMovable)
+                InsertImplicitMoveIfNeeded(ref expression, to);
+            else if (@from.IsReadOnly || to.IsReadOnly)
+                InsertImplicitShareIfNeeded(ref expression, to.ToReadOnly());
+            else if (implicitBorrowAllowed)
+                InsertImplicitBorrowIfNeeded(ref expression, to);
         }
 
         private DataType InferAssignmentTargetType([NotNull] ref IAssignableExpressionSyntax expression)
@@ -692,18 +702,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     methodInvocation.MethodNameSyntax.ReferencedSymbol = methodSymbol;
 
                     var selfParamType = methodSymbol.SelfParameterSymbol.Type;
-                    if (selfParamType is ReferenceType paramType
-                        && contextType is ReferenceType argType)
-                        switch (paramType.IsReadOnly, argType.IsReadOnly)
-                        {
-                            // TODO what about move?
-                            case (true, _):
-                                InsertImplicitShareIfNeeded(ref methodInvocation.ContextExpression, argType.ToReadOnly());
-                                break;
-                            case (false, false):
-                                InsertImplicitBorrowIfNeeded(ref methodInvocation.ContextExpression, argType);
-                                break;
-                        }
+                    InsertImplicitActionIfNeeded(ref methodInvocation.ContextExpression, selfParamType, implicitBorrowAllowed: true);
 
                     InsertImplicitConversionIfNeeded(ref methodInvocation.ContextExpression, selfParamType);
                     CheckArgumentTypeCompatibility(selfParamType, methodInvocation.ContextExpression);
