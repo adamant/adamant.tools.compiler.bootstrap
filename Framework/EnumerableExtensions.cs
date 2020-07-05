@@ -19,16 +19,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         public static IEnumerable<T> YieldValue<T>(this T? value)
             where T : class
         {
-            if (value != null)
-                yield return value;
+            if (value != null) yield return value;
         }
 
         [DebuggerStepThrough]
         public static IEnumerable<T> YieldValue<T>(this T? value)
             where T : struct
         {
-            if (value != null)
-                yield return value.Value;
+            if (value != null) yield return value.Value;
         }
 
         [DebuggerStepThrough]
@@ -70,6 +68,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Framework
         public static IEnumerable<T> SelectMany<T>(this IEnumerable<IEnumerable<T>> source)
         {
             return source.SelectMany(items => items);
+        }
+
+        [DebuggerStepThrough]
+        public static IEnumerable<T> Except<T>(this IEnumerable<T> source, T value)
+        {
+            return source.Except(value.Yield());
         }
 
         /// <summary>

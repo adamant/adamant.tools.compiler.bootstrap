@@ -112,8 +112,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             if (!obj.IsAllocated)
             {
                 color = ",color=Red";
-                label = $"<S>{label}</S>";
+                label = $"<<S>{label}</S>>";
             }
+            else
+                label = $"\"{label}\"";
 
             var access = obj.GetCurrentAccess();
             var style = "";
@@ -134,7 +136,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                     style = ",style=dotted";
                     break;
             }
-            dot.AppendLine($"    {name} [label=\"{label}\"{color}{style}];");
+            dot.AppendLine($"    {name} [label={label}{color}{style}];");
         }
 
         private static void AppendReferences(ReachabilityGraph graph, StringBuilder dot, Dictionary<MemoryPlace, string> nodes)

@@ -155,6 +155,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return temp;
         }
 
+        public TempValue? AddReturnValue(IExpressionSyntax expression, DataType type)
+        {
+            var temp = TempValue.For(this, expression, type);
+            Add(temp);
+            return temp;
+        }
+
         private void Add(Object obj)
         {
             if (objects.TryAdd(obj.OriginSyntax, obj))
@@ -207,6 +214,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             Dirty();
         }
 
+        public void ExitFunction(TempValue? returnValue)
+        {
+            foreach (var tempValue in TempValues.Except(returnValue).ToList()) Drop(tempValue);
+            foreach (var variable in Variables.ToList()) EndVariableScope(variable.Symbol);
+        }
+
         public void Drop(IEnumerable<TempValue?> temps)
         {
             foreach (var tempValue in temps) Drop(tempValue);
@@ -214,11 +227,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         internal void Delete(Object obj)
         {
-            if (!objects.Remove(obj.OriginSyntax))
+            if (!objects.ContainsKey(obj.OriginSyntax))
                 throw new Exception($"Object '{obj}' does not exist in the graph.");
 
             obj.Freed();
-            Dirty();
+            LostReference(obj);
+        }
+
+        /// <summary>
+        /// A reference to a given object was lost, it may not be in the graph anymore
+        /// </summary>
+        internal void LostReference(Object obj)
+        {
+            if (obj.GetCurrentAccess() is null)
+            {
+                if (!objects.Remove(obj.OriginSyntax))
+                    throw new Exception($"Object '{obj}' does not exist in the graph.");
+                Dirty();
+            }
+            else if (!objects.ContainsKey(obj.OriginSyntax))
+                throw new Exception($"Object '{obj}' does not exist in the graph.");
         }
         #endregion
 

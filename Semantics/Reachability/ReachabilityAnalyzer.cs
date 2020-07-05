@@ -221,8 +221,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 case IBlockExpressionSyntax exp:
                     return AnalyzeBlock(exp, graph, scope);
                 case IReturnExpressionSyntax exp:
-                    // TODO check the graph allows us to return this
-                    return Analyze(exp.ReturnValue, graph, scope);
+                {
+                    var temp = Analyze(exp.ReturnValue, graph, scope);
+                    if (!(temp is null))
+                    {
+                        // TODO make a deep copy of the graph so the existing graph is intact
+                        // create a new temp with the correct reference capabilities to the value
+                        var returnValue = graph.AddReturnValue(exp, callableDeclaration.ReturnType)!;
+                        returnValue.AssignFrom(temp, returnValue.ReferenceType.ReferenceCapability);
+                        // Exit the function, releasing all temps and variables except the returned value
+                        graph.ExitFunction(returnValue);
+                        if (returnValue.PossibleReferents.Any(r => !r.IsAllocated))
+                            diagnostics.Add(BorrowError.ValueDoesNotLiveLongEnough(file, exp.ReturnValue!.Span));
+                    }
+                    return null;
+                }
                 case INewObjectExpressionSyntax exp:
                 {
                     var arguments = exp.Arguments.Select(a => Analyze(a.Expression, graph, scope)).ToFixedList();

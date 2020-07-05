@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using ExhaustiveMatching;
 using MoreLinq;
 
@@ -63,6 +64,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             Graph.Dirty();
         }
 
+        public void AssignFrom(StackPlace place, ReferenceCapability referenceCapability)
+        {
+            switch (referenceCapability)
+            {
+                default:
+                    throw ExhaustiveMatch.Failed(referenceCapability);
+                case ReferenceCapability.Owned:
+                case ReferenceCapability.OwnedMutable:
+                case ReferenceCapability.Isolated:
+                case ReferenceCapability.IsolatedMutable:
+                case ReferenceCapability.Held:
+                case ReferenceCapability.HeldMutable:
+                    MoveFrom(place);
+                    break;
+                case ReferenceCapability.Shared:
+                    ShareFrom(place);
+                    break;
+                case ReferenceCapability.Borrowed:
+                    BorrowFrom(place);
+                    break;
+                case ReferenceCapability.Identity:
+                    IdentityFrom(place);
+                    break;
+            }
+        }
+
         internal virtual void Freed()
         {
             if (!IsAllocated)
@@ -77,6 +104,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 if (reference.CouldHaveOwnership
                     || reference.Referent.GetCurrentAccess() is null) // not reachable
                     Graph.Delete(reference.Referent);
+                else
+                    Graph.LostReference(reference.Referent);
 
             foreach (var reference in references)
                 reference.Release();
