@@ -138,17 +138,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     case IFieldParameterSyntax fieldParameter:
                     {
                         parameter.Type.BeginFulfilling();
-                        var field = (declaringClass?? throw new InvalidOperationException("Field parameter outside of class declaration"))
+                        var field = (declaringClass ?? throw new InvalidOperationException("Field parameter outside of class declaration"))
                                     .Members.OfType<IFieldDeclarationSyntax>()
                                     .SingleOrDefault(f => f.Name == fieldParameter.FieldName);
                         if (field is null)
                         {
-                            parameter.Type.Fulfill(DataType.Unknown);
+                            fieldParameter.SetIsMutableBinding(false);
+                            fieldParameter.Type.Fulfill(DataType.Unknown);
                             // TODO report an error
                             throw new NotImplementedException();
                         }
                         else
                         {
+                            fieldParameter.SetIsMutableBinding(field.IsMutableBinding);
                             if (field.Type.TryBeginFulfilling(() =>
                                 diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan,
                                     field.Name))))

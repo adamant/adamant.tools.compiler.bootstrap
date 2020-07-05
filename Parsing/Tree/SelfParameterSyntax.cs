@@ -6,10 +6,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class SelfParameterSyntax : ParameterSyntax, ISelfParameterSyntax
     {
+        public override bool IsMutableBinding => MutableSelf;
         public bool MutableSelf { get; }
 
         public SelfParameterSyntax(TextSpan span, Name fullName, bool mutableSelf)
-            : base(span, false, fullName)
+            : base(span, fullName)
         {
             MutableSelf = mutableSelf;
         }

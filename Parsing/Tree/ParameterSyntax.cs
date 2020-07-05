@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal abstract class ParameterSyntax : Syntax, IParameterSyntax
     {
-        public bool IsMutableBinding { get; }
+        public abstract bool IsMutableBinding { get; }
         public Name FullName { get; }
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -22,10 +22,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         DataType IBindingSymbol.Type => Type.Fulfilled();
 
-        protected ParameterSyntax(TextSpan span, bool isMutableBinding, Name fullName)
+        protected ParameterSyntax(TextSpan span, Name fullName)
             : base(span)
         {
-            IsMutableBinding = isMutableBinding;
             FullName = fullName;
             Unused = fullName.UnqualifiedName.Text.StartsWith("_", StringComparison.Ordinal);
         }

@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG
 
         public override int GetHashCode()
         {
-            return Number.GetHashCode();
+            return HashCode.Combine(Number);
         }
 
         public bool Equals(Variable other)

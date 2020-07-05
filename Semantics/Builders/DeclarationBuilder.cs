@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
@@ -79,8 +78,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                 {
                     var il = ilFactory.CreateGraph(constructor);
                     var parameters = BuildConstructorParameters(constructor);
+                    var fieldInitializations = BuildFieldInitializations(constructor);
                     declaration = new ConstructorDeclaration(constructor.FullName,
-                       parameters, constructor.SelfParameterType.Known(), il);
+                       parameters, constructor.SelfParameterType.Known(), fieldInitializations, il);
                     break;
                 }
                 case IFieldDeclarationSyntax fieldDeclaration:
@@ -133,6 +133,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                                             symbol.FullName,
                                             parameters,
                                             selfType,
+                                            FixedList<FieldInitialization>.Empty,
                                             graph.Build());
 
             //defaultConstructor.ControlFlowOld.InsertedDeletes = new InsertedDeletes();
@@ -150,8 +151,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
             var selfType = constructorDeclaration.SelfParameterType.Known();
             var selfName = ((QualifiedName)constructorDeclaration.FullName).Qualifier.Qualify(SpecialName.Self);
             var selfParameter = new Parameter(false, selfName, selfType);
-            return selfParameter.Yield().Concat(constructorDeclaration.Parameters.Select(BuildParameter))
-                .ToFixedList();
+            return selfParameter.Yield().Concat(constructorDeclaration.Parameters.Select(BuildParameter)).ToFixedList();
         }
 
         private static Parameter BuildParameter(IParameterSyntax parameter)
@@ -162,9 +162,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                     new Parameter(namedParameter.IsMutableBinding, namedParameter.Name, namedParameter.Type.Known()),
                 ISelfParameterSyntax selfParameter =>
                     new Parameter(selfParameter.IsMutableBinding, selfParameter.Name, selfParameter.Type.Known()),
-                IFieldParameterSyntax _ => throw new NotImplementedException("Building field parameters not implemented"),
+                IFieldParameterSyntax fieldParameter =>
+                    new Parameter(fieldParameter.IsMutableBinding, fieldParameter.Name, fieldParameter.Type.Known()),
                 _ => throw ExhaustiveMatch.Failed(parameter)
             };
+        }
+
+        private static FixedList<FieldInitialization> BuildFieldInitializations(
+            IConstructorDeclarationSyntax constructorDeclaration)
+        {
+            return constructorDeclaration.Parameters.OfType<IFieldParameterSyntax>()
+                                         .Select(BuildFieldInitialization)
+                                         .ToFixedList();
+        }
+
+        private static FieldInitialization BuildFieldInitialization(IFieldParameterSyntax parameter)
+        {
+            return new FieldInitialization(parameter.Name, parameter.FieldName);
         }
     }
 }

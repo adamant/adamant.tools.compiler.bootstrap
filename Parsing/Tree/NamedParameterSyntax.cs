@@ -6,6 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class NamedParameterSyntax : ParameterSyntax, INamedParameterSyntax
     {
+        public override bool IsMutableBinding { get; }
         public ITypeSyntax TypeSyntax { get; }
         public IExpressionSyntax? DefaultValue { get; }
 
@@ -15,8 +16,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name fullName,
             ITypeSyntax typeSyntax,
             IExpressionSyntax? defaultValue)
-            : base(span, isMutableBinding, fullName)
+            : base(span, fullName)
         {
+            IsMutableBinding = isMutableBinding;
             TypeSyntax = typeSyntax;
             DefaultValue = defaultValue;
         }
