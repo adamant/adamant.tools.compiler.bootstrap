@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
@@ -12,9 +13,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
     /// </summary>
     internal abstract class ImplicitConversionExpression : IImplicitConversionExpression
     {
-        public TextSpan Span { get; }
-        public IExpressionSyntax Expression { get; }
-        public DataType Type { get; }
+        public TextSpan Span { [DebuggerHidden] get; }
+        public IExpressionSyntax Expression { [DebuggerHidden] get; }
+        public DataType Type { [DebuggerHidden] get; }
         DataType? IExpressionSyntax.Type
         {
             get => Type;

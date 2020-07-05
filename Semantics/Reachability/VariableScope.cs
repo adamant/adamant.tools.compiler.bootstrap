@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Scopes
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
 {
     /// <summary>
     /// A lexical scope of variable places used to track when variables come into

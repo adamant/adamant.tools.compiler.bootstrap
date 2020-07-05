@@ -266,9 +266,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 }
                 break;
 
-                //case ActionStatement action:
-                //    code.AppendLine(ConvertValue(action.Value) + ";");
-                //    break;
+
                 //case DeleteStatement deleteStatement:
                 //{
                 //    var self = ConvertValue(deleteStatement.Place);
@@ -278,8 +276,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                 //    code.AppendLine($"free({self}._self);");
                 //    break;
                 //}
-                //case DeclaredValue declaredValue:
-                //    return nameMangler.Mangle(declaredValue.Name);
             }
         }
 
