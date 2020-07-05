@@ -12,7 +12,9 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.TerminatorInstru
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using ExhaustiveMatching;
+using static Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions.BooleanLogicOperator;
 using static Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions.CompareInstructionOperator;
+using static Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions.NumericInstructionOperator;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
 {
@@ -186,15 +188,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             {
                 default:
                     throw ExhaustiveMatch.Failed(expression);
-                case IBorrowExpressionSyntax _:
-                case IShareExpressionSyntax _:
-                case IMoveExpressionSyntax _:
                 case INewObjectExpressionSyntax _:
-                case IImplicitNoneConversionExpression _:
-                case IImplicitConversionExpression _:
                 case IFieldAccessExpressionSyntax _:
-                case IForeachExpressionSyntax _:
                     throw new NotImplementedException($"Convert({expression.GetType().Name}) Not Implemented.");
+                case IBorrowExpressionSyntax exp:
+                    Convert(exp.Referent);
+                    break;
+                case IShareExpressionSyntax exp:
+                    Convert(exp.Referent);
+                    break;
+                case IMoveExpressionSyntax exp:
+                    Convert(exp.Referent);
+                    break;
+                case IImplicitNumericConversionExpression exp:
+                    Convert(exp.Expression);
+                    break;
+                case IImplicitOptionalConversionExpression exp:
+                    Convert(exp.Expression);
+                    break;
+                case IImplicitImmutabilityConversionExpression exp:
+                    Convert(exp.Expression);
+                    break;
                 case ILoopExpressionSyntax exp:
                 {
                     var loopEntry = graph.NewEntryBlock(currentBlock!, exp.Block.Span.AtStart(), CurrentScope);
@@ -227,77 +241,83 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     currentBlock = loopExit;
                 }
                 break;
-                //case IForeachExpressionSyntax exp:
-                //{
-                //    // For now, we support only range syntax `foreach x: T in z..y` ranges
-                //    // aren't yet supported by the rest of the language, so they must be directly
-                //    // translated here. The for each loop is basically desugared into:
-                //    // var x: T = z;
-                //    // let temp = y;
-                //    // loop
-                //    // {
-                //    //     <loop body>
-                //    //     x += 1;
-                //    //     if x > temp => break;
-                //    // }
-                //    if (!(exp.InExpression is IBinaryOperatorExpressionSyntax inExpression)
-                //        || (inExpression.Operator != BinaryOperator.DotDot
-                //            && inExpression.Operator != BinaryOperator.LessThanDotDot
-                //            && inExpression.Operator != BinaryOperator.DotDotLessThan
-                //            && inExpression.Operator != BinaryOperator.LessThanDotDotLessThan))
-                //        throw new NotImplementedException(
-                //            "`foreach` in non-range expression not implemented");
-                //    var startExpression = inExpression.LeftOperand;
-                //    var endExpression = inExpression.RightOperand;
+                case IForeachExpressionSyntax exp:
+                {
+                    // For now, we support only range syntax `foreach x: T in z..y`. Range operators
+                    // aren't yet supported by the rest of the language, so they must be directly
+                    // translated here. The for each loop is basically desugared into:
+                    // var x: T = z;
+                    // let temp = y;
+                    // loop
+                    // {
+                    //     <loop body>
+                    //     x += 1;
+                    //     if x > temp => break;
+                    // }
+                    if (!(exp.InExpression is IBinaryOperatorExpressionSyntax inExpression)
+                        || (inExpression.Operator != BinaryOperator.DotDot
+                            && inExpression.Operator != BinaryOperator.LessThanDotDot
+                            && inExpression.Operator != BinaryOperator.DotDotLessThan
+                            && inExpression.Operator != BinaryOperator.LessThanDotDotLessThan))
+                        throw new NotImplementedException(
+                            "`foreach in` non-range expression not implemented");
 
-                //    var variableType = (IntegerType)exp.VariableType.Assigned();
-                //    var loopVariable = graph.AddVariable(exp.IsMutableBinding,
-                //        variableType, CurrentScope, exp.VariableName);
-                //    var loopVariableLValue = loopVariable.LValueReference(exp.Span);
-                //    var loopVariableReference = loopVariable.Reference(exp.Span);
+                    var startExpression = inExpression.LeftOperand;
+                    var endExpression = inExpression.RightOperand;
 
-                //    var includeStart = inExpression.Operator == BinaryOperator.DotDot
-                //                       || inExpression.Operator == BinaryOperator.DotDotLessThan;
-                //    var includeEnd = inExpression.Operator == BinaryOperator.DotDot
-                //                       || inExpression.Operator == BinaryOperator.LessThanDotDot;
+                    var variableType = (IntegerType)exp.VariableType.Assigned();
+                    var loopVariable = graph.AddVariable(exp.IsMutableBinding,
+                                            variableType, CurrentScope, exp.VariableName);
+                    var loopVariablePlace = loopVariable.Place(exp.Span);
+                    var loopVariableReference = loopVariable.Reference(exp.Span);
 
-                //    // emit var x: T = z (+1);
-                //    var startValue = ConvertToValue(startExpression);
-                //    var one = new IntegerConstant(1, variableType, exp.Span);
-                //    if (!includeStart)
-                //    {
-                //        var operand = ConvertToOperand(startValue, variableType);
-                //        startValue = new BinaryOperation(operand, BinaryOperator.Plus, one,
-                //            variableType);
-                //    }
-                //    AssignToPlace(loopVariableLValue, startValue, startExpression.Span);
-                //    // let temp = y;
-                //    var endValue = ConvertToOperand(endExpression);
-                //    // Emit block
-                //    var loopEntry = graph.NewEntryBlock(currentBlock,
-                //        exp.Block.Span.AtStart(), CurrentScope);
-                //    currentBlock = loopEntry;
-                //    var conditionBlock = continueToBlock = graph.NewBlock();
-                //    // TODO this generates the exit block too soon if the break condition is non-trivial
-                //    var loopExit = ConvertLoopBody(exp.Block);
-                //    // If it always breaks, there isn't a current block
-                //    currentBlock?.End(new GotoInstruction(conditionBlock.Number,
-                //        exp.Block.Span.AtEnd(), CurrentScope));
-                //    currentBlock = conditionBlock;
-                //    // emit x += 1;
-                //    var valuePlusOne = new BinaryOperation(loopVariableReference,
-                //        BinaryOperator.Plus, one, variableType);
-                //    AssignToPlace(loopVariableLValue, valuePlusOne, startExpression.Span);
-                //    // emit if x (>)|(>=) temp => break;
-                //    var breakOperator = includeEnd ? BinaryOperator.GreaterThan : BinaryOperator.GreaterThanOrEqual;
-                //    var breakCondition = new BinaryOperation(loopVariableReference,
-                //                            breakOperator, endValue, variableType);
-                //    var condition = ConvertToOperand(breakCondition);
-                //    currentBlock.End(new IfInstruction(condition, loopExit.Number, loopEntry.Number,
-                //            exp.Span, CurrentScope));
-                //    currentBlock = loopExit;
-                //    return;
-                //}
+                    var includeStart = inExpression.Operator == BinaryOperator.DotDot
+                                       || inExpression.Operator == BinaryOperator.DotDotLessThan;
+                    var includeEnd = inExpression.Operator == BinaryOperator.DotDot
+                                       || inExpression.Operator == BinaryOperator.LessThanDotDot;
+
+                    // Load up the constant 1
+                    var one = graph.Let(variableType, CurrentScope);
+                    currentBlock!.Add(new LoadIntegerInstruction(one.Place(exp.Span), 1, variableType,
+                                            exp.Span, CurrentScope));
+
+                    // emit var x: T = z (+1);
+                    ConvertIntoPlace(startExpression, loopVariablePlace);
+                    if (!includeStart)
+                    {
+                        var addSpan = inExpression.LeftOperand.Span.AtEnd();
+                        currentBlock!.Add(new NumericInstruction(loopVariablePlace, Add, variableType,
+                                                loopVariableReference, one.Reference(addSpan), CurrentScope));
+                    }
+
+                    // let temp = y;
+                    var endValue = ConvertToOperand(endExpression);
+
+                    // Emit block
+                    var loopEntry = graph.NewEntryBlock(currentBlock,
+                                                exp.Block.Span.AtStart(), CurrentScope);
+                    currentBlock = loopEntry;
+                    var conditionBlock = continueToBlock = graph.NewBlock();
+                    // TODO this generates the exit block too soon if the break condition is non-trivial
+                    var loopExit = ConvertLoopBody(exp.Block)!;
+                    // If it always breaks, there isn't a current block
+                    currentBlock?.End(new GotoInstruction(conditionBlock.Number,
+                                            exp.Block.Span.AtEnd(), CurrentScope));
+                    currentBlock = conditionBlock;
+                    // emit x += 1;
+                    currentBlock.Add(new NumericInstruction(loopVariablePlace, Add, variableType, loopVariableReference, one.Reference(exp.Span), CurrentScope));
+
+                    // emit if x (>)|(>=) temp => break;
+                    var breakOperator = includeEnd ? GreaterThan : GreaterThanOrEqual;
+                    var condition = graph.AddVariable(true, DataType.Bool, CurrentScope);
+                    currentBlock.Add(new CompareInstruction(condition.Place(exp.Span),
+                        breakOperator, variableType, loopVariableReference, endValue, CurrentScope));
+
+                    currentBlock.End(new IfInstruction(condition.Reference(exp.Span), loopExit.Number, loopEntry.Number,
+                            exp.Span, CurrentScope));
+                    currentBlock = loopExit;
+                }
+                break;
                 case IBreakExpressionSyntax exp:
                 {
                     // TODO Do we need `ExitScope(exp.Span.AtEnd());` ?
@@ -410,6 +430,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case ISelfExpressionSyntax _:
                 case INoneLiteralExpressionSyntax _:
                 case IIntegerLiteralExpressionSyntax _:
+                case IImplicitNoneConversionExpression _:
                     // These operation have no side effects, so if the result isn't needed, there is nothing to do
                     break;
 
@@ -514,23 +535,33 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                         case BinaryOperator.LessThanDotDot:
                         case BinaryOperator.DotDotLessThan:
                         case BinaryOperator.LessThanDotDotLessThan:
-                        case BinaryOperator.Or:
+                            throw new NotImplementedException("Range operator control flow not implemented");
                         case BinaryOperator.And:
-                            throw new NotImplementedException($"ConvertIntoPlace({expression.GetType().Name}, Place) Not Implemented for {exp.Operator}.");
+                            // TODO handle calls to overloaded operators
+                            // TODO handle short circuiting if needed
+                            currentBlock!.Add(new BooleanLogicInstruction(resultPlace, And,
+                                leftOperand, rightOperand, CurrentScope));
+                            break;
+                        case BinaryOperator.Or:
+                            // TODO handle calls to overloaded operators
+                            // TODO handle short circuiting if needed
+                            currentBlock!.Add(new BooleanLogicInstruction(resultPlace, Or,
+                                leftOperand, rightOperand, CurrentScope));
+                            break;
                         case BinaryOperator.Plus:
-                            currentBlock!.Add(new NumericInstruction(resultPlace, NumericInstructionOperator.Add,
+                            currentBlock!.Add(new NumericInstruction(resultPlace, Add,
                                 (NumericType)resultType, leftOperand, rightOperand, CurrentScope));
                             break;
                         case BinaryOperator.Minus:
-                            currentBlock!.Add(new NumericInstruction(resultPlace, NumericInstructionOperator.Subtract,
+                            currentBlock!.Add(new NumericInstruction(resultPlace, Subtract,
                                 (NumericType)resultType, leftOperand, rightOperand, CurrentScope));
                             break;
                         case BinaryOperator.Asterisk:
-                            currentBlock!.Add(new NumericInstruction(resultPlace, NumericInstructionOperator.Multiply,
+                            currentBlock!.Add(new NumericInstruction(resultPlace, Multiply,
                                 (NumericType)resultType, leftOperand, rightOperand, CurrentScope));
                             break;
                         case BinaryOperator.Slash:
-                            currentBlock!.Add(new NumericInstruction(resultPlace, NumericInstructionOperator.Divide,
+                            currentBlock!.Add(new NumericInstruction(resultPlace, Divide,
                                 (NumericType)resultType, leftOperand, rightOperand, CurrentScope));
                             break;
                         #region Comparisons
@@ -1107,21 +1138,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         //                    throw NonExhaustiveMatchException.For(operatorExpression.LeftOperand.Type);
         //            }
         //        }
-        //        case BinaryOperator.And:
-        //        case BinaryOperator.Or:
-        //        {
-        //            // TODO handle calls to overloaded operators
-        //            // TODO handle short circuiting if needed
-        //            var leftOperand = ConvertToOperand(operatorExpression.LeftOperand);
-        //            var rightOperand = ConvertToOperand(operatorExpression.RightOperand);
-        //            return new BinaryOperation(leftOperand, operatorExpression.Operator, rightOperand,
-        //                (SimpleType)operatorExpression.Type);
-        //        }
-        //        case BinaryOperator.DotDot:
-        //        case BinaryOperator.LessThanDotDot:
-        //        case BinaryOperator.DotDotLessThan:
-        //        case BinaryOperator.LessThanDotDotLessThan:
-        //            throw new NotImplementedException("Conversion of range for binary operators");
         //        default:
         //            throw ExhaustiveMatch.Failed(operatorExpression.Operator);
         //    }

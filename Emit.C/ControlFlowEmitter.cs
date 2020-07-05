@@ -242,39 +242,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     }
                 }
                 break;
-                //case BinaryOperation binaryOperation:
-                //{
-                //    var left = ConvertValue(binaryOperation.LeftOperand);
-                //    var right = ConvertValue(binaryOperation.RightOperand);
-                //    var operationType = nameMangler.Mangle(binaryOperation.Type);
-                //    string @operator;
-                //    switch (binaryOperation.Operator)
-                //    {
-                //        default:
-                //            throw ExhaustiveMatch.Failed(binaryOperation.Operator);
-                //        // If a binary operator was emitted for a boolean operation,
-                //        // then it doesn't short circuit, we just call the function
-                //        case BinaryOperator.And:
-                //            @operator = "and";
-                //            break;
-                //        case BinaryOperator.Or:
-                //            @operator = "or";
-                //            break;
-                //case BinaryOperator.DotDot:
-                //    @operator = "dotdot";
-                //    break;
-                //        case BinaryOperator.LessThanDotDot:
-                //            @operator = "ltdotdot";
-                //            break;
-                //        case BinaryOperator.DotDotLessThan:
-                //            @operator = "dotdotlt";
-                //            break;
-                //        case BinaryOperator.LessThanDotDotLessThan:
-                //            @operator = "ltdotdotlt";
-                //            break;
-                //    }
-                //    return $"{operationType}__{@operator}({left}, {right})";
-                //}
+                case BooleanLogicInstruction ins:
+                {
+                    var left = ConvertOperand(ins.LeftOperand);
+                    var right = ConvertOperand(ins.RightOperand);
+                    var operationType = nameMangler.Mangle(DataType.Bool);
+                    string @operator;
+                    switch (ins.Operator)
+                    {
+                        default:
+                            throw ExhaustiveMatch.Failed(ins.Operator);
+                        // If a binary operator was emitted for a boolean operation,
+                        // then it doesn't short circuit, we just call the function
+                        case BooleanLogicOperator.And:
+                            @operator = "and";
+                            break;
+                        case BooleanLogicOperator.Or:
+                            @operator = "or";
+                            break;
+                    }
+
+                    code.EndLine($"{operationType}__{@operator}({left}, {right});");
+                }
+                break;
 
                 //case ActionStatement action:
                 //    code.AppendLine(ConvertValue(action.Value) + ";");

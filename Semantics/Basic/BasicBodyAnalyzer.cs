@@ -352,7 +352,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         case BinaryOperator.LessThanDotDot:
                         case BinaryOperator.DotDotLessThan:
                         case BinaryOperator.LessThanDotDotLessThan:
-                            throw new NotImplementedException("Type of range operator");
+                            throw new NotImplementedException("Type analysis of range operators");
                         default:
                             throw ExhaustiveMatch.Failed(@operator);
                     }
