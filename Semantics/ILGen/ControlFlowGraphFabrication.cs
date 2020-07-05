@@ -378,22 +378,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 break;
                 case IAssignmentExpressionSyntax exp:
                 {
-                    if (exp.Operator != AssignmentOperator.Simple)
-                        throw new NotImplementedException("Complex assignment operators");
                     var leftOperand = exp.LeftOperand;
-                    var rightOperand = exp.RightOperand;
-                    var assignInto = ConvertToPlaceWithoutSideEffects(leftOperand);
-                    if (assignInto is null)
+                    var assignInto = ConvertToPlace(leftOperand);
+                    NumericInstructionOperator? op = exp.Operator switch
                     {
-                        var tempVar = graph.Let(leftOperand.Type.Assigned().Known(), CurrentScope);
-                        var tempSpan = rightOperand.Span.AtStart();
-                        ConvertIntoPlace(rightOperand, tempVar.Place(tempSpan));
-                        assignInto = ConvertToPlace(leftOperand);
-                        Operand operand = tempVar.Move(tempSpan);
-                        currentBlock!.Add(new AssignmentInstruction(assignInto, operand, exp.Span, CurrentScope));
-                    }
+                        AssignmentOperator.Simple => null,
+                        AssignmentOperator.Plus => Add,
+                        AssignmentOperator.Minus => Subtract,
+                        AssignmentOperator.Asterisk => Multiply,
+                        AssignmentOperator.Slash => Divide,
+                        _ => throw ExhaustiveMatch.Failed(exp.Operator),
+                    };
+                    if (op is null)
+                        ConvertIntoPlace(exp.RightOperand, assignInto);
                     else
-                        ConvertIntoPlace(rightOperand, assignInto);
+                    {
+                        var rhs = ConvertToOperand(exp.RightOperand);
+                        currentBlock!.Add(new NumericInstruction(assignInto, op.Value, (NumericType)leftOperand.Type.Known(),
+                            assignInto.ToOperand(leftOperand.Span), rhs, CurrentScope));
+                    }
                 }
                 break;
                 case IUnsafeExpressionSyntax exp:
@@ -486,25 +489,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 }
                 break;
                 case IAssignmentExpressionSyntax exp:
-                {
-                    if (exp.Operator != AssignmentOperator.Simple)
-                        throw new NotImplementedException("Complex assignment operators");
-                    var leftOperand = exp.LeftOperand;
-                    var rightOperand = exp.RightOperand;
-                    var assignInto = ConvertToPlaceWithoutSideEffects(leftOperand);
-                    if (assignInto is null)
-                    {
-                        var tempVar = graph.Let(leftOperand.Type.Assigned().Known(), CurrentScope);
-                        var tempSpan = rightOperand.Span.AtStart();
-                        ConvertIntoPlace(rightOperand, tempVar.Place(tempSpan));
-                        assignInto = ConvertToPlace(leftOperand);
-                        Operand operand = tempVar.Move(tempSpan);
-                        currentBlock!.Add(new AssignmentInstruction(assignInto, operand, exp.Span, CurrentScope));
-                    }
-                    else
-                        ConvertIntoPlace(rightOperand, assignInto);
-                }
-                break;
+                    throw new NotImplementedException("Assignments don't have a result");
                 case INameExpressionSyntax exp:
                 {
                     // This occurs when the source code contains a simple assignment like `x = y`
@@ -725,15 +710,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             }
         }
 
-        private Place ConvertToPlace(IExpressionSyntax expression)
-        {
-            throw new NotImplementedException($"ConvertToPlace({expression.GetType().Name}) Not Implemented.");
-        }
-
         /// <summary>
-        /// What is this function supposed to do?
+        /// Convert an expression to a place. Used for LValues
         /// </summary>
-        private Place? ConvertToPlaceWithoutSideEffects(IExpressionSyntax expression)
+        private Place ConvertToPlace(IExpressionSyntax expression)
         {
             switch (expression)
             {

@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Operands;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Places
@@ -14,6 +15,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Places
         {
             Span = span;
         }
+
+        public abstract Operand ToOperand(TextSpan span);
 
         public abstract override string ToString();
     }

@@ -1,3 +1,4 @@
+using System;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Operands;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -14,6 +15,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Places
         {
             Target = target;
             Field = field;
+        }
+
+        public override Operand ToOperand(TextSpan span)
+        {
+            throw new NotImplementedException();
         }
 
         public override string ToString()

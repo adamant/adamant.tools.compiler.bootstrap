@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG
 {
-    public struct Variable : /*IClaimHolder,*/ IEquatable<Variable>
+    public readonly struct Variable : IEquatable<Variable>
     {
         public int Number { get; }
         public string Name => Number.ToString(CultureInfo.InvariantCulture);
