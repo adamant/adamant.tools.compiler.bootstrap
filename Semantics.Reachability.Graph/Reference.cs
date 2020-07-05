@@ -197,8 +197,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         private bool IsOriginForInternal(Reference reference)
         {
-            return Borrowers.Any(b => b.Equals(reference))
-                   || Borrowers.Any(b => b.IsOriginForInternal(reference));
+            return reference == this
+                || Borrowers.Any(b => b.Equals(reference))
+                || Borrowers.Any(b => b.IsOriginForInternal(reference));
         }
 
         public Reference Borrow()
