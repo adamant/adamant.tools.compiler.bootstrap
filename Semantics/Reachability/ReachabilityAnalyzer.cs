@@ -168,21 +168,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 }
                 case IFieldAccessExpressionSyntax exp:
                 {
+                    // Value type fields act like local variables
                     if (!isReferenceType && exp.ContextExpression is ISelfExpressionSyntax) return null;
 
-                    var context = Analyze(exp.ContextExpression, graph, scope);
-                    if (!isReferenceType) return null;
+                    // Field access behaves like calling a get method
+                    // Note: right now only objects (not values) have fields
+                    var context = Analyze(exp.ContextExpression, graph, scope)!;
+                    UseArgument(context, exp.ContextExpression.Span, graph);
+                    if (isReferenceType)
+                    {
+                        var temp = graph.AddFieldAccess(exp)!;
+                        CaptureArguments(context.YieldValue(), temp);
+                        return temp;
+                    }
 
-                    throw new NotImplementedException("Analyze(expression) for IFieldAccessExpressionSyntax");
-
-                    //// Treat this like a method call to a getter
-                    //var context = Analyze(exp.ContextExpression, graph);
-                    //var @object = graph.ObjectFor(exp);
-                    //// TODO base the reference on the property type
-                    //context?.Owns(@object, true);
-                    //var temp = graph.NewTempValue();
-                    //// TODO make temp reference the object
-                    //return temp;
+                    // Temp dropped because it wasn't captured
+                    graph.Drop(context);
+                    return null;
                 }
                 case IFunctionInvocationExpressionSyntax exp:
                 {
@@ -191,7 +193,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                                        .ToFixedList();
                     var function = exp.FunctionNameSyntax.ReferencedSymbol.Assigned();
                     var parameters = function.Parameters;
-                    UseArguments(arguments, exp.Arguments, parameters);
+                    UseArguments(arguments, exp.Arguments, parameters, graph);
                     if (!(referenceType is null))
                         return CaptureArguments(exp, arguments, graph);
 
@@ -206,8 +208,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     var method = exp.MethodNameSyntax.ReferencedSymbol.Assigned();
                     var parameters = method.Parameters;
                     if (!(selfArgument is null))
-                        UseArgument(selfArgument, exp.ContextExpression.Span);
-                    UseArguments(arguments, exp.Arguments, parameters);
+                        UseArgument(selfArgument, exp.ContextExpression.Span, graph);
+                    UseArguments(arguments, exp.Arguments, parameters, graph);
                     if (!(referenceType is null))
                         return CaptureArguments(exp, arguments.Prepend(selfArgument), graph);
 
@@ -242,7 +244,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
 
                     var constructor = exp.ConstructorSymbol.Assigned();
                     var parameters = constructor.Parameters;
-                    UseArguments(arguments, exp.Arguments, parameters);
+                    UseArguments(arguments, exp.Arguments, parameters, graph);
                     if (referenceType is null) return null;
                     var obj = graph.AddObject(exp)!;
                     CaptureArguments(arguments, obj);
@@ -311,7 +313,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
         private void UseArguments(
             FixedList<TempValue?> arguments,
             FixedList<IArgumentSyntax> argumentSyntaxes,
-            IEnumerable<IBindingSymbol> parameters)
+            IEnumerable<IBindingSymbol> parameters,
+            ReachabilityGraph graph)
         {
             foreach (var ((argument, argumentSyntax), parameter) in arguments.Zip(argumentSyntaxes).Zip(parameters))
             {
@@ -319,11 +322,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 if (!(parameter.Type is ReferenceType))
                     throw new InvalidOperationException($"Expected parameter {parameter} to be a reference type");
 
-                UseArgument(argument, argumentSyntax.Span);
+                UseArgument(argument, argumentSyntax.Span, graph);
             }
         }
 
-        private void UseArgument(TempValue argument, TextSpan span)
+        private void UseArgument(TempValue argument, TextSpan span, ReachabilityGraph graph)
         {
             foreach (var reference in argument.References)
             {
@@ -363,7 +366,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 }
 
                 // Mark as used regardless to enable correct analysis of later expressions
-                reference.Use();
+                reference.Use(graph);
             }
         }
 
@@ -442,7 +445,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     if (!isReferenceType && exp.ContextExpression is ISelfExpressionSyntax) return null;
 
                     var context = Analyze(exp.ContextExpression, graph, scope);
-                    if (!isReferenceType) return null;
+                    if (!isReferenceType)
+                    {
+                        graph.Drop(context);
+                        return null;
+                    }
 
                     throw new NotImplementedException(
                         $"{nameof(AnalyzeAssignmentPlace)}(expression) not implemented for {expression.GetType().Name} other than `self`");

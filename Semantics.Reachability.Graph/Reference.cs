@@ -94,6 +94,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return ToExpressionObject(graph, expression);
         }
 
+        internal static Reference ToFieldAccess(ReachabilityGraph graph, IFieldAccessExpressionSyntax expression)
+        {
+            return ToExpressionObject(graph, expression);
+        }
+
         private static Reference ToExpressionObject(ReachabilityGraph graph, IExpressionSyntax expression)
         {
             var referenceType = expression.Type.Known().UnderlyingReferenceType()
@@ -233,7 +238,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         /// dereferenced, it doesn't have to be marked used, just checked to
         /// be usable at that moment.
         /// </summary>
-        public void Use()
+        public void Use(ReachabilityGraph graph)
         {
             switch (Phase)
             {
@@ -241,6 +246,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                     throw ExhaustiveMatch.Failed(Phase);
                 case Phase.Unused:
                     Phase = Phase.Used;
+                    graph.Dirty();
                     break;
                 case Phase.Used:
                     // already used, do nothing

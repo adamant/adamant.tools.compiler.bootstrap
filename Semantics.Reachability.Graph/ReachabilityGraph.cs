@@ -155,6 +155,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return temp;
         }
 
+        public TempValue? AddFieldAccess(IFieldAccessExpressionSyntax fieldAccess)
+        {
+            var temp = TempValue.ForFieldAccess(this, fieldAccess);
+            Add(temp);
+            return temp;
+        }
+
         public TempValue? AddReturnValue(IExpressionSyntax expression, DataType type)
         {
             var temp = TempValue.For(this, expression, type);

@@ -50,6 +50,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return temp;
         }
 
+        internal static TempValue? ForFieldAccess(
+            ReachabilityGraph graph,
+            IFieldAccessExpressionSyntax expression)
+        {
+            var referenceType = expression.Type.Known().UnderlyingReferenceType();
+            if (referenceType is null) return null;
+
+            var reference = Reference.ToFieldAccess(graph, expression);
+            var temp = new TempValue(graph, expression, referenceType);
+            temp.AddReference(reference);
+            return temp;
+        }
+
         // TODO encapsulate this in the graph class
         public static TempValue? For(ReachabilityGraph graph, IExpressionSyntax expression, DataType? type = null)
         {
