@@ -1,23 +1,25 @@
 using System;
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
 {
     internal class VariableDeclarationsCollector : SyntaxWalker
     {
-        private readonly List<IVariableDeclarationStatementSyntax> variableDeclarations
-            = new List<IVariableDeclarationStatementSyntax>();
+        private readonly List<IBindingSymbol> symbols = new List<IBindingSymbol>();
 
-        public FixedList<IVariableDeclarationStatementSyntax> Declarations =>
-            variableDeclarations.ToFixedList();
+        public FixedList<IBindingSymbol> Symbols => symbols.ToFixedList();
 
         protected override void WalkNonNull(ISyntax syntax)
         {
             switch (syntax)
             {
-                case IVariableDeclarationStatementSyntax variableDeclaration:
-                    variableDeclarations.Add(variableDeclaration);
+                case IVariableDeclarationStatementSyntax exp:
+                    symbols.Add(exp);
+                    break;
+                case IForeachExpressionSyntax exp:
+                    symbols.Add(exp);
                     break;
                 case ITypeSyntax _:
                     return;

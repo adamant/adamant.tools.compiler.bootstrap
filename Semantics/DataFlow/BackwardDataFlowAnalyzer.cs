@@ -22,29 +22,41 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
 
         protected override void WalkNonNull(ISyntax syntax, bool isLValue)
         {
+            // TODO this doesn't handle loops correctly
             switch (syntax)
             {
-                case IConcreteCallableDeclarationSyntax callableDeclaration:
-                    checker = strategy.BeginAnalysis(callableDeclaration, diagnostics);
+                case IConcreteCallableDeclarationSyntax exp:
+                    checker = strategy.BeginAnalysis(exp, diagnostics);
                     currentState = checker.StartState();
                     break;
-                case IAssignmentExpressionSyntax assignmentExpression:
-                    WalkNonNull(assignmentExpression.LeftOperand, true);
-                    WalkNonNull(assignmentExpression.RightOperand, false);
-                    currentState = checker!.Assignment(assignmentExpression, currentState!);
+                case IAssignmentExpressionSyntax exp:
+                    WalkNonNull(exp.RightOperand, false);
+                    WalkNonNull(exp.LeftOperand, true);
+                    currentState = checker!.Assignment(exp, currentState!);
                     return;
-                case INameExpressionSyntax nameExpression:
+                case INameExpressionSyntax exp:
                     if (isLValue) return; // ignore
-                    currentState = checker!.IdentifierName(nameExpression, currentState!);
+                    currentState = checker!.IdentifierName(exp, currentState!);
                     return;
-                case IVariableDeclarationStatementSyntax variableDeclaration:
-                    WalkChildren(variableDeclaration, false);
-                    currentState = checker!.VariableDeclaration(variableDeclaration, currentState!);
+                case IVariableDeclarationStatementSyntax exp:
+                    currentState = checker!.VariableDeclaration(exp, currentState!);
+                    WalkChildrenInReverse(exp, false);
+                    return;
+                case IForeachExpressionSyntax exp:
+                    WalkNonNull(exp.Block, isLValue);
+                    currentState = checker!.VariableDeclaration(exp, currentState!);
+                    WalkNonNull(exp.InExpression, isLValue);
+                    return;
+                case IFieldAccessExpressionSyntax exp:
+                    WalkNonNull(exp.ContextExpression, isLValue);
+                    // Don't walk the field name, it shouldn't be treated as a variable
+                    return;
+                case ITypeSyntax _:
                     return;
                 case IDeclarationSyntax _:
                     throw new InvalidOperationException($"Analyze data flow of declaration of type {syntax.GetType().Name}");
             }
-            WalkChildren(syntax, false);
+            WalkChildrenInReverse(syntax, isLValue);
         }
     }
 }

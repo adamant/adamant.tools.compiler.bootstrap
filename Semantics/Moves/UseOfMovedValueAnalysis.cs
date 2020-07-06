@@ -85,5 +85,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
             // No affect on state since it should already be false
             return possiblyMoved;
         }
+
+        public VariableFlags VariableDeclaration(
+            IForeachExpressionSyntax foreachExpression,
+            VariableFlags possiblyMoved)
+        {
+            // No affect on state since it should already be false
+            return possiblyMoved;
+        }
     }
 }

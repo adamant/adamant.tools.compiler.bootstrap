@@ -47,6 +47,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             get => ref initializer;
         }
 
+        public VariableFlags? VariablesLiveAfter { get; set; }
+
         public VariableDeclarationStatementSyntax(
             TextSpan span,
             bool isMutableBinding,

@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         /// Whether to store the borrow checker claims for each function and method.
         /// Default Value: false
         /// </summary>
-        public bool SaveBorrowClaims { get; set; } = false;
+        public bool SaveReachabilityGraphs { get; set; } = false;
 
         public Task<Package> CompilePackageAsync(
             string name,
@@ -70,7 +70,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             var analyzer = new SemanticAnalyzer()
             {
                 SaveLivenessAnalysis = SaveLivenessAnalysis,
-                SaveBorrowClaims = SaveBorrowClaims,
+                SaveReachabilityGraphs = SaveReachabilityGraphs,
             };
 
             var referencePairs = await Task.WhenAll(referenceTasks
@@ -108,7 +108,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             var analyzer = new SemanticAnalyzer()
             {
                 SaveLivenessAnalysis = SaveLivenessAnalysis,
-                SaveBorrowClaims = SaveBorrowClaims,
+                SaveReachabilityGraphs = SaveReachabilityGraphs,
             };
 
             return analyzer.Check(packageSyntax, references);

@@ -193,5 +193,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
         {
             walker.WalkChildren(syntax, default);
         }
+
+        public static void WalkChildrenInReverse<T>(this ISyntaxWalker<T> walker, ISyntax syntax, T arg)
+        {
+            // Cheat by getting a list of children and reversing it
+            var collector = new SyntaxCollector();
+            collector.WalkChildren(syntax);
+            foreach (var child in collector.Syntax)
+                walker.Walk(child, arg);
+        }
+
+        public static void WalkChildrenInReverse(this ISyntaxWalker walker, ISyntax syntax)
+        {
+            // Cheat by getting a list of children and reversing it
+            var collector = new SyntaxCollector();
+            collector.WalkChildren(syntax);
+            foreach (var child in collector.Syntax)
+                walker.Walk(child);
+        }
     }
 }

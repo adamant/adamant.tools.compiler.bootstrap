@@ -61,6 +61,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             }
         }
 
+        public VariableFlags? VariablesLiveAfter { get; set; }
+
         public NameExpressionSyntax(TextSpan span, SimpleName name)
             : base(span)
         {

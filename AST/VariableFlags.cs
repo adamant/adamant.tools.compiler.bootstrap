@@ -1,11 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
+namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     public class VariableFlags
     {
@@ -35,6 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
 
         public VariableFlags Set(ISymbol symbol, bool value)
         {
+            // TODO if setting to the current value, don't need to clone
             var newFlags = Clone();
             newFlags.flags[symbolMap[symbol]] = value;
             return newFlags;
@@ -42,6 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
 
         public VariableFlags Set(IEnumerable<ISymbol> symbols, bool value)
         {
+            // TODO if setting to the current value, don't need to clone
             var newFlags = Clone();
             foreach (var symbol in symbols)
                 newFlags.flags[symbolMap[symbol]] = value;

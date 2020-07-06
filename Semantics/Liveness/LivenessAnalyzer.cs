@@ -1,4 +1,3 @@
-using System;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
@@ -17,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
             IConcreteCallableDeclarationSyntax callable,
             Diagnostics diagnostics)
         {
-            throw new NotImplementedException();
+            return new LivenessAnalysis(callable);
         }
     }
 }

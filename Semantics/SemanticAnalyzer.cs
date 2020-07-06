@@ -14,6 +14,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Moves;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing;
@@ -30,10 +31,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public bool SaveLivenessAnalysis { get; set; } = false;
 
         /// <summary>
-        /// Whether to store the borrow checker claims for each function and method.
+        /// Whether to store the reachability graphs for each function and method.
         /// Default Value: false
         /// </summary>
-        public bool SaveBorrowClaims { get; set; } = false;
+        public bool SaveReachabilityGraphs { get; set; } = false;
 
         [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "OO")]
         public Package Check(
@@ -60,12 +61,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // This is where the representation transitions to IR
             var declarations = BuildIL(entities);
             // --------------------------------------------------
-
-            //var callables = declarations.OfType<ICallableDeclaration>().ToFixedList();
-
-            //var liveness = LivenessAnalyzer.Check(callables, SaveLivenessAnalysis);
-
-            //BorrowChecker.Check(callables, liveness, diagnostics, SaveBorrowClaims);
 
             // If there are errors from the previous phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
@@ -118,6 +113,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // From this point forward, analysis focuses on callable bodies
             // TODO what about field initializers?
             var callables = entities.OfType<IConcreteCallableDeclarationSyntax>().ToFixedList();
+
             ShadowChecker.Check(callables, diagnostics);
 
             DataFlowAnalysis.Check(DefiniteAssignmentAnalyzer.Instance, callables, diagnostics);
@@ -128,11 +124,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             // TODO use DataFlowAnalysis to check for unused variables and report use of variables starting with `_`
 
-            // TODO stop compilation if there are errors?
-            // diagnostics.ThrowIfFatalErrors();
+            // Compute variable liveness needed by reachability analyzer
+            DataFlowAnalysis.Check(LivenessAnalyzer.Instance, callables, diagnostics);
 
-            // TODO get reachability analyzer working
             ReachabilityAnalyzer.Analyze(callables, diagnostics);
+
+            // TODO remove live variables if SaveLivenessAnalysis is false
         }
 
         private static FixedList<Declaration> BuildIL(

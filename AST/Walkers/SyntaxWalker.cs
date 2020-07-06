@@ -17,7 +17,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
         }
 
         protected abstract void WalkNonNull(ISyntax syntax);
-        protected void WalkChildren(ISyntax syntax) => this.WalkChildren(syntax, default);
+        protected void WalkChildren(ISyntax syntax) =>
+            this.WalkChildren(syntax, default);
+        protected void WalkChildrenInReverse(ISyntax syntax) =>
+            this.WalkChildrenInReverse(syntax, default);
     }
 
     public abstract class SyntaxWalker<T> : ISyntaxWalker<T>
@@ -29,6 +32,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
         }
 
         protected abstract void WalkNonNull(ISyntax syntax, T arg);
-        protected void WalkChildren(ISyntax syntax, T arg) => SyntaxWalkerExtensions.WalkChildren(this, syntax, arg);
+        protected void WalkChildren(ISyntax syntax, T arg) =>
+            SyntaxWalkerExtensions.WalkChildren(this, syntax, arg);
+        protected void WalkChildrenInReverse(ISyntax syntax, T arg) =>
+            SyntaxWalkerExtensions.WalkChildrenInReverse(this, syntax, arg);
+
     }
 }

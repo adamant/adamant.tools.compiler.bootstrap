@@ -65,8 +65,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
                 parameters = parameters.Prepend(selfParameter);
 
             var variableDeclarations = body?.GetAllVariableDeclarations()
-                                       ?? Enumerable.Empty<IVariableDeclarationStatementSyntax>();
-            var childSymbols = parameters.Cast<ISymbol>().Concat(variableDeclarations);
+                                       ?? Enumerable.Empty<IBindingSymbol>();
+            var childSymbols = parameters.Concat(variableDeclarations);
             return new SymbolSet(childSymbols);
         }
     }

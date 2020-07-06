@@ -63,5 +63,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
                 return definitelyAssigned;
             return definitelyAssigned.Set(variableDeclaration, true);
         }
+
+        public VariableFlags VariableDeclaration(
+            IForeachExpressionSyntax foreachExpression,
+            VariableFlags definitelyAssigned)
+        {
+            return definitelyAssigned.Set(foreachExpression, true);
+        }
     }
 }

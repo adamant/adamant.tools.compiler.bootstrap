@@ -50,7 +50,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
             }
         }
 
-        public VariableFlags IdentifierName(INameExpressionSyntax nameExpression, VariableFlags definitelyUnassigned)
+        public VariableFlags IdentifierName(
+            INameExpressionSyntax nameExpression,
+            VariableFlags definitelyUnassigned)
         {
             return definitelyUnassigned;
         }
@@ -62,6 +64,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.BindingMutability
             if (variableDeclaration.Initializer is null)
                 return definitelyUnassigned;
             return definitelyUnassigned.Set(variableDeclaration, false);
+        }
+
+        public VariableFlags VariableDeclaration(
+            IForeachExpressionSyntax foreachExpression,
+            VariableFlags definitelyUnassigned)
+        {
+            return definitelyUnassigned.Set(foreachExpression, false);
         }
     }
 }
