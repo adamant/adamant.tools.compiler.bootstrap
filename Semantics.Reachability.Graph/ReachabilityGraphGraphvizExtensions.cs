@@ -8,6 +8,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 {
     public static class ReachabilityGraphGraphvizExtensions
     {
+        private const string Grey = "grey45";
+        private const string Black = "black";
+
         /// <summary>
         /// Convert the graph into DOT format supported by graphviz
         /// </summary>
@@ -173,7 +176,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 foreach (var borrower in borrowed.Borrowers)
                 {
                     var borrowerName = AppendBorrowPoint(dot, borrower, referenceNames);
-                    var color = ColorForPhase(borrower);
+                    var color = borrower.IsUsed || borrower.IsUsedForBorrow() ? Black : Grey;
                     dot.AppendLine($"    {borrowedName} -> {borrowerName} [color=\"{color}:{color}\"];");
                 }
             }
@@ -296,8 +299,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         {
             string color = reference.Phase switch
             {
-                Phase.Unused => "grey45",
-                Phase.Used => "black",
+                Phase.Unused => Grey,
+                Phase.Used => Black,
                 Phase.Released => "red",
                 _ => throw ExhaustiveMatch.Failed(reference.Phase)
             };

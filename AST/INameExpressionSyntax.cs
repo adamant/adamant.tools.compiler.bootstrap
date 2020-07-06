@@ -15,6 +15,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [DisallowNull] IBindingSymbol? ReferencedSymbol { get; set; }
         FixedList<ISymbol> LookupInContainingScope();
         [DisallowNull] ValueSemantics? ValueSemantics { get; set; }
-        VariableFlags? VariablesLiveAfter { get; set; }
+        bool VariableIsLiveAfter { get; set; }
     }
 }

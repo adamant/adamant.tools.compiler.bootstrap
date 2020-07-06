@@ -14,6 +14,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         [DisallowNull] new DataType? Type { get; set; }
         bool InferMutableType { get; }
         [DisallowNull] ref IExpressionSyntax? Initializer { get; }
-        VariableFlags? VariablesLiveAfter { get; set; }
+        bool VariableIsLiveAfter { get; set; }
     }
 }

@@ -1,3 +1,4 @@
+using System.Linq;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
@@ -199,7 +200,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
             // Cheat by getting a list of children and reversing it
             var collector = new SyntaxCollector();
             collector.WalkChildren(syntax);
-            foreach (var child in collector.Syntax)
+            foreach (var child in collector.Syntax.Reverse())
                 walker.Walk(child, arg);
         }
 
@@ -208,7 +209,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
             // Cheat by getting a list of children and reversing it
             var collector = new SyntaxCollector();
             collector.WalkChildren(syntax);
-            foreach (var child in collector.Syntax)
+            foreach (var child in collector.Syntax.Reverse())
                 walker.Walk(child);
         }
     }

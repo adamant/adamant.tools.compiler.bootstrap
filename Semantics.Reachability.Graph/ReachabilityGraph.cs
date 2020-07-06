@@ -234,11 +234,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         internal void Delete(Object obj)
         {
-            if (!objects.ContainsKey(obj.OriginSyntax))
-                throw new Exception($"Object '{obj}' does not exist in the graph.");
+            if (obj.Graph != this) throw new Exception($"Object '{obj}' is from a different graph.");
 
-            obj.Freed();
-            LostReference(obj);
+            if (objects.ContainsKey(obj.OriginSyntax))
+                obj.Freed();
         }
 
         /// <summary>
@@ -246,14 +245,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         /// </summary>
         internal void LostReference(Object obj)
         {
-            if (obj.GetCurrentAccess() is null)
-            {
-                if (!objects.Remove(obj.OriginSyntax))
-                    throw new Exception($"Object '{obj}' does not exist in the graph.");
-                Dirty();
-            }
-            else if (!objects.ContainsKey(obj.OriginSyntax))
-                throw new Exception($"Object '{obj}' does not exist in the graph.");
+            if (obj.Graph != this) throw new Exception($"Object '{obj}' is from a different graph.");
+
+            if (!(obj.GetCurrentAccess() is null)) return;
+
+            Delete(obj);
         }
         #endregion
 

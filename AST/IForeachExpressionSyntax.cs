@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public interface IForeachExpressionSyntax : IExpressionSyntax, IBindingSymbol
     {
         SimpleName VariableName { get; }
-        VariableFlags? VariablesLiveAfterVariable { get; set; }
+        bool VariableIsLiveAfterAssignment { get; set; }
         ITypeSyntax? TypeSyntax { get; }
         /// <summary>
         /// The type of the foreach expression overall, not of the variable

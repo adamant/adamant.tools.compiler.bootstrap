@@ -20,6 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         public bool DeclaredReadable => DeclaredAccess != Access.Identify;
         public Phase Phase { get; private set; } = Phase.Unused;
         public bool IsUsed => Phase == Phase.Used;
+        public bool IsReleased => Phase == Phase.Released;
         private readonly List<Reference> borrowers = new List<Reference>();
         public IReadOnlyList<Reference> Borrowers { get; }
 
@@ -259,9 +260,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         /// <summary>
         /// Release this reference so that it no longer holds the referenced object
         /// </summary>
-        internal void Release()
+        internal void Release(ReachabilityGraph graph)
         {
             Phase = Phase.Released;
+            graph.Dirty();
         }
     }
 }

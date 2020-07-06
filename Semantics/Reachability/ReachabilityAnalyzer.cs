@@ -65,6 +65,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     // TODO this variable's references effectively go away when it is no longer live
                     // TODO how does the idea of in use variables work with variables?
                     graph.Assign(variable, initializer);
+                    if (!stmt.VariableIsLiveAfter)
+                        // Variable is dead, effectively it can be removed
+                        variable?.Dead();
                 }
                 break;
                 case IExpressionStatementSyntax stmt:

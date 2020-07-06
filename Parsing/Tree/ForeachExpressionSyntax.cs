@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SimpleName VariableName => FullVariableName.UnqualifiedName;
 
-        public VariableFlags? VariablesLiveAfterVariable { get; set; }
+        public bool VariableIsLiveAfterAssignment { get; set; } = true;
 
         public ITypeSyntax? TypeSyntax { get; }
         DataType IBindingSymbol.Type => VariableType ?? throw new InvalidOperationException();

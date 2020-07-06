@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                    ?? throw new ArgumentException("Must be a reference type", nameof(symbol));
         }
 
-        public static Variable? ForField(ReachabilityGraph graph, IFieldDeclarationSyntax field)
+        internal static Variable? ForField(ReachabilityGraph graph, IFieldDeclarationSyntax field)
         {
             // Non-reference types don't participate in reachability (yet)
             var referenceType = field.Type.Known().UnderlyingReferenceType();
@@ -49,6 +49,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         internal void Assign(TempValue temp)
         {
             AddReferences(temp.StealReferences());
+        }
+
+        public void Dead()
+        {
+            ReleaseReferences();
         }
 
         public override string ToString()

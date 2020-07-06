@@ -26,8 +26,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
             switch (assignmentExpression.LeftOperand)
             {
                 case INameExpressionSyntax identifier:
-                    identifier.VariablesLiveAfter = liveVariables;
-                    return liveVariables.Set(identifier.ReferencedSymbol.Assigned(), false);
+                    var symbol = identifier.ReferencedSymbol.Assigned();
+                    identifier.VariableIsLiveAfter = liveVariables[symbol]
+                                             ?? throw new Exception($"No liveness data for variable {symbol}");
+                    return liveVariables.Set(symbol, false);
                 case IFieldAccessExpressionSyntax _:
                     return liveVariables;
                 default:
@@ -39,15 +41,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
             INameExpressionSyntax nameExpression,
             VariableFlags liveVariables)
         {
-            nameExpression.VariablesLiveAfter = liveVariables;
-            return liveVariables.Set(nameExpression.ReferencedSymbol.Assigned(), true);
+            var symbol = nameExpression.ReferencedSymbol.Assigned();
+            nameExpression.VariableIsLiveAfter = liveVariables[symbol]
+                                         ?? throw new Exception($"No liveness data for variable {symbol.FullName}");
+            return liveVariables.Set(symbol, true);
         }
 
         public VariableFlags VariableDeclaration(
             IVariableDeclarationStatementSyntax variableDeclaration,
             VariableFlags liveVariables)
         {
-            variableDeclaration.VariablesLiveAfter = liveVariables;
+            variableDeclaration.VariableIsLiveAfter = liveVariables[variableDeclaration]
+                                              ?? throw new Exception($"No liveness data for variable {variableDeclaration.FullName}");
             return liveVariables.Set(variableDeclaration, false);
         }
 
@@ -55,7 +60,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
             IForeachExpressionSyntax foreachExpression,
             VariableFlags liveVariables)
         {
-            foreachExpression.VariablesLiveAfterVariable = liveVariables;
+            foreachExpression.VariableIsLiveAfterAssignment = liveVariables[foreachExpression]
+                                            ?? throw new Exception($"No liveness data for variable {foreachExpression.FullName}");
             return liveVariables.Set(foreachExpression, false);
         }
     }

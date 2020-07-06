@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -92,23 +91,33 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         internal virtual void Freed()
         {
-            if (!IsAllocated)
-                throw new Exception("Can't free memory twice");
+            if (!IsAllocated) return; // already freed
             IsAllocated = false;
             ReleaseReferences();
         }
 
-        private void ReleaseReferences()
+        protected void ReleaseReferences()
         {
             foreach (var reference in references)
-                if (reference.CouldHaveOwnership
-                    || reference.Referent.GetCurrentAccess() is null) // not reachable
+            {
+                var deleted = false;
+                if (reference.CouldHaveOwnership)
+                {
+                    // Delete while still in the graph
                     Graph.Delete(reference.Referent);
-                else
-                    Graph.LostReference(reference.Referent);
+                    deleted = true;
+                }
 
-            foreach (var reference in references)
-                reference.Release();
+                // Release reference before checking if the object is reachable
+                reference.Release(Graph);
+                Graph.LostReference(reference.Referent);
+
+                if (!deleted
+                    && reference.Referent.GetCurrentAccess() is null) // not reachable
+                    Graph.Delete(reference.Referent);
+            }
+
+            references.Clear();
         }
 
         protected internal void AddReference(Reference reference)
@@ -123,7 +132,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         internal void MarkReferencedObjects()
         {
-            foreach (var reference in References)
+            foreach (var reference in References.Where(r => !r.IsReleased))
             {
                 var effectiveAccess = reference.EffectiveAccess();
                 var referent = reference.Referent;
