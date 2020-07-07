@@ -12,7 +12,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class FieldDeclarationSyntax : MemberDeclarationSyntax, IFieldDeclarationSyntax
     {
-        public FixedList<IModiferToken> Modifiers { get; }
         public bool IsMutableBinding { get; }
         public ITypeSyntax TypeSyntax { get; }
         private IExpressionSyntax? initializer;
@@ -33,9 +32,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan nameSpan,
             ITypeSyntax typeSyntax,
             IExpressionSyntax? initializer)
-            : base(declaringClass, span, file, fullName, nameSpan)
+            : base(declaringClass, span, file, modifiers, fullName, nameSpan)
         {
-            Modifiers = modifiers;
             IsMutableBinding = mutableBinding;
             TypeSyntax = typeSyntax;
             this.initializer = initializer;

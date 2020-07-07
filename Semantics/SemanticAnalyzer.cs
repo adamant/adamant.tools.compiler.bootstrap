@@ -16,6 +16,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Moves;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.NotImplemented;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Validation;
@@ -43,6 +44,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         {
             // First pull over all the lexer and parser warnings
             var diagnostics = new Diagnostics(packageSyntax.Diagnostics);
+
+            // Check for syntax that is not yet implemented
+            new SemanticsNotImplementedChecker(diagnostics).Check(packageSyntax);
 
             // If there are errors from the lex and parse phase, don't continue on
             diagnostics.ThrowIfFatalErrors();

@@ -14,6 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal class ClassDeclarationSyntax : DeclarationSyntax, IClassDeclarationSyntax
     {
         public FixedList<IModiferToken> Modifiers { get; }
+
         public Name FullName { get; }
 
         [DebuggerHidden]
