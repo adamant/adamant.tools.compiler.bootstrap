@@ -38,38 +38,60 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NotImplemented
             {
                 case INamedParameterSyntax syn:
                     if (!(syn.DefaultValue is null))
-                        diagnostics.Add(SemanticError.NotImplemented(file, syntax.Span, "Default values"));
+                        diagnostics.Add(SemanticError.NotImplemented(file, syn.DefaultValue.Span, "Default values"));
                     break;
                 case IFieldParameterSyntax syn:
                     if (!(syn.DefaultValue is null))
-                        diagnostics.Add(SemanticError.NotImplemented(file, syntax.Span, "Default values"));
+                        diagnostics.Add(SemanticError.NotImplemented(file, syn.DefaultValue.Span, "Default values"));
                     break;
                 case IConstructorDeclarationSyntax syn:
                     if (syn.Name != SpecialName.New)
-                        diagnostics.Add(SemanticError.NotImplemented(file, syntax.Span, "Named constructors"));
+                        diagnostics.Add(SemanticError.NotImplemented(file, syn.Span, "Named constructors"));
                     break;
-
+                case IClassDeclarationSyntax syn:
+                    // TODO classes need to be checked for duplicate modifiers
+                    CheckMoveModifier(syn);
+                    CheckSafeUnsafeModifiers(syn);
+                    break;
+                case IFieldDeclarationSyntax syn:
+                    if (!(syn.Initializer is null))
+                        diagnostics.Add(SemanticError.NotImplemented(file, syn.Initializer.Span, "Field initializers"));
+                    CheckMoveModifier(syn);
+                    CheckSafeUnsafeModifiers(syn);
+                    break;
                 case IEntityDeclarationSyntax syn:
-                    if (!(syn is IClassDeclarationSyntax))
-                    {
-                        if (syn.Modifiers.OfType<IMutableKeywordToken>().Any())
-                            diagnostics.Add(SemanticError.NotImplemented(file, syntax.Span, "`mut` modifiers"));
-
-                        // TODO there should be more complex rules for classes
-                        if (syn.Modifiers.Count > 1)
-                            diagnostics.Add(SemanticError.NotImplemented(file, syntax.Span, "Multiple modifiers"));
-                    }
-
-                    if (syn.Modifiers.OfType<IMoveKeywordToken>().Any())
-                        diagnostics.Add(SemanticError.NotImplemented(file, syntax.Span, "`move` modifiers"));
-
-                    if (syn.Modifiers.OfType<ISafeKeywordToken>().Any())
-                        diagnostics.Add(SemanticError.NotImplemented(file, syntax.Span, "`safe` modifiers"));
-                    if (syn.Modifiers.OfType<IUnsafeKeywordToken>().Any())
-                        diagnostics.Add(SemanticError.NotImplemented(file, syntax.Span, "`unsafe` modifiers"));
+                    CheckMutableModifier(syn);
+                    CheckMultipleModifiers(syn);
+                    CheckMoveModifier(syn);
+                    CheckSafeUnsafeModifiers(syn);
                     break;
             }
             WalkChildren(syntax);
+        }
+
+        private void CheckMultipleModifiers(IEntityDeclarationSyntax syn)
+        {
+            if (syn.Modifiers.Count > 1) diagnostics.Add(SemanticError.NotImplemented(file, syn.Span, "Multiple modifiers"));
+        }
+
+        private void CheckMutableModifier(IEntityDeclarationSyntax syn)
+        {
+            if (syn.Modifiers.OfType<IMutableKeywordToken>().Any())
+                diagnostics.Add(SemanticError.NotImplemented(file, syn.Span, "`mut` modifiers"));
+        }
+
+        private void CheckSafeUnsafeModifiers(IEntityDeclarationSyntax syn)
+        {
+            if (syn.Modifiers.OfType<ISafeKeywordToken>().Any())
+                diagnostics.Add(SemanticError.NotImplemented(file, syn.Span, "`safe` modifiers"));
+            if (syn.Modifiers.OfType<IUnsafeKeywordToken>().Any())
+                diagnostics.Add(SemanticError.NotImplemented(file, syn.Span, "`unsafe` modifiers"));
+        }
+
+        private void CheckMoveModifier(IEntityDeclarationSyntax syn)
+        {
+            if (syn.Modifiers.OfType<IMoveKeywordToken>().Any())
+                diagnostics.Add(SemanticError.NotImplemented(file, syn.Span, "`move` modifiers"));
         }
     }
 }
