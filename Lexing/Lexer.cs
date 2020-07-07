@@ -42,30 +42,50 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                     case ')':
                         yield return TokenFactory.CloseParen(SymbolSpan());
                         break;
-                    //case '[':
-                    //    yield return TokenFactory.OpenBracket(SymbolSpan());
-                    //    break;
-                    //case ']':
-                    //    yield return TokenFactory.CloseBracket(SymbolSpan());
-                    //    break;
+                    case '[':
+                    case ']':
+                    case '|':
+                    case '&':
+                    case '@':
+                    case '`':
+                    case '$':
+                        yield return NewReservedOperator();
+                        break;
                     case ';':
                         yield return TokenFactory.Semicolon(SymbolSpan());
                         break;
                     case ',':
                         yield return TokenFactory.Comma(SymbolSpan());
                         break;
-                    //case '#':
-                    //    if (NextCharIs('#'))
-                    //        // it is `##`
-                    //        yield return TokenFactory.HashHash(SymbolSpan(2));
-                    //    else
-                    //        // it is `#`
-                    //        yield return TokenFactory.Hash(SymbolSpan(1));
-                    //    break;
-                    case '.':
-                        if (NextCharIs('.'))
+                    case '#':
+                        switch (NextChar())
                         {
-                            if (CharAtIs(2, '<'))
+                            case '#':
+                                // it is `##`
+                                yield return NewReservedOperator(2);
+                                break;
+                            case '(':
+                                // it is `#(`
+                                yield return NewReservedOperator(2);
+                                break;
+                            case '[':
+                                // it is `#[`
+                                yield return NewReservedOperator(2);
+                                break;
+                            case '{':
+                                // it is `#{`
+                                yield return NewReservedOperator(2);
+                                break;
+                            default:
+                                // it is `#`
+                                yield return NewReservedOperator();
+                                break;
+                        }
+                        break;
+                    case '.':
+                        if (NextChar() is '.')
+                        {
+                            if (CharAt(2) is '<')
                                 // it is `..<`
                                 yield return TokenFactory.DotDotLessThan(SymbolSpan(3));
                             else
@@ -76,7 +96,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                             yield return TokenFactory.Dot(SymbolSpan());
                         break;
                     case ':':
-                        if (NextCharIs(':') && CharAtIs(2, '.'))
+                        if (NextChar() is ':' && CharAt(2) is '.')
                             // it is `::.`
                             yield return TokenFactory.ColonColonDot(SymbolSpan(3));
                         else
@@ -100,9 +120,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                                 break;
                         }
                         break;
-                    //case '|':
-                    //    yield return TokenFactory.Pipe(SymbolSpan());
-                    //    break;
                     case '→':
                         yield return TokenFactory.RightArrow(SymbolSpan());
                         break;
@@ -115,19 +132,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                     case '⤳':
                         yield return TokenFactory.RightWaveArrow(SymbolSpan());
                         break;
-                    //case '@':
-                    //    yield return TokenFactory.AtSign(SymbolSpan());
-                    //    break;
-                    //case '^':
-                    //    if (NextCharIs('.'))
-                    //        // it is `^.`
-                    //        yield return TokenFactory.CaretDot(SymbolSpan(2));
-                    //    else
-                    //        // it is `^`
-                    //        yield return TokenFactory.Caret(SymbolSpan());
-                    //    break;
+                    case '^':
+                        if (NextChar() is '.')
+                            // it is `^.`
+                            yield return NewReservedOperator(2);
+                        else
+                            // it is `^`
+                            yield return NewReservedOperator();
+                        break;
                     case '+':
-                        if (NextCharIs('='))
+                        if (NextChar() is '=')
                             // it is `+=`
                             yield return TokenFactory.PlusEquals(SymbolSpan(2));
                         else
@@ -158,18 +172,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                         else
                         {
                             // it is `~` which isn't allowed
-                            var span = SymbolSpan();
-                            diagnostics.Add(LexError.UnexpectedCharacter(file, span, currentChar));
-                            yield return TokenFactory.Unexpected(span);
+                            yield return NewUnexpectedCharacter();
                         }
                         break;
                     case '*':
-                        if (NextCharIs('='))
-                            // it is `*=`
-                            yield return TokenFactory.AsteriskEquals(SymbolSpan(2));
-                        else
-                            // it is `*`
-                            yield return TokenFactory.Asterisk(SymbolSpan());
+                        switch (NextChar())
+                        {
+                            case '=':
+                                // it is `*=`
+                                yield return TokenFactory.AsteriskEquals(SymbolSpan(2));
+                                break;
+                            case '*':
+                                // it is `**`
+                                yield return NewReservedOperator(2);
+                                break;
+                            default:
+                                // it is `*`
+                                yield return TokenFactory.Asterisk(SymbolSpan());
+                                break;
+                        }
                         break;
                     case '/':
                         switch (NextChar())
@@ -233,7 +254,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                                 yield return TokenFactory.EqualsEquals(SymbolSpan(2));
                                 break;
                             case '/':
-                                if (CharAtIs(2, '='))
+                                if (CharAt(2) is '=')
                                     // it is `=/=`
                                     yield return TokenFactory.NotEqual(SymbolSpan(3));
                                 else
@@ -249,7 +270,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                         yield return TokenFactory.NotEqual(SymbolSpan());
                         break;
                     case '>':
-                        if (NextCharIs('='))
+                        if (NextChar() is '=')
                             // it is `>=`
                             yield return TokenFactory.GreaterThanOrEqual(SymbolSpan(2));
                         else
@@ -275,9 +296,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                                 yield return TokenFactory.LeftWaveArrow(SymbolSpan(2));
                                 break;
                             case '.':
-                                if (CharAtIs(2, '.'))
+                                if (CharAt(2) is '.')
                                 {
-                                    if (CharAtIs(3, '<'))
+                                    if (CharAt(3) is '<')
                                         // it is `<..<`
                                         yield return TokenFactory.LessThanDotDotLessThan(SymbolSpan(4));
                                     else
@@ -349,7 +370,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
 
                             yield return NewIdentifierOrKeywordToken();
                         }
-                        else if (currentChar == '!' && NextCharIs('='))
+                        else if (currentChar == '!' && NextChar() is '=')
                         {
                             var span = SymbolSpan(2);
                             diagnostics.Add(LexError.CStyleNotEquals(file, span));
@@ -372,12 +393,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                 var end = tokenStart + length;
                 return TokenSpan(end);
             }
-
             TextSpan TokenSpan(int? end = null)
             {
                 tokenEnd = end ?? tokenEnd;
                 return TextSpan.FromStartEnd(tokenStart, tokenEnd);
             }
+
             IToken NewIdentifierOrKeywordToken()
             {
                 var span = TokenSpan();
@@ -413,28 +434,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                 diagnostics.Add(LexError.UnexpectedCharacter(file, span, value[0]));
                 return TokenFactory.Unexpected(span);
             }
+            IToken NewReservedOperator(int length = 1)
+            {
+                var span = SymbolSpan(length);
+                var value = code[span];
+                diagnostics.Add(LexError.ReservedOperator(file, span, value));
+                return TokenFactory.Unexpected(span);
+            }
+
             char? NextChar()
             {
                 var index = tokenStart + 1;
                 return index < text.Length ? text[index] : default;
             }
 
-            //char? CharAt(int offset)
-            //{
-            //    var index = tokenStart + offset;
-            //    return index < text.Length ? text[index] : default;
-            //}
-
-            bool NextCharIs(char c)
+            char? CharAt(int offset)
             {
-                var index = tokenStart + 1;
-                return index < text.Length && text[index] == c;
-            }
-
-            bool CharAtIs(int i, char c)
-            {
-                var index = tokenStart + i;
-                return index < text.Length && text[index] == c;
+                var index = tokenStart + offset;
+                return index < text.Length ? text[index] : default;
             }
 
             IToken LexString()

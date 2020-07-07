@@ -60,5 +60,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1008,
                 $"The word `{identifier}` is not a keyword or reserved word, it should not be escaped.");
         }
+
+        public static Diagnostic ReservedOperator(CodeFile file, TextSpan span, string op)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1009,
+                $"Unexpected character(s) `{op}`, reserved for operator or punctuators");
+        }
     }
 }

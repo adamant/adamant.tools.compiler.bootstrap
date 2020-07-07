@@ -64,9 +64,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
                 case "^":
                     return t2.Text == "." || t2.Text == ".." || t2.Text == "..<";
                 case "+":
-                case "*":
                 case ">":
                     return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == "=>";
+                case "*":
+                    return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == "=>"
+                        || t2.Text == "*=";
                 case "<":
                     return t2.Text == "=" || t2.Text == "==" || t2.Text == "=/=" || t2.Text == "=>"
                         || t2.Text == ":" || t2.Text == "::."
@@ -92,7 +94,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
                 case "#":
                     return t2.Text == "#" || t2.Text == "##";
                 case ":":
-                    return t2.Text == ":" || t2.Text == "::."; // TODO this should really be blocking the sequence ':',':','.'
+                    // TODO actually ':',':' is fine. It is really the three token sequence ':',':','.' that is the problem
+                    return t2.Text == ":";
                 default:
                     if (typeof(IKeywordToken).IsAssignableFrom(t1.TokenType)
                         || typeof(IIdentifierToken).IsAssignableFrom(t1.TokenType))

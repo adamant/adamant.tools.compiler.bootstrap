@@ -255,7 +255,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
         [Theory]
         [InlineData(" % ")]
         [InlineData(" ~ ")]
-        [InlineData(" ` ")]
+        [InlineData(" ◊ ")]
         [InlineData(" \u0007 ")] // Bell Character
         public void Unexpected_character(string text)
         {
@@ -267,6 +267,33 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
             var diagnostic = result.AssertSingleDiagnostic();
             diagnostic.AssertError(1005, 1, 1);
             Assert.True(diagnostic.Message.Contains(text[1], StringComparison.Ordinal), "Doesn't contain character");
+        }
+
+        [Theory]
+        // Not implemented
+        [InlineData("[")]
+        [InlineData("]")]
+        [InlineData("#")]
+        [InlineData("#(")]
+        [InlineData("#[")]
+        [InlineData("#{")]
+        [InlineData("|")]
+        [InlineData("&")]
+        [InlineData("@")]
+        [InlineData("^")]
+        [InlineData("^.")]
+        // Reserved
+        [InlineData("$")]
+        [InlineData("`")]
+        [InlineData("**")]
+        [InlineData("##")]
+        public void Reserved_operator(string text)
+        {
+            var result = Lex(text);
+            var token = result.AssertSingleToken();
+            token.AssertIs<IUnexpectedToken>(0, text.Length);
+            var diagnostic = result.AssertSingleDiagnostic();
+            diagnostic.AssertError(1009, 0, text.Length);
         }
 
         [Property(MaxTest = 10_000)]
