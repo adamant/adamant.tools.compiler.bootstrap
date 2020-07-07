@@ -5,6 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
 {
@@ -53,9 +54,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
             return $"⟦borrow⟧ {Referent}";
         }
 
-        public string ToGroupedString()
+        public string ToGroupedString(OperatorPrecedence surroundingPrecedence)
         {
-            return $"({ToString()})";
+            return $"({this})";
         }
     }
 }

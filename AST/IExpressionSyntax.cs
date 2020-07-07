@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.AST
@@ -29,6 +30,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public interface IExpressionSyntax : ISyntax
     {
         [DisallowNull] DataType? Type { get; set; }
-        string ToGroupedString();
+        string ToGroupedString(OperatorPrecedence surroundingPrecedence);
     }
 }

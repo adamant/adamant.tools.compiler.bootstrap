@@ -1,6 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
+using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
@@ -24,18 +25,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Fixity = fixity;
         }
 
+        protected override OperatorPrecedence ExpressionPrecedence => OperatorPrecedence.Unary;
+
         public override string ToString()
         {
-            switch (Fixity)
+            return Fixity switch
             {
-                default:
-                    throw ExhaustiveMatch.Failed(Fixity);
-                case UnaryOperatorFixity.Prefix:
-                    return $"{Operator.ToSymbolString()}{Operand}";
-                case UnaryOperatorFixity.Postfix:
-                    return $"{Operand}{Operator.ToSymbolString()}";
-
-            }
+                UnaryOperatorFixity.Prefix => $"{Operator.ToSymbolString()}{Operand.ToGroupedString(ExpressionPrecedence)}",
+                UnaryOperatorFixity.Postfix => $"{Operand.ToGroupedString(ExpressionPrecedence)}{Operator.ToSymbolString()}",
+                _ => throw ExhaustiveMatch.Failed(Fixity)
+            };
         }
     }
 }

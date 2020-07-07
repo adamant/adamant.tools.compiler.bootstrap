@@ -1,6 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
@@ -22,9 +23,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             MethodNameSyntax = methodNameSyntax;
         }
 
+        protected override OperatorPrecedence ExpressionPrecedence => OperatorPrecedence.Primary;
+
         public override string ToString()
         {
-            return $"{ContextExpression.ToGroupedString()}.{FullName}({string.Join(", ", Arguments)})";
+            return $"{ContextExpression.ToGroupedString(ExpressionPrecedence)}.{FullName}({string.Join(", ", Arguments)})";
         }
     }
 }

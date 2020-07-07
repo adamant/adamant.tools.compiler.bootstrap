@@ -5,6 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax
 {
@@ -45,7 +46,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax
             return $"{FullName}({string.Join(", ", Arguments)})";
         }
 
-        public string ToGroupedString()
+        public string ToGroupedString(OperatorPrecedence surroundingPrecedence)
         {
             return ToString();
         }

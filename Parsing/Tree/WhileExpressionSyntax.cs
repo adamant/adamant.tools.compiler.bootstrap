@@ -1,5 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
@@ -19,6 +20,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             this.condition = condition;
             Block = block;
         }
+
+        protected override OperatorPrecedence ExpressionPrecedence => OperatorPrecedence.Min;
 
         public override string ToString()
         {

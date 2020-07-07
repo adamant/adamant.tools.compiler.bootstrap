@@ -7,6 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
+using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
@@ -52,6 +53,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             if (ContainingScope != null) return ContainingScope.Lookup(SpecialName.Self);
             throw new InvalidOperationException();
         }
+
+        protected override OperatorPrecedence ExpressionPrecedence => OperatorPrecedence.Primary;
 
         public override string ToString()
         {

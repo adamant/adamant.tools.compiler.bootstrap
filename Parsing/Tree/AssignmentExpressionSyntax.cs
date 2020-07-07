@@ -1,5 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
@@ -23,9 +24,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Operator = @operator;
         }
 
+        protected override OperatorPrecedence ExpressionPrecedence => OperatorPrecedence.Assignment;
+
         public override string ToString()
         {
-            return $"{LeftOperand} {Operator.ToSymbolString()} {RightOperand}";
+            return $"{LeftOperand.ToGroupedString(ExpressionPrecedence)} {Operator.ToSymbolString()} {RightOperand.ToGroupedString(ExpressionPrecedence)}";
         }
     }
 }
