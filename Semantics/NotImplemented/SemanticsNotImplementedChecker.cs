@@ -2,6 +2,7 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.AST.Walkers;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
@@ -65,6 +66,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.NotImplemented
                     CheckMoveModifier(syn);
                     CheckSafeUnsafeModifiers(syn);
                     break;
+                case IForeachExpressionSyntax syn:
+                {
+                    var inExpression = syn.InExpression;
+                    if (!(inExpression is IBinaryOperatorExpressionSyntax exp)
+                        || (exp.Operator != BinaryOperator.DotDot
+                           && exp.Operator != BinaryOperator.LessThanDotDot
+                           && exp.Operator != BinaryOperator.DotDotLessThan
+                           && exp.Operator != BinaryOperator.LessThanDotDotLessThan))
+                        diagnostics.Add(SemanticError.NotImplemented(file, inExpression.Span, "Foreach in non range expressions"));
+                }
+                break;
             }
             WalkChildren(syntax);
         }
