@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Linq.Expressions;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
@@ -14,6 +15,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tokens
 
         public static readonly FixedDictionary<string, Func<TextSpan, IKeywordToken>> KeywordFactories =
             BuildKeywordFactories();
+
+        public static readonly IReadOnlyCollection<string> Keywords = KeywordFactories.Keys.ToHashSet();
 
         private static FixedDictionary<string, Func<TextSpan, IKeywordToken>> BuildKeywordFactories()
         {

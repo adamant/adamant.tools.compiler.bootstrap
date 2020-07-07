@@ -15,27 +15,50 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
     {
         public static Diagnostic UnclosedBlockComment(CodeFile file, TextSpan span)
         {
-            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1001, "End-of-file found, expected `*/`");
+            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1001,
+                "End-of-file found, expected `*/`");
         }
 
         public static Diagnostic UnclosedStringLiteral(CodeFile file, TextSpan span)
         {
-            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1002, "End-of-file in string constant");
+            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1002,
+                "End-of-file in string constant");
         }
 
         public static Diagnostic InvalidEscapeSequence(CodeFile file, TextSpan span)
         {
-            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1003, "Unrecognized escape sequence");
+            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1003,
+                "Unrecognized escape sequence");
         }
 
         public static Diagnostic CStyleNotEquals(CodeFile file, TextSpan span)
         {
-            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1004, "Use `≠` or `=/=` for not equal instead of `!=`");
+            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1004,
+                "Use `≠` or `=/=` for not equal instead of `!=`");
         }
 
         public static Diagnostic UnexpectedCharacter(CodeFile file, TextSpan span, char character)
         {
-            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1005, $"Unexpected character `{character}`");
+            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1005,
+                $"Unexpected character `{character}`");
+        }
+
+        public static Diagnostic ReservedWord(CodeFile file, TextSpan span, string word)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1006,
+                $"Reserved word `{word}` used as an identifier");
+        }
+
+        public static Diagnostic ContinueInsteadOfNext(CodeFile file, TextSpan span)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1007,
+                $"The word `continue` is a reserved word. Use the `next` keyword or escape the identifier as `\\continue` instead.");
+        }
+
+        public static Diagnostic EscapedIdentifierShouldNotBeEscaped(CodeFile file, TextSpan span, string identifier)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Lexing, 1008,
+                $"The word `{identifier}` is not a keyword or reserved word, it should not be escaped.");
         }
     }
 }

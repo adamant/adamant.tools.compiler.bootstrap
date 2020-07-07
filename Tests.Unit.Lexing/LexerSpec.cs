@@ -39,6 +39,90 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
         }
 
         [Theory]
+        // Keywords Not Yet Implemented
+        [InlineData("ensures")]
+        [InlineData("implicit")]
+        [InlineData("invariant")]
+        [InlineData("params")]
+        [InlineData("ref")]
+        [InlineData("throw")]
+        [InlineData("where")]
+        // Actual Reserved Words
+        [InlineData("alias")]
+        [InlineData("partial")]
+        [InlineData("xor")]
+        public void Reserved_words(string reservedWord)
+        {
+            // TODO this error should only be reported at the declaration site, not the use site
+            var result = Lex(reservedWord);
+            var token = result.AssertSingleToken();
+            token.AssertIdentifier(0, reservedWord.Length, reservedWord);
+            var diagnostic = result.AssertSingleDiagnostic();
+            diagnostic.AssertError(1006, 0, reservedWord.Length);
+        }
+
+        [Fact]
+        public void Continue_as_next()
+        {
+            // TODO this error should be contextual so that it reports reserved word when used as a keyword, but this when used as `next`
+            const string word = "continue";
+            var result = Lex(word);
+            var token = result.AssertSingleToken();
+            token.AssertIdentifier(0, word.Length, word);
+            var diagnostic = result.AssertSingleDiagnostic();
+            diagnostic.AssertError(1007, 0, word.Length);
+        }
+
+        [Theory]
+        // Keywords
+        [InlineData("class")]
+        [InlineData("int")]
+        // Keywords not yet implemented
+        [InlineData("invariant")]
+        [InlineData("ensures")]
+        [InlineData("params")]
+        // Reserved words
+        [InlineData("alias")]
+        [InlineData("partial")]
+        [InlineData("xor")]
+        // Reserved type names
+        [InlineData("int12")]
+        [InlineData("uint96")]
+        [InlineData("float42")]
+        [InlineData("fixed")]
+        [InlineData("fixed8.8", Skip = "Not implemented, doesn't lex as identifier")]
+        [InlineData("ufixed8.24", Skip = "Not implemented, doesn't lex as identifier")]
+        [InlineData("decimal")]
+        [InlineData("decimal32")]
+        [InlineData("real")]
+        [InlineData("real.45", Skip = "Doesn't lex as identifier")]
+        // Start with digits
+        [InlineData("0")]
+        [InlineData("1")]
+        [InlineData("9")]
+        [InlineData("42_answer")]
+        public void Escaped_identifiers(string identifier)
+        {
+            var result = Lex("\\"+identifier);
+            var token = result.AssertSingleToken();
+            token.AssertIdentifier(0, identifier.Length+1, identifier);
+            result.AssertNoDiagnostics();
+        }
+
+        [Theory]
+        [InlineData("hello")]
+        [InlineData("x")]
+        [InlineData("foo")]
+        public void Escaped_identifier_not_reserved(string identifier)
+        {
+            var result = Lex("\\" + identifier);
+            var token = result.AssertSingleToken();
+            token.AssertIdentifier(0, identifier.Length + 1, identifier);
+            var diagnostic = result.AssertSingleDiagnostic();
+            diagnostic.AssertError(1008, 0, identifier.Length + 1);
+        }
+
+        [Theory]
         [InlineData(@"""Hello World!""", "Hello World!")]
         [InlineData(@""" \r \n \0 \t \"" \' """, " \r \n \0 \t \" ' ")] // basic escape sequences
         [InlineData(@"""\u(2660)""", "\u2660")] // basic unicode escape sequences
@@ -53,8 +137,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
         }
 
         [Theory]
-        [MemberData(nameof(SymbolsTheoryData))]
-        public void Symbols(string symbol, Type tokenType)
+        [MemberData(nameof(Symbols_lex_TheoryData))]
+        public void Symbols_lex(string symbol, Type tokenType)
         {
             var result = Lex(symbol);
             var token = result.AssertSingleToken();
@@ -63,7 +147,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
             result.AssertNoDiagnostics();
         }
 
-        public static IEnumerable<object[]> SymbolsTheoryData()
+        public static IEnumerable<object[]> Symbols_lex_TheoryData()
         {
             return Arbitrary.Symbols.Select(item => new object[] { item.Key, item.Value });
         }
@@ -97,18 +181,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
             result.AssertNoDiagnostics();
         }
 
-        [Fact]
-        public void End_of_file_in_block_comment()
+        [Theory]
+        [InlineData(@"/*")]
+        [InlineData(@"/*/")]
+        public void End_of_file_in_block_comment(string comment)
         {
-            var result = Lex("/*");
+            var result = Lex(comment);
             var token = result.AssertSingleToken();
-            token.AssertIs<ICommentToken>(0, 2);
+            token.AssertIs<ICommentToken>(0, comment.Length);
             var diagnostic = result.AssertSingleDiagnostic();
-            diagnostic.AssertError(1001, 0, 2);
+            diagnostic.AssertError(1001, 0, comment.Length);
         }
 
-        // TODO End of file on line comment
-        // TODO `/*/` ?
+        [Fact]
+        public void End_of_file_in_line_comment()
+        {
+            var result = Lex("// hello");
+            var token = result.AssertSingleToken();
+            token.AssertIs<ICommentToken>(0, 8);
+            result.AssertNoDiagnostics();
+        }
 
         [Fact]
         public void End_of_file_in_string()

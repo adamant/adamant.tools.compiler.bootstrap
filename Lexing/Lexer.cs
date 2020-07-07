@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -324,8 +325,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                         while (tokenEnd < text.Length && IsIdentifierCharacter(text[tokenEnd]))
                             tokenEnd += 1;
 
-                        var identifierStart = tokenStart + 1;
-                        yield return TokenFactory.EscapedIdentifier(TokenSpan(), text.Substring(identifierStart, tokenEnd - identifierStart));
+                        if (tokenEnd == tokenStart + 1)
+                            yield return NewUnexpectedCharacter();
+                        else
+                            yield return NewEscapedIdentifier();
                         break;
                     }
                     default:
@@ -353,11 +356,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                             yield return TokenFactory.NotEqual(span);
                         }
                         else
-                        {
-                            var span = SymbolSpan();
-                            diagnostics.Add(LexError.UnexpectedCharacter(file, span, currentChar));
-                            yield return TokenFactory.Unexpected(span);
-                        }
+                            yield return NewUnexpectedCharacter();
+
                         break;
                 }
                 tokenStart = tokenEnd;
@@ -380,14 +380,39 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
             }
             IToken NewIdentifierOrKeywordToken()
             {
-                var span = TextSpan.FromStartEnd(tokenStart, tokenEnd);
+                var span = TokenSpan();
                 var value = code[span];
                 if (TokenTypes.KeywordFactories.TryGetValue(value, out var keywordFactory))
                     return keywordFactory(span);
 
+                if (value == "continue")
+                    diagnostics.Add(LexError.ContinueInsteadOfNext(file, span));
+                else if (TokenTypes.ReservedWords.Contains(value)
+                    || TokenTypes.IsReservedTypeName(value))
+                    diagnostics.Add(LexError.ReservedWord(file, span, value));
+
                 return TokenFactory.BareIdentifier(span, value);
             }
-
+            IToken NewEscapedIdentifier()
+            {
+                var identifierStart = tokenStart + 1;
+                var span = TokenSpan();
+                var value = text[identifierStart..tokenEnd];
+                var isValidToEscape = TokenTypes.Keywords.Contains(value)
+                                      || TokenTypes.ReservedWords.Contains(value)
+                                      || TokenTypes.IsReservedTypeName(value)
+                                      || char.IsDigit(value[0]);
+                if (!isValidToEscape)
+                    diagnostics.Add(LexError.EscapedIdentifierShouldNotBeEscaped(file, span, value));
+                return TokenFactory.EscapedIdentifier(span, value);
+            }
+            IToken NewUnexpectedCharacter()
+            {
+                var span = SymbolSpan();
+                var value = code[span];
+                diagnostics.Add(LexError.UnexpectedCharacter(file, span, value[0]));
+                return TokenFactory.Unexpected(span);
+            }
             char? NextChar()
             {
                 var index = tokenStart + 1;
