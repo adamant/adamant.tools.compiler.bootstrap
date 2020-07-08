@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Framework
 {
-    [Trait("Category", "UnitTest")]
+    [Trait("Category", "Core")]
     public class YieldTests
     {
         [Fact]

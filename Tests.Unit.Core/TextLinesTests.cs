@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Core
 {
-    [Trait("Category", "UnitTest")]
+    [Trait("Category", "Core")]
     public class TextLinesTests
     {
         public const string OneLine = "Line0";

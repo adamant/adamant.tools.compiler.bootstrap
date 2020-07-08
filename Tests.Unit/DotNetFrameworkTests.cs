@@ -6,7 +6,7 @@ using Xunit.Abstractions;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
 {
-    [Trait("Category", "UnitTest")]
+    [Trait("Category", "Characterization")]
     public class DotNetFrameworkTests
     {
         private readonly ITestOutputHelper output;
@@ -17,7 +17,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
         }
 
         [Fact]
-        [Trait("Category", "Exploratory")]
         public void ClosureTypes()
         {
             var lambda1 = GetMethodInfo(x => 1);
@@ -34,7 +33,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
         }
 
         [Fact]
-        [Trait("Category", "Exploratory")]
         public void LazyCycleThrowsInvalidOperation()
         {
             Lazy<int>? l2 = null;
@@ -44,7 +42,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
         }
 
         [Fact]
-        [Trait("Category", "Exploratory")]
         public async Task TaskSelfReferenceDeadlocks()
         {
             var task = Task.FromResult(1);
@@ -56,7 +53,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
         }
 
         [Fact]
-        [Trait("Category", "Exploratory")]
         public async Task TaskCycleDeadlocks()
         {
             var t2 = Task.FromResult(2);

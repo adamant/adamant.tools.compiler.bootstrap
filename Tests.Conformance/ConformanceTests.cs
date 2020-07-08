@@ -18,9 +18,7 @@ using Xunit.Abstractions;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
 {
-    [Trait("Category", "IntegrationTest")]
     [Trait("Category", "Conformance")]
-    [Trait("Category", "Compile")]
     public class ConformanceTests : IClassFixture<RuntimeLibraryFixture>
     {
         private readonly ITestOutputHelper testOutput;

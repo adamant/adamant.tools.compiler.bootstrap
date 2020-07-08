@@ -4,9 +4,8 @@ using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C
 {
-    [Trait("Category", "UnitTest")]
-    [Trait("Category", "Emit")]
-    public class NameManglerSpec
+    [Trait("Category", "CCodeGen")]
+    public class NameManglerTests
     {
         [Theory]
         // Basic Multilingual Plane

@@ -8,9 +8,8 @@ using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C
 {
-    [Trait("Category", "UnitTest")]
-    [Trait("Category", "Emit")]
-    public class ResourcesSpec
+    [Trait("Category", "CCodeGen")]
+    public class ResourcesTests
     {
         private readonly IReadOnlyList<byte> byteOrderMarkUtf8 = Encoding.UTF8.GetPreamble().ToList().AsReadOnly();
 

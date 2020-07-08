@@ -15,9 +15,8 @@ using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
 {
-    [Trait("Category", "UnitTest")]
-    [Trait("Category", "Lex")]
-    public class LexerSpec //: TestClass
+    [Trait("Category", "Lexing")]
+    public class LexerTests
     {
         private static LexResult Lex(string text)
         {
