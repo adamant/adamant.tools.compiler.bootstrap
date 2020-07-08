@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Places
         public override Operand ToOperand(TextSpan span)
         {
             // TODO is this the correct value semantics?
-            return new VariableReference(Variable, ValueSemantics.Copy, span);
+            return new VariableReference(Variable, OldValueSemantics.Copy, span);
         }
 
         public override string ToString()

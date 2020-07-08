@@ -113,7 +113,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             }
         }
 
-        public static ValueSemantics GetValueSemantics(this ReferenceCapability referenceCapability)
+        public static OldValueSemantics GetValueSemantics(this ReferenceCapability referenceCapability)
         {
             switch (referenceCapability)
             {
@@ -123,14 +123,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                 case Owned:
                 case IsolatedMutable:
                 case Isolated:
-                    return ValueSemantics.Own;
+                    return OldValueSemantics.Own;
                 case HeldMutable:
                 case Borrowed:
-                    return ValueSemantics.Borrow;
+                    return OldValueSemantics.Borrow;
                 case Held:
                 case Shared:
                 case Identity:
-                    return ValueSemantics.Share;
+                    return OldValueSemantics.Share;
             }
         }
 

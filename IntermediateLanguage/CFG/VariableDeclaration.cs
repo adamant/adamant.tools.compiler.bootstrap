@@ -30,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG
         public bool TypeIsNotEmpty => !Type.IsEmpty;
 
         // TODO does this make sense? shouldn't the default reference kind always be Share?
-        private readonly ValueSemantics defaultSemantics;
+        private readonly OldValueSemantics defaultSemantics;
 
         public VariableDeclaration(
             bool isParameter,
@@ -46,11 +46,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG
             Name = name;
             IsMutableBinding = isMutableBinding;
             Type = type;
-            if (type.ValueSemantics == ValueSemantics.Own)
+            if (type.ValueSemantics == OldValueSemantics.Own)
                 //if (type is ReferenceType referenceType && referenceType.Mutability == Mutability.Immutable)
                 //    defaultSemantics = ValueSemantics.Share;
                 //else
-                defaultSemantics = ValueSemantics.Borrow;
+                defaultSemantics = OldValueSemantics.Borrow;
             else
                 defaultSemantics = type.ValueSemantics;
         }
@@ -62,7 +62,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG
 
         public VariableReference Move(TextSpan span)
         {
-            return new VariableReference(Variable, ValueSemantics.Move, span);
+            return new VariableReference(Variable, OldValueSemantics.Move, span);
         }
 
         public VariablePlace Place(TextSpan span)

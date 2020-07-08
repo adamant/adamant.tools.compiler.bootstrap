@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// Since an expression of unknown type can't actually be evaluated, its
         /// value semantics are "Empty". It doesn't ever produce a value.
         /// </summary>
-        public override ValueSemantics ValueSemantics => ValueSemantics.Empty;
+        public override OldValueSemantics ValueSemantics => OldValueSemantics.Empty;
 
         public override string ToString()
         {

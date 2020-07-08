@@ -53,7 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// <summary>
         /// The value semantics of expressions producing this type
         /// </summary>
-        public abstract ValueSemantics ValueSemantics { get; }
+        public abstract OldValueSemantics ValueSemantics { get; }
 
         public abstract override string ToString();
 

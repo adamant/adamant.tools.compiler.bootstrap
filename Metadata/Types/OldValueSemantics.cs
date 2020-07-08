@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// Share - copy the reference, share the object
     /// </summary>
     [SuppressMessage("Naming", "CA1717:Only FlagsAttribute enums should have plural names", Justification = "Name not plural")]
-    public enum ValueSemantics
+    public enum OldValueSemantics
     {
         /// <summary>
         /// Expression is acting as an lvalue not an rvalue
@@ -25,6 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// <summary>
         /// Expressions of type `never` and `void`, don't produce a value
         /// </summary>
+        /// <remarks>The unknown</remarks>
         Empty = 0,
         /// <summary>
         /// The value is moved
@@ -51,32 +52,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
     public static class ValueSemanticsExtensions
     {
-        public static string Action(this ValueSemantics valueSemantics)
+        public static string Action(this OldValueSemantics valueSemantics)
         {
             string mutability;
             switch (valueSemantics)
             {
                 default:
                     throw ExhaustiveMatch.Failed(valueSemantics);
-                case ValueSemantics.LValue:
+                case OldValueSemantics.LValue:
                     mutability = "deref";
                     break;
-                case ValueSemantics.Empty:
+                case OldValueSemantics.Empty:
                     mutability = "void";
                     break;
-                case ValueSemantics.Move:
+                case OldValueSemantics.Move:
                     mutability = "move";
                     break;
-                case ValueSemantics.Copy:
+                case OldValueSemantics.Copy:
                     mutability = "copy";
                     break;
-                case ValueSemantics.Own:
+                case OldValueSemantics.Own:
                     mutability = "own";
                     break;
-                case ValueSemantics.Borrow:
+                case OldValueSemantics.Borrow:
                     mutability = "borrow";
                     break;
-                case ValueSemantics.Share:
+                case OldValueSemantics.Share:
                     mutability = "share";
                     break;
             }

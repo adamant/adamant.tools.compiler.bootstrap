@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         public override bool IsKnown { get; }
 
-        public override ValueSemantics ValueSemantics => Referent.ValueSemantics;
+        public override OldValueSemantics ValueSemantics => Referent.ValueSemantics;
 
         public OptionalType(DataType referent)
         {
@@ -43,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         public override int GetHashCode()
         {
-            return (Referent != null ? Referent.GetHashCode() : 0);
+            return HashCode.Combine(Referent);
         }
     }
 }

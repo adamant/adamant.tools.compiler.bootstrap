@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public bool DeclaredMutable { get; }
 
         // TODO clarify this
-        public override ValueSemantics ValueSemantics { get; }
+        public override OldValueSemantics ValueSemantics { get; }
 
         protected ReferenceType(bool declaredMutable, ReferenceCapability referenceCapability)
         {

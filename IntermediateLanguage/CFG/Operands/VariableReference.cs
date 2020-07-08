@@ -6,9 +6,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Operands
     public class VariableReference : Operand
     {
         public Variable Variable { get; }
-        public ValueSemantics ValueSemantics { get; }
+        public OldValueSemantics ValueSemantics { get; }
 
-        public VariableReference(Variable variable, ValueSemantics valueSemantics, TextSpan span)
+        public VariableReference(Variable variable, OldValueSemantics valueSemantics, TextSpan span)
             : base(span)
         {
             Variable = variable;
@@ -22,17 +22,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Operands
 
         public VariableReference AsOwn(TextSpan span)
         {
-            return new VariableReference(Variable, ValueSemantics.Own, span);
+            return new VariableReference(Variable, OldValueSemantics.Own, span);
         }
 
         public VariableReference AsBorrow()
         {
-            return ValueSemantics == ValueSemantics.Borrow ? this : new VariableReference(Variable, ValueSemantics.Borrow, Span);
+            return ValueSemantics == OldValueSemantics.Borrow ? this : new VariableReference(Variable, OldValueSemantics.Borrow, Span);
         }
 
         public VariableReference AsAlias()
         {
-            return ValueSemantics == ValueSemantics.Share ? this : new VariableReference(Variable, ValueSemantics.Share, Span);
+            return ValueSemantics == OldValueSemantics.Share ? this : new VariableReference(Variable, OldValueSemantics.Share, Span);
         }
     }
 }

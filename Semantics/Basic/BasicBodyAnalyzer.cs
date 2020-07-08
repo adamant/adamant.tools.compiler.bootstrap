@@ -229,7 +229,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     switch (exp.Referent)
                     {
                         case INameExpressionSyntax nameExpression:
-                            nameExpression.ValueSemantics = ValueSemantics.Own;
+                            nameExpression.ValueSemantics = OldValueSemantics.Own;
                             var type = InferType(ref exp.Referent, false);
                             switch (type)
                             {
@@ -258,7 +258,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     {
                         case INameExpressionSyntax nameExpression:
                         {
-                            nameExpression.ValueSemantics = ValueSemantics.Borrow;
+                            nameExpression.ValueSemantics = OldValueSemantics.Borrow;
                             var type = InferType(ref exp.Referent, false);
                             switch (type)
                             {
@@ -372,8 +372,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         type = InsertImplicitShareIfNeeded(ref expression, type);
 
                     if (exp.ValueSemantics is null
-                        && (type.ValueSemantics == ValueSemantics.Copy
-                            || type.ValueSemantics == ValueSemantics.Move))
+                        && (type.ValueSemantics == OldValueSemantics.Copy
+                            || type.ValueSemantics == OldValueSemantics.Move))
                         exp.ValueSemantics = type.ValueSemantics;
 
                     return type;
@@ -556,7 +556,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             switch (expression)
             {
                 case INameExpressionSyntax exp:
-                    exp.ValueSemantics = ValueSemantics.Share;
+                    exp.ValueSemantics = OldValueSemantics.Share;
                     referencedSymbol = exp.ReferencedSymbol.Assigned();
                     break;
                 case ISelfExpressionSyntax exp:
@@ -583,7 +583,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             switch (expression)
             {
                 case INameExpressionSyntax exp:
-                    exp.ValueSemantics = ValueSemantics.Borrow;
+                    exp.ValueSemantics = OldValueSemantics.Borrow;
                     referencedSymbol = exp.ReferencedSymbol.Assigned();
                     break;
                 case ISelfExpressionSyntax exp:
@@ -644,7 +644,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var type = AssignReferencedSymbolAndType(member, memberSymbols);
                     return exp.Type = type;
                 case INameExpressionSyntax exp:
-                    exp.ValueSemantics = ValueSemantics.LValue;
+                    exp.ValueSemantics = OldValueSemantics.LValue;
                     return InferNameType(exp);
             }
         }

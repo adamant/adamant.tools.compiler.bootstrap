@@ -15,6 +15,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// parameters is *a constructed type*. One with some but not all arguments
     /// supplied is *partially constructed type*.
     /// </summary>
+    /// <remarks>
+    /// There will be two special object types `Type` and `Metatype`
+    /// </remarks>
     public class ObjectType : ReferenceType, IEquatable<ObjectType>
     {
         public Name Name { get; }
@@ -99,6 +102,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         }
 
         #endregion
+
         protected internal override Self To_ReturnsSelf(ReferenceCapability referenceCapability)
         {
             return new ObjectType(Name, DeclaredMutable, referenceCapability);

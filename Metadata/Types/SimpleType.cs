@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     public abstract class SimpleType : ValueType
     {
         public Name Name { get; }
-        public override ValueSemantics ValueSemantics => ValueSemantics.Copy;
+        public override OldValueSemantics ValueSemantics => OldValueSemantics.Copy;
 
         protected SimpleType(string name)
         {
