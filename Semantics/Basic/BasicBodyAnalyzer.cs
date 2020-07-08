@@ -130,7 +130,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     if (!(type is ReferenceType referenceType))
                         throw new NotImplementedException("Compile error: can't borrow non reference type");
 
-                    return referenceType.WithCapability(ReferenceCapability.Borrowed);
+                    return referenceType.To(ReferenceCapability.Borrowed);
                 }
                 default:
                 {
@@ -270,7 +270,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                         type = DataType.Unknown;
                                     }
                                     else
-                                        type = referenceType.WithCapability(ReferenceCapability.Borrowed);
+                                        type = referenceType.To(ReferenceCapability.Borrowed);
 
                                     break;
                                 default:
@@ -450,7 +450,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             break;
                     }
 
-                    constructedType = constructedType.WithCapability(ReferenceCapability.Isolated);
+                    constructedType = constructedType.To(ReferenceCapability.Isolated);
                     if (constructedType.DeclaredMutable)
                         constructedType = constructedType.ToMutable();
                     return exp.Type = constructedType;
@@ -567,7 +567,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return type;
             }
 
-            type = referenceType.WithCapability(ReferenceCapability.Shared);
+            type = referenceType.To(ReferenceCapability.Shared);
 
             expression = new ImplicitShareExpressionSyntax(expression, type, referencedSymbol);
 
@@ -594,7 +594,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return;
             }
 
-            type = referenceType.WithCapability(ReferenceCapability.Borrowed);
+            type = referenceType.To(ReferenceCapability.Borrowed);
 
             expression = new ImplicitBorrowExpressionSyntax(expression, type, referencedSymbol);
         }

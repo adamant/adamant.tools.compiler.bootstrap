@@ -63,7 +63,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     if (type == DataType.Unknown)
                         return DataType.Unknown;
                     if (type is ReferenceType referenceType)
-                        referenceCapability.NamedType = referenceType.WithCapability(referenceCapability.Capability);
+                        referenceCapability.NamedType = referenceType.To(referenceCapability.Capability);
                     else
                         referenceCapability.NamedType = DataType.Unknown;
                     break;

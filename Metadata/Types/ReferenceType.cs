@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using ExhaustiveMatching;
 
@@ -14,10 +15,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public bool IsMovable => ReferenceCapability.IsMovable();
 
         /// <summary>
-        /// Whether this type was declared `mut class` or just `class`
+        /// Whether this type was declared `mut class` or just `class`. Types
+        /// not declared mutably are always immutable.
         /// </summary>
         public bool DeclaredMutable { get; }
 
+        // TODO clarify this
         public override ValueSemantics ValueSemantics { get; }
 
         protected ReferenceType(bool declaredMutable, ReferenceCapability referenceCapability)
@@ -27,12 +30,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             ValueSemantics = referenceCapability.GetValueSemantics();
         }
 
-        protected internal sealed override Self ToReadOnlyReturnsSelf()
+        protected internal sealed override Self ToReadOnly_ReturnsSelf()
         {
-            return WithCapabilityReturnsSelf(ReferenceCapability.ToReadOnly());
+            return To_ReturnsSelf(ReferenceCapability.ToReadOnly());
         }
 
-        protected internal abstract Self WithCapabilityReturnsSelf(ReferenceCapability referenceCapability);
+        [SuppressMessage("Naming", "CA1707:Identifiers should not contain underscores",
+            Justification = "Returns self idiom")]
+        protected internal abstract Self To_ReturnsSelf(ReferenceCapability referenceCapability);
     }
 
     public static class ReferenceTypeExtensions
@@ -40,10 +45,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// <summary>
         /// Return the same type except with the given reference capability
         /// </summary>
-        public static T WithCapability<T>(this T type, ReferenceCapability referenceCapability)
+        public static T To<T>(this T type, ReferenceCapability referenceCapability)
             where T : ReferenceType
         {
-            return type.WithCapabilityReturnsSelf(referenceCapability).Cast<T>();
+            return type.To_ReturnsSelf(referenceCapability).Cast<T>();
         }
     }
 }

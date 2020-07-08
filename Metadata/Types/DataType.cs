@@ -29,8 +29,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public static readonly UnsizedIntegerType Size = UnsizedIntegerType.Size;
         public static readonly UnsizedIntegerType Offset = UnsizedIntegerType.Offset;
 
-        //public static readonly PointerType BytePointer = new PointerType(Byte);
-
         /// <summary>
         /// The value `none` has this type, which is `never?`
         /// </summary>
@@ -59,13 +57,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         public abstract override string ToString();
 
-        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Return self idiom")]
+        [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates",
+            Justification = "Return self idiom")]
         public static implicit operator Self(DataType type)
         {
             return new Self(type);
         }
 
-        protected internal virtual Self ToReadOnlyReturnsSelf()
+        [SuppressMessage("Naming", "CA1707:Identifiers should not contain underscores",
+            Justification = "Returns self idiom")]
+        protected internal virtual Self ToReadOnly_ReturnsSelf()
         {
             return this;
         }

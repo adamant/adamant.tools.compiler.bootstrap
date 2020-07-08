@@ -102,7 +102,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         }
         #endregion
 
-        protected internal override Self WithCapabilityReturnsSelf(ReferenceCapability referenceCapability)
+        protected internal override Self To_ReturnsSelf(ReferenceCapability referenceCapability)
         {
             return new UserObjectType(Name, DeclaredMutable, referenceCapability);
         }

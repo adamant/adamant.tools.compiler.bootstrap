@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public static T ToReadOnly<T>(this T type)
             where T : DataType
         {
-            return type.ToReadOnlyReturnsSelf().Cast<T>();
+            return type.ToReadOnly_ReturnsSelf().Cast<T>();
         }
 
         /// <summary>
