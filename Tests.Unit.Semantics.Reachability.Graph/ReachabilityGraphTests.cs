@@ -5,12 +5,12 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph;
 using Moq;
 using Xunit;
-using Xunit.Categories;
+
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Graph
 {
-    [UnitTest]
-    [Category("Semantic")]
+    [Trait("Category", "UnitTest")]
+    [Trait("Category", "Semantic")]
     public class ReachabilityGraphTests
     {
         [Fact]

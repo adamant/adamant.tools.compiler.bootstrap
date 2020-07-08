@@ -6,7 +6,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
 {
     public static class DebugFormatExtensions
     {
-
         public static string DebugFormat(this IEnumerable<Diagnostic> diagnostics)
         {
             return string.Join(", ",

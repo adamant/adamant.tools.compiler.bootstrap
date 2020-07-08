@@ -1,11 +1,10 @@
 using System;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Xunit;
-using Xunit.Categories;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Core
 {
-    [UnitTest]
+    [Trait("Category", "UnitTest")]
     public class TextLinesTests
     {
         public const string OneLine = "Line0";

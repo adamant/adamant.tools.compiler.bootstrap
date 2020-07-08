@@ -1,12 +1,11 @@
 using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using Xunit;
-using Xunit.Categories;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C
 {
-    [UnitTest]
-    [Category("Emit")]
+    [Trait("Category", "UnitTest")]
+    [Trait("Category", "Emit")]
     public class NameManglerSpec
     {
         [Theory]

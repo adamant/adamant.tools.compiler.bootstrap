@@ -11,13 +11,13 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using FsCheck;
 using FsCheck.Xunit;
 using Xunit;
-using Xunit.Categories;
+
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
 {
-    [UnitTest]
-    [Category("Lex")]
-    public class LexerSpec
+    [Trait("Category", "UnitTest")]
+    [Trait("Category", "Lex")]
+    public class LexerSpec //: TestClass
     {
         private static LexResult Lex(string text)
         {
@@ -142,7 +142,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
         {
             var result = Lex(symbol);
             var token = result.AssertSingleToken();
-            token.AssertOfType(tokenType);
+            Assert.OfType(tokenType, token);
             Assert.Equal(new TextSpan(0, symbol.Length), token.Span);
             result.AssertNoDiagnostics();
         }

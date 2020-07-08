@@ -2,12 +2,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
 {
     namespace OuterNamespace
     {
-        public class TestClass { }
-        public class TestClass<T> { }
+        public class TestClass1 { }
+        public class TestClass1<T> { }
 
         namespace InnerNamespace
         {
-            public class TestClass
+            public class TestClass1
             {
             }
 
@@ -15,8 +15,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit
             {
                 public static void TestMethod()
                 {
-                    InnerNamespace.TestClass t1 = new TestClass();
-                    OuterNamespace.TestClass<int> t2 = new TestClass<int>();
+                    InnerNamespace.TestClass1 t1 = new TestClass1();
+                    OuterNamespace.TestClass1<int> t2 = new TestClass1<int>();
                 }
             }
         }

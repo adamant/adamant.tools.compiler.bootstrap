@@ -3,7 +3,6 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
-using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using Xunit;
 
@@ -31,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
         public IToken AssertSingleToken()
         {
             Assert.True(2 == Tokens.Count, $"Expected token count {1}, was {Tokens.Count - 1} (excluding EOF)");
-            var eof = Tokens[^1].AssertOfType<IEndOfFileToken>();
+            var eof = Assert.IsAssignableFrom<IEndOfFileToken>(Tokens[^1]);
             Assert.Equal(new TextSpan(Tokens[^2].Span.End, 0), eof.Span);
             return Tokens[0];
         }

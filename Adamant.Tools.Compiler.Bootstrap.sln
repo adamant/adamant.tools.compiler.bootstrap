@@ -70,6 +70,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Unit.Semantics.Reacha
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Unit.Metadata", "Tests.Unit.Metadata\Tests.Unit.Metadata.csproj", "{4877C6EF-016F-4E43-8660-94C459DC0B45}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Asserts", "Tests.Asserts\Tests.Asserts.csproj", "{718FA0E8-8FD8-4913-89FE-C2D9E9D58AAB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -180,6 +182,10 @@ Global
 		{4877C6EF-016F-4E43-8660-94C459DC0B45}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4877C6EF-016F-4E43-8660-94C459DC0B45}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4877C6EF-016F-4E43-8660-94C459DC0B45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{718FA0E8-8FD8-4913-89FE-C2D9E9D58AAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{718FA0E8-8FD8-4913-89FE-C2D9E9D58AAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{718FA0E8-8FD8-4913-89FE-C2D9E9D58AAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{718FA0E8-8FD8-4913-89FE-C2D9E9D58AAB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

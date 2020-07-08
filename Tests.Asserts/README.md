@@ -1,0 +1,3 @@
+# Adamant.Tools.Compiler.Bootstrap.Tests.Asserts
+
+The currently officially recommended way of defining custom asserts for xUnit is to reference the `xunit.assert.source` NuGet package which brings the source code of the asserts class into your project as a partial class. However, that code doesn't compile with treat all warnings as errors. Nor is it written with the new C# nullable references. Given that the custom asserts are in a partial class, it must be in the same project and be subject to the same compilation options. As a result, this project can't be configured the way all the other projects are.

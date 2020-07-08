@@ -15,13 +15,12 @@ using Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Helpers;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
 using Xunit;
 using Xunit.Abstractions;
-using Xunit.Categories;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
 {
-    [IntegrationTest]
-    [Category("Conformance")]
-    [Category("Compile")]
+    [Trait("Category", "IntegrationTest")]
+    [Trait("Category", "Conformance")]
+    [Trait("Category", "Compile")]
     public class ConformanceTests : IClassFixture<RuntimeLibraryFixture>
     {
         private readonly ITestOutputHelper testOutput;

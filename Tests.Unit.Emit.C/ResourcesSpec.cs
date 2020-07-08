@@ -5,12 +5,11 @@ using System.Text;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
 using Xunit;
-using Xunit.Categories;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Emit.C
 {
-    [UnitTest]
-    [Category("Emit")]
+    [Trait("Category", "UnitTest")]
+    [Trait("Category", "Emit")]
     public class ResourcesSpec
     {
         private readonly IReadOnlyList<byte> byteOrderMarkUtf8 = Encoding.UTF8.GetPreamble().ToList().AsReadOnly();

@@ -1,5 +1,4 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using Xunit;
 
@@ -15,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             string expectedValue)
         {
             Assert.NotNull(token);
-            var identifier = Assert.IsAssignableFrom<IIdentifierToken>(token);
+            var identifier = Assert.OfType<IIdentifierToken>(token);
             Assert.True(expectedStart == identifier.Span.Start, $"Expected token start {expectedStart}, was {identifier.Span.Start}");
             Assert.True(expectedLength == identifier.Span.Length, $"Expected token length {expectedLength}, was {identifier.Span.Length}");
             Assert.Equal(expectedValue, identifier.Value);
@@ -28,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             string expectedValue)
         {
             Assert.NotNull(token);
-            var identifier = token.AssertOfType<IStringLiteralToken>();
+            var identifier = Assert.OfType<IStringLiteralToken>(token);
             Assert.True(expectedStart == identifier.Span.Start, $"Expected token start {expectedStart}, was {identifier.Span.Start}");
             Assert.True(expectedLength == identifier.Span.Length, $"Expected token length {expectedLength}, was {identifier.Span.Length}");
             Assert.Equal(expectedValue, identifier.Value);
@@ -41,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
             where T : IToken
         {
             Assert.NotNull(token);
-            token.AssertOfType<T>();
+            Assert.OfType<T>(token);
             Assert.True(expectedStart == token.Span.Start, $"Expected token start {expectedStart}, was {token.Span.Start}");
             Assert.True(expectedLength == token.Span.Length, $"Expected token length {expectedLength}, was {token.Span.Length}");
         }
@@ -55,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
 
         public static void AssertLexingDiagnostic(this Diagnostic diagnostic, int errorCode, int start, int length)
         {
-            diagnostic.AssertDiagnostic(DiagnosticPhase.Lexing, errorCode, start, length);
+            Assert.Diagnostic(diagnostic, DiagnosticPhase.Lexing, errorCode, start, length);
         }
     }
 }
