@@ -13,14 +13,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
         /// <summary>
         /// The type being constructed
         /// </summary>
-        public UserObjectType ConstructedType { get; }
+        public ObjectType ConstructedType { get; }
         public FixedList<Operand> Arguments { get; }
         public int Arity => Arguments.Count;
 
         public NewObjectInstruction(
             Place resultPlace,
             Name constructor,
-            UserObjectType constructedType,
+            ObjectType constructedType,
             FixedList<Operand> arguments,
             TextSpan span,
             Scope scope)

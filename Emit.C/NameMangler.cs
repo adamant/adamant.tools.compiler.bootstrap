@@ -83,9 +83,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             return type switch
             {
                 SimpleType simpleType => Mangle(simpleType),
-                UserObjectType userObjectType => Mangle(userObjectType),
+                ObjectType objectType => Mangle(objectType),
                 _ => throw new NotImplementedException(),
-                //throw ExhaustiveMatch.Failed(type)
+                //_ => throw ExhaustiveMatch.Failed(type),
             };
         }
 
@@ -94,7 +94,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             return Mangle(type.Name);
         }
 
-        public string Mangle(UserObjectType type)
+        public string Mangle(ObjectType type)
         {
             // builder with room for the characters we are likely to add
             var builder = new StringBuilder(EstimateSize(type.Name) + 5);

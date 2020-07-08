@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
         IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Enumerable.Empty<IBindingSymbol>();
         DataType IFunctionSymbol.ReturnType => ConstructedType;
 
-        public DefaultConstructor(UserObjectType constructedType)
+        public DefaultConstructor(ObjectType constructedType)
         {
             ConstructedType = constructedType;
             FullName = constructedType.Name.Qualify(SpecialName.New);

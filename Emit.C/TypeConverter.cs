@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                     return "void";
                 case SimpleType simpleType:
                     return nameMangler.Mangle(simpleType.Name);
-                case UserObjectType t:
+                case ObjectType t:
                     return nameMangler.Mangle(t);
                 //case PointerType ptr:
                 //    var referenced = ptr.Referent.AssertKnown();

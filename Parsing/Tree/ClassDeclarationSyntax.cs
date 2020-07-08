@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             if (Members.Any(m => m is IConstructorDeclarationSyntax))
                 return;
 
-            var constructor = new DefaultConstructor((UserObjectType)DeclaresType.Fulfilled());
+            var constructor = new DefaultConstructor((ObjectType)DeclaresType.Fulfilled());
             ChildSymbols = new SymbolSet(ChildSymbols.Append<ISymbol>(constructor));
         }
 

@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
     {
         public ImplicitImmutabilityConversionExpression(
             IExpressionSyntax expression,
-            UserObjectType convertToType)
+            ObjectType convertToType)
             : base(expression.Span, convertToType, expression)
         {
         }

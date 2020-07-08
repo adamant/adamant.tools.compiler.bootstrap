@@ -205,9 +205,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
                         case OptionalType _: // `T??`
                         case AnyType _: // `Any?`
                             throw new NotImplementedException();
-                        case UserObjectType userObjectType:
+                        case ObjectType objectType:
                         {
-                            var typeName = nameMangler.Mangle(userObjectType);
+                            var typeName = nameMangler.Mangle(objectType);
                             code.EndLine($"({ins.Type}){{&{typeName}___vtable, NULL}};");
                         }
                         break;

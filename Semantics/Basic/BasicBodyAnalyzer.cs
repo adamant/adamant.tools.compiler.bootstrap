@@ -196,7 +196,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         expression = new ImplicitNumericConversionExpression(expression, targetType);
                 }
                 break;
-                case (UserObjectType targetType, UserObjectType expressionType)
+                case (ObjectType targetType, ObjectType expressionType)
                         when targetType.IsReadOnly && expressionType.IsMutable:
                     // TODO if source type is explicitly mutable, issue warning about using `mut` in immutable context
                     expression = new ImplicitImmutabilityConversionExpression(expression, expressionType.ToReadOnly());
@@ -425,7 +425,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         exp.ConstructorSymbol = UnknownSymbol.Instance;
                         return exp.Type  = DataType.Unknown;
                     }
-                    var constructedType = (UserObjectType)constructingType;
+                    var constructedType = (ObjectType)constructingType;
                     var typeSymbol = exp.TypeSyntax.ContainingScope.Assigned().GetSymbolForType(constructedType);
                     var constructors = typeSymbol.ChildSymbols[SpecialName.New].OfType<IFunctionSymbol>().ToFixedList();
                     constructors = ResolveOverload(constructors, argumentTypes);

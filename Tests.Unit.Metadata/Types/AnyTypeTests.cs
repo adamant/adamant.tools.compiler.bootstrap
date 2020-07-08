@@ -24,6 +24,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
         }
 
         [Fact]
+        public void Is_not_empty_type()
+        {
+            var type = new AnyType(Isolated);
+
+            Assert.False(type.IsEmpty);
+        }
+
+        [Fact]
         public void Is_declared_mutable()
         {
             var type = new AnyType(Isolated);

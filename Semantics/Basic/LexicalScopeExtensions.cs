@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     throw new NotImplementedException($"{nameof(GetSymbolForType)} not implemented for {type.GetType().Name}");
                 case UnknownType _:
                     return UnknownSymbol.Instance;
-                case UserObjectType objectType:
+                case ObjectType objectType:
                     return containingScope.LookupInGlobalScope(objectType.Name).OfType<ITypeSymbol>().Single();
                 case SizedIntegerType integerType:
                     return containingScope.LookupInGlobalScope(integerType.Name).OfType<ITypeSymbol>().Single();

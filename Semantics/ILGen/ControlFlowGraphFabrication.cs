@@ -627,7 +627,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 {
                     var constructorName = exp.ConstructorSymbol!.FullName;
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
-                    var constructedType = (UserObjectType)exp.TypeSyntax.NamedType.Assigned().Known();
+                    var constructedType = (ObjectType)exp.TypeSyntax.NamedType.Assigned().Known();
                     currentBlock!.Add(new NewObjectInstruction(resultPlace, constructorName, constructedType, args, exp.Span, CurrentScope));
                 }
                 break;

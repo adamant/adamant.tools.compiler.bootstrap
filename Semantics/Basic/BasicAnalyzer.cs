@@ -109,7 +109,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     if (@class.DeclaresType.TryBeginFulfilling(() => diagnostics.Add(
                         TypeError.CircularDefinition(@class.File, @class.NameSpan, @class.Name))))
                     {
-                        var classType = UserObjectType.Declaration(@class,
+                        var classType = ObjectType.Declaration(@class,
                             @class.Modifiers.Any(m => m is IMutableKeywordToken));
                         @class.DeclaresType.Fulfill(classType);
                         @class.CreateDefaultConstructor();
@@ -168,13 +168,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
         }
 
-        private static UserObjectType ResolveTypesInParameter(
+        private static ObjectType ResolveTypesInParameter(
             ISelfParameterSyntax selfParameter,
             IClassDeclarationSyntax declaringClass)
         {
             var declaringType = declaringClass.DeclaresType.Fulfilled();
             selfParameter.Type.BeginFulfilling();
-            var selfType = (UserObjectType)declaringType;
+            var selfType = (ObjectType)declaringType;
             if (selfParameter.MutableSelf) selfType = selfType.ForConstructorSelf();
             selfParameter.Type.Fulfill(selfType);
             return selfType;

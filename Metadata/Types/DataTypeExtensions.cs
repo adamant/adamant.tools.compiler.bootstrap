@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                     return targetReference.ReferenceCapability.IsAssignableFrom(sourceReference.ReferenceCapability);
                 case (ReferenceType _, AnyType _):
                     return false;
-                case (UserObjectType targetReference, UserObjectType sourceReference):
+                case (ObjectType targetReference, ObjectType sourceReference):
                     return targetReference.ReferenceCapability.IsAssignableFrom(sourceReference.ReferenceCapability)
                            && targetReference.Name.Equals(sourceReference.Name);
                 case (OptionalType targetOptional, OptionalType sourceOptional):
