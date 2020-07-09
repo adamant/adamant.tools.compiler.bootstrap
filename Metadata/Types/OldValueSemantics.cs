@@ -16,6 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// Share - copy the reference, share the object
     /// </summary>
     [SuppressMessage("Naming", "CA1717:Only FlagsAttribute enums should have plural names", Justification = "Name not plural")]
+    // TODO maybe rename OperationSemantics and move elsewhere. (Applies to all expressions?)
     public enum OldValueSemantics
     {
         /// <summary>

@@ -7,6 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// </summary>
     [SuppressMessage("Naming", "CA1717:Only FlagsAttribute enums should have plural names",
         Justification = "Name not plural")]
+    // TODO rename this, maybe TypeSemantics. The current name is confusing with value semantics vs reference semantics
     public enum ValueSemantics
     {
         /// <summary>

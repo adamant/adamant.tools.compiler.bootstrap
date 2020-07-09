@@ -1,6 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Operands;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Places
 {
@@ -17,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Places
         public override Operand ToOperand(TextSpan span)
         {
             // TODO is this the correct value semantics?
-            return new VariableReference(Variable, OldValueSemantics.Copy, span);
+            return new VariableReference(Variable, span);
         }
 
         public override string ToString()
