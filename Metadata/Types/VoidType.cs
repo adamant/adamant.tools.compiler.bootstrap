@@ -20,5 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public override bool IsEmpty => true;
 
         public override bool IsKnown => true;
+
+        public override ValueSemantics ValueSemantics => ValueSemantics.Void;
     }
 }

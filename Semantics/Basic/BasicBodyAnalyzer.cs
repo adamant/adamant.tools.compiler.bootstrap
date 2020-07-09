@@ -372,9 +372,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         type = InsertImplicitShareIfNeeded(ref expression, type);
 
                     if (exp.ValueSemantics is null
-                        && (type.ValueSemantics == OldValueSemantics.Copy
-                            || type.ValueSemantics == OldValueSemantics.Move))
-                        exp.ValueSemantics = type.ValueSemantics;
+                        && (type.OldValueSemantics == OldValueSemantics.Copy
+                            || type.OldValueSemantics == OldValueSemantics.Move))
+                        exp.ValueSemantics = type.OldValueSemantics;
 
                     return type;
                 }

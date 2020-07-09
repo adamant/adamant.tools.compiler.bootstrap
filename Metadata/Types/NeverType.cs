@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// `throw`, `return` and `break` which never produce a result. It is also
     /// used as the type of a `loop` statement with no breaks in it.
     /// </summary>
-    public class NeverType : EmptyType
+    public sealed class NeverType : EmptyType
     {
         #region Singleton
         internal static readonly NeverType Instance = new NeverType();
@@ -20,5 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             : base(SpecialName.Never)
         { }
         #endregion
+
+        public override ValueSemantics ValueSemantics => ValueSemantics.Never;
     }
 }

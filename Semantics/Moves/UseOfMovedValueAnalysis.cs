@@ -59,7 +59,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
 
             var valueSemantics = nameExpression.ValueSemantics
                 // TODO this isn't correct, but for now fields don't have proper move, borrow handling
-                ?? nameExpression.Type.Assigned().ValueSemantics;
+                ?? nameExpression.Type.Assigned().OldValueSemantics;
             switch (valueSemantics)
             {
                 case OldValueSemantics.Move:

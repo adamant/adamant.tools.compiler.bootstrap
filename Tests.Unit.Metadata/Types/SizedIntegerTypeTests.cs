@@ -3,6 +3,7 @@ using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
 {
+    [Trait("Category", "Types")]
     public class SizedIntegerTypeTests
     {
         [Fact]
@@ -19,6 +20,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
             var type = SizedIntegerType.Byte;
 
             Assert.False(type.IsSigned);
+        }
+
+        [Fact]
+        public void Int_has_copy_semantics()
+        {
+            var type = SizedIntegerType.Int;
+
+            Assert.Equal(ValueSemantics.Copy, type.ValueSemantics);
         }
     }
 }

@@ -39,6 +39,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
             Assert.True(type.DeclaredMutable);
         }
 
+        [Fact]
+        public void Has_reference_semantics()
+        {
+            var type = new AnyType(Isolated);
+
+            Assert.Equal(ValueSemantics.Reference, type.ValueSemantics);
+        }
+
         [Theory]
         [InlineData(Isolated, "iso Any")]
         [InlineData(OwnedMutable, "owned mut Any")]

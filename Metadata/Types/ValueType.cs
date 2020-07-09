@@ -7,5 +7,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         typeof(OptionalType))]
     public abstract class ValueType : DataType
     {
+        private protected ValueType() { }
     }
 }

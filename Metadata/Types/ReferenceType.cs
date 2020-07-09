@@ -14,6 +14,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public bool IsMutable => ReferenceCapability.IsMutable();
         public bool IsMovable => ReferenceCapability.IsMovable();
 
+        public override ValueSemantics ValueSemantics => ValueSemantics.Reference;
+
         /// <summary>
         /// Whether this type was declared `mut class` or just `class`. Types
         /// not declared mutably are always immutable.
@@ -21,13 +23,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public bool DeclaredMutable { get; }
 
         // TODO clarify this
-        public override OldValueSemantics ValueSemantics { get; }
+        public override OldValueSemantics OldValueSemantics { get; }
 
-        protected ReferenceType(bool declaredMutable, ReferenceCapability referenceCapability)
+        private protected ReferenceType(bool declaredMutable, ReferenceCapability referenceCapability)
         {
             ReferenceCapability = referenceCapability;
             DeclaredMutable = declaredMutable;
-            ValueSemantics = referenceCapability.GetValueSemantics();
+            OldValueSemantics = referenceCapability.GetValueSemantics();
         }
 
         protected internal sealed override Self ToReadOnly_ReturnsSelf()

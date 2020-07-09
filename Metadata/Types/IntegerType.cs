@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         typeof(UnsizedIntegerType))]
     public abstract class IntegerType : NumericType
     {
-        protected IntegerType(string name)
+        private protected IntegerType(string name)
             : base(name)
         {
         }

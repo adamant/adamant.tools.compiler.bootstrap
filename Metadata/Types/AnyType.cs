@@ -3,13 +3,14 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     /// <summary>
-    /// The universal type all reference types can be converted to.
+    /// The universal type all reference types can be converted to. A top type
+    /// for reference and function types.
     /// </summary>
     /// <remarks>
     /// `Any` is "declared" mutable so that it can hold mutable references to
     /// mutable types.
     /// </remarks>
-    public class AnyType : ReferenceType
+    public sealed class AnyType : ReferenceType
     {
         public AnyType(ReferenceCapability referenceCapability)
             : base(true, referenceCapability)

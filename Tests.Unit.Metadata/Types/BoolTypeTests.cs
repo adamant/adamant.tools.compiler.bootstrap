@@ -33,6 +33,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
         }
 
         [Fact]
+        public void Has_copy_semantics()
+        {
+            var type = BoolType.Instance;
+
+            Assert.Equal(ValueSemantics.Copy, type.ValueSemantics);
+        }
+
+        [Fact]
         public void Has_special_name_bool()
         {
             var type = BoolType.Instance;

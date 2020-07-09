@@ -33,6 +33,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
             Assert.False(type.IsEmpty);
         }
 
+        [Fact]
+        public void Has_copy_semantics()
+        {
+            var type = new IntegerConstantType(1);
+
+            Assert.Equal(ValueSemantics.Copy, type.ValueSemantics);
+        }
+
         [Theory]
         [InlineData(-23)]
         [InlineData(-1)]

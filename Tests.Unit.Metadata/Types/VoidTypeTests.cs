@@ -5,12 +5,12 @@ using Xunit;
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
 {
     [Trait("Category", "Types")]
-    public class NeverTypeTests
+    public class VoidTypeTests
     {
         [Fact]
         public void Is_empty_data_type()
         {
-            var type = NeverType.Instance;
+            var type = VoidType.Instance;
 
             Assert.OfType<EmptyType>(type);
         }
@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
         [Fact]
         public void Is_known_type()
         {
-            var type = NeverType.Instance;
+            var type = VoidType.Instance;
 
             Assert.True(type.IsKnown);
         }
@@ -26,33 +26,33 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
         [Fact]
         public void Is_empty_type()
         {
-            var type = NeverType.Instance;
+            var type = VoidType.Instance;
 
             Assert.True(type.IsEmpty);
         }
 
         [Fact]
-        public void Never_has_never_semantics()
+        public void Void_has_void_semantics()
         {
-            var type = NeverType.Instance;
+            var type = VoidType.Instance;
 
-            Assert.Equal(ValueSemantics.Never, type.ValueSemantics);
+            Assert.Equal(ValueSemantics.Void, type.ValueSemantics);
         }
 
         [Fact]
         public void Has_special_name_never()
         {
-            var type = NeverType.Instance;
+            var type = VoidType.Instance;
 
-            Assert.Equal(SpecialName.Never, type.Name);
+            Assert.Equal(SpecialName.Void, type.Name);
         }
 
         [Fact]
         public void Has_proper_ToString()
         {
-            var type = NeverType.Instance;
+            var type = VoidType.Instance;
 
-            Assert.Equal("never", type.ToString());
+            Assert.Equal("void", type.ToString());
         }
 
         [Fact]

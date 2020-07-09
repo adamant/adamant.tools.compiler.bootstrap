@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         typeof(IntegerType))]
     public abstract class NumericType : SimpleType
     {
-        protected NumericType(string name)
+        private protected NumericType(string name)
             : base(name)
         {
         }

@@ -2,7 +2,7 @@ using System;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
-    public class SizedIntegerType : IntegerType
+    public sealed class SizedIntegerType : IntegerType
     {
         //internal new static readonly SizedIntegerType Int8 = new SizedIntegerType("int8", -8);
         internal new static readonly SizedIntegerType Byte = new SizedIntegerType("byte", 8);

@@ -51,9 +51,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public abstract bool IsKnown { get; }
 
         /// <summary>
+        /// The value semantics of values of this type
+        /// </summary>
+        public abstract ValueSemantics ValueSemantics { get; }
+
+        /// <summary>
         /// The value semantics of expressions producing this type
         /// </summary>
-        public abstract OldValueSemantics ValueSemantics { get; }
+        public abstract OldValueSemantics OldValueSemantics { get; }
+
+        private protected DataType() { }
 
         public abstract override string ToString();
 

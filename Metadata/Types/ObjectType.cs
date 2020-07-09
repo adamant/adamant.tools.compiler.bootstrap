@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// <remarks>
     /// There will be two special object types `Type` and `Metatype`
     /// </remarks>
-    public class ObjectType : ReferenceType, IEquatable<ObjectType>
+    public sealed class ObjectType : ReferenceType, IEquatable<ObjectType>
     {
         public Name FullName { get; }
 

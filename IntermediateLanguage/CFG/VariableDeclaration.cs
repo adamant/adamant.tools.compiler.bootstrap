@@ -46,13 +46,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG
             Name = name;
             IsMutableBinding = isMutableBinding;
             Type = type;
-            if (type.ValueSemantics == OldValueSemantics.Own)
+            if (type.OldValueSemantics == OldValueSemantics.Own)
                 //if (type is ReferenceType referenceType && referenceType.Mutability == Mutability.Immutable)
                 //    defaultSemantics = ValueSemantics.Share;
                 //else
                 defaultSemantics = OldValueSemantics.Borrow;
             else
-                defaultSemantics = type.ValueSemantics;
+                defaultSemantics = type.OldValueSemantics;
         }
 
         public VariableReference Reference(TextSpan span)

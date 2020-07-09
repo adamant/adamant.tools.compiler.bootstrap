@@ -10,16 +10,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// types are like an immutable struct type `Optional[T]`. However, the value
     /// semantics are strange. They depend on the referent type.
     /// </summary>
-    public class OptionalType : ValueType, IEquatable<OptionalType>
+    public sealed class OptionalType : ValueType, IEquatable<OptionalType>
     {
         public DataType Referent { get; }
 
         public override bool IsKnown { get; }
 
-        public override OldValueSemantics ValueSemantics => Referent.ValueSemantics;
+        public override ValueSemantics ValueSemantics =>
+            Referent.ValueSemantics == ValueSemantics.Never
+            ? ValueSemantics.Copy : Referent.ValueSemantics;
+
+        public override OldValueSemantics OldValueSemantics => Referent.OldValueSemantics;
 
         public OptionalType(DataType referent)
         {
+            if (referent is VoidType)
+                throw new ArgumentException("Cannot create `void?` type", nameof(referent));
             Referent = referent;
             IsKnown = referent.IsKnown;
         }
