@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
-    public sealed class BoolType : SimpleType
+    public class BoolType : SimpleType
     {
         #region Singleton
         internal static readonly BoolType Instance = new BoolType();
@@ -9,6 +9,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             : base("bool")
         { }
         #endregion
+
+        private protected BoolType(string name)
+            : base(name) { }
 
         public override bool IsKnown => true;
     }
