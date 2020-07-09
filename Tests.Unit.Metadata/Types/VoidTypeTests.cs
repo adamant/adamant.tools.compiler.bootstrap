@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
         {
             var type = VoidType.Instance;
 
-            Assert.Equal(ValueSemantics.Void, type.ValueSemantics);
+            Assert.Equal(TypeSemantics.Void, type.Semantics);
         }
 
         [Fact]

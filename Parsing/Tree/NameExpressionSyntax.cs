@@ -47,10 +47,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             }
         }
 
-        private OldValueSemantics? valueSemantics;
+        private ExpressionSemantics? valueSemantics;
 
         [DisallowNull]
-        public OldValueSemantics? ValueSemantics
+        public ExpressionSemantics? Semantics
         {
             [DebuggerStepThrough]
             get => valueSemantics;

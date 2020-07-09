@@ -57,21 +57,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
             if (possiblyMoved[symbol] == true)
                 diagnostics.Add(SemanticError.UseOfPossiblyMovedValue(file, nameExpression.Span));
 
-            var valueSemantics = nameExpression.ValueSemantics
+            var valueSemantics = nameExpression.Semantics
                 // TODO this isn't correct, but for now fields don't have proper move, borrow handling
                 ?? nameExpression.Type.Assigned().OldValueSemantics;
             switch (valueSemantics)
             {
-                case OldValueSemantics.Move:
-                case OldValueSemantics.Own:
+                case ExpressionSemantics.Move:
+                case ExpressionSemantics.Own:
                     return possiblyMoved.Set(symbol, true);
-                case OldValueSemantics.Copy:
-                case OldValueSemantics.Borrow:
-                case OldValueSemantics.Share:
-                case OldValueSemantics.Empty:
+                case ExpressionSemantics.Copy:
+                case ExpressionSemantics.Borrow:
+                case ExpressionSemantics.Share:
+                case ExpressionSemantics.Empty:
                     // Not moving value
                     return possiblyMoved;
-                case OldValueSemantics.LValue:
+                case ExpressionSemantics.LValue:
                     throw new NotImplementedException();
                 default:
                     throw ExhaustiveMatch.Failed(valueSemantics);

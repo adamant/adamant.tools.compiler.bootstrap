@@ -3,12 +3,11 @@ using System.Diagnostics.CodeAnalysis;
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     /// <summary>
-    /// The value semantics of values of a type
+    /// The semantics of values of a type
     /// </summary>
     [SuppressMessage("Naming", "CA1717:Only FlagsAttribute enums should have plural names",
         Justification = "Name not plural")]
-    // TODO rename this, maybe TypeSemantics. The current name is confusing with value semantics vs reference semantics
-    public enum ValueSemantics
+    public enum TypeSemantics
     {
         /// <summary>
         /// Types with never value semantics have no values, but they are assignable

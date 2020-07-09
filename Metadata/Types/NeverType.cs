@@ -21,6 +21,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         { }
         #endregion
 
-        public override ValueSemantics ValueSemantics => ValueSemantics.Never;
+        public override TypeSemantics Semantics => TypeSemantics.Never;
     }
 }

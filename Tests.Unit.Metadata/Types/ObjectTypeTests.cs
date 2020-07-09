@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
         {
             var type = new ObjectType(Name.From("Foo", "Bar"), true, ReferenceCapability.Isolated);
 
-            Assert.Equal(ValueSemantics.Reference, type.ValueSemantics);
+            Assert.Equal(TypeSemantics.Reference, type.Semantics);
         }
     }
 }

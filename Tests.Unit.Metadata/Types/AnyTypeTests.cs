@@ -44,7 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
         {
             var type = new AnyType(Isolated);
 
-            Assert.Equal(ValueSemantics.Reference, type.ValueSemantics);
+            Assert.Equal(TypeSemantics.Reference, type.Semantics);
         }
 
         [Theory]

@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         public override bool IsKnown => true;
 
-        public override OldValueSemantics OldValueSemantics => OldValueSemantics.Empty;
+        public override ExpressionSemantics OldValueSemantics => ExpressionSemantics.Empty;
 
         private protected EmptyType(Name name)
         {

@@ -16,11 +16,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         public override bool IsKnown { get; }
 
-        public override ValueSemantics ValueSemantics =>
-            Referent.ValueSemantics == ValueSemantics.Never
-            ? ValueSemantics.Copy : Referent.ValueSemantics;
+        public override TypeSemantics Semantics =>
+            Referent.Semantics == TypeSemantics.Never
+            ? TypeSemantics.Copy : Referent.Semantics;
 
-        public override OldValueSemantics OldValueSemantics => Referent.OldValueSemantics;
+        public override ExpressionSemantics OldValueSemantics => Referent.OldValueSemantics;
 
         public OptionalType(DataType referent)
         {

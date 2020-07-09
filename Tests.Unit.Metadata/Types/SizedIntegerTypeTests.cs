@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
         {
             var type = SizedIntegerType.Int;
 
-            Assert.Equal(ValueSemantics.Copy, type.ValueSemantics);
+            Assert.Equal(TypeSemantics.Copy, type.Semantics);
         }
     }
 }

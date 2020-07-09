@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
         {
             var type = NeverType.Instance;
 
-            Assert.Equal(ValueSemantics.Never, type.ValueSemantics);
+            Assert.Equal(TypeSemantics.Never, type.Semantics);
         }
 
         [Fact]

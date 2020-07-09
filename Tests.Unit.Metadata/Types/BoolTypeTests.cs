@@ -37,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
         {
             var type = BoolType.Instance;
 
-            Assert.Equal(ValueSemantics.Copy, type.ValueSemantics);
+            Assert.Equal(TypeSemantics.Copy, type.Semantics);
         }
 
         [Fact]

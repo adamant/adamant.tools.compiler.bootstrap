@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Xunit;
 
@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
         {
             var optionalAny = new OptionalType(new AnyType(ReferenceCapability.Isolated));
 
-            Assert.Equal(ValueSemantics.Reference, optionalAny.ValueSemantics);
+            Assert.Equal(TypeSemantics.Reference, optionalAny.Semantics);
         }
 
         [Fact]
@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
         {
             var optionalBool = new OptionalType(DataType.Bool);
 
-            Assert.Equal(ValueSemantics.Copy, optionalBool.ValueSemantics);
+            Assert.Equal(TypeSemantics.Copy, optionalBool.Semantics);
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
         {
             var optionalNever = new OptionalType(DataType.Never);
 
-            Assert.Equal(ValueSemantics.Copy, optionalNever.ValueSemantics);
+            Assert.Equal(TypeSemantics.Copy, optionalNever.Semantics);
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
         {
             var optionalNever = new OptionalType(DataType.Unknown);
 
-            Assert.Equal(ValueSemantics.Copy, optionalNever.ValueSemantics);
+            Assert.Equal(TypeSemantics.Copy, optionalNever.Semantics);
         }
 
         [Fact(Skip = "There are no move types yet (and they can't be faked)")]

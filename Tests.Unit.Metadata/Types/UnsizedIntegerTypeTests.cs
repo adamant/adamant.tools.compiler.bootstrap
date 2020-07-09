@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
         {
             var type = UnsizedIntegerType.Size;
 
-            Assert.Equal(ValueSemantics.Copy, type.ValueSemantics);
+            Assert.Equal(TypeSemantics.Copy, type.Semantics);
         }
 
         [Fact]
@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
         {
             var type = UnsizedIntegerType.Offset;
 
-            Assert.Equal(ValueSemantics.Copy, type.ValueSemantics);
+            Assert.Equal(TypeSemantics.Copy, type.Semantics);
         }
     }
 }

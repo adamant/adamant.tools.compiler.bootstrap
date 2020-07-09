@@ -4,7 +4,7 @@ using ExhaustiveMatching;
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 {
     /// <summary>
-    /// The value semantics is how an expression produces its value.
+    /// The semantics of the value of an expression
     ///
     /// Value Types:
     /// Move - the value is moved
@@ -16,8 +16,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// Share - copy the reference, share the object
     /// </summary>
     [SuppressMessage("Naming", "CA1717:Only FlagsAttribute enums should have plural names", Justification = "Name not plural")]
-    // TODO maybe rename OperationSemantics and move elsewhere. (Applies to all expressions?)
-    public enum OldValueSemantics
+    // TODO remove from types
+    // TODO move to AST
+    // TODO add to all expressions
+    public enum ExpressionSemantics
     {
         /// <summary>
         /// Expression is acting as an lvalue not an rvalue
@@ -53,32 +55,32 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
     public static class ValueSemanticsExtensions
     {
-        public static string Action(this OldValueSemantics valueSemantics)
+        public static string Action(this ExpressionSemantics valueSemantics)
         {
             string mutability;
             switch (valueSemantics)
             {
                 default:
                     throw ExhaustiveMatch.Failed(valueSemantics);
-                case OldValueSemantics.LValue:
+                case ExpressionSemantics.LValue:
                     mutability = "deref";
                     break;
-                case OldValueSemantics.Empty:
+                case ExpressionSemantics.Empty:
                     mutability = "void";
                     break;
-                case OldValueSemantics.Move:
+                case ExpressionSemantics.Move:
                     mutability = "move";
                     break;
-                case OldValueSemantics.Copy:
+                case ExpressionSemantics.Copy:
                     mutability = "copy";
                     break;
-                case OldValueSemantics.Own:
+                case ExpressionSemantics.Own:
                     mutability = "own";
                     break;
-                case OldValueSemantics.Borrow:
+                case ExpressionSemantics.Borrow:
                     mutability = "borrow";
                     break;
-                case OldValueSemantics.Share:
+                case ExpressionSemantics.Share:
                     mutability = "share";
                     break;
             }

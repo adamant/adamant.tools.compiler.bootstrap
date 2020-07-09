@@ -38,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
         {
             var type = new IntegerConstantType(1);
 
-            Assert.Equal(ValueSemantics.Copy, type.ValueSemantics);
+            Assert.Equal(TypeSemantics.Copy, type.Semantics);
         }
 
         [Theory]

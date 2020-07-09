@@ -19,13 +19,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// Like `never` values of type unknown can be assigned to any value.
         /// It acts like a bottom type in this respect.
         /// </summary>
-        public override ValueSemantics ValueSemantics => ValueSemantics.Never;
+        public override TypeSemantics Semantics => TypeSemantics.Never;
 
         /// <summary>
         /// Since an expression of unknown type can't actually be evaluated, its
         /// value semantics are "Empty". It doesn't ever produce a value.
         /// </summary>
-        public override OldValueSemantics OldValueSemantics => OldValueSemantics.Empty;
+        public override ExpressionSemantics OldValueSemantics => ExpressionSemantics.Empty;
 
         public override string ToString()
         {
