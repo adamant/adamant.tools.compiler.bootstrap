@@ -109,8 +109,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     if (@class.DeclaresType.TryBeginFulfilling(() => diagnostics.Add(
                         TypeError.CircularDefinition(@class.File, @class.NameSpan, @class.Name))))
                     {
-                        var classType = ObjectType.Declaration(@class,
-                            @class.Modifiers.Any(m => m is IMutableKeywordToken));
+                        bool mutable = @class.Modifiers.Any(m => m is IMutableKeywordToken);
+                        var classType = new ObjectType(
+                            @class,
+                            mutable,
+                            ReferenceCapability.Shared);
                         @class.DeclaresType.Fulfill(classType);
                         @class.CreateDefaultConstructor();
                     }

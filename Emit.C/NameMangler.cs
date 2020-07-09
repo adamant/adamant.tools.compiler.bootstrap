@@ -97,8 +97,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         public string Mangle(ObjectType type)
         {
             // builder with room for the characters we are likely to add
-            var builder = new StringBuilder(EstimateSize(type.Name) + 5);
-            Mangle(type.Name, builder);
+            var builder = new StringBuilder(EstimateSize(type.FullName) + 5);
+            Mangle(type.FullName, builder);
             return mapping.GetAscii(builder.ToString());
         }
 

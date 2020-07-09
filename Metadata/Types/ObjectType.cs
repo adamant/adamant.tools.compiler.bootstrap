@@ -20,32 +20,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// </remarks>
     public class ObjectType : ReferenceType, IEquatable<ObjectType>
     {
-        public Name Name { get; }
+        public Name FullName { get; }
 
         public override bool IsKnown { [DebuggerStepThrough] get => true; }
 
-        private ObjectType(
-            Name name,
+        public ObjectType(
+            Name fullName,
             bool declaredMutable,
             ReferenceCapability referenceCapability)
             : base(declaredMutable, referenceCapability)
         {
-            Name = name;
+            FullName = fullName;
         }
 
-        public static ObjectType Declaration(
+        public ObjectType(
             ITypeSymbol symbol,
-            bool mutable)
+            bool declaredMutable,
+            ReferenceCapability referenceCapability)
+            : this(symbol.FullName, declaredMutable, referenceCapability)
         {
-            return new ObjectType(
-                symbol.FullName,
-                mutable,
-                ReferenceCapability.Shared);
-        }
-
-        public static ObjectType Declaration(Name fullName, bool mutable)
-        {
-            return new ObjectType(fullName, mutable, ReferenceCapability.Shared);
         }
 
         /// <summary>
@@ -54,7 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public ObjectType ToMutable()
         {
             Requires.That("DeclaredMutable", DeclaredMutable, "must be declared as a mutable type to use mutably");
-            return new ObjectType(Name, DeclaredMutable, ReferenceCapability.ToMutable());
+            return new ObjectType(FullName, DeclaredMutable, ReferenceCapability.ToMutable());
         }
 
         /// <summary>
@@ -63,14 +56,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// </summary>
         public ObjectType ForConstructorSelf()
         {
-            return new ObjectType(Name, DeclaredMutable, ReferenceCapability.Borrowed);
+            return new ObjectType(FullName, DeclaredMutable, ReferenceCapability.Borrowed);
         }
 
         public override string ToString()
         {
             var capability = ReferenceCapability.ToSourceString();
-            if (capability.Length == 0) return Name.ToString();
-            return $"{capability} {Name}";
+            if (capability.Length == 0) return FullName.ToString();
+            return $"{capability} {FullName}";
         }
 
         #region Equality
@@ -81,14 +74,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         public bool Equals(ObjectType? other)
         {
-            return !(other is null) && EqualityComparer<Name>.Default.Equals(Name, other.Name)
+            return !(other is null) && EqualityComparer<Name>.Default.Equals(FullName, other.FullName)
                                     && DeclaredMutable == other.DeclaredMutable
                                     && ReferenceCapability == other.ReferenceCapability;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Name, DeclaredMutable, ReferenceCapability);
+            return HashCode.Combine(FullName, DeclaredMutable, ReferenceCapability);
         }
 
         public static bool operator ==(ObjectType type1, ObjectType type2)
@@ -105,7 +98,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         protected internal override Self To_ReturnsSelf(ReferenceCapability referenceCapability)
         {
-            return new ObjectType(Name, DeclaredMutable, referenceCapability);
+            return new ObjectType(FullName, DeclaredMutable, referenceCapability);
         }
     }
 }

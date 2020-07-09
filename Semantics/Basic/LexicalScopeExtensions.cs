@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case UnknownType _:
                     return UnknownSymbol.Instance;
                 case ObjectType objectType:
-                    return containingScope.LookupInGlobalScope(objectType.Name).OfType<ITypeSymbol>().Single();
+                    return containingScope.LookupInGlobalScope(objectType.FullName).OfType<ITypeSymbol>().Single();
                 case SizedIntegerType integerType:
                     return containingScope.LookupInGlobalScope(integerType.Name).OfType<ITypeSymbol>().Single();
                 case UnsizedIntegerType integerType:

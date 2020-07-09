@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 
         private static FixedList<ISymbol> DefinePrimitiveSymbols()
         {
-            var stringType = ObjectType.Declaration(Name.From("String"), false);
+            var stringType = new ObjectType(Name.From("String"), false, ReferenceCapability.Shared);
             return new List<ISymbol>
             {
                 // Simple Types

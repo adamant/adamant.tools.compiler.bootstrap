@@ -52,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
             var graph = new ReachabilityGraph();
             var mockExpression = new Mock<INewObjectExpressionSyntax>();
             // TODO this type should be Isolated or Owned
-            var fakeReferenceType = ObjectType.Declaration(Name.From("Fake"), false);
+            var fakeReferenceType = new ObjectType(Name.From("Fake"), false, ReferenceCapability.Shared);
             mockExpression.Setup(e => e.Type).Returns(fakeReferenceType);
 
             var temp = graph.AddObject(mockExpression.Object);
@@ -73,7 +73,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
             var graph = new ReachabilityGraph();
             var mockExpression = new Mock<INewObjectExpressionSyntax>();
             // TODO this type should be Isolated or Owned
-            var fakeReferenceType = ObjectType.Declaration(Name.From("Fake"), false);
+            var fakeReferenceType = new ObjectType(Name.From("Fake"), false, ReferenceCapability.Shared);
             mockExpression.Setup(e => e.Type).Returns(fakeReferenceType);
             var temp = graph.AddObject(mockExpression.Object);
             var mockVariableBinding = new Mock<IBindingSymbol>();

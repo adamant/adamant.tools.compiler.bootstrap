@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
         public DefaultConstructor(ObjectType constructedType)
         {
             ConstructedType = constructedType;
-            FullName = constructedType.Name.Qualify(SpecialName.New);
+            FullName = constructedType.FullName.Qualify(SpecialName.New);
         }
     }
 }
