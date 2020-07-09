@@ -176,21 +176,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Lexing
                         }
                         break;
                     case '*':
-                        switch (NextChar())
-                        {
-                            case '=':
-                                // it is `*=`
-                                yield return TokenFactory.AsteriskEquals(SymbolSpan(2));
-                                break;
-                            case '*':
-                                // it is `**`
-                                yield return NewReservedOperator(2);
-                                break;
-                            default:
-                                // it is `*`
-                                yield return TokenFactory.Asterisk(SymbolSpan());
-                                break;
-                        }
+                        if (NextChar() is '=')
+                            // it is `*=`
+                            yield return TokenFactory.AsteriskEquals(SymbolSpan(2));
+                        else
+                            // it is `*`
+                            yield return TokenFactory.Asterisk(SymbolSpan());
+
                         break;
                     case '/':
                         switch (NextChar())

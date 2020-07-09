@@ -284,7 +284,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing
         // Reserved
         [InlineData("$")]
         [InlineData("`")]
-        [InlineData("**")]
         [InlineData("##")]
         public void Reserved_operator(string text)
         {
