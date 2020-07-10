@@ -5,30 +5,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     /// <summary>
     /// The semantics of the value of an expression
     ///
-    /// Value Types:
     /// Move - the value is moved
     /// Copy - the value is copied, either memcopy or using copy initializer
-    ///
-    /// Reference Types:
-    /// Own - move an owned reference
+    /// Acquire - take ownership from (can apply to isolated, owned, and held)
     /// Borrow - copy the reference, borrow the object
     /// Share - copy the reference, share the object
     /// </summary>
     [SuppressMessage("Naming", "CA1717:Only FlagsAttribute enums should have plural names", Justification = "Name not plural")]
-    // TODO remove from types
-    // TODO move to AST
     // TODO add to all expressions
     public enum ExpressionSemantics
     {
         /// <summary>
-        /// Expression is acting as an lvalue not an rvalue
+        /// Never returns or has unknown return
         /// </summary>
-        LValue = -1,
+        Never = -1,
         /// <summary>
-        /// Expressions of type `never` and `void`, don't produce a value
+        /// Expressions of type `void`, don't produce a value
         /// </summary>
-        /// <remarks>The unknown</remarks>
-        Empty = 0,
+        Void = 0,
         /// <summary>
         /// The value is moved
         /// </summary>
@@ -39,9 +33,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         /// </summary>
         Copy,
         /// <summary>
-        /// The owning reference is moved
+        /// The ownership is transferred between the references. Leaves the
+        /// giver in a moved state.
         /// </summary>
-        Own,
+        Acquire,
         /// <summary>
         /// Copy a reference, borrow the referent
         /// </summary>

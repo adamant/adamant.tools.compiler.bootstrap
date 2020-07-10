@@ -63,17 +63,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
             switch (valueSemantics)
             {
                 case ExpressionSemantics.Move:
-                case ExpressionSemantics.Own:
+                case ExpressionSemantics.Acquire:
                     return possiblyMoved.Set(symbol, true);
                 case ExpressionSemantics.Copy:
                 case ExpressionSemantics.Borrow:
                 case ExpressionSemantics.Share:
-                case ExpressionSemantics.Empty:
+                case ExpressionSemantics.Void:
+                case ExpressionSemantics.Never:
                 case null: // If it were move or copy, that would have been set to the ExpressionSemantics
                     // Not moving value
                     return possiblyMoved;
-                case ExpressionSemantics.LValue:
-                    throw new NotImplementedException();
                 default:
                     throw ExhaustiveMatch.Failed(valueSemantics);
             }

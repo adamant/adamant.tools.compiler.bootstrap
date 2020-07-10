@@ -8,14 +8,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         {
             string mutability = valueSemantics switch
             {
-                ExpressionSemantics.LValue => "deref",
-                ExpressionSemantics.Empty => "void",
+                ExpressionSemantics.Never => "never",
+                ExpressionSemantics.Void => "void",
                 ExpressionSemantics.Move => "move",
                 ExpressionSemantics.Copy => "copy",
-                ExpressionSemantics.Own => "own",
+                ExpressionSemantics.Acquire => "own",
                 ExpressionSemantics.Borrow => "borrow",
                 ExpressionSemantics.Share => "share",
-                _ => throw ExhaustiveMatch.Failed(valueSemantics)
+                _ => throw ExhaustiveMatch.Failed(valueSemantics),
             };
 
             return mutability;

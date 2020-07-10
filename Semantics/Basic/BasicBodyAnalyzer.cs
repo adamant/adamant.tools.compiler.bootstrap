@@ -228,7 +228,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     switch (exp.Referent)
                     {
                         case INameExpressionSyntax nameExpression:
-                            nameExpression.Semantics = ExpressionSemantics.Own;
+                            nameExpression.Semantics = ExpressionSemantics.Acquire;
                             var type = InferType(ref exp.Referent, false);
                             switch (type)
                             {
@@ -650,7 +650,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var type = AssignReferencedSymbolAndType(member, memberSymbols);
                     return exp.Type = type;
                 case INameExpressionSyntax exp:
-                    exp.Semantics = ExpressionSemantics.LValue;
+                    //exp.Semantics = ExpressionSemantics.LValue;
                     return InferNameType(exp);
             }
         }
