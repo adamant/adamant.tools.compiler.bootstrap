@@ -14,5 +14,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
 
             Assert.Equal(TypeSemantics.Reference, type.Semantics);
         }
+
+        [Fact]
+        public void Convert_to_non_constant_type_is_same_type()
+        {
+            var type = new ObjectType(Name.From("Foo", "Bar"), true, ReferenceCapability.Isolated);
+
+            var nonConstant = type.ToNonConstantType();
+
+            Assert.Same(type, nonConstant);
+        }
     }
 }

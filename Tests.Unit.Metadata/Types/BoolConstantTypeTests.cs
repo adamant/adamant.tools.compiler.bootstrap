@@ -16,6 +16,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
         }
 
         [Fact]
+        public void Is_constant()
+        {
+            var type = BoolConstantType.True;
+
+            Assert.True(type.IsConstant);
+        }
+
+        [Fact]
         public void True_type_has_true_value()
         {
             var type = BoolConstantType.True;
@@ -47,6 +55,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
 
             Assert.Equal(SimpleName.Special("const[false]"), type.Name);
             Assert.Equal("const[false]", type.ToString());
+        }
+
+        [Fact]
+        public void Converts_to_non_constant_bool_type()
+        {
+            var type = BoolConstantType.False;
+
+            var nonConstant = type.ToNonConstantType();
+
+            Assert.Same(DataType.Bool, nonConstant);
         }
     }
 }

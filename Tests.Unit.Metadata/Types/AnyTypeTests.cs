@@ -16,6 +16,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
         }
 
         [Fact]
+        public void Is_not_constant()
+        {
+            var type = new AnyType(Isolated);
+
+            Assert.False(type.IsConstant);
+        }
+
+        [Fact]
         public void Is_known_type()
         {
             var type = new AnyType(Isolated);

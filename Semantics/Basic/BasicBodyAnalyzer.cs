@@ -115,9 +115,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         {
             var type = InferType(ref expression);
             if (!type.IsKnown) return DataType.Unknown;
-            if (type is IntegerConstantType _)
-                // TODO there should be a method that combines this with type inference
-                return InsertImplicitConversionIfNeeded(ref expression, DataType.Int);
+            type = type.ToNonConstantType();
+            type = InsertImplicitConversionIfNeeded(ref expression, type);
 
             switch (expression)
             {
@@ -312,7 +311,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IStringLiteralExpressionSyntax exp:
                     return exp.Type = stringSymbol?.DeclaresType ?? DataType.Unknown;
                 case IBoolLiteralExpressionSyntax exp:
-                    return exp.Type = DataType.Bool;
+                    return exp.Type = exp.Value ? DataType.True : DataType.False;
                 case IBinaryOperatorExpressionSyntax binaryOperatorExpression:
                 {
                     var leftType = InferType(ref binaryOperatorExpression.LeftOperand);

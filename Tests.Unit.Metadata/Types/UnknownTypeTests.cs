@@ -14,6 +14,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
             Assert.False(type.IsKnown);
         }
 
+        [Fact]
+        public void Is_not_constant()
+        {
+            var type = UnknownType.Instance;
+
+            Assert.False(type.IsConstant);
+        }
+
         /// <summary>
         /// It has never semantics because it is assignable to anything
         /// </summary>

@@ -8,6 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     /// </summary>
     public sealed class IntegerConstantType : IntegerType
     {
+        public override bool IsConstant => true;
         public BigInteger Value { get; }
         public override bool IsKnown => true;
 
@@ -15,6 +16,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             : base($"const[{value}]")
         {
             Value = value;
+        }
+
+        public override DataType ToNonConstantType()
+        {
+            return Int;
         }
     }
 }

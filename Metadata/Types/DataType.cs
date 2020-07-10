@@ -47,6 +47,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// </summary>
         public virtual bool IsEmpty => false;
 
+        public virtual bool IsConstant => false;
+
         /// <summary>
         /// A known type is one that has no unknown parts
         /// </summary>
@@ -63,6 +65,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public abstract ExpressionSemantics OldValueSemantics { get; }
 
         private protected DataType() { }
+
+        public virtual DataType ToNonConstantType()
+        {
+            return this;
+        }
 
         public abstract override string ToString();
 

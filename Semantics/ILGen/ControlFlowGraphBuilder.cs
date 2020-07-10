@@ -28,16 +28,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
 
         public VariableDeclaration AddVariable(bool mutableBinding, DataType type, Scope scope, SimpleName? name = null)
         {
-            var variable =
-                new VariableDeclaration(false, mutableBinding, type, new Variable(variables.Count), scope, name);
+            var variable = new VariableDeclaration(false, mutableBinding, type.ToNonConstantType(),
+                            new Variable(variables.Count), scope, name);
             variables.Add(variable);
             return variable;
         }
 
         public VariableDeclaration AddParameter(bool mutableBinding, DataType type, Scope scope, SimpleName name)
         {
-            var variable =
-                new VariableDeclaration(true, mutableBinding, type, new Variable(variables.Count), scope, name);
+            var variable = new VariableDeclaration(true, mutableBinding, type.ToNonConstantType(),
+                            new Variable(variables.Count), scope, name);
             variables.Add(variable);
             return variable;
         }

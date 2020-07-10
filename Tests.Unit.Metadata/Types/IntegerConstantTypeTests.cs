@@ -18,6 +18,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
         }
 
         [Fact]
+        public void Is_constant()
+        {
+            var type = new IntegerConstantType(1);
+
+            Assert.True(type.IsConstant);
+        }
+
+        [Fact]
         public void Is_known_type()
         {
             var type = new IntegerConstantType(1);
@@ -53,6 +61,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
             var type = new IntegerConstantType(value);
 
             Assert.Equal(value, type.Value);
+        }
+
+        [Fact]
+        public void Converts_to_non_constant_int_type()
+        {
+            // TODO larger values need to convert to larger integer types
+
+            var type = new IntegerConstantType(42);
+
+            var nonConstant = type.ToNonConstantType();
+
+            Assert.Same(DataType.Int, nonConstant);
         }
     }
 }

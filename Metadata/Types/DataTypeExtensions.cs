@@ -26,6 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
                 case (_, _) when target.Equals(source):
                 case (UnknownType _, _):
                 case (_, UnknownType _):
+                case (BoolType _, BoolConstantType _):
                     return true;
                 case (AnyType targetReference, ReferenceType sourceReference):
                     return targetReference.ReferenceCapability.IsAssignableFrom(sourceReference.ReferenceCapability);
