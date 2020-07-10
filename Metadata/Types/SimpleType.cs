@@ -12,8 +12,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
 
         public override TypeSemantics Semantics => TypeSemantics.Copy;
 
-        public override ExpressionSemantics OldValueSemantics => ExpressionSemantics.Copy;
-
         private protected SimpleType(string name)
         {
             Name = SimpleName.Special(name);

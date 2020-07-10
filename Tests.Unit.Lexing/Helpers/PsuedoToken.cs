@@ -30,17 +30,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
         public static PsuedoToken For(IToken token, CodeText code)
         {
             var tokenType = token.GetType();
-            switch (token)
+            var text = token.Text(code);
+            return token switch
             {
-                case IIdentifierToken identifier:
-                    return new PsuedoToken(tokenType, token.Text(code), identifier.Value);
-                case IStringLiteralToken stringLiteral:
-                    return new PsuedoToken(tokenType, token.Text(code), stringLiteral.Value);
-                case IIntegerLiteralToken integerLiteral:
-                    return new PsuedoToken(tokenType, token.Text(code), integerLiteral.Value);
-                default:
-                    return new PsuedoToken(tokenType, token.Text(code));
-            }
+                IIdentifierToken identifier => new PsuedoToken(tokenType, text, identifier.Value),
+                IStringLiteralToken stringLiteral => new PsuedoToken(tokenType, text, stringLiteral.Value),
+                IIntegerLiteralToken integerLiteral => new PsuedoToken(tokenType, text, integerLiteral.Value),
+                _ => new PsuedoToken(tokenType, text)
+            };
         }
 
         public override bool Equals(object? obj)
@@ -70,19 +67,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Lexing.Helpers
         public override string ToString()
         {
             var textValue = string.IsNullOrEmpty(Text) ? "" : $":„{Text.Escape()}„";
-            switch (Value)
+            return Value switch
             {
-                case null:
-                    return $"{TokenType.Name}{textValue}";
-                case string s:
-                    return $"{TokenType.Name}{textValue} 【{s.Escape()}】";
-                case BigInteger i:
-                    return $"{TokenType.Name}{textValue} {i}";
-                case IReadOnlyList<Diagnostic> diagnostics:
-                    return $"{TokenType.Name}{textValue} [{diagnostics.DebugFormat()}]";
-                default:
-                    return $"{TokenType.Name}{textValue} InvalidValue={Value}";
-            }
+                null => $"{TokenType.Name}{textValue}",
+                string s => $"{TokenType.Name}{textValue} 【{s.Escape()}】",
+                BigInteger i => $"{TokenType.Name}{textValue} {i}",
+                IReadOnlyList<Diagnostic> diagnostics => $"{TokenType.Name}{textValue} [{diagnostics.DebugFormat()}]",
+                _ => $"{TokenType.Name}{textValue} InvalidValue={Value}"
+            };
         }
     }
 }

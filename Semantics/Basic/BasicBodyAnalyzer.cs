@@ -370,10 +370,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     if (implicitShare)
                         type = InsertImplicitShareIfNeeded(ref expression, type);
 
-                    if (exp.Semantics is null
-                        && (type.OldValueSemantics == ExpressionSemantics.Copy
-                            || type.OldValueSemantics == ExpressionSemantics.Move))
-                        exp.Semantics = type.OldValueSemantics;
+                    // TODO do a more complete generation of expression semantics
+                    if (exp.Semantics is null)
+                        switch (type.Semantics)
+                        {
+                            case TypeSemantics.Copy:
+                                exp.Semantics = ExpressionSemantics.Copy;
+                                break;
+                            case TypeSemantics.Move:
+                                exp.Semantics = ExpressionSemantics.Move;
+                                break;
+                        }
 
                     return type;
                 }

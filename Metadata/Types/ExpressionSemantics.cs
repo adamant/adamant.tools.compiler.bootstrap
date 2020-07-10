@@ -57,33 +57,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     {
         public static string Action(this ExpressionSemantics valueSemantics)
         {
-            string mutability;
-            switch (valueSemantics)
+            string mutability = valueSemantics switch
             {
-                default:
-                    throw ExhaustiveMatch.Failed(valueSemantics);
-                case ExpressionSemantics.LValue:
-                    mutability = "deref";
-                    break;
-                case ExpressionSemantics.Empty:
-                    mutability = "void";
-                    break;
-                case ExpressionSemantics.Move:
-                    mutability = "move";
-                    break;
-                case ExpressionSemantics.Copy:
-                    mutability = "copy";
-                    break;
-                case ExpressionSemantics.Own:
-                    mutability = "own";
-                    break;
-                case ExpressionSemantics.Borrow:
-                    mutability = "borrow";
-                    break;
-                case ExpressionSemantics.Share:
-                    mutability = "share";
-                    break;
-            }
+                ExpressionSemantics.LValue => "deref",
+                ExpressionSemantics.Empty => "void",
+                ExpressionSemantics.Move => "move",
+                ExpressionSemantics.Copy => "copy",
+                ExpressionSemantics.Own => "own",
+                ExpressionSemantics.Borrow => "borrow",
+                ExpressionSemantics.Share => "share",
+                _ => throw ExhaustiveMatch.Failed(valueSemantics)
+            };
 
             return mutability;
         }

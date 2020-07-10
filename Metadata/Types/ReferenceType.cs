@@ -23,13 +23,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public bool DeclaredMutable { get; }
 
         // TODO clarify this
-        public override ExpressionSemantics OldValueSemantics { get; }
 
         private protected ReferenceType(bool declaredMutable, ReferenceCapability referenceCapability)
         {
             ReferenceCapability = referenceCapability;
             DeclaredMutable = declaredMutable;
-            OldValueSemantics = referenceCapability.GetValueSemantics();
+            referenceCapability.GetValueSemantics();
         }
 
         protected internal sealed override Self ToReadOnly_ReturnsSelf()

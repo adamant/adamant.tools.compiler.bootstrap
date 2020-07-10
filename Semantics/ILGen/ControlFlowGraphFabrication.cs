@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         /// <summary>
         /// The next available scope number
         /// </summary>
-        private Scope nextScope;
+        //private Scope nextScope;
         private readonly Stack<Scope> scopes = new Stack<Scope>();
         private Scope CurrentScope => scopes.Peek();
 
@@ -62,7 +62,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             // We start in the outer scope and need that on the stack
             var scope = Scope.Outer;
             scopes.Push(scope);
-            nextScope = scope.Next();
+            //nextScope = scope.Next();
             switch (callable)
             {
                 default:
@@ -81,6 +81,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     returnType = function.ReturnType.Known();
                     break;
             }
+
+            // TODO really use return type
+            _ = returnType;
         }
 
         public ControlFlowGraph CreateGraph()

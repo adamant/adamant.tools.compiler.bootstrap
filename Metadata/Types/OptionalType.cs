@@ -20,8 +20,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             Referent.Semantics == TypeSemantics.Never
             ? TypeSemantics.Copy : Referent.Semantics;
 
-        public override ExpressionSemantics OldValueSemantics => Referent.OldValueSemantics;
-
         public OptionalType(DataType referent)
         {
             if (referent is VoidType)

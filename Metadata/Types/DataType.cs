@@ -59,11 +59,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// </summary>
         public abstract TypeSemantics Semantics { get; }
 
-        /// <summary>
-        /// The value semantics of expressions producing this type
-        /// </summary>
-        public abstract ExpressionSemantics OldValueSemantics { get; }
-
         private protected DataType() { }
 
         public virtual DataType ToNonConstantType()
