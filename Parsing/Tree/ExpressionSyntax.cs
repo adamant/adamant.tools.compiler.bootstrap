@@ -32,6 +32,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             }
         }
 
+        private ExpressionSemantics? valueSemantics;
+
+        [DisallowNull]
+        public ExpressionSemantics? Semantics
+        {
+            [DebuggerStepThrough]
+            get => valueSemantics;
+            set
+            {
+                if (valueSemantics != null)
+                    throw new InvalidOperationException("Can't set semantics repeatedly");
+                valueSemantics = value ?? throw new ArgumentNullException(nameof(value));
+            }
+        }
+
         protected ExpressionSyntax(TextSpan span)
             : base(span)
         {

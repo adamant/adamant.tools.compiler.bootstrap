@@ -13,7 +13,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         SimpleName Name { get; }
         [DisallowNull] IBindingSymbol? ReferencedSymbol { get; set; }
         FixedList<ISymbol> LookupInContainingScope();
-        [DisallowNull] ExpressionSemantics? Semantics { get; set; }
         bool VariableIsLiveAfter { get; set; }
     }
 }

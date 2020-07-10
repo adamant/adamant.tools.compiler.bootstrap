@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.AST;
 using Adamant.Tools.Compiler.Bootstrap.Core;
@@ -24,8 +25,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax
             get => type;
             set
             {
-                if (type != null) throw new InvalidOperationException("Can't set type repeatedly");
+                if (type != null)
+                    throw new InvalidOperationException("Can't set type repeatedly");
                 type = value ?? throw new ArgumentNullException(nameof(Type), "Can't set type to null");
+            }
+        }
+
+        private ExpressionSemantics? valueSemantics;
+
+        [DisallowNull]
+        public ExpressionSemantics? Semantics
+        {
+            [DebuggerStepThrough]
+            get => valueSemantics;
+            set
+            {
+                if (valueSemantics != null)
+                    throw new InvalidOperationException("Can't set semantics repeatedly");
+                valueSemantics = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 

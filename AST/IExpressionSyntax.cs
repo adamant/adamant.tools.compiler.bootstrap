@@ -30,6 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     public interface IExpressionSyntax : ISyntax
     {
         [DisallowNull] DataType? Type { get; set; }
+        [DisallowNull] ExpressionSemantics? Semantics { get; set; }
         string ToGroupedString(OperatorPrecedence surroundingPrecedence);
     }
 }

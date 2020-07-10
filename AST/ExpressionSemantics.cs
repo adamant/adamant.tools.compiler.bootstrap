@@ -12,7 +12,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     /// Share - copy the reference, share the object
     /// </summary>
     [SuppressMessage("Naming", "CA1717:Only FlagsAttribute enums should have plural names", Justification = "Name not plural")]
-    // TODO add to all expressions
     public enum ExpressionSemantics
     {
         /// <summary>
