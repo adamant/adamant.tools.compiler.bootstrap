@@ -113,27 +113,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             }
         }
 
-        public static ExpressionSemantics GetValueSemantics(this ReferenceCapability referenceCapability)
-        {
-            switch (referenceCapability)
-            {
-                default:
-                    throw ExhaustiveMatch.Failed(referenceCapability);
-                case OwnedMutable:
-                case Owned:
-                case IsolatedMutable:
-                case Isolated:
-                    return ExpressionSemantics.Own;
-                case HeldMutable:
-                case Borrowed:
-                    return ExpressionSemantics.Borrow;
-                case Held:
-                case Shared:
-                case Identity:
-                    return ExpressionSemantics.Share;
-            }
-        }
-
         /// <summary>
         /// Convert to the equivalent reference capability that is mutable.
         /// </summary>

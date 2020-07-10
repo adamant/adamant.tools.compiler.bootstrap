@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
-using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
+namespace Adamant.Tools.Compiler.Bootstrap.AST
 {
     /// <summary>
     /// The semantics of the value of an expression
@@ -51,25 +50,5 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// Copy a reference, share the referent
         /// </summary>
         Share,
-    }
-
-    public static class ValueSemanticsExtensions
-    {
-        public static string Action(this ExpressionSemantics valueSemantics)
-        {
-            string mutability = valueSemantics switch
-            {
-                ExpressionSemantics.LValue => "deref",
-                ExpressionSemantics.Empty => "void",
-                ExpressionSemantics.Move => "move",
-                ExpressionSemantics.Copy => "copy",
-                ExpressionSemantics.Own => "own",
-                ExpressionSemantics.Borrow => "borrow",
-                ExpressionSemantics.Share => "share",
-                _ => throw ExhaustiveMatch.Failed(valueSemantics)
-            };
-
-            return mutability;
-        }
     }
 }

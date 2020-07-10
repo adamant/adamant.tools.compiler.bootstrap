@@ -28,7 +28,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         {
             ReferenceCapability = referenceCapability;
             DeclaredMutable = declaredMutable;
-            referenceCapability.GetValueSemantics();
         }
 
         protected internal sealed override Self ToReadOnly_ReturnsSelf()
