@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Config
 
             using var file = new JsonTextReader(File.OpenText(projectFilePath));
             var serializer = new JsonSerializer();
-            var projectFile = serializer.Deserialize<ProjectConfig>(file);
+            var projectFile = serializer.Deserialize<ProjectConfig>(file) ?? throw new NullReferenceException();
             projectFile.FullPath = projectFilePath;
             return projectFile;
         }
