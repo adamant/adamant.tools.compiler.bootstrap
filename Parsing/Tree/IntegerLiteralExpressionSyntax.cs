@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public BigInteger Value { get; }
 
         public IntegerLiteralExpressionSyntax(TextSpan span, BigInteger value)
-            : base(span)
+            : base(span, ExpressionSemantics.Copy)
         {
             Value = value;
         }

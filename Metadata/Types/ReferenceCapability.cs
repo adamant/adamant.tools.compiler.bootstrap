@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             }
         }
 
-        public static bool IsMovable(this ReferenceCapability referenceCapability)
+        public static bool CanBeAcquired(this ReferenceCapability referenceCapability)
         {
             switch (referenceCapability)
             {

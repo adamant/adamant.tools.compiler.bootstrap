@@ -70,6 +70,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
                 case ExpressionSemantics.Share:
                 case ExpressionSemantics.Void:
                 case ExpressionSemantics.Never:
+                case ExpressionSemantics.CreateReference:
                 case null: // If it were move or copy, that would have been set to the ExpressionSemantics
                     // Not moving value
                     return possiblyMoved;

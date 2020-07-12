@@ -148,9 +148,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                         graph.Add(temp);
                         return temp;
                     }
-
-                    // Can this happen?
-                    throw new NotImplementedException();
+                    else
+                    {
+                        // It must be a field or something
+                        var source = Analyze(exp.Referent, graph, scope)!;
+                        var temp = TempValue.For(graph, exp);
+                        temp?.ShareFrom(source);
+                        graph.Add(temp);
+                        return temp;
+                    }
                 }
                 case INameExpressionSyntax exp:
                     if (!isReferenceType) return null;

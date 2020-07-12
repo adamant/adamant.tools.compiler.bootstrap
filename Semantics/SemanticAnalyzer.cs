@@ -112,6 +112,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             new TypeFulfillmentValidator().Walk(entities);
             new ReferencedSymbolValidator().Walk(entities);
             new TypeKnownValidator().Walk(entities);
+            new ExpressionSemanticsValidator().Walk(entities);
 #endif
 
             // From this point forward, analysis focuses on callable bodies

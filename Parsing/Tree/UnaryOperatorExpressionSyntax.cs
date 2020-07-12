@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             UnaryOperatorFixity fixity,
             UnaryOperator @operator,
             IExpressionSyntax operand)
-            : base(span)
+            : base(span, ExpressionSemantics.Copy)
         {
             Operator = @operator;
             this.operand = operand;

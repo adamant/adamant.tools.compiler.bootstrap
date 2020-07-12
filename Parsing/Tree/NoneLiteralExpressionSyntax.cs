@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal class NoneLiteralExpressionSyntax : LiteralExpressionSyntax, INoneLiteralExpressionSyntax
     {
         public NoneLiteralExpressionSyntax(TextSpan span)
-            : base(span)
+            : base(span, ExpressionSemantics.Copy)
         {
         }
 

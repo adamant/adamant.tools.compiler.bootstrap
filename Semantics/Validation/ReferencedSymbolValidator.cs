@@ -26,6 +26,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
         {
             switch (syntax)
             {
+                case IClassDeclarationSyntax _:
+                    // Don't recur into body, we will see those as separate members
+                    return;
                 case IFieldAccessExpressionSyntax memberAccessExpression:
                     WalkChildren(memberAccessExpression);
                     AssertHasReferencedSymbol(memberAccessExpression, memberAccessExpression.ReferencedSymbol);

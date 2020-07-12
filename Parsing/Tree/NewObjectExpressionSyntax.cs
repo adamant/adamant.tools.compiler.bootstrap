@@ -40,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             ITypeNameSyntax typeSyntax,
             ICallableNameSyntax? constructorName,
             FixedList<IArgumentSyntax> arguments)
-            : base(span)
+            : base(span, ExpressionSemantics.Acquire)
         {
             TypeSyntax = typeSyntax;
             Arguments = arguments;

@@ -32,24 +32,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             }
         }
 
-        private ExpressionSemantics? valueSemantics;
+        private ExpressionSemantics? semantics;
 
         [DisallowNull]
         public ExpressionSemantics? Semantics
         {
             [DebuggerStepThrough]
-            get => valueSemantics;
+            get => semantics;
             set
             {
-                if (valueSemantics != null)
+                if (semantics != null)
                     throw new InvalidOperationException("Can't set semantics repeatedly");
-                valueSemantics = value ?? throw new ArgumentNullException(nameof(value));
+                semantics = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
-        protected ExpressionSyntax(TextSpan span)
+        protected ExpressionSyntax(TextSpan span, ExpressionSemantics? semantics = null)
             : base(span)
         {
+            this.semantics = semantics;
         }
 
         public void Poison()

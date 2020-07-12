@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         }
 
         public BorrowExpressionSyntax(TextSpan span, IExpressionSyntax referent)
-            : base(span)
+            : base(span, ExpressionSemantics.Borrow)
         {
             this.referent  = referent;
         }

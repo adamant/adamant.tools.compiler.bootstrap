@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
         }
 
         public ImplicitBorrowExpressionSyntax(IExpressionSyntax referent, DataType type, IBindingSymbol borrowedSymbol)
-            : base(type, referent.Span)
+            : base(type, referent.Span, ExpressionSemantics.Borrow)
         {
             this.referent = referent;
             this.borrowedSymbol = borrowedSymbol ?? throw new ArgumentNullException(nameof(borrowedSymbol));

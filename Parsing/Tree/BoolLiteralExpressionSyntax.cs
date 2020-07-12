@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public bool Value { [DebuggerStepThrough] get; }
 
         public BoolLiteralExpressionSyntax(TextSpan span, bool value)
-            : base(span)
+            : base(span, ExpressionSemantics.Copy)
         {
             Value = value;
         }

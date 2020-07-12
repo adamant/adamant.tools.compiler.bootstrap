@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
         public ImplicitNumericConversionExpression(
             IExpressionSyntax expression,
             NumericType convertToType)
-            : base(expression.Span, convertToType, expression)
+            : base(expression.Span, convertToType, expression, ExpressionSemantics.Copy)
         {
             ConvertToType = convertToType;
         }

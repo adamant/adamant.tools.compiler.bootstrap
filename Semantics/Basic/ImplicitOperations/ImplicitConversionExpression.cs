@@ -16,8 +16,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
         public IExpressionSyntax Expression { [DebuggerHidden] get; }
         DataType IImplicitConversionExpression.Type { [DebuggerHidden] get => Type!; }
 
-        protected ImplicitConversionExpression(TextSpan span, DataType convertToType, IExpressionSyntax expression)
-            : base(convertToType, span)
+        protected ImplicitConversionExpression(
+            TextSpan span,
+            DataType convertToType,
+            IExpressionSyntax expression,
+            ExpressionSemantics semantics)
+            : base(convertToType, span, semantics)
         {
             Expression = expression;
         }

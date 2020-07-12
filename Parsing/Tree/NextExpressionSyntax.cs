@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal class NextExpressionSyntax : ExpressionSyntax, INextExpressionSyntax
     {
         public NextExpressionSyntax(TextSpan span)
-            : base(span)
+            : base(span, ExpressionSemantics.Never)
         {
         }
 

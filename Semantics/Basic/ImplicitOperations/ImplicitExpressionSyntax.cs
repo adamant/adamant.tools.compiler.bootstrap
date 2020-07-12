@@ -23,24 +23,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
             set => throw new InvalidOperationException("Can't set type repeatedly");
         }
 
-        private ExpressionSemantics? valueSemantics;
+        private ExpressionSemantics? semantics;
         [DisallowNull]
         public ExpressionSemantics? Semantics
         {
             [DebuggerStepThrough]
-            get => valueSemantics;
+            get => semantics;
             set
             {
-                if (valueSemantics != null)
+                if (semantics != null)
                     throw new InvalidOperationException("Can't set semantics repeatedly");
-                valueSemantics = value ?? throw new ArgumentNullException(nameof(value));
+                semantics = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
-        protected ImplicitExpressionSyntax(DataType type, TextSpan span)
+        protected ImplicitExpressionSyntax(DataType type, TextSpan span, ExpressionSemantics? semantics = null)
         {
             Span = span;
             this.type = type ?? throw new ArgumentNullException(nameof(type));
+            this.semantics = semantics;
         }
     }
 }

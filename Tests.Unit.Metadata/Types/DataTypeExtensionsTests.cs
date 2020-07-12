@@ -3,6 +3,7 @@ using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
 {
+    [Trait("Category", "Types")]
     public class DataTypeExtensionsTests
     {
         [Fact]

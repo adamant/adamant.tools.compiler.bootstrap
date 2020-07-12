@@ -5,8 +5,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal abstract class LiteralExpressionSyntax : ExpressionSyntax, ILiteralExpressionSyntax
     {
-        protected LiteralExpressionSyntax(TextSpan span)
-            : base(span)
+        protected LiteralExpressionSyntax(TextSpan span, ExpressionSemantics? semantics = null)
+            : base(span, semantics)
         {
         }
     }

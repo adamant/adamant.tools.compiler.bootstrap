@@ -15,7 +15,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
         public ImplicitNoneConversionExpression(
             IExpressionSyntax expression,
             OptionalType convertToType)
-            : base(expression.Span, convertToType, expression)
+            // We can always copy the `none` literal
+            : base(expression.Span, convertToType, expression, ExpressionSemantics.Copy)
         {
             ConvertToType = convertToType;
         }

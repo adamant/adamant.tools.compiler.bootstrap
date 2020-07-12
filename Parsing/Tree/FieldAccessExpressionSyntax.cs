@@ -43,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public override string ToString()
         {
-            return $"{ContextExpression}.{Field}";
+            return $"{ContextExpression.ToGroupedString(ExpressionPrecedence)}.{Field}";
         }
     }
 }

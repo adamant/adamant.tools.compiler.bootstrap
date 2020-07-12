@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public string Value { [DebuggerStepThrough] get; }
 
         public StringLiteralExpressionSyntax(TextSpan span, string value)
-            : base(span)
+            : base(span, ExpressionSemantics.Share)
         {
             Value = value;
         }

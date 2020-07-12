@@ -44,5 +44,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
         /// Copy a reference, share the referent
         /// </summary>
         Share,
+        /// <summary>
+        /// Take a reference to a place. Used for LValues
+        /// </summary>
+        CreateReference,
     }
 }

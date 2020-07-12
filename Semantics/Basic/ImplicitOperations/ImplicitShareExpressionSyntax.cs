@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
         public IBindingSymbol SharedSymbol { [DebuggerStepThrough] get; }
 
         public ImplicitShareExpressionSyntax(IExpressionSyntax referent, DataType type, IBindingSymbol sharedSymbol)
-            : base(type, referent.Span)
+            : base(type, referent.Span, ExpressionSemantics.Share)
         {
             this.referent = referent;
             this.SharedSymbol = sharedSymbol ?? throw new ArgumentNullException(nameof(sharedSymbol));

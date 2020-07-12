@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public ReturnExpressionSyntax(
             TextSpan span,
             IExpressionSyntax? returnValue)
-            : base(span)
+            : base(span, ExpressionSemantics.Never)
         {
             this.returnValue = returnValue;
         }

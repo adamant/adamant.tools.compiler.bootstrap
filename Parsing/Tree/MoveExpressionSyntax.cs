@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         }
 
         public MoveExpressionSyntax(TextSpan span, INameExpressionSyntax referent)
-            : base(span)
+            : base(span) // TODO this could be a move or acquire?
         {
             this.referent = referent;
         }

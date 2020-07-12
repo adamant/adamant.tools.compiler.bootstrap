@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         public ReferenceCapability ReferenceCapability { get; }
         public bool IsReadOnly => !ReferenceCapability.IsMutable();
         public bool IsMutable => ReferenceCapability.IsMutable();
-        public bool IsMovable => ReferenceCapability.IsMovable();
+        public bool IsMovable => ReferenceCapability.CanBeAcquired();
 
         public override TypeSemantics Semantics => TypeSemantics.Reference;
 

@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
         public ImplicitOptionalConversionExpression(
             IExpressionSyntax expression,
             OptionalType convertToType)
-            : base(expression.Span, convertToType, expression)
+            : base(expression.Span, convertToType, expression, expression.Semantics.Assigned())
         {
             ConvertToType = convertToType;
         }
