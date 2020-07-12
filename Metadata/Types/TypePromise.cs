@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using ExhaustiveMatching;
 
@@ -19,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
     [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
     public class TypePromise
     {
-        public PromiseState State { get; private set; }
+        private PromiseState State { get; set; }
         private DataType? dataType;
 
         [DebuggerHidden]

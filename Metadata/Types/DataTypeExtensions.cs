@@ -8,6 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
         /// <summary>
         /// Returns the same type except with any mutability removed
         /// </summary>
+        [DebuggerHidden]
         public static T ToReadOnly<T>(this T type)
             where T : DataType
         {

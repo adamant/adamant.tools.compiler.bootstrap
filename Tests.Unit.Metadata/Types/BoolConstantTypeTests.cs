@@ -40,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
         }
 
         [Fact]
-        public void True_has_special_name_bool_an_ToString()
+        public void True_has_special_name_and_ToString()
         {
             var type = BoolConstantType.True;
 
@@ -49,7 +49,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
         }
 
         [Fact]
-        public void False_has_special_name_bool_an_ToString()
+        public void False_has_special_name_and_ToString()
         {
             var type = BoolConstantType.False;
 
