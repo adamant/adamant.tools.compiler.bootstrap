@@ -664,7 +664,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private static void InsertImplicitActionIfNeeded([NotNull] ref IExpressionSyntax expression, DataType toType, bool implicitBorrowAllowed)
         {
-            var fromType = expression.Type.Known();
+            var fromType = expression.Type.Assigned();
             if (!(fromType is ReferenceType from) || !(toType is ReferenceType to)) return;
 
             if (@from.IsMovable && to.IsMovable)
