@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.FST
 {
     [Closed(
         typeof(ISelfParameterSyntax),

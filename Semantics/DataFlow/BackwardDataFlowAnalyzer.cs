@@ -1,7 +1,7 @@
 using System;
-using Adamant.Tools.Compiler.Bootstrap.AST;
-using Adamant.Tools.Compiler.Bootstrap.AST.Walkers;
 using Adamant.Tools.Compiler.Bootstrap.Core;
+using Adamant.Tools.Compiler.Bootstrap.FST;
+using Adamant.Tools.Compiler.Bootstrap.FST.Walkers;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
 {

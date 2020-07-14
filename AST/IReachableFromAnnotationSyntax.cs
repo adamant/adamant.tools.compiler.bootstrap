@@ -1,6 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.FST
 {
     public interface IReachableFromAnnotationSyntax : IReachabilityAnnotationSyntax
     {

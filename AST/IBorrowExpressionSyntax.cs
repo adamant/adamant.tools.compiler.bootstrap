@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.FST
 {
     /// <summary>
     /// i.e. `mut exp`. A borrow expression causes a borrow from a variable. That

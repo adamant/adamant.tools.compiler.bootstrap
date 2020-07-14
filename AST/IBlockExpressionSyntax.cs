@@ -1,4 +1,4 @@
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.FST
 {
     /// <summary>
     /// A block expression. Not to be used to represent function

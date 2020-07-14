@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using Adamant.Tools.Compiler.Bootstrap.AST;
+using Adamant.Tools.Compiler.Bootstrap.FST;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen

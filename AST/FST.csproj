@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.AST</AssemblyName>
-    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.AST</RootNamespace>
+    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.FST</AssemblyName>
+    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.FST</RootNamespace>
     <LangVersion>8.0</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>

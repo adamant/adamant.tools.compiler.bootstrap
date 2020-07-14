@@ -1,6 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.FST
 {
     public interface IUnaryOperatorExpressionSyntax : IExpressionSyntax
     {

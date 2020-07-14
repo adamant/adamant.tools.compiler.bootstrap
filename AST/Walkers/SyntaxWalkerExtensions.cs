@@ -1,7 +1,7 @@
 using System.Linq;
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
+namespace Adamant.Tools.Compiler.Bootstrap.FST.Walkers
 {
     public static class SyntaxWalkerExtensions
     {

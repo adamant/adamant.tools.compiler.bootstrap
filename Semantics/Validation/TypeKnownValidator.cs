@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using Adamant.Tools.Compiler.Bootstrap.AST;
-using Adamant.Tools.Compiler.Bootstrap.AST.Walkers;
+using Adamant.Tools.Compiler.Bootstrap.FST;
+using Adamant.Tools.Compiler.Bootstrap.FST.Walkers;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation

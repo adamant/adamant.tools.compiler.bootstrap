@@ -1,6 +1,6 @@
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.FST
 {
     /// <summary>
     /// A statement that can appear directly in a method body. (i.e. not a result statement)

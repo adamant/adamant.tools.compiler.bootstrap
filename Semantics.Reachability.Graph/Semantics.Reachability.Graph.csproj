@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AST\AST.csproj" />
+    <ProjectReference Include="..\AST\FST.csproj" />
   </ItemGroup>
 
 </Project>

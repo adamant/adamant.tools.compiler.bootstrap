@@ -1,7 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
+namespace Adamant.Tools.Compiler.Bootstrap.FST.Walkers
 {
     public static class WalkExtensions
     {

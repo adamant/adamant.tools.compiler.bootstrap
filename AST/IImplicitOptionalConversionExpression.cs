@@ -1,6 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.FST
 {
     /// <summary>
     /// Convert a type to option of that type (i.e. "Some(value)")

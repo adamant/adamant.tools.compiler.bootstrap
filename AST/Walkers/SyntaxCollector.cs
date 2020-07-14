@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 
-namespace Adamant.Tools.Compiler.Bootstrap.AST.Walkers
+namespace Adamant.Tools.Compiler.Bootstrap.FST.Walkers
 {
     internal class SyntaxCollector : SyntaxWalker
     {

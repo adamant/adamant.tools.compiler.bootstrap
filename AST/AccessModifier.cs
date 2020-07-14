@@ -1,4 +1,4 @@
-namespace Adamant.Tools.Compiler.Bootstrap.AST
+namespace Adamant.Tools.Compiler.Bootstrap.FST
 {
     public enum AccessModifier
     {

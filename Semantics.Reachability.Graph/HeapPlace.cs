@@ -1,5 +1,5 @@
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.AST;
+using Adamant.Tools.Compiler.Bootstrap.FST;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
