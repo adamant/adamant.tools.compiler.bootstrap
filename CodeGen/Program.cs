@@ -1,12 +1,15 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
 {
-    public class Program
+    public static class Program
     {
         public const string DirectiveMarker = "◊";
 
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types",
+            Justification = "Main method catching all exceptions to prevent exit")]
         public static int Main(string[] args)
         {
             if (args.Length != 1)

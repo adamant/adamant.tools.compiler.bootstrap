@@ -2,16 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Metadata</AssemblyName>
-    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Metadata</RootNamespace>
-    <LangVersion>8.0</LangVersion>
+    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Types</AssemblyName>
+    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Types</RootNamespace>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningsAsErrors />
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,9 +25,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj" />
+    <ProjectReference Include="..\Framework\Framework.csproj" />
     <ProjectReference Include="..\Names\Names.csproj" />
-    <ProjectReference Include="..\Types\Types.csproj" />
   </ItemGroup>
 
 </Project>

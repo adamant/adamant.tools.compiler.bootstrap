@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
         private static string? GetConfig(IEnumerable<string> lines, string config)
         {
             var start = Program.DirectiveMarker + config;
-            var line = lines.SingleOrDefault(l => l.StartsWith(start));
+            var line = lines.SingleOrDefault(l => l.StartsWith(start, StringComparison.InvariantCulture));
             line = line?.Substring(start.Length);
             line = line?.TrimEnd(';'); // TODO error if no semicolon
             line = line?.Trim();
@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
 
         private static IEnumerable<RuleConfig> GetRules(List<string> lines)
         {
-            var ruleLines = lines.Where(l => !l.StartsWith(Program.DirectiveMarker) && !String.IsNullOrWhiteSpace(l))
+            var ruleLines = lines.Where(l => !l.StartsWith(Program.DirectiveMarker, StringComparison.InvariantCulture) && !String.IsNullOrWhiteSpace(l))
                                  .Select(l => l.TrimEnd(';')) // TODO error if no semicolon
                                  .ToList()!;
             foreach (var ruleLine in ruleLines)
