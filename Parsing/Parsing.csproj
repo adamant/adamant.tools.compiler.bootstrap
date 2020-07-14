@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AST\FST.csproj" />
+    <ProjectReference Include="..\FST\FST.csproj" />
     <ProjectReference Include="..\Lexing\Lexing.csproj" />
   </ItemGroup>
 
