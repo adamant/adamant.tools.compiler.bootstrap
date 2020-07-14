@@ -2,14 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-
-    <IsPackable>false</IsPackable>
-
-
-
-    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata</AssemblyName>
-
-    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata</RootNamespace>
+    <AssemblyName>Adamant.Tools.Compiler.Bootstrap.Symbols</AssemblyName>
+    <RootNamespace>Adamant.Tools.Compiler.Bootstrap.Symbols</RootNamespace>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
@@ -28,18 +22,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
-    <PackageReference Include="xunit.analyzers" Version="0.10.0" />
-    <PackageReference Include="xunit.core" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.2">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Metadata\Metadata.csproj" />
-    <ProjectReference Include="..\Tests.Asserts\Tests.Asserts.csproj" />
   </ItemGroup>
 
 </Project>
