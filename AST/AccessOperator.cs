@@ -12,15 +12,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         public static string ToSymbolString(this AccessOperator @operator)
         {
-            switch (@operator)
+            return @operator switch
             {
-                default:
-                    throw ExhaustiveMatch.Failed(@operator);
-                case AccessOperator.Standard:
-                    return ".";
-                case AccessOperator.Conditional:
-                    return "?.";
-            }
+                AccessOperator.Standard => ".",
+                AccessOperator.Conditional => "?.",
+                _ => throw ExhaustiveMatch.Failed(@operator)
+            };
         }
     }
 }

@@ -15,21 +15,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.AST
     {
         public static string ToSymbolString(this AssignmentOperator @operator)
         {
-            switch (@operator)
+            return @operator switch
             {
-                default:
-                    throw ExhaustiveMatch.Failed(@operator);
-                case AssignmentOperator.Simple:
-                    return "=";
-                case AssignmentOperator.Plus:
-                    return "+=";
-                case AssignmentOperator.Minus:
-                    return "-=";
-                case AssignmentOperator.Asterisk:
-                    return "*=";
-                case AssignmentOperator.Slash:
-                    return "/=";
-            }
+                AssignmentOperator.Simple => "=",
+                AssignmentOperator.Plus => "+=",
+                AssignmentOperator.Minus => "-=",
+                AssignmentOperator.Asterisk => "*=",
+                AssignmentOperator.Slash => "/=",
+                _ => throw ExhaustiveMatch.Failed(@operator)
+            };
         }
     }
 }
