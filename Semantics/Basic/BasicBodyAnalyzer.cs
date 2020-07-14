@@ -6,14 +6,14 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.FST;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
+using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
-using DataType = Adamant.Tools.Compiler.Bootstrap.Metadata.Types.DataType;
+using DataType = Adamant.Tools.Compiler.Bootstrap.Types.DataType;
 using UnaryOperator = Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.UnaryOperator;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic

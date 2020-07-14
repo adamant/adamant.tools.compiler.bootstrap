@@ -1,7 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
     /// <summary>
     /// The two empty types are `never` and `void`. They are the only types with

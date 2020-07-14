@@ -1,6 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage

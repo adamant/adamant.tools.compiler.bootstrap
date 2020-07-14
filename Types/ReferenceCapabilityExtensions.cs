@@ -1,7 +1,7 @@
 using System;
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
     public static class ReferenceCapabilityExtensions
     {

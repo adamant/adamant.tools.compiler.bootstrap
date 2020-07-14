@@ -1,4 +1,4 @@
-namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
     /// <summary>
     /// The type of expressions and values whose type could not be determined or

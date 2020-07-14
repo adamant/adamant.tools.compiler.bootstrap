@@ -7,7 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Operands;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Places;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.TerminatorInstructions;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 using static Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions.CompareInstructionOperator;
 using static Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions.NumericInstructionOperator;

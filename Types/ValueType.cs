@@ -1,6 +1,6 @@
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
     [Closed(
         typeof(SimpleType),

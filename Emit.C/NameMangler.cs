@@ -3,8 +3,8 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C

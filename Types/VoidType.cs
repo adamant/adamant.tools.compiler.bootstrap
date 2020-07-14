@@ -1,6 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
     /// <summary>
     /// The void type behaves similar to a unit type. However it represents the

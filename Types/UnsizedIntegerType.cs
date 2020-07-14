@@ -1,4 +1,4 @@
-namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
     /// <summary>
     /// Integer types whose exact bit length is architecture dependent

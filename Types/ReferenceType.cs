@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
     [Closed(
         typeof(ObjectType),

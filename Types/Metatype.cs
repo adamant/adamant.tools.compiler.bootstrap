@@ -1,4 +1,4 @@
-namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
     /// <summary>
     /// As in Swift, the metatype is the type of a type. That is the type of the

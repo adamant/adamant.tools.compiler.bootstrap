@@ -3,7 +3,7 @@ using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
     /// <summary>
     /// This represents a DataType that may not be computed yet. There are three

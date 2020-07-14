@@ -1,6 +1,6 @@
 using System;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
     public sealed class SizedIntegerType : IntegerType
     {

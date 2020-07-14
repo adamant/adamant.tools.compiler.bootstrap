@@ -1,8 +1,8 @@
 using System;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
+using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 {

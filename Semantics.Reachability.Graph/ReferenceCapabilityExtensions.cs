@@ -1,6 +1,6 @@
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
-using static Adamant.Tools.Compiler.Bootstrap.Metadata.Types.ReferenceCapability;
+using static Adamant.Tools.Compiler.Bootstrap.Types.ReferenceCapability;
 using static Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph.Access;
 using static Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph.Ownership;
 

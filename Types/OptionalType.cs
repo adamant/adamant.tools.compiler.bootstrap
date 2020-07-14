@@ -1,6 +1,6 @@
 using System;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
     /// <summary>
     /// The type `T?` is an optional type. Optional types either have the value

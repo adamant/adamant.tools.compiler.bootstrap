@@ -1,11 +1,11 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.FST;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Parsing.Tree;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
+using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
-using static Adamant.Tools.Compiler.Bootstrap.Metadata.Types.ReferenceCapability;
+using static Adamant.Tools.Compiler.Bootstrap.Types.ReferenceCapability;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 {

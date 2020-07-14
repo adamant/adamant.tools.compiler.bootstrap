@@ -1,8 +1,8 @@
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+using Adamant.Tools.Compiler.Bootstrap.Types;
 using Xunit;
-using static Adamant.Tools.Compiler.Bootstrap.Metadata.Types.ReferenceCapability;
+using static Adamant.Tools.Compiler.Bootstrap.Types.ReferenceCapability;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Types
 {
     [Trait("Category", "Types")]
     public class AnyTypeTests

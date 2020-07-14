@@ -1,7 +1,7 @@
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Types;
+using Adamant.Tools.Compiler.Bootstrap.Types;
 using Xunit;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Metadata.Types
+namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Types
 {
     [Trait("Category", "Types")]
     public class UnsizedIntegerTypeTests
