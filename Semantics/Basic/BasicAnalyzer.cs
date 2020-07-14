@@ -111,7 +111,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     {
                         bool mutable = @class.Modifiers.Any(m => m is IMutableKeywordToken);
                         var classType = new ObjectType(
-                            @class,
+                            @class.FullName,
                             mutable,
                             ReferenceCapability.Shared);
                         @class.DeclaresType.Fulfill(classType);

@@ -33,14 +33,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Types
             FullName = fullName;
         }
 
-        public ObjectType(
-            ITypeSymbol symbol,
-            bool declaredMutable,
-            ReferenceCapability referenceCapability)
-            : this(symbol.FullName, declaredMutable, referenceCapability)
-        {
-        }
-
         /// <summary>
         /// Use this type as a mutable type. Only allowed if the type is declared mutable
         /// </summary>
