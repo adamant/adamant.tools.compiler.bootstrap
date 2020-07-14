@@ -24,4 +24,9 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Names\Names.csproj" />
+    <ProjectReference Include="..\Types\Types.csproj" />
+  </ItemGroup>
+
 </Project>
