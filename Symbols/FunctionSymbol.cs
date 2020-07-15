@@ -10,6 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     public class FunctionSymbol : ParentSymbol
     {
         public FixedList<BindingSymbol> Parameters { get; }
+        public int Arity => Parameters.Count;
         public DataType ReturnType { get; }
 
         // TODO isn't there overlap between the parameters and the child symbols?
@@ -22,6 +23,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         {
             Parameters = parameters;
             ReturnType = returnType;
+        }
+
+        public static FunctionSymbol CreateDefaultConstructor(ObjectType constructedType)
+        {
+            var name = constructedType.FullName.Qualify(SpecialName.New);
+            return new FunctionSymbol(name, FixedList<BindingSymbol>.Empty, constructedType, SymbolSet.Empty);
         }
     }
 }
