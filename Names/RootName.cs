@@ -16,6 +16,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
     {
         public abstract IEnumerable<SimpleName> Segments { get; }
 
+        private protected RootName() { }
+
         /// <summary>
         /// Construct a new name by qualifying the given name with this one.
         /// </summary>

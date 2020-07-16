@@ -7,7 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Names
 {
-    public class SimpleName : Name, IEquatable<SimpleName>
+    public sealed class SimpleName : Name
     {
         private static readonly Regex NeedsQuoted = new Regex(@"[\\ #ₛ]", RegexOptions.Compiled);
 
@@ -15,7 +15,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public override SimpleName UnqualifiedName => this;
         public string Text { get; }
-        public int? Number { get; }
+        /// <summary>
+        /// Since the same variable name can be declared more than once, they are
+        /// given declaration numbers. The first one is declaration 0 and is
+        /// displayed without a declaration number.
+        /// </summary>
+        public int? DeclarationNumber { get; }
         public bool IsSpecial { get; }
 
         public SimpleName(string text)
@@ -25,6 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
 
         public static SimpleName Variable(string text, int number)
         {
+            if (number <0) throw new ArgumentOutOfRangeException(nameof(number), "Must not be negative");
             return new SimpleName(text, false, number);
         }
 
@@ -33,11 +39,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
             return new SimpleName(text, true, null);
         }
 
-        private SimpleName(string text, bool isSpecial, int? number)
+        private SimpleName(string text, bool isSpecial, int? declarationNumber)
         {
             Text = text;
             IsSpecial = isSpecial;
-            Number = number;
+            DeclarationNumber = declarationNumber;
         }
 
         [DebuggerHidden]
@@ -66,9 +72,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
             return false;
         }
 
-        public SimpleName WithoutNumber()
+        public SimpleName WithoutDeclarationNumber()
         {
-            if (Number is null)
+            if (DeclarationNumber is null)
                 return this;
             return new SimpleName(Text, IsSpecial, null);
         }
@@ -78,38 +84,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
             var escapedName = Text.Escape();
             if (NeedsQuoted.IsMatch(escapedName))
                 escapedName += $@"""{escapedName}""";
-            if (Number != null && Number != 0)
-                escapedName += "#" + Number;
+            if (DeclarationNumber != null && DeclarationNumber != 0)
+                escapedName += "#" + DeclarationNumber;
             return escapedName;
         }
 
         #region Equals
-        public override bool Equals(object? obj)
+        public override bool Equals(Name? other)
         {
-            return Equals(obj as SimpleName);
-        }
-
-        public bool Equals(SimpleName? other)
-        {
-            return !(other is null)
-                && Text == other.Text
-                && IsSpecial == other.IsSpecial
-                && Number == other.Number;
+            return other is SimpleName name
+                && Text == name.Text
+                && IsSpecial == name.IsSpecial
+                && DeclarationNumber == name.DeclarationNumber;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Text, IsSpecial, Number);
-        }
-
-        public static bool operator ==(SimpleName? name1, SimpleName? name2)
-        {
-            return EqualityComparer<SimpleName>.Default.Equals(name1, name2);
-        }
-
-        public static bool operator !=(SimpleName? name1, SimpleName? name2)
-        {
-            return !(name1 == name2);
+            return HashCode.Combine(Text, IsSpecial, DeclarationNumber);
         }
         #endregion
     }

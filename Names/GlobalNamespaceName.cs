@@ -6,7 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
     /// <summary>
     /// Represents the "name" of the global namespace i.e. nothing
     /// </summary>
-    public class GlobalNamespaceName : RootName
+    public sealed class GlobalNamespaceName : RootName
     {
         #region Singleton
         public static readonly GlobalNamespaceName Instance = new GlobalNamespaceName();

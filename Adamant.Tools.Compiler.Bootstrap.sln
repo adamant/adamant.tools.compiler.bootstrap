@@ -75,13 +75,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Asserts", "Tests.Asse
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeGen", "CodeGen\CodeGen.csproj", "{4D709360-03ED-4A76-8EBB-18B89462A9DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Types", "Types\Types.csproj", "{FAEB3A90-FD3D-416D-8443-31E245033560}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Types", "Types\Types.csproj", "{FAEB3A90-FD3D-416D-8443-31E245033560}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Unit.Types", "Tests.Unit.Types\Tests.Unit.Types.csproj", "{342F648A-6AEF-4755-B98C-62C6E5BBCFF2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Unit.Types", "Tests.Unit.Types\Tests.Unit.Types.csproj", "{342F648A-6AEF-4755-B98C-62C6E5BBCFF2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Symbols", "Symbols\Symbols.csproj", "{016047CF-74AA-4611-B995-D47EF2454CAD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Symbols", "Symbols\Symbols.csproj", "{016047CF-74AA-4611-B995-D47EF2454CAD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Unit.Symbols", "Tests.Unit.Symbols\Tests.Unit.Symbols.csproj", "{A65EEF14-F7D5-4DBD-BCAC-9AF67B275EB2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Unit.Symbols", "Tests.Unit.Symbols\Tests.Unit.Symbols.csproj", "{A65EEF14-F7D5-4DBD-BCAC-9AF67B275EB2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Unit.Names", "Tests.Unit.Names\Tests.Unit.Names.csproj", "{C7752F7D-AF11-47A2-84C3-95D35166E02F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -213,6 +215,10 @@ Global
 		{A65EEF14-F7D5-4DBD-BCAC-9AF67B275EB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A65EEF14-F7D5-4DBD-BCAC-9AF67B275EB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A65EEF14-F7D5-4DBD-BCAC-9AF67B275EB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7752F7D-AF11-47A2-84C3-95D35166E02F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7752F7D-AF11-47A2-84C3-95D35166E02F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7752F7D-AF11-47A2-84C3-95D35166E02F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7752F7D-AF11-47A2-84C3-95D35166E02F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -66,6 +66,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
             return this;
         }
 
+        // TODO equality
+
         public abstract override string ToString();
 
         [SuppressMessage("Usage", "CA2225:Operator overloads have named alternates",

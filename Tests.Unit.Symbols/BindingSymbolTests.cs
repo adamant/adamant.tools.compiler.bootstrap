@@ -19,5 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
             Assert.True(symbol.IsMutableBinding);
             Assert.Equal(type, symbol.Type);
         }
+
+        // TODO Bindings with the same name should match mutability and type
     }
 }

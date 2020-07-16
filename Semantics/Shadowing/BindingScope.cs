@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing
     {
         public bool Lookup(SimpleName name, [NotNullWhen(true)] out VariableBinding? binding)
         {
-            return LookupWithoutNumber(name.WithoutNumber(), out binding);
+            return LookupWithoutNumber(name.WithoutDeclarationNumber(), out binding);
         }
 
         protected abstract bool LookupWithoutNumber(SimpleName name, [NotNullWhen(true)] out VariableBinding? binding);

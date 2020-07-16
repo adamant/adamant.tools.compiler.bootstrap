@@ -1,6 +1,3 @@
-using System;
-using System.Globalization;
-
 namespace Adamant.Tools.Compiler.Bootstrap.Names
 {
     public static class SpecialName
@@ -27,17 +24,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         public static SimpleName Constructor(string? name = null)
         {
             return name is null ? New : SimpleName.Special("new_" + name);
-        }
-
-        public static SimpleName CallerBound(SimpleName name)
-        {
-            if (name.Number != 0 && name != Self)
-            {
-                var nameNumber = name.Number?.ToString(CultureInfo.InvariantCulture) ?? "null";
-                throw new ArgumentException($"Caller bound name `{name}` should have number 0, has {nameNumber}", nameof(name));
-            }
-
-            return SimpleName.Special(name + "_caller_bound");
         }
     }
 }

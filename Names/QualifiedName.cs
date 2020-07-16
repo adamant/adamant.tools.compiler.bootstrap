@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
     /// A qualified name doesn't include the package. This is because the
     /// package name could be aliased.
     /// </summary>
-    public class QualifiedName : Name, IEquatable<QualifiedName>
+    public sealed class QualifiedName : Name
     {
         public Name Qualifier { get; }
         public override SimpleName UnqualifiedName { get; }
@@ -52,31 +52,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         }
 
         #region Equals
-        public override bool Equals(object? obj)
+        public override bool Equals(Name? other)
         {
-            return Equals(obj as QualifiedName);
-        }
-
-        public bool Equals(QualifiedName? other)
-        {
-            return !(other is null)
-                   && UnqualifiedName.Equals(other.UnqualifiedName)
-                   && Qualifier.Equals(other.Qualifier);
+            return other is QualifiedName name
+                   && UnqualifiedName.Equals(name.UnqualifiedName)
+                   && Qualifier.Equals(name.Qualifier);
         }
 
         public override int GetHashCode()
         {
             return HashCode.Combine(Qualifier, UnqualifiedName);
-        }
-
-        public static bool operator ==(QualifiedName name1, QualifiedName name2)
-        {
-            return EqualityComparer<QualifiedName>.Default.Equals(name1, name2);
-        }
-
-        public static bool operator !=(QualifiedName name1, QualifiedName name2)
-        {
-            return !(name1 == name2);
         }
         #endregion
     }

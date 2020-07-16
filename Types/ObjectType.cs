@@ -23,6 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
 
         public override bool IsKnown { [DebuggerStepThrough] get => true; }
 
+        // TODO referenceCapability needs to match declared mutable?
         public ObjectType(
             Name fullName,
             bool declaredMutable,

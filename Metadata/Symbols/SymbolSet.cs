@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
 
         private static SimpleName LookupByName(ISymbol symbol)
         {
-            return symbol.FullName.UnqualifiedName.WithoutNumber();
+            return symbol.FullName.UnqualifiedName.WithoutDeclarationNumber();
         }
 
         IEnumerator<ISymbol> IEnumerable<ISymbol>.GetEnumerator()
