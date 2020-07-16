@@ -5,6 +5,7 @@ using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
 {
+    [Trait("Category", "Symbols")]
     public class SymbolTests
     {
         [Fact]

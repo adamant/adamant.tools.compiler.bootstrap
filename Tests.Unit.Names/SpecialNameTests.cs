@@ -3,6 +3,7 @@ using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Names
 {
+    [Trait("Category", "Names")]
     public class SpecialNameTests
     {
         [Fact]
