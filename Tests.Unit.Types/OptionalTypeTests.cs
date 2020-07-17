@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using Xunit;
 
@@ -60,6 +61,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Types
         public void Cannot_have_optional_void_type()
         {
             Assert.Throws<ArgumentException>(() => new OptionalType(DataType.Void));
+        }
+
+        [Fact]
+        public void With_equal_referent_are_equal()
+        {
+            var type1 = new OptionalType(new ObjectType(Name.From("foo", "bar", "baz"), true, ReferenceCapability.Borrowed));
+            var type2 = new OptionalType(new ObjectType(Name.From("foo", "bar", "baz"), true, ReferenceCapability.Borrowed));
+
+            Assert.Equal(type1, type2);
         }
     }
 }

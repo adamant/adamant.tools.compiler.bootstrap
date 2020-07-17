@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
             return symbols.Distinct().GroupBy(LookupByName).ToFixedDictionary(g => g.Key, g => g.ToFixedList());
         }
 
-        // TODO name this a property of Symbol?
+        // TODO make this a property of Symbol?
         private static SimpleName LookupByName(Symbol symbol)
         {
             return symbol.FullName.UnqualifiedName.WithoutDeclarationNumber();

@@ -64,5 +64,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Types
 
             Assert.Equal(type, @readonly);
         }
+
+        [Fact]
+        public void Is_equal_to_itself()
+        {
+            Assert.Equal(NeverType.Instance, NeverType.Instance);
+        }
     }
 }

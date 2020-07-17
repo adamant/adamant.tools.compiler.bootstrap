@@ -74,5 +74,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Types
 
             Assert.Same(DataType.Int, nonConstant);
         }
+
+        [Theory]
+        [InlineData(-234234)]
+        [InlineData(-1)]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(234234524)]
+        public void Integer_constant_types_with_same_value_are_equal(int value)
+        {
+            var type1 = new IntegerConstantType(value);
+            var type2 = new IntegerConstantType(value);
+
+            Assert.Equal(type1, type2);
+        }
     }
 }

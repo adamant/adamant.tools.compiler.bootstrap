@@ -28,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Types
         [InlineData(-1)]
         [InlineData(int.MinValue)]
         [InlineData((long)int.MinValue-1)]
-        public void Integer_constant_types_not_assignable_to_int32_(long value)
+        public void Integer_constant_types_not_assignable_to_int32(long value)
         {
             var constType = new IntegerConstantType(value);
 

@@ -21,6 +21,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
             Assert.Equal(type, symbol.Type);
         }
 
+        [Fact]
+        public void Two_bindings_with_same_name_mutability_and_type_are_equal()
+        {
+            var binding1 = new BindingSymbol(Name.From("foo", "bar", "baz"), true,
+                new ObjectType(Name.From("My_class"), true, ReferenceCapability.Borrowed));
+            var binding2 = new BindingSymbol(Name.From("foo", "bar", "baz"), true,
+                new ObjectType(Name.From("My_class"), true, ReferenceCapability.Borrowed));
+
+            Assert.Equal(binding1, binding2);
+        }
+
         // TODO Bindings with the same name should match mutability and type
     }
 }

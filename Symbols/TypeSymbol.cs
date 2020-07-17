@@ -1,3 +1,4 @@
+using System;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
@@ -14,6 +15,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
             : base(fullName, childSymbols)
         {
             DeclaresType = declaresType;
+        }
+
+        public override bool Equals(Symbol? other)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1065:Do not raise exceptions in unexpected locations", Justification = "<Pending>")]
+        public override int GetHashCode()
+        {
+            throw new NotImplementedException();
         }
     }
 }

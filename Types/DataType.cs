@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using ExhaustiveMatching;
@@ -14,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         typeof(EmptyType),
         typeof(UnknownType)
         )]
-    public abstract class DataType
+    public abstract class DataType : IEquatable<DataType>
     {
         #region Standard Types
         public static readonly UnknownType Unknown = UnknownType.Instance;
@@ -83,5 +84,27 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         {
             return this;
         }
+
+        #region Equality
+        public abstract bool Equals(DataType? other);
+        public abstract override int GetHashCode();
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj.GetType() == GetType() && Equals((DataType)obj);
+        }
+
+        public static bool operator ==(DataType? left, DataType? right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(DataType? left, DataType? right)
+        {
+            return !Equals(left, right);
+        }
+        #endregion
     }
 }

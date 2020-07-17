@@ -1,3 +1,4 @@
+using System;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using ExhaustiveMatching;
 
@@ -26,6 +27,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         public override string ToString()
         {
             return Name.ToString();
+        }
+
+        public override bool Equals(DataType? other)
+        {
+            // Empty types are all fixed instances, so a reference equality suffices
+            return ReferenceEquals(this, other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Name);
         }
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -17,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
     /// <remarks>
     /// There will be two special object types `Type` and `Metatype`
     /// </remarks>
-    public sealed class ObjectType : ReferenceType, IEquatable<ObjectType>
+    public sealed class ObjectType : ReferenceType
     {
         public Name FullName { get; }
 
@@ -59,33 +58,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         }
 
         #region Equality
-        public override bool Equals(object? obj)
+        public override bool Equals(DataType? other)
         {
-            return Equals(obj as ObjectType);
-        }
-
-        public bool Equals(ObjectType? other)
-        {
-            return !(other is null) && EqualityComparer<Name>.Default.Equals(FullName, other.FullName)
-                                    && DeclaredMutable == other.DeclaredMutable
-                                    && ReferenceCapability == other.ReferenceCapability;
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return other is ObjectType otherType
+                && FullName == otherType.FullName
+                && DeclaredMutable == otherType.DeclaredMutable
+                && ReferenceCapability == otherType.ReferenceCapability;
         }
 
         public override int GetHashCode()
         {
             return HashCode.Combine(FullName, DeclaredMutable, ReferenceCapability);
         }
-
-        public static bool operator ==(ObjectType type1, ObjectType type2)
-        {
-            return EqualityComparer<ObjectType>.Default.Equals(type1, type2);
-        }
-
-        public static bool operator !=(ObjectType type1, ObjectType type2)
-        {
-            return !(type1 == type2);
-        }
-
         #endregion
 
         protected internal override Self To_ReturnsSelf(ReferenceCapability referenceCapability)

@@ -11,5 +11,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     {
         public NamespaceSymbol(Name fullName, SymbolSet childSymbols)
             : base(fullName, childSymbols) { }
+
+        public override bool Equals(Symbol? other)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1065:Do not raise exceptions in unexpected locations", Justification = "<Pending>")]
+        public override int GetHashCode()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

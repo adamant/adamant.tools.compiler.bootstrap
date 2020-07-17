@@ -92,5 +92,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Types
 
             Assert.Equal(capability, converted.ReferenceCapability);
         }
+
+        [Fact]
+        public void Any_types_with_same_reference_capability_are_equal()
+        {
+            var type1 = new AnyType(Shared);
+            var type2 = new AnyType(Shared);
+
+            Assert.Equal(type1, type2);
+        }
+
+        [Fact]
+        public void Any_types_with_different_reference_capabilities_are_not_equal()
+        {
+            var type1 = new AnyType(Shared);
+            var type2 = new AnyType(Borrowed);
+
+            Assert.NotEqual(type1, type2);
+        }
     }
 }

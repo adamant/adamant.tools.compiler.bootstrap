@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Types
@@ -21,6 +22,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         public override DataType ToNonConstantType()
         {
             return Int;
+        }
+
+        public override bool Equals(DataType? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return other is IntegerConstantType otherType
+                && Value == otherType.Value;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Value);
         }
     }
 }

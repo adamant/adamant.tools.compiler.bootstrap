@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
-    public class BoolConstantType : BoolType
+    public sealed class BoolConstantType : BoolType
     {
         internal new static readonly BoolConstantType True = new BoolConstantType(true);
         internal new static readonly BoolConstantType False = new BoolConstantType(false);

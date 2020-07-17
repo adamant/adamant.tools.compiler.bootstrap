@@ -73,5 +73,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Types
 
             Assert.Equal(type, @readonly);
         }
+
+        [Fact]
+        public void Bool_type_equal_to_itself()
+        {
+            Assert.Equal(BoolType.Instance, BoolType.Instance);
+        }
+
+        [Fact]
+        public void Bool_type_not_equal_to_bool_constant_type()
+        {
+            Assert.NotEqual(BoolType.Instance, DataType.True);
+            Assert.NotEqual(BoolType.Instance, DataType.True);
+        }
     }
 }

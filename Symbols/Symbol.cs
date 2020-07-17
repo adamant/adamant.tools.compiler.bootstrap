@@ -20,13 +20,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         }
 
         // TODO lookup method
-        public bool Equals(Symbol? other)
-        {
-            if (other is null) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return FullName.Equals(other.FullName);
-            //&& AttributesEqual(other);
-        }
+
+        #region Equality
+        public abstract bool Equals(Symbol? other);
+
+        public abstract override int GetHashCode();
 
         public sealed override bool Equals(object? obj)
         {
@@ -35,11 +33,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
             return obj.GetType() == GetType() && Equals((Symbol)obj);
         }
 
-        // TODO protected abstract bool AttributesEqual(Symbol other);
-
-        public override int GetHashCode()
+        public static bool operator ==(Symbol? symbol1, Symbol? symbol2)
         {
-            return HashCode.Combine(FullName);
+            return Equals(symbol1, symbol2);
         }
+
+        public static bool operator !=(Symbol? symbol1, Symbol? symbol2)
+        {
+            return !(symbol1 == symbol2);
+        }
+        #endregion
     }
 }

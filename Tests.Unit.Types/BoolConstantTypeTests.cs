@@ -66,5 +66,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Types
 
             Assert.Same(DataType.Bool, nonConstant);
         }
+
+        [Fact]
+        public void Bool_constant_types_with_same_value_are_equal()
+        {
+            Assert.Equal(BoolConstantType.True, BoolConstantType.True);
+            Assert.Equal(BoolConstantType.False, BoolConstantType.False);
+        }
+
+        [Fact]
+        public void Any_types_with_different_reference_capabilities_are_not_equal()
+        {
+            Assert.NotEqual(BoolConstantType.True, BoolConstantType.False);
+        }
     }
 }

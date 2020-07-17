@@ -32,5 +32,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Types
 
             Assert.Equal(TypeSemantics.Never, type.Semantics);
         }
+
+        [Fact]
+        public void Equal_to_itself()
+        {
+            Assert.Equal(UnknownType.Instance, UnknownType.Instance);
+        }
     }
 }

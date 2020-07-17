@@ -1,3 +1,6 @@
+using System;
+using Adamant.Tools.Compiler.Bootstrap.Names;
+
 namespace Adamant.Tools.Compiler.Bootstrap.Types
 {
     /// <summary>
@@ -24,6 +27,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         public override string ToString()
         {
             return "⧼unknown⧽";
+        }
+
+        public override bool Equals(DataType? other)
+        {
+            // The unknown type is a singleton, so reference equality suffices
+            return ReferenceEquals(this, other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(SpecialName.Unknown);
         }
     }
 }

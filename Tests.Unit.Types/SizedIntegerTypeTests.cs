@@ -29,5 +29,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Types
 
             Assert.Equal(TypeSemantics.Copy, type.Semantics);
         }
+
+        [Fact]
+        public void Types_equal_to_themselves_and_not_others()
+        {
+            Assert.Equal(SizedIntegerType.Int, SizedIntegerType.Int);
+            Assert.Equal(SizedIntegerType.UInt, SizedIntegerType.UInt);
+            Assert.Equal(SizedIntegerType.Byte, SizedIntegerType.Byte);
+
+            Assert.NotEqual(SizedIntegerType.Int, SizedIntegerType.UInt);
+            Assert.NotEqual(SizedIntegerType.Int, SizedIntegerType.Byte);
+        }
     }
 }
