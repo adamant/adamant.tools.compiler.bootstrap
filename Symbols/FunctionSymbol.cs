@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Types;
@@ -33,13 +35,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
 
         public override bool Equals(Symbol? other)
         {
-            throw new System.NotImplementedException();
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            // Check exact type to make sure it isn't a method
+            if (other.GetType() != GetType()) return false;
+            var otherSymbol = (FunctionSymbol)other;
+            return FullName == otherSymbol.FullName
+                && Parameters.SequenceEqual(otherSymbol.Parameters)
+                && ReturnType == otherSymbol.ReturnType;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1065:Do not raise exceptions in unexpected locations", Justification = "<Pending>")]
         public override int GetHashCode()
         {
-            throw new System.NotImplementedException();
+            return HashCode.Combine(FullName, Parameters, ReturnType);
         }
     }
 }

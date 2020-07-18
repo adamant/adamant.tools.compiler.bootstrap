@@ -1,3 +1,4 @@
+using System;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Symbols
@@ -14,13 +15,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
 
         public override bool Equals(Symbol? other)
         {
-            throw new System.NotImplementedException();
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return other is NamespaceSymbol otherNamespace
+                   && FullName == otherNamespace.FullName;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1065:Do not raise exceptions in unexpected locations", Justification = "<Pending>")]
         public override int GetHashCode()
         {
-            throw new System.NotImplementedException();
+            return HashCode.Combine(FullName);
         }
     }
 }

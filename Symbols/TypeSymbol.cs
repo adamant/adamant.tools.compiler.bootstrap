@@ -9,23 +9,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     /// </summary>
     public sealed class TypeSymbol : ParentSymbol
     {
-        public DataType DeclaresType { get; }
+        public ObjectType DeclaresType { get; }
 
-        public TypeSymbol(Name fullName, SymbolSet childSymbols, DataType declaresType)
+        public TypeSymbol(Name fullName, ObjectType declaresType, SymbolSet childSymbols)
             : base(fullName, childSymbols)
         {
+            if (fullName != declaresType.FullName)
+                throw new ArgumentException("Declared type must have the same name as symbol", nameof(declaresType));
+
             DeclaresType = declaresType;
         }
 
         public override bool Equals(Symbol? other)
         {
-            throw new System.NotImplementedException();
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return other is TypeSymbol otherType
+                   && FullName == otherType.FullName
+                   && DeclaresType == otherType.DeclaresType;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1065:Do not raise exceptions in unexpected locations", Justification = "<Pending>")]
         public override int GetHashCode()
         {
-            throw new NotImplementedException();
+            return HashCode.Combine(FullName, DeclaresType);
         }
     }
 }

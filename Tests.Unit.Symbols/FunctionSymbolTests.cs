@@ -39,5 +39,70 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
             Assert.Equal(type, defaultConstructor.ReturnType);
             Assert.Empty(defaultConstructor.ChildSymbols);
         }
+
+        [Fact]
+        public void Functions_with_same_name_parameters_and_return_type_are_equal()
+        {
+            var parameters = new[]
+            {
+                new BindingSymbol(Name.From("a"), false, DataType.Int),
+                new BindingSymbol(Name.From("b"), false, DataType.Bool),
+            }.ToFixedList();
+            var func1 = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Void, SymbolSet.Empty);
+            var func2 = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Void, SymbolSet.Empty);
+
+            Assert.Equal(func1, func2);
+        }
+
+        [Fact]
+        public void Functions_with_different_parameters_are_not_equal()
+        {
+            var parameters1 = new[]
+            {
+                new BindingSymbol(Name.From("a"), false, DataType.Int),
+                new BindingSymbol(Name.From("b"), false, DataType.Bool),
+            }.ToFixedList();
+            var func1 = new FunctionSymbol(Name.From("Fake"), parameters1, DataType.Void, SymbolSet.Empty);
+            var parameters2 = new[]
+            {
+                new BindingSymbol(Name.From("a"), false, DataType.Int),
+                new BindingSymbol(Name.From("b"), false, DataType.Int),
+            }.ToFixedList();
+            var func2 = new FunctionSymbol(Name.From("Fake"), parameters2, DataType.Void, SymbolSet.Empty);
+
+            Assert.NotEqual(func1, func2);
+        }
+
+        [Fact]
+        public void Functions_with_different_return_types_are_not_equal()
+        {
+            var parameters = new[]
+            {
+                new BindingSymbol(Name.From("a"), false, DataType.Int),
+                new BindingSymbol(Name.From("b"), false, DataType.Bool),
+            }.ToFixedList();
+            var func1 = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Void, SymbolSet.Empty);
+            var func2 = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Int, SymbolSet.Empty);
+
+            Assert.NotEqual(func1, func2);
+        }
+
+        [Fact]
+        public void Is_not_equal_to_equivalent_method()
+        {
+            // Note that methods should really have different names than functions,
+            // but, just in case, we need to check method vs. function in equality.
+            var parameters = new[]
+            {
+                new BindingSymbol(Name.From("a"), false, DataType.Int),
+                new BindingSymbol(Name.From("b"), false, DataType.Bool),
+            }.ToFixedList();
+            var func = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Void, SymbolSet.Empty);
+            var selfParameter = new BindingSymbol(SpecialName.Self, true, new ObjectType(Name.From("My_Class"), false, ReferenceCapability.Borrowed));
+            var method = new MethodSymbol(Name.From("Fake"), selfParameter, parameters, DataType.Void, SymbolSet.Empty);
+
+            // Note: assert false used to ensure which object Equals is called on
+            Assert.False(func.Equals(method));
+        }
     }
 }
