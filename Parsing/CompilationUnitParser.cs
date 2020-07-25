@@ -3,6 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.FST;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Parsing.NotImplemented;
 using Adamant.Tools.Compiler.Bootstrap.Parsing.Tree;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 
@@ -19,9 +20,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var declarations = parser.ParseNonMemberDeclarations<IEndOfFileToken>();
             var eof = tokens.Required<IEndOfFileToken>();
             var span = TextSpan.FromStartEnd(0, eof.End);
-            return new CompilationUnitSyntax(implicitNamespaceName, span,
+            var diagnostics = tokens.Context.Diagnostics;
+            var compilationUnit = new CompilationUnitSyntax(implicitNamespaceName, span,
                 tokens.Context.File, usingDirectives,
-                declarations, tokens.Context.Diagnostics.Build());
+                declarations);
+
+            CheckSyntax(compilationUnit, diagnostics);
+            compilationUnit.Attach(diagnostics.Build());
+            return compilationUnit;
         }
 
         private static RootName ParseImplicitNamespaceName(ITokenIterator<IEssentialToken> tokens)
@@ -31,6 +37,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 name = name.Qualify(segment);
 
             return name;
+        }
+
+        private static void CheckSyntax(CompilationUnitSyntax compilationUnit, Diagnostics diagnostics)
+        {
+            var notImplementedChecker = new SyntaxNotImplementedChecker(compilationUnit, diagnostics);
+            notImplementedChecker.Check();
         }
     }
 }

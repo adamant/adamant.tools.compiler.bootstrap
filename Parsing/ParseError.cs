@@ -16,6 +16,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
     /// </summary>
     internal static class ParseError
     {
+        /// <summary>
+        /// Special temporary error for language features that are not implemented. For that reason
+        /// it breaks convention and uses error number 2000
+        /// </summary>
+        public static Diagnostic NotImplemented(CodeFile file, TextSpan span, string feature)
+        {
+            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 2000,
+                $"{feature} are not yet implemented");
+        }
+
         public static Diagnostic IncompleteDeclaration(CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Parsing, 2001, "Incomplete declaration");

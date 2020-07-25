@@ -11,6 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     /// </summary>
     public class FunctionSymbol : ParentSymbol
     {
+        // TODO the parameter types are part of the symbol, actual parameter symbols are children
         public FixedList<BindingSymbol> Parameters { get; }
         public int Arity => Parameters.Count;
         public DataType ReturnType { get; }

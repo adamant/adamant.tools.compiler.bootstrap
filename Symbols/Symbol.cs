@@ -4,6 +4,7 @@ using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Symbols
 {
+    // TODO have symbols reference their containing symbols and act a little more like names
     [Closed(
         typeof(ParentSymbol),
         typeof(BindingSymbol))]

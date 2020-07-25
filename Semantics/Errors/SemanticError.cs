@@ -14,16 +14,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
     /// </summary>
     public static class SemanticError
     {
-        /// <summary>
-        /// Special temporary error for language features that are not implemented. For that reason
-        /// it breaks convention and uses error number 6000
-        /// </summary>
-        public static Diagnostic NotImplemented(CodeFile file, TextSpan span, string feature)
-        {
-            return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6000,
-                $"{feature} are not yet implemented");
-        }
-
         public static Diagnostic CantRebindMutableBinding(CodeFile file, TextSpan span)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 6001,

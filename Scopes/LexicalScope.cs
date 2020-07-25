@@ -6,6 +6,9 @@ using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Scopes
 {
+    /// <summary>
+    /// A lexical scope allows for the lookup of an <see cref="ISymbol"/> by a name
+    /// </summary>
     public abstract class LexicalScope
     {
         private readonly SymbolSet symbols;

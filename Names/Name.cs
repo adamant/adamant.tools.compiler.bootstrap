@@ -3,6 +3,7 @@ using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Names
 {
+    // TODO It seems like the idea of qualified names doesn't make sense. That is something for symbols
     /// <summary>
     /// A name of a declaration. Note that names could even refer to local
     /// variables etc.

@@ -15,15 +15,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public FixedList<IUsingDirectiveSyntax> UsingDirectives { get; }
         public FixedList<INonMemberDeclarationSyntax> Declarations { get; }
         public FixedList<IEntityDeclarationSyntax> EntityDeclarations { get; }
-        public FixedList<Diagnostic> Diagnostics { get; }
+        public FixedList<Diagnostic> Diagnostics { get; private set; }
 
         public CompilationUnitSyntax(
             RootName implicitNamespaceName,
             TextSpan span,
             CodeFile codeFile,
             FixedList<IUsingDirectiveSyntax> usingDirectives,
-            FixedList<INonMemberDeclarationSyntax> declarations,
-            FixedList<Diagnostic> diagnostics)
+            FixedList<INonMemberDeclarationSyntax> declarations)
             : base(span)
         {
             CodeFile = codeFile;
@@ -31,6 +30,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             UsingDirectives = usingDirectives;
             Declarations = declarations;
             EntityDeclarations = GetEntityDeclarations(declarations).ToFixedList();
+            Diagnostics = FixedList<Diagnostic>.Empty;
+        }
+
+        public void Attach(FixedList<Diagnostic> diagnostics)
+        {
             Diagnostics = diagnostics;
         }
 
