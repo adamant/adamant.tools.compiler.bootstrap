@@ -1,4 +1,3 @@
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using ExhaustiveMatching;
@@ -15,6 +14,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.FST
         typeof(ICallableDeclarationSyntax))]
     public interface IEntityDeclarationSyntax : IDeclarationSyntax, ISymbol
     {
-        FixedList<IModiferToken> Modifiers { get; }
+        IAccessModifierToken? AccessModifier { get; }
     }
 }

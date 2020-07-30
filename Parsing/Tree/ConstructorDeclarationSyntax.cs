@@ -24,14 +24,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             IClassDeclarationSyntax declaringType,
             TextSpan span,
             CodeFile file,
-            FixedList<IModiferToken> modifiers,
+            IAccessModifierToken? accessModifier,
             Name fullName,
             TextSpan nameSpan,
             ISelfParameterSyntax implicitSelfParameter,
             FixedList<IConstructorParameterSyntax> parameters,
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             IBodySyntax body)
-            : base(span, file, modifiers, fullName, nameSpan, parameters, reachabilityAnnotations,
+            : base(span, file, accessModifier, fullName, nameSpan, parameters, reachabilityAnnotations,
                 GetChildSymbols(implicitSelfParameter, parameters, body))
         {
             DeclaringClass = declaringType;

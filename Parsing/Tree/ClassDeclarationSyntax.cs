@@ -13,8 +13,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class ClassDeclarationSyntax : DeclarationSyntax, IClassDeclarationSyntax
     {
-        public FixedList<IModiferToken> Modifiers { get; }
-
+        public IAccessModifierToken? AccessModifier { get; }
+        public IMutableKeywordToken? MutableModifier { get; }
         public Name FullName { get; }
 
         [DebuggerHidden]
@@ -32,13 +32,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public ClassDeclarationSyntax(
             TextSpan headerSpan,
             CodeFile file,
-            FixedList<IModiferToken> modifiers,
+            IAccessModifierToken? accessModifier,
+            IMutableKeywordToken? mutableModifier,
             Name fullName,
             TextSpan nameSpan,
             Func<IClassDeclarationSyntax, (FixedList<IMemberDeclarationSyntax>, TextSpan)> parseMembers)
             : base(headerSpan, file, nameSpan)
         {
-            Modifiers = modifiers;
+            AccessModifier = accessModifier;
+            MutableModifier = mutableModifier;
             FullName = fullName;
             var (members, bodySpan) = parseMembers(this);
             Members = members;

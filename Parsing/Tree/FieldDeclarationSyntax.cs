@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.FST;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Names;
@@ -26,13 +25,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             IClassDeclarationSyntax declaringClass,
             TextSpan span,
             CodeFile file,
-            FixedList<IModiferToken> modifiers,
+            IAccessModifierToken? accessModifier,
             bool mutableBinding,
             Name fullName,
             TextSpan nameSpan,
             ITypeSyntax typeSyntax,
             IExpressionSyntax? initializer)
-            : base(declaringClass, span, file, modifiers, fullName, nameSpan)
+            : base(declaringClass, span, file, accessModifier, fullName, nameSpan)
         {
             IsMutableBinding = mutableBinding;
             TypeSyntax = typeSyntax;

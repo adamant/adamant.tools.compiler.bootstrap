@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             IClassDeclarationSyntax declaringClass,
             TextSpan span,
             CodeFile file,
-            FixedList<IModiferToken> modifiers,
+            IAccessModifierToken? accessModifier,
             Name fullName,
             TextSpan nameSpan,
             ISelfParameterSyntax selfParameter,
@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             ITypeSyntax? returnTypeSyntax,
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             IBodySyntax body)
-            : base(declaringClass, span, file, modifiers, fullName, nameSpan, selfParameter,
+            : base(declaringClass, span, file, accessModifier, fullName, nameSpan, selfParameter,
                 parameters, returnTypeSyntax, reachabilityAnnotations,
                 GetChildSymbols(selfParameter, parameters, body))
         {

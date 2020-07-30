@@ -15,6 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal abstract class CallableDeclarationSyntax : DeclarationSyntax, ICallableDeclarationSyntax
     {
+        public IAccessModifierToken? AccessModifier { get; }
         public Name FullName { get; }
         private DataType? selfParameterType;
         [DisallowNull]
@@ -29,7 +30,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             }
         }
 
-        public FixedList<IModiferToken> Modifiers { get; }
         public FixedList<IParameterSyntax> Parameters { get; }
         IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;
         public TypePromise ReturnType { get; } = new TypePromise();
@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         protected CallableDeclarationSyntax(
             TextSpan span,
             CodeFile file,
-            FixedList<IModiferToken> modifiers,
+            IAccessModifierToken? accessModifier,
             Name fullName,
             TextSpan nameSpan,
             IEnumerable<IParameterSyntax> parameters,
@@ -49,8 +49,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             SymbolSet childSymbols)
             : base(span, file, nameSpan)
         {
+            AccessModifier = accessModifier;
             FullName = fullName;
-            Modifiers = modifiers;
             Parameters = parameters.ToFixedList();
             ReachabilityAnnotations = reachabilityAnnotations;
             ChildSymbols = childSymbols;

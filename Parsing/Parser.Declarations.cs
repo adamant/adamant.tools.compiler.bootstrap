@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.FST;
+using Adamant.Tools.Compiler.Bootstrap.Lexing;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Parsing.Tree;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
@@ -32,7 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         public INonMemberDeclarationSyntax ParseNonMemberDeclaration()
         {
-            var modifiers = AcceptMany(Tokens.AcceptToken<IModiferToken>);
+            var modifiers = ParseModifiers();
 
             switch (Tokens.Current)
             {
@@ -48,10 +50,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
+
+
         internal IMemberDeclarationSyntax ParseMemberDeclaration(
             IClassDeclarationSyntax classDeclaration)
         {
-            var modifiers = AcceptMany(Tokens.AcceptToken<IModiferToken>);
+            var modifiers = ParseModifiers();
 
             switch (Tokens.Current)
             {
@@ -69,11 +73,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             }
         }
 
+        [SuppressMessage("Performance", "CA1826:Do not use Enumerable methods on indexable collections. Instead use the collection directly",
+            Justification = "LastOrDefault() doesn't have a simple equivalent")]
+        private ModifierParser ParseModifiers()
+        {
+            var modifiers = AcceptMany(Tokens.AcceptToken<IModiferToken>);
+            var endOfModifiers = TokenFactory.EndOfFile(modifiers.LastOrDefault()?.Span.AtEnd() ?? Tokens.Current.Span.AtStart());
+            var modifierTokens = new TokenIterator<IEssentialToken>(Tokens.Context, modifiers.Append<IEssentialToken>(endOfModifiers));
+            return new ModifierParser(modifierTokens);
+        }
+
         #region Parse Namespaces
         internal NamespaceDeclarationSyntax ParseNamespaceDeclaration(
-             FixedList<IModiferToken> _)
+             ModifierParser modifiers)
         {
-            // TODO generate errors for attributes or modifiers
+            modifiers.ParseEndOfModifiers();
             var ns = Tokens.Expect<INamespaceKeywordToken>();
             var globalQualifier = Tokens.AcceptToken<IColonColonDotToken>();
             var (name, nameSpan) = ParseNamespaceName();
@@ -110,8 +124,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         #endregion
 
         #region Parse Functions
-        internal IFunctionDeclarationSyntax ParseFunction(FixedList<IModiferToken> modifiers)
+        internal IFunctionDeclarationSyntax ParseFunction(ModifierParser modifiers)
         {
+            var accessModifer = modifiers.ParseAccessModifier();
+            modifiers.ParseEndOfModifiers();
             var fn = Tokens.Expect<IFunctionKeywordToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(identifier.Value);
@@ -121,7 +137,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var body = bodyParser.ParseFunctionBody();
             var span = TextSpan.Covering(fn, body.Span);
 
-            return new FunctionDeclarationSyntax(span, File, modifiers, name, identifier.Span,
+            return new FunctionDeclarationSyntax(span, File, accessModifer, name, identifier.Span,
                 parameters, returnType, reachabilityAnnotations, body);
         }
 
@@ -156,14 +172,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
         #region Parse Class Declarations
         private IClassDeclarationSyntax ParseClass(
-             FixedList<IModiferToken> modifiers)
+             ModifierParser modifiers)
         {
+            var accessModifier = modifiers.ParseAccessModifier();
+            var mutableModifier = modifiers.ParseMutableModifier();
+            modifiers.ParseEndOfModifiers();
             var @class = Tokens.Expect<IClassKeywordToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(identifier.Value);
             var headerSpan = TextSpan.Covering(@class, identifier.Span);
             var bodyParser = NestedParser(name);
-            return new ClassDeclarationSyntax(headerSpan, File, modifiers, name, identifier.Span, bodyParser.ParseClassBody);
+            return new ClassDeclarationSyntax(headerSpan, File, accessModifier, mutableModifier, name, identifier.Span, bodyParser.ParseClassBody);
         }
 
         private (FixedList<IMemberDeclarationSyntax> members, TextSpan span) ParseClassBody(IClassDeclarationSyntax declaringType)
@@ -186,8 +205,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         internal FieldDeclarationSyntax ParseField(
             IClassDeclarationSyntax declaringType,
             bool mutableBinding,
-            FixedList<IModiferToken> modifiers)
+            ModifierParser modifiers)
         {
+            var accessModifer = modifiers.ParseAccessModifier();
+            modifiers.ParseEndOfModifiers();
             // We should only be called when there is a binding keyword
             var binding = Tokens.Required<IBindingToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
@@ -200,14 +221,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
 
             var semicolon = Tokens.Expect<ISemicolonToken>();
             var span = TextSpan.Covering(binding, semicolon);
-            return new FieldDeclarationSyntax(declaringType, span, File, modifiers, mutableBinding, name,
+            return new FieldDeclarationSyntax(declaringType, span, File, accessModifer, mutableBinding, name,
                 identifier.Span, type, initializer);
         }
 
         internal IMemberDeclarationSyntax ParseMemberFunction(
             IClassDeclarationSyntax declaringType,
-            FixedList<IModiferToken> modifiers)
+            ModifierParser modifiers)
         {
+            var accessModifer = modifiers.ParseAccessModifier();
+            modifiers.ParseEndOfModifiers();
             var fn = Tokens.Expect<IFunctionKeywordToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(identifier.Value);
@@ -224,7 +247,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             {
                 var body = bodyParser.ParseFunctionBody();
                 var span = TextSpan.Covering(fn, body.Span);
-                return new AssociatedFunctionDeclarationSyntax(declaringType, span, File, modifiers,
+                return new AssociatedFunctionDeclarationSyntax(declaringType, span, File, accessModifer,
                     name, identifier.Span, namedParameters, returnType, reachabilityAnnotations, body);
             }
 
@@ -239,22 +262,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             {
                 var body = bodyParser.ParseFunctionBody();
                 var span = TextSpan.Covering(fn, body.Span);
-                return new ConcreteMethodDeclarationSyntax(declaringType, span, File, modifiers, name,
+                return new ConcreteMethodDeclarationSyntax(declaringType, span, File, accessModifer, name,
                     identifier.Span, selfParameter, namedParameters, returnType, reachabilityAnnotations, body);
             }
             else
             {
                 var semicolon = bodyParser.Tokens.Expect<ISemicolonToken>();
                 var span = TextSpan.Covering(fn, semicolon);
-                return new AbstractMethodDeclarationSyntax(declaringType, span, File, modifiers, name,
+                return new AbstractMethodDeclarationSyntax(declaringType, span, File, accessModifer, name,
                     identifier.Span, selfParameter, namedParameters, returnType, reachabilityAnnotations);
             }
         }
 
         internal ConstructorDeclarationSyntax ParseConstructor(
             IClassDeclarationSyntax declaringType,
-            FixedList<IModiferToken> modifiers)
+            ModifierParser modifiers)
         {
+            var accessModifer = modifiers.ParseAccessModifier();
+            modifiers.ParseEndOfModifiers();
             var newKeywordSpan = Tokens.Expect<INewKeywordToken>();
             var identifier = Tokens.AcceptToken<IIdentifierToken>();
             var name = nameContext.Qualify(SpecialName.Constructor(identifier?.Value));
@@ -266,7 +291,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             // For now, just say constructors have no annotations
             var reachabilityAnnotations = FixedList<IReachabilityAnnotationSyntax>.Empty;
             var span = TextSpan.Covering(newKeywordSpan, body.Span);
-            return new ConstructorDeclarationSyntax(declaringType, span, File, modifiers, name,
+            return new ConstructorDeclarationSyntax(declaringType, span, File, accessModifer, name,
                 TextSpan.Covering(newKeywordSpan, identifier?.Span), selfParameter, parameters, reachabilityAnnotations, body);
         }
         #endregion

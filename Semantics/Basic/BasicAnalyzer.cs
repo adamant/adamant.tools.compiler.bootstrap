@@ -6,7 +6,6 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.FST;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
-using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 
@@ -109,7 +108,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     if (@class.DeclaresType.TryBeginFulfilling(() => diagnostics.Add(
                         TypeError.CircularDefinition(@class.File, @class.NameSpan, @class.Name))))
                     {
-                        bool mutable = @class.Modifiers.Any(m => m is IMutableKeywordToken);
+                        bool mutable = !(@class.MutableModifier is null);
                         var classType = new ObjectType(
                             @class.FullName,
                             mutable,
