@@ -3,7 +3,7 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
+namespace Adamant.Tools.Compiler.Bootstrap.Metadata
 {
     /// <summary>
     /// An immutable set of symbols that are indexed by their unqualified name

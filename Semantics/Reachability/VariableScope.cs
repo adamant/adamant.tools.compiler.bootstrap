@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
+using Adamant.Tools.Compiler.Bootstrap.Metadata;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
 {

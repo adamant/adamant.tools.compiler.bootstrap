@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
+using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using ExhaustiveMatching;
 

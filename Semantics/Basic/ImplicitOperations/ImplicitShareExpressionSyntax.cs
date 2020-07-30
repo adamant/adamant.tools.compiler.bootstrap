@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.CST;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
+using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 

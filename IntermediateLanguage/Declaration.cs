@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
+using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using ExhaustiveMatching;
 

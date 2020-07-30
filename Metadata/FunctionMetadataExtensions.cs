@@ -1,6 +1,6 @@
 using System.Linq;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
+namespace Adamant.Tools.Compiler.Bootstrap.Metadata
 {
     public static class FunctionSymbolExtensions
     {

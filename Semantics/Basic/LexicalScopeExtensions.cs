@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
+using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 

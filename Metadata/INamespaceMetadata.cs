@@ -1,4 +1,4 @@
-namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
+namespace Adamant.Tools.Compiler.Bootstrap.Metadata
 {
     /// <summary>
     /// While namespaces in syntax declarations are repeated across files, and

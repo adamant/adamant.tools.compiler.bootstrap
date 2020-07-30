@@ -1,6 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
+namespace Adamant.Tools.Compiler.Bootstrap.Metadata
 {
     /// <summary>
     /// A symbol for a variable or field. Both of which are bindings using `let` or `var`

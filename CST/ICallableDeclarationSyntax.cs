@@ -1,5 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
+using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CST

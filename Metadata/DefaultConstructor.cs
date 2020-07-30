@@ -3,7 +3,7 @@ using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
+namespace Adamant.Tools.Compiler.Bootstrap.Metadata
 {
     public sealed class DefaultConstructor : IFunctionSymbol
     {

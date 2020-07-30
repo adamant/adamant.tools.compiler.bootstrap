@@ -1,6 +1,6 @@
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
+namespace Adamant.Tools.Compiler.Bootstrap.Metadata
 {
     /// <summary>
     /// A symbol that has child symbols

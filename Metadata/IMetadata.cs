@@ -1,7 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols
+namespace Adamant.Tools.Compiler.Bootstrap.Metadata
 {
     [Closed(
         typeof(IParentSymbol),
