@@ -16,10 +16,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SimpleName Name => FullName.UnqualifiedName;
         public ISelfParameterSyntax SelfParameter { get; }
-        public IBindingSymbol SelfParameterSymbol => SelfParameter;
+        public IBindingMetadata SelfParameterMetadata => SelfParameter;
         public new FixedList<INamedParameterSyntax> Parameters { get; }
         public ITypeSyntax? ReturnTypeSyntax { get; }
-        DataType IFunctionSymbol.ReturnType => ReturnType.Fulfilled();
+        DataType IFunctionMetadata.ReturnType => ReturnType.Fulfilled();
 
         protected MethodDeclarationSyntax(
             IClassDeclarationSyntax declaringClass,
@@ -32,9 +32,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<INamedParameterSyntax> parameters,
             ITypeSyntax? returnTypeSyntax,
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
-            SymbolSet childSymbols)
+            MetadataSet childMetadata)
             : base(span, file, accessModifier, fullName, nameSpan,
-                parameters, reachabilityAnnotations, childSymbols)
+                parameters, reachabilityAnnotations, childMetadata)
         {
             DeclaringClass = declaringClass;
             SelfParameter = selfParameter;

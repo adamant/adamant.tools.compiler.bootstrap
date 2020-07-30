@@ -18,17 +18,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     {
         public SimpleName Name { [DebuggerStepThrough] get; }
 
-        private IBindingSymbol? referencedSymbol;
+        private IBindingMetadata? referencedBinding;
         [DisallowNull]
-        public IBindingSymbol? ReferencedSymbol
+        public IBindingMetadata? ReferencedBinding
         {
             [DebuggerStepThrough]
-            get => referencedSymbol;
+            get => referencedBinding;
             set
             {
-                if (referencedSymbol != null)
-                    throw new InvalidOperationException("Can't set referenced symbol repeatedly");
-                referencedSymbol = value ?? throw new ArgumentNullException(nameof(value));
+                if (referencedBinding != null)
+                    throw new InvalidOperationException($"Can't set {nameof(ReferencedBinding)} repeatedly");
+                referencedBinding = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 
@@ -54,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name = name;
         }
 
-        public FixedList<ISymbol> LookupInContainingScope()
+        public FixedList<IMetadata> LookupInContainingScope()
         {
             if (ContainingScope != null)
                 return ContainingScope.Lookup(Name);

@@ -20,9 +20,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             get => ref referent;
         }
 
-        private IBindingSymbol? movedSymbol;
+        private IBindingMetadata? movedSymbol;
         [DisallowNull]
-        public IBindingSymbol? MovedSymbol
+        public IBindingMetadata? MovedSymbol
         {
             [DebuggerStepThrough]
             get => movedSymbol;

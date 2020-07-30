@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             IBodySyntax body)
             : base(span, file, accessModifier, fullName, nameSpan, parameters, reachabilityAnnotations,
-                GetChildSymbols(implicitSelfParameter, parameters, body))
+                GetChildMetadata(implicitSelfParameter, parameters, body))
         {
             DeclaringClass = declaringType;
             ImplicitSelfParameter = implicitSelfParameter;

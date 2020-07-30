@@ -7,12 +7,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Scopes
 {
     public class GlobalScope : LexicalScope
     {
-        public GlobalScope(IEnumerable<ISymbol> symbols, IEnumerable<ISymbol> nestedSymbols)
-            : base(new SymbolSet(symbols), new SymbolSet(nestedSymbols))
+        public GlobalScope(IEnumerable<IMetadata> metadata, IEnumerable<IMetadata> nestedMetadata)
+            : base(new MetadataSet(metadata), new MetadataSet(nestedMetadata))
         {
         }
 
-        public override FixedList<ISymbol> LookupInGlobalScope(Name name)
+        public override FixedList<IMetadata> LookupInGlobalScope(Name name)
         {
             // Don't include nested scopes, it must be in the global scope because it is global qualified
             return Lookup(name, includeNested: false);

@@ -3,9 +3,9 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata
 {
     /// <summary>
-    /// A symbol for a type declaration (i.e. a class)
+    /// Metadata for a type declaration (i.e. a class)
     /// </summary>
-    public interface ITypeSymbol : IParentSymbol
+    public interface ITypeMetadata : IParentMetadata
     {
         DataType DeclaresType { get; }
     }

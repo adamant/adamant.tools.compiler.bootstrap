@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
-    public interface IForeachExpressionSyntax : IExpressionSyntax, IBindingSymbol
+    public interface IForeachExpressionSyntax : IExpressionSyntax, IBindingMetadata
     {
         SimpleName VariableName { get; }
         bool VariableIsLiveAfterAssignment { get; set; }

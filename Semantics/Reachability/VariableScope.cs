@@ -10,8 +10,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
     internal class VariableScope
     {
         public VariableScope? ContainingScope { get; }
-        private readonly HashSet<IBindingSymbol> variables = new HashSet<IBindingSymbol>();
-        public IReadOnlyCollection<IBindingSymbol> Variables => variables;
+        private readonly HashSet<IBindingMetadata> variables = new HashSet<IBindingMetadata>();
+        public IReadOnlyCollection<IBindingMetadata> Variables => variables;
 
         public VariableScope(VariableScope? containingScope = null)
         {
@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
         /// <summary>
         /// Declare a variable in the current scope
         /// </summary>
-        public void VariableDeclared(IBindingSymbol symbol)
+        public void VariableDeclared(IBindingMetadata symbol)
         {
             variables.Add(symbol);
         }

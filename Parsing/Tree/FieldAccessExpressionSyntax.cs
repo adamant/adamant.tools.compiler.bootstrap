@@ -16,14 +16,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public INameExpressionSyntax Field { get; }
 
         [DisallowNull]
-        public IBindingSymbol? ReferencedSymbol
+        public IBindingMetadata? ReferencedBinding
         {
-            get => Field.ReferencedSymbol;
+            get => Field.ReferencedBinding;
             set
             {
-                if (Field.ReferencedSymbol != null)
+                if (Field.ReferencedBinding != null)
                     throw new InvalidOperationException("Can't set ReferencedSymbol repeatedly");
-                Field.ReferencedSymbol = value ?? throw new ArgumentNullException(nameof(value));
+                Field.ReferencedBinding = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 

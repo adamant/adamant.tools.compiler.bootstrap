@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         typeof(MethodDeclaration),
         typeof(FieldDeclaration),
         typeof(ConstructorDeclaration))]
-    public abstract class Declaration : ISymbol
+    public abstract class Declaration : IMetadata
     {
         public bool IsMember { get; }
         public Name FullName { get; }
@@ -20,13 +20,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SimpleName Name => FullName.UnqualifiedName;
 
-        public SymbolSet ChildSymbols { get; }
+        public MetadataSet ChildMetadata { get; }
 
-        protected Declaration(bool isMember, Name fullName, SymbolSet childSymbols)
+        protected Declaration(bool isMember, Name fullName, MetadataSet childMetadata)
         {
             IsMember = isMember;
             FullName = fullName;
-            ChildSymbols = childSymbols;
+            ChildMetadata = childMetadata;
         }
 
         public override string ToString()

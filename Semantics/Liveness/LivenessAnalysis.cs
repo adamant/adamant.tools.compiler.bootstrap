@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
             switch (assignmentExpression.LeftOperand)
             {
                 case INameExpressionSyntax identifier:
-                    var symbol = identifier.ReferencedSymbol.Assigned();
+                    var symbol = identifier.ReferencedBinding.Assigned();
                     identifier.VariableIsLiveAfter = liveVariables[symbol]
                                              ?? throw new Exception($"No liveness data for variable {symbol}");
                     return liveVariables.Set(symbol, false);
@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness
             INameExpressionSyntax nameExpression,
             VariableFlags liveVariables)
         {
-            var symbol = nameExpression.ReferencedSymbol.Assigned();
+            var symbol = nameExpression.ReferencedBinding.Assigned();
             nameExpression.VariableIsLiveAfter = liveVariables[symbol]
                                          ?? throw new Exception($"No liveness data for variable {symbol.FullName}");
             return liveVariables.Set(symbol, true);

@@ -21,10 +21,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public ICallableNameSyntax? ConstructorName { get; }
 
         public FixedList<IArgumentSyntax> Arguments { get; }
-        private IFunctionSymbol? constructorSymbol;
+        private IFunctionMetadata? constructorSymbol;
 
         [DisallowNull]
-        public IFunctionSymbol? ConstructorSymbol
+        public IFunctionMetadata? ReferencedConstructor
         {
             get => constructorSymbol;
             set

@@ -20,16 +20,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
             get => ref referent;
         }
 
-        private readonly IBindingSymbol movedSymbol;
+        private readonly IBindingMetadata movedSymbol;
         [DisallowNull]
-        public IBindingSymbol? MovedSymbol
+        public IBindingMetadata? MovedSymbol
         {
             [DebuggerStepThrough]
             get => movedSymbol;
             set => throw new InvalidOperationException("Can't set referenced symbol repeatedly");
         }
 
-        public ImplicitMoveSyntax(IExpressionSyntax referent, DataType type, IBindingSymbol movedSymbol)
+        public ImplicitMoveSyntax(IExpressionSyntax referent, DataType type, IBindingMetadata movedSymbol)
             : base(type, referent.Span)
         {
             this.referent = referent;

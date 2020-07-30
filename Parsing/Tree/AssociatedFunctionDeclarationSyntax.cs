@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public new FixedList<INamedParameterSyntax> Parameters { get; }
         public ITypeSyntax? ReturnTypeSyntax { get; }
-        DataType IFunctionSymbol.ReturnType => ReturnType.Fulfilled();
+        DataType IFunctionMetadata.ReturnType => ReturnType.Fulfilled();
         public IBodySyntax Body { get; }
 
         public AssociatedFunctionDeclarationSyntax(
@@ -34,7 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             IBodySyntax body)
             : base(span, file, accessModifier, fullName, nameSpan, parameters,
-                reachabilityAnnotations, GetChildSymbols(null, parameters, body))
+                reachabilityAnnotations, GetChildMetadata(null, parameters, body))
         {
             DeclaringClass = declaringClass;
             Parameters = parameters;

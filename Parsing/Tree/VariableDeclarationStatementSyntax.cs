@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public ITypeSyntax? TypeSyntax { [DebuggerStepThrough] get; }
         public bool InferMutableType { [DebuggerStepThrough] get; }
         private DataType? type;
-        DataType IBindingSymbol.Type => Type ?? throw new InvalidOperationException();
+        DataType IBindingMetadata.Type => Type ?? throw new InvalidOperationException();
 
         [DisallowNull]
         public DataType? Type

@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations)
             : base(declaringClass, span, file, accessModifier, fullName, nameSpan,
                 selfParameter, parameters, returnTypeSyntax, reachabilityAnnotations,
-                GetChildSymbols(selfParameter, parameters, null))
+                GetChildMetadata(selfParameter, parameters, null))
         {
         }
 

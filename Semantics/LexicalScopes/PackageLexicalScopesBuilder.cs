@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         {
             return
                 // Any namespace created by primitive symbols
-                PrimitiveSymbols.Instance.SelectMany(s => s.FullName.NestedInNames())
+                PrimitiveMetadataDefinitions.Instance.SelectMany(s => s.FullName.NestedInNames())
                 // or any namespace containing a referenced entity
                 .Concat(references.Values.SelectMany(p => p.GetNonMemberDeclarations())
                           .SelectMany(d => d.FullName.NestedInNames()))
@@ -62,18 +62,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                 .Distinct();
         }
 
-        private static FixedList<ISymbol> GetNonMemberEntitySymbols(
+        private static FixedList<IMetadata> GetNonMemberEntitySymbols(
             PackageSyntax packageSyntax,
             FixedDictionary<string, Package> references)
         {
-            return references.Values.SelectMany(p => p.GetNonMemberDeclarations()).SafeCast<ISymbol>()
+            return references.Values.SelectMany(p => p.GetNonMemberDeclarations()).SafeCast<IMetadata>()
                              .Concat(packageSyntax.GetDeclarations().OfType<INonMemberEntityDeclarationSyntax>())
-                             .Concat(PrimitiveSymbols.Instance).ToFixedList();
+                             .Concat(PrimitiveMetadataDefinitions.Instance).ToFixedList();
         }
 
-        private static IEnumerable<Namespace> BuildNamespaces(IEnumerable<Name> namespaceNames, IEnumerable<ISymbol> nonMemberEntitySymbols)
+        private static IEnumerable<Namespace> BuildNamespaces(IEnumerable<Name> namespaceNames, IEnumerable<IMetadata> nonMemberEntitySymbols)
         {
-            var symbols = new List<ISymbol>(nonMemberEntitySymbols);
+            var symbols = new List<IMetadata>(nonMemberEntitySymbols);
             // Process longest to shortest so nested namespaces will be available to construct outer namespaces
             foreach (var namespaceName in namespaceNames.OrderByDescending(n => n.Segments.Count()))
             {

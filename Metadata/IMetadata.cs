@@ -4,9 +4,9 @@ using ExhaustiveMatching;
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata
 {
     [Closed(
-        typeof(IParentSymbol),
-        typeof(IBindingSymbol))]
-    public interface ISymbol
+        typeof(IParentMetadata),
+        typeof(IBindingMetadata))]
+    public interface IMetadata
     {
         Name FullName { get; }
     }

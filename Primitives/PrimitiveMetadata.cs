@@ -3,15 +3,15 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 {
-    internal abstract class PrimitiveSymbol : ISymbol
+    internal abstract class PrimitiveMetadata : IMetadata
     {
         public Name FullName { get; }
-        public SymbolSet ChildSymbols { get; }
+        public MetadataSet ChildMetadata { get; }
 
-        protected PrimitiveSymbol(Name fullName, SymbolSet childSymbols)
+        protected PrimitiveMetadata(Name fullName, MetadataSet childMetadata)
         {
             FullName = fullName;
-            ChildSymbols = childSymbols;
+            ChildMetadata = childMetadata;
         }
     }
 }

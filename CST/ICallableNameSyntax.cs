@@ -10,6 +10,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public interface ICallableNameSyntax : ISyntax, IHasContainingScope
     {
         Name Name { get; }
-        [DisallowNull] IFunctionSymbol? ReferencedSymbol { get; set; }
+        [DisallowNull] IFunctionMetadata? ReferencedFunctionMetadata { get; set; }
     }
 }

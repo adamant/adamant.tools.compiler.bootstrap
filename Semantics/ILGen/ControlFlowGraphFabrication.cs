@@ -373,7 +373,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 break;
                 case IMethodInvocationExpressionSyntax exp:
                 {
-                    var methodName = exp.MethodNameSyntax.ReferencedSymbol!.FullName;
+                    var methodName = exp.MethodNameSyntax.ReferencedFunctionMetadata!.FullName;
                     var target = ConvertToOperand(exp.ContextExpression);
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
                     currentBlock!.Add(new CallVirtualInstruction(target, methodName, args, exp.Span, CurrentScope));
@@ -411,7 +411,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     break;
                 case IFunctionInvocationExpressionSyntax exp:
                 {
-                    var functionName = exp.FunctionNameSyntax.ReferencedSymbol!.FullName;
+                    var functionName = exp.FunctionNameSyntax.ReferencedFunctionMetadata!.FullName;
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
                     currentBlock!.Add(CallInstruction.ForFunction(functionName, args, exp.Span, CurrentScope));
                 }
@@ -496,7 +496,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case INameExpressionSyntax exp:
                 {
                     // This occurs when the source code contains a simple assignment like `x = y`
-                    var symbol = exp.ReferencedSymbol.Assigned();
+                    var symbol = exp.ReferencedBinding.Assigned();
                     var variable = graph.VariableFor(symbol.FullName.UnqualifiedName).Reference(exp.Span);
                     currentBlock!.Add(new AssignmentInstruction(resultPlace, variable, exp.Span, CurrentScope));
                 }
@@ -610,14 +610,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 break;
                 case IFunctionInvocationExpressionSyntax exp:
                 {
-                    var functionName = exp.FunctionNameSyntax.ReferencedSymbol!.FullName;
+                    var functionName = exp.FunctionNameSyntax.ReferencedFunctionMetadata!.FullName;
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
                     currentBlock!.Add(CallInstruction.ForFunction(resultPlace, functionName, args, exp.Span, CurrentScope));
                 }
                 break;
                 case IMethodInvocationExpressionSyntax exp:
                 {
-                    var methodName = exp.MethodNameSyntax.ReferencedSymbol!.FullName;
+                    var methodName = exp.MethodNameSyntax.ReferencedFunctionMetadata!.FullName;
                     var target = ConvertToOperand(exp.ContextExpression);
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
                     if (exp.ContextExpression.Type is ReferenceType)
@@ -628,7 +628,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 break;
                 case INewObjectExpressionSyntax exp:
                 {
-                    var constructorName = exp.ConstructorSymbol!.FullName;
+                    var constructorName = exp.ReferencedConstructor!.FullName;
                     var args = exp.Arguments.Select(a => ConvertToOperand(a.Expression)).ToFixedList();
                     var constructedType = (ObjectType)exp.TypeSyntax.NamedType.Assigned().Known();
                     currentBlock!.Add(new NewObjectInstruction(resultPlace, constructorName, constructedType, args, exp.Span, CurrentScope));
@@ -675,7 +675,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     return graph.SelfVariable.Reference(exp.Span);
                 case INameExpressionSyntax exp:
                 {
-                    var symbol = exp.ReferencedSymbol.Assigned();
+                    var symbol = exp.ReferencedBinding.Assigned();
                     return graph.VariableFor(symbol.FullName.UnqualifiedName).Reference(exp.Span);
                 }
                 case IAssignmentExpressionSyntax _:
@@ -732,7 +732,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                     return new VariablePlace(Variable.Self, exp.Span);
                 case INameExpressionSyntax exp:
                 {
-                    var symbol = exp.ReferencedSymbol.Assigned();
+                    var symbol = exp.ReferencedBinding.Assigned();
                     return graph.VariableFor(symbol.FullName.UnqualifiedName).Place(exp.Span);
                 }
             }

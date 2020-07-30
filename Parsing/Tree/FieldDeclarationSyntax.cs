@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        DataType IBindingSymbol.Type => Type.Fulfilled();
+        DataType IBindingMetadata.Type => Type.Fulfilled();
 
         public FieldDeclarationSyntax(
             IClassDeclarationSyntax declaringClass,

@@ -8,7 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
-    public class MethodDeclaration : Declaration, ICallableDeclaration, IMethodSymbol
+    public class MethodDeclaration : Declaration, ICallableDeclaration, IMethodMetadata
     {
         public bool IsExternal => false;
         [SuppressMessage("Design", "CA1033:Interface methods should be callable by child types",
@@ -18,13 +18,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 
         [SuppressMessage("Design", "CA1033:Interface methods should be callable by child types",
             Justification = "NA")]
-        IBindingSymbol IMethodSymbol.SelfParameterSymbol => SelfParameter;
+        IBindingMetadata IMethodMetadata.SelfParameterMetadata => SelfParameter;
         public FixedList<Parameter> Parameters { get; }
         public int Arity => Parameters.Count;
         public DataType ReturnType { get; }
         public ControlFlowGraph? IL { get; }
 
-        IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;
+        IEnumerable<IBindingMetadata> IFunctionMetadata.Parameters => Parameters;
 
         public MethodDeclaration(
             Name name,
@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
             FixedList<Parameter> parameters,
             DataType returnType,
             ControlFlowGraph? il)
-            : base(true, name, SymbolSet.Empty)
+            : base(true, name, MetadataSet.Empty)
         {
             SelfParameter = selfParameter;
             Parameters = parameters;

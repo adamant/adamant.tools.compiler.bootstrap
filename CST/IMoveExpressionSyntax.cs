@@ -9,6 +9,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public interface IMoveExpressionSyntax : IExpressionSyntax
     {
         ref IExpressionSyntax Referent { get; }
-        [DisallowNull] IBindingSymbol? MovedSymbol { get; set; }
+        [DisallowNull] IBindingMetadata? MovedSymbol { get; set; }
     }
 }

@@ -9,6 +9,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public interface IShareExpressionSyntax : IExpressionSyntax
     {
         ref IExpressionSyntax Referent { get; }
-        IBindingSymbol SharedSymbol { get; }
+        IBindingMetadata SharedSymbol { get; }
     }
 }

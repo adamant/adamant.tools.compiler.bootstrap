@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
 
         private static void AssertHasReferencedSymbol(
             ISyntax syntax,
-            ISymbol? referencedSymbol)
+            IMetadata? referencedSymbol)
         {
             if (referencedSymbol is null)
                 throw new Exception($"Expression doesn't have referenced symbol `{syntax}`");
@@ -31,19 +31,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     return;
                 case IFieldAccessExpressionSyntax memberAccessExpression:
                     WalkChildren(memberAccessExpression);
-                    AssertHasReferencedSymbol(memberAccessExpression, memberAccessExpression.ReferencedSymbol);
+                    AssertHasReferencedSymbol(memberAccessExpression, memberAccessExpression.ReferencedBinding);
                     return;
                 case INameExpressionSyntax nameExpression:
                     WalkChildren(nameExpression);
-                    AssertHasReferencedSymbol(nameExpression, nameExpression.ReferencedSymbol);
+                    AssertHasReferencedSymbol(nameExpression, nameExpression.ReferencedBinding);
                     return;
                 case ICallableNameSyntax callableName:
                     WalkChildren(callableName);
-                    AssertHasReferencedSymbol(callableName, callableName.ReferencedSymbol);
+                    AssertHasReferencedSymbol(callableName, callableName.ReferencedFunctionMetadata);
                     return;
                 case ITypeNameSyntax typeName:
                     WalkChildren(typeName);
-                    AssertHasReferencedSymbol(typeName, typeName.ReferencedSymbol);
+                    AssertHasReferencedSymbol(typeName, typeName.ReferencedType);
                     return;
                 case IMoveExpressionSyntax move:
                     WalkChildren(move);
@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     return;
                 case IBorrowExpressionSyntax borrow:
                     WalkChildren(borrow);
-                    AssertHasReferencedSymbol(borrow, borrow.BorrowedSymbol);
+                    AssertHasReferencedSymbol(borrow, borrow.BorrowedFromBinding);
                     return;
                 case IShareExpressionSyntax share:
                     WalkChildren(share);

@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(INonMemberEntityDeclarationSyntax),
         typeof(IMemberDeclarationSyntax),
         typeof(ICallableDeclarationSyntax))]
-    public interface IEntityDeclarationSyntax : IDeclarationSyntax, ISymbol
+    public interface IEntityDeclarationSyntax : IDeclarationSyntax, IMetadata
     {
         IAccessModifierToken? AccessModifier { get; }
     }

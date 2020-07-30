@@ -9,17 +9,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
 {
     public class VariableFlags
     {
-        private readonly FixedDictionary<ISymbol, int> symbolMap;
+        private readonly FixedDictionary<IMetadata, int> symbolMap;
         private readonly BitArray flags;
 
         public VariableFlags(IConcreteCallableDeclarationSyntax callable, bool defaultValue)
         {
-            symbolMap = callable.ChildSymbols.Enumerate<ISymbol>().ToFixedDictionary();
+            symbolMap = callable.ChildMetadata.Enumerate<IMetadata>().ToFixedDictionary();
             flags = new BitArray(symbolMap.Count, defaultValue);
         }
 
         public VariableFlags(
-            FixedDictionary<ISymbol, int> symbolMap,
+            FixedDictionary<IMetadata, int> symbolMap,
             BitArray flags)
         {
             this.symbolMap = symbolMap;
@@ -31,9 +31,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
         /// variable.
         /// </summary>
         [SuppressMessage("Design", "CA1043:Use Integral Or String Argument For Indexers", Justification = "Symbols are like immutable strings")]
-        public bool? this[ISymbol symbol] => symbolMap.TryGetValue(symbol, out var i) ? (bool?)flags[i] : null;
+        public bool? this[IMetadata symbol] => symbolMap.TryGetValue(symbol, out var i) ? (bool?)flags[i] : null;
 
-        public VariableFlags Set(ISymbol symbol, bool value)
+        public VariableFlags Set(IMetadata symbol, bool value)
         {
             // TODO if setting to the current value, don't need to clone
             var newFlags = Clone();
@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow
             return newFlags;
         }
 
-        public VariableFlags Set(IEnumerable<ISymbol> symbols, bool value)
+        public VariableFlags Set(IEnumerable<IMetadata> symbols, bool value)
         {
             // TODO if setting to the current value, don't need to clone
             var newFlags = Clone();

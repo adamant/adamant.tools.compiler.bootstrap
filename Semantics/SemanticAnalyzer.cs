@@ -70,7 +70,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             return new Package(packageSyntax.Name, diagnostics.Build(), references, declarations, entryPoint);
         }
 
-        private static ITypeSymbol? BuildLexicalScopes(
+        private static ITypeMetadata? BuildLexicalScopes(
             PackageSyntax packageSyntax,
             FixedDictionary<string, Package> references,
             Diagnostics diagnostics)
@@ -78,7 +78,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             var scopesBuilder = new PackageLexicalScopesBuilder(packageSyntax, references, diagnostics);
             scopesBuilder.BuildScopesFor(packageSyntax);
             var stringSymbol = scopesBuilder.GlobalScope.LookupInGlobalScope(new SimpleName("String"))
-                                            .OfType<ITypeSymbol>().FirstOrDefault();
+                                            .OfType<ITypeMetadata>().FirstOrDefault();
             if (stringSymbol is null)
                 // TODO we are assuming there is a compilation unit. This should be generated against the package itself
                 diagnostics.Add(SemanticError.NoStringTypeDefined(packageSyntax.CompilationUnits[0].CodeFile));
@@ -95,7 +95,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
         private static void CheckSemantics(
             FixedList<IEntityDeclarationSyntax> entities,
-            ITypeSymbol? stringSymbol,
+            ITypeMetadata? stringSymbol,
             Diagnostics diagnostics)
         {
             // Basic Analysis includes: Name Binding, Type Checking, Constant Folding

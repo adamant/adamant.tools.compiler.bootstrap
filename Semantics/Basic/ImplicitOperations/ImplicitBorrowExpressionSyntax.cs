@@ -19,16 +19,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
             get => ref referent;
         }
 
-        private readonly IBindingSymbol borrowedSymbol;
+        private readonly IBindingMetadata borrowedSymbol;
         [DisallowNull]
-        public IBindingSymbol? BorrowedSymbol
+        public IBindingMetadata? BorrowedFromBinding
         {
             [DebuggerStepThrough]
             get => borrowedSymbol;
             set => throw new InvalidOperationException("Can't set referenced symbol repeatedly");
         }
 
-        public ImplicitBorrowExpressionSyntax(IExpressionSyntax referent, DataType type, IBindingSymbol borrowedSymbol)
+        public ImplicitBorrowExpressionSyntax(IExpressionSyntax referent, DataType type, IBindingMetadata borrowedSymbol)
             : base(type, referent.Span, ExpressionSemantics.Borrow)
         {
             this.referent = referent;

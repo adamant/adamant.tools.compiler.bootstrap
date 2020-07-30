@@ -11,6 +11,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public interface IBorrowExpressionSyntax : IExpressionSyntax
     {
         ref IExpressionSyntax Referent { get; }
-        [DisallowNull] IBindingSymbol? BorrowedSymbol { get; set; }
+        [DisallowNull] IBindingMetadata? BorrowedFromBinding { get; set; }
     }
 }

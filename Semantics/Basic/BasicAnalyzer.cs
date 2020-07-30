@@ -29,10 +29,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
     /// </summary>
     public class BasicAnalyzer
     {
-        private readonly ITypeSymbol? stringSymbol;
+        private readonly ITypeMetadata? stringSymbol;
         private readonly Diagnostics diagnostics;
 
-        public BasicAnalyzer(ITypeSymbol? stringSymbol, Diagnostics diagnostics)
+        public BasicAnalyzer(ITypeMetadata? stringSymbol, Diagnostics diagnostics)
         {
             this.stringSymbol = stringSymbol;
             this.diagnostics = diagnostics;

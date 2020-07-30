@@ -38,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
             return assignmentExpression.LeftOperand switch
             {
                 INameExpressionSyntax identifier =>
-                    definitelyAssigned.Set(identifier.ReferencedSymbol.Assigned(), true),
+                    definitelyAssigned.Set(identifier.ReferencedBinding.Assigned(), true),
                 IFieldAccessExpressionSyntax _ => definitelyAssigned,
                 _ => throw new NotImplementedException("Complex assignments not yet implemented")
             };
@@ -48,7 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment
             INameExpressionSyntax nameExpression,
             VariableFlags definitelyAssigned)
         {
-            if (definitelyAssigned[nameExpression.ReferencedSymbol.Assigned()] == false)
+            if (definitelyAssigned[nameExpression.ReferencedBinding.Assigned()] == false)
                 diagnostics.Add(SemanticError.VariableMayNotHaveBeenAssigned(file,
                     nameExpression.Span, nameExpression.Name));
 

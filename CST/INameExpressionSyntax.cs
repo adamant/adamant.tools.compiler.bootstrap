@@ -11,8 +11,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public interface INameExpressionSyntax : IAssignableExpressionSyntax, IHasContainingScope
     {
         SimpleName Name { get; }
-        [DisallowNull] IBindingSymbol? ReferencedSymbol { get; set; }
-        FixedList<ISymbol> LookupInContainingScope();
+        [DisallowNull] IBindingMetadata? ReferencedBinding { get; set; }
+        FixedList<IMetadata> LookupInContainingScope();
         bool VariableIsLiveAfter { get; set; }
     }
 }

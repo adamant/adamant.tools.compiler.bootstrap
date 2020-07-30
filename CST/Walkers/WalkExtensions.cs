@@ -5,12 +5,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Walkers
 {
     public static class WalkExtensions
     {
-        public static FixedList<IBindingSymbol> GetAllVariableDeclarations(
+        public static FixedList<IBindingMetadata> GetAllVariableDeclarations(
             this IBodySyntax body)
         {
             var collector = new VariableDeclarationsCollector();
             collector.Walk(body);
-            return collector.Symbols;
+            return collector.Metadata;
         }
     }
 }

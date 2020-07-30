@@ -3,14 +3,14 @@ using ExhaustiveMatching;
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata
 {
     /// <summary>
-    /// A symbol that has child symbols
+    /// Metadata that has child metadata
     /// </summary>
     [Closed(
-        typeof(ITypeSymbol),
-        typeof(IFunctionSymbol),
-        typeof(INamespaceSymbol))]
-    public interface IParentSymbol : ISymbol
+        typeof(ITypeMetadata),
+        typeof(IFunctionMetadata),
+        typeof(INamespaceMetadata))]
+    public interface IParentMetadata : IMetadata
     {
-        SymbolSet ChildSymbols { get; }
+        MetadataSet ChildMetadata { get; }
     }
 }

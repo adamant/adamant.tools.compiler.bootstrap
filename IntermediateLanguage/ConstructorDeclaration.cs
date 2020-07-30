@@ -8,7 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
-    public class ConstructorDeclaration : Declaration, ICallableDeclaration, IFunctionSymbol
+    public class ConstructorDeclaration : Declaration, ICallableDeclaration, IFunctionMetadata
     {
         [SuppressMessage("Design", "CA1033:Interface methods should be callable by child types", Justification = "NA")]
         bool ICallableDeclaration.IsExternal => false;
@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         public FixedList<FieldInitialization> FieldInitializations { get; }
         public ControlFlowGraph IL { get; }
 
-        IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;
+        IEnumerable<IBindingMetadata> IFunctionMetadata.Parameters => Parameters;
 
         public ConstructorDeclaration(
             Name fullName,
@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
             DataType returnType,
             FixedList<FieldInitialization> fieldInitializations,
             ControlFlowGraph il)
-            : base(true, fullName, SymbolSet.Empty)
+            : base(true, fullName, MetadataSet.Empty)
         {
             ReturnType = returnType;
             IL = il;

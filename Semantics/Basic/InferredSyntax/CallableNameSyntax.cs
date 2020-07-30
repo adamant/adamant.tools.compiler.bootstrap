@@ -13,10 +13,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax
         public TextSpan Span { get; }
         public Name Name { get; }
 
-        private IFunctionSymbol? referencedSymbol;
+        private IFunctionMetadata? referencedSymbol;
 
         [DisallowNull]
-        public IFunctionSymbol? ReferencedSymbol
+        public IFunctionMetadata? ReferencedFunctionMetadata
         {
             get => referencedSymbol;
             set

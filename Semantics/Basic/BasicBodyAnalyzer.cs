@@ -28,14 +28,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
     public class BasicBodyAnalyzer
     {
         private readonly CodeFile file;
-        private readonly ITypeSymbol? stringSymbol;
+        private readonly ITypeMetadata? stringSymbol;
         private readonly Diagnostics diagnostics;
         private readonly DataType? returnType;
         private readonly BasicTypeAnalyzer typeAnalyzer;
 
         public BasicBodyAnalyzer(
             CodeFile file,
-            ITypeSymbol? stringSymbol,
+            ITypeMetadata? stringSymbol,
             Diagnostics diagnostics,
             DataType? returnType = null)
         {
@@ -243,7 +243,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                     throw new NotImplementedException("Non-moveable type can't be moved");
                             }
 
-                            exp.MovedSymbol = nameExpression.ReferencedSymbol!;
+                            exp.MovedSymbol = nameExpression.ReferencedBinding!;
                             exp.Semantics = ExpressionSemantics.Acquire;
                             return exp.Type = type;
                         case IBorrowExpressionSyntax _:
@@ -277,7 +277,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                                     throw new NotImplementedException("Non-mutable type can't be borrowed mutably");
                             }
 
-                            exp.BorrowedSymbol = nameExpression.ReferencedSymbol!;
+                            exp.BorrowedFromBinding = nameExpression.ReferencedBinding!;
                             return exp.Type = type;
                         }
                         case IBorrowExpressionSyntax _:
@@ -432,22 +432,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     if (!constructingType.IsKnown)
                     {
                         diagnostics.Add(NameBindingError.CouldNotBindConstructor(file, exp.Span));
-                        exp.ConstructorSymbol = UnknownSymbol.Instance;
+                        exp.ReferencedConstructor = UnknownMetadata.Instance;
                         return exp.Type  = DataType.Unknown;
                     }
                     var constructedType = (ObjectType)constructingType;
                     var typeSymbol = exp.TypeSyntax.ContainingScope.Assigned().GetSymbolForType(constructedType);
-                    var constructors = typeSymbol.ChildSymbols[SpecialName.New].OfType<IFunctionSymbol>().ToFixedList();
+                    var constructors = typeSymbol.ChildMetadata[SpecialName.New].OfType<IFunctionMetadata>().ToFixedList();
                     constructors = ResolveOverload(constructors, argumentTypes);
                     switch (constructors.Count)
                     {
                         case 0:
                             diagnostics.Add(NameBindingError.CouldNotBindConstructor(file, exp.Span));
-                            exp.ConstructorSymbol = UnknownSymbol.Instance;
+                            exp.ReferencedConstructor = UnknownMetadata.Instance;
                             break;
                         case 1:
                             var constructorSymbol = constructors.Single();
-                            exp.ConstructorSymbol = constructorSymbol;
+                            exp.ReferencedConstructor = constructorSymbol;
                             foreach (var (arg, parameter) in exp.Arguments.Zip(constructorSymbol.Parameters))
                             {
                                 InsertImplicitConversionIfNeeded(ref arg.Expression, parameter.Type);
@@ -456,7 +456,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             break;
                         default:
                             diagnostics.Add(NameBindingError.AmbiguousConstructorCall(file, exp.Span));
-                            exp.ConstructorSymbol = UnknownSymbol.Instance;
+                            exp.ReferencedConstructor = UnknownMetadata.Instance;
                             break;
                     }
 
@@ -528,7 +528,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var contextType = InferType(ref exp.ContextExpression, !isSelfField);
                     var contextSymbol = exp.Field.ContainingScope.Assigned().GetSymbolForType(contextType);
                     var member = exp.Field;
-                    var memberSymbols = contextSymbol.Lookup(member.Name).OfType<IBindingSymbol>().ToFixedList();
+                    var memberSymbols = contextSymbol.Lookup(member.Name).OfType<IBindingMetadata>().ToFixedList();
                     var type = AssignReferencedSymbolAndType(member, memberSymbols);
                     // In many contexts, variable names are implicitly shared
                     if (implicitShare) type = InsertImplicitShareIfNeeded(ref expression, type);
@@ -592,20 +592,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             // Value types aren't shared
             if (!(type is ReferenceType referenceType)) return type;
 
-            IBindingSymbol referencedSymbol;
+            IBindingMetadata referencedSymbol;
             switch (expression)
             {
                 case INameExpressionSyntax exp:
                     exp.Semantics = ExpressionSemantics.Share;
-                    referencedSymbol = exp.ReferencedSymbol.Assigned();
+                    referencedSymbol = exp.ReferencedBinding.Assigned();
                     break;
                 case ISelfExpressionSyntax exp:
-                    referencedSymbol = exp.ReferencedSymbol.Assigned();
+                    referencedSymbol = exp.ReferencedBinding.Assigned();
                     break;
                 case IFieldAccessExpressionSyntax exp:
                     exp.Field.Semantics = ExpressionSemantics.Share;
                     exp.Semantics = ExpressionSemantics.Share;
-                    referencedSymbol = exp.ReferencedSymbol.Assigned();
+                    referencedSymbol = exp.ReferencedBinding.Assigned();
                     break;
                 default:
                     // implicit share isn't needed around other expressions
@@ -624,15 +624,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             // Value types aren't shared
             if (!(type is ReferenceType referenceType)) return;
 
-            IBindingSymbol referencedSymbol;
+            IBindingMetadata referencedSymbol;
             switch (expression)
             {
                 case INameExpressionSyntax exp:
                     exp.Semantics = ExpressionSemantics.Borrow;
-                    referencedSymbol = exp.ReferencedSymbol.Assigned();
+                    referencedSymbol = exp.ReferencedBinding.Assigned();
                     break;
                 case ISelfExpressionSyntax exp:
-                    referencedSymbol = exp.ReferencedSymbol.Assigned();
+                    referencedSymbol = exp.ReferencedBinding.Assigned();
                     break;
                 default:
                     // implicit borrow isn't needed around other expressions
@@ -656,7 +656,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 // Implicit move not needed
                 return;
 
-            var referencedSymbol = name.ReferencedSymbol.Assigned();
+            var referencedSymbol = name.ReferencedBinding.Assigned();
             expression = new ImplicitMoveSyntax(expression, type, referencedSymbol);
             name.Semantics = ExpressionSemantics.Acquire;
             expression.Semantics = ExpressionSemantics.Acquire;
@@ -687,7 +687,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var contextType = InferType(ref exp.ContextExpression, !isSelfField);
                     var contextSymbol = exp.Field.ContainingScope.Assigned().GetSymbolForType(contextType);
                     var member = exp.Field;
-                    var memberSymbols = contextSymbol.Lookup(member.Name).OfType<IBindingSymbol>().ToFixedList();
+                    var memberSymbols = contextSymbol.Lookup(member.Name).OfType<IBindingMetadata>().ToFixedList();
                     var type = AssignReferencedSymbolAndType(member, memberSymbols);
                     exp.Field.Semantics ??= ExpressionSemantics.CreateReference;
                     exp.Semantics = exp.Field.Semantics.Assigned();
@@ -714,7 +714,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
                 var functionName = targetName.Qualify(methodInvocation.MethodNameSyntax.Name);
                 // This will find both namespaced function calls and associated function calls
-                if (scope.Lookup(functionName).OfType<IFunctionSymbol>().Any())
+                if (scope.Lookup(functionName).OfType<IFunctionMetadata>().Any())
                 {
                     // It is a namespaced or associated function invocation, modify the tree
                     var nameSpan = TextSpan.Covering(methodInvocation.ContextExpression.Span, methodInvocation.MethodNameSyntax.Span);
@@ -740,21 +740,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             };
 
             var contextTypeSymbol = methodInvocation.MethodNameSyntax.ContainingScope.Assigned().GetSymbolForType(contextType);
-            contextTypeSymbol.ChildSymbols.TryGetValue((SimpleName)methodInvocation.MethodNameSyntax.Name, out var childSymbols);
-            var methodSymbols = (childSymbols ?? FixedList<ISymbol>.Empty).OfType<IMethodSymbol>().ToFixedList();
+            contextTypeSymbol.ChildMetadata.TryGetValue((SimpleName)methodInvocation.MethodNameSyntax.Name, out var childSymbols);
+            var methodSymbols = (childSymbols ?? FixedList<IMetadata>.Empty).OfType<IMethodMetadata>().ToFixedList();
             methodSymbols = ResolveOverload(contextType, methodSymbols, argumentTypes);
             switch (methodSymbols.Count)
             {
                 case 0:
                     diagnostics.Add(NameBindingError.CouldNotBindMethod(file, methodInvocation.Span));
-                    methodInvocation.MethodNameSyntax.ReferencedSymbol = UnknownSymbol.Instance;
+                    methodInvocation.MethodNameSyntax.ReferencedFunctionMetadata = UnknownMetadata.Instance;
                     methodInvocation.Type = DataType.Unknown;
                     break;
                 case 1:
                     var methodSymbol = methodSymbols.Single();
-                    methodInvocation.MethodNameSyntax.ReferencedSymbol = methodSymbol;
+                    methodInvocation.MethodNameSyntax.ReferencedFunctionMetadata = methodSymbol;
 
-                    var selfParamType = methodSymbol.SelfParameterSymbol.Type;
+                    var selfParamType = methodSymbol.SelfParameterMetadata.Type;
                     InsertImplicitActionIfNeeded(ref methodInvocation.ContextExpression, selfParamType, implicitBorrowAllowed: true);
 
                     InsertImplicitConversionIfNeeded(ref methodInvocation.ContextExpression, selfParamType);
@@ -772,7 +772,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     break;
                 default:
                     diagnostics.Add(NameBindingError.AmbiguousMethodCall(file, methodInvocation.Span));
-                    methodInvocation.MethodNameSyntax.ReferencedSymbol = UnknownSymbol.Instance;
+                    methodInvocation.MethodNameSyntax.ReferencedFunctionMetadata = UnknownMetadata.Instance;
                     methodInvocation.Type = DataType.Unknown;
                     break;
             }
@@ -803,19 +803,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             var argumentTypes = functionInvocationExpression.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
             var scope = functionInvocationExpression.FunctionNameSyntax.ContainingScope.Assigned();
             var functionSymbols = scope.Lookup(functionInvocationExpression.FullName)
-                .OfType<IFunctionSymbol>().ToFixedList();
+                .OfType<IFunctionMetadata>().ToFixedList();
             functionSymbols = ResolveOverload(functionSymbols, argumentTypes);
             switch (functionSymbols.Count)
             {
                 case 0:
                     diagnostics.Add(NameBindingError.CouldNotBindFunction(file, functionInvocationExpression.Span));
-                    functionInvocationExpression.FunctionNameSyntax.ReferencedSymbol = UnknownSymbol.Instance;
+                    functionInvocationExpression.FunctionNameSyntax.ReferencedFunctionMetadata = UnknownMetadata.Instance;
                     functionInvocationExpression.Type = DataType.Unknown;
                     functionInvocationExpression.Semantics = ExpressionSemantics.Never;
                     break;
                 case 1:
                     var functionSymbol = functionSymbols.Single();
-                    functionInvocationExpression.FunctionNameSyntax.ReferencedSymbol = functionSymbol;
+                    functionInvocationExpression.FunctionNameSyntax.ReferencedFunctionMetadata = functionSymbol;
                     foreach (var (arg, parameter) in
                         functionInvocationExpression.Arguments.Zip(functionSymbol.Parameters))
                     {
@@ -828,7 +828,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     break;
                 default:
                     diagnostics.Add(NameBindingError.AmbiguousFunctionCall(file, functionInvocationExpression.Span));
-                    functionInvocationExpression.FunctionNameSyntax.ReferencedSymbol = UnknownSymbol.Instance;
+                    functionInvocationExpression.FunctionNameSyntax.ReferencedFunctionMetadata = UnknownMetadata.Instance;
                     functionInvocationExpression.Type = DataType.Unknown;
                     functionInvocationExpression.Semantics = ExpressionSemantics.Never;
                     break;
@@ -888,29 +888,29 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         public DataType InferNameType(INameExpressionSyntax nameExpression)
         {
-            var symbols = nameExpression.LookupInContainingScope();
+            var metadatas = nameExpression.LookupInContainingScope();
             DataType type;
-            switch (symbols.Count)
+            switch (metadatas.Count)
             {
                 case 0:
                     diagnostics.Add(NameBindingError.CouldNotBindName(file, nameExpression.Span));
-                    nameExpression.ReferencedSymbol = UnknownSymbol.Instance;
+                    nameExpression.ReferencedBinding = UnknownMetadata.Instance;
                     type = DataType.Unknown;
                     break;
                 case 1:
                 {
-                    var symbol = symbols.Single();
-                    switch (symbol)
+                    var metadata = metadatas.Single();
+                    switch (metadata)
                     {
-                        case IBindingSymbol binding:
+                        case IBindingMetadata binding:
                         {
-                            nameExpression.ReferencedSymbol = binding;
+                            nameExpression.ReferencedBinding = binding;
                             type = binding.Type;
                         }
                         break;
                         default:
                             diagnostics.Add(NameBindingError.CouldNotBindName(file, nameExpression.Span));
-                            nameExpression.ReferencedSymbol = UnknownSymbol.Instance;
+                            nameExpression.ReferencedBinding = UnknownMetadata.Instance;
                             type = DataType.Unknown;
                             break;
                     }
@@ -918,7 +918,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
                 default:
                     diagnostics.Add(NameBindingError.AmbiguousName(file, nameExpression.Span));
-                    nameExpression.ReferencedSymbol = UnknownSymbol.Instance;
+                    nameExpression.ReferencedBinding = UnknownMetadata.Instance;
                     type = DataType.Unknown;
                     break;
             }
@@ -928,31 +928,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private DataType InferSelfType(ISelfExpressionSyntax selfExpression)
         {
-            var symbols = selfExpression.LookupInContainingScope();
+            var metadatas = selfExpression.LookupInContainingScope();
             DataType type;
-            switch (symbols.Count)
+            switch (metadatas.Count)
             {
                 case 0:
                     diagnostics.Add(selfExpression.IsImplicit
                         ? SemanticError.ImplicitSelfOutsideMethod(file, selfExpression.Span)
                         : SemanticError.SelfOutsideMethod(file, selfExpression.Span));
-                    selfExpression.ReferencedSymbol = UnknownSymbol.Instance;
+                    selfExpression.ReferencedBinding = UnknownMetadata.Instance;
                     type = DataType.Unknown;
                     break;
                 case 1:
                 {
-                    var symbol = symbols.Single();
-                    switch (symbol)
+                    var metadata = metadatas.Single();
+                    switch (metadata)
                     {
-                        case IBindingSymbol binding:
+                        case IBindingMetadata binding:
                         {
-                            selfExpression.ReferencedSymbol = binding;
+                            selfExpression.ReferencedBinding = binding;
                             type = binding.Type;
                         }
                         break;
                         default:
                             diagnostics.Add(NameBindingError.CouldNotBindName(file, selfExpression.Span));
-                            selfExpression.ReferencedSymbol = UnknownSymbol.Instance;
+                            selfExpression.ReferencedBinding = UnknownMetadata.Instance;
                             type = DataType.Unknown;
                             break;
                     }
@@ -961,7 +961,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
                 default:
                     diagnostics.Add(NameBindingError.AmbiguousName(file, selfExpression.Span));
-                    selfExpression.ReferencedSymbol = UnknownSymbol.Instance;
+                    selfExpression.ReferencedBinding = UnknownMetadata.Instance;
                     type = DataType.Unknown;
                     break;
             }
@@ -1008,18 +1008,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
         private DataType AssignReferencedSymbolAndType(
             INameExpressionSyntax identifier,
-            FixedList<IBindingSymbol> memberSymbols)
+            FixedList<IBindingMetadata> memberSymbols)
         {
             switch (memberSymbols.Count)
             {
                 case 0:
                     diagnostics.Add(NameBindingError.CouldNotBindMember(file, identifier.Span));
-                    identifier.ReferencedSymbol = UnknownSymbol.Instance;
+                    identifier.ReferencedBinding = UnknownMetadata.Instance;
                     identifier.Semantics = ExpressionSemantics.Never;
                     return identifier.Type = DataType.Unknown;
                 case 1:
                     var memberSymbol = memberSymbols.Single();
-                    identifier.ReferencedSymbol = memberSymbol;
+                    identifier.ReferencedBinding = memberSymbol;
                     switch (memberSymbol.Type.Semantics)
                     {
                         default:
@@ -1041,7 +1041,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return identifier.Type = memberSymbol.Type;
                 default:
                     diagnostics.Add(NameBindingError.AmbiguousName(file, identifier.Span));
-                    identifier.ReferencedSymbol = UnknownSymbol.Instance;
+                    identifier.ReferencedBinding = UnknownMetadata.Instance;
                     identifier.Semantics = ExpressionSemantics.Never;
                     return identifier.Type = DataType.Unknown;
             }
@@ -1132,8 +1132,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         //    }
         //}
 
-        private static FixedList<IFunctionSymbol> ResolveOverload(
-            FixedList<IFunctionSymbol> symbols,
+        private static FixedList<IFunctionMetadata> ResolveOverload(
+            FixedList<IFunctionMetadata> symbols,
             FixedList<DataType> argumentTypes)
         {
             // Filter down to symbols that could possible match
@@ -1147,9 +1147,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             return symbols;
         }
 
-        private static FixedList<IMethodSymbol> ResolveOverload(
+        private static FixedList<IMethodMetadata> ResolveOverload(
             DataType selfType,
-            FixedList<IMethodSymbol> symbols,
+            FixedList<IMethodMetadata> symbols,
             FixedList<DataType> argumentTypes)
         {
             // Filter down to symbols that could possible match

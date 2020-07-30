@@ -17,8 +17,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     {
         private bool isDirty = false;
         private bool recomputingCurrentAccess = false;
-        private readonly Dictionary<IBindingSymbol, CallerVariable> callerVariables = new Dictionary<IBindingSymbol, CallerVariable>();
-        private readonly Dictionary<IBindingSymbol, Variable> variables = new Dictionary<IBindingSymbol, Variable>();
+        private readonly Dictionary<IBindingMetadata, CallerVariable> callerVariables = new Dictionary<IBindingMetadata, CallerVariable>();
+        private readonly Dictionary<IBindingMetadata, Variable> variables = new Dictionary<IBindingMetadata, Variable>();
         private readonly Dictionary<ISyntax, Object> objects = new Dictionary<ISyntax, Object>();
         private readonly HashSet<TempValue> tempValues = new HashSet<TempValue>();
 
@@ -131,7 +131,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return variable;
         }
 
-        public Variable? AddVariable(IBindingSymbol bindingSymbol)
+        public Variable? AddVariable(IBindingMetadata bindingSymbol)
         {
             var referenceType = bindingSymbol.Type.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
@@ -202,7 +202,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
                 Add(reference.Referent);
         }
 
-        public void EndVariableScope(IBindingSymbol variable)
+        public void EndVariableScope(IBindingMetadata variable)
         {
             if (!variables.Remove(variable, out var place))
                 throw new Exception($"Variable '{variable.FullName.UnqualifiedName}' does not exist in the graph.");
@@ -265,12 +265,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             Drop(value);
         }
 
-        public Variable GetVariableFor(IBindingSymbol variableSymbol)
+        public Variable GetVariableFor(IBindingMetadata variableSymbol)
         {
             // Variable needs to have already been declared
             return variables[variableSymbol];
         }
-        public Variable? TryGetVariableFor(IBindingSymbol variableSymbol)
+        public Variable? TryGetVariableFor(IBindingMetadata variableSymbol)
         {
             return variables.TryGetValue(variableSymbol, out var variable)
                 ? variable : null;

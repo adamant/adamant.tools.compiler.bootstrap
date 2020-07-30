@@ -15,9 +15,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     {
         public bool IsImplicit { get; }
 
-        private IBindingSymbol? referencedSymbol;
+        private IBindingMetadata? referencedSymbol;
         [DisallowNull]
-        public IBindingSymbol? ReferencedSymbol
+        public IBindingMetadata? ReferencedBinding
         {
             get => referencedSymbol;
             set
@@ -48,7 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             IsImplicit = isImplicit;
         }
 
-        public FixedList<ISymbol> LookupInContainingScope()
+        public FixedList<IMetadata> LookupInContainingScope()
         {
             if (ContainingScope != null) return ContainingScope.Lookup(SpecialName.Self);
             throw new InvalidOperationException();

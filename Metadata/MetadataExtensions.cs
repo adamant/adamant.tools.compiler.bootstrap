@@ -5,33 +5,33 @@ using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata
 {
-    public static class SymbolExtensions
+    public static class MetadataExtensions
     {
-        private static readonly FixedList<ISymbol> UnknownSymbolList = new FixedList<ISymbol>(UnknownSymbol.Instance.Yield());
+        private static readonly FixedList<IMetadata> UnknownMetadataList = new FixedList<IMetadata>(UnknownMetadata.Instance.Yield());
 
-        public static bool IsGlobal(this ISymbol symbol)
+        public static bool IsGlobal(this IMetadata metadata)
         {
-            return symbol.FullName is SimpleName;
+            return metadata.FullName is SimpleName;
         }
 
-        public static FixedList<ISymbol> Lookup(this ISymbol symbol, SimpleName name)
+        public static FixedList<IMetadata> Lookup(this IMetadata metadata, SimpleName name)
         {
-            if (symbol == UnknownSymbol.Instance) return UnknownSymbolList;
-            return symbol switch
+            if (metadata == UnknownMetadata.Instance) return UnknownMetadataList;
+            return metadata switch
             {
-                IParentSymbol parentSymbol =>
-                    parentSymbol.ChildSymbols.TryGetValue(name, out var childSymbols)
-                        ? childSymbols
-                        : FixedList<ISymbol>.Empty,
-                IBindingSymbol _ => FixedList<ISymbol>.Empty,
-                _ => throw ExhaustiveMatch.Failed(symbol)
+                IParentMetadata parentMetadata =>
+                    parentMetadata.ChildMetadata.TryGetValue(name, out var childMetadata)
+                        ? childMetadata
+                        : FixedList<IMetadata>.Empty,
+                IBindingMetadata _ => FixedList<IMetadata>.Empty,
+                _ => throw ExhaustiveMatch.Failed(metadata)
             };
         }
 
-        public static T Assigned<T>(this T? symbol)
-            where T : class, ISymbol
+        public static T Assigned<T>(this T? metadata)
+            where T : class, IMetadata
         {
-            return symbol ?? throw new InvalidOperationException("Symbol not assigned");
+            return metadata ?? throw new InvalidOperationException("Metadata not assigned");
         }
     }
 }

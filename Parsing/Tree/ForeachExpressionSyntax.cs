@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal class ForeachExpressionSyntax : ExpressionSyntax, IForeachExpressionSyntax
     {
         public bool IsMutableBinding { get; }
-        Name ISymbol.FullName => FullVariableName;
+        Name IMetadata.FullName => FullVariableName;
         private Name FullVariableName { get; }
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public bool VariableIsLiveAfterAssignment { get; set; } = true;
 
         public ITypeSyntax? TypeSyntax { get; }
-        DataType IBindingSymbol.Type => VariableType ?? throw new InvalidOperationException();
+        DataType IBindingMetadata.Type => VariableType ?? throw new InvalidOperationException();
         private DataType? variableType;
 
         [DisallowNull]

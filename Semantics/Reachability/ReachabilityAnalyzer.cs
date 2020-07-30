@@ -119,7 +119,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     _ = referenceType ?? throw new InvalidOperationException("Can't borrow value type");
 
                     // If there is a variable, it is a simple borrow expression
-                    var variable = graph.TryGetVariableFor(exp.BorrowedSymbol.Assigned());
+                    var variable = graph.TryGetVariableFor(exp.BorrowedFromBinding.Assigned());
                     if (!(variable is null))
                     {
                         var temp = TempValue.For(graph, exp);
@@ -200,7 +200,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     var arguments = exp.Arguments
                                        .Select(a => Analyze(a.Expression, graph, scope))
                                        .ToFixedList();
-                    var function = exp.FunctionNameSyntax.ReferencedSymbol.Assigned();
+                    var function = exp.FunctionNameSyntax.ReferencedFunctionMetadata.Assigned();
                     var parameters = function.Parameters;
                     UseArguments(arguments, exp.Arguments, parameters, graph);
                     if (!(referenceType is null))
@@ -214,7 +214,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 {
                     var selfArgument = Analyze(exp.ContextExpression, graph, scope);
                     var arguments = exp.Arguments.Select(a => Analyze(a.Expression, graph, scope)).ToFixedList();
-                    var method = exp.MethodNameSyntax.ReferencedSymbol.Assigned();
+                    var method = exp.MethodNameSyntax.ReferencedFunctionMetadata.Assigned();
                     var parameters = method.Parameters;
                     if (!(selfArgument is null))
                         UseArgument(selfArgument, exp.ContextExpression.Span, graph);
@@ -251,7 +251,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 {
                     var arguments = exp.Arguments.Select(a => Analyze(a.Expression, graph, scope)).ToFixedList();
 
-                    var constructor = exp.ConstructorSymbol.Assigned();
+                    var constructor = exp.ReferencedConstructor.Assigned();
                     var parameters = constructor.Parameters;
                     UseArguments(arguments, exp.Arguments, parameters, graph);
                     if (referenceType is null) return null;
@@ -322,7 +322,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
         private void UseArguments(
             FixedList<TempValue?> arguments,
             FixedList<IArgumentSyntax> argumentSyntaxes,
-            IEnumerable<IBindingSymbol> parameters,
+            IEnumerable<IBindingMetadata> parameters,
             ReachabilityGraph graph)
         {
             foreach (var ((argument, argumentSyntax), parameter) in arguments.Zip(argumentSyntaxes).Zip(parameters))
@@ -448,7 +448,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     throw ExhaustiveMatch.Failed(expression);
                 case IFieldAccessExpressionSyntax exp:
                 {
-                    var variable = graph.TryGetVariableFor(exp.ReferencedSymbol.Assigned());
+                    var variable = graph.TryGetVariableFor(exp.ReferencedBinding.Assigned());
                     if (!(variable is null)) return variable;
 
                     if (!isReferenceType && exp.ContextExpression is ISelfExpressionSyntax) return null;
@@ -465,7 +465,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 }
                 case INameExpressionSyntax exp:
                 {
-                    return isReferenceType ? graph.GetVariableFor(exp.ReferencedSymbol.Assigned()) : null;
+                    return isReferenceType ? graph.GetVariableFor(exp.ReferencedBinding.Assigned()) : null;
                 }
             }
         }
@@ -553,7 +553,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
         }
 
         private static Variable? VariableDeclared(
-            IBindingSymbol bindingSymbol,
+            IBindingMetadata bindingSymbol,
             ReachabilityGraph graph,
             VariableScope scope)
         {

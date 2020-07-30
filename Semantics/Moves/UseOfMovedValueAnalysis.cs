@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
             {
                 case INameExpressionSyntax identifierName:
                     // We are assigning into this variable so it definitely has a value now
-                    var symbol = identifierName.ReferencedSymbol.Assigned();
+                    var symbol = identifierName.ReferencedBinding.Assigned();
                     return possiblyMoved.Set(symbol, false);
                 case IFieldAccessExpressionSyntax _:
                     return possiblyMoved;
@@ -52,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Moves
 
         public VariableFlags IdentifierName(INameExpressionSyntax nameExpression, VariableFlags possiblyMoved)
         {
-            var symbol = nameExpression.ReferencedSymbol.Assigned();
+            var symbol = nameExpression.ReferencedBinding.Assigned();
             if (possiblyMoved[symbol] == true)
                 diagnostics.Add(SemanticError.UseOfPossiblyMovedValue(file, nameExpression.Span));
 

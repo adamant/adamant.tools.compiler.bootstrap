@@ -23,11 +23,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public FixedList<IMemberDeclarationSyntax> Members { get; }
         public TypePromise DeclaresType { get; } = new TypePromise();
-        public SymbolSet ChildSymbols { get; protected set; }
+        public MetadataSet ChildMetadata { get; protected set; }
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        DataType ITypeSymbol.DeclaresType => DeclaresType.Fulfilled();
+        DataType ITypeMetadata.DeclaresType => DeclaresType.Fulfilled();
 
         public ClassDeclarationSyntax(
             TextSpan headerSpan,
@@ -44,7 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FullName = fullName;
             var (members, bodySpan) = parseMembers(this);
             Members = members;
-            ChildSymbols = new SymbolSet(Members);
+            ChildMetadata = new MetadataSet(Members);
             Span = TextSpan.Covering(headerSpan, bodySpan);
         }
 
@@ -54,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
                 return;
 
             var constructor = new DefaultConstructor((ObjectType)DeclaresType.Fulfilled());
-            ChildSymbols = new SymbolSet(ChildSymbols.Append<ISymbol>(constructor));
+            ChildMetadata = new MetadataSet(ChildMetadata.Append<IMetadata>(constructor));
         }
 
         public override string ToString()

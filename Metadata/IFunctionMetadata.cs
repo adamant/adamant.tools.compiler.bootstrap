@@ -4,11 +4,11 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata
 {
     /// <summary>
-    /// A symbol for a function
+    /// Metadata for a function
     /// </summary>
-    public interface IFunctionSymbol : IParentSymbol
+    public interface IFunctionMetadata : IParentMetadata
     {
-        IEnumerable<IBindingSymbol> Parameters { get; }
+        IEnumerable<IBindingMetadata> Parameters { get; }
         DataType ReturnType { get; }
     }
 }

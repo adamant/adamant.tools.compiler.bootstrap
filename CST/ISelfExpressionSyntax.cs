@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public interface ISelfExpressionSyntax : IExpressionSyntax, IHasContainingScope
     {
         bool IsImplicit { get; }
-        [DisallowNull] IBindingSymbol? ReferencedSymbol { get; set; }
-        FixedList<ISymbol> LookupInContainingScope();
+        [DisallowNull] IBindingMetadata? ReferencedBinding { get; set; }
+        FixedList<IMetadata> LookupInContainingScope();
     }
 }

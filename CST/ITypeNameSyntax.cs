@@ -6,7 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
     public interface ITypeNameSyntax : ITypeSyntax, IHasContainingScope
     {
-        [DisallowNull] ISymbol? ReferencedSymbol { get; set; }
-        FixedList<ISymbol> LookupInContainingScope();
+        [DisallowNull] IMetadata? ReferencedType { get; set; }
+        FixedList<IMetadata> LookupInContainingScope();
     }
 }

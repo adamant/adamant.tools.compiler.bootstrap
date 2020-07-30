@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
     public class DeclarationBuilder
     {
         private readonly ILFactory ilFactory;
-        private readonly Dictionary<ISymbol, Declaration> declarations = new Dictionary<ISymbol, Declaration>();
+        private readonly Dictionary<IMetadata, Declaration> declarations = new Dictionary<IMetadata, Declaration>();
 
         public DeclarationBuilder(ILFactory ilFactory)
         {
@@ -108,7 +108,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
 
         private Declaration BuildDefaultConstructor(IClassDeclarationSyntax classDeclaration)
         {
-            var symbol = classDeclaration.ChildSymbols.SafeCast<ISymbol>()
+            var symbol = classDeclaration.ChildMetadata.SafeCast<IMetadata>()
                             .OfType<DefaultConstructor>().Single();
             if (declarations.TryGetValue(symbol, out var declaration))
                 return declaration;

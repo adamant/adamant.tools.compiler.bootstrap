@@ -12,17 +12,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     {
         public Name Name { get; }
 
-        private IFunctionSymbol? referencedSymbol;
+        private IFunctionMetadata? referencedFunctionMetadata;
 
         [DisallowNull]
-        public IFunctionSymbol? ReferencedSymbol
+        public IFunctionMetadata? ReferencedFunctionMetadata
         {
-            get => referencedSymbol;
+            get => referencedFunctionMetadata;
             set
             {
-                if (referencedSymbol != null)
-                    throw new InvalidOperationException("Can't set referenced symbol repeatedly");
-                referencedSymbol = value ?? throw new ArgumentNullException(nameof(value));
+                if (referencedFunctionMetadata != null)
+                    throw new InvalidOperationException($"Can't set {nameof(ReferencedFunctionMetadata)} repeatedly");
+                referencedFunctionMetadata = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 

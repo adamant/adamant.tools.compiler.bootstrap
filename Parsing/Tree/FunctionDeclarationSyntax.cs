@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public bool IsExternalFunction { [DebuggerStepThrough] get; [DebuggerStepThrough] set; }
         public ITypeSyntax? ReturnTypeSyntax { [DebuggerStepThrough] get; }
         public new FixedList<INamedParameterSyntax> Parameters { [DebuggerStepThrough] get; }
-        DataType IFunctionSymbol.ReturnType => ReturnType.Fulfilled();
+        DataType IFunctionMetadata.ReturnType => ReturnType.Fulfilled();
         public IBodySyntax Body { [DebuggerStepThrough] get; }
 
         public FunctionDeclarationSyntax(
@@ -28,7 +28,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             IBodySyntax body)
             : base(span, file, accessModifier, fullName, nameSpan, parameters,
-                reachabilityAnnotations, GetChildSymbols(null, parameters, body))
+                reachabilityAnnotations, GetChildMetadata(null, parameters, body))
         {
             Parameters = parameters;
             ReturnTypeSyntax = returnTypeSyntax;

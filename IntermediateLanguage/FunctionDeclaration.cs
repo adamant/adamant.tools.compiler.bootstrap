@@ -8,7 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
-    public class FunctionDeclaration : Declaration, ICallableDeclaration, IFunctionSymbol
+    public class FunctionDeclaration : Declaration, ICallableDeclaration, IFunctionMetadata
     {
         public bool IsExternal { get; }
 
@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         public DataType ReturnType { get; }
         public ControlFlowGraph IL { get; }
 
-        IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;
+        IEnumerable<IBindingMetadata> IFunctionMetadata.Parameters => Parameters;
 
         public FunctionDeclaration(
             bool isExternal,
@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
             FixedList<Parameter> parameters,
             DataType returnType,
             ControlFlowGraph il)
-            : base(isMember, name, SymbolSet.Empty)
+            : base(isMember, name, MetadataSet.Empty)
         {
             Parameters = parameters;
             ReturnType = returnType;

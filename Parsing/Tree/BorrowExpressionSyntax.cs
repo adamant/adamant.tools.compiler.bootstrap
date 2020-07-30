@@ -14,17 +14,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         private IExpressionSyntax referent;
         public ref IExpressionSyntax Referent => ref referent;
 
-        private IBindingSymbol? borrowedSymbol;
+        private IBindingMetadata? borrowedFromBinding;
 
         [DisallowNull]
-        public IBindingSymbol? BorrowedSymbol
+        public IBindingMetadata? BorrowedFromBinding
         {
-            get => borrowedSymbol;
+            get => borrowedFromBinding;
             set
             {
-                if (borrowedSymbol != null)
-                    throw new InvalidOperationException("Can't set referenced symbol repeatedly");
-                borrowedSymbol = value ?? throw new ArgumentNullException(nameof(value));
+                if (borrowedFromBinding != null)
+                    throw new InvalidOperationException($"Can't set {nameof(BorrowedFromBinding)} repeatedly");
+                borrowedFromBinding = value ?? throw new ArgumentNullException(nameof(value));
             }
         }
 

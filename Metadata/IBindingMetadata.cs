@@ -3,9 +3,9 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata
 {
     /// <summary>
-    /// A symbol for a variable or field. Both of which are bindings using `let` or `var`
+    /// Metadata for a variable or field. Both of which are bindings using `let` or `var`
     /// </summary>
-    public interface IBindingSymbol : ISymbol
+    public interface IBindingMetadata : IMetadata
     {
         DataType Type { get; }
         bool IsMutableBinding { get; }

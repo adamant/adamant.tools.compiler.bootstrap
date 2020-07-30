@@ -12,9 +12,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     /// </summary>
     public class CallerVariable : StackPlace
     {
-        public IBindingSymbol Symbol { get; }
+        public IBindingMetadata Symbol { get; }
 
-        private CallerVariable(ReachabilityGraph graph, IBindingSymbol symbol)
+        private CallerVariable(ReachabilityGraph graph, IBindingMetadata symbol)
             : base(graph)
         {
             _ = symbol.Type.UnderlyingReferenceType()

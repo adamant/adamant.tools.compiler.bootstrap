@@ -5,22 +5,22 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata
 {
-    public class UnknownSymbol : ITypeSymbol, IFunctionSymbol, IBindingSymbol
+    public class UnknownMetadata : ITypeMetadata, IFunctionMetadata, IBindingMetadata
     {
         #region Singleton
-        public static readonly UnknownSymbol Instance = new UnknownSymbol();
+        public static readonly UnknownMetadata Instance = new UnknownMetadata();
 
-        private UnknownSymbol() { }
+        private UnknownMetadata() { }
         #endregion
 
-        // We don't know what this is, so it might be mutable (fewer errors this way)
+        // We don't know what this is, so it might be mutable (fewer errors that way)
         public bool IsMutableBinding => true;
         public Name FullName => SpecialName.Unknown;
         public DataType Type => DataType.Unknown;
         public DataType DeclaresType => DataType.Unknown;
-        public SymbolSet ChildSymbols => SymbolSet.Empty;
+        public MetadataSet ChildMetadata => MetadataSet.Empty;
 
-        public IEnumerable<IBindingSymbol> Parameters => Enumerable.Empty<IBindingSymbol>();
+        public IEnumerable<IBindingMetadata> Parameters => Enumerable.Empty<IBindingMetadata>();
 
         public DataType ReturnType => DataType.Unknown;
     }

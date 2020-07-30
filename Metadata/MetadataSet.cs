@@ -6,30 +6,30 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata
 {
     /// <summary>
-    /// An immutable set of symbols that are indexed by their unqualified name
+    /// An immutable set of metadata that is indexed by their unqualified name
     /// </summary>
-    public class SymbolSet : FixedDictionary<SimpleName, FixedList<ISymbol>>, IEnumerable<ISymbol>
+    public class MetadataSet : FixedDictionary<SimpleName, FixedList<IMetadata>>, IEnumerable<IMetadata>
     {
-        public new static readonly SymbolSet Empty = new SymbolSet(Enumerable.Empty<ISymbol>());
+        public new static readonly MetadataSet Empty = new MetadataSet(Enumerable.Empty<IMetadata>());
 
-        public SymbolSet(IEnumerable<ISymbol> symbols)
-            : base(GroupSymbols(symbols))
+        public MetadataSet(IEnumerable<IMetadata> metadata)
+            : base(GroupMetadata(metadata))
         {
         }
 
-        private static Dictionary<SimpleName, FixedList<ISymbol>> GroupSymbols(
-            IEnumerable<ISymbol> symbols)
+        private static Dictionary<SimpleName, FixedList<IMetadata>> GroupMetadata(
+            IEnumerable<IMetadata> metadata)
         {
-            return symbols.Distinct().GroupBy(LookupByName)
+            return metadata.Distinct().GroupBy(LookupByName)
                 .ToDictionary(g => g.Key, g => g.ToFixedList());
         }
 
-        private static SimpleName LookupByName(ISymbol symbol)
+        private static SimpleName LookupByName(IMetadata metadata)
         {
-            return symbol.FullName.UnqualifiedName.WithoutDeclarationNumber();
+            return metadata.FullName.UnqualifiedName.WithoutDeclarationNumber();
         }
 
-        IEnumerator<ISymbol> IEnumerable<ISymbol>.GetEnumerator()
+        IEnumerator<IMetadata> IEnumerable<IMetadata>.GetEnumerator()
         {
             return Values.SelectMany().GetEnumerator();
         }

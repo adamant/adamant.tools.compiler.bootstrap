@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             IBodySyntax body)
             : base(declaringClass, span, file, accessModifier, fullName, nameSpan, selfParameter,
                 parameters, returnTypeSyntax, reachabilityAnnotations,
-                GetChildSymbols(selfParameter, parameters, body))
+                GetChildMetadata(selfParameter, parameters, body))
         {
             Body = body;
         }

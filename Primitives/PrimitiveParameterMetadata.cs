@@ -4,7 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 {
-    internal class PrimitiveParameterSymbol : PrimitiveSymbol, IBindingSymbol
+    internal class PrimitiveParameterMetadata : PrimitiveMetadata, IBindingMetadata
     {
         public SimpleName Name => FullName.UnqualifiedName;
 
@@ -12,8 +12,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 
         public bool IsMutableBinding => false;
 
-        public PrimitiveParameterSymbol(Name fullName, DataType type)
-            : base(fullName, SymbolSet.Empty)
+        public PrimitiveParameterMetadata(Name fullName, DataType type)
+            : base(fullName, MetadataSet.Empty)
         {
             Type = type;
         }

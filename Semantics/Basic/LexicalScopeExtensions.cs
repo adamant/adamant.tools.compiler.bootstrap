@@ -8,25 +8,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 {
     internal static class LexicalScopeExtensions
     {
-        public static ITypeSymbol GetSymbolForType(this LexicalScope containingScope, DataType type)
+        public static ITypeMetadata GetSymbolForType(this LexicalScope containingScope, DataType type)
         {
             return type switch
             {
-                UnknownType _ => UnknownSymbol.Instance,
+                UnknownType _ => UnknownMetadata.Instance,
                 ObjectType objectType =>
                         containingScope
                         .LookupInGlobalScope(objectType.FullName)
-                        .OfType<ITypeSymbol>()
+                        .OfType<ITypeMetadata>()
                         .Single(),
                 SizedIntegerType integerType =>
                         containingScope
                         .LookupInGlobalScope(integerType.Name)
-                        .OfType<ITypeSymbol>()
+                        .OfType<ITypeMetadata>()
                         .Single(),
                 UnsizedIntegerType integerType =>
                         containingScope
                         .LookupInGlobalScope(integerType.Name)
-                        .OfType<ITypeSymbol>()
+                        .OfType<ITypeMetadata>()
                         .Single(),
                 _ => throw new NotImplementedException(
                     $"{nameof(GetSymbolForType)} not implemented for {type.GetType().Name}")

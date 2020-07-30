@@ -16,9 +16,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     {
         public Name Name { get; }
 
-        private ISymbol? referencedSymbol;
+        private IMetadata? referencedSymbol;
         [DisallowNull]
-        public ISymbol? ReferencedSymbol
+        public IMetadata? ReferencedType
         {
             get => referencedSymbol;
             set
@@ -48,7 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name = name;
         }
 
-        public FixedList<ISymbol> LookupInContainingScope()
+        public FixedList<IMetadata> LookupInContainingScope()
         {
             if (ContainingScope != null)
                 return ContainingScope.Lookup(Name);

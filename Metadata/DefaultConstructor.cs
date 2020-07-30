@@ -5,15 +5,15 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata
 {
-    public sealed class DefaultConstructor : IFunctionSymbol
+    public sealed class DefaultConstructor : IFunctionMetadata
     {
         public Name FullName { get; }
         public DataType ConstructedType { get; }
 
-        SymbolSet IParentSymbol.ChildSymbols => SymbolSet.Empty;
+        MetadataSet IParentMetadata.ChildMetadata => MetadataSet.Empty;
 
-        IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Enumerable.Empty<IBindingSymbol>();
-        DataType IFunctionSymbol.ReturnType => ConstructedType;
+        IEnumerable<IBindingMetadata> IFunctionMetadata.Parameters => Enumerable.Empty<IBindingMetadata>();
+        DataType IFunctionMetadata.ReturnType => ConstructedType;
 
         public DefaultConstructor(ObjectType constructedType)
         {

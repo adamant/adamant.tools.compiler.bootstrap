@@ -7,29 +7,29 @@ using ExhaustiveMatching;
 namespace Adamant.Tools.Compiler.Bootstrap.Scopes
 {
     /// <summary>
-    /// A lexical scope allows for the lookup of an <see cref="ISymbol"/> by a name
+    /// A lexical scope allows for the lookup of an <see cref="IMetadata"/> by a name
     /// </summary>
     public abstract class LexicalScope
     {
-        private readonly SymbolSet symbols;
-        private readonly SymbolSet nestedSymbols;
+        private readonly MetadataSet metadata;
+        private readonly MetadataSet nestedMetadata;
 
-        protected LexicalScope(SymbolSet symbols, SymbolSet nestedSymbols)
+        protected LexicalScope(MetadataSet metadata, MetadataSet nestedMetadata)
         {
-            this.symbols = symbols;
-            this.nestedSymbols = nestedSymbols;
+            this.metadata = metadata;
+            this.nestedMetadata = nestedMetadata;
         }
 
-        public abstract FixedList<ISymbol> LookupInGlobalScope(Name name);
+        public abstract FixedList<IMetadata> LookupInGlobalScope(Name name);
 
-        public virtual FixedList<ISymbol> Lookup(SimpleName name, bool includeNested = true)
+        public virtual FixedList<IMetadata> Lookup(SimpleName name, bool includeNested = true)
         {
-            return symbols.TryGetValue(name, out var declaration)
+            return metadata.TryGetValue(name, out var declaration)
                 ? declaration
-                : (includeNested && nestedSymbols.TryGetValue(name, out var nestedDeclaration) ? nestedDeclaration : FixedList<ISymbol>.Empty);
+                : (includeNested && nestedMetadata.TryGetValue(name, out var nestedDeclaration) ? nestedDeclaration : FixedList<IMetadata>.Empty);
         }
 
-        public FixedList<ISymbol> Lookup(Name name, bool includeNested = true)
+        public FixedList<IMetadata> Lookup(Name name, bool includeNested = true)
         {
             switch (name)
             {
@@ -38,9 +38,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Scopes
                 case SimpleName simpleName:
                     return Lookup(simpleName, includeNested);
                 case QualifiedName qualifiedName:
-                    var containingSymbols = Lookup(qualifiedName.Qualifier, includeNested);
-                    return containingSymbols.OfType<IParentSymbol>()
-                        .SelectMany(s => s.ChildSymbols[qualifiedName.UnqualifiedName])
+                    var containingMetadata = Lookup(qualifiedName.Qualifier, includeNested);
+                    return containingMetadata.OfType<IParentMetadata>()
+                        .SelectMany(s => s.ChildMetadata[qualifiedName.UnqualifiedName])
                         .ToFixedList();
             }
         }

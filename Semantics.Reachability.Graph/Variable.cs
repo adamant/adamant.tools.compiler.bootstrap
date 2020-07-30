@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
     /// </summary>
     public class Variable : StackPlace
     {
-        public IBindingSymbol Symbol { get; }
+        public IBindingMetadata Symbol { get; }
 
         /// <summary>
         /// The type of this variable or field. If the original type was optional
@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         /// </summary>
         public ReferenceType Type { get; }
 
-        internal Variable(ReachabilityGraph graph, IBindingSymbol symbol)
+        internal Variable(ReachabilityGraph graph, IBindingMetadata symbol)
             : base(graph)
         {
             Symbol = symbol;
@@ -38,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             return variable;
         }
 
-        internal static Variable? Declared(ReachabilityGraph graph, IBindingSymbol symbol)
+        internal static Variable? Declared(ReachabilityGraph graph, IBindingMetadata symbol)
         {
             var referenceType = symbol.Type.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;

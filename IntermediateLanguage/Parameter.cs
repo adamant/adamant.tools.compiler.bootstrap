@@ -5,13 +5,13 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
-    public class Parameter : IBindingSymbol
+    public class Parameter : IBindingMetadata
     {
         public bool IsMutableBinding { get; }
         public SimpleName Name { get; }
         public DataType Type { get; internal set; }
 
-        Name ISymbol.FullName => throw new NotImplementedException();
+        Name IMetadata.FullName => throw new NotImplementedException();
 
         public Parameter(
             bool isMutableBinding,

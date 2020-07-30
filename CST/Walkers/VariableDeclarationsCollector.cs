@@ -7,19 +7,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Walkers
 {
     internal class VariableDeclarationsCollector : SyntaxWalker
     {
-        private readonly List<IBindingSymbol> symbols = new List<IBindingSymbol>();
+        private readonly List<IBindingMetadata> metadata = new List<IBindingMetadata>();
 
-        public FixedList<IBindingSymbol> Symbols => symbols.ToFixedList();
+        public FixedList<IBindingMetadata> Metadata => metadata.ToFixedList();
 
         protected override void WalkNonNull(ISyntax syntax)
         {
             switch (syntax)
             {
                 case IVariableDeclarationStatementSyntax exp:
-                    symbols.Add(exp);
+                    metadata.Add(exp);
                     break;
                 case IForeachExpressionSyntax exp:
-                    symbols.Add(exp);
+                    metadata.Add(exp);
                     break;
                 case ITypeSyntax _:
                     return;

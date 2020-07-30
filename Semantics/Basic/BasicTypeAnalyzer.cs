@@ -36,22 +36,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return null;
                 case ITypeNameSyntax typeName:
                 {
-                    var symbols = typeName.LookupInContainingScope().OfType<ITypeSymbol>().ToFixedList();
+                    var symbols = typeName.LookupInContainingScope().OfType<ITypeMetadata>().ToFixedList();
                     switch (symbols.Count)
                     {
                         case 0:
                             diagnostics.Add(NameBindingError.CouldNotBindName(file, typeName.Span));
-                            typeName.ReferencedSymbol = UnknownSymbol.Instance;
+                            typeName.ReferencedType = UnknownMetadata.Instance;
                             typeSyntax.NamedType = DataType.Unknown;
                             break;
                         case 1:
                             var symbol = symbols.Single();
-                            typeName.ReferencedSymbol = symbol;
+                            typeName.ReferencedType = symbol;
                             typeName.NamedType = symbol.DeclaresType;
                             break;
                         default:
                             diagnostics.Add(NameBindingError.AmbiguousName(file, typeName.Span));
-                            typeName.ReferencedSymbol = UnknownSymbol.Instance;
+                            typeName.ReferencedType = UnknownMetadata.Instance;
                             typeName.NamedType = DataType.Unknown;
                             break;
                     }

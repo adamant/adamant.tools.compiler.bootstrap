@@ -116,7 +116,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             }
 
             var @namespace = namespaces.Single(ns => ns.FullName.Equals(name));
-            return new NestedScope(containingScope, @namespace.ChildSymbols, @namespace.NestedSymbols);
+            return new NestedScope(containingScope, @namespace.ChildMetadata, @namespace.NestedSymbols);
         }
 
         private LexicalScope BuildUsingDirectivesScope(
@@ -125,7 +125,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         {
             if (!usingDirectives.Any()) return containingScope;
 
-            var importedSymbols = Enumerable.Empty<ISymbol>();
+            var importedSymbols = Enumerable.Empty<IMetadata>();
             foreach (var usingDirective in usingDirectives)
             {
                 var @namespace = namespaces.SingleOrDefault(ns => ns.FullName.Equals(usingDirective.Name));
@@ -135,7 +135,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     continue;
                 }
 
-                importedSymbols = importedSymbols.Concat(@namespace.ChildSymbols);
+                importedSymbols = importedSymbols.Concat(@namespace.ChildMetadata);
             }
 
             return new NestedScope(containingScope, importedSymbols);

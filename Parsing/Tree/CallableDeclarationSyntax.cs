@@ -31,12 +31,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         }
 
         public FixedList<IParameterSyntax> Parameters { get; }
-        IEnumerable<IBindingSymbol> IFunctionSymbol.Parameters => Parameters;
+        IEnumerable<IBindingMetadata> IFunctionMetadata.Parameters => Parameters;
         public TypePromise ReturnType { get; } = new TypePromise();
-        DataType IFunctionSymbol.ReturnType => ReturnType.Fulfilled();
+        DataType IFunctionMetadata.ReturnType => ReturnType.Fulfilled();
         public FixedList<IReachabilityAnnotationSyntax> ReachabilityAnnotations { get; }
 
-        public SymbolSet ChildSymbols { get; protected set; }
+        public MetadataSet ChildMetadata { get; protected set; }
 
         protected CallableDeclarationSyntax(
             TextSpan span,
@@ -46,17 +46,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan nameSpan,
             IEnumerable<IParameterSyntax> parameters,
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
-            SymbolSet childSymbols)
+            MetadataSet childMetadata)
             : base(span, file, nameSpan)
         {
             AccessModifier = accessModifier;
             FullName = fullName;
             Parameters = parameters.ToFixedList();
             ReachabilityAnnotations = reachabilityAnnotations;
-            ChildSymbols = childSymbols;
+            ChildMetadata = childMetadata;
         }
 
-        protected static SymbolSet GetChildSymbols(
+        protected static MetadataSet GetChildMetadata(
             ISelfParameterSyntax? selfParameter,
             IEnumerable<IParameterSyntax> parameters,
             IBodySyntax? body)
@@ -65,9 +65,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
                 parameters = parameters.Prepend(selfParameter);
 
             var variableDeclarations = body?.GetAllVariableDeclarations()
-                                       ?? Enumerable.Empty<IBindingSymbol>();
+                                       ?? Enumerable.Empty<IBindingMetadata>();
             var childSymbols = parameters.Concat(variableDeclarations);
-            return new SymbolSet(childSymbols);
+            return new MetadataSet(childSymbols);
         }
     }
 }

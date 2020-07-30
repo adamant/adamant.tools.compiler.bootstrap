@@ -4,16 +4,16 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 {
-    internal class Namespace : INamespaceSymbol
+    internal class Namespace : INamespaceMetadata
     {
         public Name FullName { get; }
-        public SymbolSet ChildSymbols { get; }
-        public SymbolSet NestedSymbols { get; }
-        public Namespace(Name fullName, IEnumerable<ISymbol> childSymbols, IEnumerable<ISymbol> nestedSymbols)
+        public MetadataSet ChildMetadata { get; }
+        public MetadataSet NestedSymbols { get; }
+        public Namespace(Name fullName, IEnumerable<IMetadata> childSymbols, IEnumerable<IMetadata> nestedSymbols)
         {
             FullName = fullName;
-            ChildSymbols = new SymbolSet(childSymbols);
-            NestedSymbols = new SymbolSet(nestedSymbols);
+            ChildMetadata = new MetadataSet(childSymbols);
+            NestedSymbols = new MetadataSet(nestedSymbols);
         }
     }
 }

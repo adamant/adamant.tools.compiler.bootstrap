@@ -8,6 +8,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         ref IExpressionSyntax ContextExpression { get; }
         AccessOperator AccessOperator { get; }
         INameExpressionSyntax Field { get; }
-        [DisallowNull] IBindingSymbol? ReferencedSymbol { get; set; }
+        [DisallowNull] IBindingMetadata? ReferencedBinding { get; set; }
     }
 }

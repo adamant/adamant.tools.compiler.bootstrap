@@ -1,7 +1,7 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Metadata
 {
-    public interface IMethodSymbol : IFunctionSymbol
+    public interface IMethodMetadata : IFunctionMetadata
     {
-        IBindingSymbol SelfParameterSymbol { get; }
+        IBindingMetadata SelfParameterMetadata { get; }
     }
 }
