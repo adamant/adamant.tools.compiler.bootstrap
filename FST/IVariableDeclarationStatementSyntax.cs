@@ -4,7 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
-namespace Adamant.Tools.Compiler.Bootstrap.FST
+namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
     public interface IVariableDeclarationStatementSyntax : IBodyStatementSyntax, IBindingSymbol
     {

@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace Adamant.Tools.Compiler.Bootstrap.FST
+namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
     public interface IBreakExpressionSyntax : IExpressionSyntax
     {

@@ -1,6 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 
-namespace Adamant.Tools.Compiler.Bootstrap.FST
+namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
     /// <summary>
     /// A bare variable of a reference type is generally a share of that reference.

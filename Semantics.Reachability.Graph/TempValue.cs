@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.FST;
+using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph

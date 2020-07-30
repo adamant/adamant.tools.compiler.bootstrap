@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 
-namespace Adamant.Tools.Compiler.Bootstrap.FST
+namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
     public interface IFieldAccessExpressionSyntax : IAssignableExpressionSyntax
     {

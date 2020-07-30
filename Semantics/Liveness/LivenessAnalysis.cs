@@ -1,5 +1,5 @@
 using System;
-using Adamant.Tools.Compiler.Bootstrap.FST;
+using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 

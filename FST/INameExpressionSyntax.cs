@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Metadata.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
-namespace Adamant.Tools.Compiler.Bootstrap.FST
+namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
     /// <summary>
     /// An expression that is a single unqualified name

@@ -1,6 +1,6 @@
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.FST
+namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
     [Closed(
         typeof(INameExpressionSyntax),

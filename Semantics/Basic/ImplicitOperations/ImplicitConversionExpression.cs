@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.FST;
+using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 

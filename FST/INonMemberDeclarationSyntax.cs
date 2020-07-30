@@ -1,6 +1,6 @@
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.FST
+namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
     /// <summary>
     /// Things that can be declared outside of a class

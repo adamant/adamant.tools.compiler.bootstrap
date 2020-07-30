@@ -1,7 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.FST
+namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
     [Closed(
         typeof(IDeclarationSyntax),

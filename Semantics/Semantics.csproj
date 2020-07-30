@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FST\FST.csproj" />
+    <ProjectReference Include="..\FST\CST.csproj" />
     <ProjectReference Include="..\Core\Core.csproj" />
     <ProjectReference Include="..\Framework\Framework.csproj" />
     <ProjectReference Include="..\IntermediateLanguage\IntermediateLanguage.csproj" />

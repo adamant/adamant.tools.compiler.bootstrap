@@ -1,6 +1,6 @@
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
-namespace Adamant.Tools.Compiler.Bootstrap.FST
+namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
     /// <summary>
     /// Implicit conversion between simple numeric types

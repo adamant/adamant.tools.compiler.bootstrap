@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using Adamant.Tools.Compiler.Bootstrap.FST;
+using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing

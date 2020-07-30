@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.FST
+namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
     [Closed(
         typeof(ICapabilityTypeSyntax),

@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.FST;
-using Adamant.Tools.Compiler.Bootstrap.FST.Walkers;
+using Adamant.Tools.Compiler.Bootstrap.CST;
+using Adamant.Tools.Compiler.Bootstrap.CST.Walkers;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing

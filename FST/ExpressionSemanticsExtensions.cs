@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.FST
+namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
     public static class ExpressionSemanticsExtensions
     {

@@ -54,7 +54,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Unit.Lexing", "Tests.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Names", "Names\Names.csproj", "{CDFD4AFB-FD42-483C-AA80-876E1CD4E00B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FST", "FST\FST.csproj", "{9BB1E4FE-D7B8-4864-9C50-6F960F2543E2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CST", "FST\CST.csproj", "{9BB1E4FE-D7B8-4864-9C50-6F960F2543E2}"
 	ProjectSection(ProjectDependencies) = postProject
 		{4D709360-03ED-4A76-8EBB-18B89462A9DB} = {4D709360-03ED-4A76-8EBB-18B89462A9DB}
 	EndProjectSection
@@ -83,7 +83,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Symbols", "Symbols\Symbols.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Unit.Symbols", "Tests.Unit.Symbols\Tests.Unit.Symbols.csproj", "{A65EEF14-F7D5-4DBD-BCAC-9AF67B275EB2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Unit.Names", "Tests.Unit.Names\Tests.Unit.Names.csproj", "{C7752F7D-AF11-47A2-84C3-95D35166E02F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Unit.Names", "Tests.Unit.Names\Tests.Unit.Names.csproj", "{C7752F7D-AF11-47A2-84C3-95D35166E02F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

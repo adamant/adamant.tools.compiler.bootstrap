@@ -1,4 +1,4 @@
-using Adamant.Tools.Compiler.Bootstrap.FST;
+using Adamant.Tools.Compiler.Bootstrap.CST;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {

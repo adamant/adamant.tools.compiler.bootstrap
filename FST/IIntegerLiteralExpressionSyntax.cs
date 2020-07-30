@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace Adamant.Tools.Compiler.Bootstrap.FST
+namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
     public interface IIntegerLiteralExpressionSyntax : ILiteralExpressionSyntax
     {

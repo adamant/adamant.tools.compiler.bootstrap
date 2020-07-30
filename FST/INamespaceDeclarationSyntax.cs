@@ -1,7 +1,7 @@
 using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
-namespace Adamant.Tools.Compiler.Bootstrap.FST
+namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
     public interface INamespaceDeclarationSyntax : INonMemberDeclarationSyntax, IDeclarationSyntax
     {
