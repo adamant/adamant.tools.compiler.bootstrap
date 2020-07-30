@@ -252,18 +252,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
 
             var sourceFiles = new[] { codePath, runtimeLibrarySourcePath };
             var headerSearchPaths = new[] { cacheDir };
-            string outputPath;
-            switch (project.Template)
+            string outputPath = project.Template switch
             {
-                case ProjectTemplate.App:
-                    outputPath = Path.ChangeExtension(codePath, "exe");
-                    break;
-                case ProjectTemplate.Lib:
-                    outputPath = Path.ChangeExtension(codePath, "dll");
-                    break;
-                default:
-                    throw ExhaustiveMatch.Failed(project.Template);
-            }
+                ProjectTemplate.App => Path.ChangeExtension(codePath, "exe"),
+                ProjectTemplate.Lib => Path.ChangeExtension(codePath, "dll"),
+                _ => throw ExhaustiveMatch.Failed(project.Template)
+            };
 
             lock (consoleLock)
             {

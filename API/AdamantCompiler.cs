@@ -65,6 +65,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             if (!parseBlock.TryReceiveAll(out var compilationUnits))
                 throw new Exception("Not all compilation units are ready");
 
+            var referencePairs = await Task
+                                       .WhenAll(referenceTasks.Select(async kv =>
+                                           (alias: kv.Key, package: await kv.Value.ConfigureAwait(false))))
+                                       .ConfigureAwait(false);
+            var references = referencePairs.ToFixedDictionary(r => r.alias, r => r.package);
+
+            // TODO add the references to the package syntax
             var packageSyntax = new PackageSyntax(name, compilationUnits.ToFixedList());
 
             var analyzer = new SemanticAnalyzer()
@@ -73,10 +80,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                 SaveReachabilityGraphs = SaveReachabilityGraphs,
             };
 
-            var referencePairs = await Task.WhenAll(referenceTasks
-                                    .Select(async kv => (alias: kv.Key, package: await kv.Value.ConfigureAwait(false))))
-                                    .ConfigureAwait(false);
-            var references = referencePairs.ToFixedDictionary(r => r.alias, r => r.package);
             return analyzer.Check(packageSyntax, references);
         }
 
