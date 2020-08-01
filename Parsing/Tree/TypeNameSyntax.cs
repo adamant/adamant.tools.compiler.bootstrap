@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public FixedList<IMetadata> LookupInContainingScope()
         {
             if (ContainingScope != null)
-                return ContainingScope.Lookup(Name);
+                return ContainingScope.LookupMetadata(Name);
 
             throw new InvalidOperationException("Can't lookup type name without containing scope");
         }

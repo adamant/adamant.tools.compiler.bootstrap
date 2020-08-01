@@ -27,15 +27,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Scopes
             : this(containingScope, new MetadataSet(symbol.Yield()), MetadataSet.Empty)
         { }
 
-        public override FixedList<IMetadata> LookupInGlobalScope(Name name)
+        public override FixedList<IMetadata> LookupMetadataInGlobalScope(Name name)
         {
-            return ContainingScope.LookupInGlobalScope(name);
+            return ContainingScope.LookupMetadataInGlobalScope(name);
         }
 
-        public override FixedList<IMetadata> Lookup(SimpleName name, bool includeNested = true)
+        public override FixedList<IMetadata> LookupMetadata(SimpleName name, bool includeNested = true)
         {
-            var symbols = base.Lookup(name, includeNested);
-            return symbols.Any() ? symbols : ContainingScope.Lookup(name, includeNested);
+            var symbols = base.LookupMetadata(name, includeNested);
+            return symbols.Any() ? symbols : ContainingScope.LookupMetadata(name, includeNested);
         }
     }
 }

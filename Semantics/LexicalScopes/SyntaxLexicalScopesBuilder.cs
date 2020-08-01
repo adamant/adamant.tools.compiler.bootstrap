@@ -72,9 +72,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     containingScope = BuildBodyScope(constructor.ImplicitSelfParameter, constructor.Parameters, containingScope);
                     Walk(constructor.Body, containingScope);
                     return;
-                case IHasContainingScope hasContainingScope:
-                    hasContainingScope.ContainingScope = containingScope;
-                    break;
                 case IForeachExpressionSyntax foreachExpression:
                     Walk(foreachExpression.TypeSyntax, containingScope);
                     Walk(foreachExpression.InExpression, containingScope);
@@ -91,6 +88,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                             containingScope = new NestedScope(containingScope, variableDeclaration);
                     }
                     return;
+                case IHasContainingScope hasContainingScope:
+                    hasContainingScope.ContainingScope = containingScope;
+                    break;
             }
 
             WalkChildren(syntax, containingScope);

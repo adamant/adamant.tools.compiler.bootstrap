@@ -15,17 +15,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 UnknownType _ => UnknownMetadata.Instance,
                 ObjectType objectType =>
                         containingScope
-                        .LookupInGlobalScope(objectType.FullName)
+                        .LookupMetadataInGlobalScope(objectType.FullName)
                         .OfType<ITypeMetadata>()
                         .Single(),
                 SizedIntegerType integerType =>
                         containingScope
-                        .LookupInGlobalScope(integerType.Name)
+                        .LookupMetadataInGlobalScope(integerType.Name)
                         .OfType<ITypeMetadata>()
                         .Single(),
                 UnsizedIntegerType integerType =>
                         containingScope
-                        .LookupInGlobalScope(integerType.Name)
+                        .LookupMetadataInGlobalScope(integerType.Name)
                         .OfType<ITypeMetadata>()
                         .Single(),
                 _ => throw new NotImplementedException(

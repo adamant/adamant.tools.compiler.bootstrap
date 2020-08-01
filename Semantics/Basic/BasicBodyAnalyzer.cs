@@ -714,7 +714,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 
                 var functionName = targetName.Qualify(methodInvocation.MethodNameSyntax.Name);
                 // This will find both namespaced function calls and associated function calls
-                if (scope.Lookup(functionName).OfType<IFunctionMetadata>().Any())
+                if (scope.LookupMetadata(functionName).OfType<IFunctionMetadata>().Any())
                 {
                     // It is a namespaced or associated function invocation, modify the tree
                     var nameSpan = TextSpan.Covering(methodInvocation.ContextExpression.Span, methodInvocation.MethodNameSyntax.Span);
@@ -802,7 +802,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         {
             var argumentTypes = functionInvocationExpression.Arguments.Select(argument => InferType(ref argument.Expression)).ToFixedList();
             var scope = functionInvocationExpression.FunctionNameSyntax.ContainingScope.Assigned();
-            var functionSymbols = scope.Lookup(functionInvocationExpression.FullName)
+            var functionSymbols = scope.LookupMetadata(functionInvocationExpression.FullName)
                 .OfType<IFunctionMetadata>().ToFixedList();
             functionSymbols = ResolveOverload(functionSymbols, argumentTypes);
             switch (functionSymbols.Count)
