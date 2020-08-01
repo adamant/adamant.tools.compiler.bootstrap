@@ -1,5 +1,6 @@
 ◊namespace Adamant.Tools.Compiler.Bootstrap.AST;
 ◊base Syntax;
+◊prefix I;
 ◊suffix Syntax;
 ◊list FixedList;
 

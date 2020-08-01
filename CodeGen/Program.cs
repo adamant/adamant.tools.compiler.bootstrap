@@ -26,7 +26,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
                 Console.WriteLine($"Input:  {inputPath}");
                 Console.WriteLine($"Output: {outputPath}");
 
-                var grammar = Parser.ReadGrammarConfig(inputPath);
+                var inputFile = File.ReadAllText(inputPath)
+                                ?? throw new InvalidOperationException("null from reading input file");
+                var grammar = Parser.ReadGrammarConfig(inputFile);
                 var code = CodeBuilder.Generate(grammar);
                 return 0;
             }
