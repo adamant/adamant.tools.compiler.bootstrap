@@ -19,8 +19,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
                 new BindingSymbol(Name.From("a"), false, DataType.Int),
                 new BindingSymbol(Name.From("b"), false, DataType.Bool),
             }.ToFixedList();
-            var method1 = new MethodSymbol(Name.From("Fake"), selfParameter, parameters, DataType.Void, SymbolSet.Empty);
-            var method2 = new MethodSymbol(Name.From("Fake"), selfParameter, parameters, DataType.Void, SymbolSet.Empty);
+            var method1 = new MethodSymbol(Name.From("Fake"), selfParameter, parameters, DataType.Void);
+            var method2 = new MethodSymbol(Name.From("Fake"), selfParameter, parameters, DataType.Void);
 
             Assert.Equal(method1, method2);
         }
@@ -35,12 +35,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
                 new BindingSymbol(Name.From("a"), false, DataType.Int),
                 new BindingSymbol(Name.From("b"), false, DataType.Bool),
             }.ToFixedList();
-            var method1 = new MethodSymbol(Name.From("Fake"), selfParameter1, parameters, DataType.Void,
-                SymbolSet.Empty);
+            var method1 = new MethodSymbol(Name.From("Fake"), selfParameter1, parameters, DataType.Void);
             var selfParameter2 = new BindingSymbol(SpecialName.Self, true,
                 new ObjectType(Name.From("My_Class2"), false, ReferenceCapability.Borrowed));
-            var method2 = new MethodSymbol(Name.From("Fake"), selfParameter2, parameters, DataType.Void,
-                SymbolSet.Empty);
+            var method2 = new MethodSymbol(Name.From("Fake"), selfParameter2, parameters, DataType.Void);
 
             Assert.NotEqual(method1, method2);
         }
@@ -55,13 +53,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
                 new BindingSymbol(Name.From("a"), false, DataType.Int),
                 new BindingSymbol(Name.From("b"), false, DataType.Bool),
             }.ToFixedList();
-            var method1 = new MethodSymbol(Name.From("Fake"), selfParameter, parameters1, DataType.Void, SymbolSet.Empty);
+            var method1 = new MethodSymbol(Name.From("Fake"), selfParameter, parameters1, DataType.Void);
             var parameters2 = new[]
             {
                 new BindingSymbol(Name.From("a"), false, DataType.Int),
                 new BindingSymbol(Name.From("b"), false, DataType.Int),
             }.ToFixedList();
-            var method2 = new MethodSymbol(Name.From("Fake"), selfParameter, parameters2, DataType.Void, SymbolSet.Empty);
+            var method2 = new MethodSymbol(Name.From("Fake"), selfParameter, parameters2, DataType.Void);
 
             Assert.NotEqual(method1, method2);
         }
@@ -76,8 +74,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
                 new BindingSymbol(Name.From("a"), false, DataType.Int),
                 new BindingSymbol(Name.From("b"), false, DataType.Bool),
             }.ToFixedList();
-            var method1 = new MethodSymbol(Name.From("Fake"), selfParameter, parameters, DataType.Void, SymbolSet.Empty);
-            var method2 = new MethodSymbol(Name.From("Fake"), selfParameter, parameters, DataType.Int, SymbolSet.Empty);
+            var method1 = new MethodSymbol(Name.From("Fake"), selfParameter, parameters, DataType.Void);
+            var method2 = new MethodSymbol(Name.From("Fake"), selfParameter, parameters, DataType.Int);
 
             Assert.NotEqual(method1, method2);
         }
@@ -95,8 +93,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
             }.ToFixedList();
             var selfParameter = new BindingSymbol(SpecialName.Self, true,
                 new ObjectType(Name.From("My_Class"), false, ReferenceCapability.Borrowed));
-            var method = new MethodSymbol(Name.From("Fake"), selfParameter, parameters, DataType.Void, SymbolSet.Empty);
-            var func = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Void, SymbolSet.Empty);
+            var method = new MethodSymbol(Name.From("Fake"), selfParameter, parameters, DataType.Void);
+            var func = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Void);
 
             // Note: assert false used to ensure which object Equals is called on
             Assert.False(method.Equals(func));

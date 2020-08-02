@@ -7,12 +7,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     /// <summary>
     /// A symbol for a type declaration (i.e. a class)
     /// </summary>
-    public sealed class TypeSymbol : ParentSymbol
+    public sealed class TypeSymbol : Symbol
     {
         public ObjectType DeclaresType { get; }
 
-        public TypeSymbol(Name fullName, ObjectType declaresType, SymbolSet childSymbols)
-            : base(fullName, childSymbols)
+        public TypeSymbol(Name fullName, ObjectType declaresType)
+            : base(fullName)
         {
             if (fullName != declaresType.FullName)
                 throw new ArgumentException("Declared type must have the same name as symbol", nameof(declaresType));

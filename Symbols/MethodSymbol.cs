@@ -14,9 +14,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
             Name fullName,
             BindingSymbol selfParameter,
             FixedList<BindingSymbol> parameters,
-            DataType returnType,
-            SymbolSet childSymbols)
-            : base(fullName, parameters, returnType, childSymbols)
+            DataType returnType)
+            : base(fullName, parameters, returnType)
         {
             SelfParameter = selfParameter;
         }

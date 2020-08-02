@@ -14,15 +14,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
         {
             var type = new ObjectType(Name.From("foo", "bar", "My_Class"), true, ReferenceCapability.Isolated);
 
-            Assert.Throws<ArgumentException>(() => new TypeSymbol(Name.From("foo", "bar", "Different_name"), type, SymbolSet.Empty));
+            Assert.Throws<ArgumentException>(() => new TypeSymbol(Name.From("foo", "bar", "Different_name"), type));
         }
 
         [Fact]
         public void With_same_name_and_type_are_equal()
         {
             var type = new ObjectType(Name.From("foo", "bar", "My_Class"), true, ReferenceCapability.Isolated);
-            var sym1 = new TypeSymbol(Name.From("foo", "bar", "My_Class"), type, SymbolSet.Empty);
-            var sym2 = new TypeSymbol(Name.From("foo", "bar", "My_Class"), type, SymbolSet.Empty);
+            var sym1 = new TypeSymbol(Name.From("foo", "bar", "My_Class"), type);
+            var sym2 = new TypeSymbol(Name.From("foo", "bar", "My_Class"), type);
 
             Assert.Equal(sym1, sym2);
         }
@@ -31,9 +31,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
         public void With_different_name_are_not_equal()
         {
             var type1 = new ObjectType(Name.From("foo", "bar", "My_Class1"), true, ReferenceCapability.Isolated);
-            var sym1 = new TypeSymbol(Name.From("foo", "bar", "My_Class1"), type1, SymbolSet.Empty);
+            var sym1 = new TypeSymbol(Name.From("foo", "bar", "My_Class1"), type1);
             var type2 = new ObjectType(Name.From("foo", "bar", "My_Class2"), true, ReferenceCapability.Isolated);
-            var sym2 = new TypeSymbol(Name.From("foo", "bar", "My_Class2"), type2, SymbolSet.Empty);
+            var sym2 = new TypeSymbol(Name.From("foo", "bar", "My_Class2"), type2);
 
             Assert.NotEqual(sym1, sym2);
         }
@@ -42,9 +42,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
         public void With_different_type_are_not_equal()
         {
             var type1 = new ObjectType(Name.From("foo", "bar", "My_Class"), true, ReferenceCapability.Isolated);
-            var sym1 = new TypeSymbol(Name.From("foo", "bar", "My_Class"), type1, SymbolSet.Empty);
+            var sym1 = new TypeSymbol(Name.From("foo", "bar", "My_Class"), type1);
             var type2 = new ObjectType(Name.From("foo", "bar", "My_Class"), false, ReferenceCapability.Isolated);
-            var sym2 = new TypeSymbol(Name.From("foo", "bar", "My_Class"), type2, SymbolSet.Empty);
+            var sym2 = new TypeSymbol(Name.From("foo", "bar", "My_Class"), type2);
 
             Assert.NotEqual(sym1, sym2);
         }

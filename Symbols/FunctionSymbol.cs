@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     /// <summary>
     /// A symbol for a function
     /// </summary>
-    public class FunctionSymbol : ParentSymbol
+    public class FunctionSymbol : Symbol
     {
         // TODO the parameter types are part of the symbol, actual parameter symbols are children
         public FixedList<BindingSymbol> Parameters { get; }
@@ -20,9 +20,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         public FunctionSymbol(
             Name fullName,
             FixedList<BindingSymbol> parameters,
-            DataType returnType,
-            SymbolSet childSymbols)
-            : base(fullName, childSymbols)
+            DataType returnType)
+            : base(fullName)
         {
             Parameters = parameters;
             ReturnType = returnType;
@@ -31,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         public static FunctionSymbol CreateDefaultConstructor(ObjectType constructedType)
         {
             var name = constructedType.FullName.Qualify(SpecialName.New);
-            return new FunctionSymbol(name, FixedList<BindingSymbol>.Empty, constructedType, SymbolSet.Empty);
+            return new FunctionSymbol(name, FixedList<BindingSymbol>.Empty, constructedType);
         }
 
         public override bool Equals(Symbol? other)

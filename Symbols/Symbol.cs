@@ -6,7 +6,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
 {
     // TODO have symbols reference their containing symbols and act a little more like names
     [Closed(
-        typeof(ParentSymbol),
+        typeof(TypeSymbol),
+        typeof(FunctionSymbol),
+        typeof(NamespaceSymbol),
         typeof(BindingSymbol))]
     public abstract class Symbol : IEquatable<Symbol>
     {

@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
             var parameters = Enumerable.Range(1, expectedParameters)
                                        .Select(n => new BindingSymbol(Name.From("param" + n), true, DataType.Int))
                                        .ToFixedList();
-            var func = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Void, SymbolSet.Empty);
+            var func = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Void);
 
             Assert.Equal(expectedParameters, func.Arity);
         }
@@ -37,7 +37,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
             Assert.Empty(defaultConstructor.Parameters);
             Assert.Equal(0, defaultConstructor.Arity);
             Assert.Equal(type, defaultConstructor.ReturnType);
-            Assert.Empty(defaultConstructor.ChildSymbols);
         }
 
         [Fact]
@@ -48,8 +47,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
                 new BindingSymbol(Name.From("a"), false, DataType.Int),
                 new BindingSymbol(Name.From("b"), false, DataType.Bool),
             }.ToFixedList();
-            var func1 = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Void, SymbolSet.Empty);
-            var func2 = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Void, SymbolSet.Empty);
+            var func1 = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Void);
+            var func2 = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Void);
 
             Assert.Equal(func1, func2);
         }
@@ -62,13 +61,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
                 new BindingSymbol(Name.From("a"), false, DataType.Int),
                 new BindingSymbol(Name.From("b"), false, DataType.Bool),
             }.ToFixedList();
-            var func1 = new FunctionSymbol(Name.From("Fake"), parameters1, DataType.Void, SymbolSet.Empty);
+            var func1 = new FunctionSymbol(Name.From("Fake"), parameters1, DataType.Void);
             var parameters2 = new[]
             {
                 new BindingSymbol(Name.From("a"), false, DataType.Int),
                 new BindingSymbol(Name.From("b"), false, DataType.Int),
             }.ToFixedList();
-            var func2 = new FunctionSymbol(Name.From("Fake"), parameters2, DataType.Void, SymbolSet.Empty);
+            var func2 = new FunctionSymbol(Name.From("Fake"), parameters2, DataType.Void);
 
             Assert.NotEqual(func1, func2);
         }
@@ -81,8 +80,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
                 new BindingSymbol(Name.From("a"), false, DataType.Int),
                 new BindingSymbol(Name.From("b"), false, DataType.Bool),
             }.ToFixedList();
-            var func1 = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Void, SymbolSet.Empty);
-            var func2 = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Int, SymbolSet.Empty);
+            var func1 = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Void);
+            var func2 = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Int);
 
             Assert.NotEqual(func1, func2);
         }
@@ -97,9 +96,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
                 new BindingSymbol(Name.From("a"), false, DataType.Int),
                 new BindingSymbol(Name.From("b"), false, DataType.Bool),
             }.ToFixedList();
-            var func = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Void, SymbolSet.Empty);
+            var func = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Void);
             var selfParameter = new BindingSymbol(SpecialName.Self, true, new ObjectType(Name.From("My_Class"), false, ReferenceCapability.Borrowed));
-            var method = new MethodSymbol(Name.From("Fake"), selfParameter, parameters, DataType.Void, SymbolSet.Empty);
+            var method = new MethodSymbol(Name.From("Fake"), selfParameter, parameters, DataType.Void);
 
             // Note: assert false used to ensure which object Equals is called on
             Assert.False(func.Equals(method));

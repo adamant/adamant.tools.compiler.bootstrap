@@ -8,10 +8,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     /// IL doesn't even directly represent namespaces, for symbols, a namespace
     /// is the container of all the names in it. There is one symbol per namespace.
     /// </summary>
-    public sealed class NamespaceSymbol : ParentSymbol
+    public sealed class NamespaceSymbol : Symbol
     {
-        public NamespaceSymbol(Name fullName, SymbolSet childSymbols)
-            : base(fullName, childSymbols) { }
+        public NamespaceSymbol(Name fullName)
+            : base(fullName) { }
 
         public override bool Equals(Symbol? other)
         {
