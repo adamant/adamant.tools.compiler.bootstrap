@@ -1,6 +1,11 @@
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
-    // TODO I think this exists from the days when `mut` and `move` were treated as special parts of the argument. Perhaps remove this.
+    /// <remarks>
+    /// This is needed because it is not possible to put <code>ref IExpressionSyntax</code>
+    /// directly into a list.
+    ///
+    /// TODO remove type once expression is immutable
+    /// </remarks>
     public partial interface IArgumentSyntax
     {
         ref IExpressionSyntax Expression { get; }
