@@ -9,26 +9,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
     public partial class CodeTemplate
     {
         private readonly Grammar grammar;
-        private readonly FixedList<string> baseType;
 
         public CodeTemplate(Grammar grammar)
         {
             this.grammar = grammar;
-            baseType = grammar.BaseType.YieldValue().Select(b => b.Text).ToFixedList();
-        }
-
-        private string TypeName(string name)
-        {
-            // If it is a nonterminal, then transform the name
-            if (grammar.Rules.Any(r => r.Nonterminal.Text == name))
-                return $"{grammar.Prefix}{name}{grammar.Suffix}";
-
-            return name;
         }
 
         private string TypeName(Symbol symbol)
         {
-            return symbol.IsQuoted ? symbol.Text : TypeName(symbol.Text);
+            if (symbol.IsQuoted)
+                return symbol.Text;
+
+            // If it is a nonterminal, then transform the name
+            if (grammar.Rules.Any(r => r.Nonterminal == symbol))
+                return $"{grammar.Prefix}{symbol.Text}{grammar.Suffix}";
+
+            return symbol.Text;
         }
 
         private bool IsNew(Rule rule, Property property)
