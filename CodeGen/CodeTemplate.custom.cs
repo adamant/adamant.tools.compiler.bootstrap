@@ -14,16 +14,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
         public CodeTemplate(Grammar grammar)
         {
             this.grammar = grammar;
-            baseType = grammar.BaseType.YieldValue().ToFixedList();
+            baseType = grammar.BaseType.YieldValue().Select(b => b.Text).ToFixedList();
         }
 
         private string TypeName(string name)
         {
             // If it is a nonterminal, then transform the name
-            if (grammar.Rules.Any(r => r.Nonterminal == name))
+            if (grammar.Rules.Any(r => r.Nonterminal.Text == name))
                 return $"{grammar.Prefix}{name}{grammar.Suffix}";
 
             return name;
+        }
+
+        private string TypeName(Symbol symbol)
+        {
+            return symbol.IsQuoted ? symbol.Text : TypeName(symbol.Text);
         }
 
         private bool IsNew(Rule rule, Property property)
@@ -45,10 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
         {
             var parents = rule.Parents.Select(TypeName);
             if (!rule.Parents.Any())
-            {
-                if (grammar.BaseType is null) return "";
-                parents = baseType;
-            }
+                return "";
 
             return " : " + string.Join(", ", parents);
         }

@@ -1,5 +1,5 @@
 ◊namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen;
-◊base ISyntax;
+◊base 'ISyntax';
 ◊prefix I;
 ◊suffix Syntax;
 ◊list FixedList;
@@ -12,6 +12,7 @@
 ◊using Adamant.Tools.Compiler.Bootstrap.Tokens;
 ◊using Adamant.Tools.Compiler.Bootstrap.Types;
 
+'ISyntax' = Span:TextSpan;
 AbstractMethodDeclaration: MethodDeclaration;
 Argument = Expression;
 AssignableExpression: Expression;
@@ -69,7 +70,7 @@ NoneLiteralExpression: LiteralExpression;
 NonMemberDeclaration: Declaration;
 NonMemberEntityDeclaration: EntityDeclaration, NonMemberDeclaration;
 OptionalType: Type = Referent:Type;
-Parameter: ISyntax, IBindingMetadata = Name:SimpleName Unused:bool Type:DataTypePromise;
+Parameter: 'ISyntax', IBindingMetadata = Name:SimpleName Unused:bool Type:DataTypePromise;
 ReachabilityAnnotation;
 ReachableFromAnnotation: ReachabilityAnnotation = ReachableFrom:NameExpression;
 ResultStatement: Statement, BlockOrResult = Expression;

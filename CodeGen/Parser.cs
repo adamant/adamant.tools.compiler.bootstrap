@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.CodeGen.Config;
@@ -20,12 +21,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             }
 
             var ns = GetConfig(lines, "namespace");
-            var baseType = GetConfig(lines, "base");
+            var baseType = ParseSymbol(GetConfig(lines, "base"));
             var prefix = GetConfig(lines, "prefix") ?? "";
             var suffix = GetConfig(lines, "suffix") ?? "";
             var listType = GetConfig(lines, "list") ?? "List";
             var usingNamespaces = GetUsingNamespaces(lines);
-            var rules = GetRules(lines).ToList();
+            var rules = GetRules(lines).Select(r => DefaultBaseType(r, baseType));
             return new Grammar(ns, baseType, prefix, suffix, listType, usingNamespaces, rules);
         }
 
@@ -47,6 +48,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             return lines.Select(l => l.Substring(start.Length).TrimEnd(';').Trim());
         }
 
+        private static Rule DefaultBaseType(Rule rule, Symbol? baseType)
+        {
+            if (baseType is null
+                || rule.Parents.Any()
+                || rule.Nonterminal == baseType) return rule;
+            return new Rule(rule.Nonterminal, baseType.YieldValue(), rule.Properties);
+        }
+
         private static IEnumerable<Rule> GetRules(List<string> lines)
         {
             var ruleLines = lines.Where(l => !l.StartsWith(Program.DirectiveMarker, StringComparison.InvariantCulture) && !string.IsNullOrWhiteSpace(l))
@@ -65,16 +74,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             }
         }
 
-        private static (string nonterminal, List<string> parents) ParseDeclaration(string declaration)
-        {
-            var declarationSplit = declaration.Split(':');
-            if (declarationSplit.Length > 2) throw new FormatException($"Too many colons in declaration: '{declaration}'");
-            var nonterminal = declarationSplit[0].Trim();
-            var parents = declarationSplit.Length == 2 ? declarationSplit[1] : null;
-            var parentsSplit = parents?.Split(',').Select(p => p.Trim()).ToList() ?? new List<string>();
-            return (nonterminal, parentsSplit);
-        }
-
         private static IEnumerable<Property> ParseDefinition(string? definition)
         {
             if (definition is null) yield break;
@@ -83,9 +82,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             foreach (var property in properties)
             {
                 var isList = property.EndsWith('*');
-                var trimmedProperty = property.TrimEnd('*');
+                var trimmedProperty = isList ? property[..^1] : property;
                 var isOptional = property.EndsWith('?');
-                trimmedProperty = trimmedProperty.TrimEnd('?');
+                trimmedProperty = isOptional ? trimmedProperty[..^1] : trimmedProperty;
                 var parts = trimmedProperty.Split(':').Select(p => p.Trim()).ToArray();
 
                 switch (parts.Length)
@@ -107,6 +106,35 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
                         throw new FormatException($"Too many colons in definition: '{definition}'");
                 }
             }
+        }
+
+        private static (Symbol nonterminal, IEnumerable<Symbol> parents) ParseDeclaration(string declaration)
+        {
+            var declarationSplit = declaration.SplitOrEmpty(':');
+            if (declarationSplit.Count > 2) throw new FormatException($"Too many colons in declaration: '{declaration}'");
+            string symbol = declarationSplit[0].Trim();
+            var nonterminal = ParseSymbol(symbol)!; // TODO WTF!!!!!!!!!!!
+            var parents = declarationSplit.Count == 2 ? declarationSplit[1] : null;
+            var parentSymbols = ParseParents(parents);
+            return (nonterminal, parentSymbols);
+        }
+
+        private static IEnumerable<Symbol> ParseParents(string? parents)
+        {
+            if (parents is null) return Enumerable.Empty<Symbol>();
+
+            return parents
+                   .Split(',')
+                   .Select(p => p.Trim())
+                   .Select(p => ParseSymbol(p)!); // TODO WTF!!!!!!!!!!!!
+        }
+
+        [return: NotNullIfNotNull(nameof(Symbol))]
+        private static Symbol? ParseSymbol(string? symbol)
+        {
+            if (symbol is null) return null;
+            if (symbol.StartsWith('\'') && symbol.EndsWith('\'')) return new Symbol(symbol[1..^1], true);
+            return new Symbol(symbol);
         }
     }
 }

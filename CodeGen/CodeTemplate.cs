@@ -91,7 +91,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             
             #line default
             #line hidden
-            this.Write("            ");
+            this.Write("        ");
             
             #line 20 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(IsNew(rule, property) ? "new " : ""));
