@@ -7,17 +7,19 @@
     { #>
 using <#=usingNamespace #>;
 <#  } #>
+using ExhaustiveMatching;
 
 namespace <#=grammar.Namespace #>
 {
 <#  foreach(var rule in grammar.Rules)
     { #>
-    public partial interface <#= TypeName(rule.Nonterminal) #><#= BaseTypes(rule) #>
+<#=ClosedType(rule) #>    public partial interface <#= TypeName(rule.Nonterminal) #><#= BaseTypes(rule) #>
     {
 <#      foreach(var property in rule.Properties)
         { #>
             <#=IsNew(rule, property) ? "new " : "" #><#=TypeName(property) #> <#=property.Name #> { get; }
 <#      } #>
     }
+
 <#  } #>
 }

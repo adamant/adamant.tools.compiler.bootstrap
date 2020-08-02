@@ -49,37 +49,43 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             
             #line default
             #line hidden
-            this.Write("\r\nnamespace ");
+            this.Write("using ExhaustiveMatching;\r\n\r\nnamespace ");
             
-            #line 11 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\CodeTemplate.tt"
+            #line 12 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(grammar.Namespace));
             
             #line default
             #line hidden
             this.Write("\r\n{\r\n");
             
-            #line 13 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\CodeTemplate.tt"
+            #line 14 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\CodeTemplate.tt"
   foreach(var rule in grammar.Rules)
     { 
             
             #line default
             #line hidden
+            
+            #line 16 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\CodeTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(ClosedType(rule)));
+            
+            #line default
+            #line hidden
             this.Write("    public partial interface ");
             
-            #line 15 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\CodeTemplate.tt"
+            #line 16 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(TypeName(rule.Nonterminal)));
             
             #line default
             #line hidden
             
-            #line 15 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\CodeTemplate.tt"
+            #line 16 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(BaseTypes(rule)));
             
             #line default
             #line hidden
             this.Write("\r\n    {\r\n");
             
-            #line 17 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\CodeTemplate.tt"
+            #line 18 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\CodeTemplate.tt"
       foreach(var property in rule.Properties)
         { 
             
@@ -87,34 +93,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             #line hidden
             this.Write("            ");
             
-            #line 19 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\CodeTemplate.tt"
+            #line 20 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(IsNew(rule, property) ? "new " : ""));
             
             #line default
             #line hidden
             
-            #line 19 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\CodeTemplate.tt"
+            #line 20 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(TypeName(property)));
             
             #line default
             #line hidden
             this.Write(" ");
             
-            #line 19 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\CodeTemplate.tt"
+            #line 20 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\CodeTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(property.Name));
             
             #line default
             #line hidden
             this.Write(" { get; }\r\n");
             
-            #line 20 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\CodeTemplate.tt"
+            #line 21 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\CodeTemplate.tt"
       } 
             
             #line default
             #line hidden
-            this.Write("    }\r\n");
+            this.Write("    }\r\n\r\n");
             
-            #line 22 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\CodeTemplate.tt"
+            #line 24 "C:\dataFast\adamant-lang\adamant.tools.compiler.bootstrap\CodeGen\CodeTemplate.tt"
   } 
             
             #line default
