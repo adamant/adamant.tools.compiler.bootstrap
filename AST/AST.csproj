@@ -24,6 +24,12 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj" />
+    <ProjectReference Include="..\Symbols\Symbols.csproj" />
+    <ProjectReference Include="..\Types\Types.csproj" />
+  </ItemGroup>
+
 
   <ItemGroup>
     <Compile Update="AbstractSyntaxTree.tree.cs">

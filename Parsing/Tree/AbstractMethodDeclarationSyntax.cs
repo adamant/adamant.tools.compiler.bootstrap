@@ -18,17 +18,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan nameSpan,
             ISelfParameterSyntax selfParameter,
             FixedList<INamedParameterSyntax> parameters,
-            ITypeSyntax? returnTypeSyntax,
+            ITypeSyntax? returnType,
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations)
             : base(declaringClass, span, file, accessModifier, fullName, nameSpan,
-                selfParameter, parameters, returnTypeSyntax, reachabilityAnnotations,
+                selfParameter, parameters, returnType, reachabilityAnnotations,
                 GetChildMetadata(selfParameter, parameters, null))
         {
         }
 
         public override string ToString()
         {
-            var returnType = ReturnTypeSyntax != null ? " -> " + ReturnTypeSyntax : "";
+            var returnType = ReturnType != null ? " -> " + ReturnType : "";
             return $"fn {FullName}({string.Join(", ", Parameters.Prepend<IParameterSyntax>(SelfParameter))}){returnType};";
         }
     }

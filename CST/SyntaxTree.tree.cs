@@ -50,7 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IAssociatedFunctionDeclarationSyntax : IMemberDeclarationSyntax, IConcreteCallableDeclarationSyntax
     {
-        ITypeSyntax? ReturnTypeSyntax { get; }
+        ITypeSyntax? ReturnType { get; }
         DataTypePromise ReturnDataType { get; }
     }
 
@@ -254,7 +254,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IFunctionDeclarationSyntax : INonMemberEntityDeclarationSyntax, IConcreteCallableDeclarationSyntax
     {
         bool IsExternalFunction { get; }
-        ITypeSyntax? ReturnTypeSyntax { get; }
+        ITypeSyntax? ReturnType { get; }
         DataTypePromise ReturnDataType { get; }
     }
 
@@ -344,7 +344,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IMethodDeclarationSyntax : IMemberDeclarationSyntax, ICallableDeclarationSyntax
     {
         ISelfParameterSyntax SelfParameter { get; }
-        ITypeSyntax? ReturnTypeSyntax { get; }
+        ITypeSyntax? ReturnType { get; }
         DataTypePromise ReturnDataType { get; }
     }
 

@@ -49,20 +49,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     break;
                 case IFunctionDeclarationSyntax function:
                     foreach (var parameter in function.Parameters) Walk(parameter, containingScope);
-                    Walk(function.ReturnTypeSyntax, containingScope);
+                    Walk(function.ReturnType, containingScope);
                     containingScope = BuildBodyScope(function.Parameters, containingScope);
                     Walk(function.Body, containingScope);
                     return;
                 case IAssociatedFunctionDeclarationSyntax function:
                     foreach (var parameter in function.Parameters) Walk(parameter, containingScope);
-                    Walk(function.ReturnTypeSyntax, containingScope);
+                    Walk(function.ReturnType, containingScope);
                     containingScope = BuildBodyScope(function.Parameters, containingScope);
                     Walk(function.Body, containingScope);
                     return;
                 case IConcreteMethodDeclarationSyntax concreteMethod:
                     Walk(concreteMethod.SelfParameter, containingScope);
                     foreach (var parameter in concreteMethod.Parameters) Walk(parameter, containingScope);
-                    Walk(concreteMethod.ReturnTypeSyntax, containingScope);
+                    Walk(concreteMethod.ReturnType, containingScope);
                     containingScope = BuildBodyScope(concreteMethod.SelfParameter, concreteMethod.Parameters, containingScope);
                     Walk(concreteMethod.Body, containingScope);
                     return;

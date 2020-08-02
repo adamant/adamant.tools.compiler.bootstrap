@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public ISelfParameterSyntax SelfParameter { get; }
         public IBindingMetadata SelfParameterMetadata => SelfParameter;
         public new FixedList<INamedParameterSyntax> Parameters { get; }
-        public ITypeSyntax? ReturnTypeSyntax { get; }
+        public ITypeSyntax? ReturnType { get; }
         DataType IFunctionMetadata.ReturnDataType => ReturnDataType.Fulfilled();
 
         protected MethodDeclarationSyntax(
@@ -30,7 +30,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan nameSpan,
             ISelfParameterSyntax selfParameter,
             FixedList<INamedParameterSyntax> parameters,
-            ITypeSyntax? returnTypeSyntax,
+            ITypeSyntax? returnType,
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             MetadataSet childMetadata)
             : base(span, file, accessModifier, fullName, nameSpan,
@@ -39,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             DeclaringClass = declaringClass;
             SelfParameter = selfParameter;
             Parameters = parameters;
-            ReturnTypeSyntax = returnTypeSyntax;
+            ReturnType = returnType;
         }
     }
 }

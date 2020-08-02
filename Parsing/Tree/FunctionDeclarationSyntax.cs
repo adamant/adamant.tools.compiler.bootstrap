@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal class FunctionDeclarationSyntax : CallableDeclarationSyntax, IFunctionDeclarationSyntax
     {
         public bool IsExternalFunction { [DebuggerStepThrough] get; [DebuggerStepThrough] set; }
-        public ITypeSyntax? ReturnTypeSyntax { [DebuggerStepThrough] get; }
+        public ITypeSyntax? ReturnType { [DebuggerStepThrough] get; }
         public new FixedList<INamedParameterSyntax> Parameters { [DebuggerStepThrough] get; }
         DataType IFunctionMetadata.ReturnDataType => ReturnDataType.Fulfilled();
         public IBodySyntax Body { [DebuggerStepThrough] get; }
@@ -24,20 +24,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             Name fullName,
             TextSpan nameSpan,
             FixedList<INamedParameterSyntax> parameters,
-            ITypeSyntax? returnTypeSyntax,
+            ITypeSyntax? returnType,
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             IBodySyntax body)
             : base(span, file, accessModifier, fullName, nameSpan, parameters,
                 reachabilityAnnotations, GetChildMetadata(null, parameters, body))
         {
             Parameters = parameters;
-            ReturnTypeSyntax = returnTypeSyntax;
+            ReturnType = returnType;
             Body = body;
         }
 
         public override string ToString()
         {
-            var returnType = ReturnTypeSyntax != null ? " -> " + ReturnTypeSyntax : "";
+            var returnType = ReturnType != null ? " -> " + ReturnType : "";
             return $"fn {FullName}({string.Join(", ", Parameters)}){returnType} {Body}";
         }
     }

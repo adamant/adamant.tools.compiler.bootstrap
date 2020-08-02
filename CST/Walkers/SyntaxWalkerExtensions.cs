@@ -37,25 +37,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Walkers
                     walker.Walk(concreteMethodDeclaration.SelfParameter, arg);
                     foreach (var parameter in concreteMethodDeclaration.Parameters)
                         walker.Walk(parameter, arg);
-                    walker.Walk(concreteMethodDeclaration.ReturnTypeSyntax, arg);
+                    walker.Walk(concreteMethodDeclaration.ReturnType, arg);
                     walker.Walk(concreteMethodDeclaration.Body, arg);
                     break;
                 case IAbstractMethodDeclarationSyntax abstractMethodDeclaration:
                     walker.Walk(abstractMethodDeclaration.SelfParameter, arg);
                     foreach (var parameter in abstractMethodDeclaration.Parameters)
                         walker.Walk(parameter, arg);
-                    walker.Walk(abstractMethodDeclaration.ReturnTypeSyntax, arg);
+                    walker.Walk(abstractMethodDeclaration.ReturnType, arg);
                     break;
                 case IAssociatedFunctionDeclarationSyntax associatedFunctionDeclaration:
                     foreach (var parameter in associatedFunctionDeclaration.Parameters)
                         walker.Walk(parameter, arg);
-                    walker.Walk(associatedFunctionDeclaration.ReturnTypeSyntax, arg);
+                    walker.Walk(associatedFunctionDeclaration.ReturnType, arg);
                     walker.Walk(associatedFunctionDeclaration.Body, arg);
                     break;
                 case IFunctionDeclarationSyntax functionDeclaration:
                     foreach (var parameter in functionDeclaration.Parameters)
                         walker.Walk(parameter, arg);
-                    walker.Walk(functionDeclaration.ReturnTypeSyntax, arg);
+                    walker.Walk(functionDeclaration.ReturnType, arg);
                     walker.Walk(functionDeclaration.Body, arg);
                     break;
                 case IFieldDeclarationSyntax fieldDeclaration:

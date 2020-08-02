@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public SimpleName Name => FullName.UnqualifiedName;
 
         public new FixedList<INamedParameterSyntax> Parameters { get; }
-        public ITypeSyntax? ReturnTypeSyntax { get; }
+        public ITypeSyntax? ReturnType { get; }
         DataType IFunctionMetadata.ReturnDataType => ReturnDataType.Fulfilled();
         public IBodySyntax Body { get; }
 
@@ -38,13 +38,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         {
             DeclaringClass = declaringClass;
             Parameters = parameters;
-            ReturnTypeSyntax = returnTypeSyntax;
+            ReturnType = returnTypeSyntax;
             Body = body;
         }
 
         public override string ToString()
         {
-            var returnType = ReturnTypeSyntax != null ? " -> " + ReturnTypeSyntax : "";
+            var returnType = ReturnType != null ? " -> " + ReturnType : "";
             return $"fn {FullName}({string.Join(", ", Parameters)}){returnType} {Body}";
         }
     }

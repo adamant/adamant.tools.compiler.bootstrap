@@ -2,3 +2,12 @@
 ◊base 'IAbstractSyntax';
 ◊prefix I;
 ◊list FixedList;
+◊using Adamant.Tools.Compiler.Bootstrap.Core;
+◊using Adamant.Tools.Compiler.Bootstrap.Symbols;
+
+'IAbstractSyntax' = TextSpan;
+
+Declaration = Symbol;
+MemberDeclaration: Declaration;
+NonMemberEntityDeclaration: Declaration;
+ClassDeclaration: NonMemberEntityDeclaration;

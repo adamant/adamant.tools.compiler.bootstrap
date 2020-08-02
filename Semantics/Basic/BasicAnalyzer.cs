@@ -69,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var analyzer = new BasicTypeAnalyzer(method.File, diagnostics);
                     method.SelfParameterType = ResolveTypesInParameter(method.SelfParameter, method.DeclaringClass);
                     ResolveTypesInParameters(analyzer, method.Parameters, method.DeclaringClass);
-                    ResolveReturnType(method.ReturnDataType, method.ReturnTypeSyntax, analyzer);
+                    ResolveReturnType(method.ReturnDataType, method.ReturnType, analyzer);
                     break;
                 }
                 case IConstructorDeclarationSyntax constructor:
@@ -85,7 +85,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 {
                     var analyzer = new BasicTypeAnalyzer(associatedFunction.File, diagnostics);
                     ResolveTypesInParameters(analyzer, associatedFunction.Parameters, null);
-                    ResolveReturnType(associatedFunction.ReturnDataType, associatedFunction.ReturnTypeSyntax, analyzer);
+                    ResolveReturnType(associatedFunction.ReturnDataType, associatedFunction.ReturnType, analyzer);
                     break;
                 }
                 case IFieldDeclarationSyntax field:
@@ -101,7 +101,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 {
                     var analyzer = new BasicTypeAnalyzer(function.File, diagnostics);
                     ResolveTypesInParameters(analyzer, function.Parameters, null);
-                    ResolveReturnType(function.ReturnDataType, function.ReturnTypeSyntax, analyzer);
+                    ResolveReturnType(function.ReturnDataType, function.ReturnType, analyzer);
                     break;
                 }
                 case IClassDeclarationSyntax @class:
