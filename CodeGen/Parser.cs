@@ -92,14 +92,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
                     case 1:
                     {
                         var name = parts[0];
-                        yield return new Property(name, name, isOptional, isList);
+                        yield return new Property(name, new Symbol(name), isOptional, isList);
                     }
                     break;
                     case 2:
                     {
                         var name = parts[0];
                         var type = parts[1];
-                        yield return new Property(name, type, isOptional, isList);
+                        yield return new Property(name, ParseSymbol(type), isOptional, isList);
                     }
                     break;
                     default:
@@ -112,8 +112,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
         {
             var declarationSplit = declaration.SplitOrEmpty(':');
             if (declarationSplit.Count > 2) throw new FormatException($"Too many colons in declaration: '{declaration}'");
-            string symbol = declarationSplit[0].Trim();
-            var nonterminal = ParseSymbol(symbol)!; // TODO WTF!!!!!!!!!!!
+            var nonterminal = ParseSymbol(declarationSplit[0].Trim());
             var parents = declarationSplit.Count == 2 ? declarationSplit[1] : null;
             var parentSymbols = ParseParents(parents);
             return (nonterminal, parentSymbols);
@@ -126,10 +125,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             return parents
                    .Split(',')
                    .Select(p => p.Trim())
-                   .Select(p => ParseSymbol(p)!); // TODO WTF!!!!!!!!!!!!
+                   .Select(p => ParseSymbol(p));
         }
 
-        [return: NotNullIfNotNull(nameof(Symbol))]
+        [return: NotNullIfNotNull("symbol")]
         private static Symbol? ParseSymbol(string? symbol)
         {
             if (symbol is null) return null;

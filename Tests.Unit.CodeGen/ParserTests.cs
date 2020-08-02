@@ -253,7 +253,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
             var rule = Assert.Single(config.Rules);
             var property = Assert.Single(rule.Properties);
             Assert.Equal("MyProperty", property.Name);
-            Assert.Equal("MyProperty", property.Type);
+            Assert.Equal(new Symbol("MyProperty"), property.Type);
             Assert.False(property.IsOptional);
             Assert.False(property.IsList);
         }
@@ -267,7 +267,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
             var rule = Assert.Single(config.Rules);
             var property = Assert.Single(rule.Properties);
             Assert.Equal("MyProperty", property.Name);
-            Assert.Equal("MyProperty", property.Type);
+            Assert.Equal(new Symbol("MyProperty"), property.Type);
             Assert.True(property.IsOptional);
             Assert.False(property.IsList);
         }
@@ -281,10 +281,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
             var rule = Assert.Single(config.Rules);
             var property = Assert.Single(rule.Properties);
             Assert.Equal("MyProperty", property.Name);
-            Assert.Equal("MyType", property.Type);
+            Assert.Equal(new Symbol("MyType"), property.Type);
             Assert.False(property.IsOptional);
             Assert.False(property.IsList);
         }
+
+        [Fact]
+        public void ParsesQuotedTypedProperty()
+        {
+            const string grammar = "MyNonterminal = MyProperty:'MyType';";
+            var config = Parser.ReadGrammarConfig(grammar);
+
+            var rule = Assert.Single(config.Rules);
+            var property = Assert.Single(rule.Properties);
+            Assert.Equal("MyProperty", property.Name);
+            Assert.Equal(new Symbol("MyType", true), property.Type);
+            Assert.False(property.IsOptional);
+            Assert.False(property.IsList);
+        }
+
 
         [Fact]
         public void ParsesListTypedProperty()
@@ -295,7 +310,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
             var rule = Assert.Single(config.Rules);
             var property = Assert.Single(rule.Properties);
             Assert.Equal("MyProperty", property.Name);
-            Assert.Equal("MyType", property.Type);
+            Assert.Equal(new Symbol("MyType"), property.Type);
             Assert.False(property.IsOptional);
             Assert.True(property.IsList);
         }
@@ -309,7 +324,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
             var rule = Assert.Single(config.Rules);
             var property = Assert.Single(rule.Properties);
             Assert.Equal("MyProperty", property.Name);
-            Assert.Equal("MyType", property.Type);
+            Assert.Equal(new Symbol("MyType"), property.Type);
             Assert.True(property.IsOptional);
             Assert.False(property.IsList);
         }
@@ -334,12 +349,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
             Assert.Collection(rule.Properties, p1 =>
             {
                 Assert.Equal("MyProperty1", p1.Name);
-                Assert.Equal("MyType1", p1.Type);
+                Assert.Equal(new Symbol("MyType1"), p1.Type);
                 Assert.False(p1.IsList);
             }, p2 =>
             {
                 Assert.Equal("MyProperty2", p2.Name);
-                Assert.Equal("MyType2", p2.Type);
+                Assert.Equal(new Symbol("MyType2"), p2.Type);
                 Assert.True(p2.IsList);
             });
         }

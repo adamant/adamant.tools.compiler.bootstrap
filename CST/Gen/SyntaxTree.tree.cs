@@ -318,7 +318,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen
 
     public partial interface IImplicitOptionalConversionExpressionSyntax : IImplicitConversionExpressionSyntax
     {
-        IOptionalTypeSyntax ConvertToType { get; }
+        OptionalType ConvertToType { get; }
     }
 
     public partial interface IIntegerLiteralExpressionSyntax : ILiteralExpressionSyntax

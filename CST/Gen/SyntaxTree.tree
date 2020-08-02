@@ -52,7 +52,7 @@ ImplicitConversionExpression: Expression = Expression Type:DataType;
 ImplicitImmutabilityConversionExpression: ImplicitConversionExpression;
 ImplicitNoneConversionExpression: ImplicitConversionExpression;
 ImplicitNumericConversionExpression: ImplicitConversionExpression = ConvertToType:NumericType;
-ImplicitOptionalConversionExpression: ImplicitConversionExpression = ConvertToType:OptionalType;
+ImplicitOptionalConversionExpression: ImplicitConversionExpression = ConvertToType:'OptionalType';
 IntegerLiteralExpression: LiteralExpression = Value:BigInteger;
 InvocationExpression: Expression = FullName:Name Arguments:Argument*;
 LiteralExpression: Expression;
