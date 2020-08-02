@@ -22,12 +22,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public SimpleName Name => FullName.UnqualifiedName;
 
         public FixedList<IMemberDeclarationSyntax> Members { get; }
-        public DataTypePromise DeclaresType { get; } = new DataTypePromise();
+        public DataTypePromise DeclaresDataType { get; } = new DataTypePromise();
         public MetadataSet ChildMetadata { get; protected set; }
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        DataType ITypeMetadata.DeclaresType => DeclaresType.Fulfilled();
+        DataType ITypeMetadata.DeclaresDataType => DeclaresDataType.Fulfilled();
 
         public ClassDeclarationSyntax(
             TextSpan headerSpan,
@@ -53,7 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             if (Members.Any(m => m is IConstructorDeclarationSyntax))
                 return;
 
-            var constructor = new DefaultConstructor((ObjectType)DeclaresType.Fulfilled());
+            var constructor = new DefaultConstructor((ObjectType)DeclaresDataType.Fulfilled());
             ChildMetadata = new MetadataSet(ChildMetadata.Append<IMetadata>(constructor));
         }
 

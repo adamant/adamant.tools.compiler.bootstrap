@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 {
     internal static class LexicalScopeExtensions
     {
-        public static ITypeMetadata GetSymbolForType(this LexicalScope containingScope, DataType type)
+        public static ITypeMetadata GetMetadataForType(this LexicalScope containingScope, DataType type)
         {
             return type switch
             {
@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         .OfType<ITypeMetadata>()
                         .Single(),
                 _ => throw new NotImplementedException(
-                    $"{nameof(GetSymbolForType)} not implemented for {type.GetType().Name}")
+                    $"{nameof(GetMetadataForType)} not implemented for {type.GetType().Name}")
             };
         }
     }

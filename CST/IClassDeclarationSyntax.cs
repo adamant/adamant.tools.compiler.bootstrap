@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
     public partial interface IClassDeclarationSyntax : ITypeMetadata
     {
-        new DataTypePromise DeclaresType { get; }
+        new DataTypePromise DeclaresDataType { get; }
         void CreateDefaultConstructor();
     }
 }

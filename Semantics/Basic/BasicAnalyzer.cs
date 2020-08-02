@@ -74,7 +74,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
                 case IConstructorDeclarationSyntax constructor:
                 {
-                    var selfType = constructor.DeclaringClass.DeclaresType.Fulfilled();
+                    var selfType = constructor.DeclaringClass.DeclaresDataType.Fulfilled();
                     constructor.SelfParameterType = ResolveTypesInParameter(constructor.ImplicitSelfParameter, constructor.DeclaringClass);
                     var analyzer = new BasicTypeAnalyzer(constructor.File, diagnostics);
                     ResolveTypesInParameters(analyzer, constructor.Parameters, constructor.DeclaringClass);
@@ -105,7 +105,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     break;
                 }
                 case IClassDeclarationSyntax @class:
-                    if (@class.DeclaresType.TryBeginFulfilling(() => diagnostics.Add(
+                    if (@class.DeclaresDataType.TryBeginFulfilling(() => diagnostics.Add(
                         TypeError.CircularDefinition(@class.File, @class.NameSpan, @class.Name))))
                     {
                         bool mutable = !(@class.MutableModifier is null);
@@ -113,7 +113,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             @class.FullName,
                             mutable,
                             ReferenceCapability.Shared);
-                        @class.DeclaresType.Fulfill(classType);
+                        @class.DeclaresDataType.Fulfill(classType);
                         @class.CreateDefaultConstructor();
                     }
                     break;
@@ -174,7 +174,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             ISelfParameterSyntax selfParameter,
             IClassDeclarationSyntax declaringClass)
         {
-            var declaringType = declaringClass.DeclaresType.Fulfilled();
+            var declaringType = declaringClass.DeclaresDataType.Fulfilled();
             selfParameter.DataType.BeginFulfilling();
             var selfType = (ObjectType)declaringType;
             if (selfParameter.MutableSelf) selfType = selfType.ForConstructorSelf();

@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata
         public bool IsMutableBinding => true;
         public Name FullName => SpecialName.Unknown;
         public DataType DataType => DataType.Unknown;
-        public DataType DeclaresType => DataType.Unknown;
+        public DataType DeclaresDataType => DataType.Unknown;
         public MetadataSet ChildMetadata => MetadataSet.Empty;
 
         public IEnumerable<IBindingMetadata> Parameters => Enumerable.Empty<IBindingMetadata>();

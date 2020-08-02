@@ -7,6 +7,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata
     /// </summary>
     public interface ITypeMetadata : IParentMetadata
     {
-        DataType DeclaresType { get; }
+        DataType DeclaresDataType { get; }
     }
 }

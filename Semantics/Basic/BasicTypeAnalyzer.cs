@@ -36,8 +36,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     return null;
                 case ITypeNameSyntax typeName:
                 {
-                    var symbols = typeName.LookupInContainingScope().OfType<ITypeMetadata>().ToFixedList();
-                    switch (symbols.Count)
+                    var metadatas = typeName.LookupInContainingScope().OfType<ITypeMetadata>().ToFixedList();
+                    switch (metadatas.Count)
                     {
                         case 0:
                             diagnostics.Add(NameBindingError.CouldNotBindName(file, typeName.Span));
@@ -45,9 +45,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             typeSyntax.NamedType = DataType.Unknown;
                             break;
                         case 1:
-                            var symbol = symbols.Single();
-                            typeName.ReferencedType = symbol;
-                            typeName.NamedType = symbol.DeclaresType;
+                            var metadata = metadatas.Single();
+                            typeName.ReferencedType = metadata;
+                            typeName.NamedType = metadata.DeclaresDataType;
                             break;
                         default:
                             diagnostics.Add(NameBindingError.AmbiguousName(file, typeName.Span));

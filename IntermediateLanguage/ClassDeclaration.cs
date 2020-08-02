@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
     public class ClassDeclaration : Declaration, ITypeMetadata
     {
         public FixedList<Declaration> Members { get; }
-        public DataType DeclaresType { get; }
+        public DataType DeclaresDataType { get; }
 
         public ClassDeclaration(
             Name name,
@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
             FixedList<Declaration> members)
             : base(false, name, new MetadataSet(members))
         {
-            DeclaresType = declaresType;
+            DeclaresDataType = declaresType;
             Members = members;
         }
     }

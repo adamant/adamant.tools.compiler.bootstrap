@@ -310,7 +310,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IIntegerLiteralExpressionSyntax exp:
                     return exp.Type = new IntegerConstantType(exp.Value);
                 case IStringLiteralExpressionSyntax exp:
-                    return exp.Type = stringSymbol?.DeclaresType ?? DataType.Unknown;
+                    return exp.Type = stringSymbol?.DeclaresDataType ?? DataType.Unknown;
                 case IBoolLiteralExpressionSyntax exp:
                     return exp.Type = exp.Value ? DataType.True : DataType.False;
                 case IBinaryOperatorExpressionSyntax binaryOperatorExpression:
@@ -436,7 +436,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         return exp.Type  = DataType.Unknown;
                     }
                     var constructedType = (ObjectType)constructingType;
-                    var typeSymbol = exp.TypeSyntax.ContainingScope.Assigned().GetSymbolForType(constructedType);
+                    var typeSymbol = exp.TypeSyntax.ContainingScope.Assigned().GetMetadataForType(constructedType);
                     var constructors = typeSymbol.ChildMetadata[SpecialName.New].OfType<IFunctionMetadata>().ToFixedList();
                     constructors = ResolveOverload(constructors, argumentTypes);
                     switch (constructors.Count)
@@ -526,7 +526,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     // Don't wrap the self expression in a share expression for field access
                     var isSelfField = exp.ContextExpression is ISelfExpressionSyntax;
                     var contextType = InferType(ref exp.ContextExpression, !isSelfField);
-                    var contextSymbol = exp.Field.ContainingScope.Assigned().GetSymbolForType(contextType);
+                    var contextSymbol = exp.Field.ContainingScope.Assigned().GetMetadataForType(contextType);
                     var member = exp.Field;
                     var memberSymbols = contextSymbol.Lookup(member.Name).OfType<IBindingMetadata>().ToFixedList();
                     var type = AssignReferencedSymbolAndType(member, memberSymbols);
@@ -685,7 +685,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     // Don't wrap the self expression in a share expression for field access
                     var isSelfField = exp.ContextExpression is ISelfExpressionSyntax;
                     var contextType = InferType(ref exp.ContextExpression, !isSelfField);
-                    var contextSymbol = exp.Field.ContainingScope.Assigned().GetSymbolForType(contextType);
+                    var contextSymbol = exp.Field.ContainingScope.Assigned().GetMetadataForType(contextType);
                     var member = exp.Field;
                     var memberSymbols = contextSymbol.Lookup(member.Name).OfType<IBindingMetadata>().ToFixedList();
                     var type = AssignReferencedSymbolAndType(member, memberSymbols);
@@ -739,7 +739,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 return methodInvocation.Type = DataType.Unknown;
             };
 
-            var contextTypeSymbol = methodInvocation.MethodNameSyntax.ContainingScope.Assigned().GetSymbolForType(contextType);
+            var contextTypeSymbol = methodInvocation.MethodNameSyntax.ContainingScope.Assigned().GetMetadataForType(contextType);
             contextTypeSymbol.ChildMetadata.TryGetValue((SimpleName)methodInvocation.MethodNameSyntax.Name, out var childSymbols);
             var methodSymbols = (childSymbols ?? FixedList<IMetadata>.Empty).OfType<IMethodMetadata>().ToFixedList();
             methodSymbols = ResolveOverload(contextType, methodSymbols, argumentTypes);

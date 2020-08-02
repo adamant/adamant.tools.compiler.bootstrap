@@ -88,7 +88,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                     break;
                 case IClassDeclarationSyntax classDeclaration:
                     declaration = new ClassDeclaration(classDeclaration.FullName,
-                        classDeclaration.DeclaresType.Known(),
+                        classDeclaration.DeclaresDataType.Known(),
                         BuildClassMembers(classDeclaration));
                     break;
             }
@@ -113,7 +113,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
             if (declarations.TryGetValue(symbol, out var declaration))
                 return declaration;
 
-            var selfType = classDeclaration.DeclaresType.Fulfilled();
+            var selfType = classDeclaration.DeclaresDataType.Fulfilled();
             var selfParameter = new Parameter(false, SpecialName.Self, selfType);
             var parameters = selfParameter.Yield().ToFixedList();
 

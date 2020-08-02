@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             this.declaresType = declaresType;
         }
 
-        public DataType DeclaresType
+        public DataType DeclaresDataType
         {
             get => declaresType ?? throw new InvalidOperationException();
             internal set => declaresType = value;
