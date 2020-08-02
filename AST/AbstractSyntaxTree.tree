@@ -1,0 +1,4 @@
+◊namespace Adamant.Tools.Compiler.Bootstrap.AST;
+◊base 'IAbstractSyntax';
+◊prefix I;
+◊list FixedList;
