@@ -8,14 +8,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
     {
         public SimpleName Name => FullName.UnqualifiedName;
 
-        public DataType Type { get; }
+        public DataType DataType { get; }
 
         public bool IsMutableBinding => false;
 
         public PrimitiveParameterMetadata(Name fullName, DataType type)
             : base(fullName, MetadataSet.Empty)
         {
-            Type = type;
+            DataType = type;
         }
     }
 }

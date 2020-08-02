@@ -43,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         // TODO encapsulate these in the graph class
         public static Reference ToNewParameterObject(ReachabilityGraph graph, IParameterSyntax parameter)
         {
-            var referenceType = parameter.Type.Known().UnderlyingReferenceType()
+            var referenceType = parameter.DataType.Known().UnderlyingReferenceType()
                                 ?? throw new ArgumentException("Must be a parameter with a reference type", nameof(parameter));
 
             var referenceCapability = referenceType.ReferenceCapability;
@@ -57,7 +57,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public static Reference ToNewParameterContextObject(ReachabilityGraph graph, IParameterSyntax parameter)
         {
-            var referenceType = parameter.Type.Known().UnderlyingReferenceType()
+            var referenceType = parameter.DataType.Known().UnderlyingReferenceType()
                 ?? throw new ArgumentException("Must be a parameter with a reference type",
                                                 nameof(parameter));
 
@@ -117,7 +117,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public static Reference ToNewFieldObject(ReachabilityGraph graph, IFieldDeclarationSyntax field)
         {
-            var referenceType = field.Type.Known().UnderlyingReferenceType()
+            var referenceType = field.DataType.Known().UnderlyingReferenceType()
                                 ?? throw new ArgumentException("Must be a parameter with a reference type",
                                     nameof(field));
 

@@ -55,7 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         public Variable? AddParameter(IParameterSyntax parameter)
         {
             // Non-reference types don't participate in reachability (yet)
-            var referenceType = parameter.Type.Known().UnderlyingReferenceType();
+            var referenceType = parameter.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null)
                 return null;
 
@@ -123,7 +123,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public Variable? AddField(IFieldDeclarationSyntax fieldDeclaration)
         {
-            var referenceType = fieldDeclaration.Type.Known().UnderlyingReferenceType();
+            var referenceType = fieldDeclaration.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
             var variable = Variable.ForField(this, fieldDeclaration);
@@ -133,7 +133,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public Variable? AddVariable(IBindingMetadata bindingSymbol)
         {
-            var referenceType = bindingSymbol.Type.Known().UnderlyingReferenceType();
+            var referenceType = bindingSymbol.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
             var variable = Variable.Declared(this, bindingSymbol);

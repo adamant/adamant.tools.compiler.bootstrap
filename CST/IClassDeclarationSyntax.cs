@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         IMutableKeywordToken? MutableModifier { get; }
         SimpleName Name { get; }
         FixedList<IMemberDeclarationSyntax> Members { get; }
-        new TypePromise DeclaresType { get; }
+        new DataTypePromise DeclaresType { get; }
         void CreateDefaultConstructor();
     }
 }

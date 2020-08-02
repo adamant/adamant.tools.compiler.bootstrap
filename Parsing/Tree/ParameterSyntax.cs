@@ -16,11 +16,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SimpleName Name => FullName.UnqualifiedName;
         public bool Unused { get; }
-        public TypePromise Type { get; } = new TypePromise();
+        public DataTypePromise DataType { get; } = new DataTypePromise();
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        DataType IBindingMetadata.Type => Type.Fulfilled();
+        DataType IBindingMetadata.DataType => DataType.Fulfilled();
 
         protected ParameterSyntax(TextSpan span, Name fullName)
             : base(span)

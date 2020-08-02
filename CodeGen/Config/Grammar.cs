@@ -10,6 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen.Config
         public string Prefix { get; }
         public string Suffix { get; }
         public string ListType { get; }
+        public FixedList<string> UsingNamespaces { get; }
         public FixedList<Rule> Rules { get; }
 
         public Grammar(
@@ -18,6 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen.Config
             string prefix,
             string suffix,
             string listType,
+            IEnumerable<string> usingNamespaces,
             IEnumerable<Rule> rules)
         {
             Namespace = @namespace;
@@ -25,6 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen.Config
             Prefix = prefix;
             Suffix = suffix;
             ListType = listType;
+            UsingNamespaces = usingNamespaces.ToFixedList();
             Rules = rules.ToFixedList();
         }
     }

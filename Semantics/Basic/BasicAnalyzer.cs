@@ -69,7 +69,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var analyzer = new BasicTypeAnalyzer(method.File, diagnostics);
                     method.SelfParameterType = ResolveTypesInParameter(method.SelfParameter, method.DeclaringClass);
                     ResolveTypesInParameters(analyzer, method.Parameters, method.DeclaringClass);
-                    ResolveReturnType(method.ReturnType, method.ReturnTypeSyntax, analyzer);
+                    ResolveReturnType(method.ReturnDataType, method.ReturnTypeSyntax, analyzer);
                     break;
                 }
                 case IConstructorDeclarationSyntax constructor:
@@ -85,23 +85,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 {
                     var analyzer = new BasicTypeAnalyzer(associatedFunction.File, diagnostics);
                     ResolveTypesInParameters(analyzer, associatedFunction.Parameters, null);
-                    ResolveReturnType(associatedFunction.ReturnType, associatedFunction.ReturnTypeSyntax, analyzer);
+                    ResolveReturnType(associatedFunction.ReturnDataType, associatedFunction.ReturnTypeSyntax, analyzer);
                     break;
                 }
                 case IFieldDeclarationSyntax field:
-                    if (field.Type.TryBeginFulfilling(() =>
+                    if (field.DataType.TryBeginFulfilling(() =>
                         diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan, field.Name))))
                     {
                         var resolver = new BasicTypeAnalyzer(field.File, diagnostics);
                         var type = resolver.Evaluate(field.TypeSyntax);
-                        field.Type.Fulfill(type);
+                        field.DataType.Fulfill(type);
                     }
                     break;
                 case IFunctionDeclarationSyntax function:
                 {
                     var analyzer = new BasicTypeAnalyzer(function.File, diagnostics);
                     ResolveTypesInParameters(analyzer, function.Parameters, null);
-                    ResolveReturnType(function.ReturnType, function.ReturnTypeSyntax, analyzer);
+                    ResolveReturnType(function.ReturnDataType, function.ReturnTypeSyntax, analyzer);
                     break;
                 }
                 case IClassDeclarationSyntax @class:
@@ -132,38 +132,38 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         throw ExhaustiveMatch.Failed(parameter);
                     case INamedParameterSyntax namedParameter:
                     {
-                        parameter.Type.BeginFulfilling();
+                        parameter.DataType.BeginFulfilling();
                         var type = analyzer.Evaluate(namedParameter.TypeSyntax);
-                        parameter.Type.Fulfill(type);
+                        parameter.DataType.Fulfill(type);
                     }
                     break;
                     case IFieldParameterSyntax fieldParameter:
                     {
-                        parameter.Type.BeginFulfilling();
+                        parameter.DataType.BeginFulfilling();
                         var field = (declaringClass ?? throw new InvalidOperationException("Field parameter outside of class declaration"))
                                     .Members.OfType<IFieldDeclarationSyntax>()
                                     .SingleOrDefault(f => f.Name == fieldParameter.FieldName);
                         if (field is null)
                         {
                             fieldParameter.SetIsMutableBinding(false);
-                            fieldParameter.Type.Fulfill(DataType.Unknown);
+                            fieldParameter.DataType.Fulfill(DataType.Unknown);
                             // TODO report an error
                             throw new NotImplementedException();
                         }
                         else
                         {
                             fieldParameter.SetIsMutableBinding(field.IsMutableBinding);
-                            if (field.Type.TryBeginFulfilling(() =>
+                            if (field.DataType.TryBeginFulfilling(() =>
                                 diagnostics.Add(TypeError.CircularDefinition(field.File, field.NameSpan,
                                     field.Name))))
                             {
                                 var resolver = new BasicBodyAnalyzer(field.File, stringSymbol, diagnostics);
-                                field.Type.BeginFulfilling();
+                                field.DataType.BeginFulfilling();
                                 var type = resolver.EvaluateType(field.TypeSyntax);
-                                field.Type.Fulfill(type);
+                                field.DataType.Fulfill(type);
                             }
 
-                            parameter.Type.Fulfill(field.Type.Fulfilled());
+                            parameter.DataType.Fulfill(field.DataType.Fulfilled());
                         }
                     }
                     break;
@@ -175,15 +175,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
             IClassDeclarationSyntax declaringClass)
         {
             var declaringType = declaringClass.DeclaresType.Fulfilled();
-            selfParameter.Type.BeginFulfilling();
+            selfParameter.DataType.BeginFulfilling();
             var selfType = (ObjectType)declaringType;
             if (selfParameter.MutableSelf) selfType = selfType.ForConstructorSelf();
-            selfParameter.Type.Fulfill(selfType);
+            selfParameter.DataType.Fulfill(selfType);
             return selfType;
         }
 
         private static void ResolveReturnType(
-            TypePromise returnTypePromise,
+            DataTypePromise returnTypePromise,
             ITypeSyntax? returnTypeSyntax,
             BasicTypeAnalyzer analyzer)
         {
@@ -204,20 +204,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case IFunctionDeclarationSyntax function:
                 {
                     var resolver = new BasicBodyAnalyzer(function.File, stringSymbol, diagnostics,
-                        function.ReturnType.Fulfilled());
+                        function.ReturnDataType.Fulfilled());
                     resolver.ResolveTypes(function.Body);
                     break;
                 }
                 case IAssociatedFunctionDeclarationSyntax associatedFunction:
                 {
                     var resolver = new BasicBodyAnalyzer(associatedFunction.File, stringSymbol, diagnostics,
-                        associatedFunction.ReturnType.Fulfilled());
+                        associatedFunction.ReturnDataType.Fulfilled());
                     resolver.ResolveTypes(associatedFunction.Body);
                     break;
                 }
                 case IConcreteMethodDeclarationSyntax method:
                 {
-                    var resolver = new BasicBodyAnalyzer(method.File, stringSymbol, diagnostics, method.ReturnType.Fulfilled());
+                    var resolver = new BasicBodyAnalyzer(method.File, stringSymbol, diagnostics, method.ReturnDataType.Fulfilled());
                     resolver.ResolveTypes(method.Body);
                     break;
                 }
@@ -228,7 +228,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     if (field.Initializer != null)
                     {
                         var resolver = new BasicBodyAnalyzer(field.File, stringSymbol, diagnostics);
-                        resolver.CheckType(ref field.Initializer, field.Type.Fulfilled());
+                        resolver.CheckType(ref field.Initializer, field.DataType.Fulfilled());
                     }
                     break;
                 case IConstructorDeclarationSyntax constructor:

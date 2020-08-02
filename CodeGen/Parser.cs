@@ -24,8 +24,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             var prefix = GetConfig(lines, "prefix") ?? "";
             var suffix = GetConfig(lines, "suffix") ?? "";
             var listType = GetConfig(lines, "list") ?? "List";
+            var usingNamespaces = GetUsingNamespaces(lines);
             var rules = GetRules(lines).ToList();
-            return new Grammar(ns, baseType, prefix, suffix, listType, rules);
+            return new Grammar(ns, baseType, prefix, suffix, listType, usingNamespaces, rules);
         }
 
         private static string? GetConfig(IEnumerable<string> lines, string config)
@@ -36,6 +37,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             line = line?.TrimEnd(';'); // TODO error if no semicolon
             line = line?.Trim();
             return line;
+        }
+
+        private static IEnumerable<string> GetUsingNamespaces(IEnumerable<string> lines)
+        {
+            const string start = Program.DirectiveMarker + "using";
+            lines = lines.Where(l => l.StartsWith(start, StringComparison.InvariantCulture));
+            // TODO error if no semicolon
+            return lines.Select(l => l.Substring(start.Length).TrimEnd(';').Trim());
         }
 
         private static IEnumerable<Rule> GetRules(List<string> lines)

@@ -238,7 +238,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     {
                         // TODO make a deep copy of the graph so the existing graph is intact
                         // create a new temp with the correct reference capabilities to the value
-                        var returnValue = graph.AddReturnValue(exp, callableDeclaration.ReturnType)!;
+                        var returnValue = graph.AddReturnValue(exp, callableDeclaration.ReturnDataType)!;
                         returnValue.AssignFrom(temp, returnValue.ReferenceType.ReferenceCapability);
                         // Exit the function, releasing all temps and variables except the returned value
                         graph.ExitFunction(returnValue);
@@ -328,7 +328,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
             foreach (var ((argument, argumentSyntax), parameter) in arguments.Zip(argumentSyntaxes).Zip(parameters))
             {
                 if (argument is null) continue;
-                if (!(parameter.Type is ReferenceType))
+                if (!(parameter.DataType is ReferenceType))
                     throw new InvalidOperationException($"Expected parameter {parameter} to be a reference type");
 
                 UseArgument(argument, argumentSyntax.Span, graph);

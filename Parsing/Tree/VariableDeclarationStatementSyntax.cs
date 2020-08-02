@@ -21,10 +21,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public ITypeSyntax? TypeSyntax { [DebuggerStepThrough] get; }
         public bool InferMutableType { [DebuggerStepThrough] get; }
         private DataType? type;
-        DataType IBindingMetadata.Type => Type ?? throw new InvalidOperationException();
+        DataType IBindingMetadata.DataType => DataType ?? throw new InvalidOperationException();
 
         [DisallowNull]
-        public DataType? Type
+        public DataType? DataType
         {
             [DebuggerStepThrough]
             get => type;
@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             {
                 if (type != null)
                     throw new InvalidOperationException("Can't set type repeatedly");
-                type = value ?? throw new ArgumentNullException(nameof(Type),
+                type = value ?? throw new ArgumentNullException(nameof(DataType),
                            "Can't set type to null");
             }
         }

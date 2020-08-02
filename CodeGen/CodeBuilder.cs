@@ -6,9 +6,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
     {
         public static string Generate(Grammar grammar)
         {
-            _ = grammar;
-            //throw new NotImplementedException();
-            return "";
+            var template = new CodeTemplate(grammar);
+            return template.TransformText();
         }
     }
 }

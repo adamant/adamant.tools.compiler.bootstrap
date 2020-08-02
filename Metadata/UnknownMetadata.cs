@@ -16,12 +16,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata
         // We don't know what this is, so it might be mutable (fewer errors that way)
         public bool IsMutableBinding => true;
         public Name FullName => SpecialName.Unknown;
-        public DataType Type => DataType.Unknown;
+        public DataType DataType => DataType.Unknown;
         public DataType DeclaresType => DataType.Unknown;
         public MetadataSet ChildMetadata => MetadataSet.Empty;
 
         public IEnumerable<IBindingMetadata> Parameters => Enumerable.Empty<IBindingMetadata>();
 
-        public DataType ReturnType => DataType.Unknown;
+        public DataType ReturnDataType => DataType.Unknown;
     }
 }

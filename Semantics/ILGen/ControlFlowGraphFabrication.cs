@@ -68,17 +68,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 default:
                     throw ExhaustiveMatch.Failed(callable);
                 case IConcreteMethodDeclarationSyntax method:
-                    returnType = method.ReturnType.Known();
+                    returnType = method.ReturnDataType.Known();
                     break;
                 case IConstructorDeclarationSyntax constructor:
                     selfType = constructor.SelfParameterType.Assigned();
                     returnType = DataType.Void; // the body should `return;`
                     break;
                 case IAssociatedFunctionDeclarationSyntax associatedFunction:
-                    returnType = associatedFunction.ReturnType.Known();
+                    returnType = associatedFunction.ReturnDataType.Known();
                     break;
                 case IFunctionDeclarationSyntax function:
-                    returnType = function.ReturnType.Known();
+                    returnType = function.ReturnDataType.Known();
                     break;
             }
 
@@ -92,7 +92,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
             if (selfType != null) graph.AddSelfParameter(selfType);
 
             foreach (var parameter in callable.Parameters.Where(p => !p.Unused))
-                graph.AddParameter(parameter.IsMutableBinding, parameter.Type.Fulfilled(), CurrentScope, parameter.Name.UnqualifiedName);
+                graph.AddParameter(parameter.IsMutableBinding, parameter.DataType.Fulfilled(), CurrentScope, parameter.Name.UnqualifiedName);
 
             currentBlock = graph.NewBlock();
             foreach (var statement in callable.Body.Statements)
@@ -119,7 +119,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IVariableDeclarationStatementSyntax variableDeclaration:
                 {
                     var variable = graph.AddVariable(variableDeclaration.IsMutableBinding,
-                        variableDeclaration.Type.Assigned(),
+                        variableDeclaration.DataType.Assigned(),
                         CurrentScope, variableDeclaration.Name.UnqualifiedName);
                     if (variableDeclaration.Initializer != null)
                     {

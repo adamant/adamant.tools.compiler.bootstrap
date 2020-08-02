@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Text;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
 {
@@ -22,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             {
                 Console.WriteLine("~~~~~~ Compiler Code Generator");
                 var inputPath = args[0];
-                var outputPath = Path.ChangeExtension(inputPath, "cs");
+                var outputPath = Path.ChangeExtension(inputPath, ".tree.cs");
                 Console.WriteLine($"Input:  {inputPath}");
                 Console.WriteLine($"Output: {outputPath}");
 
@@ -30,6 +31,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
                                 ?? throw new InvalidOperationException("null from reading input file");
                 var grammar = Parser.ReadGrammarConfig(inputFile);
                 var code = CodeBuilder.Generate(grammar);
+                // Only write if changed so VS doesn't think we constantly change the file and need to recompile
+                var previousCode = File.Exists(outputPath) ? File.ReadAllText(outputPath, new UTF8Encoding(false, true)) : null;
+                if (code != previousCode)
+                    File.WriteAllText(outputPath, code);
                 return 0;
             }
             catch (Exception ex)

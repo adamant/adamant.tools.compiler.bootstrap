@@ -56,7 +56,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             var name = function.Name.Text;
             var parameters = Convert(function.Parameters);
-            var returnType = typeConverter.Convert(function.ReturnType.Known());
+            var returnType = typeConverter.Convert(function.ReturnDataType.Known());
             code.FunctionDeclarations.AppendLine($"{returnType} {name}({parameters});");
         }
 
@@ -64,7 +64,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
         {
             var name = nameMangler.MangleName(function);
             var parameters = Convert(function.Parameters);
-            var returnType = typeConverter.Convert(function.ReturnType.Known());
+            var returnType = typeConverter.Convert(function.ReturnDataType.Known());
 
             // Write out the function declaration for C so we can call functions defined after others
             code.FunctionDeclarations.AppendLine($"{returnType} {name}({parameters});");
@@ -82,7 +82,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
             var name = nameMangler.MangleName(method);
             var parameters = Convert(method.Parameters.Prepend(method.SelfParameter));
-            var returnType = typeConverter.Convert(method.ReturnType.Known());
+            var returnType = typeConverter.Convert(method.ReturnDataType.Known());
 
             // Write out the function declaration for C so we can call functions defined after others
             code.FunctionDeclarations.AppendLine($"{returnType} {name}({parameters});");
@@ -102,7 +102,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
             var name = nameMangler.MangleName(constructor);
             var parameters = Convert(constructor.Parameters);
-            var returnType = typeConverter.Convert(constructor.ReturnType.Known());
+            var returnType = typeConverter.Convert(constructor.ReturnDataType.Known());
 
             // Write out the function declaration for C so we can call functions defined after others
             code.FunctionDeclarations.AppendLine($"{returnType} {name}({parameters});");
@@ -136,7 +136,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             structs.BeginBlock();
             foreach (var field in @class.Members.OfType<FieldDeclaration>())
             {
-                var fieldType = typeConverter.Convert(field.Type.Known());
+                var fieldType = typeConverter.Convert(field.DataType.Known());
                 var fieldName = nameMangler.Mangle(field.Name);
                 structs.AppendLine($"{fieldType} {fieldName};");
             }
@@ -147,7 +147,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             {
                 var name = nameMangler.MangleUnqualifiedName(method);
                 var parameters = Convert(method.Parameters.Prepend(method.SelfParameter));
-                var returnType = typeConverter.Convert(method.ReturnType.Known());
+                var returnType = typeConverter.Convert(method.ReturnDataType.Known());
                 structs.AppendLine($"{returnType} (*{name})({parameters});");
             }
             structs.EndBlockWithSemicolon();

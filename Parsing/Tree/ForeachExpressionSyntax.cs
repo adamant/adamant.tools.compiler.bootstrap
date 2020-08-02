@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public bool VariableIsLiveAfterAssignment { get; set; } = true;
 
         public ITypeSyntax? TypeSyntax { get; }
-        DataType IBindingMetadata.Type => VariableType ?? throw new InvalidOperationException();
+        DataType IBindingMetadata.DataType => VariableType ?? throw new InvalidOperationException();
         private DataType? variableType;
 
         [DisallowNull]

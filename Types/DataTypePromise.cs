@@ -13,10 +13,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
     /// * In Progress
     /// * Fulfilled
     ///
-    /// Once a <see cref="TypePromise"/> has been fulfilled it can't be changed.
+    /// Once a <see cref="DataTypePromise"/> has been fulfilled it can't be changed.
     /// </summary>
     [DebuggerDisplay("{" + nameof(ToString) + "(),nq}")]
-    public class TypePromise
+    public class DataTypePromise
     {
         private PromiseState State { get; set; }
         private DataType? dataType;

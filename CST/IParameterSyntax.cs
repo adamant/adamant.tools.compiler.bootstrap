@@ -13,6 +13,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
         SimpleName Name { get; }
         bool Unused { get; }
-        new TypePromise Type { get; }
+        new DataTypePromise DataType { get; }
     }
 }

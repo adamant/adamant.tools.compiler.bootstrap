@@ -1,0 +1,23 @@
+<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#  foreach(var usingNamespace in grammar.UsingNamespaces)
+    { #>
+using <#=usingNamespace #>;
+<#  } #>
+
+namespace <#=grammar.Namespace #>
+{
+<#  foreach(var rule in grammar.Rules)
+    { #>
+    public partial interface <#= TypeName(rule.Nonterminal) #><#= BaseTypes(rule) #>
+    {
+<#      foreach(var property in rule.Properties)
+        { #>
+            <#=IsNew(rule, property) ? "new " : "" #><#=TypeName(property) #> <#=property.Name #> { get; }
+<#      } #>
+    }
+<#  } #>
+}

@@ -31,23 +31,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     return;
                 case IMethodDeclarationSyntax methodDeclaration:
                     WalkChildren(methodDeclaration);
-                    methodDeclaration.ReturnType.Fulfilled();
+                    methodDeclaration.ReturnDataType.Fulfilled();
                     return;
                 case IFunctionDeclarationSyntax functionDeclaration:
                     WalkChildren(functionDeclaration);
-                    functionDeclaration.ReturnType.Fulfilled();
+                    functionDeclaration.ReturnDataType.Fulfilled();
                     return;
                 case IAssociatedFunctionDeclarationSyntax associatedFunctionDeclaration:
                     WalkChildren(associatedFunctionDeclaration);
-                    associatedFunctionDeclaration.ReturnType.Fulfilled();
+                    associatedFunctionDeclaration.ReturnDataType.Fulfilled();
                     return;
                 case IParameterSyntax parameter:
                     WalkChildren(parameter);
-                    parameter.Type.Fulfilled();
+                    parameter.DataType.Fulfilled();
                     return;
                 case IFieldDeclarationSyntax fieldDeclaration:
                     WalkChildren(fieldDeclaration);
-                    fieldDeclaration.Type.Fulfilled();
+                    fieldDeclaration.DataType.Fulfilled();
                     return;
                 case ITypeSyntax type:
                     WalkChildren(type);
@@ -55,7 +55,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     return;
                 case IVariableDeclarationStatementSyntax variableDeclaration:
                     WalkChildren(variableDeclaration);
-                    variableDeclaration.Type.Assigned();
+                    variableDeclaration.DataType.Assigned();
                     return;
                 case IForeachExpressionSyntax foreachExpression:
                     WalkChildren(foreachExpression);

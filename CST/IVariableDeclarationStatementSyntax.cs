@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         TextSpan NameSpan { get; }
         SimpleName Name { get; }
         ITypeSyntax? TypeSyntax { get; }
-        [DisallowNull] new DataType? Type { get; set; }
+        [DisallowNull] new DataType? DataType { get; set; }
         bool InferMutableType { get; }
         [DisallowNull] ref IExpressionSyntax? Initializer { get; }
         bool VariableIsLiveAfter { get; set; }

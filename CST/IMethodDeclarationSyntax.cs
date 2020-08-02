@@ -15,6 +15,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         [DisallowNull] DataType? SelfParameterType { get; set; }
         new FixedList<INamedParameterSyntax> Parameters { get; }
         ITypeSyntax? ReturnTypeSyntax { get; }
-        new TypePromise ReturnType { get; }
+        new DataTypePromise ReturnDataType { get; }
     }
 }

@@ -7,6 +7,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
         new FixedList<INamedParameterSyntax> Parameters { get; }
         ITypeSyntax? ReturnTypeSyntax { get; }
-        new TypePromise ReturnType { get; }
+        new DataTypePromise ReturnDataType { get; }
     }
 }

@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         IBindingMetadata IMethodMetadata.SelfParameterMetadata => SelfParameter;
         public FixedList<Parameter> Parameters { get; }
         public int Arity => Parameters.Count;
-        public DataType ReturnType { get; }
+        public DataType ReturnDataType { get; }
         public ControlFlowGraph? IL { get; }
 
         IEnumerable<IBindingMetadata> IFunctionMetadata.Parameters => Parameters;
@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         {
             SelfParameter = selfParameter;
             Parameters = parameters;
-            ReturnType = returnType;
+            ReturnDataType = returnType;
             IL = il;
         }
     }

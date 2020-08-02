@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public IBindingMetadata SelfParameterMetadata => SelfParameter;
         public new FixedList<INamedParameterSyntax> Parameters { get; }
         public ITypeSyntax? ReturnTypeSyntax { get; }
-        DataType IFunctionMetadata.ReturnType => ReturnType.Fulfilled();
+        DataType IFunctionMetadata.ReturnDataType => ReturnDataType.Fulfilled();
 
         protected MethodDeclarationSyntax(
             IClassDeclarationSyntax declaringClass,

@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public interface IFieldDeclarationSyntax : IMemberDeclarationSyntax, IBindingMetadata
     {
         ITypeSyntax TypeSyntax { get; }
-        new TypePromise Type { get; }
+        new DataTypePromise DataType { get; }
         [DisallowNull] ref IExpressionSyntax? Initializer { get; }
     }
 }

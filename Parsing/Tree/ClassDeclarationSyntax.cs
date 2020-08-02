@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public SimpleName Name => FullName.UnqualifiedName;
 
         public FixedList<IMemberDeclarationSyntax> Members { get; }
-        public TypePromise DeclaresType { get; } = new TypePromise();
+        public DataTypePromise DeclaresType { get; } = new DataTypePromise();
         public MetadataSet ChildMetadata { get; protected set; }
 
         [DebuggerHidden]

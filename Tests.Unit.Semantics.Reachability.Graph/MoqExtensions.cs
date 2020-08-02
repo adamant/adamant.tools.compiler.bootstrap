@@ -6,10 +6,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
 {
     public static class MoqExtensions
     {
-        public static IReturnsResult<TMock> Returns<TMock>(this IReturns<TMock, TypePromise> mock, DataType type)
+        public static IReturnsResult<TMock> Returns<TMock>(this IReturns<TMock, DataTypePromise> mock, DataType type)
             where TMock : class
         {
-            var promise = new TypePromise();
+            var promise = new DataTypePromise();
             promise.BeginFulfilling();
             promise.Fulfill(type);
             return mock.Returns(promise);

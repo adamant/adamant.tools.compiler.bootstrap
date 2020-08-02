@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata
         MetadataSet IParentMetadata.ChildMetadata => MetadataSet.Empty;
 
         IEnumerable<IBindingMetadata> IFunctionMetadata.Parameters => Enumerable.Empty<IBindingMetadata>();
-        DataType IFunctionMetadata.ReturnType => ConstructedType;
+        DataType IFunctionMetadata.ReturnDataType => ConstructedType;
 
         public DefaultConstructor(ObjectType constructedType)
         {

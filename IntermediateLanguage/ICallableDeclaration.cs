@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         bool IsConstructor { get; }
         FixedList<Parameter> Parameters { get; }
         int Arity { get; }
-        DataType ReturnType { get; }
+        DataType ReturnDataType { get; }
         ControlFlowGraph? IL { get; }
     }
 }

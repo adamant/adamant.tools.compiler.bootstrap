@@ -9,6 +9,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata
     public interface IFunctionMetadata : IParentMetadata
     {
         IEnumerable<IBindingMetadata> Parameters { get; }
-        DataType ReturnType { get; }
+        DataType ReturnDataType { get; }
     }
 }

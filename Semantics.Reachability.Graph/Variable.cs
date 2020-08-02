@@ -22,14 +22,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
             : base(graph)
         {
             Symbol = symbol;
-            Type = symbol.Type.UnderlyingReferenceType()
+            Type = symbol.DataType.UnderlyingReferenceType()
                    ?? throw new ArgumentException("Must be a reference type", nameof(symbol));
         }
 
         internal static Variable? ForField(ReachabilityGraph graph, IFieldDeclarationSyntax field)
         {
             // Non-reference types don't participate in reachability (yet)
-            var referenceType = field.Type.Known().UnderlyingReferenceType();
+            var referenceType = field.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
             var variable = new Variable(graph, field);
@@ -40,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         internal static Variable? Declared(ReachabilityGraph graph, IBindingMetadata symbol)
         {
-            var referenceType = symbol.Type.Known().UnderlyingReferenceType();
+            var referenceType = symbol.DataType.Known().UnderlyingReferenceType();
             if (referenceType is null) return null;
 
             return new Variable(graph, symbol);
@@ -58,7 +58,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public override string ToString()
         {
-            return $"{Symbol.FullName.UnqualifiedName}: {Symbol.Type}";
+            return $"{Symbol.FullName.UnqualifiedName}: {Symbol.DataType}";
         }
     }
 }

@@ -50,7 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                     var il = ilFactory.CreateGraph(function);
                     declaration = new FunctionDeclaration(function.IsExternalFunction, false,
                         function.FullName, BuildParameters(function.Parameters),
-                        function.ReturnType.Known(), il);
+                        function.ReturnDataType.Known(), il);
                     break;
                 }
                 case IAssociatedFunctionDeclarationSyntax associatedFunction:
@@ -58,20 +58,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                     var il = ilFactory.CreateGraph(associatedFunction);
                     declaration = new FunctionDeclaration(false, true,
                         associatedFunction.FullName, BuildParameters(associatedFunction.Parameters),
-                        associatedFunction.ReturnType.Known(), il);
+                        associatedFunction.ReturnDataType.Known(), il);
                     break;
                 }
                 case IConcreteMethodDeclarationSyntax method:
                 {
                     var il = ilFactory.CreateGraph(method);
                     declaration = new MethodDeclaration(method.FullName, BuildParameter(method.SelfParameter), BuildParameters(method.Parameters),
-                        method.ReturnType.Known(), il);
+                        method.ReturnDataType.Known(), il);
                     break;
                 }
                 case IAbstractMethodDeclarationSyntax method:
                 {
                     declaration = new MethodDeclaration(method.FullName, BuildParameter(method.SelfParameter), BuildParameters(method.Parameters),
-                        method.ReturnType.Known(), null);
+                        method.ReturnDataType.Known(), null);
                     break;
                 }
                 case IConstructorDeclarationSyntax constructor:
@@ -84,7 +84,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                     break;
                 }
                 case IFieldDeclarationSyntax fieldDeclaration:
-                    declaration = new FieldDeclaration(fieldDeclaration.IsMutableBinding, fieldDeclaration.FullName, fieldDeclaration.Type.Known());
+                    declaration = new FieldDeclaration(fieldDeclaration.IsMutableBinding, fieldDeclaration.FullName, fieldDeclaration.DataType.Known());
                     break;
                 case IClassDeclarationSyntax classDeclaration:
                     declaration = new ClassDeclaration(classDeclaration.FullName,
@@ -156,11 +156,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
             return parameter switch
             {
                 INamedParameterSyntax namedParameter =>
-                    new Parameter(namedParameter.IsMutableBinding, namedParameter.Name, namedParameter.Type.Known()),
+                    new Parameter(namedParameter.IsMutableBinding, namedParameter.Name, namedParameter.DataType.Known()),
                 ISelfParameterSyntax selfParameter =>
-                    new Parameter(selfParameter.IsMutableBinding, selfParameter.Name, selfParameter.Type.Known()),
+                    new Parameter(selfParameter.IsMutableBinding, selfParameter.Name, selfParameter.DataType.Known()),
                 IFieldParameterSyntax fieldParameter =>
-                    new Parameter(fieldParameter.IsMutableBinding, fieldParameter.Name, fieldParameter.Type.Known()),
+                    new Parameter(fieldParameter.IsMutableBinding, fieldParameter.Name, fieldParameter.DataType.Known()),
                 _ => throw ExhaustiveMatch.Failed(parameter)
             };
         }

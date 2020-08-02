@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata
     /// </summary>
     public interface IBindingMetadata : IMetadata
     {
-        DataType Type { get; }
+        DataType DataType { get; }
         bool IsMutableBinding { get; }
     }
 }

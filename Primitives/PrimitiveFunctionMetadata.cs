@@ -13,13 +13,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 
         IEnumerable<IBindingMetadata> IFunctionMetadata.Parameters => Parameters;
 
-        public DataType ReturnType { get; }
+        public DataType ReturnDataType { get; }
 
         protected PrimitiveFunctionMetadata(Name fullName, FixedList<PrimitiveParameterMetadata> parameters, DataType returnType)
             : base(fullName, new MetadataSet(parameters))
         {
             Parameters = parameters;
-            ReturnType = returnType;
+            ReturnDataType = returnType;
         }
 
         public static PrimitiveFunctionMetadata New(

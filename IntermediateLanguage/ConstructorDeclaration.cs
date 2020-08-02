@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         bool ICallableDeclaration.IsConstructor => true;
         public FixedList<Parameter> Parameters { get; }
         public int Arity => Parameters.Count;
-        public DataType ReturnType { get; }
+        public DataType ReturnDataType { get; }
         public FixedList<FieldInitialization> FieldInitializations { get; }
         public ControlFlowGraph IL { get; }
 
@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
             ControlFlowGraph il)
             : base(true, fullName, MetadataSet.Empty)
         {
-            ReturnType = returnType;
+            ReturnDataType = returnType;
             IL = il;
             FieldInitializations = fieldInitializations;
             Parameters = parameters;

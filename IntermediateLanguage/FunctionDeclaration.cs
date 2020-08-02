@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 
         public FixedList<Parameter> Parameters { get; }
         public int Arity => Parameters.Count;
-        public DataType ReturnType { get; }
+        public DataType ReturnDataType { get; }
         public ControlFlowGraph IL { get; }
 
         IEnumerable<IBindingMetadata> IFunctionMetadata.Parameters => Parameters;
@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
             : base(isMember, name, MetadataSet.Empty)
         {
             Parameters = parameters;
-            ReturnType = returnType;
+            ReturnDataType = returnType;
             IL = il;
             IsExternal = isExternal;
         }

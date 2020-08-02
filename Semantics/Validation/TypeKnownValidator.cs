@@ -30,23 +30,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     return;
                 case IMethodDeclarationSyntax methodDeclaration:
                     WalkChildren(methodDeclaration);
-                    methodDeclaration.ReturnType.Known();
+                    methodDeclaration.ReturnDataType.Known();
                     return;
                 case IFunctionDeclarationSyntax functionDeclaration:
                     WalkChildren(functionDeclaration);
-                    functionDeclaration.ReturnType.Known();
+                    functionDeclaration.ReturnDataType.Known();
                     return;
                 case IAssociatedFunctionDeclarationSyntax associatedFunctionDeclaration:
                     WalkChildren(associatedFunctionDeclaration);
-                    associatedFunctionDeclaration.ReturnType.Known();
+                    associatedFunctionDeclaration.ReturnDataType.Known();
                     return;
                 case IParameterSyntax parameter:
                     WalkChildren(parameter);
-                    parameter.Type.Known();
+                    parameter.DataType.Known();
                     return;
                 case IFieldDeclarationSyntax fieldDeclaration:
                     WalkChildren(fieldDeclaration);
-                    fieldDeclaration.Type.Known();
+                    fieldDeclaration.DataType.Known();
                     return;
                 case ITypeSyntax type:
                     WalkChildren(type);
@@ -54,7 +54,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Validation
                     return;
                 case IVariableDeclarationStatementSyntax variableDeclaration:
                     WalkChildren(variableDeclaration);
-                    variableDeclaration.Type.Known();
+                    variableDeclaration.DataType.Known();
                     return;
                 case IForeachExpressionSyntax foreachExpression:
                     WalkChildren(foreachExpression);

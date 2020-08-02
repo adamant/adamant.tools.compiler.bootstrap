@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
         {
             var graph = new ReachabilityGraph();
             var mockParameter = new Mock<IParameterSyntax>();
-            mockParameter.Setup(p => p.Type).Returns(DataType.Bool);
+            mockParameter.Setup(p => p.DataType).Returns(DataType.Bool);
 
             var localVariable = graph.AddParameter(mockParameter.Object);
 
@@ -77,7 +77,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Semantics.Reachability.Gra
             mockExpression.Setup(e => e.Type).Returns(fakeReferenceType);
             var temp = graph.AddObject(mockExpression.Object);
             var mockVariableBinding = new Mock<IBindingMetadata>();
-            mockVariableBinding.Setup(v => v.Type).Returns(fakeReferenceType);
+            mockVariableBinding.Setup(v => v.DataType).Returns(fakeReferenceType);
             var variable = graph.AddVariable(mockVariableBinding.Object);
 
             graph.Assign(variable, temp);

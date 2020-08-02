@@ -108,6 +108,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
         }
 
         [Fact]
+        public void ParsesUsingNamespaces()
+        {
+            const string grammar = "◊using Foo.Bar;\r◊using Foo.Bar.Baz;";
+
+            var config = Parser.ReadGrammarConfig(grammar);
+
+            Assert.Equal(new[] { "Foo.Bar", "Foo.Bar.Baz" }, config.UsingNamespaces);
+        }
+
+        [Fact]
         public void ParsesSingleInheritanceRule()
         {
             const string grammar = "SubType: BaseType;";

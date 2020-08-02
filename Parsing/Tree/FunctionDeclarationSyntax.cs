@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public bool IsExternalFunction { [DebuggerStepThrough] get; [DebuggerStepThrough] set; }
         public ITypeSyntax? ReturnTypeSyntax { [DebuggerStepThrough] get; }
         public new FixedList<INamedParameterSyntax> Parameters { [DebuggerStepThrough] get; }
-        DataType IFunctionMetadata.ReturnType => ReturnType.Fulfilled();
+        DataType IFunctionMetadata.ReturnDataType => ReturnDataType.Fulfilled();
         public IBodySyntax Body { [DebuggerStepThrough] get; }
 
         public FunctionDeclarationSyntax(

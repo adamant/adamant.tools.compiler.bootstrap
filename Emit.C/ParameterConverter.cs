@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
 
         public string Convert(Parameter parameter)
         {
-            var type = typeConverter.Convert(parameter.Type);
+            var type = typeConverter.Convert(parameter.DataType);
             var name = nameMangler.Mangle(parameter.Name.UnqualifiedName);
             return $"{type} {name}";
         }

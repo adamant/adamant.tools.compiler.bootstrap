@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
         private CallerVariable(ReachabilityGraph graph, IBindingMetadata symbol)
             : base(graph)
         {
-            _ = symbol.Type.UnderlyingReferenceType()
+            _ = symbol.DataType.UnderlyingReferenceType()
                 ?? throw new ArgumentException("Must be a reference type", nameof(symbol));
             Symbol = symbol;
         }
@@ -32,7 +32,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability.Graph
 
         public override string ToString()
         {
-            return $"⟦{Symbol.FullName.UnqualifiedName}⟧: {Symbol.Type}";
+            return $"⟦{Symbol.FullName.UnqualifiedName}⟧: {Symbol.DataType}";
         }
     }
 }

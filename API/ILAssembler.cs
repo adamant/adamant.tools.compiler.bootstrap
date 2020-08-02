@@ -62,7 +62,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.EndLine();
             builder.BeginLine(builder.IndentCharacters);
             builder.Append("-> ");
-            builder.EndLine(function.ReturnType.ToString());
+            builder.EndLine(function.ReturnDataType.ToString());
             if (function.IL != null)
             {
                 builder.BeginBlock();
@@ -86,7 +86,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                 name = "." + name.Substring(fieldPrefix.Length);
 
             var format = parameter.IsMutableBinding ? "var {0}: {1}" : "{0}: {1}";
-            return string.Format(CultureInfo.InvariantCulture, format, name, parameter.Type);
+            return string.Format(CultureInfo.InvariantCulture, format, name, parameter.DataType);
         }
 
         private static void Disassemble(MethodDeclaration method, AssemblyBuilder builder)
@@ -100,7 +100,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.EndLine();
             builder.BeginLine(builder.IndentCharacters);
             builder.Append("-> ");
-            builder.EndLine(method.ReturnType.ToString());
+            builder.EndLine(method.ReturnDataType.ToString());
             if (method.IL != null)
             {
                 builder.BeginBlock();
@@ -120,7 +120,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             builder.EndLine();
             builder.BeginLine(builder.IndentCharacters);
             builder.Append("-> ");
-            builder.EndLine(constructor.ReturnType.ToString());
+            builder.EndLine(constructor.ReturnDataType.ToString());
             builder.BeginBlock();
             Disassemble(constructor.IL, builder);
             builder.EndBlock();
@@ -236,7 +236,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         private static void Disassemble(FieldDeclaration field, AssemblyBuilder builder)
         {
             var binding = field.IsMutableBinding ? "var" : "let";
-            builder.AppendLine($"{binding} {field.Name}: {field.Type};");
+            builder.AppendLine($"{binding} {field.Name}: {field.DataType};");
         }
     }
 }

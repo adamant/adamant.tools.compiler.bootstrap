@@ -105,7 +105,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     diagnostics.Add(TypeError.CannotConvert(file, variableDeclaration.Initializer, initializerType, type));
             }
 
-            variableDeclaration.Type = type;
+            variableDeclaration.DataType = type;
         }
 
         /// <summary>
@@ -450,8 +450,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                             exp.ReferencedConstructor = constructorSymbol;
                             foreach (var (arg, parameter) in exp.Arguments.Zip(constructorSymbol.Parameters))
                             {
-                                InsertImplicitConversionIfNeeded(ref arg.Expression, parameter.Type);
-                                CheckArgumentTypeCompatibility(parameter.Type, arg.Expression);
+                                InsertImplicitConversionIfNeeded(ref arg.Expression, parameter.DataType);
+                                CheckArgumentTypeCompatibility(parameter.DataType, arg.Expression);
                             }
                             break;
                         default:
@@ -754,21 +754,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     var methodSymbol = methodSymbols.Single();
                     methodInvocation.MethodNameSyntax.ReferencedFunctionMetadata = methodSymbol;
 
-                    var selfParamType = methodSymbol.SelfParameterMetadata.Type;
+                    var selfParamType = methodSymbol.SelfParameterMetadata.DataType;
                     InsertImplicitActionIfNeeded(ref methodInvocation.ContextExpression, selfParamType, implicitBorrowAllowed: true);
 
                     InsertImplicitConversionIfNeeded(ref methodInvocation.ContextExpression, selfParamType);
                     CheckArgumentTypeCompatibility(selfParamType, methodInvocation.ContextExpression);
 
                     foreach (var (arg, type) in methodInvocation.Arguments.Zip(methodSymbol
-                                                                               .Parameters.Select(p => p.Type)))
+                                                                               .Parameters.Select(p => p.DataType)))
                     {
                         InsertImplicitConversionIfNeeded(ref arg.Expression, type);
                         CheckArgumentTypeCompatibility(type, arg.Expression);
                     }
 
-                    methodInvocation.Type = methodSymbol.ReturnType;
-                    AssignInvocationSemantics(methodInvocation, methodSymbol.ReturnType);
+                    methodInvocation.Type = methodSymbol.ReturnDataType;
+                    AssignInvocationSemantics(methodInvocation, methodSymbol.ReturnDataType);
                     break;
                 default:
                     diagnostics.Add(NameBindingError.AmbiguousMethodCall(file, methodInvocation.Span));
@@ -819,12 +819,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     foreach (var (arg, parameter) in
                         functionInvocationExpression.Arguments.Zip(functionSymbol.Parameters))
                     {
-                        InsertImplicitConversionIfNeeded(ref arg.Expression, parameter.Type);
-                        CheckArgumentTypeCompatibility(parameter.Type, arg.Expression);
+                        InsertImplicitConversionIfNeeded(ref arg.Expression, parameter.DataType);
+                        CheckArgumentTypeCompatibility(parameter.DataType, arg.Expression);
                     }
 
-                    functionInvocationExpression.Type = functionSymbol.ReturnType;
-                    AssignInvocationSemantics(functionInvocationExpression, functionSymbol.ReturnType);
+                    functionInvocationExpression.Type = functionSymbol.ReturnDataType;
+                    AssignInvocationSemantics(functionInvocationExpression, functionSymbol.ReturnDataType);
                     break;
                 default:
                     diagnostics.Add(NameBindingError.AmbiguousFunctionCall(file, functionInvocationExpression.Span));
@@ -905,7 +905,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         case IBindingMetadata binding:
                         {
                             nameExpression.ReferencedBinding = binding;
-                            type = binding.Type;
+                            type = binding.DataType;
                         }
                         break;
                         default:
@@ -947,7 +947,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         case IBindingMetadata binding:
                         {
                             selfExpression.ReferencedBinding = binding;
-                            type = binding.Type;
+                            type = binding.DataType;
                         }
                         break;
                         default:
@@ -1020,10 +1020,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 case 1:
                     var memberSymbol = memberSymbols.Single();
                     identifier.ReferencedBinding = memberSymbol;
-                    switch (memberSymbol.Type.Semantics)
+                    switch (memberSymbol.DataType.Semantics)
                     {
                         default:
-                            throw ExhaustiveMatch.Failed(memberSymbol.Type.Semantics);
+                            throw ExhaustiveMatch.Failed(memberSymbol.DataType.Semantics);
                         case TypeSemantics.Copy:
                             identifier.Semantics = ExpressionSemantics.Copy;
                             break;
@@ -1038,7 +1038,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                         case TypeSemantics.Void:
                             throw new InvalidOperationException("Can't assign semantics to void field");
                     }
-                    return identifier.Type = memberSymbol.Type;
+                    return identifier.Type = memberSymbol.DataType;
                 default:
                     diagnostics.Add(NameBindingError.AmbiguousName(file, identifier.Span));
                     identifier.ReferencedBinding = UnknownMetadata.Instance;

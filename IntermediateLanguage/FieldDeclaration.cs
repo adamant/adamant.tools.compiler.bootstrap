@@ -7,13 +7,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
     public class FieldDeclaration : Declaration, IBindingMetadata
     {
         public bool IsMutableBinding { get; }
-        public DataType Type { get; }
+        public DataType DataType { get; }
 
         public FieldDeclaration(bool isMutableBinding, Name fullName, DataType type)
             : base(true, fullName, MetadataSet.Empty)
         {
             IsMutableBinding = isMutableBinding;
-            Type = type;
+            DataType = type;
         }
     }
 }

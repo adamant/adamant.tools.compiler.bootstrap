@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
     {
         public bool IsMutableBinding { get; }
         public SimpleName Name { get; }
-        public DataType Type { get; internal set; }
+        public DataType DataType { get; internal set; }
 
         Name IMetadata.FullName => throw new NotImplementedException();
 
@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         {
             IsMutableBinding = isMutableBinding;
             Name = name;
-            Type = type;
+            DataType = type;
         }
     }
 }
