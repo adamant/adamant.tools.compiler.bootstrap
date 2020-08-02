@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     [Closed(
         typeof(IMethodDeclarationSyntax),
         typeof(IConcreteCallableDeclarationSyntax))]
-    public interface ICallableDeclarationSyntax : IEntityDeclarationSyntax, IFunctionMetadata
+    public partial interface ICallableDeclarationSyntax : IEntityDeclarationSyntax, IFunctionMetadata
     {
         new FixedList<IParameterSyntax> Parameters { get; }
         FixedList<IReachabilityAnnotationSyntax> ReachabilityAnnotations { get; }

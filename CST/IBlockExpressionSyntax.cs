@@ -4,7 +4,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     /// A block expression. Not to be used to represent function
     /// or type bodies.
     /// </summary>
-    public interface IBlockExpressionSyntax : IExpressionSyntax, IBlockOrResultSyntax, IBodyOrBlockSyntax
+    public partial interface IBlockExpressionSyntax : IExpressionSyntax, IBlockOrResultSyntax, IBodyOrBlockSyntax
     {
     }
 }

@@ -6,7 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
-    public interface IClassDeclarationSyntax : INonMemberEntityDeclarationSyntax, ITypeMetadata
+    public partial interface IClassDeclarationSyntax : INonMemberEntityDeclarationSyntax, ITypeMetadata
     {
         IMutableKeywordToken? MutableModifier { get; }
         SimpleName Name { get; }

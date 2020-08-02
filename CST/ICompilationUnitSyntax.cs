@@ -4,7 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
-    public interface ICompilationUnitSyntax : ISyntax
+    public partial interface ICompilationUnitSyntax : ISyntax
     {
         CodeFile CodeFile { get; }
         RootName ImplicitNamespaceName { get; }

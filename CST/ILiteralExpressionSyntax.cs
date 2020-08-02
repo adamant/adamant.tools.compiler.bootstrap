@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(IStringLiteralExpressionSyntax),
         typeof(IIntegerLiteralExpressionSyntax),
         typeof(IBoolLiteralExpressionSyntax))]
-    public interface ILiteralExpressionSyntax : IExpressionSyntax
+    public partial interface ILiteralExpressionSyntax : IExpressionSyntax
     {
     }
 }

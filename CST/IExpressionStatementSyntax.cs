@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
-    public interface IExpressionStatementSyntax : IBodyStatementSyntax
+    public partial interface IExpressionStatementSyntax : IBodyStatementSyntax
     {
         ref IExpressionSyntax Expression { get; }
     }

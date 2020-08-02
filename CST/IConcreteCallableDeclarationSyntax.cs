@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(IConcreteMethodDeclarationSyntax),
         typeof(IFunctionDeclarationSyntax),
         typeof(IAssociatedFunctionDeclarationSyntax))]
-    public interface IConcreteCallableDeclarationSyntax : ICallableDeclarationSyntax
+    public partial interface IConcreteCallableDeclarationSyntax : ICallableDeclarationSyntax
     {
         IBodySyntax Body { get; }
     }

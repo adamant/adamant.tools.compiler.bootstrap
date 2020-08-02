@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     [Closed(
         typeof(INamedParameterSyntax),
         typeof(IFieldParameterSyntax))]
-    public interface IConstructorParameterSyntax : IParameterSyntax
+    public partial interface IConstructorParameterSyntax : IParameterSyntax
     {
     }
 }

@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
-    public interface INoneLiteralExpressionSyntax : ILiteralExpressionSyntax
+    public partial interface INoneLiteralExpressionSyntax : ILiteralExpressionSyntax
     {
     }
 }

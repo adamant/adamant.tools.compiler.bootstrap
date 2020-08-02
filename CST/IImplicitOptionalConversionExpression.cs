@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     /// <summary>
     /// Convert a type to option of that type (i.e. "Some(value)")
     /// </summary>
-    public interface IImplicitOptionalConversionExpression : IImplicitConversionExpression
+    public partial interface IImplicitOptionalConversionExpression : IImplicitConversionExpression
     {
         OptionalType ConvertToType { get; }
     }

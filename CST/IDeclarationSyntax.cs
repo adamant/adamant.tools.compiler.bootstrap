@@ -6,7 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     [Closed(
         typeof(INamespaceDeclarationSyntax),
         typeof(IEntityDeclarationSyntax))]
-    public interface IDeclarationSyntax : ISyntax
+    public partial interface IDeclarationSyntax : ISyntax
     {
         CodeFile File { get; }
 

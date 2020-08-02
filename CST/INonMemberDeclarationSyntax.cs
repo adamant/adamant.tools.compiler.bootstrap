@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     [Closed(
         typeof(INamespaceDeclarationSyntax),
         typeof(INonMemberEntityDeclarationSyntax))]
-    public interface INonMemberDeclarationSyntax : IDeclarationSyntax
+    public partial interface INonMemberDeclarationSyntax : IDeclarationSyntax
     {
     }
 }

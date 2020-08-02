@@ -6,7 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     /// <summary>
     /// i.e. `move name`. A move takes ownership of something from a variable
     /// </summary>
-    public interface IMoveExpressionSyntax : IExpressionSyntax
+    public partial interface IMoveExpressionSyntax : IExpressionSyntax
     {
         ref IExpressionSyntax Referent { get; }
         [DisallowNull] IBindingMetadata? MovedSymbol { get; set; }

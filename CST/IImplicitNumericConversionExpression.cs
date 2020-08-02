@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     /// <summary>
     /// Implicit conversion between simple numeric types
     /// </summary>
-    public interface IImplicitNumericConversionExpression : IImplicitConversionExpression
+    public partial interface IImplicitNumericConversionExpression : IImplicitConversionExpression
     {
         NumericType ConvertToType { get; }
     }

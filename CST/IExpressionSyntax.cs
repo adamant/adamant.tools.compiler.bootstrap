@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(IBorrowExpressionSyntax),
         typeof(IShareExpressionSyntax),
         typeof(IAssignableExpressionSyntax))]
-    public interface IExpressionSyntax : ISyntax
+    public partial interface IExpressionSyntax : ISyntax
     {
         [DisallowNull] DataType? Type { get; set; }
         [DisallowNull] ExpressionSemantics? Semantics { get; set; }

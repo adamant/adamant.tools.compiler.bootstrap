@@ -4,7 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
-    public interface INewObjectExpressionSyntax : IExpressionSyntax
+    public partial interface INewObjectExpressionSyntax : IExpressionSyntax
     {
         ITypeNameSyntax TypeSyntax { get; }
         ICallableNameSyntax? ConstructorName { get; }

@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(ICapabilityTypeSyntax),
         typeof(ITypeNameSyntax),
         typeof(IOptionalTypeSyntax))]
-    public interface ITypeSyntax : ISyntax
+    public partial interface ITypeSyntax : ISyntax
     {
         [DisallowNull] DataType? NamedType { get; set; }
     }

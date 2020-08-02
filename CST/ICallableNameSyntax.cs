@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     /// <summary>
     /// The name of a function, method, constructor that is being invoked
     /// </summary>
-    public interface ICallableNameSyntax : ISyntax, IHasContainingScope
+    public partial interface ICallableNameSyntax : ISyntax, IHasContainingScope
     {
         Name Name { get; }
         [DisallowNull] IFunctionMetadata? ReferencedFunctionMetadata { get; set; }

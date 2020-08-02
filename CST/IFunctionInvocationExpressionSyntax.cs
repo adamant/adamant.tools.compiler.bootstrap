@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
-    public interface IFunctionInvocationExpressionSyntax : IInvocationExpressionSyntax
+    public partial interface IFunctionInvocationExpressionSyntax : IInvocationExpressionSyntax
     {
         ICallableNameSyntax FunctionNameSyntax { get; }
     }

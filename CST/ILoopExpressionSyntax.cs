@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
-    public interface ILoopExpressionSyntax : IExpressionSyntax
+    public partial interface ILoopExpressionSyntax : IExpressionSyntax
     {
         IBlockExpressionSyntax Block { get; }
     }

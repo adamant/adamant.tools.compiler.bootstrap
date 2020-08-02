@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
-    public interface IBoolLiteralExpressionSyntax : ILiteralExpressionSyntax
+    public partial interface IBoolLiteralExpressionSyntax : ILiteralExpressionSyntax
     {
         bool Value { get; }
     }

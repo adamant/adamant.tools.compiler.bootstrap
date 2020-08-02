@@ -5,7 +5,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     [Closed(
         typeof(IBodyStatementSyntax),
         typeof(IResultStatementSyntax))]
-    public interface IStatementSyntax : ISyntax
+    public partial interface IStatementSyntax : ISyntax
     {
     }
 }

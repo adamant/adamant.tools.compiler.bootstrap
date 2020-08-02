@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
-    public interface INextExpressionSyntax : IExpressionSyntax
+    public partial interface INextExpressionSyntax : IExpressionSyntax
     {
     }
 }

@@ -6,7 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     [Closed(
         typeof(IBodySyntax),
         typeof(IBlockExpressionSyntax))]
-    public interface IBodyOrBlockSyntax : ISyntax
+    public partial interface IBodyOrBlockSyntax : ISyntax
     {
         FixedList<IStatementSyntax> Statements { get; }
     }

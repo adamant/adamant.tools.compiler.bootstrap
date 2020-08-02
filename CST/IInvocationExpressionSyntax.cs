@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     [Closed(
         typeof(IMethodInvocationExpressionSyntax),
         typeof(IFunctionInvocationExpressionSyntax))]
-    public interface IInvocationExpressionSyntax : IExpressionSyntax
+    public partial interface IInvocationExpressionSyntax : IExpressionSyntax
     {
         Name FullName { get; }
         FixedList<IArgumentSyntax> Arguments { get; }

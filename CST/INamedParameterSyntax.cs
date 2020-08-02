@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
-    public interface INamedParameterSyntax : IParameterSyntax, IConstructorParameterSyntax
+    public partial interface INamedParameterSyntax : IParameterSyntax, IConstructorParameterSyntax
     {
         ITypeSyntax TypeSyntax { get; }
         IExpressionSyntax? DefaultValue { get; }

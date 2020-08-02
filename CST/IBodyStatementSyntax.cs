@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     [Closed(
         typeof(IVariableDeclarationStatementSyntax),
         typeof(IExpressionStatementSyntax))]
-    public interface IBodyStatementSyntax : IStatementSyntax
+    public partial interface IBodyStatementSyntax : IStatementSyntax
     {
     }
 }

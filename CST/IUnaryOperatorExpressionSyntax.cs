@@ -2,7 +2,7 @@ using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
-    public interface IUnaryOperatorExpressionSyntax : IExpressionSyntax
+    public partial interface IUnaryOperatorExpressionSyntax : IExpressionSyntax
     {
         UnaryOperatorFixity Fixity { get; }
         UnaryOperator Operator { get; }

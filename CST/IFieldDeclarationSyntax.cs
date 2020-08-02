@@ -4,7 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
-    public interface IFieldDeclarationSyntax : IMemberDeclarationSyntax, IBindingMetadata
+    public partial interface IFieldDeclarationSyntax : IMemberDeclarationSyntax, IBindingMetadata
     {
         ITypeSyntax TypeSyntax { get; }
         new DataTypePromise DataType { get; }

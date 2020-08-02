@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(ISelfParameterSyntax),
         typeof(INamedParameterSyntax),
         typeof(IFieldParameterSyntax))]
-    public interface IParameterSyntax : ISyntax, IBindingMetadata
+    public partial interface IParameterSyntax : ISyntax, IBindingMetadata
     {
         SimpleName Name { get; }
         bool Unused { get; }

@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
-    public interface IFieldAccessExpressionSyntax : IAssignableExpressionSyntax
+    public partial interface IFieldAccessExpressionSyntax : IAssignableExpressionSyntax
     {
         ref IExpressionSyntax ContextExpression { get; }
         AccessOperator AccessOperator { get; }

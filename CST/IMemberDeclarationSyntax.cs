@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(IFieldDeclarationSyntax),
         typeof(IConstructorDeclarationSyntax),
         typeof(IAssociatedFunctionDeclarationSyntax))]
-    public interface IMemberDeclarationSyntax : IEntityDeclarationSyntax
+    public partial interface IMemberDeclarationSyntax : IEntityDeclarationSyntax
     {
         IClassDeclarationSyntax DeclaringClass { get; }
         SimpleName Name { get; }

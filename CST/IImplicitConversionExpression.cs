@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(IImplicitOptionalConversionExpression),
         typeof(IImplicitNoneConversionExpression),
         typeof(IImplicitImmutabilityConversionExpression))]
-    public interface IImplicitConversionExpression : IExpressionSyntax
+    public partial interface IImplicitConversionExpression : IExpressionSyntax
     {
         IExpressionSyntax Expression { get; }
         new DataType Type { get; }

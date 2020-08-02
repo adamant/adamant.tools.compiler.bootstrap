@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     [Closed(
         typeof(IAbstractMethodDeclarationSyntax),
         typeof(IConcreteMethodDeclarationSyntax))]
-    public interface IMethodDeclarationSyntax : IMemberDeclarationSyntax, ICallableDeclarationSyntax, IMethodMetadata
+    public partial interface IMethodDeclarationSyntax : IMemberDeclarationSyntax, ICallableDeclarationSyntax, IMethodMetadata
     {
         ISelfParameterSyntax SelfParameter { get; }
         [DisallowNull] DataType? SelfParameterType { get; set; }

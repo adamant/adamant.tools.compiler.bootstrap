@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     /// is, the result is a borrow of the value referenced. Note that borrow expressions
     /// don't apply to value types since they are passed by move, copy, or reference.
     /// </summary>
-    public interface IBorrowExpressionSyntax : IExpressionSyntax
+    public partial interface IBorrowExpressionSyntax : IExpressionSyntax
     {
         ref IExpressionSyntax Referent { get; }
         [DisallowNull] IBindingMetadata? BorrowedFromBinding { get; set; }
