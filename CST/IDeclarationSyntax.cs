@@ -1,15 +1,7 @@
-using Adamant.Tools.Compiler.Bootstrap.Core;
-using ExhaustiveMatching;
-
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
-    [Closed(
-        typeof(INamespaceDeclarationSyntax),
-        typeof(IEntityDeclarationSyntax))]
-    public partial interface IDeclarationSyntax : ISyntax
+    public partial interface IDeclarationSyntax
     {
-        CodeFile File { get; }
-
         /// <summary>
         /// The span of whatever would count as the "name" of this declaration
         /// for things like operator overloads, constructors and destructors,
@@ -18,6 +10,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         /// * "new foo"
         /// * "delete"
         /// </summary>
-        TextSpan NameSpan { get; }
+        //TextSpan NameSpan { get; }
     }
 }

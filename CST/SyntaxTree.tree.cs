@@ -8,12 +8,11 @@ using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen
+namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
     [Closed(
         typeof(IArgumentSyntax),
         typeof(IBodyOrBlockSyntax),
-        typeof(IBodyStatementSyntax),
         typeof(ICallableNameSyntax),
         typeof(ICompilationUnitSyntax),
         typeof(IDeclarationSyntax),
@@ -35,7 +34,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen
 
     public partial interface IArgumentSyntax : ISyntax
     {
-        IExpressionSyntax Expression { get; }
     }
 
     [Closed(
@@ -47,23 +45,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen
 
     public partial interface IAssignmentExpressionSyntax : IExpressionSyntax
     {
-        IAssignableExpressionSyntax LeftOperand { get; }
         AssignmentOperator Operator { get; }
-        IExpressionSyntax RightOperand { get; }
     }
 
     public partial interface IAssociatedFunctionDeclarationSyntax : IMemberDeclarationSyntax, IConcreteCallableDeclarationSyntax
     {
-        new FixedList<INamedParameterSyntax> NewParameters { get; }
         ITypeSyntax? ReturnTypeSyntax { get; }
-        DataTypePromise ReturnType { get; }
+        DataTypePromise ReturnDataType { get; }
     }
 
     public partial interface IBinaryOperatorExpressionSyntax : IExpressionSyntax
     {
-        IExpressionSyntax LeftOperand { get; }
         BinaryOperator Operator { get; }
-        IExpressionSyntax RightOperand { get; }
     }
 
     public partial interface IBlockExpressionSyntax : IExpressionSyntax, IBlockOrResultSyntax, IBodyOrBlockSyntax
@@ -88,9 +81,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen
     [Closed(
         typeof(IExpressionStatementSyntax),
         typeof(IVariableDeclarationStatementSyntax))]
-    public partial interface IBodyStatementSyntax : ISyntax
+    public partial interface IBodyStatementSyntax : IStatementSyntax
     {
-        IStatementSyntax Statement { get; }
     }
 
     public partial interface IBodySyntax : IBodyOrBlockSyntax
@@ -105,13 +97,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen
 
     public partial interface IBorrowExpressionSyntax : IExpressionSyntax
     {
-        IExpressionSyntax Referent { get; }
-        IBindingMetadata BorrowedFromBinding { get; }
     }
 
     public partial interface IBreakExpressionSyntax : IExpressionSyntax
     {
-        IExpressionSyntax Value { get; }
     }
 
     [Closed(
@@ -119,14 +108,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen
         typeof(IMethodDeclarationSyntax))]
     public partial interface ICallableDeclarationSyntax : IEntityDeclarationSyntax, IFunctionMetadata
     {
-        FixedList<IParameterSyntax> NewParameters { get; }
         FixedList<IReachabilityAnnotationSyntax> ReachabilityAnnotations { get; }
     }
 
     public partial interface ICallableNameSyntax : ISyntax
     {
         Name Name { get; }
-        IFunctionMetadata? ReferencedFunctionMetadata { get; }
     }
 
     public partial interface ICanReachAnnotationSyntax : IReachabilityAnnotationSyntax
@@ -145,12 +132,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen
         IMutableKeywordToken? MutableModifier { get; }
         SimpleName Name { get; }
         FixedList<IMemberDeclarationSyntax> Members { get; }
-        DataTypePromise DeclaresType { get; }
     }
 
     public partial interface ICompilationUnitSyntax : ISyntax
     {
-        CodeFile File { get; }
+        CodeFile CodeFile { get; }
         RootName ImplicitNamespaceName { get; }
         FixedList<IUsingDirectiveSyntax> UsingDirectives { get; }
         FixedList<INonMemberDeclarationSyntax> Declarations { get; }
@@ -175,8 +161,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen
     public partial interface IConstructorDeclarationSyntax : IMemberDeclarationSyntax, IConcreteCallableDeclarationSyntax
     {
         ISelfParameterSyntax ImplicitSelfParameter { get; }
-        DataType? SelfParameterType { get; }
-        new IConstructorParameterSyntax NewParameters { get; }
     }
 
     [Closed(
@@ -214,7 +198,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen
 
     public partial interface IExpressionStatementSyntax : IBodyStatementSyntax
     {
-        IExpressionSyntax Expression { get; }
     }
 
     [Closed(
@@ -241,26 +224,21 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen
         typeof(IWhileExpressionSyntax))]
     public partial interface IExpressionSyntax : ISyntax
     {
-        DataType? Type { get; }
-        ExpressionSemantics? Semantics { get; }
     }
 
     public partial interface IFieldAccessExpressionSyntax : IAssignableExpressionSyntax
     {
-        IExpressionSyntax ContextExpression { get; }
         AccessOperator AccessOperator { get; }
         INameExpressionSyntax Field { get; }
-        IBindingMetadata? ReferencedBinding { get; }
     }
 
     public partial interface IFieldDeclarationSyntax : IMemberDeclarationSyntax
     {
         ITypeSyntax TypeSyntax { get; }
-        DataTypePromise Type { get; }
-        IExpressionSyntax? Initializer { get; }
+        DataTypePromise DataType { get; }
     }
 
-    public partial interface IFieldParameterSyntax : IConstructorParameterSyntax
+    public partial interface IFieldParameterSyntax : IParameterSyntax, IConstructorParameterSyntax
     {
         SimpleName FieldName { get; }
         IExpressionSyntax? DefaultValue { get; }
@@ -269,27 +247,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen
     public partial interface IForeachExpressionSyntax : IExpressionSyntax
     {
         SimpleName VariableName { get; }
-        bool VariableIsLiveAfterAssignment { get; }
-        ITypeSyntax TypeSyntax { get; }
-        new DataType? Type { get; }
-        DataType? VariableType { get; }
-        IExpressionSyntax InExpression { get; }
+        ITypeSyntax? TypeSyntax { get; }
         IBlockExpressionSyntax Block { get; }
     }
 
     public partial interface IFunctionDeclarationSyntax : INonMemberEntityDeclarationSyntax, IConcreteCallableDeclarationSyntax
     {
         bool IsExternalFunction { get; }
-        new FixedList<INamedParameterSyntax> NewParameters { get; }
         ITypeSyntax? ReturnTypeSyntax { get; }
-        DataTypePromise ReturnType { get; }
+        DataTypePromise ReturnDataType { get; }
+    }
+
+    public partial interface IFunctionInvocationExpressionSyntax : IInvocationExpressionSyntax
+    {
+        ICallableNameSyntax FunctionNameSyntax { get; }
     }
 
     public partial interface IIfExpressionSyntax : IExpressionSyntax, IElseClauseSyntax
     {
-        IExpressionSyntax Condition { get; }
         IBlockOrResultSyntax ThenBlock { get; }
-        IElseClauseSyntax ElseClause { get; }
+        IElseClauseSyntax? ElseClause { get; }
     }
 
     [Closed(
@@ -300,7 +277,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen
     public partial interface IImplicitConversionExpressionSyntax : IExpressionSyntax
     {
         IExpressionSyntax Expression { get; }
-        new DataType Type { get; }
+        DataType DataType { get; }
     }
 
     public partial interface IImplicitImmutabilityConversionExpressionSyntax : IImplicitConversionExpressionSyntax
@@ -309,6 +286,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen
 
     public partial interface IImplicitNoneConversionExpressionSyntax : IImplicitConversionExpressionSyntax
     {
+        OptionalType ConvertToType { get; }
     }
 
     public partial interface IImplicitNumericConversionExpressionSyntax : IImplicitConversionExpressionSyntax
@@ -327,6 +305,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen
     }
 
     [Closed(
+        typeof(IFunctionInvocationExpressionSyntax),
         typeof(IMethodInvocationExpressionSyntax))]
     public partial interface IInvocationExpressionSyntax : IExpressionSyntax
     {
@@ -365,22 +344,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen
     public partial interface IMethodDeclarationSyntax : IMemberDeclarationSyntax, ICallableDeclarationSyntax
     {
         ISelfParameterSyntax SelfParameter { get; }
-        DataType? SelfParameterType { get; }
-        new FixedList<IParameterSyntax> NewParameters { get; }
-        ITypeSyntax ReturnTypeSyntax { get; }
-        DataTypePromise ReturnType { get; }
+        ITypeSyntax? ReturnTypeSyntax { get; }
+        DataTypePromise ReturnDataType { get; }
     }
 
     public partial interface IMethodInvocationExpressionSyntax : IInvocationExpressionSyntax
     {
-        IExpressionSyntax ContextExpression { get; }
         ICallableNameSyntax MethodNameSyntax { get; }
     }
 
     public partial interface IMoveExpressionSyntax : IExpressionSyntax
     {
-        IExpressionSyntax Referent { get; }
-        IBindingMetadata? MovedSymbol { get; }
     }
 
     public partial interface INamedParameterSyntax : IParameterSyntax, IConstructorParameterSyntax
@@ -392,8 +366,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen
     public partial interface INameExpressionSyntax : IAssignableExpressionSyntax, IHasContainingScope
     {
         SimpleName Name { get; }
-        IBindingMetadata? ReferencedBinding { get; }
-        bool VariableIsLiveAfter { get; }
     }
 
     public partial interface INamespaceDeclarationSyntax : INonMemberDeclarationSyntax, IDeclarationSyntax
@@ -410,7 +382,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen
         ITypeNameSyntax TypeSyntax { get; }
         ICallableNameSyntax? ConstructorName { get; }
         FixedList<IArgumentSyntax> Arguments { get; }
-        IFunctionMetadata? ReferencedConstructor { get; }
     }
 
     public partial interface INextExpressionSyntax : IExpressionSyntax
@@ -442,13 +413,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen
 
     [Closed(
         typeof(IConstructorParameterSyntax),
+        typeof(IFieldParameterSyntax),
         typeof(INamedParameterSyntax),
         typeof(ISelfParameterSyntax))]
     public partial interface IParameterSyntax : ISyntax, IBindingMetadata
     {
         SimpleName Name { get; }
         bool Unused { get; }
-        DataTypePromise Type { get; }
+        DataTypePromise DataType { get; }
     }
 
     [Closed(
@@ -460,23 +432,20 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen
 
     public partial interface IReachableFromAnnotationSyntax : IReachabilityAnnotationSyntax
     {
-        INameExpressionSyntax ReachableFrom { get; }
+        FixedList<INameExpressionSyntax> ReachableFrom { get; }
     }
 
     public partial interface IResultStatementSyntax : IStatementSyntax, IBlockOrResultSyntax
     {
-        IExpressionSyntax Expression { get; }
     }
 
     public partial interface IReturnExpressionSyntax : IExpressionSyntax
     {
-        IExpressionSyntax? ReturnValue { get; }
     }
 
     public partial interface ISelfExpressionSyntax : IExpressionSyntax, IHasContainingScope
     {
         bool IsImplicit { get; }
-        IBindingMetadata? ReferencedBinding { get; }
     }
 
     public partial interface ISelfParameterSyntax : IParameterSyntax
@@ -486,11 +455,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen
 
     public partial interface IShareExpressionSyntax : IExpressionSyntax
     {
-        IExpressionSyntax Referent { get; }
         IBindingMetadata SharedSymbol { get; }
     }
 
     [Closed(
+        typeof(IBodyStatementSyntax),
         typeof(IResultStatementSyntax))]
     public partial interface IStatementSyntax : ISyntax
     {
@@ -503,7 +472,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen
 
     public partial interface ITypeNameSyntax : ITypeSyntax, IHasContainingScope
     {
-        IMetadata? ReferencedType { get; }
     }
 
     [Closed(
@@ -512,19 +480,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen
         typeof(ITypeNameSyntax))]
     public partial interface ITypeSyntax : ISyntax
     {
-        DataType? NamedType { get; }
     }
 
     public partial interface IUnaryOperatorExpressionSyntax : IExpressionSyntax
     {
         UnaryOperatorFixity Fixity { get; }
         UnaryOperator Operator { get; }
-        IExpressionSyntax Operand { get; }
     }
 
     public partial interface IUnsafeExpressionSyntax : IExpressionSyntax
     {
-        IExpressionSyntax Expression { get; }
     }
 
     public partial interface IUsingDirectiveSyntax : ISyntax
@@ -537,15 +502,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Gen
         TextSpan NameSpan { get; }
         SimpleName Name { get; }
         ITypeSyntax? TypeSyntax { get; }
-        DataType? Type { get; }
         bool InferMutableType { get; }
-        IExpressionSyntax? Initializer { get; }
-        bool VariableIsLiveAfter { get; }
     }
 
     public partial interface IWhileExpressionSyntax : IExpressionSyntax
     {
-        IExpressionSyntax Condition { get; }
         IBlockExpressionSyntax Block { get; }
     }
 

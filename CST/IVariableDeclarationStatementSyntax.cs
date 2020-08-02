@@ -1,18 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
-using Adamant.Tools.Compiler.Bootstrap.Core;
-using Adamant.Tools.Compiler.Bootstrap.Metadata;
-using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
-    public partial interface IVariableDeclarationStatementSyntax : IBodyStatementSyntax, IBindingMetadata
+    public partial interface IVariableDeclarationStatementSyntax
     {
-        TextSpan NameSpan { get; }
-        SimpleName Name { get; }
-        ITypeSyntax? TypeSyntax { get; }
         [DisallowNull] new DataType? DataType { get; set; }
-        bool InferMutableType { get; }
         [DisallowNull] ref IExpressionSyntax? Initializer { get; }
         bool VariableIsLiveAfter { get; set; }
     }

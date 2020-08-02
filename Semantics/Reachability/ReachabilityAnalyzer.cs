@@ -268,13 +268,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                     graph.Add(temp);
                     return temp;
                 }
-                case IImplicitNumericConversionExpression exp:
+                case IImplicitNumericConversionExpressionSyntax exp:
                     return Analyze(exp.Expression, graph, scope);
                 case IIntegerLiteralExpressionSyntax _:
                 case IBoolLiteralExpressionSyntax _:
                 case INoneLiteralExpressionSyntax _:
                     return null;
-                case IImplicitImmutabilityConversionExpression exp:
+                case IImplicitImmutabilityConversionExpressionSyntax exp:
                     // TODO does this need to be handled specially?
                     return Analyze(exp.Expression, graph, scope);
                 case IIfExpressionSyntax exp:
@@ -310,11 +310,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability
                 case INextExpressionSyntax _:
                     // TODO deal with control flow effects
                     return null;
-                case IImplicitNoneConversionExpression exp:
+                case IImplicitNoneConversionExpressionSyntax exp:
                     Analyze(exp.Expression, graph, scope);
                     // TODO Is there a chance this needs something done?
                     return null;
-                case IImplicitOptionalConversionExpression exp:
+                case IImplicitOptionalConversionExpressionSyntax exp:
                     return Analyze(exp.Expression, graph, scope);
             }
         }

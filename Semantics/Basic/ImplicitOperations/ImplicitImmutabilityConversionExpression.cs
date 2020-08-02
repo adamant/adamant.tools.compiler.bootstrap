@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
 {
     // TODO No error is reported if IImplicitImmutabilityConversionExpression is missing
-    internal class ImplicitImmutabilityConversionExpression : ImplicitConversionExpression, IImplicitImmutabilityConversionExpression
+    internal class ImplicitImmutabilityConversionExpression : ImplicitConversionExpression, IImplicitImmutabilityConversionExpressionSyntax
     {
         public ImplicitImmutabilityConversionExpression(
             IExpressionSyntax expression,

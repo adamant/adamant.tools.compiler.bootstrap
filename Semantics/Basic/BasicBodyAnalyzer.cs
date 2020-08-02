@@ -580,7 +580,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                 }
                 case INoneLiteralExpressionSyntax exp:
                     return exp.Type = DataType.None;
-                case IImplicitConversionExpression _:
+                case IImplicitConversionExpressionSyntax _:
                     throw new Exception("ImplicitConversionExpressions are inserted by BasicExpressionAnalyzer. They should not be present in the AST yet.");
                 case IBlockExpressionSyntax blockSyntax:
                     return InferBlockType(blockSyntax);

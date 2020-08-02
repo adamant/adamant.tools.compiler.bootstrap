@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
     /// An implicit conversion from `none` of type `never?` to some other optional
     /// type. For example, a conversion to `int?`
     /// </summary>
-    internal class ImplicitNoneConversionExpression : ImplicitConversionExpression, IImplicitNoneConversionExpression
+    internal class ImplicitNoneConversionExpression : ImplicitConversionExpression, IImplicitNoneConversionExpressionSyntax
     {
         public OptionalType ConvertToType { get; }
 

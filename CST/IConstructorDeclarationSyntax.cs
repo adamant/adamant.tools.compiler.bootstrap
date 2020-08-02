@@ -4,9 +4,8 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
-    public partial interface IConstructorDeclarationSyntax : IMemberDeclarationSyntax, IConcreteCallableDeclarationSyntax
+    public partial interface IConstructorDeclarationSyntax
     {
-        ISelfParameterSyntax ImplicitSelfParameter { get; }
         [DisallowNull] DataType? SelfParameterType { get; set; }
         new FixedList<IConstructorParameterSyntax> Parameters { get; }
     }

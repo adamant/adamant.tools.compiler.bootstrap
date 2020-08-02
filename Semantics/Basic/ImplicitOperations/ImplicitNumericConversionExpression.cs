@@ -3,7 +3,7 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.ImplicitOperations
 {
-    internal class ImplicitNumericConversionExpression : ImplicitConversionExpression, IImplicitNumericConversionExpression
+    internal class ImplicitNumericConversionExpression : ImplicitConversionExpression, IImplicitNumericConversionExpressionSyntax
     {
         public NumericType ConvertToType { get; }
 

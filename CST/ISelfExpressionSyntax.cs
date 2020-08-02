@@ -4,9 +4,8 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
-    public partial interface ISelfExpressionSyntax : IExpressionSyntax, IHasContainingScope
+    public partial interface ISelfExpressionSyntax
     {
-        bool IsImplicit { get; }
         [DisallowNull] IBindingMetadata? ReferencedBinding { get; set; }
         FixedList<IMetadata> LookupInContainingScope();
     }

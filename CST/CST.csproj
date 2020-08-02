@@ -10,7 +10,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningsAsErrors />
   </PropertyGroup>
 
@@ -42,13 +42,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Gen\SyntaxTree.tree.cs">
+    <Compile Update="SyntaxTree.tree.cs">
       <DependentUpon>SyntaxTree.tree</DependentUpon>
     </Compile>
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="$(SolutionDir)CodeGen\$(OutDir)\CompilerCodeGen.exe &quot;$(ProjectDir)Gen\SyntaxTree.tree&quot;" />
+    <Exec Command="$(SolutionDir)CodeGen\$(OutDir)\CompilerCodeGen.exe &quot;$(ProjectDir)SyntaxTree.tree&quot;" />
   </Target>
 
 </Project>

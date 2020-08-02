@@ -3,11 +3,9 @@ using Adamant.Tools.Compiler.Bootstrap.Metadata;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
-    public partial interface IFieldAccessExpressionSyntax : IAssignableExpressionSyntax
+    public partial interface IFieldAccessExpressionSyntax
     {
         ref IExpressionSyntax ContextExpression { get; }
-        AccessOperator AccessOperator { get; }
-        INameExpressionSyntax Field { get; }
         [DisallowNull] IBindingMetadata? ReferencedBinding { get; set; }
     }
 }

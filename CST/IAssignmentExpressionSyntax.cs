@@ -1,9 +1,8 @@
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
-    public partial interface IAssignmentExpressionSyntax : IExpressionSyntax
+    public partial interface IAssignmentExpressionSyntax
     {
         ref IAssignableExpressionSyntax LeftOperand { get; }
-        AssignmentOperator Operator { get; }
         ref IExpressionSyntax RightOperand { get; }
     }
 }

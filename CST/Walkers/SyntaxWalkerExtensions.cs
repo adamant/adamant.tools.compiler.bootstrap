@@ -65,7 +65,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST.Walkers
                 case IArgumentSyntax argument:
                     walker.Walk(argument.Expression, arg);
                     break;
-                case IImplicitConversionExpression implicitConversion:
+                case IImplicitConversionExpressionSyntax implicitConversion:
                     walker.Walk(implicitConversion.Expression, arg);
                     break;
                 case INamedParameterSyntax namedParameter:

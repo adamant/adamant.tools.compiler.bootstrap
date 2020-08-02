@@ -203,13 +203,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IMoveExpressionSyntax exp:
                     Convert(exp.Referent);
                     break;
-                case IImplicitNumericConversionExpression exp:
+                case IImplicitNumericConversionExpressionSyntax exp:
                     Convert(exp.Expression);
                     break;
-                case IImplicitOptionalConversionExpression exp:
+                case IImplicitOptionalConversionExpressionSyntax exp:
                     Convert(exp.Expression);
                     break;
-                case IImplicitImmutabilityConversionExpression exp:
+                case IImplicitImmutabilityConversionExpressionSyntax exp:
                     Convert(exp.Expression);
                     break;
                 case ILoopExpressionSyntax exp:
@@ -438,7 +438,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case ISelfExpressionSyntax _:
                 case INoneLiteralExpressionSyntax _:
                 case IIntegerLiteralExpressionSyntax _:
-                case IImplicitNoneConversionExpression _:
+                case IImplicitNoneConversionExpressionSyntax _:
                     // These operation have no side effects, so if the result isn't needed, there is nothing to do
                     break;
 
@@ -485,7 +485,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IBlockExpressionSyntax _:
                 case INoneLiteralExpressionSyntax _:
                     throw new NotImplementedException($"ConvertIntoPlace({expression.GetType().Name}, Place) Not Implemented.");
-                case IImplicitOptionalConversionExpression exp:
+                case IImplicitOptionalConversionExpressionSyntax exp:
                 {
                     var operand = ConvertToOperand(exp.Expression);
                     currentBlock!.Add(new SomeInstruction(resultPlace, exp.ConvertToType, operand, exp.Span, CurrentScope));
@@ -510,7 +510,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IMoveExpressionSyntax exp:
                     ConvertIntoPlace(exp.Referent, resultPlace);
                     break;
-                case IImplicitImmutabilityConversionExpression exp:
+                case IImplicitImmutabilityConversionExpressionSyntax exp:
                     ConvertIntoPlace(exp.Expression, resultPlace);
                     break;
                 case IBinaryOperatorExpressionSyntax exp:
@@ -640,11 +640,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IBoolLiteralExpressionSyntax exp:
                     currentBlock!.Add(new LoadBoolInstruction(resultPlace, exp.Value, exp.Span, CurrentScope));
                     break;
-                case IImplicitNumericConversionExpression exp:
+                case IImplicitNumericConversionExpressionSyntax exp:
                 {
                     if (exp.Expression.Type.Assigned().Known() is IntegerConstantType constantType)
                         currentBlock!.Add(new LoadIntegerInstruction(resultPlace, constantType.Value,
-                            (IntegerType)exp.Type.Assigned().Known(),
+                            (IntegerType)exp.DataType.Assigned().Known(),
                             exp.Span, CurrentScope));
                     else
                         currentBlock!.Add(new ConvertInstruction(resultPlace, ConvertToOperand(exp.Expression),
@@ -655,7 +655,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IIntegerLiteralExpressionSyntax exp:
                     throw new InvalidOperationException(
                         "Integer literals should have an implicit conversion around them");
-                case IImplicitNoneConversionExpression exp:
+                case IImplicitNoneConversionExpressionSyntax exp:
                     currentBlock!.Add(new LoadNoneInstruction(resultPlace, exp.ConvertToType, exp.Span, CurrentScope));
                     break;
             }
@@ -684,16 +684,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
                 case IFieldAccessExpressionSyntax _:
                 case IMethodInvocationExpressionSyntax _:
                 case INewObjectExpressionSyntax _:
-                case IImplicitNumericConversionExpression _:
+                case IImplicitNumericConversionExpressionSyntax _:
                 case IIntegerLiteralExpressionSyntax _:
                 case IStringLiteralExpressionSyntax _:
                 case IBoolLiteralExpressionSyntax _:
                 case INoneLiteralExpressionSyntax _:
-                case IImplicitImmutabilityConversionExpression _:
-                case IImplicitOptionalConversionExpression _:
+                case IImplicitImmutabilityConversionExpressionSyntax _:
+                case IImplicitOptionalConversionExpressionSyntax _:
                 case IUnsafeExpressionSyntax _:
                 case IBlockExpressionSyntax _:
-                case IImplicitNoneConversionExpression _:
+                case IImplicitNoneConversionExpressionSyntax _:
                 case IBreakExpressionSyntax _:
                 case INextExpressionSyntax _:
                 case IReturnExpressionSyntax _:
