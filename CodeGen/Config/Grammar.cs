@@ -6,7 +6,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen.Config
     public class Grammar
     {
         public string? Namespace { get; }
-        public Symbol? BaseType { get; }
+        public GrammarSymbol? BaseType { get; }
         public string Prefix { get; }
         public string Suffix { get; }
         public string ListType { get; }
@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen.Config
 
         public Grammar(
             string? @namespace,
-            Symbol? baseType,
+            GrammarSymbol? baseType,
             string prefix,
             string suffix,
             string listType,

@@ -1,14 +1,9 @@
-using System.Linq;
-using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Names;
-using Adamant.Tools.Compiler.Bootstrap.Symbols;
-using Adamant.Tools.Compiler.Bootstrap.Types;
 using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
 {
     [Trait("Category", "Symbols")]
-    public class FunctionSymbolTests
+    public class FunctionSymbolTests : SymbolTestFixture
     {
         [Theory]
         [InlineData(0)]
@@ -17,73 +12,39 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
         [InlineData(20)]
         public void Arity_is_number_of_parameters(int expectedParameters)
         {
-            var parameters = Enumerable.Range(1, expectedParameters)
-                                       .Select(n => new BindingSymbol(Name.From("param" + n), true, DataType.Int))
-                                       .ToFixedList();
-            var func = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Void);
+            var funcA = Func("A", @params: Params(expectedParameters));
 
-            Assert.Equal(expectedParameters, func.Arity);
+            Assert.Equal(expectedParameters, funcA.Arity);
         }
 
         [Fact]
-        public void Default_constructor_has_correct_properties()
+        public void Functions_with_same_parameters_and_return_type_are_equal()
         {
-            // TODO It is a little strange that the type here has a reference capability
-            var fullName = Name.From("My_Class");
-            var type = new ObjectType(fullName, true, ReferenceCapability.Isolated);
-            var defaultConstructor = FunctionSymbol.CreateDefaultConstructor(type);
+            var parameters = Params(DataType("T1"), DataType("T2"));
+            var funcA = Func("A", @params: parameters, @return: DataType("T3"));
+            var funcACopy = Func(funcA);
 
-            Assert.Equal(fullName.Qualify(SpecialName.New), defaultConstructor.FullName);
-            Assert.Empty(defaultConstructor.Parameters);
-            Assert.Equal(0, defaultConstructor.Arity);
-            Assert.Equal(type, defaultConstructor.ReturnType);
-        }
-
-        [Fact]
-        public void Functions_with_same_name_parameters_and_return_type_are_equal()
-        {
-            var parameters = new[]
-            {
-                new BindingSymbol(Name.From("a"), false, DataType.Int),
-                new BindingSymbol(Name.From("b"), false, DataType.Bool),
-            }.ToFixedList();
-            var func1 = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Void);
-            var func2 = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Void);
-
-            Assert.Equal(func1, func2);
+            Assert.Equal(funcA, funcACopy);
         }
 
         [Fact]
         public void Functions_with_different_parameters_are_not_equal()
         {
-            var parameters1 = new[]
-            {
-                new BindingSymbol(Name.From("a"), false, DataType.Int),
-                new BindingSymbol(Name.From("b"), false, DataType.Bool),
-            }.ToFixedList();
-            var func1 = new FunctionSymbol(Name.From("Fake"), parameters1, DataType.Void);
-            var parameters2 = new[]
-            {
-                new BindingSymbol(Name.From("a"), false, DataType.Int),
-                new BindingSymbol(Name.From("b"), false, DataType.Int),
-            }.ToFixedList();
-            var func2 = new FunctionSymbol(Name.From("Fake"), parameters2, DataType.Void);
+            var parameters1 = Params(DataType("T1"), DataType("T2"));
+            var funcA1 = Func("A", @params: parameters1);
+            var parameters2 = Params(DataType("T1"), DataType("T3"));
+            var funcA2 = Func(funcA1, @params: parameters2);
 
-            Assert.NotEqual(func1, func2);
+            Assert.NotEqual(funcA1, funcA2);
         }
 
         [Fact]
         public void Functions_with_different_return_types_are_not_equal()
         {
-            var parameters = new[]
-            {
-                new BindingSymbol(Name.From("a"), false, DataType.Int),
-                new BindingSymbol(Name.From("b"), false, DataType.Bool),
-            }.ToFixedList();
-            var func1 = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Void);
-            var func2 = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Int);
+            var funcA1 = Func("A", @return: DataType("T1"));
+            var funcA2 = Func(funcA1, @return: DataType("T2"));
 
-            Assert.NotEqual(func1, func2);
+            Assert.NotEqual(funcA1, funcA2);
         }
 
         [Fact]
@@ -91,17 +52,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
         {
             // Note that methods should really have different names than functions,
             // but, just in case, we need to check method vs. function in equality.
-            var parameters = new[]
-            {
-                new BindingSymbol(Name.From("a"), false, DataType.Int),
-                new BindingSymbol(Name.From("b"), false, DataType.Bool),
-            }.ToFixedList();
-            var func = new FunctionSymbol(Name.From("Fake"), parameters, DataType.Void);
-            var selfParameter = new BindingSymbol(SpecialName.Self, true, new ObjectType(Name.From("My_Class"), false, ReferenceCapability.Borrowed));
-            var method = new MethodSymbol(Name.From("Fake"), selfParameter, parameters, DataType.Void);
+            var ns = Namespace();
+            var parameters = Params(DataType("T1"), DataType("T2"));
+            var funcA = Func("A", ns, parameters, DataType("T3"));
+            var selfDataType = DataType("Class");
+            var selfType = Type("Class", ns, selfDataType);
+            var methodA = Method("A", selfType, selfDataType, parameters, DataType("T3"));
 
             // Note: assert false used to ensure which object Equals is called on
-            Assert.False(func.Equals(method));
+            Assert.False(funcA.Equals(methodA));
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         // TODO make this a property of Symbol?
         private static SimpleName LookupByName(Symbol symbol)
         {
-            return symbol.FullName.UnqualifiedName.WithoutDeclarationNumber();
+            return symbol.Name?.UnqualifiedName.WithoutDeclarationNumber() ?? throw new NullReferenceException();
         }
 
         public IEnumerator<Symbol> GetEnumerator()

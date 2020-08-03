@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             this.grammar = grammar;
         }
 
-        private string TypeName(Symbol symbol)
+        private string TypeName(GrammarSymbol symbol)
         {
             if (symbol.IsQuoted)
                 return symbol.Text;

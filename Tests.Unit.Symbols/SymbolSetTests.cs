@@ -1,12 +1,10 @@
-using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
-using Adamant.Tools.Compiler.Bootstrap.Types;
 using Xunit;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
 {
     [Trait("Category", "Symbols")]
-    public class SymbolSetTests
+    public class SymbolSetTests : SymbolTestFixture
     {
         [Fact]
         public void Empty_symbol_set_is_empty()
@@ -19,10 +17,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
         [Fact]
         public void Contains_distinct_symbols()
         {
-            var sym1 = new BindingSymbol(Name.From("foo"), true, DataType.Int);
-            var sym1Dup = new BindingSymbol(Name.From("foo"), true, DataType.Int);
-            var sym2 = new BindingSymbol(Name.From("bar"), false, DataType.Bool);
-            var sym3 = new BindingSymbol(Name.From("baz"), false, new ObjectType(Name.From("My_Class"), true, ReferenceCapability.Borrowed));
+            var sym1 = Variable("sym1");
+            var sym1Dup = Variable(sym1);
+            var sym2 = Variable("sym2");
+            var sym3 = Variable("sym3");
 
             var set = new SymbolSet(new[] { sym1, sym1Dup, sym2, sym2, sym3 });
 

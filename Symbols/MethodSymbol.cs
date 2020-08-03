@@ -6,18 +6,21 @@ using Adamant.Tools.Compiler.Bootstrap.Types;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Symbols
 {
-    public sealed class MethodSymbol : FunctionSymbol
+    public sealed class MethodSymbol : FunctionOrMethodSymbol
     {
-        public BindingSymbol SelfParameter { get; }
+        public new TypeSymbol ContainingSymbol { get; }
+        public DataType SelfDataType { get; }
 
         public MethodSymbol(
-            Name fullName,
-            BindingSymbol selfParameter,
-            FixedList<BindingSymbol> parameters,
-            DataType returnType)
-            : base(fullName, parameters, returnType)
+            TypeSymbol containingSymbol,
+            SimpleName name,
+            DataType selfDataType,
+            FixedList<DataType> parameterDataTypes,
+            DataType returnDataType)
+            : base(containingSymbol, name, parameterDataTypes, returnDataType)
         {
-            SelfParameter = selfParameter;
+            ContainingSymbol = containingSymbol;
+            SelfDataType = selfDataType;
         }
 
         public override bool Equals(Symbol? other)
@@ -25,15 +28,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
             return other is MethodSymbol otherMethod
-                   && FullName == otherMethod.FullName
-                   && SelfParameter == otherMethod.SelfParameter
-                   && Parameters.SequenceEqual(otherMethod.Parameters)
-                   && ReturnType == otherMethod.ReturnType;
+                   && ContainingSymbol == otherMethod.ContainingSymbol
+                   && Name == otherMethod.Name
+                   && SelfDataType == otherMethod.SelfDataType
+                   && ParameterDataTypes.SequenceEqual(otherMethod.ParameterDataTypes)
+                   && ReturnDataType == otherMethod.ReturnDataType;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(FullName, SelfParameter, Parameters, ReturnType);
+            return HashCode.Combine(Name, SelfDataType, ParameterDataTypes, ReturnDataType);
         }
     }
 }

@@ -48,7 +48,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             return lines.Select(l => l.Substring(start.Length).TrimEnd(';').Trim());
         }
 
-        private static Rule DefaultBaseType(Rule rule, Symbol? baseType)
+        private static Rule DefaultBaseType(Rule rule, GrammarSymbol? baseType)
         {
             if (baseType is null
                 || rule.Parents.Any()
@@ -92,7 +92,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
                     case 1:
                     {
                         var name = parts[0];
-                        yield return new Property(name, new Symbol(name), isOptional, isList);
+                        yield return new Property(name, new GrammarSymbol(name), isOptional, isList);
                     }
                     break;
                     case 2:
@@ -108,7 +108,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             }
         }
 
-        private static (Symbol nonterminal, IEnumerable<Symbol> parents) ParseDeclaration(string declaration)
+        private static (GrammarSymbol nonterminal, IEnumerable<GrammarSymbol> parents) ParseDeclaration(string declaration)
         {
             var declarationSplit = declaration.SplitOrEmpty(':');
             if (declarationSplit.Count > 2) throw new FormatException($"Too many colons in declaration: '{declaration}'");
@@ -118,9 +118,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
             return (nonterminal, parentSymbols);
         }
 
-        private static IEnumerable<Symbol> ParseParents(string? parents)
+        private static IEnumerable<GrammarSymbol> ParseParents(string? parents)
         {
-            if (parents is null) return Enumerable.Empty<Symbol>();
+            if (parents is null) return Enumerable.Empty<GrammarSymbol>();
 
             return parents
                    .Split(',')
@@ -129,11 +129,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen
         }
 
         [return: NotNullIfNotNull("symbol")]
-        private static Symbol? ParseSymbol(string? symbol)
+        private static GrammarSymbol? ParseSymbol(string? symbol)
         {
             if (symbol is null) return null;
-            if (symbol.StartsWith('\'') && symbol.EndsWith('\'')) return new Symbol(symbol[1..^1], true);
-            return new Symbol(symbol);
+            if (symbol.StartsWith('\'') && symbol.EndsWith('\'')) return new GrammarSymbol(symbol[1..^1], true);
+            return new GrammarSymbol(symbol);
         }
     }
 }

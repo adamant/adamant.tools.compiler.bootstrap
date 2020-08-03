@@ -4,22 +4,22 @@ using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Symbols
 {
-    // TODO have symbols reference their containing symbols and act a little more like names
     [Closed(
+        typeof(NamespaceOrPackageSymbol),
         typeof(TypeSymbol),
-        typeof(FunctionSymbol),
-        typeof(NamespaceSymbol),
+        typeof(InvokableSymbol),
         typeof(BindingSymbol))]
     public abstract class Symbol : IEquatable<Symbol>
     {
-        public Name FullName { get; }
+        public Symbol? ContainingSymbol { get; }
+        public SimpleName? Name { get; }
+        public bool IsGlobal => ContainingSymbol is null;
 
-        public bool IsGlobal => FullName is SimpleName;
-
-        protected Symbol(Name fullName)
+        protected Symbol(Symbol? containingSymbol, SimpleName? name)
         {
             // Note: constructor can't be `private protected` so `Symbol` can be mocked in unit tests
-            FullName = fullName;
+            ContainingSymbol = containingSymbol;
+            Name = name;
         }
 
         // TODO lookup method

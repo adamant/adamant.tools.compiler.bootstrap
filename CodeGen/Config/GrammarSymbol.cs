@@ -2,18 +2,18 @@ using System;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CodeGen.Config
 {
-    public class Symbol : IEquatable<Symbol>
+    public class GrammarSymbol : IEquatable<GrammarSymbol>
     {
         public string Text { get; }
         public bool IsQuoted { get; }
 
-        public Symbol(string text, bool isQuoted = false)
+        public GrammarSymbol(string text, bool isQuoted = false)
         {
             Text = text;
             IsQuoted = isQuoted;
         }
 
-        public bool Equals(Symbol? other)
+        public bool Equals(GrammarSymbol? other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen.Config
 
         public override bool Equals(object? obj)
         {
-            return Equals(obj as Symbol);
+            return Equals(obj as GrammarSymbol);
         }
 
         public override int GetHashCode()
@@ -30,12 +30,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen.Config
             return HashCode.Combine(Text, IsQuoted);
         }
 
-        public static bool operator ==(Symbol? left, Symbol? right)
+        public static bool operator ==(GrammarSymbol? left, GrammarSymbol? right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(Symbol? left, Symbol? right)
+        public static bool operator !=(GrammarSymbol? left, GrammarSymbol? right)
         {
             return !Equals(left, right);
         }

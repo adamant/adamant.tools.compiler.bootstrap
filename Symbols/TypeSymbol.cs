@@ -9,15 +9,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     /// </summary>
     public sealed class TypeSymbol : Symbol
     {
-        public ObjectType DeclaresType { get; }
+        public new NamespaceOrPackageSymbol ContainingSymbol { get; }
+        public new SimpleName Name { get; }
+        public ObjectType DeclaresDataType { get; }
 
-        public TypeSymbol(Name fullName, ObjectType declaresType)
-            : base(fullName)
+        public TypeSymbol(
+            NamespaceOrPackageSymbol containingSymbol,
+            SimpleName name,
+            ObjectType declaresDataType)
+            : base(containingSymbol, name)
         {
-            if (fullName != declaresType.FullName)
-                throw new ArgumentException("Declared type must have the same name as symbol", nameof(declaresType));
+            if (name != declaresDataType.FullName)
+                throw new ArgumentException("Declared type must have the same name as symbol", nameof(declaresDataType));
 
-            DeclaresType = declaresType;
+            ContainingSymbol = containingSymbol;
+            Name = name;
+            DeclaresDataType = declaresDataType;
         }
 
         public override bool Equals(Symbol? other)
@@ -25,13 +32,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
             return other is TypeSymbol otherType
-                   && FullName == otherType.FullName
-                   && DeclaresType == otherType.DeclaresType;
+                   && ContainingSymbol == otherType.ContainingSymbol
+                   && Name == otherType.Name
+                   && DeclaresDataType == otherType.DeclaresDataType;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(FullName, DeclaresType);
+            return HashCode.Combine(ContainingSymbol, Name, DeclaresDataType);
         }
     }
 }

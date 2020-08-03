@@ -9,45 +9,34 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     /// <summary>
     /// A symbol for a function
     /// </summary>
-    public class FunctionSymbol : Symbol
+    public sealed class FunctionSymbol : FunctionOrMethodSymbol
     {
-        // TODO the parameter types are part of the symbol, actual parameter symbols are children
-        public FixedList<BindingSymbol> Parameters { get; }
-        public int Arity => Parameters.Count;
-        public DataType ReturnType { get; }
+        public new NamespaceOrPackageSymbol ContainingSymbol { get; }
 
-        // TODO isn't there overlap between the parameters and the child symbols?
         public FunctionSymbol(
-            Name fullName,
-            FixedList<BindingSymbol> parameters,
-            DataType returnType)
-            : base(fullName)
+            NamespaceOrPackageSymbol containingSymbol,
+            SimpleName name,
+            FixedList<DataType> parameterDataTypes,
+            DataType returnDataType)
+            : base(containingSymbol, name, parameterDataTypes, returnDataType)
         {
-            Parameters = parameters;
-            ReturnType = returnType;
-        }
-
-        public static FunctionSymbol CreateDefaultConstructor(ObjectType constructedType)
-        {
-            var name = constructedType.FullName.Qualify(SpecialName.New);
-            return new FunctionSymbol(name, FixedList<BindingSymbol>.Empty, constructedType);
+            ContainingSymbol = containingSymbol;
         }
 
         public override bool Equals(Symbol? other)
         {
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
-            // Check exact type to make sure it isn't a method
-            if (other.GetType() != GetType()) return false;
-            var otherSymbol = (FunctionSymbol)other;
-            return FullName == otherSymbol.FullName
-                && Parameters.SequenceEqual(otherSymbol.Parameters)
-                && ReturnType == otherSymbol.ReturnType;
+            return other is FunctionSymbol otherFunction
+                   && ContainingSymbol == otherFunction.ContainingSymbol
+                   && Name == otherFunction.Name
+                   && ParameterDataTypes.SequenceEqual(otherFunction.ParameterDataTypes)
+                   && ReturnDataType == otherFunction.ReturnDataType;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(FullName, Parameters, ReturnType);
+            return HashCode.Combine(ContainingSymbol, Name, ParameterDataTypes, ReturnDataType);
         }
     }
 }

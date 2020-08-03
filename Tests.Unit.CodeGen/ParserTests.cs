@@ -77,7 +77,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
 
             var config = Parser.ReadGrammarConfig(grammar);
 
-            Assert.Equal(new Symbol("MyBase"), config.BaseType);
+            Assert.Equal(new GrammarSymbol("MyBase"), config.BaseType);
         }
 
         [Fact]
@@ -87,7 +87,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
 
             var config = Parser.ReadGrammarConfig(grammar);
 
-            Assert.Equal(new Symbol("MyBase", true), config.BaseType);
+            Assert.Equal(new GrammarSymbol("MyBase", true), config.BaseType);
         }
 
         [Fact]
@@ -139,7 +139,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
             var config = Parser.ReadGrammarConfig(grammar);
 
             var rule = Assert.Single(config.Rules);
-            Assert.Equal(new Symbol("SubType"), rule.Nonterminal);
+            Assert.Equal(new GrammarSymbol("SubType"), rule.Nonterminal);
             Assert.Empty(rule.Parents);
             Assert.Empty(rule.Properties);
         }
@@ -151,7 +151,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
             var config = Parser.ReadGrammarConfig(grammar);
 
             var rule = Assert.Single(config.Rules);
-            Assert.Equal(new Symbol("IMyFullTypeName", true), rule.Nonterminal);
+            Assert.Equal(new GrammarSymbol("IMyFullTypeName", true), rule.Nonterminal);
             Assert.Empty(rule.Parents);
             Assert.Empty(rule.Properties);
         }
@@ -163,8 +163,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
             var config = Parser.ReadGrammarConfig(grammar);
 
             var rule = Assert.Single(config.Rules);
-            Assert.Equal(new Symbol("SubType"), rule.Nonterminal);
-            var expectedParents = new[] { new Symbol("MyBase") }.ToFixedList();
+            Assert.Equal(new GrammarSymbol("SubType"), rule.Nonterminal);
+            var expectedParents = new[] { new GrammarSymbol("MyBase") }.ToFixedList();
             Assert.Equal(expectedParents, rule.Parents);
             Assert.Empty(rule.Properties);
         }
@@ -176,7 +176,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
             var config = Parser.ReadGrammarConfig(grammar);
 
             var rule = Assert.Single(config.Rules);
-            Assert.Equal(new Symbol("MyBase"), rule.Nonterminal);
+            Assert.Equal(new GrammarSymbol("MyBase"), rule.Nonterminal);
             Assert.Empty(rule.Parents);
             Assert.Empty(rule.Properties);
         }
@@ -189,8 +189,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
             var config = Parser.ReadGrammarConfig(grammar);
 
             var rule = Assert.Single(config.Rules);
-            Assert.Equal(new Symbol("SubType"), rule.Nonterminal);
-            Assert.Single(rule.Parents, new Symbol("BaseType"));
+            Assert.Equal(new GrammarSymbol("SubType"), rule.Nonterminal);
+            Assert.Single(rule.Parents, new GrammarSymbol("BaseType"));
             Assert.Empty(rule.Properties);
         }
 
@@ -202,8 +202,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
             var config = Parser.ReadGrammarConfig(grammar);
 
             var rule = Assert.Single(config.Rules);
-            Assert.Equal(new Symbol("SubType"), rule.Nonterminal);
-            var expectedParents = new[] { new Symbol("BaseType1"), new Symbol("BaseType2") }.ToFixedList();
+            Assert.Equal(new GrammarSymbol("SubType"), rule.Nonterminal);
+            var expectedParents = new[] { new GrammarSymbol("BaseType1"), new GrammarSymbol("BaseType2") }.ToFixedList();
             Assert.Equal(expectedParents, rule.Parents);
             Assert.Empty(rule.Properties);
         }
@@ -216,8 +216,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
             var config = Parser.ReadGrammarConfig(grammar);
 
             var rule = Assert.Single(config.Rules);
-            Assert.Equal(new Symbol("SubType"), rule.Nonterminal);
-            var expectedParents = new[] { new Symbol("BaseType1", true), new Symbol("BaseType2") }.ToFixedList();
+            Assert.Equal(new GrammarSymbol("SubType"), rule.Nonterminal);
+            var expectedParents = new[] { new GrammarSymbol("BaseType1", true), new GrammarSymbol("BaseType2") }.ToFixedList();
             Assert.Equal(expectedParents, rule.Parents);
             Assert.Empty(rule.Properties);
         }
@@ -253,7 +253,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
             var rule = Assert.Single(config.Rules);
             var property = Assert.Single(rule.Properties);
             Assert.Equal("MyProperty", property.Name);
-            Assert.Equal(new Symbol("MyProperty"), property.Type);
+            Assert.Equal(new GrammarSymbol("MyProperty"), property.Type);
             Assert.False(property.IsOptional);
             Assert.False(property.IsList);
         }
@@ -267,7 +267,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
             var rule = Assert.Single(config.Rules);
             var property = Assert.Single(rule.Properties);
             Assert.Equal("MyProperty", property.Name);
-            Assert.Equal(new Symbol("MyProperty"), property.Type);
+            Assert.Equal(new GrammarSymbol("MyProperty"), property.Type);
             Assert.True(property.IsOptional);
             Assert.False(property.IsList);
         }
@@ -281,7 +281,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
             var rule = Assert.Single(config.Rules);
             var property = Assert.Single(rule.Properties);
             Assert.Equal("MyProperty", property.Name);
-            Assert.Equal(new Symbol("MyType"), property.Type);
+            Assert.Equal(new GrammarSymbol("MyType"), property.Type);
             Assert.False(property.IsOptional);
             Assert.False(property.IsList);
         }
@@ -295,7 +295,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
             var rule = Assert.Single(config.Rules);
             var property = Assert.Single(rule.Properties);
             Assert.Equal("MyProperty", property.Name);
-            Assert.Equal(new Symbol("MyType", true), property.Type);
+            Assert.Equal(new GrammarSymbol("MyType", true), property.Type);
             Assert.False(property.IsOptional);
             Assert.False(property.IsList);
         }
@@ -310,7 +310,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
             var rule = Assert.Single(config.Rules);
             var property = Assert.Single(rule.Properties);
             Assert.Equal("MyProperty", property.Name);
-            Assert.Equal(new Symbol("MyType"), property.Type);
+            Assert.Equal(new GrammarSymbol("MyType"), property.Type);
             Assert.False(property.IsOptional);
             Assert.True(property.IsList);
         }
@@ -324,7 +324,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
             var rule = Assert.Single(config.Rules);
             var property = Assert.Single(rule.Properties);
             Assert.Equal("MyProperty", property.Name);
-            Assert.Equal(new Symbol("MyType"), property.Type);
+            Assert.Equal(new GrammarSymbol("MyType"), property.Type);
             Assert.True(property.IsOptional);
             Assert.False(property.IsList);
         }
@@ -349,12 +349,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.CodeGen
             Assert.Collection(rule.Properties, p1 =>
             {
                 Assert.Equal("MyProperty1", p1.Name);
-                Assert.Equal(new Symbol("MyType1"), p1.Type);
+                Assert.Equal(new GrammarSymbol("MyType1"), p1.Type);
                 Assert.False(p1.IsList);
             }, p2 =>
             {
                 Assert.Equal("MyProperty2", p2.Name);
-                Assert.Equal(new Symbol("MyType2"), p2.Type);
+                Assert.Equal(new GrammarSymbol("MyType2"), p2.Type);
                 Assert.True(p2.IsList);
             });
         }

@@ -5,14 +5,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.CodeGen.Config
 {
     public class Rule
     {
-        public Symbol Nonterminal { get; }
-        public FixedList<Symbol> Parents { get; }
+        public GrammarSymbol Nonterminal { get; }
+        public FixedList<GrammarSymbol> Parents { get; }
 
         public FixedList<Property> Properties { get; }
 
         public Rule(
-            Symbol nonterminal,
-            IEnumerable<Symbol> parents,
+            GrammarSymbol nonterminal,
+            IEnumerable<GrammarSymbol> parents,
             IEnumerable<Property> properties)
         {
             Nonterminal = nonterminal;
