@@ -4,6 +4,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Adamant.Tools.Compiler.Bootstrap.Tokens;
 using Adamant.Tools.Compiler.Bootstrap.Types;
 using ExhaustiveMatching;
@@ -178,6 +179,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
         CodeFile File { get; }
         TextSpan NameSpan { get; }
+        Promise<Symbol> Symbol { get; }
     }
 
     [Closed(

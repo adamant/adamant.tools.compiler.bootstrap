@@ -9,6 +9,7 @@
 ◊using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 ◊using Adamant.Tools.Compiler.Bootstrap.Metadata;
 ◊using Adamant.Tools.Compiler.Bootstrap.Names;
+◊using Adamant.Tools.Compiler.Bootstrap.Symbols;
 ◊using Adamant.Tools.Compiler.Bootstrap.Tokens;
 ◊using Adamant.Tools.Compiler.Bootstrap.Types;
 
@@ -37,7 +38,7 @@ ConcreteCallableDeclaration: CallableDeclaration = Body;
 ConcreteMethodDeclaration: MethodDeclaration, ConcreteCallableDeclaration;
 ConstructorDeclaration: MemberDeclaration, ConcreteCallableDeclaration = ImplicitSelfParameter:SelfParameter;
 ConstructorParameter: Parameter;
-Declaration = File:CodeFile NameSpan:TextSpan;
+Declaration = File:CodeFile NameSpan:TextSpan Symbol:Promise<Symbol>;
 ElseClause;
 EntityDeclaration: Declaration = AccessModifier:IAccessModifierToken?;
 ExpressionStatement: BodyStatement;
