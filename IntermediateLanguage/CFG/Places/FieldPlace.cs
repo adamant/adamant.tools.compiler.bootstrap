@@ -8,9 +8,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Places
     public class FieldPlace : Place
     {
         public Operand Target { get; }
-        public Name Field { get; }
+        public MaybeQualifiedName Field { get; }
 
-        public FieldPlace(Operand target, Name field, TextSpan span)
+        public FieldPlace(Operand target, MaybeQualifiedName field, TextSpan span)
             : base(span)
         {
             Target = target;

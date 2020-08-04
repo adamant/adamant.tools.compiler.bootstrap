@@ -9,13 +9,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
     public class CallInstruction : Instruction
     {
         public Place? ResultPlace { get; }
-        public Name FunctionName { get; }
+        public MaybeQualifiedName FunctionName { get; }
         public Operand? Self { get; }
         public bool IsMethodCall => !(Self is null);
         public FixedList<Operand> Arguments { get; }
         public int Arity => Arguments.Count;
 
-        private CallInstruction(Place? resultPlace, Operand? self, Name functionName, FixedList<Operand> arguments, TextSpan span, Scope scope)
+        private CallInstruction(Place? resultPlace, Operand? self, MaybeQualifiedName functionName, FixedList<Operand> arguments, TextSpan span, Scope scope)
             : base(span, scope)
         {
             ResultPlace = resultPlace;
@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
 
         public static CallInstruction ForFunction(
             Place resultPlace,
-            Name functionName,
+            MaybeQualifiedName functionName,
             FixedList<Operand> arguments,
             TextSpan span,
             Scope scope)
@@ -35,7 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
         }
 
         public static CallInstruction ForFunction(
-            Name functionName,
+            MaybeQualifiedName functionName,
             FixedList<Operand> arguments,
             TextSpan span,
             Scope scope)
@@ -46,7 +46,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
         public static CallInstruction ForMethod(
             Place resultPlace,
             Operand self,
-            Name functionName,
+            MaybeQualifiedName functionName,
             FixedList<Operand> arguments,
             TextSpan span,
             Scope scope)
@@ -56,7 +56,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
 
         public static CallInstruction ForMethod(
             Operand self,
-            Name functionName,
+            MaybeQualifiedName functionName,
             FixedList<Operand> arguments,
             TextSpan span,
             Scope scope)

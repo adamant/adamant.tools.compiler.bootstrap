@@ -13,13 +13,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
         typeof(NeverType))]
     public abstract class EmptyType : DataType
     {
-        public Name Name { get; }
+        public MaybeQualifiedName Name { get; }
 
         public override bool IsEmpty => true;
 
         public override bool IsKnown => true;
 
-        private protected EmptyType(Name name)
+        private protected EmptyType(MaybeQualifiedName name)
         {
             Name = name;
         }

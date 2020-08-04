@@ -8,6 +8,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata
         typeof(IBindingMetadata))]
     public interface IMetadata
     {
-        Name FullName { get; }
+        MaybeQualifiedName FullName { get; }
     }
 }

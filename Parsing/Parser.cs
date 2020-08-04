@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         /// <summary>
         /// A nested parser establishes a nested naming context for things parsed by it.
         /// </summary>
-        protected Parser NestedParser(Name name)
+        protected Parser NestedParser(MaybeQualifiedName name)
         {
             return new Parser(Tokens, name);
         }

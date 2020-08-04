@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Names
         [Fact]
         public void Constructor_is_special()
         {
-            var name = SpecialName.Constructor("from_foo");
+            var name = SpecialNames.Constructor("from_foo");
 
             Assert.True(name.IsSpecial);
         }
@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Names
         [Fact]
         public void Constructor_name_is_prefixed_with_new()
         {
-            var name = SpecialName.Constructor("from_foo");
+            var name = SpecialNames.Constructor("from_foo");
 
             Assert.Equal("new_from_foo", name.Text);
         }
@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Names
         [Fact]
         public void Constructor_without_name_is_just_new()
         {
-            var name = SpecialName.Constructor();
+            var name = SpecialNames.Constructor();
 
             Assert.Equal("new", name.Text);
         }

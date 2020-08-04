@@ -360,7 +360,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 {
                     // If it is one of these, we assume there is a missing identifier
                     var identifierSpan = Tokens.Expect<IIdentifierToken>();
-                    return new NameExpressionSyntax(identifierSpan, SpecialName.Unknown);
+                    return new NameExpressionSyntax(identifierSpan, SpecialNames.Unknown);
                 }
                 case IOpenBraceToken _:
                 case ICloseBraceToken _:

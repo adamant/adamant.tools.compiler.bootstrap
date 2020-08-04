@@ -16,7 +16,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         public FieldParameterSyntax(
             TextSpan span,
-            Name fullName,
+            MaybeQualifiedName fullName,
             SimpleName fieldName,
             IExpressionSyntax? defaultValue)
             : base(span, fullName)

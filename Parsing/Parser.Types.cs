@@ -101,31 +101,31 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 default:
                     throw ExhaustiveMatch.Failed(keyword);
                 case IVoidKeywordToken _:
-                    name = SpecialName.Void;
+                    name = SpecialNames.Void;
                     break;
                 case INeverKeywordToken _:
-                    name = SpecialName.Never;
+                    name = SpecialNames.Never;
                     break;
                 case IBoolKeywordToken _:
-                    name = SpecialName.Bool;
+                    name = SpecialNames.Bool;
                     break;
                 case IAnyKeywordToken _:
-                    name = SpecialName.Any;
+                    name = SpecialNames.Any;
                     break;
                 case IByteKeywordToken _:
-                    name = SpecialName.Byte;
+                    name = SpecialNames.Byte;
                     break;
                 case IIntKeywordToken _:
-                    name = SpecialName.Int;
+                    name = SpecialNames.Int;
                     break;
                 case IUIntKeywordToken _:
-                    name = SpecialName.UInt;
+                    name = SpecialNames.UInt;
                     break;
                 case ISizeKeywordToken _:
-                    name = SpecialName.Size;
+                    name = SpecialNames.Size;
                     break;
                 case IOffsetKeywordToken _:
-                    name = SpecialName.Offset;
+                    name = SpecialNames.Offset;
                     break;
             }
 

@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         public bool IsMutableBinding { get; }
         public DataType DataType { get; }
 
-        public FieldDeclaration(bool isMutableBinding, Name fullName, DataType type)
+        public FieldDeclaration(bool isMutableBinding, MaybeQualifiedName fullName, DataType type)
             : base(true, fullName, MetadataSet.Empty)
         {
             IsMutableBinding = isMutableBinding;

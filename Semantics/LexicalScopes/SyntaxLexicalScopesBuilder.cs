@@ -98,7 +98,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 
         private LexicalScope BuildNamespaceScopes(RootName nsName, LexicalScope containingScope)
         {
-            Name name;
+            MaybeQualifiedName name;
             switch (nsName)
             {
                 default:

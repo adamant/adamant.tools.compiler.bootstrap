@@ -66,8 +66,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Types
         [Fact]
         public void With_equal_referent_are_equal()
         {
-            var type1 = new OptionalType(new ObjectType(Name.From("foo", "bar", "baz"), true, ReferenceCapability.Borrowed));
-            var type2 = new OptionalType(new ObjectType(Name.From("foo", "bar", "baz"), true, ReferenceCapability.Borrowed));
+            var type1 = new OptionalType(new ObjectType(MaybeQualifiedName.From("foo", "bar", "baz"), true, ReferenceCapability.Borrowed));
+            var type2 = new OptionalType(new ObjectType(MaybeQualifiedName.From("foo", "bar", "baz"), true, ReferenceCapability.Borrowed));
 
             Assert.Equal(type1, type2);
         }

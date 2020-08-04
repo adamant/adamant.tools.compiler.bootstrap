@@ -37,7 +37,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(SpecialName.Unknown);
+            return HashCode.Combine(SpecialNames.Unknown);
         }
     }
 }

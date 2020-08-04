@@ -40,7 +40,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Types
         [Fact]
         public void Underlying_reference_type_of_reference_type_is_itself()
         {
-            var referenceType = new ObjectType(Name.From("Foo", "Bar"), true, ReferenceCapability.Borrowed);
+            var referenceType = new ObjectType(MaybeQualifiedName.From("Foo", "Bar"), true, ReferenceCapability.Borrowed);
 
             var underlyingType = referenceType.UnderlyingReferenceType();
 
@@ -50,7 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Types
         [Fact]
         public void Underlying_reference_type_of_optional_reference_type_is_reference_type()
         {
-            var referenceType = new ObjectType(Name.From("Foo", "Bar"), true, ReferenceCapability.Borrowed);
+            var referenceType = new ObjectType(MaybeQualifiedName.From("Foo", "Bar"), true, ReferenceCapability.Borrowed);
             var optionalType = new OptionalType(referenceType);
 
             var underlyingType = optionalType.UnderlyingReferenceType();

@@ -15,14 +15,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
     public abstract class Declaration : IMetadata
     {
         public bool IsMember { get; }
-        public Name FullName { get; }
+        public MaybeQualifiedName FullName { get; }
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SimpleName Name => FullName.UnqualifiedName;
 
         public MetadataSet ChildMetadata { get; }
 
-        protected Declaration(bool isMember, Name fullName, MetadataSet childMetadata)
+        protected Declaration(bool isMember, MaybeQualifiedName fullName, MetadataSet childMetadata)
         {
             IsMember = isMember;
             FullName = fullName;

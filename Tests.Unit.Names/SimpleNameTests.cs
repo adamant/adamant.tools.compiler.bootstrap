@@ -113,7 +113,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Names
         {
             var name = new SimpleName("foo");
 
-            var hasQualifier = name.HasQualifier(Name.From("bar"));
+            var hasQualifier = name.HasQualifier(MaybeQualifiedName.From("bar"));
 
             Assert.False(hasQualifier);
         }
@@ -123,7 +123,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Names
         {
             var name = new SimpleName("foo");
 
-            var hasQualifier = name.IsNestedIn(Name.From("bar"));
+            var hasQualifier = name.IsNestedIn(MaybeQualifiedName.From("bar"));
 
             Assert.False(hasQualifier);
         }

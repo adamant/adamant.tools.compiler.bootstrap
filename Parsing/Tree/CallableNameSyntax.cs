@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class CallableNameSyntax : Syntax, ICallableNameSyntax
     {
-        public Name Name { get; }
+        public MaybeQualifiedName Name { get; }
 
         private IFunctionMetadata? referencedFunctionMetadata;
 

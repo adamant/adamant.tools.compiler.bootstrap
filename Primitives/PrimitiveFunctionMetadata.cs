@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 
         public DataType ReturnDataType { get; }
 
-        protected PrimitiveFunctionMetadata(Name fullName, FixedList<PrimitiveParameterMetadata> parameters, DataType returnType)
+        protected PrimitiveFunctionMetadata(MaybeQualifiedName fullName, FixedList<PrimitiveParameterMetadata> parameters, DataType returnType)
             : base(fullName, new MetadataSet(parameters))
         {
             Parameters = parameters;
@@ -23,14 +23,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         }
 
         public static PrimitiveFunctionMetadata New(
-            Name fullName,
+            MaybeQualifiedName fullName,
             params (string name, DataType type)[] parameters)
         {
             return new PrimitiveFunctionMetadata(fullName, ConvertParameters(fullName, parameters), DataType.Void);
         }
 
         public static PrimitiveFunctionMetadata New(
-            Name fullName,
+            MaybeQualifiedName fullName,
             DataType returnType,
             params (string name, DataType type)[] parameters)
         {
@@ -38,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         }
 
         protected static FixedList<PrimitiveParameterMetadata> ConvertParameters(
-            Name fullName,
+            MaybeQualifiedName fullName,
             params (string name, DataType type)[] parameters)
         {
             return parameters.Select(p => new PrimitiveParameterMetadata(fullName.Qualify(p.name), p.type))

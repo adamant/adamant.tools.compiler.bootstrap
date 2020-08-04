@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     name = name.Qualify(identifier.Value);
             var semicolon = Tokens.Expect<ISemicolonToken>();
             var span = TextSpan.Covering(accept.Span, semicolon);
-            return new UsingDirectiveSyntax(span, (Name)name);
+            return new UsingDirectiveSyntax(span, (MaybeQualifiedName)name);
         }
     }
 }

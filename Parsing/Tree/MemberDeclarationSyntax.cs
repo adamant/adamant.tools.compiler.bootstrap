@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public IClassDeclarationSyntax DeclaringClass { get; }
         public IAccessModifierToken? AccessModifier { get; }
 
-        public Name FullName { get; }
+        public MaybeQualifiedName FullName { get; }
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan span,
             CodeFile file,
             IAccessModifierToken? accessModifier,
-            Name fullName,
+            MaybeQualifiedName fullName,
             TextSpan nameSpan,
             MetadataSet? childSymbols = null)
             : base(span, file, nameSpan)

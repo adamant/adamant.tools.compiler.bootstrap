@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 
         private static FixedList<IMetadata> DefinePrimitiveSymbols()
         {
-            var stringType = new ObjectType(Name.From("String"), false, ReferenceCapability.Shared);
+            var stringType = new ObjectType(MaybeQualifiedName.From("String"), false, ReferenceCapability.Shared);
             return new List<IMetadata>
             {
                 // Simple Types
@@ -32,25 +32,25 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
                 PrimitiveTypeMetadata.NewEmptyType(DataType.Never),
 
                 // Intrinsic functions used by the standard library
-                PrimitiveFunctionMetadata.New(Name.From("intrinsics", "mem_allocate"),
+                PrimitiveFunctionMetadata.New(MaybeQualifiedName.From("intrinsics", "mem_allocate"),
                     DataType.Size, ("length", DataType.Size)),
 
-                PrimitiveFunctionMetadata.New(Name.From("intrinsics", "mem_deallocate"),
+                PrimitiveFunctionMetadata.New(MaybeQualifiedName.From("intrinsics", "mem_deallocate"),
                     ("ptr", DataType.Size)),
 
-                PrimitiveFunctionMetadata.New(Name.From("intrinsics", "mem_copy"),
+                PrimitiveFunctionMetadata.New(MaybeQualifiedName.From("intrinsics", "mem_copy"),
                     ("from_ptr", DataType.Size), ("to_ptr", DataType.Size), ("length", DataType.Size)),
 
-                PrimitiveFunctionMetadata.New(Name.From("intrinsics", "mem_set_byte"),
+                PrimitiveFunctionMetadata.New(MaybeQualifiedName.From("intrinsics", "mem_set_byte"),
                     ("ptr", DataType.Size), ("value", DataType.Byte)),
 
-                PrimitiveFunctionMetadata.New(Name.From("intrinsics", "mem_get_byte"),
+                PrimitiveFunctionMetadata.New(MaybeQualifiedName.From("intrinsics", "mem_get_byte"),
                     DataType.Byte, ("ptr", DataType.Size)),
 
-                PrimitiveFunctionMetadata.New(Name.From("intrinsics", "print_utf8"),
+                PrimitiveFunctionMetadata.New(MaybeQualifiedName.From("intrinsics", "print_utf8"),
                     ("ptr", DataType.Size), ("length", DataType.Size)),
 
-                PrimitiveFunctionMetadata.New(Name.From("intrinsics", "read_utf8_line"),
+                PrimitiveFunctionMetadata.New(MaybeQualifiedName.From("intrinsics", "read_utf8_line"),
                     DataType.Size, ("ptr", DataType.Size), ("length", DataType.Size)),
             }.ToFixedList();
         }

@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal class VariableDeclarationStatementSyntax : StatementSyntax, IVariableDeclarationStatementSyntax
     {
         public bool IsMutableBinding { [DebuggerStepThrough] get; }
-        public Name FullName { [DebuggerStepThrough] get; }
+        public MaybeQualifiedName FullName { [DebuggerStepThrough] get; }
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SimpleName Name => FullName.UnqualifiedName;
@@ -52,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public VariableDeclarationStatementSyntax(
             TextSpan span,
             bool isMutableBinding,
-            Name fullName,
+            MaybeQualifiedName fullName,
             TextSpan nameSpan,
             ITypeSyntax? typeSyntax,
             bool inferMutableType,

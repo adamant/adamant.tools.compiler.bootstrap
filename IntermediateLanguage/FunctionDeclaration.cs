@@ -25,7 +25,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         public FunctionDeclaration(
             bool isExternal,
             bool isMember,
-            Name name,
+            MaybeQualifiedName name,
             FixedList<Parameter> parameters,
             DataType returnType,
             ControlFlowGraph il)

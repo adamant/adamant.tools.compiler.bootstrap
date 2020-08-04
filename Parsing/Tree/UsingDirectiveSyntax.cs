@@ -7,9 +7,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal class UsingDirectiveSyntax : Syntax, IUsingDirectiveSyntax
     {
         // For now, we only support namespace names
-        public Name Name { get; }
+        public MaybeQualifiedName Name { get; }
 
-        public UsingDirectiveSyntax(TextSpan span, Name name)
+        public UsingDirectiveSyntax(TextSpan span, MaybeQualifiedName name)
             : base(span)
         {
             Name = name;

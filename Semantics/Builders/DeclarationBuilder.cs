@@ -114,7 +114,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
                 return declaration;
 
             var selfType = classDeclaration.DeclaresDataType.Fulfilled();
-            var selfParameter = new Parameter(false, SpecialName.Self, selfType);
+            var selfParameter = new Parameter(false, SpecialNames.Self, selfType);
             var parameters = selfParameter.Yield().ToFixedList();
 
             var graph = new ControlFlowGraphBuilder(classDeclaration.File);
@@ -147,7 +147,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Builders
         private static FixedList<Parameter> BuildConstructorParameters(IConstructorDeclarationSyntax constructorDeclaration)
         {
             var selfType = constructorDeclaration.SelfParameterType.Known();
-            var selfParameter = new Parameter(false, SpecialName.Self, selfType);
+            var selfParameter = new Parameter(false, SpecialNames.Self, selfType);
             return selfParameter.Yield().Concat(constructorDeclaration.Parameters.Select(BuildParameter)).ToFixedList();
         }
 

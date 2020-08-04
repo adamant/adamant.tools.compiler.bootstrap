@@ -114,7 +114,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface ICallableNameSyntax : ISyntax
     {
-        Name Name { get; }
+        MaybeQualifiedName Name { get; }
     }
 
     public partial interface ICanReachAnnotationSyntax : IReachabilityAnnotationSyntax
@@ -311,7 +311,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(IMethodInvocationExpressionSyntax))]
     public partial interface IInvocationExpressionSyntax : IExpressionSyntax
     {
-        Name FullName { get; }
+        MaybeQualifiedName FullName { get; }
         FixedList<IArgumentSyntax> Arguments { get; }
     }
 
@@ -373,8 +373,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface INamespaceDeclarationSyntax : INonMemberDeclarationSyntax, IDeclarationSyntax
     {
         bool IsGlobalQualified { get; }
-        Name Name { get; }
-        Name FullName { get; }
+        MaybeQualifiedName Name { get; }
+        MaybeQualifiedName FullName { get; }
         FixedList<IUsingDirectiveSyntax> UsingDirectives { get; }
         FixedList<INonMemberDeclarationSyntax> Declarations { get; }
     }
@@ -496,7 +496,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
     public partial interface IUsingDirectiveSyntax : ISyntax
     {
-        Name Name { get; }
+        MaybeQualifiedName Name { get; }
     }
 
     public partial interface IVariableDeclarationStatementSyntax : IBodyStatementSyntax, IBindingMetadata

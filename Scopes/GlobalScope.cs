@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Scopes
         {
         }
 
-        public override FixedList<IMetadata> LookupMetadataInGlobalScope(Name name)
+        public override FixedList<IMetadata> LookupMetadataInGlobalScope(MaybeQualifiedName name)
         {
             // Don't include nested scopes, it must be in the global scope because it is global qualified
             return LookupMetadata(name, includeNested: false);

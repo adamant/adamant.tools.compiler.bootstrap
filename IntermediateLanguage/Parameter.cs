@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         public SimpleName Name { get; }
         public DataType DataType { get; internal set; }
 
-        Name IMetadata.FullName => throw new NotImplementedException();
+        MaybeQualifiedName IMetadata.FullName => throw new NotImplementedException();
 
         public Parameter(
             bool isMutableBinding,

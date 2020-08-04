@@ -437,7 +437,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
                     }
                     var constructedType = (ObjectType)constructingType;
                     var typeSymbol = exp.TypeSyntax.ContainingScope.Assigned().GetMetadataForType(constructedType);
-                    var constructors = typeSymbol.ChildMetadata[SpecialName.New].OfType<IFunctionMetadata>().ToFixedList();
+                    var constructors = typeSymbol.ChildMetadata[SpecialNames.New].OfType<IFunctionMetadata>().ToFixedList();
                     constructors = ResolveOverload(constructors, argumentTypes);
                     switch (constructors.Count)
                     {
@@ -784,7 +784,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
         /// Used on the target of a method invocation to see if it is really the name of a namespace or class
         /// </summary>
         /// <returns>A name if the expression is a qualified name, otherwise null</returns>
-        private static Name? MethodContextAsName(IExpressionSyntax expression)
+        private static MaybeQualifiedName? MethodContextAsName(IExpressionSyntax expression)
         {
             return expression switch
             {

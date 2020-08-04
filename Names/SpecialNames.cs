@@ -1,6 +1,6 @@
 namespace Adamant.Tools.Compiler.Bootstrap.Names
 {
-    public static class SpecialName
+    public static class SpecialNames
     {
         // The name of the `UnknownSymbol`
         public static readonly SimpleName Unknown = SimpleName.Special("unknown");

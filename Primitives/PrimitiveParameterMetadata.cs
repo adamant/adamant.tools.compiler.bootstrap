@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
 
         public bool IsMutableBinding => false;
 
-        public PrimitiveParameterMetadata(Name fullName, DataType type)
+        public PrimitiveParameterMetadata(MaybeQualifiedName fullName, DataType type)
             : base(fullName, MetadataSet.Empty)
         {
             DataType = type;

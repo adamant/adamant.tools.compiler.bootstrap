@@ -53,7 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Types
         {
             var type = BoolType.Instance;
 
-            Assert.Equal(SpecialName.Bool, type.Name);
+            Assert.Equal(SpecialNames.Bool, type.Name);
         }
 
         [Fact]

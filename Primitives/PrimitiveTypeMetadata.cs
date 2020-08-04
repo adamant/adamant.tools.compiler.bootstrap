@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         private DataType? declaresType;
 
         protected PrimitiveTypeMetadata(
-            Name fullName,
+            MaybeQualifiedName fullName,
             DataType? declaresType,
             IEnumerable<IMetadata>? childSymbols = null)
             : base(fullName, new MetadataSet(childSymbols ?? Enumerable.Empty<IMetadata>()))
@@ -26,7 +26,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             internal set => declaresType = value;
         }
 
-        public static PrimitiveTypeMetadata NewType(Name fullName, IEnumerable<IMetadata> childSymbols)
+        public static PrimitiveTypeMetadata NewType(MaybeQualifiedName fullName, IEnumerable<IMetadata> childSymbols)
         {
             return new PrimitiveTypeMetadata(fullName, null, childSymbols);
         }
@@ -43,7 +43,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
             return new PrimitiveTypeMetadata(type.Name, type);
         }
 
-        public static PrimitiveTypeMetadata New(Name fullName, DataType? type = null)
+        public static PrimitiveTypeMetadata New(MaybeQualifiedName fullName, DataType? type = null)
         {
             return new PrimitiveTypeMetadata(fullName, type);
         }

@@ -33,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                     var mutableSelf = Tokens.Accept<IMutableKeywordToken>();
                     var selfSpan = Tokens.Expect<ISelfKeywordToken>();
                     span = TextSpan.Covering(span, selfSpan);
-                    var name = nameContext.Qualify(SpecialName.Self);
+                    var name = nameContext.Qualify(SpecialNames.Self);
                     return new SelfParameterSyntax(span, name, mutableSelf);
                 }
                 default:

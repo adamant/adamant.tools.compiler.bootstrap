@@ -42,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.NotImplemented
                         diagnostics.Add(ParseError.NotImplemented(file, syn.DefaultValue.Span, "Default values"));
                     break;
                 case IConstructorDeclarationSyntax syn:
-                    if (syn.Name != SpecialName.New)
+                    if (syn.Name != SpecialNames.New)
                         diagnostics.Add(ParseError.NotImplemented(file, syn.Span, "Named constructors"));
                     break;
                 case IFieldDeclarationSyntax syn:

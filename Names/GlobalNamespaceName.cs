@@ -16,19 +16,19 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
 
         public override IEnumerable<SimpleName> Segments => Enumerable.Empty<SimpleName>();
 
-        public override Name Qualify(Name name)
+        public override MaybeQualifiedName Qualify(MaybeQualifiedName name)
         {
             return name;
         }
 
-        public override IEnumerable<Name> NestedInNames()
+        public override IEnumerable<MaybeQualifiedName> NestedInNames()
         {
-            return Enumerable.Empty<Name>();
+            return Enumerable.Empty<MaybeQualifiedName>();
         }
 
-        public override IEnumerable<Name> NamespaceNames()
+        public override IEnumerable<MaybeQualifiedName> NamespaceNames()
         {
-            return Enumerable.Empty<Name>();
+            return Enumerable.Empty<MaybeQualifiedName>();
         }
 
         public override string ToString()

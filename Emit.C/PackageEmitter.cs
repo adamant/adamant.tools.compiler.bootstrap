@@ -61,12 +61,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             var arguments = new List<string>();
             foreach (var parameterTypeName in entryPoint.Parameters.Select(p => p.DataType).Cast<ObjectType>().Select(t => t.FullName))
             {
-                if (parameterTypeName.Equals(Name.From("system", "console", "Console")))
+                if (parameterTypeName.Equals(MaybeQualifiedName.From("system", "console", "Console")))
                 {
                     code.Definitions.AppendLine("system__console__Console console = { &system__console__Console___vtable, malloc(sizeof(system__console__Console___Self)) };");
                     arguments.Add("system__console__Console___new__1(console)");
                 }
-                else if (parameterTypeName.Equals(Name.From("system", "console", "Arguments")))
+                else if (parameterTypeName.Equals(MaybeQualifiedName.From("system", "console", "Arguments")))
                     throw new NotImplementedException();
                 else
                     throw new Exception($"Unexpected type for parameter to main: {parameterTypeName}");

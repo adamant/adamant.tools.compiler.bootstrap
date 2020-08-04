@@ -13,8 +13,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal class ForeachExpressionSyntax : ExpressionSyntax, IForeachExpressionSyntax
     {
         public bool IsMutableBinding { get; }
-        Name IMetadata.FullName => FullVariableName;
-        private Name FullVariableName { get; }
+        MaybeQualifiedName IMetadata.FullName => FullVariableName;
+        private MaybeQualifiedName FullVariableName { get; }
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SimpleName VariableName => FullVariableName.UnqualifiedName;
@@ -45,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public ForeachExpressionSyntax(
             TextSpan span,
             bool isMutableBinding,
-            Name fullVariableName,
+            MaybeQualifiedName fullVariableName,
             ITypeSyntax? typeSyntax,
             IExpressionSyntax inExpression,
             IBlockExpressionSyntax block)

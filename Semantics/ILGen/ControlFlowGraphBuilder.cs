@@ -45,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen
         public VariableDeclaration AddSelfParameter(DataType type)
         {
             Requires.That("variableNumber", variables.Count == 0, "Self parameter must have variable number 0");
-            var variable = new VariableDeclaration(true, false, type, Variable.Self, null, SpecialName.Self);
+            var variable = new VariableDeclaration(true, false, type, Variable.Self, null, SpecialNames.Self);
             variables.Add(variable);
             return variable;
         }

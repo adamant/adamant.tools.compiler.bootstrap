@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata
 
         // We don't know what this is, so it might be mutable (fewer errors that way)
         public bool IsMutableBinding => true;
-        public Name FullName => SpecialName.Unknown;
+        public MaybeQualifiedName FullName => SpecialNames.Unknown;
         public DataType DataType => DataType.Unknown;
         public DataType DeclaresDataType => DataType.Unknown;
         public MetadataSet ChildMetadata => MetadataSet.Empty;

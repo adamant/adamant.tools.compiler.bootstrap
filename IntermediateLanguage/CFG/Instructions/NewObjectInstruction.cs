@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
 {
     public class NewObjectInstruction : InstructionWithResult
     {
-        public Name Constructor { get; }
+        public MaybeQualifiedName Constructor { get; }
         /// <summary>
         /// The type being constructed
         /// </summary>
@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
 
         public NewObjectInstruction(
             Place resultPlace,
-            Name constructor,
+            MaybeQualifiedName constructor,
             ObjectType constructedType,
             FixedList<Operand> arguments,
             TextSpan span,

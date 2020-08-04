@@ -62,7 +62,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
                 "Expression must be of type `bool`");
         }
 
-        public static Diagnostic CircularDefinition(CodeFile file, TextSpan span, Name typeDeclarationName)
+        public static Diagnostic CircularDefinition(CodeFile file, TextSpan span, MaybeQualifiedName typeDeclarationName)
         {
             return new Diagnostic(file, span, DiagnosticLevel.FatalCompilationError, DiagnosticPhase.Analysis, 3006,
                 $"Declaration of type `{typeDeclarationName}` is part of a circular definition");

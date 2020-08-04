@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         IEnumerable<IBindingMetadata> IFunctionMetadata.Parameters => Parameters;
 
         public ConstructorDeclaration(
-            Name fullName,
+            MaybeQualifiedName fullName,
             FixedList<Parameter> parameters,
             DataType returnType,
             FixedList<FieldInitialization> fieldInitializations,

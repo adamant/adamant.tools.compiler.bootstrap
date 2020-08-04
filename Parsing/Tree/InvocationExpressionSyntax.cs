@@ -8,12 +8,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal abstract class InvocationExpressionSyntax : ExpressionSyntax, IInvocationExpressionSyntax
     {
-        public Name FullName { [DebuggerStepThrough] get; }
+        public MaybeQualifiedName FullName { [DebuggerStepThrough] get; }
         public FixedList<IArgumentSyntax> Arguments { [DebuggerStepThrough] get; }
 
         private protected InvocationExpressionSyntax(
             TextSpan span,
-            Name functionName,
+            MaybeQualifiedName functionName,
             FixedList<IArgumentSyntax> arguments)
             : base(span)
         {

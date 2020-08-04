@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         public IBindingMetadata SelfParameterMetadata { get; }
 
         private PrimitiveMethodMetadata(
-            Name fullName,
+            MaybeQualifiedName fullName,
             PrimitiveParameterMetadata selfParameter,
             FixedList<PrimitiveParameterMetadata> parameters,
             DataType returnType)
@@ -20,12 +20,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Primitives
         }
 
         public static PrimitiveMethodMetadata New(
-            Name fullName,
+            MaybeQualifiedName fullName,
             DataType returnType,
             DataType selfType,
             params (string name, DataType type)[] parameters)
         {
-            var selfParameter = new PrimitiveParameterMetadata(fullName.Qualify(SpecialName.Self), selfType);
+            var selfParameter = new PrimitiveParameterMetadata(fullName.Qualify(SpecialNames.Self), selfType);
             return new PrimitiveMethodMetadata(fullName, selfParameter, ConvertParameters(fullName, parameters), returnType);
         }
     }

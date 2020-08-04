@@ -102,7 +102,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             return mapping.GetAscii(builder.ToString());
         }
 
-        public string Mangle(Name name)
+        public string Mangle(MaybeQualifiedName name)
         {
             var builder = new StringBuilder(EstimateSize(name));
             Mangle(name, builder);
@@ -114,7 +114,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             return Mangle(new SimpleName(name));
         }
 
-        private static int EstimateSize(Name name)
+        private static int EstimateSize(MaybeQualifiedName name)
         {
             return name switch
             {
@@ -125,7 +125,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Emit.C
             };
         }
 
-        private static void Mangle(Name name, StringBuilder builder)
+        private static void Mangle(MaybeQualifiedName name, StringBuilder builder)
         {
             switch (name)
             {

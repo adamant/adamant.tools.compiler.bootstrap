@@ -45,7 +45,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         /// However, the syntax of a package has both namespace declarations and implicit
         /// namespaces of compilation units and can have empty namespaces.
         /// </summary>
-        private static IEnumerable<Name> GetNamespaceNames(
+        private static IEnumerable<MaybeQualifiedName> GetNamespaceNames(
             PackageSyntax packageSyntax,
             FixedDictionary<string, Package> references)
         {
@@ -71,7 +71,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                              .Concat(PrimitiveMetadataDefinitions.Instance).ToFixedList();
         }
 
-        private static IEnumerable<Namespace> BuildNamespaces(IEnumerable<Name> namespaceNames, IEnumerable<IMetadata> nonMemberEntitySymbols)
+        private static IEnumerable<Namespace> BuildNamespaces(IEnumerable<MaybeQualifiedName> namespaceNames, IEnumerable<IMetadata> nonMemberEntitySymbols)
         {
             var symbols = new List<IMetadata>(nonMemberEntitySymbols);
             // Process longest to shortest so nested namespaces will be available to construct outer namespaces

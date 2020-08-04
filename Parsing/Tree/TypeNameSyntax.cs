@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     /// </summary>
     internal class TypeNameSyntax : TypeSyntax, ITypeNameSyntax
     {
-        public Name Name { get; }
+        public MaybeQualifiedName Name { get; }
 
         private IMetadata? referencedSymbol;
         [DisallowNull]
@@ -42,7 +42,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             }
         }
 
-        public TypeNameSyntax(TextSpan span, Name name)
+        public TypeNameSyntax(TextSpan span, MaybeQualifiedName name)
             : base(span)
         {
             Name = name;

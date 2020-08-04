@@ -20,7 +20,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Scopes
             this.nestedMetadata = nestedMetadata;
         }
 
-        public abstract FixedList<IMetadata> LookupMetadataInGlobalScope(Name name);
+        public abstract FixedList<IMetadata> LookupMetadataInGlobalScope(MaybeQualifiedName name);
 
         public virtual FixedList<IMetadata> LookupMetadata(SimpleName name, bool includeNested = true)
         {
@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Scopes
                 : (includeNested && nestedMetadata.TryGetValue(name, out var nestedDeclaration) ? nestedDeclaration : FixedList<IMetadata>.Empty);
         }
 
-        public FixedList<IMetadata> LookupMetadata(Name name, bool includeNested = true)
+        public FixedList<IMetadata> LookupMetadata(MaybeQualifiedName name, bool includeNested = true)
         {
             switch (name)
             {

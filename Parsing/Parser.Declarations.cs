@@ -103,11 +103,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
                 nameContext, usingDirectives, declarations);
         }
 
-        private (Name, TextSpan) ParseNamespaceName()
+        private (MaybeQualifiedName, TextSpan) ParseNamespaceName()
         {
             var firstSegment = Tokens.RequiredToken<IIdentifierToken>();
             var span = firstSegment.Span;
-            Name name = new SimpleName(firstSegment.Value);
+            MaybeQualifiedName name = new SimpleName(firstSegment.Value);
 
             while (Tokens.Accept<IDotToken>())
             {
@@ -282,10 +282,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             modifiers.ParseEndOfModifiers();
             var newKeywordSpan = Tokens.Expect<INewKeywordToken>();
             var identifier = Tokens.AcceptToken<IIdentifierToken>();
-            var name = nameContext.Qualify(SpecialName.Constructor(identifier?.Value));
+            var name = nameContext.Qualify(SpecialNames.Constructor(identifier?.Value));
             var bodyParser = NestedParser(name);
             // Implicit self parameter is taken to be after the current token which is expected to be `(`
-            var selfParameter = new SelfParameterSyntax(Tokens.Current.Span.AtEnd(), name.Qualify(SpecialName.Self), true);
+            var selfParameter = new SelfParameterSyntax(Tokens.Current.Span.AtEnd(), name.Qualify(SpecialNames.Self), true);
             var parameters = bodyParser.ParseParameters(bodyParser.ParseConstructorParameter);
             var body = bodyParser.ParseFunctionBody();
             // For now, just say constructors have no annotations

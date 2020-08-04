@@ -68,7 +68,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Errors
                 $"Method call is ambiguous.");
         }
 
-        public static Diagnostic UsingNonExistentNamespace(CodeFile file, TextSpan span, Name ns)
+        public static Diagnostic UsingNonExistentNamespace(CodeFile file, TextSpan span, MaybeQualifiedName ns)
         {
             return new Diagnostic(file, span, DiagnosticLevel.CompilationError, DiagnosticPhase.Analysis, 5010,
                 $"Using directive refers to namespace `{ns}` which does not exist");

@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal abstract class ParameterSyntax : Syntax, IParameterSyntax
     {
         public abstract bool IsMutableBinding { get; }
-        public Name FullName { get; }
+        public MaybeQualifiedName FullName { get; }
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SimpleName Name => FullName.UnqualifiedName;
@@ -22,7 +22,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         DataType IBindingMetadata.DataType => DataType.Fulfilled();
 
-        protected ParameterSyntax(TextSpan span, Name fullName)
+        protected ParameterSyntax(TextSpan span, MaybeQualifiedName fullName)
             : base(span)
         {
             FullName = fullName;

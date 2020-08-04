@@ -13,8 +13,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         /// declared using the package qualifier `namespace ::example { }`.
         /// </summary>
         public bool IsGlobalQualified { get; }
-        public Name Name { get; }
-        public Name FullName { get; }
+        public MaybeQualifiedName Name { get; }
+        public MaybeQualifiedName FullName { get; }
         /// <summary>
         /// The name context is the part of the namespace determined by the file
         /// location and any containing namespace declarations.
@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan span,
             CodeFile file,
             bool isGlobalQualified,
-            Name name,
+            MaybeQualifiedName name,
             TextSpan nameSpan,
             RootName nameContext,
             FixedList<IUsingDirectiveSyntax> usingDirectives,

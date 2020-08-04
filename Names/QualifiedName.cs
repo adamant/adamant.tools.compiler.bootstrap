@@ -9,13 +9,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
     /// A qualified name doesn't include the package. This is because the
     /// package name could be aliased.
     /// </summary>
-    public sealed class QualifiedName : Name
+    public sealed class QualifiedName : MaybeQualifiedName
     {
-        public Name Qualifier { get; }
+        public MaybeQualifiedName Qualifier { get; }
         public override SimpleName UnqualifiedName { get; }
 
         public QualifiedName(
-            Name qualifier,
+            MaybeQualifiedName qualifier,
             SimpleName simpleName)
         {
             Qualifier = qualifier;
@@ -26,22 +26,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public override IEnumerable<SimpleName> Segments => Qualifier.Segments.Append(UnqualifiedName);
 
-        public override IEnumerable<Name> NestedInNames()
+        public override IEnumerable<MaybeQualifiedName> NestedInNames()
         {
             return Qualifier.NestedInNames().Append(Qualifier);
         }
 
-        public override IEnumerable<Name> NamespaceNames()
+        public override IEnumerable<MaybeQualifiedName> NamespaceNames()
         {
             return Qualifier.NamespaceNames().Append(this);
         }
 
-        public override bool HasQualifier(Name name)
+        public override bool HasQualifier(MaybeQualifiedName name)
         {
             return Qualifier.Equals(name);
         }
 
-        public override bool IsNestedIn(Name name)
+        public override bool IsNestedIn(MaybeQualifiedName name)
         {
             return Qualifier.Equals(name) || Qualifier.IsNestedIn(name);
         }
@@ -52,7 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         }
 
         #region Equals
-        public override bool Equals(Name? other)
+        public override bool Equals(MaybeQualifiedName? other)
         {
             return other is QualifiedName name
                    && UnqualifiedName.Equals(name.UnqualifiedName)

@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         public DataType DeclaresDataType { get; }
 
         public ClassDeclaration(
-            Name name,
+            MaybeQualifiedName name,
             DataType declaresType,
             FixedList<Declaration> members)
             : base(false, name, new MetadataSet(members))

@@ -6,10 +6,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 {
     internal class Namespace : INamespaceMetadata
     {
-        public Name FullName { get; }
+        public MaybeQualifiedName FullName { get; }
         public MetadataSet ChildMetadata { get; }
         public MetadataSet NestedSymbols { get; }
-        public Namespace(Name fullName, IEnumerable<IMetadata> childSymbols, IEnumerable<IMetadata> nestedSymbols)
+        public Namespace(MaybeQualifiedName fullName, IEnumerable<IMetadata> childSymbols, IEnumerable<IMetadata> nestedSymbols)
         {
             FullName = fullName;
             ChildMetadata = new MetadataSet(childSymbols);

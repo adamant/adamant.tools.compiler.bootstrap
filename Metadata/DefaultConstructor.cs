@@ -7,7 +7,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata
 {
     public sealed class DefaultConstructor : IFunctionMetadata
     {
-        public Name FullName { get; }
+        public MaybeQualifiedName FullName { get; }
         public DataType ConstructedType { get; }
 
         MetadataSet IParentMetadata.ChildMetadata => MetadataSet.Empty;
@@ -18,7 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Metadata
         public DefaultConstructor(ObjectType constructedType)
         {
             ConstructedType = constructedType;
-            FullName = constructedType.FullName.Qualify(SpecialName.New);
+            FullName = constructedType.FullName.Qualify(SpecialNames.New);
         }
     }
 }

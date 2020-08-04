@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan span,
             CodeFile file,
             IAccessModifierToken? accessModifier,
-            Name fullName,
+            MaybeQualifiedName fullName,
             TextSpan nameSpan,
             FixedList<INamedParameterSyntax> parameters,
             ITypeSyntax? returnTypeSyntax,

@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
         IEnumerable<IBindingMetadata> IFunctionMetadata.Parameters => Parameters;
 
         public MethodDeclaration(
-            Name name,
+            MaybeQualifiedName name,
             Parameter selfParameter,
             FixedList<Parameter> parameters,
             DataType returnType,

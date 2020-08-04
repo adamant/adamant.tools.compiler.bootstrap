@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax
     internal class CallableNameSyntax : ICallableNameSyntax
     {
         public TextSpan Span { get; }
-        public Name Name { get; }
+        public MaybeQualifiedName Name { get; }
 
         private IFunctionMetadata? referencedSymbol;
 
@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax
             set => throw new InvalidOperationException("Can't set containing scope repeatedly");
         }
 
-        public CallableNameSyntax(TextSpan span, Name name, LexicalScope containingScope)
+        public CallableNameSyntax(TextSpan span, MaybeQualifiedName name, LexicalScope containingScope)
         {
             Span = span;
             Name = name;

@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public NamedParameterSyntax(
             TextSpan span,
             bool isMutableBinding,
-            Name fullName,
+            MaybeQualifiedName fullName,
             ITypeSyntax typeSyntax,
             IExpressionSyntax? defaultValue)
             : base(span, fullName)

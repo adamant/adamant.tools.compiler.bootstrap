@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public override bool IsMutableBinding => MutableSelf;
         public bool MutableSelf { get; }
 
-        public SelfParameterSyntax(TextSpan span, Name fullName, bool mutableSelf)
+        public SelfParameterSyntax(TextSpan span, MaybeQualifiedName fullName, bool mutableSelf)
             : base(span, fullName)
         {
             MutableSelf = mutableSelf;

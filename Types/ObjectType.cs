@@ -18,13 +18,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
     /// </remarks>
     public sealed class ObjectType : ReferenceType
     {
-        public Name FullName { get; }
+        public MaybeQualifiedName FullName { get; }
 
         public override bool IsKnown { [DebuggerStepThrough] get => true; }
 
         // TODO referenceCapability needs to match declared mutable?
         public ObjectType(
-            Name fullName,
+            MaybeQualifiedName fullName,
             bool declaredMutable,
             ReferenceCapability referenceCapability)
             : base(declaredMutable, referenceCapability)

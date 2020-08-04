@@ -7,7 +7,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Names
 {
-    public sealed class SimpleName : Name
+    public sealed class SimpleName : MaybeQualifiedName
     {
         private static readonly Regex NeedsQuoted = new Regex(@"[\\ #ₛ]", RegexOptions.Compiled);
 
@@ -50,23 +50,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public override IEnumerable<SimpleName> Segments => this.Yield();
 
-        public override IEnumerable<Name> NestedInNames()
+        public override IEnumerable<MaybeQualifiedName> NestedInNames()
         {
-            return Enumerable.Empty<Name>();
+            return Enumerable.Empty<MaybeQualifiedName>();
         }
 
-        public override IEnumerable<Name> NamespaceNames()
+        public override IEnumerable<MaybeQualifiedName> NamespaceNames()
         {
             return this.Yield();
         }
 
-        public override bool HasQualifier(Name name)
+        public override bool HasQualifier(MaybeQualifiedName name)
         {
             // A simple name doesn't have a qualifier
             return false;
         }
 
-        public override bool IsNestedIn(Name name)
+        public override bool IsNestedIn(MaybeQualifiedName name)
         {
             // A simple name isn't nested in any other names
             return false;
@@ -90,7 +90,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         }
 
         #region Equals
-        public override bool Equals(Name? other)
+        public override bool Equals(MaybeQualifiedName? other)
         {
             return other is SimpleName name
                 && Text == name.Text

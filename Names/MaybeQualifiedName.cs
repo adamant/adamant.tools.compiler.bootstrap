@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
     [Closed(
         typeof(SimpleName),
         typeof(QualifiedName))]
-    public abstract class Name : RootName, IEquatable<Name>
+    public abstract class MaybeQualifiedName : RootName, IEquatable<MaybeQualifiedName>
     {
         /// <summary>
         /// The unqualified (i.e. SimpleName) portion of the name
@@ -19,23 +19,23 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
 
         public abstract SimpleName UnqualifiedName { get; }
 
-        private protected Name() { }
+        private protected MaybeQualifiedName() { }
 
         /// <summary>
         /// Construct a name from its segments
         /// </summary>
 
-        public static Name From(
+        public static MaybeQualifiedName From(
             string firstSegment,
             params string[] segments)
         {
-            Name name = new SimpleName(firstSegment);
+            MaybeQualifiedName name = new SimpleName(firstSegment);
             foreach (var segment in segments)
                 name = name.Qualify(segment);
             return name;
         }
 
-        public override Name Qualify(Name name)
+        public override MaybeQualifiedName Qualify(MaybeQualifiedName name)
         {
             return name switch
             {
@@ -46,30 +46,30 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
             };
         }
 
-        public abstract bool HasQualifier(Name name);
+        public abstract bool HasQualifier(MaybeQualifiedName name);
 
-        public abstract bool IsNestedIn(Name name);
+        public abstract bool IsNestedIn(MaybeQualifiedName name);
 
         public abstract override string ToString();
 
         #region Equality
-        public abstract bool Equals(Name? other);
+        public abstract bool Equals(MaybeQualifiedName? other);
 
         public sealed override bool Equals(object? obj)
         {
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj.GetType() == GetType() && Equals((Name)obj);
+            return obj.GetType() == GetType() && Equals((MaybeQualifiedName)obj);
         }
 
         public abstract override int GetHashCode();
 
-        public static bool operator ==(Name? name1, Name? name2)
+        public static bool operator ==(MaybeQualifiedName? name1, MaybeQualifiedName? name2)
         {
             return Equals(name1, name2);
         }
 
-        public static bool operator !=(Name? name1, Name? name2)
+        public static bool operator !=(MaybeQualifiedName? name1, MaybeQualifiedName? name2)
         {
             return !(name1 == name2);
         }

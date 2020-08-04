@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             CodeFile file,
             IAccessModifierToken? accessModifier,
             bool mutableBinding,
-            Name fullName,
+            MaybeQualifiedName fullName,
             TextSpan nameSpan,
             ITypeSyntax typeSyntax,
             IExpressionSyntax? initializer)

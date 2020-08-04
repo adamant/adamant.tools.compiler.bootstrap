@@ -38,7 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Types
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(SpecialName.Any, ReferenceCapability);
+            return HashCode.Combine(SpecialNames.Any, ReferenceCapability);
         }
 
         protected internal override Self To_ReturnsSelf(ReferenceCapability referenceCapability)

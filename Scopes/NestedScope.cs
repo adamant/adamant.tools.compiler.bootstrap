@@ -27,7 +27,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Scopes
             : this(containingScope, new MetadataSet(symbol.Yield()), MetadataSet.Empty)
         { }
 
-        public override FixedList<IMetadata> LookupMetadataInGlobalScope(Name name)
+        public override FixedList<IMetadata> LookupMetadataInGlobalScope(MaybeQualifiedName name)
         {
             return ContainingScope.LookupMetadataInGlobalScope(name);
         }

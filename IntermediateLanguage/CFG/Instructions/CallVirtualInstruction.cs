@@ -9,7 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
     public class CallVirtualInstruction : Instruction
     {
         public Place? ResultPlace { get; }
-        public Name Function { get; }
+        public MaybeQualifiedName Function { get; }
 
         public Operand Self { get; }
 
@@ -19,7 +19,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
         public CallVirtualInstruction(
             Place? resultPlace,
             Operand self,
-            Name function,
+            MaybeQualifiedName function,
             FixedList<Operand> arguments,
             TextSpan span,
             Scope scope)
@@ -33,7 +33,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage.CFG.Instructions
 
         public CallVirtualInstruction(
             Operand self,
-            Name function,
+            MaybeQualifiedName function,
             FixedList<Operand> arguments,
             TextSpan span,
             Scope scope)

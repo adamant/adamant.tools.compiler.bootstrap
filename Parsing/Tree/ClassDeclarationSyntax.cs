@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     {
         public IAccessModifierToken? AccessModifier { get; }
         public IMutableKeywordToken? MutableModifier { get; }
-        public Name FullName { get; }
+        public MaybeQualifiedName FullName { get; }
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -34,7 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             CodeFile file,
             IAccessModifierToken? accessModifier,
             IMutableKeywordToken? mutableModifier,
-            Name fullName,
+            MaybeQualifiedName fullName,
             TextSpan nameSpan,
             Func<IClassDeclarationSyntax, (FixedList<IMemberDeclarationSyntax>, TextSpan)> parseMembers)
             : base(headerSpan, file, nameSpan)
