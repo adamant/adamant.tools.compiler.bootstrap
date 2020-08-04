@@ -179,7 +179,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     {
         CodeFile File { get; }
         TextSpan NameSpan { get; }
-        Promise<Symbol> Symbol { get; }
+        Promise<Symbol?> Symbol { get; }
     }
 
     [Closed(

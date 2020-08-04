@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     {
         public CodeFile File { get; }
         public TextSpan NameSpan { get; }
-        public Promise<Symbol> Symbol { get; } = new Promise<Symbol>();
+        public Promise<Symbol?> Symbol { get; } = new Promise<Symbol?>();
 
         protected DeclarationSyntax(TextSpan span, CodeFile file, TextSpan nameSpan)
             : base(span)

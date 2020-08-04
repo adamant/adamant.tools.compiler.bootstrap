@@ -87,10 +87,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Unit.Names", "Tests.U
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Unit.CodeGen", "Tests.Unit.CodeGen\Tests.Unit.CodeGen.csproj", "{C57EB532-BEE5-4238-BF35-4B77F77E5FD5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AST", "AST\AST.csproj", "{411991A2-008D-4661-8307-6E07FC813704}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AST", "AST\AST.csproj", "{411991A2-008D-4661-8307-6E07FC813704}"
 	ProjectSection(ProjectDependencies) = postProject
 		{4D709360-03ED-4A76-8EBB-18B89462A9DB} = {4D709360-03ED-4A76-8EBB-18B89462A9DB}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LexicalScopes", "LexicalScopes\LexicalScopes.csproj", "{C78245F3-71A5-4628-8796-79B8FC3C7690}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -234,6 +236,10 @@ Global
 		{411991A2-008D-4661-8307-6E07FC813704}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{411991A2-008D-4661-8307-6E07FC813704}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{411991A2-008D-4661-8307-6E07FC813704}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C78245F3-71A5-4628-8796-79B8FC3C7690}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C78245F3-71A5-4628-8796-79B8FC3C7690}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C78245F3-71A5-4628-8796-79B8FC3C7690}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C78245F3-71A5-4628-8796-79B8FC3C7690}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

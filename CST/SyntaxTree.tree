@@ -38,7 +38,7 @@ ConcreteCallableDeclaration: CallableDeclaration = Body;
 ConcreteMethodDeclaration: MethodDeclaration, ConcreteCallableDeclaration;
 ConstructorDeclaration: MemberDeclaration, ConcreteCallableDeclaration = ImplicitSelfParameter:SelfParameter;
 ConstructorParameter: Parameter;
-Declaration = File:CodeFile NameSpan:TextSpan Symbol:Promise<Symbol>;
+Declaration = File:CodeFile NameSpan:TextSpan Symbol:Promise<Symbol?>;
 ElseClause;
 EntityDeclaration: Declaration = AccessModifier:IAccessModifierToken?;
 ExpressionStatement: BodyStatement;
