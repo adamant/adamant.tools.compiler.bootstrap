@@ -93,21 +93,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var (name, nameSpan) = ParseNamespaceName();
             nameSpan = TextSpan.Covering(nameSpan, globalQualifier?.Span);
             Tokens.Expect<IOpenBraceToken>();
-            var bodyParser = NestedParser(nameContext.Qualify(name));
+            _ = containingNamespace
+                ?? throw new InvalidOperationException("Namespace not nested inside a containing namespace");
+            var bodyParser = NestedParser(nameContext.Qualify((MaybeQualifiedName)name.ToRootName()), containingNamespace.Qualify(name));
             var usingDirectives = bodyParser.ParseUsingDirectives();
             var declarations = bodyParser.ParseNonMemberDeclarations<ICloseBraceToken>();
             var closeBrace = Tokens.Expect<ICloseBraceToken>();
             var span = TextSpan.Covering(ns, closeBrace);
             return new NamespaceDeclarationSyntax(span, File,
-                globalQualifier != null, name, nameSpan,
-                nameContext, usingDirectives, declarations);
+                globalQualifier != null, name, nameSpan, containingNamespace, usingDirectives, declarations);
         }
 
-        private (MaybeQualifiedName, TextSpan) ParseNamespaceName()
+        private (NamespaceName, TextSpan) ParseNamespaceName()
         {
             var firstSegment = Tokens.RequiredToken<IIdentifierToken>();
             var span = firstSegment.Span;
-            MaybeQualifiedName name = new SimpleName(firstSegment.Value);
+            NamespaceName name = firstSegment.Value;
 
             while (Tokens.Accept<IDotToken>())
             {
@@ -131,7 +132,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var fn = Tokens.Expect<IFunctionKeywordToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(identifier.Value);
-            var bodyParser = NestedParser(name);
+            var bodyParser = NestedParser(name, null);
             var parameters = bodyParser.ParseParameters(bodyParser.ParseFunctionParameter);
             var (returnType, reachabilityAnnotations) = ParseReturn();
             var body = bodyParser.ParseFunctionBody();
@@ -181,7 +182,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(identifier.Value);
             var headerSpan = TextSpan.Covering(@class, identifier.Span);
-            var bodyParser = NestedParser(name);
+            var bodyParser = NestedParser(name, null);
             return new ClassDeclarationSyntax(headerSpan, File, accessModifier, mutableModifier, name, identifier.Span, bodyParser.ParseClassBody);
         }
 
@@ -234,7 +235,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var fn = Tokens.Expect<IFunctionKeywordToken>();
             var identifier = Tokens.RequiredToken<IIdentifierToken>();
             var name = nameContext.Qualify(identifier.Value);
-            var bodyParser = NestedParser(name);
+            var bodyParser = NestedParser(name, null);
             var parameters = bodyParser.ParseParameters(bodyParser.ParseMethodParameter);
             var (returnType, reachabilityAnnotations) = ParseReturn();
 
@@ -283,7 +284,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var newKeywordSpan = Tokens.Expect<INewKeywordToken>();
             var identifier = Tokens.AcceptToken<IIdentifierToken>();
             var name = nameContext.Qualify(SpecialNames.Constructor(identifier?.Value));
-            var bodyParser = NestedParser(name);
+            var bodyParser = NestedParser(name, null);
             // Implicit self parameter is taken to be after the current token which is expected to be `(`
             var selfParameter = new SelfParameterSyntax(Tokens.Current.Span.AtEnd(), name.Qualify(SpecialNames.Self), true);
             var parameters = bodyParser.ParseParameters(bodyParser.ParseConstructorParameter);

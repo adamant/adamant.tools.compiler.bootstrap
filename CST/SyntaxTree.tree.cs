@@ -373,8 +373,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface INamespaceDeclarationSyntax : INonMemberDeclarationSyntax, IDeclarationSyntax
     {
         bool IsGlobalQualified { get; }
-        MaybeQualifiedName Name { get; }
-        MaybeQualifiedName FullName { get; }
+        NamespaceName DeclaredNames { get; }
+        NamespaceName Name { get; }
         FixedList<IUsingDirectiveSyntax> UsingDirectives { get; }
         FixedList<INonMemberDeclarationSyntax> Declarations { get; }
     }

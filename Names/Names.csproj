@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Framework\Framework.csproj" />
+    <ProjectReference Include="..\Tokens\Tokens.csproj" />
   </ItemGroup>
 
 </Project>

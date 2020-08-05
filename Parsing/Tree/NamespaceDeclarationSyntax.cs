@@ -13,13 +13,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         /// declared using the package qualifier `namespace ::example { }`.
         /// </summary>
         public bool IsGlobalQualified { get; }
-        public MaybeQualifiedName Name { get; }
-        public MaybeQualifiedName FullName { get; }
+
+        public NamespaceName DeclaredNames { get; }
+
         /// <summary>
         /// The name context is the part of the namespace determined by the file
         /// location and any containing namespace declarations.
         /// </summary>
-        public RootName NameContext { get; }
+        public NamespaceName NameContext { get; }
+
+        public NamespaceName Name { get; }
+
         public FixedList<IUsingDirectiveSyntax> UsingDirectives { get; }
         public FixedList<INonMemberDeclarationSyntax> Declarations { get; }
 
@@ -27,24 +31,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             TextSpan span,
             CodeFile file,
             bool isGlobalQualified,
-            MaybeQualifiedName name,
+            NamespaceName declaredNames,
             TextSpan nameSpan,
-            RootName nameContext,
+            NamespaceName nameContext,
             FixedList<IUsingDirectiveSyntax> usingDirectives,
             FixedList<INonMemberDeclarationSyntax> declarations)
             : base(span, file, nameSpan)
         {
-            Name = name;
-            FullName = nameContext.Qualify(name);
+            DeclaredNames = declaredNames;
+            NameContext = nameContext;
+            Name = nameContext.Qualify(declaredNames);
             UsingDirectives = usingDirectives;
             Declarations = declarations;
             IsGlobalQualified = isGlobalQualified;
-            NameContext = nameContext;
         }
 
         public override string ToString()
         {
-            return $"namespace {FullName} {{ … }}";
+            return $"namespace ::{Name} {{ … }}";
         }
     }
 }

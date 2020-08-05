@@ -65,7 +65,7 @@ MethodInvocationExpression: InvocationExpression = MethodNameSyntax:CallableName
 MoveExpression: Expression;
 NamedParameter: Parameter, ConstructorParameter = TypeSyntax:Type DefaultValue:Expression?;
 NameExpression: AssignableExpression, IHasContainingScope = Name:SimpleName;
-NamespaceDeclaration: NonMemberDeclaration, Declaration = IsGlobalQualified:bool Name:MaybeQualifiedName FullName:MaybeQualifiedName UsingDirectives:UsingDirective* Declarations:NonMemberDeclaration*;
+NamespaceDeclaration: NonMemberDeclaration, Declaration = IsGlobalQualified:bool DeclaredNames:NamespaceName Name:NamespaceName UsingDirectives:UsingDirective* Declarations:NonMemberDeclaration*;
 NewObjectExpression: Expression = TypeSyntax:TypeName ConstructorName:CallableName? Arguments:Argument*;
 NextExpression: Expression;
 NoneLiteralExpression: LiteralExpression;

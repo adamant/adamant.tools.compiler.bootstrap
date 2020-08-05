@@ -15,13 +15,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
         public ICompilationUnitSyntax Parse(ITokenIterator<IEssentialToken> tokens)
         {
             var implicitNamespaceName = ParseImplicitNamespaceName(tokens);
-            var parser = new Parser(tokens, implicitNamespaceName);
+            var parser = new Parser(tokens, implicitNamespaceName.ToRootName(), implicitNamespaceName);
             var usingDirectives = parser.ParseUsingDirectives();
             var declarations = parser.ParseNonMemberDeclarations<IEndOfFileToken>();
             var eof = tokens.Required<IEndOfFileToken>();
             var span = TextSpan.FromStartEnd(0, eof.End);
             var diagnostics = tokens.Context.Diagnostics;
-            var compilationUnit = new CompilationUnitSyntax(implicitNamespaceName, span,
+            var compilationUnit = new CompilationUnitSyntax(implicitNamespaceName.ToRootName(), span,
                 tokens.Context.File, usingDirectives,
                 declarations);
 
@@ -30,9 +30,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             return compilationUnit;
         }
 
-        private static RootName ParseImplicitNamespaceName(ITokenIterator<IEssentialToken> tokens)
+        private static NamespaceName ParseImplicitNamespaceName(ITokenIterator<IEssentialToken> tokens)
         {
-            RootName name = GlobalNamespaceName.Instance;
+            NamespaceName name = NamespaceName.Global;
             foreach (var segment in tokens.Context.File.Reference.Namespace)
                 name = name.Qualify(segment);
 

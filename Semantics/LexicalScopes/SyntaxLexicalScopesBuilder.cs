@@ -41,7 +41,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
                     break;
                 case INamespaceDeclarationSyntax ns:
                     if (ns.IsGlobalQualified) containingScope = globalScope;
-                    containingScope = BuildNamespaceScopes(ns.Name, containingScope);
+                    containingScope = BuildNamespaceScopes(ns.Name.ToRootName(), containingScope);
                     containingScope = BuildUsingDirectivesScope(ns.UsingDirectives, containingScope);
                     break;
                 case IClassDeclarationSyntax _:

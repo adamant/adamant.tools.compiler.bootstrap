@@ -3,11 +3,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
     public static class SpecialNames
     {
         // The name of the `UnknownSymbol`
+        // TODO remove as a name
         public static readonly SimpleName Unknown = SimpleName.Special("unknown");
 
+        // TODO remove as a name
         public static readonly SimpleName New = SimpleName.Special("new");
+
+        // TODO remove as a name
         public static readonly SimpleName Self = SimpleName.Special("self");
-        public static readonly SimpleName Owned = SimpleName.Special("owned");
 
         public static readonly SimpleName Void = SimpleName.Special("void");
         public static readonly SimpleName Never = SimpleName.Special("never");
