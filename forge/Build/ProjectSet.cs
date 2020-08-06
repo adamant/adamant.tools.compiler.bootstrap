@@ -11,7 +11,8 @@ using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using Adamant.Tools.Compiler.Bootstrap.Forge.Config;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
@@ -99,7 +100,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
             var sourcePaths = Directory.EnumerateFiles(sourceDir, "*.ad", SearchOption.AllDirectories);
             // Wait for the references, unfortunately, this requires an ugly loop.
             var referenceTasks = project.References.ToDictionary(r => r.Name, r => projectBuilds[r.Project]);
-            var references = new Dictionary<string, Package>();
+            var references = new Dictionary<Name, Package>();
             foreach (var referenceTask in referenceTasks)
             {
                 var package = await referenceTask.Value.ConfigureAwait(false);

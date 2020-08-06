@@ -1,5 +1,4 @@
 using System;
-using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 using Xunit;
 
@@ -40,7 +39,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
         [Fact]
         public void With_different_type_are_not_equal()
         {
-            var container = new PackageSymbol(new SimpleName("my.package"));
+            var container = new PackageSymbol(Name("my.package"));
             var type1 = DataType("T1");
             var sym1 = Type("T1", container, type1);
             var type2 = DataType("T2");

@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     {
         public static readonly SymbolSet Empty = new SymbolSet(Enumerable.Empty<Symbol>());
 
-        private readonly FixedDictionary<SimpleName, FixedList<Symbol>> symbols;
+        private readonly FixedDictionary<TypeName, FixedList<Symbol>> symbols;
 
         public int Count { get; }
 
@@ -23,15 +23,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
             Count = this.symbols.Sum(item => item.Value.Count);
         }
 
-        private static FixedDictionary<SimpleName, FixedList<Symbol>> GroupSymbols(IEnumerable<Symbol> symbols)
+        private static FixedDictionary<TypeName, FixedList<Symbol>> GroupSymbols(IEnumerable<Symbol> symbols)
         {
             return symbols.Distinct().GroupBy(LookupByName).ToFixedDictionary(g => g.Key, g => g.ToFixedList());
         }
 
         // TODO make this a property of Symbol?
-        private static SimpleName LookupByName(Symbol symbol)
+        private static TypeName LookupByName(Symbol symbol)
         {
-            return symbol.Name?.UnqualifiedName.WithoutDeclarationNumber() ?? throw new NullReferenceException();
+            return symbol.Name ?? throw new NullReferenceException();
+            //return symbol.Name?.UnqualifiedName.WithoutDeclarationNumber() ?? throw new NullReferenceException();
         }
 
         public IEnumerator<Symbol> GetEnumerator()

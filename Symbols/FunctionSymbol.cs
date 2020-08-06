@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
 
         public FunctionSymbol(
             NamespaceOrPackageSymbol containingSymbol,
-            SimpleName name,
+            Name name,
             FixedList<DataType> parameterDataTypes,
             DataType returnDataType)
             : base(containingSymbol, name, parameterDataTypes, returnDataType)

@@ -10,16 +10,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     public sealed class TypeSymbol : Symbol
     {
         public new NamespaceOrPackageSymbol ContainingSymbol { get; }
-        public new SimpleName Name { get; }
+        public new TypeName Name { get; }
         public ObjectType DeclaresDataType { get; }
 
         public TypeSymbol(
             NamespaceOrPackageSymbol containingSymbol,
-            SimpleName name,
+            TypeName name,
             ObjectType declaresDataType)
             : base(containingSymbol, name)
         {
-            if (name != declaresDataType.FullName)
+            // TODO check the name correctly
+            if (name.Text != declaresDataType.FullName.UnqualifiedName.Text)
                 throw new ArgumentException("Declared type must have the same name as symbol", nameof(declaresDataType));
 
             ContainingSymbol = containingSymbol;

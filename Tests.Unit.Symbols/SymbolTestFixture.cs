@@ -21,15 +21,15 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
             return new PackageSymbol(Name(name) ?? DefaultName("package"));
         }
 
-        protected SimpleName DefaultName(string prefix)
+        protected Name DefaultName(string prefix)
         {
-            return new SimpleName($"⧫{prefix}_{++unique}");
+            return new Name($"⧫{prefix}_{++unique}");
         }
 
         [return: NotNullIfNotNull("name")]
-        protected static SimpleName? Name(string? name = null)
+        protected static Name? Name(string? name = null)
         {
-            return name is null ? null : new SimpleName(name);
+            return name is null ? null : new Name(name);
         }
 
         protected FixedList<DataType> Params(int? count = null)
@@ -98,7 +98,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
         }
         protected ObjectType DataType(string? name = null)
         {
-            return new ObjectType(Name(name) ?? DefaultName("DataType"), false, ReferenceCapability.Isolated);
+            var finalName = Name(name) ?? DefaultName("DataType");
+            return new ObjectType(new SimpleName(finalName.Text), false, ReferenceCapability.Isolated);
         }
 
         protected TypeSymbol Type(

@@ -11,22 +11,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.LexicalScopes
     public abstract class LexicalScope<TSymbol>
     {
         private readonly PackagesScope packagesScope;
-        private readonly Dictionary<SimpleName, List<TSymbol>> symbolsInScope = new Dictionary<SimpleName, List<TSymbol>>();
-        private readonly Dictionary<SimpleName, List<TSymbol>> symbolsInNestedScopes = new Dictionary<SimpleName, List<TSymbol>>();
+        private readonly Dictionary<TypeName, List<TSymbol>> symbolsInScope = new Dictionary<TypeName, List<TSymbol>>();
+        private readonly Dictionary<TypeName, List<TSymbol>> symbolsInNestedScopes = new Dictionary<TypeName, List<TSymbol>>();
 
         protected LexicalScope(PackagesScope packagesScope)
         {
             this.packagesScope = packagesScope;
         }
 
-        public PackageSymbol LookupPackage(SimpleName name)
+        public PackageSymbol LookupPackage(Name name)
         {
             return packagesScope.LookupPackage(name);
         }
 
-        public abstract IEnumerable<TSymbol> LookupInGlobalScope(SimpleName name);
+        public abstract IEnumerable<TSymbol> LookupInGlobalScope(TypeName name);
 
-        public IEnumerable<TSymbol> Lookup(SimpleName name, bool includeNested = true)
+        public IEnumerable<TSymbol> Lookup(TypeName name, bool includeNested = true)
         {
             if (symbolsInScope.TryGetValue(name, out var symbols)) return symbols;
             if (includeNested && symbolsInNestedScopes.TryGetValue(name, out symbols)) return symbols;

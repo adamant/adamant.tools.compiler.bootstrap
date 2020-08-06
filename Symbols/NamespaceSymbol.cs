@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     {
         public new NamespaceOrPackageSymbol ContainingSymbol { get; }
 
-        public NamespaceSymbol(NamespaceOrPackageSymbol containingSymbol, SimpleName name)
+        public NamespaceSymbol(NamespaceOrPackageSymbol containingSymbol, Name name)
             : base(containingSymbol, name)
         {
             ContainingSymbol = containingSymbol;

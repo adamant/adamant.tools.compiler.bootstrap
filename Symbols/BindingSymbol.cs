@@ -9,11 +9,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         typeof(FieldSymbol))]
     public abstract class BindingSymbol : Symbol
     {
-        public new SimpleName Name { get; }
+        public new Name Name { get; }
         public bool IsMutableBinding { get; }
         public DataType DataType { get; }
 
-        protected BindingSymbol(Symbol containingSymbol, SimpleName name, bool isMutableBinding, DataType dataType)
+        protected BindingSymbol(Symbol containingSymbol, Name name, bool isMutableBinding, DataType dataType)
             : base(containingSymbol, name)
         {
             Name = name;

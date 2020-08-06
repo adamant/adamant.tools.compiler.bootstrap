@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
 
         public MethodSymbol(
             TypeSymbol containingSymbol,
-            SimpleName name,
+            Name name,
             DataType selfDataType,
             FixedList<DataType> parameterDataTypes,
             DataType returnDataType)

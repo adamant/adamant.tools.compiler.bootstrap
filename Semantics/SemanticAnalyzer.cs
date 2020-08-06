@@ -13,6 +13,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Moves;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability;
@@ -37,9 +38,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
         public bool SaveReachabilityGraphs { get; set; } = false;
 
         [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "OO")]
-        public Package Check(
-            PackageSyntax packageSyntax,
-            FixedDictionary<string, Package> references)
+        public Package Check(PackageSyntax packageSyntax)
         {
             // First pull over all the lexer and parser warnings
             var diagnostics = new Diagnostics(packageSyntax.Diagnostics);
@@ -47,7 +46,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // If there are errors from the lex and parse phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
 
-            var stringSymbol = BuildScopes(packageSyntax, references, diagnostics);
+            BuildDeclarationScopes(packageSyntax, diagnostics);
+
+            var stringSymbol = BuildScopes(packageSyntax, diagnostics);
 
             // Make a list of all the entity declarations (i.e. not namespaces)
             var entities = GetEntityDeclarations(packageSyntax);
@@ -67,15 +68,26 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             var entryPoint = DetermineEntryPoint(declarations, diagnostics);
 
-            return new Package(packageSyntax.Name, diagnostics.Build(), references, declarations, entryPoint);
+            return new Package(packageSyntax.Symbol, diagnostics.Build(), packageSyntax.References, declarations, entryPoint);
+        }
+
+        /// <summary>
+        /// Build up lexical scopes down to the declaration level
+        /// </summary>
+        private static void BuildDeclarationScopes(PackageSyntax packageSyntax, Diagnostics diagnostics)
+        {
+            var builder = new PackageLexicalScopesBuilder(diagnostics);
+            // TODO can the references be part of the package syntax?
+            builder.BuildScopesFor(packageSyntax);
+
+            // TODO finish building declaration scopes
         }
 
         private static ITypeMetadata? BuildScopes(
             PackageSyntax packageSyntax,
-            FixedDictionary<string, Package> references,
             Diagnostics diagnostics)
         {
-            var scopesBuilder = new PackageScopesBuilder(packageSyntax, references, diagnostics);
+            var scopesBuilder = new PackageScopesBuilder(packageSyntax, diagnostics);
             scopesBuilder.BuildScopesFor(packageSyntax);
             var stringSymbol = scopesBuilder.GlobalScope.LookupMetadataInGlobalScope(new SimpleName("String"))
                                             .OfType<ITypeMetadata>().FirstOrDefault();

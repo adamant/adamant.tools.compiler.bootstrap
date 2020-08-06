@@ -12,7 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
 
         public ConstructorSymbol(
             TypeSymbol containingSymbol,
-            SimpleName? name,
+            Name? name,
             FixedList<DataType> parameterDataTypes)
             : base(containingSymbol, name, parameterDataTypes)
         {

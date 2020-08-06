@@ -6,7 +6,9 @@ using System.Threading.Tasks.Dataflow;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.CST;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Lexing;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Parsing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
 
@@ -27,17 +29,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         public bool SaveReachabilityGraphs { get; set; } = false;
 
         public Task<Package> CompilePackageAsync(
-            string name,
+            Name name,
             IEnumerable<ICodeFileSource> files,
-            FixedDictionary<string, Task<Package>> referenceTasks)
+            FixedDictionary<Name, Task<Package>> referenceTasks)
         {
             return CompilePackageAsync(name, files, referenceTasks, TaskScheduler.Default);
         }
 
         public async Task<Package> CompilePackageAsync(
-            string name,
+            Name name,
             IEnumerable<ICodeFileSource> fileSources,
-            FixedDictionary<string, Task<Package>> referenceTasks,
+            FixedDictionary<Name, Task<Package>> referenceTasks,
             TaskScheduler taskScheduler)
         {
             var lexer = new Lexer();
@@ -72,7 +74,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
             var references = referencePairs.ToFixedDictionary(r => r.alias, r => r.package);
 
             // TODO add the references to the package syntax
-            var packageSyntax = new PackageSyntax(name, compilationUnits.ToFixedList());
+            var packageSyntax = new PackageSyntax(name, compilationUnits.ToFixedList(), references);
 
             var analyzer = new SemanticAnalyzer()
             {
@@ -80,13 +82,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                 SaveReachabilityGraphs = SaveReachabilityGraphs,
             };
 
-            return analyzer.Check(packageSyntax, references);
+            return analyzer.Check(packageSyntax);
         }
 
         public Package CompilePackage(
             string name,
             IEnumerable<ICodeFileSource> fileSources,
-            FixedDictionary<string, Package> references)
+            FixedDictionary<Name, Package> references)
         {
             return CompilePackage(name, fileSources.Select(s => s.Load()), references);
         }
@@ -94,7 +96,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
         public Package CompilePackage(
             string name,
             IEnumerable<CodeFile> files,
-            FixedDictionary<string, Package> references)
+            FixedDictionary<Name, Package> references)
         {
             var lexer = new Lexer();
             var parser = new CompilationUnitParser();
@@ -106,7 +108,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                     return parser.Parse(tokens);
                 })
                 .ToFixedList();
-            var packageSyntax = new PackageSyntax(name, compilationUnits);
+            var packageSyntax = new PackageSyntax(name, compilationUnits, references);
 
             var analyzer = new SemanticAnalyzer()
             {
@@ -114,7 +116,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.API
                 SaveReachabilityGraphs = SaveReachabilityGraphs,
             };
 
-            return analyzer.Check(packageSyntax, references);
+            return analyzer.Check(packageSyntax);
         }
     }
 }

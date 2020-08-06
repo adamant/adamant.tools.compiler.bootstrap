@@ -12,10 +12,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     public abstract class Symbol : IEquatable<Symbol>
     {
         public Symbol? ContainingSymbol { get; }
-        public SimpleName? Name { get; }
+        public TypeName? Name { get; }
         public bool IsGlobal => ContainingSymbol is null;
 
-        protected Symbol(Symbol? containingSymbol, SimpleName? name)
+        protected Symbol(Symbol? containingSymbol, TypeName? name)
         {
             // Note: constructor can't be `private protected` so `Symbol` can be mocked in unit tests
             ContainingSymbol = containingSymbol;

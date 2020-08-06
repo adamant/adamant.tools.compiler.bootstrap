@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
 
         internal VariableSymbol(
             InvokableSymbol containingSymbol,
-            SimpleName name,
+            Name name,
             int declarationNumber,
             bool isMutableBinding,
             DataType dataType)

@@ -24,7 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Symbols
             Assert.False(symbol.IsGlobal);
         }
 
-        private static Symbol FakeSymbol(NamespaceOrPackageSymbol? containing, SimpleName name)
+        private static Symbol FakeSymbol(NamespaceOrPackageSymbol? containing, Name name)
         {
             return new Mock<Symbol>(MockBehavior.Default, containing, name).Object;
         }

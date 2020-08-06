@@ -1,4 +1,5 @@
 using Adamant.Tools.Compiler.Bootstrap.Emit.C.Properties;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Semantics;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Emit.C

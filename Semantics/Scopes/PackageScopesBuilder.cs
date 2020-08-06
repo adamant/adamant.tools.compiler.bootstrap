@@ -23,14 +23,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
         private readonly FixedList<Namespace> namespaces;
         public GlobalScope GlobalScope { get; }
 
-        public PackageScopesBuilder(
-            PackageSyntax packageSyntax,
-            FixedDictionary<string, Package> references,
-            Diagnostics diagnostics)
+        public PackageScopesBuilder(PackageSyntax packageSyntax, Diagnostics diagnostics)
         {
             this.diagnostics = diagnostics;
-            var namespaceNames = GetNamespaceNames(packageSyntax, references);
-            var nonMemberEntitySymbols = GetNonMemberEntitySymbols(packageSyntax, references);
+            var namespaceNames = GetNamespaceNames(packageSyntax);
+            var nonMemberEntitySymbols = GetNonMemberEntitySymbols(packageSyntax);
             namespaces = BuildNamespaces(namespaceNames, nonMemberEntitySymbols).ToFixedList();
             var allSymbols = nonMemberEntitySymbols.Concat(namespaces).ToFixedList();
             var globalSymbols = allSymbols.ToLookup(s => s.IsGlobal());
@@ -45,16 +42,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
         /// However, the syntax of a package has both namespace declarations and implicit
         /// namespaces of compilation units and can have empty namespaces.
         /// </summary>
-        private static IEnumerable<MaybeQualifiedName> GetNamespaceNames(
-            PackageSyntax packageSyntax,
-            FixedDictionary<string, Package> references)
+        private static IEnumerable<MaybeQualifiedName> GetNamespaceNames(PackageSyntax packageSyntax)
         {
             return
                 // Any namespace created by primitive symbols
                 PrimitiveMetadataDefinitions.Instance.SelectMany(s => s.FullName.NestedInNames())
                 // or any namespace containing a referenced entity
-                .Concat(references.Values.SelectMany(p => p.GetNonMemberDeclarations())
-                          .SelectMany(d => d.FullName.NestedInNames()))
+                .Concat(packageSyntax.References.Values.SelectMany(p => p.GetNonMemberDeclarations())
+                                     .SelectMany(d => d.FullName.NestedInNames()))
                 // or any namespace of a compilation unit
                 .Concat(packageSyntax.CompilationUnits.SelectMany(cu => cu.ImplicitNamespaceName.NamespaceNames()))
                 // or any declared namespace
@@ -62,13 +57,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
                 .Distinct();
         }
 
-        private static FixedList<IMetadata> GetNonMemberEntitySymbols(
-            PackageSyntax packageSyntax,
-            FixedDictionary<string, Package> references)
+        private static FixedList<IMetadata> GetNonMemberEntitySymbols(PackageSyntax packageSyntax)
         {
-            return references.Values.SelectMany(p => p.GetNonMemberDeclarations()).SafeCast<IMetadata>()
-                             .Concat(packageSyntax.GetDeclarations().OfType<INonMemberEntityDeclarationSyntax>())
-                             .Concat(PrimitiveMetadataDefinitions.Instance).ToFixedList();
+            return packageSyntax.References
+                    .Values.SelectMany(p => p.GetNonMemberDeclarations()).SafeCast<IMetadata>()
+                    .Concat(packageSyntax.GetDeclarations().OfType<INonMemberEntityDeclarationSyntax>())
+                    .Concat(PrimitiveMetadataDefinitions.Instance).ToFixedList();
         }
 
         private static IEnumerable<Namespace> BuildNamespaces(IEnumerable<MaybeQualifiedName> namespaceNames, IEnumerable<IMetadata> nonMemberEntitySymbols)

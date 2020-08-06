@@ -10,7 +10,8 @@ using Adamant.Tools.Compiler.Bootstrap.API;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Emit.C;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Semantics;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
+using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Conformance.Helpers;
 using Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Helpers;
 using Xunit;
@@ -52,7 +53,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
                 SaveLivenessAnalysis = true,
                 SaveReachabilityGraphs = true,
             };
-            var references = new Dictionary<string, Package>();
+            var references = new Dictionary<Name, Package>();
 
             // Reference Standard Library
             var stdLibPackage = CompileStdLib(compiler);
@@ -116,7 +117,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Conformance
                 var codeFiles = sourcePaths.Select(p => LoadCode(p, sourceDir, rootNamespace))
                     .ToList();
                 return compiler.CompilePackage("adamant.stdlib", codeFiles,
-                    FixedDictionary<string, Package>.Empty);
+                    FixedDictionary<Name, Package>.Empty);
             }
             catch (FatalCompilationErrorException ex)
             {

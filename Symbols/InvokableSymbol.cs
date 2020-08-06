@@ -13,7 +13,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         public FixedList<DataType> ParameterDataTypes { get; }
         public int Arity => ParameterDataTypes.Count;
 
-        protected InvokableSymbol(Symbol containingSymbol, SimpleName? name, FixedList<DataType> parameterDataTypes)
+        protected InvokableSymbol(Symbol containingSymbol, Name? name, FixedList<DataType> parameterDataTypes)
             : base(containingSymbol, name)
         {
             ParameterDataTypes = parameterDataTypes;

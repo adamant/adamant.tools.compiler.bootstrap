@@ -8,9 +8,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         typeof(PackageSymbol))]
     public abstract class NamespaceOrPackageSymbol : Symbol
     {
-        public new SimpleName Name { get; }
+        public new Name Name { get; }
 
-        protected NamespaceOrPackageSymbol(NamespaceOrPackageSymbol? containingSymbol, SimpleName name)
+        protected NamespaceOrPackageSymbol(NamespaceOrPackageSymbol? containingSymbol, Name name)
             : base(containingSymbol, name)
         {
             Name = name;

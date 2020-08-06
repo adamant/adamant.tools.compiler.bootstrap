@@ -3,6 +3,9 @@ using System.Diagnostics;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
+using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
+using Adamant.Tools.Compiler.Bootstrap.Names;
+using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
@@ -13,20 +16,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     /// matched as part of syntax. It is always treated as the singular root.</remarks>
     public class PackageSyntax
     {
-        public string Name { get; }
+        public PackageSymbol Symbol { get; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         public FixedList<ICompilationUnitSyntax> CompilationUnits { get; }
+
+        public FixedDictionary<Name, Package> References { get; }
 
         public IEnumerable<Diagnostic> Diagnostics =>
             CompilationUnits.SelectMany(cu => cu.Diagnostics);
 
         public PackageSyntax(
-            string name,
-            FixedList<ICompilationUnitSyntax> compilationUnits)
+            Name name,
+            FixedList<ICompilationUnitSyntax> compilationUnits,
+            FixedDictionary<Name, Package> references)
         {
-            Name = name;
+            Symbol = new PackageSymbol(name);
             CompilationUnits = compilationUnits;
+            References = references;
         }
 
         public IEnumerable<IDeclarationSyntax> GetDeclarations()
@@ -43,7 +50,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 
         public override string ToString()
         {
-            return $"package {Name}: {CompilationUnits.Count} Compilation Units";
+            return $"package {Symbol.Name.Text}: {CompilationUnits.Count} Compilation Units";
         }
     }
 }

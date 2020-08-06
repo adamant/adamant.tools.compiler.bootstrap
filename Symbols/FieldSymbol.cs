@@ -10,7 +10,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
 
         public FieldSymbol(
             TypeSymbol containingSymbol,
-            SimpleName name,
+            Name name,
             bool isMutableBinding,
             DataType dataType)
             : base(containingSymbol, name, isMutableBinding, dataType)
