@@ -13,10 +13,10 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.DataFlow;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.DefiniteAssignment;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen;
-using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Moves;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Validation;
 

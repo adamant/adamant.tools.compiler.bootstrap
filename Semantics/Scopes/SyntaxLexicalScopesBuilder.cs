@@ -10,7 +10,7 @@ using Adamant.Tools.Compiler.Bootstrap.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Errors;
 using ExhaustiveMatching;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 {
     internal class SyntaxLexicalScopesBuilder : SyntaxWalker<LexicalScope>
     {

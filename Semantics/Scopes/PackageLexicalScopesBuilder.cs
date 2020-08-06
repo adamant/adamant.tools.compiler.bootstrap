@@ -8,7 +8,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Primitives;
 using Adamant.Tools.Compiler.Bootstrap.Scopes;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 {
     /// <summary>
     /// Builds up a hierarchy of lexical scope objects that are later used to look

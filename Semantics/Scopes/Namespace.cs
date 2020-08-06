@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Adamant.Tools.Compiler.Bootstrap.Metadata;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 
-namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
+namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 {
     internal class Namespace : INamespaceMetadata
     {
