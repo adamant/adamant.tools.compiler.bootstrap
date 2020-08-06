@@ -75,7 +75,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             FixedDictionary<string, Package> references,
             Diagnostics diagnostics)
         {
-            var scopesBuilder = new PackageLexicalScopesBuilder(packageSyntax, references, diagnostics);
+            var scopesBuilder = new PackageScopesBuilder(packageSyntax, references, diagnostics);
             scopesBuilder.BuildScopesFor(packageSyntax);
             var stringSymbol = scopesBuilder.GlobalScope.LookupMetadataInGlobalScope(new SimpleName("String"))
                                             .OfType<ITypeMetadata>().FirstOrDefault();

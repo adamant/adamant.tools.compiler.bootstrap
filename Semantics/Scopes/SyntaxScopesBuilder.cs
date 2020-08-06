@@ -12,14 +12,14 @@ using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 {
-    internal class SyntaxLexicalScopesBuilder : SyntaxWalker<LexicalScope>
+    internal class SyntaxScopesBuilder : SyntaxWalker<LexicalScope>
     {
         private readonly CodeFile file;
         private readonly GlobalScope globalScope;
         private readonly FixedList<Namespace> namespaces;
         private readonly Diagnostics diagnostics;
 
-        public SyntaxLexicalScopesBuilder(
+        public SyntaxScopesBuilder(
             CodeFile file,
             GlobalScope globalScope,
             FixedList<Namespace> namespaces,

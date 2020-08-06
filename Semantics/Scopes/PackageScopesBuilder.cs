@@ -17,13 +17,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
     /// Package qualified names are not supported yet, so currently, all names
     /// get placed into a single unified tree of namespace symbols.
     /// </summary>
-    public class PackageLexicalScopesBuilder
+    public class PackageScopesBuilder
     {
         private readonly Diagnostics diagnostics;
         private readonly FixedList<Namespace> namespaces;
         public GlobalScope GlobalScope { get; }
 
-        public PackageLexicalScopesBuilder(
+        public PackageScopesBuilder(
             PackageSyntax packageSyntax,
             FixedDictionary<string, Package> references,
             Diagnostics diagnostics)
@@ -89,7 +89,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
         {
             foreach (var compilationUnit in package.CompilationUnits)
             {
-                var lexicalScopesWalker = new SyntaxLexicalScopesBuilder(compilationUnit.CodeFile, GlobalScope, namespaces, diagnostics);
+                var lexicalScopesWalker = new SyntaxScopesBuilder(compilationUnit.CodeFile, GlobalScope, namespaces, diagnostics);
                 lexicalScopesWalker.Walk(compilationUnit, GlobalScope);
             }
         }
