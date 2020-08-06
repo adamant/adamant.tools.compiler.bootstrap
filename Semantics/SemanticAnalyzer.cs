@@ -47,7 +47,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // If there are errors from the lex and parse phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
 
-            var stringSymbol = BuildLexicalScopes(packageSyntax, references, diagnostics);
+            var stringSymbol = BuildScopes(packageSyntax, references, diagnostics);
 
             // Make a list of all the entity declarations (i.e. not namespaces)
             var entities = GetEntityDeclarations(packageSyntax);
@@ -70,7 +70,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             return new Package(packageSyntax.Name, diagnostics.Build(), references, declarations, entryPoint);
         }
 
-        private static ITypeMetadata? BuildLexicalScopes(
+        private static ITypeMetadata? BuildScopes(
             PackageSyntax packageSyntax,
             FixedDictionary<string, Package> references,
             Diagnostics diagnostics)
