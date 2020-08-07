@@ -21,7 +21,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing
             var eof = tokens.Required<IEndOfFileToken>();
             var span = TextSpan.FromStartEnd(0, eof.End);
             var diagnostics = tokens.Context.Diagnostics;
-            var compilationUnit = new CompilationUnitSyntax(implicitNamespaceName.ToRootName(), span,
+            var compilationUnit = new CompilationUnitSyntax(implicitNamespaceName, span,
                 tokens.Context.File, usingDirectives,
                 declarations);
 

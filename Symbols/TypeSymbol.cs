@@ -9,6 +9,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     /// </summary>
     public sealed class TypeSymbol : Symbol
     {
+        public override PackageSymbol Package { get; }
         public new NamespaceOrPackageSymbol ContainingSymbol { get; }
         public new TypeName Name { get; }
         public ObjectType DeclaresDataType { get; }
@@ -23,6 +24,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
             if (name.Text != declaresDataType.FullName.UnqualifiedName.Text)
                 throw new ArgumentException("Declared type must have the same name as symbol", nameof(declaresDataType));
 
+            Package = containingSymbol.Package;
             ContainingSymbol = containingSymbol;
             Name = name;
             DeclaresDataType = declaresDataType;

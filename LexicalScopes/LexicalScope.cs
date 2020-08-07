@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
 
@@ -11,12 +12,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.LexicalScopes
     public abstract class LexicalScope<TSymbol>
     {
         private readonly PackagesScope packagesScope;
-        private readonly Dictionary<TypeName, List<TSymbol>> symbolsInScope = new Dictionary<TypeName, List<TSymbol>>();
-        private readonly Dictionary<TypeName, List<TSymbol>> symbolsInNestedScopes = new Dictionary<TypeName, List<TSymbol>>();
+        private readonly FixedDictionary<TypeName, FixedList<TSymbol>> symbolsInScope;
+        private readonly FixedDictionary<TypeName, FixedList<TSymbol>> symbolsInNestedScopes;
 
-        protected LexicalScope(PackagesScope packagesScope)
+        protected LexicalScope(
+            PackagesScope packagesScope,
+            FixedDictionary<TypeName, FixedList<TSymbol>> symbolsInScope,
+            FixedDictionary<TypeName, FixedList<TSymbol>> symbolsInNestedScopes)
         {
             this.packagesScope = packagesScope;
+            this.symbolsInScope = symbolsInScope;
+            this.symbolsInNestedScopes = symbolsInNestedScopes;
         }
 
         public PackageSymbol LookupPackage(Name name)

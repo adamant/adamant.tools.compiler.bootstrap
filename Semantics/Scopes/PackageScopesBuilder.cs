@@ -51,7 +51,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
                 .Concat(packageSyntax.References.Values.SelectMany(p => p.GetNonMemberDeclarations())
                                      .SelectMany(d => d.FullName.NestedInNames()))
                 // or any namespace of a compilation unit
-                .Concat(packageSyntax.CompilationUnits.SelectMany(cu => cu.ImplicitNamespaceName.NamespaceNames()))
+                .Concat(packageSyntax.CompilationUnits.SelectMany(cu => cu.ImplicitNamespaceName.ToRootName().NamespaceNames()))
                 // or any declared namespace
                 .Concat(packageSyntax.GetDeclarations().OfType<INamespaceDeclarationSyntax>().SelectMany(ns => ns.Name.ToRootName().NamespaceNames()))
                 .Distinct();

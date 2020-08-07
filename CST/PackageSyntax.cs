@@ -6,6 +6,7 @@ using Adamant.Tools.Compiler.Bootstrap.Framework;
 using Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage;
 using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
+using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 
 namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
@@ -17,6 +18,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public class PackageSyntax
     {
         public PackageSymbol Symbol { get; }
+        public SymbolTreeBuilder SymbolTreeBuilder { get; }
 
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         public FixedList<ICompilationUnitSyntax> CompilationUnits { get; }
@@ -32,6 +34,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
             FixedDictionary<Name, Package> references)
         {
             Symbol = new PackageSymbol(name);
+            SymbolTreeBuilder = new SymbolTreeBuilder(Symbol);
             CompilationUnits = compilationUnits;
             References = references;
         }

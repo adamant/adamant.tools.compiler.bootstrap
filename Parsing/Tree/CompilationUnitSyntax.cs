@@ -11,14 +11,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal class CompilationUnitSyntax : Syntax, ICompilationUnitSyntax
     {
         public CodeFile CodeFile { get; }
-        public RootName ImplicitNamespaceName { get; }
+        public NamespaceName ImplicitNamespaceName { get; }
         public FixedList<IUsingDirectiveSyntax> UsingDirectives { get; }
         public FixedList<INonMemberDeclarationSyntax> Declarations { get; }
         public FixedList<IEntityDeclarationSyntax> EntityDeclarations { get; }
         public FixedList<Diagnostic> Diagnostics { get; private set; }
 
         public CompilationUnitSyntax(
-            RootName implicitNamespaceName,
+            NamespaceName implicitNamespaceName,
             TextSpan span,
             CodeFile codeFile,
             FixedList<IUsingDirectiveSyntax> usingDirectives,

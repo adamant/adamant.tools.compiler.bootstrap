@@ -33,7 +33,7 @@ CallableName = Name:MaybeQualifiedName;
 CanReachAnnotation: ReachabilityAnnotation = CanReach:NameExpression*;
 CapabilityType: Type = ReferentType:Type Capability:ReferenceCapability;
 ClassDeclaration: NonMemberEntityDeclaration = MutableModifier:IMutableKeywordToken? Name:SimpleName Members:MemberDeclaration*;
-CompilationUnit = CodeFile ImplicitNamespaceName:RootName UsingDirectives:UsingDirective* Declarations:NonMemberDeclaration* EntityDeclarations:EntityDeclaration* Diagnostics:Diagnostic*;
+CompilationUnit = CodeFile ImplicitNamespaceName:NamespaceName UsingDirectives:UsingDirective* Declarations:NonMemberDeclaration* EntityDeclarations:EntityDeclaration* Diagnostics:Diagnostic*;
 ConcreteCallableDeclaration: CallableDeclaration = Body;
 ConcreteMethodDeclaration: MethodDeclaration, ConcreteCallableDeclaration;
 ConstructorDeclaration: MemberDeclaration, ConcreteCallableDeclaration = ImplicitSelfParameter:SelfParameter;

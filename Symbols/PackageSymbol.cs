@@ -11,6 +11,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
     /// </remarks>
     public class PackageSymbol : NamespaceOrPackageSymbol
     {
+        public override PackageSymbol Package => this;
+
         public PackageSymbol(Name name)
             : base(null, name) { }
 

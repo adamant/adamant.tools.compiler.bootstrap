@@ -36,7 +36,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
             switch (syntax)
             {
                 case ICompilationUnitSyntax compilationUnit:
-                    containingScope = BuildNamespaceScopes(compilationUnit.ImplicitNamespaceName, containingScope);
+                    containingScope = BuildNamespaceScopes(compilationUnit.ImplicitNamespaceName.ToRootName(), containingScope);
                     containingScope = BuildUsingDirectivesScope(compilationUnit.UsingDirectives, containingScope);
                     break;
                 case INamespaceDeclarationSyntax ns:

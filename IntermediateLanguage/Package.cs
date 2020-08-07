@@ -2,27 +2,33 @@ using System.Collections.Generic;
 using System.Linq;
 using Adamant.Tools.Compiler.Bootstrap.Core;
 using Adamant.Tools.Compiler.Bootstrap.Framework;
-using Adamant.Tools.Compiler.Bootstrap.Names;
 using Adamant.Tools.Compiler.Bootstrap.Symbols;
+using Adamant.Tools.Compiler.Bootstrap.Symbols.Trees;
 
 namespace Adamant.Tools.Compiler.Bootstrap.IntermediateLanguage
 {
     public class Package
     {
         public PackageSymbol Symbol { get; }
+        public PackageSymbolTree SymbolTree { get; }
         public FixedList<Diagnostic> Diagnostics { get; internal set; }
-        public FixedDictionary<Name, Package> References { get; }
+        /// <summary>
+        /// Referenced packages
+        /// </summary>
+        /// <remarks>No longer need aliases. All references are now explicit.</remarks>
+        public FixedList<Package> References { get; }
         public FixedList<Declaration> Declarations { get; }
         public FunctionDeclaration EntryPoint { get; internal set; }
 
         public Package(
-            PackageSymbol symbol,
+            PackageSymbolTree symbolTree,
             FixedList<Diagnostic> diagnostics,
-            FixedDictionary<Name, Package> references,
+            FixedList<Package> references,
             IEnumerable<Declaration> declarations,
             FunctionDeclaration entryPoint)
         {
-            Symbol = symbol;
+            Symbol = symbolTree.Package;
+            SymbolTree = symbolTree;
             Diagnostics = diagnostics;
             References = references;
             EntryPoint = entryPoint;

@@ -11,6 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Symbols
         typeof(BindingSymbol))]
     public abstract class Symbol : IEquatable<Symbol>
     {
+        public abstract PackageSymbol Package { get; }
         public Symbol? ContainingSymbol { get; }
         public TypeName? Name { get; }
         public bool IsGlobal => ContainingSymbol is null;

@@ -212,7 +212,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Forge.Build
                 {
                     codeEmitter.Emit(currentPackage);
                     emittedPackages.Add(currentPackage);
-                    packagesToEmit.EnqueueRange(currentPackage.References.Values);
+                    packagesToEmit.EnqueueRange(currentPackage.References);
                 }
             }
 

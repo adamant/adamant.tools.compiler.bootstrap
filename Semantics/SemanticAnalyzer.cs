@@ -16,6 +16,7 @@ using Adamant.Tools.Compiler.Bootstrap.Semantics.ILGen;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Liveness;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Moves;
+using Adamant.Tools.Compiler.Bootstrap.Semantics.Namespaces;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Reachability;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes;
 using Adamant.Tools.Compiler.Bootstrap.Semantics.Shadowing;
@@ -46,7 +47,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             // If there are errors from the lex and parse phase, don't continue on
             diagnostics.ThrowIfFatalErrors();
 
-            BuildDeclarationScopes(packageSyntax, diagnostics);
+            NamespaceSymbolBuilder.BuildNamespaceSymbols(packageSyntax);
+
+            BuildNamespaceScopes(packageSyntax, diagnostics);
 
             var stringSymbol = BuildScopes(packageSyntax, diagnostics);
 
@@ -68,17 +71,18 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
 
             var entryPoint = DetermineEntryPoint(declarations, diagnostics);
 
-            return new Package(packageSyntax.Symbol, diagnostics.Build(), packageSyntax.References, declarations, entryPoint);
+            var references = packageSyntax.References.Values.ToFixedList();
+            return new Package(packageSyntax.SymbolTreeBuilder.Build(), diagnostics.Build(), references, declarations, entryPoint);
         }
 
         /// <summary>
         /// Build up lexical scopes down to the declaration level
         /// </summary>
-        private static void BuildDeclarationScopes(PackageSyntax packageSyntax, Diagnostics diagnostics)
+        private static void BuildNamespaceScopes(PackageSyntax packageSyntax, Diagnostics diagnostics)
         {
             var builder = new PackageLexicalScopesBuilder(diagnostics);
             // TODO can the references be part of the package syntax?
-            builder.BuildScopesFor(packageSyntax);
+            builder.BuildNamespaceScopesFor(packageSyntax);
 
             // TODO finish building declaration scopes
         }
