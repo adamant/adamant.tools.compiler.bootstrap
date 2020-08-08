@@ -131,7 +131,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IClassDeclarationSyntax : INonMemberEntityDeclarationSyntax
     {
         IMutableKeywordToken? MutableModifier { get; }
-        SimpleName Name { get; }
+        new SimpleName Name { get; }
         FixedList<IMemberDeclarationSyntax> Members { get; }
     }
 
@@ -141,7 +141,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         NamespaceName ImplicitNamespaceName { get; }
         FixedList<IUsingDirectiveSyntax> UsingDirectives { get; }
         FixedList<INonMemberDeclarationSyntax> Declarations { get; }
-        FixedList<IEntityDeclarationSyntax> EntityDeclarations { get; }
+        FixedList<IEntityDeclarationSyntax> AllEntityDeclarations { get; }
         FixedList<Diagnostic> Diagnostics { get; }
     }
 
@@ -196,6 +196,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IEntityDeclarationSyntax : IDeclarationSyntax
     {
         IAccessModifierToken? AccessModifier { get; }
+        Name? Name { get; }
     }
 
     public partial interface IExpressionStatementSyntax : IBodyStatementSyntax
@@ -337,7 +338,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
     public partial interface IMemberDeclarationSyntax : IEntityDeclarationSyntax
     {
         IClassDeclarationSyntax DeclaringClass { get; }
-        SimpleName Name { get; }
+        new SimpleName Name { get; }
     }
 
     [Closed(
@@ -399,6 +400,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(INonMemberEntityDeclarationSyntax))]
     public partial interface INonMemberDeclarationSyntax : IDeclarationSyntax
     {
+        NamespaceName ContainingNamespaceName { get; }
     }
 
     [Closed(

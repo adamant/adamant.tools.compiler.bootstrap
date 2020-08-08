@@ -13,13 +13,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 {
     internal class ClassDeclarationSyntax : DeclarationSyntax, IClassDeclarationSyntax
     {
+        public NamespaceName ContainingNamespaceName { get; }
         public IAccessModifierToken? AccessModifier { get; }
         public IMutableKeywordToken? MutableModifier { get; }
         public MaybeQualifiedName FullName { get; }
-
+        public Name? Name { get; }
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public SimpleName Name => FullName.UnqualifiedName;
+        SimpleName IClassDeclarationSyntax.Name => FullName.UnqualifiedName;
 
         public FixedList<IMemberDeclarationSyntax> Members { get; }
         public DataTypePromise DeclaresDataType { get; } = new DataTypePromise();
@@ -30,18 +31,22 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         DataType ITypeMetadata.DeclaresDataType => DeclaresDataType.Fulfilled();
 
         public ClassDeclarationSyntax(
+            NamespaceName containingNamespaceName,
             TextSpan headerSpan,
             CodeFile file,
             IAccessModifierToken? accessModifier,
             IMutableKeywordToken? mutableModifier,
             MaybeQualifiedName fullName,
             TextSpan nameSpan,
+            Name name,
             Func<IClassDeclarationSyntax, (FixedList<IMemberDeclarationSyntax>, TextSpan)> parseMembers)
             : base(headerSpan, file, nameSpan)
         {
+            ContainingNamespaceName = containingNamespaceName;
             AccessModifier = accessModifier;
             MutableModifier = mutableModifier;
             FullName = fullName;
+            Name = name;
             var (members, bodySpan) = parseMembers(this);
             Members = members;
             ChildMetadata = new MetadataSet(Members);

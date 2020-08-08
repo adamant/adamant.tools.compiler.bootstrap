@@ -23,7 +23,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
         {
             var packagesScope = BuildPackageScope(packageSyntax);
 
-            //var globalScope = new GlobalScope<Promise<Symbol?>>(packagesScope);
+
             // TODO finish building scopes
         }
 
@@ -35,9 +35,24 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
             return new PackagesScope(packageSyntax.Symbol, packageAliases);
         }
 
-        private static GlobalScope<Promise<Symbol?>> BuildGlobalScope(PackageSyntax packageSyntax)
+        private static GlobalScope<Promise<Symbol?>> BuildGlobalScope(PackageSyntax packageSyntax, PackagesScope _)
         {
-            //var globalSymbolsInReferences = packageSyntax.References.Values.SelectMany(p => p.SymbolTree.Children(p.Symbol));
+            var nonMemberEntityDeclarations = packageSyntax.CompilationUnits
+                                                           .SelectMany(cu => cu.AllEntityDeclarations)
+                                                           .OfType<INonMemberEntityDeclarationSyntax>().ToList();
+
+            var globalSymbolsInReferences = packageSyntax.References.Values
+                                                         .SelectMany(p => p.SymbolTree.Children(p.Symbol))
+                                                         .Where(s => !(s.Name is null))
+                                                         .Select(s => (s.Name!, Symbol: Promise.ForValue(s)));
+
+            //var globalSymbolsInPackage = nonMemberEntityDeclarations
+            //                             .Where(e => e.ContainingNamespaceName == NamespaceName.Global)
+            //                             .Select(e => (e.Name, e.Symbol));
+
+            //globalSymbolsInPackage.Concat(globalSymbolsInReferences).ToFixedList()
+
+            //var globalScope = new GlobalScope<Promise<Symbol?>>(packagesScope,);
 
             throw new NotImplementedException();
         }

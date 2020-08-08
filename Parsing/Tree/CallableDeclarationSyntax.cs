@@ -15,6 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal abstract class CallableDeclarationSyntax : DeclarationSyntax, ICallableDeclarationSyntax
     {
         public IAccessModifierToken? AccessModifier { get; }
+        public Name? Name { get; }
         public MaybeQualifiedName FullName { get; }
         private DataType? selfParameterType;
         [DisallowNull]
@@ -43,6 +44,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             IAccessModifierToken? accessModifier,
             MaybeQualifiedName fullName,
             TextSpan nameSpan,
+            Name? name,
             IEnumerable<IParameterSyntax> parameters,
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             MetadataSet childMetadata)
@@ -50,6 +52,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         {
             AccessModifier = accessModifier;
             FullName = fullName;
+            Name = name;
             Parameters = parameters.ToFixedList();
             ReachabilityAnnotations = reachabilityAnnotations;
             ChildMetadata = childMetadata;

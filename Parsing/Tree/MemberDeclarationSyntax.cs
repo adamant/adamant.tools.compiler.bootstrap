@@ -16,8 +16,8 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public SimpleName Name => FullName.UnqualifiedName;
-
+        SimpleName IMemberDeclarationSyntax.Name => FullName.UnqualifiedName;
+        public Name? Name { get; }
         public MetadataSet ChildMetadata { get; protected set; }
 
         protected MemberDeclarationSyntax(
@@ -27,12 +27,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             IAccessModifierToken? accessModifier,
             MaybeQualifiedName fullName,
             TextSpan nameSpan,
+            Name? name,
             MetadataSet? childSymbols = null)
             : base(span, file, nameSpan)
         {
             DeclaringClass = declaringClass;
             AccessModifier = accessModifier;
             FullName = fullName;
+            Name = name;
             ChildMetadata = childSymbols ?? MetadataSet.Empty;
         }
     }

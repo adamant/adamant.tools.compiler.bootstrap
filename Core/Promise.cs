@@ -11,6 +11,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
         private PromiseState State { get; set; }
         private T value = default!;
 
+        public Promise()
+        {
+            State = PromiseState.Pending;
+        }
+
+        public Promise(T value)
+        {
+            this.value = value;
+            State = PromiseState.Fulfilled;
+        }
+
         [DebuggerHidden]
         public void BeginFulfilling()
         {
@@ -48,12 +59,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
         }
 
         [DebuggerHidden]
-        public T Fulfilled()
+        public T Result
         {
-            if (State != PromiseState.Fulfilled)
-                throw new InvalidOperationException("Promise not fulfilled");
+            get
+            {
+                if (State != PromiseState.Fulfilled) throw new InvalidOperationException("Promise not fulfilled");
 
-            return value;
+                return value;
+            }
         }
 
         // Useful for debugging
@@ -72,6 +85,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.Core
                 case PromiseState.Fulfilled:
                     return value?.ToString() ?? "⧼null⧽";
             }
+        }
+    }
+
+    public static class Promise
+    {
+        public static Promise<T> ForValue<T>(T value)
+        {
+            return new Promise<T>(value);
         }
     }
 }

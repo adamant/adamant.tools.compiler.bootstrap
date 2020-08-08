@@ -19,12 +19,13 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             IAccessModifierToken? accessModifier,
             MaybeQualifiedName fullName,
             TextSpan nameSpan,
+            Name name,
             ISelfParameterSyntax selfParameter,
             FixedList<INamedParameterSyntax> parameters,
             ITypeSyntax? returnType,
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             IBodySyntax body)
-            : base(declaringClass, span, file, accessModifier, fullName, nameSpan, selfParameter,
+            : base(declaringClass, span, file, accessModifier, fullName, nameSpan, name, selfParameter,
                 parameters, returnType, reachabilityAnnotations,
                 GetChildMetadata(selfParameter, parameters, body))
         {

@@ -29,9 +29,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             bool mutableBinding,
             MaybeQualifiedName fullName,
             TextSpan nameSpan,
+            Name name,
             ITypeSyntax typeSyntax,
             IExpressionSyntax? initializer)
-            : base(declaringClass, span, file, accessModifier, fullName, nameSpan)
+            : base(declaringClass, span, file, accessModifier, fullName, nameSpan, name)
         {
             IsMutableBinding = mutableBinding;
             TypeSyntax = typeSyntax;

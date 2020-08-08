@@ -14,7 +14,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public NamespaceName ImplicitNamespaceName { get; }
         public FixedList<IUsingDirectiveSyntax> UsingDirectives { get; }
         public FixedList<INonMemberDeclarationSyntax> Declarations { get; }
-        public FixedList<IEntityDeclarationSyntax> EntityDeclarations { get; }
+        public FixedList<IEntityDeclarationSyntax> AllEntityDeclarations { get; }
         public FixedList<Diagnostic> Diagnostics { get; private set; }
 
         public CompilationUnitSyntax(
@@ -29,7 +29,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             ImplicitNamespaceName = implicitNamespaceName;
             UsingDirectives = usingDirectives;
             Declarations = declarations;
-            EntityDeclarations = GetEntityDeclarations(declarations).ToFixedList();
+            AllEntityDeclarations = GetEntityDeclarations(declarations).ToFixedList();
             Diagnostics = FixedList<Diagnostic>.Empty;
         }
 

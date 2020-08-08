@@ -15,7 +15,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
 
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public SimpleName Name => FullName.UnqualifiedName;
+        SimpleName IMemberDeclarationSyntax.Name => FullName.UnqualifiedName;
 
         public new FixedList<INamedParameterSyntax> Parameters { get; }
         public ITypeSyntax? ReturnType { get; }
@@ -29,11 +29,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             IAccessModifierToken? accessModifier,
             MaybeQualifiedName fullName,
             TextSpan nameSpan,
+            Name name,
             FixedList<INamedParameterSyntax> parameters,
             ITypeSyntax? returnTypeSyntax,
             FixedList<IReachabilityAnnotationSyntax> reachabilityAnnotations,
             IBodySyntax body)
-            : base(span, file, accessModifier, fullName, nameSpan, parameters,
+            : base(span, file, accessModifier, fullName, nameSpan, name, parameters,
                 reachabilityAnnotations, GetChildMetadata(null, parameters, body))
         {
             DeclaringClass = declaringClass;

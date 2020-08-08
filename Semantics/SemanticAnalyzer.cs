@@ -105,7 +105,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics
             PackageSyntax packageSyntax)
         {
             return packageSyntax.CompilationUnits
-                .SelectMany(cu => cu.EntityDeclarations)
+                .SelectMany(cu => cu.AllEntityDeclarations)
                 .ToFixedList();
         }
 
