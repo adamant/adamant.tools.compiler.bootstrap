@@ -9,12 +9,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Scopes
     /// <summary>
     /// A lexical scope allows for the lookup of an <see cref="IMetadata"/> by a name
     /// </summary>
-    public abstract class LexicalScope
+    public abstract class Scope
     {
         private readonly MetadataSet metadata;
         private readonly MetadataSet nestedMetadata;
 
-        protected LexicalScope(MetadataSet metadata, MetadataSet nestedMetadata)
+        protected Scope(MetadataSet metadata, MetadataSet nestedMetadata)
         {
             this.metadata = metadata;
             this.nestedMetadata = nestedMetadata;

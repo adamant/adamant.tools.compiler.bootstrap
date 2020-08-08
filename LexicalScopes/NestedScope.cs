@@ -6,11 +6,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.LexicalScopes
 {
     public class NestedScope<TSymbol> : LexicalScope<TSymbol>
     {
+        private readonly LexicalScope<TSymbol> containingScope;
+
         public NestedScope(
-            PackagesScope packagesScope,
+            LexicalScope<TSymbol> containingScope,
             FixedDictionary<TypeName, FixedList<TSymbol>> symbolsInScope,
             FixedDictionary<TypeName, FixedList<TSymbol>> symbolsInNestedScopes)
-            : base(packagesScope, symbolsInScope, symbolsInNestedScopes) { }
+            : base(containingScope.PackagesScope, symbolsInScope, symbolsInNestedScopes)
+        {
+            this.containingScope = containingScope;
+        }
 
         public override IEnumerable<TSymbol> LookupInGlobalScope(TypeName name)
         {

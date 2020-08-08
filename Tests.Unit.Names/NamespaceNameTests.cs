@@ -46,7 +46,10 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Names
 
             var expected = new[]
             {
-                Namespace("foo"), Namespace("foo", "bar"), Namespace("foo", "bar", "baz")
+                NamespaceName.Global,
+                Namespace("foo"),
+                Namespace("foo", "bar"),
+                Namespace("foo", "bar", "baz")
             };
             Assert.Equal(expected, names);
         }
@@ -58,7 +61,71 @@ namespace Adamant.Tools.Compiler.Bootstrap.Tests.Unit.Names
 
             var names = ns.NamespaceNames();
 
-            Assert.Empty(names);
+            var expected = new[]
+            {
+                NamespaceName.Global
+            };
+            Assert.Equal(expected, names);
+        }
+
+        [Fact]
+        public void Namespace_not_nested_in_itself()
+        {
+            var ns = Namespace("foo", "bar", "baz");
+
+            var isNested = ns.IsNestedIn(ns);
+
+            Assert.False(isNested);
+        }
+
+        [Fact]
+        public void Namespace_nested_in_global_namespace()
+        {
+            var ns = Namespace("foo", "bar", "baz");
+
+            var isNested = ns.IsNestedIn(NamespaceName.Global);
+
+            Assert.True(isNested);
+        }
+
+        [Fact]
+        public void Namespace_nested_in_containing_namespace()
+        {
+            var ns = Namespace("foo", "bar", "baz");
+
+            var isNested = ns.IsNestedIn(Namespace("foo", "bar"));
+
+            Assert.True(isNested);
+        }
+
+        [Fact]
+        public void Namespace_nested_in_containing_namespace_parent()
+        {
+            var ns = Namespace("foo", "bar", "baz");
+
+            var isNested = ns.IsNestedIn(Namespace("foo"));
+
+            Assert.True(isNested);
+        }
+
+        [Fact]
+        public void Namespace_not_nested_in_child()
+        {
+            var ns = Namespace("foo", "bar", "baz");
+
+            var isNested = ns.IsNestedIn(ns.Qualify("biff"));
+
+            Assert.False(isNested);
+        }
+
+        [Fact]
+        public void Equal_namespaces_have_same_hash_code()
+        {
+            var ns1 = Namespace("foo", "bar", "baz");
+            var ns2 = Namespace("foo", "bar", "baz");
+
+            Assert.Equal(ns1, ns2);
+            Assert.Equal(ns1.GetHashCode(), ns2.GetHashCode());
         }
 
         private static NamespaceName Namespace(params string[] segments)

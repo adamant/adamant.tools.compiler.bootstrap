@@ -27,16 +27,16 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic.InferredSyntax
             }
         }
 
-        private readonly LexicalScope containingScope;
+        private readonly Scope containingScope;
 
         [DisallowNull]
-        public LexicalScope? ContainingScope
+        public Scope? ContainingScope
         {
             get => containingScope;
             set => throw new InvalidOperationException("Can't set containing scope repeatedly");
         }
 
-        public CallableNameSyntax(TextSpan span, MaybeQualifiedName name, LexicalScope containingScope)
+        public CallableNameSyntax(TextSpan span, MaybeQualifiedName name, Scope containingScope)
         {
             Span = span;
             Name = name;

@@ -12,6 +12,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
     internal class FunctionDeclarationSyntax : CallableDeclarationSyntax, IFunctionDeclarationSyntax
     {
         public NamespaceName ContainingNamespaceName { get; }
+        public new Name Name { get; }
         public bool IsExternalFunction { [DebuggerStepThrough] get; [DebuggerStepThrough] set; }
         public ITypeSyntax? ReturnType { [DebuggerStepThrough] get; }
         public new FixedList<INamedParameterSyntax> Parameters { [DebuggerStepThrough] get; }
@@ -34,6 +35,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
                 reachabilityAnnotations, GetChildMetadata(null, parameters, body))
         {
             ContainingNamespaceName = containingNamespaceName;
+            Name = name;
             Parameters = parameters;
             ReturnType = returnType;
             Body = body;

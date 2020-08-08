@@ -29,9 +29,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
             }
         }
 
-        private LexicalScope? containingScope;
+        private Scope? containingScope;
         [DisallowNull]
-        public LexicalScope? ContainingScope
+        public Scope? ContainingScope
         {
             get => containingScope;
             set

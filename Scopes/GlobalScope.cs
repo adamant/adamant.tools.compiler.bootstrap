@@ -5,7 +5,7 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Scopes
 {
-    public class GlobalScope : LexicalScope
+    public class GlobalScope : Scope
     {
         public GlobalScope(IEnumerable<IMetadata> metadata, IEnumerable<IMetadata> nestedMetadata)
             : base(new MetadataSet(metadata), new MetadataSet(nestedMetadata))

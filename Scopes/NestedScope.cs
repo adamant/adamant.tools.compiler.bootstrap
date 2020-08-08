@@ -6,12 +6,12 @@ using Adamant.Tools.Compiler.Bootstrap.Names;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Scopes
 {
-    public class NestedScope : LexicalScope
+    public class NestedScope : Scope
     {
-        public LexicalScope ContainingScope { get; }
+        public Scope ContainingScope { get; }
 
         public NestedScope(
-            LexicalScope containingScope,
+            Scope containingScope,
             MetadataSet metadata,
             MetadataSet? nestedMetadata = null)
             : base(metadata, nestedMetadata ?? MetadataSet.Empty)
@@ -19,11 +19,11 @@ namespace Adamant.Tools.Compiler.Bootstrap.Scopes
             ContainingScope = containingScope;
         }
 
-        public NestedScope(LexicalScope containingScope, IEnumerable<IMetadata> symbols)
+        public NestedScope(Scope containingScope, IEnumerable<IMetadata> symbols)
             : this(containingScope, new MetadataSet(symbols), MetadataSet.Empty)
         { }
 
-        public NestedScope(LexicalScope containingScope, IMetadata symbol)
+        public NestedScope(Scope containingScope, IMetadata symbol)
             : this(containingScope, new MetadataSet(symbol.Yield()), MetadataSet.Empty)
         { }
 

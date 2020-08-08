@@ -11,7 +11,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.LexicalScopes
     /// </summary>
     public abstract class LexicalScope<TSymbol>
     {
-        private readonly PackagesScope packagesScope;
+        internal PackagesScope PackagesScope { get; }
         private readonly FixedDictionary<TypeName, FixedList<TSymbol>> symbolsInScope;
         private readonly FixedDictionary<TypeName, FixedList<TSymbol>> symbolsInNestedScopes;
 
@@ -20,14 +20,14 @@ namespace Adamant.Tools.Compiler.Bootstrap.LexicalScopes
             FixedDictionary<TypeName, FixedList<TSymbol>> symbolsInScope,
             FixedDictionary<TypeName, FixedList<TSymbol>> symbolsInNestedScopes)
         {
-            this.packagesScope = packagesScope;
+            this.PackagesScope = packagesScope;
             this.symbolsInScope = symbolsInScope;
             this.symbolsInNestedScopes = symbolsInNestedScopes;
         }
 
         public PackageSymbol LookupPackage(Name name)
         {
-            return packagesScope.LookupPackage(name);
+            return PackagesScope.LookupPackage(name);
         }
 
         public abstract IEnumerable<TSymbol> LookupInGlobalScope(TypeName name);

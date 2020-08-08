@@ -20,73 +20,67 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.LexicalScopes
 
         [SuppressMessage("Performance", "CA1822:Mark members as static",
             Justification = "OO")]
-        public void BuildNamespaceScopesFor(PackageSyntax packageSyntax)
+        public void BuildNamespaceScopesFor(PackageSyntax package)
         {
-            var packagesScope = BuildPackagesScope(packageSyntax);
-            var globalScope = BuildGlobalScope(packageSyntax, packagesScope);
+            var declarationSymbols = GetAllDeclarationSymbols(package);
+            var namespaces = BuildNamespaces(declarationSymbols);
+            var packagesScope = BuildPackagesScope(package);
+            var globalScope = BuildGlobalScope(packagesScope, namespaces[NamespaceName.Global]);
 
-            // TODO finish building scopes
+            foreach (var compilationUnit in package.CompilationUnits)
+            {
+                var builder = new NamespaceLexicalScopesBuilder(diagnostics, namespaces);
+                //new SyntaxScopesBuilder(compilationUnit.CodeFile, GlobalScope, namespaces, diagnostics);
+                builder.Walk(compilationUnit, globalScope);
+            }
         }
 
-        private static PackagesScope BuildPackagesScope(PackageSyntax packageSyntax)
+        private static FixedList<DeclarationSymbol> GetAllDeclarationSymbols(PackageSyntax package)
         {
-            var packageAliases = packageSyntax.References
+            var packageSymbols = package.CompilationUnits
+                                        .SelectMany(cu => cu.AllEntityDeclarations)
+                                        .OfType<INonMemberEntityDeclarationSyntax>()
+                                        .Select(d => new DeclarationSymbol(d));
+
+            // TODO it might be better to go to the declarations and get their symbols (once that is implemented)
+            var referencedSymbols = package.References.Values
+                                           .SelectMany(p => p.SymbolTree.Symbols)
+                                           .Where(s => s.ContainingSymbol is NamespaceOrPackageSymbol)
+                                           .Select(s => new DeclarationSymbol(s));
+            return packageSymbols.Concat(referencedSymbols).ToFixedList();
+        }
+
+        private static FixedDictionary<NamespaceName, Namespace> BuildNamespaces(
+            FixedList<DeclarationSymbol> declarationSymbols)
+        {
+            var namespaces = declarationSymbols.SelectMany(s => s.ContainingNamespace.NamespaceNames()).Distinct();
+            var nsSymbols = new List<Namespace>();
+            foreach (var ns in namespaces)
+            {
+                var symbols = ToDictionary(declarationSymbols.Where(s => s.ContainingNamespace == ns));
+                var nestedSymbols = ToDictionary(declarationSymbols.Where(s => s.ContainingNamespace.IsNestedIn(ns)));
+                nsSymbols.Add(new Namespace(ns, symbols, nestedSymbols));
+            }
+
+            return nsSymbols.ToFixedDictionary(ns => ns.Name);
+        }
+        private static PackagesScope BuildPackagesScope(PackageSyntax package)
+        {
+            var packageAliases = package.References
                                   .ToDictionary(p => p.Key, p => p.Value.Symbol)
                                   .ToFixedDictionary();
-            return new PackagesScope(packageSyntax.Symbol, packageAliases);
+            return new PackagesScope(package.Symbol, packageAliases);
         }
 
-        private static GlobalScope<Promise<Symbol?>> BuildGlobalScope(PackageSyntax packageSyntax, PackagesScope packagesScope)
+        private static GlobalScope<Promise<Symbol?>> BuildGlobalScope(
+            PackagesScope packagesScope,
+            Namespace globalNamespace)
         {
-            var nonMemberEntityDeclarations = packageSyntax.CompilationUnits
-                                                           .SelectMany(cu => cu.AllEntityDeclarations)
-                                                           .OfType<INonMemberEntityDeclarationSyntax>().ToList();
-
-            var globalSymbols = GlobalSymbols(packageSyntax, nonMemberEntityDeclarations);
-            var nonGlobalSymbols = NonGlobalSymbols(packageSyntax, nonMemberEntityDeclarations);
-            return new GlobalScope<Promise<Symbol?>>(packagesScope, globalSymbols, nonGlobalSymbols);
-        }
-
-        private static FixedDictionary<TypeName, FixedList<Promise<Symbol?>>> GlobalSymbols(
-            PackageSyntax packageSyntax,
-            IEnumerable<INonMemberEntityDeclarationSyntax> nonMemberEntityDeclarations)
-        {
-            var symbolsInPackage = GetNameAndSymbol(nonMemberEntityDeclarations
-                                    .Where(e => e.ContainingNamespaceName == NamespaceName.Global));
-
-            var symbolsInReferences = GetNameAndSymbol(packageSyntax.References.Values
-                                    .SelectMany(p => p.SymbolTree.Children(p.Symbol)));
-
-            return ToDictionary(symbolsInPackage.Concat(symbolsInReferences));
-        }
-
-        private static FixedDictionary<TypeName, FixedList<Promise<Symbol?>>> NonGlobalSymbols(
-            PackageSyntax packageSyntax,
-            List<INonMemberEntityDeclarationSyntax> nonMemberEntityDeclarations)
-        {
-            var symbolsInPackage = GetNameAndSymbol(nonMemberEntityDeclarations
-                                    .Where(e => e.ContainingNamespaceName != NamespaceName.Global));
-
-            var symbolsInReferences = GetNameAndSymbol(packageSyntax.References.Values
-                                    .SelectMany(p => p.SymbolTree.Symbols)
-                                    .Where(s => s.ContainingSymbol is NamespaceSymbol));
-
-            return ToDictionary(symbolsInPackage.Concat(symbolsInReferences));
-        }
-
-        private static IEnumerable<NameAndSymbol> GetNameAndSymbol(
-            IEnumerable<INonMemberEntityDeclarationSyntax> syntax)
-        {
-            return syntax.Where(s => !(s.Name is null)).Select(s => new NameAndSymbol(s.Name!, s.Symbol));
-        }
-
-        private static IEnumerable<NameAndSymbol> GetNameAndSymbol(IEnumerable<Symbol> symbols)
-        {
-            return symbols.Where(s => !(s.Name is null)).Select(s => new NameAndSymbol(s.Name!, s));
+            return new GlobalScope<Promise<Symbol?>>(packagesScope, globalNamespace.Symbols, globalNamespace.NestedSymbols);
         }
 
         private static FixedDictionary<TypeName, FixedList<Promise<Symbol?>>> ToDictionary(
-            IEnumerable<NameAndSymbol> symbols)
+            IEnumerable<DeclarationSymbol> symbols)
         {
             return symbols.GroupBy(s => s.Name, s => s.Symbol)
                           .ToFixedDictionary(e => e.Key, e => e.ToFixedList());

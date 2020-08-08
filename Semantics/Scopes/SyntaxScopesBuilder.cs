@@ -12,7 +12,7 @@ using ExhaustiveMatching;
 
 namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
 {
-    internal class SyntaxScopesBuilder : SyntaxWalker<LexicalScope>
+    internal class SyntaxScopesBuilder : SyntaxWalker<Scope>
     {
         private readonly CodeFile file;
         private readonly GlobalScope globalScope;
@@ -31,7 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
             this.diagnostics = diagnostics;
         }
 
-        protected override void WalkNonNull(ISyntax syntax, LexicalScope containingScope)
+        protected override void WalkNonNull(ISyntax syntax, Scope containingScope)
         {
             switch (syntax)
             {
@@ -96,7 +96,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
             WalkChildren(syntax, containingScope);
         }
 
-        private LexicalScope BuildNamespaceScopes(RootName nsName, LexicalScope containingScope)
+        private Scope BuildNamespaceScopes(RootName nsName, Scope containingScope)
         {
             MaybeQualifiedName name;
             switch (nsName)
@@ -119,9 +119,9 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
             return new NestedScope(containingScope, @namespace.ChildMetadata, @namespace.NestedSymbols);
         }
 
-        private LexicalScope BuildUsingDirectivesScope(
+        private Scope BuildUsingDirectivesScope(
             FixedList<IUsingDirectiveSyntax> usingDirectives,
-            LexicalScope containingScope)
+            Scope containingScope)
         {
             if (!usingDirectives.Any()) return containingScope;
 
@@ -141,17 +141,17 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Scopes
             return new NestedScope(containingScope, importedSymbols);
         }
 
-        private static LexicalScope BuildBodyScope(
+        private static Scope BuildBodyScope(
             IEnumerable<IParameterSyntax> parameters,
-            LexicalScope containingScope)
+            Scope containingScope)
         {
             return new NestedScope(containingScope, parameters);
         }
 
-        private static LexicalScope BuildBodyScope(
+        private static Scope BuildBodyScope(
             ISelfParameterSyntax selfParameter,
             IEnumerable<IParameterSyntax> parameters,
-            LexicalScope containingScope)
+            Scope containingScope)
         {
             return new NestedScope(containingScope, parameters.Prepend(selfParameter));
         }

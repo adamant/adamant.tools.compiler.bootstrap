@@ -8,7 +8,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Semantics.Basic
 {
     internal static class LexicalScopeExtensions
     {
-        public static ITypeMetadata GetMetadataForType(this LexicalScope containingScope, DataType type)
+        public static ITypeMetadata GetMetadataForType(this Scope containingScope, DataType type)
         {
             return type switch
             {

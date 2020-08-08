@@ -17,7 +17,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Parsing.Tree
         public IAccessModifierToken? AccessModifier { get; }
         public IMutableKeywordToken? MutableModifier { get; }
         public MaybeQualifiedName FullName { get; }
-        public Name? Name { get; }
+        public Name Name { get; }
         [DebuggerHidden]
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         SimpleName IClassDeclarationSyntax.Name => FullName.UnqualifiedName;

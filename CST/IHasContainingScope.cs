@@ -5,6 +5,6 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
 {
     public interface IHasContainingScope
     {
-        [DisallowNull] LexicalScope? ContainingScope { get; set; }
+        [DisallowNull] Scope? ContainingScope { get; set; }
     }
 }

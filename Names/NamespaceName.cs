@@ -31,6 +31,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
 
         public IEnumerable<NamespaceName> NamespaceNames()
         {
+            yield return Global;
             for (int n = 1; n <= Segments.Count; n++)
                 yield return new NamespaceName(Segments.Take(n));
         }
@@ -91,6 +92,12 @@ namespace Adamant.Tools.Compiler.Bootstrap.Names
         public static implicit operator NamespaceName(string text)
         {
             return new NamespaceName(text);
+        }
+
+        public bool IsNestedIn(NamespaceName ns)
+        {
+            return ns.Segments.Count < Segments.Count
+                   && ns.Segments.SequenceEqual(Segments.Take(ns.Segments.Count));
         }
     }
 }

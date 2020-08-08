@@ -408,6 +408,7 @@ namespace Adamant.Tools.Compiler.Bootstrap.CST
         typeof(IFunctionDeclarationSyntax))]
     public partial interface INonMemberEntityDeclarationSyntax : IEntityDeclarationSyntax, INonMemberDeclarationSyntax
     {
+        new Name Name { get; }
     }
 
     public partial interface IOptionalTypeSyntax : ITypeSyntax

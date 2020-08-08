@@ -70,7 +70,7 @@ NewObjectExpression: Expression = TypeSyntax:TypeName ConstructorName:CallableNa
 NextExpression: Expression;
 NoneLiteralExpression: LiteralExpression;
 NonMemberDeclaration: Declaration = ContainingNamespaceName:NamespaceName;
-NonMemberEntityDeclaration: EntityDeclaration, NonMemberDeclaration;
+NonMemberEntityDeclaration: EntityDeclaration, NonMemberDeclaration = Name;
 OptionalType: Type = Referent:Type;
 Parameter: 'ISyntax', IBindingMetadata = Name:SimpleName Unused:bool DataType:DataTypePromise;
 ReachabilityAnnotation;
